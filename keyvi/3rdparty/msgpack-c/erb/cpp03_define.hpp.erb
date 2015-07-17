@@ -15,88 +15,73 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-#ifndef MSGPACK_CPP03_DEFINE_ARRAY_HPP
-#define MSGPACK_CPP03_DEFINE_ARRAY_HPP
+#ifndef MSGPACK_CPP03_DEFINE_HPP
+#define MSGPACK_CPP03_DEFINE_HPP
 
 #include "msgpack/versioning.hpp"
-#include "msgpack/adaptor/msgpack_tuple.hpp"
-#include "msgpack/adaptor/adaptor_base.hpp"
+#include "msgpack/adaptor/msgpack_tuple_fwd.hpp"
+#include "msgpack/adaptor/int_fwd.hpp"
 #include "msgpack/object_fwd.hpp"
 
-#define MSGPACK_DEFINE_ARRAY(...) \
+#define MSGPACK_DEFINE(...) \
     template <typename Packer> \
     void msgpack_pack(Packer& pk) const \
     { \
-        msgpack::type::make_define_array(__VA_ARGS__).msgpack_pack(pk); \
+        msgpack::type::make_define(__VA_ARGS__).msgpack_pack(pk); \
     } \
     void msgpack_unpack(msgpack::object const& o) \
     { \
-        msgpack::type::make_define_array(__VA_ARGS__).msgpack_unpack(o); \
+        msgpack::type::make_define(__VA_ARGS__).msgpack_unpack(o); \
     }\
     template <typename MSGPACK_OBJECT> \
     void msgpack_object(MSGPACK_OBJECT* o, msgpack::zone& z) const \
     { \
-        msgpack::type::make_define_array(__VA_ARGS__).msgpack_object(o, z); \
+        msgpack::type::make_define(__VA_ARGS__).msgpack_object(o, z); \
     }
 
-#define MSGPACK_BASE_ARRAY(base) (*const_cast<base *>(static_cast<base const*>(this)))
-
 // MSGPACK_ADD_ENUM must be used in the global namespace.
-#define MSGPACK_ADD_ENUM(enum_name) \
+#define MSGPACK_ADD_ENUM(enum) \
   namespace msgpack { \
-  /** @cond */ \
   MSGPACK_API_VERSION_NAMESPACE(v1) { \
-  /** @endcond */ \
-  namespace adaptor { \
-    template<> \
-    struct convert<enum_name> { \
-      msgpack::object const& operator()(msgpack::object const& o, enum_name& v) const {\
-        int tmp; \
-        o >> tmp; \
-        v = static_cast<enum_name>(tmp); \
-        return o; \
-      } \
-    }; \
-    template<> \
-    struct object<enum_name> { \
-      void operator()(msgpack::object& o, const enum_name& v) const {\
-        o << static_cast<int>(v); \
-      } \
-    }; \
-    template<> \
-    struct object_with_zone<enum_name> { \
-      void operator()(msgpack::object::with_zone& o, const enum_name& v) const { \
-        o << static_cast<int>(v); \
-      } \
-    }; \
-    template<> \
-    struct pack<enum_name> { \
+    inline msgpack::object const& operator>> (msgpack::object const& o, enum& v) \
+    { \
+      int tmp; \
+      o >> tmp; \
+      v = static_cast<enum>(tmp); \
+      return o; \
+    } \
+    inline void operator<< (msgpack::object& o, const enum& v) \
+    { \
+      o << static_cast<int>(v); \
+    } \
+    inline void operator<< (msgpack::object::with_zone& o, const enum& v) \
+    { \
+      o << static_cast<int>(v); \
+    } \
+    namespace detail { \
       template <typename Stream> \
-      msgpack::packer<Stream>& operator()(msgpack::packer<Stream>& o, const enum_name& v) const { \
-        return o << static_cast<int>(v); \
-      } \
-    }; \
+      struct packer_serializer<Stream, enum> { \
+        static msgpack::packer<Stream>& pack(msgpack::packer<Stream>& o, const enum& v) { \
+          return o << static_cast<int>(v); \
+        } \
+      }; \
+    } \
   } \
-  /** @cond */ \
-  } \
-  /** @endcond */ \
   }
 
 namespace msgpack {
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
 namespace type {
 
-/// @cond
+
 <% GENERATION_LIMIT = 31 %>
 template <typename A0 = void<%1.upto(GENERATION_LIMIT+1) {|i|%>, typename A<%=i%> = void<%}%>>
-struct define_array;
-/// @endcond
+struct define;
+
 
 template <>
-struct define_array<> {
-    typedef define_array<> value_type;
+struct define<> {
+    typedef define<> value_type;
     typedef tuple<> tuple_type;
     template <typename Packer>
     void msgpack_pack(Packer& pk) const
@@ -114,14 +99,12 @@ struct define_array<> {
         o->via.array.size = 0;
     }
 };
-
-/// @cond
 <%0.upto(GENERATION_LIMIT) {|i|%>
 template <typename A0<%1.upto(i) {|j|%>, typename A<%=j%><%}%>>
-struct define_array<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>> {
-    typedef define_array<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>> value_type;
+struct define<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>> {
+    typedef define<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>> value_type;
     typedef tuple<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>> tuple_type;
-    define_array(A0& _a0<%1.upto(i) {|j|%>, A<%=j%>& _a<%=j%><%}%>) :
+    define(A0& _a0<%1.upto(i) {|j|%>, A<%=j%>& _a<%=j%><%}%>) :
         a0(_a0)<%1.upto(i) {|j|%>, a<%=j%>(_a<%=j%>)<%}%> {}
     template <typename Packer>
     void msgpack_pack(Packer& pk) const
@@ -154,28 +137,22 @@ struct define_array<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>> {
     A<%=j%>& a<%=j%>;<%}%>
 };
 <%}%>
-/// @endcond
 
-inline define_array<> make_define_array()
+inline define<> make_define()
 {
-    return define_array<>();
+    return define<>();
 }
-
-/// @cond
 <%0.upto(GENERATION_LIMIT) {|i|%>
 template <typename A0<%1.upto(i) {|j|%>, typename A<%=j%><%}%>>
-inline define_array<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>> make_define_array(A0& a0<%1.upto(i) {|j|%>, A<%=j%>& a<%=j%><%}%>)
+define<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>> make_define(A0& a0<%1.upto(i) {|j|%>, A<%=j%>& a<%=j%><%}%>)
 {
-    return define_array<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>>(a0<%1.upto(i) {|j|%>, a<%=j%><%}%>);
+    return define<A0<%1.upto(i) {|j|%>, A<%=j%><%}%>>(a0<%1.upto(i) {|j|%>, a<%=j%><%}%>);
 }
 <%}%>
-/// @endcond
 
 }  // namespace type
-/// @cond
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
 }  // namespace msgpack
 
 
-#endif // MSGPACK_CPP03_DEFINE_ARRAY_HPP
+#endif // MSGPACK_CPP03_DEFINE_HPP

@@ -97,9 +97,6 @@ static int msgpack_pack_map(msgpack_packer* pk, size_t n);
 static int msgpack_pack_str(msgpack_packer* pk, size_t l);
 static int msgpack_pack_str_body(msgpack_packer* pk, const void* b, size_t l);
 
-static int msgpack_pack_v4raw(msgpack_packer* pk, size_t l);
-static int msgpack_pack_v4raw_body(msgpack_packer* pk, const void* b, size_t l);
-
 static int msgpack_pack_bin(msgpack_packer* pk, size_t l);
 static int msgpack_pack_bin_body(msgpack_packer* pk, const void* b, size_t l);
 
@@ -153,3 +150,4 @@ inline void msgpack_packer_free(msgpack_packer* pk)
 #endif
 
 #endif /* msgpack/pack.h */
+

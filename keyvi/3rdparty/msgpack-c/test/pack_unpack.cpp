@@ -50,6 +50,8 @@ TEST(pack, myclass)
 }
 
 
+#if !defined(MSGPACK_USE_CPP03)
+
 TEST(unpack, int_ret_no_offset_no_ref)
 {
     msgpack::sbuffer sbuf;
@@ -94,6 +96,8 @@ TEST(unpack, int_ret_offset_ref)
     EXPECT_EQ(false, referenced);
     EXPECT_EQ(off, sbuf.size());
 }
+
+#endif // !defined(MSGPACK_USE_CPP03)
 
 
 TEST(unpack, int_no_offset_no_ref)
@@ -285,35 +289,4 @@ TEST(unpack, sequence)
     EXPECT_EQ(3, msg.get().as<int>());
 
     EXPECT_EQ(off, sbuf.size());
-}
-
-
-TEST(unpack, convert_to_object_handle)
-{
-    msgpack::sbuffer sbuf;
-    msgpack::pack(sbuf, 1);
-    msgpack::unpacked msg;
-
-    msgpack::unpack(msg, sbuf.data(), sbuf.size());
-    msgpack::object_handle oh(msgpack::move(msg));
-    EXPECT_EQ(1, oh.get().as<int>());
-
-}
-
-TEST(unpack, convert_to_object_handle_direct)
-{
-    msgpack::sbuffer sbuf;
-    msgpack::pack(sbuf, 1);
-    msgpack::object_handle oh(msgpack::unpack(sbuf.data(), sbuf.size()));
-    EXPECT_EQ(1, oh.get().as<int>());
-
-}
-
-TEST(unpack, convert_to_object_handle_direct_implicit)
-{
-    msgpack::sbuffer sbuf;
-    msgpack::pack(sbuf, 1);
-    msgpack::object_handle oh = msgpack::unpack(sbuf.data(), sbuf.size());
-    EXPECT_EQ(1, oh.get().as<int>());
-
 }

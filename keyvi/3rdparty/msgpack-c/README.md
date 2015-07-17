@@ -1,7 +1,7 @@
 `msgpack` for C/C++
 ===================
 
-Version 1.1.0 [![Build Status](https://travis-ci.org/msgpack/msgpack-c.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-c) [![Build status](https://ci.appveyor.com/api/projects/status/8kstcgt79qj123mw/branch/master?svg=true)](https://ci.appveyor.com/project/redboltz/msgpack-c/branch/master)
+Version 1.0.1 [![Build Status](https://travis-ci.org/msgpack/msgpack-c.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-c)
 
 It's like JSON but small and fast.
 
@@ -201,7 +201,7 @@ the binaries:' text box.
 ### Documentation
 
 You can get addtional information on the
-[wiki](https://github.com/msgpack/msgpack-c/wiki).
+[wiki](https://github.com/msgpack/msgpack-c/wiki/).
 
 Contributing
 ------------

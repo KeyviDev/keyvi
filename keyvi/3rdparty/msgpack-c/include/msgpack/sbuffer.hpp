@@ -28,9 +28,7 @@
 
 namespace msgpack {
 
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
 
 class sbuffer {
 public:
@@ -129,9 +127,7 @@ private:
     size_t m_alloc;
 };
 
-/// @cond
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
 
 }  // namespace msgpack
 

@@ -1,4 +1,4 @@
-#include <msgpack.hpp>
+#include <msgpack_fwd.hpp>
 #include <gtest/gtest.h>
 #include <cmath>
 
@@ -38,6 +38,9 @@ MSGPACK_ADD_ENUM(outer_enum_class::enum_class_test);
 
 #endif // !defined(MSGPACK_USE_CPP03)
 
+
+
+#include <msgpack.hpp>
 
 
 using namespace std;
@@ -677,83 +680,6 @@ TEST(object_with_zone, construct_enum_outer)
     EXPECT_EQ(elem, obj.via.u64);
 }
 
-// User defined inheriting classes
-struct top {
-    int t;
-    MSGPACK_DEFINE(t);
-};
-
-struct mid1 : top {
-    int m1;
-    MSGPACK_DEFINE(MSGPACK_BASE(top), m1);
-};
-
-struct mid2 : top {
-    int m2;
-    MSGPACK_DEFINE(m2, MSGPACK_BASE(top));
-};
-
-struct bottom : mid1, mid2 {
-    int b;
-    MSGPACK_DEFINE(MSGPACK_BASE(mid1), MSGPACK_BASE(mid2), b);
-};
-
-TEST(object_with_zone, user_defined_non_virtual)
-{
-    bottom b;
-    b.b = 1;
-    b.m1 = 2;
-    b.m2 = 3;
-    b.mid1::t = 4;
-    b.mid2::t = 5;
-
-    msgpack::zone z;
-    msgpack::object obj(b, z);
-    bottom br = obj.as<bottom>();
-    EXPECT_EQ(b.b, br.b);
-    EXPECT_EQ(b.m1, br.m1);
-    EXPECT_EQ(b.m2, br.m2);
-    EXPECT_EQ(b.mid1::t, br.mid1::t);
-    EXPECT_EQ(b.mid2::t, br.mid2::t);
-}
-
-struct v_top {
-    int t;
-    MSGPACK_DEFINE(t);
-};
-
-struct v_mid1 : virtual v_top {
-    int m1;
-    MSGPACK_DEFINE(m1);
-};
-
-struct v_mid2 : virtual v_top {
-    int m2;
-    MSGPACK_DEFINE(m2);
-};
-
-struct v_bottom : v_mid1, v_mid2 {
-    int b;
-    MSGPACK_DEFINE(MSGPACK_BASE(v_mid1), MSGPACK_BASE(v_mid2), MSGPACK_BASE(v_top), b);
-};
-
-TEST(object_with_zone, user_defined_virtual)
-{
-    v_bottom b;
-    b.b = 1;
-    b.m1 = 2;
-    b.m2 = 3;
-    b.t = 4;
-
-    msgpack::zone z;
-    msgpack::object obj(b, z);
-    v_bottom br = obj.as<v_bottom>();
-    EXPECT_EQ(b.b, br.b);
-    EXPECT_EQ(b.m1, br.m1);
-    EXPECT_EQ(b.m2, br.m2);
-    EXPECT_EQ(b.t, br.t);
-}
-
 #if !defined(MSGPACK_USE_CPP03)
 
 TEST(object_with_zone, construct_enum_outer_newstyle)
@@ -863,52 +789,4 @@ TEST(object_with_zone, tuple_empty)
     EXPECT_EQ(obj.as<test_t>(), v);
 }
 
-#endif // !defined(MSGPACK_USE_CPP03)
-
-TEST(object_with_zone, ext_empty)
-{
-    msgpack::type::ext v;
-    msgpack::zone z;
-    msgpack::object obj(v, z);
-    EXPECT_EQ(obj.as<msgpack::type::ext>(), v);
-    EXPECT_EQ(obj.as<msgpack::type::ext_ref>(), v);
-}
-
-TEST(object_with_zone, ext)
-{
-    msgpack::type::ext v(42, 10);
-    for (int i = 0; i < 10; ++i) v.data()[i] = i;
-    msgpack::zone z;
-    msgpack::object obj(v, z);
-    EXPECT_EQ(obj.as<msgpack::type::ext>(), v);
-    EXPECT_EQ(obj.as<msgpack::type::ext_ref>(), v);
-}
-
-TEST(object_with_zone, ext_from_buf)
-{
-    char const buf[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    msgpack::type::ext v(42, buf, sizeof(buf));
-    msgpack::zone z;
-    msgpack::object obj(v, z);
-    EXPECT_EQ(obj.as<msgpack::type::ext>(), v);
-    EXPECT_EQ(obj.as<msgpack::type::ext_ref>(), v);
-}
-
-TEST(object_with_zone, ext_ref_empty)
-{
-    msgpack::type::ext_ref v;
-    msgpack::zone z;
-    msgpack::object obj(v, z);
-    EXPECT_EQ(obj.as<msgpack::type::ext>(), v);
-    EXPECT_EQ(obj.as<msgpack::type::ext_ref>(), v);
-}
-
-TEST(object_with_zone, ext_ref_from_buf)
-{
-    char const buf[] = { 77, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    msgpack::type::ext_ref v(buf, sizeof(buf));
-    msgpack::zone z;
-    msgpack::object obj(v, z);
-    EXPECT_EQ(obj.as<msgpack::type::ext>(), v);
-    EXPECT_EQ(obj.as<msgpack::type::ext_ref>(), v);
-}
+#endif

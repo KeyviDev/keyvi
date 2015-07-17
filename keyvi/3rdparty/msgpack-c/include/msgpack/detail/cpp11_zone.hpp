@@ -36,9 +36,7 @@
 
 namespace msgpack {
 
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
 
 class zone {
 private:
@@ -97,6 +95,7 @@ private:
 
             ++m_tail;
         }
+#if !defined(MSGPACK_USE_CPP03)
         finalizer_array(finalizer_array&& other) noexcept
             :m_tail(other.m_tail), m_end(other.m_end), m_array(other.m_array)
         {
@@ -110,7 +109,7 @@ private:
             new (this) finalizer_array(std::move(other));
             return *this;
         }
-
+#endif
         finalizer* m_tail;
         finalizer* m_end;
         finalizer* m_array;
@@ -161,6 +160,7 @@ private:
             m_free = chunk_size;
             m_ptr  = reinterpret_cast<char*>(m_head) + sizeof(chunk);
         }
+#if !defined(MSGPACK_USE_CPP03)
         chunk_list(chunk_list&& other) noexcept
             :m_free(other.m_free), m_ptr(other.m_ptr), m_head(other.m_head)
         {
@@ -172,7 +172,7 @@ private:
             new (this) chunk_list(std::move(other));
             return *this;
         }
-
+#endif
         size_t m_free;
         char* m_ptr;
         chunk* m_head;
@@ -201,21 +201,21 @@ public:
     void swap(zone& o);
 
 
-    static void* operator new(std::size_t size)
+    static void* operator new(std::size_t size) throw(std::bad_alloc)
     {
         void* p = ::malloc(size);
         if (!p) throw std::bad_alloc();
         return p;
     }
-    static void operator delete(void *p) noexcept
+    static void operator delete(void *p) throw()
     {
         ::free(p);
     }
-    static void* operator new(std::size_t /*size*/, void* mem) noexcept
+    static void* operator new(std::size_t /*size*/, void* mem) throw()
     {
         return mem;
     }
-    static void operator delete(void * /*p*/, void* /*mem*/) noexcept
+    static void operator delete(void * /*p*/, void* /*mem*/) throw()
     {
     }
 
@@ -361,15 +361,7 @@ T* zone::allocate(Args... args)
     }
 }
 
-inline std::size_t aligned_size(
-    std::size_t size,
-    std::size_t align = MSGPACK_ZONE_ALIGN) {
-    return (size + align - 1) / align * align;
-}
-
-/// @cond
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
 
 }  // namespace msgpack
 
