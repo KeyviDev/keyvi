@@ -21,42 +21,18 @@
 #include <sstream>
 #include <cassert>
 
-#if 0 // When you want to adapt map instead of array, you can enable these macro definition.
-#define MSGPACK_USE_DEFINE_MAP
-#define MSGPACK_USE_BOOST
-#endif
+// msgpack.hpp is also ok
+#include <msgpack_fwd.hpp>
 
-#include <msgpack.hpp>
 
-struct my_base1 {
-    int a;
-    MSGPACK_DEFINE(a);
-};
-inline bool operator==(my_base1 const& lhs, my_base1 const& rhs) {
-    return lhs.a == rhs.a;
-}
-
-struct my_base2 {
-    std::string b;
-    std::string c;
-    MSGPACK_DEFINE(b, c);
-};
-inline bool operator==(my_base2 const& lhs, my_base2 const& rhs) {
-    return lhs.b == rhs.b && lhs.c == rhs.c;
-}
-
-class my_class : public my_base1, private my_base2 {
+class my_class {
 public:
     my_class() {} // When you want to convert from msgpack::object to my_class,
                   // my_class should be default constractible.
     my_class(std::string const& name, int age):name_(name), age_(age) {}
-    void set_b(std::string const& str) { b = str; }
-    void set_c(std::string const& str) { c = str; }
+
     friend bool operator==(my_class const& lhs, my_class const& rhs) {
-        return
-            static_cast<my_base1 const&>(lhs) == static_cast<my_base1 const&>(rhs) &&
-            static_cast<my_base2 const&>(lhs) == static_cast<my_base2 const&>(rhs) &&
-            lhs.name_ == rhs.name_ && lhs.age_ == rhs.age_;
+        return lhs.name_ == rhs.name_ && lhs.age_ == rhs.age_;
     }
 
 private:
@@ -64,7 +40,7 @@ private:
     int age_;
 
 public:
-    MSGPACK_DEFINE(name_, age_, MSGPACK_BASE(my_base1), MSGPACK_BASE(my_base2));
+    MSGPACK_DEFINE(name_, age_);
 };
 
 void print(std::string const& buf) {
@@ -81,12 +57,11 @@ void print(std::string const& buf) {
     std::cout << std::dec << std::endl;
 }
 
+#include <msgpack.hpp>
+
 int main() {
     {   // pack, unpack
         my_class my("John Smith", 42);
-        my.a = 123;
-        my.set_b("ABC");
-        my.set_c("DEF");
         std::stringstream ss;
         msgpack::pack(ss, my);
 
@@ -100,8 +75,6 @@ int main() {
     }
     {   // create object with zone
         my_class my("John Smith", 42);
-        my.set_b("ABC");
-        my.set_c("DEF");
         msgpack::zone z;
         msgpack::object obj(my, z);
         std::cout << obj << std::endl;

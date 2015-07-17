@@ -23,9 +23,7 @@
 
 namespace msgpack {
 
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
 
 struct container_size_overflow : public std::runtime_error {
     explicit container_size_overflow(const std::string& msg)
@@ -44,17 +42,7 @@ inline void check_container_size(std::size_t size) {
 }
 
 template <>
-inline void check_container_size<4>(std::size_t /*size*/) {
-}
-
-template <std::size_t N>
-inline void check_container_size_for_ext(std::size_t size) {
-    if (size > 0xffffffff) throw container_size_overflow("container size overflow");
-}
-
-template <>
-inline void check_container_size_for_ext<4>(std::size_t size) {
-    if (size > 0xfffffffe) throw container_size_overflow("container size overflow");
+inline void check_container_size<4>(std::size_t size) {
 }
 
 } // namespace detail
@@ -66,9 +54,7 @@ inline uint32_t checked_get_container_size(T size) {
 }
 
 
-/// @cond
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
 
 }  // namespace msgpack
 

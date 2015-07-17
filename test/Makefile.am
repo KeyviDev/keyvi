@@ -23,17 +23,10 @@ check_PROGRAMS = \
 		msgpack_stream \
 		msgpack_vref \
 		msgpack_cpp11 \
-		multi_file \
 		reference_cpp11 \
 		reference \
 		limit \
-		json \
-		raw \
-		user_class \
-		iterator_cpp11 \
-		boost_fusion \
-		boost_optional \
-		boost_string_ref
+		iterator_cpp11
 
 TESTS = $(check_PROGRAMS)
 
@@ -84,20 +77,6 @@ reference_cpp11_SOURCES = reference_cpp11.cpp
 
 limit_SOURCES = limit.cpp
 
-json_SOURCES = json.cpp
-
-raw_SOURCES = raw.cpp
-
-user_class_SOURCES = user_class.cpp
-
 iterator_cpp11_SOURCES = iterator_cpp11.cpp
-
-multi_file_SOURCES = multi_file1.cpp multi_file2.cpp
-
-boost_fusion_SOURCES = boost_fusion.cpp
-
-boost_optional_SOURCES = boost_optional.cpp
-
-boost_string_ref_SOURCES = boost_string_ref.cpp
 
 EXTRA_DIST = cases.mpac cases_compact.mpac

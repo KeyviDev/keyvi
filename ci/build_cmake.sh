@@ -18,33 +18,20 @@ fi
 
 if [ $1 = "cpp11" ]
 then
-    cpp11="-DMSGPACK_CXX11=ON"
+    if [ $2 = "32" ]
+    then
+        cmake -DMSGPACK_CXX11=ON -DMSGPACK_32BIT=ON ..
+    else
+        cmake -DMSGPACK_CXX11=ON ..
+    fi
 else
-    cpp11=""
+    if [ $2 = "32" ]
+    then
+        cmake -DMSGPACK_32BIT=ON ..
+    else
+        cmake ..
+    fi
 fi
-
-if [ $2 = "32" ]
-then
-    bit32="-DMSGPACK_32BIT=ON"
-else
-    bit32=""
-fi
-
-if [ $3 = "boost" ]
-then
-    boost="-DMSGPACK_BOOST=ON"
-else
-    boost=""
-fi
-
-if [ "$4" != "" ]
-then
-    boost_dir="-DMSGPACK_BOOST_DIR=$4"
-else
-    boost_dir=""
-fi
-
-cmake $cpp11 $bit32 $boost $boost_dir ..
 
 ret=$?
 if [ $ret -ne 0 ]
@@ -76,7 +63,7 @@ then
     exit $ret
 fi
 
-if [ "$2" != "32" ]
+if [ $2 != "32" ]
 then
     ctest -T memcheck | tee memcheck.log
 

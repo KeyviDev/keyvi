@@ -19,88 +19,69 @@
 #define MSGPACK_TYPE_VECTOR_HPP
 
 #include "msgpack/versioning.hpp"
-#include "msgpack/adaptor/adaptor_base.hpp"
+#include "msgpack/object_fwd.hpp"
 #include "msgpack/adaptor/check_container_size.hpp"
 
 #include <vector>
 
 namespace msgpack {
 
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
-
-namespace adaptor {
 
 template <typename T>
-struct convert<std::vector<T> > {
-    msgpack::object const& operator()(msgpack::object const& o, std::vector<T>& v) const {
-        if(o.type != msgpack::type::ARRAY) { throw msgpack::type_error(); }
-        v.resize(o.via.array.size);
-        if(o.via.array.size > 0) {
-            msgpack::object* p = o.via.array.ptr;
-            msgpack::object* const pend = o.via.array.ptr + o.via.array.size;
-            typename std::vector<T>::iterator it = v.begin();
-            do {
-                p->convert(*it);
-                ++p;
-                ++it;
-            } while(p < pend);
-        }
-        return o;
+inline msgpack::object const& operator>> (msgpack::object const& o, std::vector<T>& v)
+{
+    if(o.type != msgpack::type::ARRAY) { throw msgpack::type_error(); }
+    v.resize(o.via.array.size);
+    if(o.via.array.size > 0) {
+        msgpack::object* p = o.via.array.ptr;
+        msgpack::object* const pend = o.via.array.ptr + o.via.array.size;
+        T* it = &v[0];
+        do {
+            p->convert(*it);
+            ++p;
+            ++it;
+        } while(p < pend);
     }
-};
+    return o;
+}
 
-template <typename T>
-struct pack<std::vector<T> > {
-    template <typename Stream>
-    msgpack::packer<Stream>& operator()(msgpack::packer<Stream>& o, const std::vector<T>& v) const {
-        uint32_t size = checked_get_container_size(v.size());
-        o.pack_array(size);
-        for(typename std::vector<T>::const_iterator it(v.begin()), it_end(v.end());
+template <typename Stream, typename T>
+inline msgpack::packer<Stream>& operator<< (msgpack::packer<Stream>& o, const std::vector<T>& v)
+{
+    uint32_t size = checked_get_container_size(v.size());
+    o.pack_array(size);
+    for(typename std::vector<T>::const_iterator it(v.begin()), it_end(v.end());
             it != it_end; ++it) {
-            o.pack(*it);
-        }
-        return o;
+        o.pack(*it);
     }
-};
+    return o;
+}
 
 template <typename T>
-struct object_with_zone<std::vector<T> > {
-    void operator()(msgpack::object::with_zone& o, const std::vector<T>& v) const {
-        o.type = msgpack::type::ARRAY;
-        if(v.empty()) {
-            o.via.array.ptr = nullptr;
-            o.via.array.size = 0;
-        } else {
-            uint32_t size = checked_get_container_size(v.size());
-            msgpack::object* p = static_cast<msgpack::object*>(o.zone.allocate_align(sizeof(msgpack::object)*size));
-            msgpack::object* const pend = p + size;
-            o.via.array.ptr = p;
-            o.via.array.size = size;
-            typename std::vector<T>::const_iterator it(v.begin());
-            do {
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif // defined(__GNUC__) && !defined(__clang__)
-                *p = msgpack::object(*it, o.zone);
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif // defined(__GNUC__) && !defined(__clang__)
-                ++p;
-                ++it;
-            } while(p < pend);
-        }
+inline void operator<< (msgpack::object::with_zone& o, const std::vector<T>& v)
+{
+    o.type = msgpack::type::ARRAY;
+    if(v.empty()) {
+        o.via.array.ptr = nullptr;
+        o.via.array.size = 0;
+    } else {
+        uint32_t size = checked_get_container_size(v.size());
+        msgpack::object* p = static_cast<msgpack::object*>(o.zone.allocate_align(sizeof(msgpack::object)*size));
+        msgpack::object* const pend = p + size;
+        o.via.array.ptr = p;
+        o.via.array.size = size;
+        typename std::vector<T>::const_iterator it(v.begin());
+        do {
+            *p = msgpack::object(*it, o.zone);
+            ++p;
+            ++it;
+        } while(p < pend);
     }
-};
+}
 
-} // namespace adaptor
+}  // MSGPACK_API_VERSION_NAMESPACE(v1)
 
-/// @cond
-} // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
-
-} // namespace msgpack
+}  // namespace msgpack
 
 #endif // MSGPACK_TYPE_VECTOR_HPP

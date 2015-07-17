@@ -20,8 +20,6 @@
 #include <iostream>
 #include <sstream>
 
-// This example uses obsolete APIs
-// See protocol_new.cpp
 namespace myprotocol {
     using namespace msgpack::type;
     using msgpack::define;

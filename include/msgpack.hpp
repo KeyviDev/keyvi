@@ -23,4 +23,3 @@
 #include "msgpack/sbuffer.hpp"
 #include "msgpack/vrefbuffer.hpp"
 #include "msgpack/version.hpp"
-#include "msgpack/type.hpp"

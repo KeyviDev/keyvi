@@ -19,7 +19,6 @@
 #define MSGPACK_PACK_HPP
 
 #include "msgpack/versioning.hpp"
-#include "msgpack/cpp_config.hpp"
 
 #include <stdexcept>
 #include <limits>
@@ -30,9 +29,7 @@
 
 namespace msgpack {
 
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
 
 template <typename Stream>
 class packer {
@@ -83,20 +80,16 @@ public:
 
     packer<Stream>& pack_array(uint32_t n);
 
-    packer<Stream>& pack_map(uint32_t n);
+	packer<Stream>& pack_map(uint32_t n);
 
-    packer<Stream>& pack_str(uint32_t l);
-    packer<Stream>& pack_str_body(const char* b, uint32_t l);
+	packer<Stream>& pack_str(uint32_t l);
+	packer<Stream>& pack_str_body(const char* b, uint32_t l);
 
-    // v4
-    packer<Stream>& pack_v4raw(uint32_t l);
-    packer<Stream>& pack_v4raw_body(const char* b, uint32_t l);
-
-    packer<Stream>& pack_bin(uint32_t l);
-    packer<Stream>& pack_bin_body(const char* b, uint32_t l);
+	packer<Stream>& pack_bin(uint32_t l);
+	packer<Stream>& pack_bin_body(const char* b, uint32_t l);
 
     packer<Stream>& pack_ext(size_t l, int8_t type);
-    packer<Stream>& pack_ext_body(const char* b, uint32_t l);
+	packer<Stream>& pack_ext_body(const char* b, uint32_t l);
 
 private:
     template <typename T>
@@ -126,13 +119,11 @@ private:
 private:
     packer(const packer&);
     packer& operator=(const packer&);
-    packer();
 #else  // defined(MSGPACK_USE_CPP03)
-public:
     packer(const packer&) = delete;
     packer& operator=(const packer&) = delete;
-    packer() = delete;
 #endif // defined(MSGPACK_USE_CPP03)
+    packer();
 };
 
 
@@ -147,6 +138,14 @@ inline void pack(Stream& s, const T& v)
 {
     packer<Stream>(s).pack(v);
 }
+
+// serialize operator
+template <typename Stream, typename T>
+inline msgpack::packer<Stream>& operator<< (msgpack::packer<Stream>& o, const T& v)
+{
+    return detail::packer_serializer<Stream, T>::pack(o, v);
+}
+
 
 
 #if defined(__LITTLE_ENDIAN__)
@@ -612,10 +611,7 @@ inline packer<Stream>& packer<Stream>::pack_double(double d)
     mem.f = d;
     char buf[9];
     buf[0] = static_cast<char>(0xcbu);
-
-#if defined(TARGET_OS_IPHONE)
-    // ok
-#elif defined(__arm__) && !(__ARM_EABI__) // arm-oabi
+#if defined(__arm__) && !(__ARM_EABI__) // arm-oabi
     // https://github.com/msgpack/msgpack-perl/pull/1
     mem.i = (mem.i & 0xFFFFFFFFUL) << 32UL | (mem.i >> 32UL);
 #endif
@@ -712,34 +708,6 @@ inline packer<Stream>& packer<Stream>::pack_str(uint32_t l)
 
 template <typename Stream>
 inline packer<Stream>& packer<Stream>::pack_str_body(const char* b, uint32_t l)
-{
-    append_buffer(b, l);
-    return *this;
-}
-
-// Raw (V4)
-
-template <typename Stream>
-inline packer<Stream>& packer<Stream>::pack_v4raw(uint32_t l)
-{
-    if(l < 32) {
-        unsigned char d = 0xa0u | static_cast<uint8_t>(l);
-        char buf = take8_8(d);
-        append_buffer(&buf, 1);
-    } else if(l < 65536) {
-        char buf[3];
-        buf[0] = static_cast<char>(0xdau); _msgpack_store16(&buf[1], static_cast<uint16_t>(l));
-        append_buffer(buf, 3);
-    } else {
-        char buf[5];
-        buf[0] = static_cast<char>(0xdbu); _msgpack_store32(&buf[1], static_cast<uint32_t>(l));
-        append_buffer(buf, 5);
-    }
-    return *this;
-}
-
-template <typename Stream>
-inline packer<Stream>& packer<Stream>::pack_v4raw_body(const char* b, uint32_t l)
 {
     append_buffer(b, l);
     return *this;
@@ -1087,9 +1055,7 @@ inline void packer<Stream>::pack_imp_int64(T d)
     }
 }
 
-/// @cond
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
 
 }  // namespace msgpack
 

@@ -24,7 +24,7 @@
   // If MSVC would support C++11 completely,
   // then 'defined(_MSC_VER)' would replace with
   // '_MSC_VER < XXXX'
-# if (__cplusplus < 201103L) || defined(_MSC_VER)
+# if (__cplusplus < 201103) || defined(_MSC_VER)
 #  define MSGPACK_USE_CPP03
 # endif
 #endif // MSGPACK_USE_CPP03
@@ -32,10 +32,10 @@
 
 
 #if defined __cplusplus
-#if __cplusplus < 201103L
+#if __cplusplus < 201103
 
 #if !defined(nullptr)
-#  if _MSC_VER < 1600
+#  if _MSC_VER < 1600 
 #    define nullptr (0)
 #  endif
 #endif
@@ -44,9 +44,7 @@
 
 namespace msgpack {
 
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
 
 template <typename T>
 struct unique_ptr : std::auto_ptr<T> {
@@ -77,22 +75,18 @@ template <typename T>
 struct enable_if<false, T> {
 };
 
-/// @cond
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
 
 }  // namespace msgpack
 
 
-#else  // __cplusplus < 201103L
+#else  // __cplusplus < 201103
 
 #include <memory>
 #include <tuple>
 
 namespace msgpack {
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
 
     // unique_ptr
     using std::unique_ptr;
@@ -104,13 +98,11 @@ MSGPACK_API_VERSION_NAMESPACE(v1) {
     using std::swap;
     using std::enable_if;
 
-/// @cond
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
 }  // namespace msgpack
 
 
-#endif // __cplusplus < 201103L
+#endif // __cplusplus < 201103
 
 #endif // __cplusplus
 

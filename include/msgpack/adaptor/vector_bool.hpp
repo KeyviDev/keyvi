@@ -24,72 +24,56 @@
 
 namespace msgpack {
 
-/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
-/// @endcond
 
-namespace adaptor {
-
-template <>
-struct convert<std::vector<bool> > {
-    msgpack::object const& operator()(msgpack::object const& o, std::vector<bool>& v) const {
-        if (o.type != msgpack::type::ARRAY) { throw msgpack::type_error(); }
-        if (o.via.array.size > 0) {
-            v.resize(o.via.array.size);
-            msgpack::object* p = o.via.array.ptr;
-            for (std::vector<bool>::iterator it = v.begin(), end = v.end();
-                 it != end;
-                 ++it) {
-                *it = p->as<bool>();
-                ++p;
-            }
-        }
-        return o;
-    }
-};
-
-template <>
-struct pack<std::vector<bool> > {
-    template <typename Stream>
-    msgpack::packer<Stream>& operator()(msgpack::packer<Stream>& o, const std::vector<bool>& v) const {
-        uint32_t size = checked_get_container_size(v.size());
-        o.pack_array(size);
-        for(std::vector<bool>::const_iterator it(v.begin()), it_end(v.end());
-            it != it_end; ++it) {
-            o.pack(static_cast<bool>(*it));
-        }
-        return o;
-    }
-};
-
-template <>
-struct object_with_zone<std::vector<bool> > {
-    void operator()(msgpack::object::with_zone& o, const std::vector<bool>& v) const {
-        o.type = msgpack::type::ARRAY;
-        if(v.empty()) {
-            o.via.array.ptr = nullptr;
-            o.via.array.size = 0;
-        } else {
-            uint32_t size = checked_get_container_size(v.size());
-            msgpack::object* p = static_cast<msgpack::object*>(o.zone.allocate_align(sizeof(msgpack::object)*size));
-            msgpack::object* const pend = p + size;
-            o.via.array.ptr = p;
-            o.via.array.size = size;
-            std::vector<bool>::const_iterator it(v.begin());
-            do {
-                *p = msgpack::object(static_cast<bool>(*it), o.zone);
-                ++p;
-                ++it;
-            } while(p < pend);
+inline msgpack::object const& operator>> (msgpack::object const& o, std::vector<bool>& v)
+{
+    if (o.type != msgpack::type::ARRAY) { throw msgpack::type_error(); }
+    if (o.via.array.size > 0) {
+        v.resize(o.via.array.size);
+        msgpack::object* p = o.via.array.ptr;
+        for (std::vector<bool>::iterator it = v.begin(), end = v.end();
+             it != end;
+             ++it) {
+            *it = p->as<bool>();
+            ++p;
         }
     }
-};
+    return o;
+}
 
-} // namespace adaptor
+template <typename Stream>
+inline msgpack::packer<Stream>& operator<< (msgpack::packer<Stream>& o, const std::vector<bool>& v)
+{
+    o.pack_array(v.size());
+    for(std::vector<bool>::const_iterator it(v.begin()), it_end(v.end());
+        it != it_end; ++it) {
+        o.pack(static_cast<bool>(*it));
+    }
+    return o;
+}
 
-/// @cond
+inline void operator<< (msgpack::object::with_zone& o, const std::vector<bool>& v)
+{
+    o.type = msgpack::type::ARRAY;
+    if(v.empty()) {
+        o.via.array.ptr = nullptr;
+        o.via.array.size = 0;
+    } else {
+        msgpack::object* p = static_cast<msgpack::object*>(o.zone.allocate_align(sizeof(msgpack::object)*v.size()));
+        msgpack::object* const pend = p + v.size();
+        o.via.array.ptr = p;
+        o.via.array.size = v.size();
+        std::vector<bool>::const_iterator it(v.begin());
+        do {
+            *p = object(static_cast<bool>(*it), o.zone);
+            ++p;
+            ++it;
+        } while(p < pend);
+    }
+}
+
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
-/// @endcond
 
 }  // namespace msgpack
 

@@ -29,18 +29,7 @@ LIST (APPEND check_PROGRAMS
     msgpack_c.cpp
     reference.cpp
     limit.cpp
-    json.cpp
-    raw.cpp
-    user_class.cpp
 )
-
-IF (MSGPACK_BOOST)
-    LIST (APPEND check_PROGRAMS
-        boost_fusion.cpp
-        boost_optional.cpp
-        boost_string_ref.cpp
-    )
-ENDIF ()
 
 IF (MSGPACK_CXX11)
     LIST (APPEND check_PROGRAMS
@@ -64,7 +53,7 @@ FOREACH (source_file ${check_PROGRAMS})
     )
     ADD_TEST (${source_file_we} ${source_file_we})
     IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS "-Wall -Wextra -Werror -g -O3")
+        SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS "-Wall -g -O3")
     ENDIF ()
     IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         IF (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -74,9 +63,3 @@ FOREACH (source_file ${check_PROGRAMS})
         ENDIF ()
     ENDIF ()
 ENDFOREACH ()
-
-ADD_EXECUTABLE (
-    multi_file
-    multi_file1.cpp multi_file2.cpp
-)
-ADD_TEST (multi_file multi_file)
