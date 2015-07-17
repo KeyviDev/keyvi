@@ -45,7 +45,7 @@ MSGPACK_API_VERSION_NAMESPACE(v1) {
     case msgpack::type::BOOLEAN: v.SetBool(o.via.boolean); break;
     case msgpack::type::POSITIVE_INTEGER: v.SetUint64(o.via.u64); break;
     case msgpack::type::NEGATIVE_INTEGER: v.SetInt64(o.via.i64); break;
-    case msgpack::type::DOUBLE: v.SetDouble(o.via.dec); break;
+    case msgpack::type::FLOAT: v.SetDouble(o.via.f64); break;
     case msgpack::type::STR: v.SetString(o.via.str.ptr, o.via.str.size); break;
     case msgpack::type::ARRAY:{
       v.SetArray();
@@ -239,8 +239,8 @@ MSGPACK_API_VERSION_NAMESPACE(v1) {
                 }
                 else if (v.IsDouble())
                 {
-                    o.type = type::DOUBLE;
-                    o.via.dec = v.GetDouble();
+                    o.type = type::FLOAT;
+                    o.via.f64 = v.GetDouble();
                 }
                 break;
             default:

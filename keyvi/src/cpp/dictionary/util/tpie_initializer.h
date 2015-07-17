@@ -44,14 +44,14 @@ final
     }
 
     ~TpieIntializer() {
-      tpie::tpie_finish(tpie_systems_);
+      tpie::tpie_finish();
     }
 
    private:
-    const int tpie_systems_ = tpie::subsystem::ALL; // crashes, probably miss a service?: tpie::subsystem::MEMORY_MANAGER | tpie::subsystem::DEFAULT_LOGGING;
+    // todo: only init whats needed tpie::flags<subsystem> tpie_systems_ = tpie::subsystem::ALL; // crashes, probably miss a service?: tpie::subsystem::MEMORY_MANAGER | tpie::subsystem::DEFAULT_LOGGING;
 
     TpieIntializer() {
-      tpie::tpie_init(tpie_systems_);
+      tpie::tpie_init();
     }
 
     TpieIntializer(TpieIntializer const&) = delete;
