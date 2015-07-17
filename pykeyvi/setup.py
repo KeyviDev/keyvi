@@ -8,7 +8,7 @@ import pkg_resources
 # workaround for autwrap bug (includes incompatible boost)
 autowrap_data_dir = "autowrap_includes"
 
-dictionary_sources = os.path.abspath('../dictionary')
+dictionary_sources = os.path.abspath('../keyvi')
 
 mode = 'release'
 #mode = 'debug'
