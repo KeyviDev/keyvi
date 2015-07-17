@@ -1,0 +1,1934 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+\chapter{TPIE Programmer's Reference}
+\plabel{cha:reference}
+
+\comment{LA: Andy and Jan please check if this chapter is ok. JV: As
+  far as I'm concerned, the mm and stream stuff is ok.}
+
+\comment{LA: Add progress bar stuff?! JV: Done. (and what about in section 4?).
+  Jan? No, the example is in this section.}
+
+%%%%%%%%% Memory Manager %%%%%%%%%
+\mysection{Registration-based Memory Manager}
+\plabel{sec:mm-ref}
+\index{memory manager|(}
+
+%\comment{LA: Jan add STL stuff/flag}
+
+\subsection{Files}
+  \btabb
+    \entry{\#include <mm\_register.h>} {Note that there is no need to
+include this file when using the AMI entry points, since it is included by
+all AMI header files.}
+  \etabb
+
+\subsection{Class Declaration}
+  \btabb
+    \entry{class \textbf{MM\_register};} {}
+  \etabb
+
+\subsection{Global Variables}
+  \btabb
+    \entry{MM\_register \textbf{MM\_manager};} {This is the only instance of
+the \lstinline|MM\_register| class that should exist in a program.}
+  \etabb
+
+\subsection{Description}
+The TPIE memory manager \lstinline|MM_manager|, the only instance of class
+\lstinline|MM_register|, traps memory allocation and deallocation requests in
+order to monitor and enforce memory usage limits. The actual memory
+allocation requests are done using the standard \CPP{} operators \lstinline|new|
+and \lstinline|delete|, which have been replaced with in-house versions that
+interact with the memory manager.
+
+\subsection{Public Member Functions}
+  \btabb
+
+    \entry{MM\_err \textbf{enforce\_memory\_limit}();} {Instruct TPIE to
+    abort computation when the memory limit is exceeded.}
+
+    \entry{MM\_err \textbf{ignore\_memory\_limit}();} {Instruct TPIE to
+    ignore the memory limit set using \lstinline|set_memory_limit|.}
+
+    \entry{size\_t \textbf{memory\_available}();} {Return the number of
+    bytes of memory which can be allocated before the user-specified limit
+    is reached.}
+
+  \etabb
+  
+  \btabb
+    \entry{size\_t \textbf{memory\_limit}();} {Return the memory limit as
+    set by the last call to method \lstinline|set_memory_limit|.}
+
+    \entry{size\_t \textbf{memory\_used}();} {Return the number of bytes
+    of memory currently allocated.}
+
+    \entry{MM\_err \textbf{set\_memory\_limit}(size\_t size);} {Set the
+    application's memory limit. The memory limit is set to \lstinline|size|
+    bytes. If the specified memory limit is greater than or equal to the
+    amount of memory already allocated, \lstinline|set_memory_limit| returns
+    \lstinline|MM_ERROR_NO_ERROR|, otherwise it returns
+    \lstinline|MM_ERROR_EXCESSIVE_ALLOCATION|. By default, successive calls
+    to operator \lstinline|new| will cause the program to abort if the
+    resulting memory usage would exceed \lstinline|size| bytes. This behavior
+    can be controlled explicitly by the use of methods
+    \lstinline|enforce_memory_limit|, \lstinline|warn_memory_limit| and
+    \lstinline|ignore_memory_limit|.}
+
+    \entry{MM\_err \textbf{warn\_memory\_limit}();} {Instruct TPIE to
+    issue a warning when the memory limit is exceeded.}
+
+    \entry{int \textbf{space\_overhead}();} {TPIE imposes a small space
+    overhead on each memory allocation request received by operator
+    \lstinline|new|. This involves increasing each allocation request by a
+    fixed number of bytes. The precise size of this increase is machine
+    dependent, but typically 8 bytes. Method \lstinline|space_overhead|
+    returns the size of this increase.}
+
+  \entry{void \textbf{pause\_allocation\_counting}();} {Instruct the
+    memory manager not to keep track of how much memory is allocated.
+    See below for a more detailled discussion of situtations in which
+    this feature may come in handy.}
+  
+  \entry{void \textbf{resume\_allocation\_counting}();} {Instruct the
+    memory manager to keep track of how much memory is allocated. This
+    behavior is the default behavior. See below for a more detailled
+    discussion of situtations in which this feature may come in
+    handy. The pause/resume calls may be nested.}
+  
+  \entry{size\_t \textbf{allocation\_count\_factor}() const;} {
+    Returns 1 iff allocation is switched on. In all other cases, a
+    value of zero is returned.}
+
+  \etabb
+
+\paragraph{Allocation Counting}  When using certain implementations of
+STL, some dynamic data structures such as stacks or vectors change
+the size of their scratch space by invoking the system call
+\texttt{realloc}. Such calls will invalidate the memory manager's
+information about how much space is allocated, and eventually will
+lead the memory manager to loose track of the available space. The
+suggested solution is to instruct STL not to use \texttt{realloc} but
+corresponding \texttt{delete}/\texttt{new}-delete calls, and this
+behavior is implemented by TPIE.
+
+However, the performance-oriented programmer may not want to sacrifice
+potentially fast reallocation, and thus TPIE offers the possibility to
+switch off and on allocation counting. If allocation counting is
+switched off, reallocation is re-enabled in STL (if STL's
+implementation supports this), but TPIE cannot guarantee that the
+memory limit is respected. Thus, it is the programmer's responsibility
+to keep track of how much memory is allocated while allocation
+counting is switched off. Being in ``pause''-mode does not affect
+correct deallocation of objects that have been allocation with
+allocation counting switched on (and vice versa).
+
+
+\index{memory manager|)}
+
+\clearpage
+%%%%%%%%%% AMI Stream %%%%%%%%%%
+\mysection{Streams}
+\index{streams!AMI|(}\plabel{sec:ref-ami-stream}
+\index{AMI_STREAM@{\tt AMI\_STREAM}}
+
+\subsection{Files}
+  \btabb
+    \entry{\#include <ami\_stream.h>} {}
+  \etabb
+
+\subsection{Class Declaration}
+  \btabb
+    \entry{template<class T> class \textbf{AMI\_STREAM};} {}
+  \etabb
+
+\subsection{Description}
+An \lstinline|AMI_STREAM<T>| object stores an ordered collection of objects of
+type \lstinline|T| on external memory.
+
+\index{AMI_STREAM@{\tt AMI\_STREAM}!stream types|(}
+The stream type of an \lstinline|AMI_STREAM| indicates what
+operations are permitted on the stream.
+An \lstinline|AMI_STREAM<T>| object can have one of four different
+types:\comment{LA: Add something like this about persistence flag}
+\begin{itemize}
+    
+    \item \lstinline|AMI_READ_STREAM|: Input operations on
+    the stream are permitted, but output is not permitted.
+    
+    \item \lstinline|AMI_WRITE_STREAM|: Output operations are
+    permitted, but input operations are not permitted. 
+    
+    \item \lstinline|AMI_APPEND_STREAM|: Output is appended
+    to the end of the stream. Input operations are not
+    permitted. This is similar to
+    \lstinline|AMI_WRITE_STREAM| except that if the stream is
+    constructed on a file containing an existing stream,
+    objects written to the stream will be appended at the
+    end of the stream.
+
+    \item \lstinline|AMI_READ_WRITE_STREAM|: Both input and output
+    operations are permitted.
+\end{itemize}
+\index{AMI_STREAM@{\tt AMI\_STREAM}!stream types|)}
+
+%%\clearpage
+
+\subsection{Constructors, Destructor and Related Functions}
+
+\comment{LA: Jan please check (new substream). Also please add
+  ``tell'', right? Done (tell)}
+
+  \btabb
+  
+  \entry{\textbf{AMI\_STREAM}(unsigned int device = UINT\_MAX);} {A new
+    stream of type \lstinline|AMI_READ_WRITE_STREAM| is constructed on
+    the given device as a file with a randomly generated name.}
+ 
+  \entry{\textbf{AMI\_STREAM}(const char *path\_name);} {A stream of
+    type \lstinline|AMI_READ_WRITE_STREAM| is constructed on the file
+    whose path name is given. If the file does not already exist, a
+    new stream is constructed on a newly created file with the
+    specified file name. If the file already exists, it is checked if
+    it contains a valid stream, and if so, the new stream is
+    constructed on this file. If the file does not contain a valid
+    stream, the status flag is set to
+    \lstinline|AMI_STREAM_STATUS_INVALID|.}
+  
+  \entry{\textbf{AMI\_STREAM}(const char *path\_name,
+    AMI\_stream\_type st);} {A stream of type \lstinline|st| is
+    constructed on the file whose pathname is given.}
+  
+  \entry{\textbf{AMI\_STREAM}(BTE\_STREAM<T> *bs);} {A stream is
+    constructed from an existing \lstinline|BTE_STREAM| (see
+    Section~\ref{sec:ref-bte}). This constructor will not normally be
+    used by a TPIE application programmer. The new
+    \lstinline|AMI_STREAM| gets the same type as the
+    \lstinline|BTE_STREAM|.}
+
+    \entry{\textbf{$\sim$AMI\_STREAM}();} {Destructor. Free the memory
+    buffer and close the file. IF the persistence flag is
+    \lstinline|PERSIST_DELETE|, also remove the file.}
+  
+  \index{new_substream()@{\tt new\_substream()}!AMI|)} 
+  \entry{AMI\_err \textbf{new\_substream}(AMI\_stream\_type st,
+    TPIE\_OS\_OFFSET sub\_begin, TPIE\_OS\_OFFSET sub\_end,
+    AMI\_stream<T> **sub\_stream );} {A 
+    substream is an AMI stream that is part of another AMI stream.
+    More precisely, a substream $B$ of a stream $A$ is defined as a
+    contiguous range of objects from the ordered collection of objects
+    that make up the stream $A$.  If desired, one can construct
+    substreams of substreams of substreams {\em ad infinitum}. Since a
+    substream is a stream in its own right, many of the stream member
+    functions can be applied to a substream. A substream can be
+    created via the pseudo-constructor\footnote{The reason we do not
+      use a real constructor is to get around the fact that
+      constructors can not be virtual. Please see
+      Section~\ref{cha:implementation} for more details.}
+    \lstinline|new_substream()|. Here, \lstinline|st| specifies the
+    type of the substream, and the offsets \lstinline|sub_begin| and
+    \lstinline|sub_end| define the positions in the original stream
+    $A$ where the new substream $B$ will begin and end. Upon
+    completion, \lstinline|*sub_stream| points to the newly created
+    substream.}\index{new_substream()@{\tt new\_substream()}!AMI|)}
+
+\etabb
+
+\subsection{Public Member Functions}
+
+\comment{LA: Andy please check memory usage functions. Does the reader
+  know what ``data buffer'' is?}
+
+  \btabb
+
+    \entry{bool \textbf{operator!}() const;} {Return \lstinline|true| if the
+    status of the stream is not
+    \lstinline|AMI_STREAM_STATUS_VALID|, \lstinline|false| otherwise. See
+    also \lstinline|is_valid()| and \lstinline|status()|.}
+
+    \entry{off\_t \textbf{chunk\_size}() const;} {Return the maximum number
+    of items (of type \lstinline|T|) that can be stored in one block.}
+
+    \entry{static const tpie\_stats\_stream\& \textbf{gstats}() const;}
+    {Return an object containing the statistics of all streams opened by the
+    application (global statistics). See also \lstinline|stats()|.}
+
+    \entry{bool \textbf{is\_valid}() const;} {Return \lstinline|true| if the
+    status of the stream is \lstinline|AMI_STREAM_STATUS_VALID|,
+    \lstinline|false| otherwise. See also \lstinline|status()|.}
+
+  \etabb
+  
+%%\clearpage
+
+\comment{LA: Is the ``current position''in the below defined?}
+  
+  \btabb 
+  
+  \index{main_memory_usage()@{\tt main\_memory\_usage()}!AMI|(}
+  \entry{AMI\_err \textbf{main\_memory\_usage}(size\_t *usage,
+    MM\_stream\_usage usage\_type);} {This function is used for
+    obtaining the amount of main memory used by an
+    \lstinline|AMI_STREAM<T>| object (in bytes).
+    \lstinline|usage_type| is one of the following:
+
+  \begin{description}
+  \item\lstinline|MM_STREAM_USAGE_CURRENT:| Total amount of memory
+    currently used by the stream.
+  \item\lstinline|MM_STREAM_USAGE_MAXIMUM:| Max amount of memory that
+    will ever be used by the stream.
+  \item\lstinline|MM_STREAM_USAGE_OVERHEAD:| The amount of memory used
+    by the object itself, without the data buffer.
+  \item\lstinline|MM_STREAM_USAGE_BUFFER:| The amount of memory used
+    by the data buffer.
+  \item\lstinline|MM_STREAM_USAGE_SUBSTREAM:| The additional amount of
+    memory that will be used by each substream created.
+  \end{description}
+} \index{main_memory_usage()@{\tt main\_memory\_usage()}!AMI|)}
+
+  \index{name()@{\tt name()}!AMI|(}
+  \entry{AMI\_err \textbf{name}(char **stream\_name);} {Store the path
+  to the UNIX file name holding the stream, in newly allocated
+  memory.}
+  \index{name()@{\tt name()}!AMI|)}
+
+  \entry{void \textbf{persist}(persistence p)} {Set the persistence flag
+  to \lstinline|p|, which can have one of two values:
+  \lstinline|PERSIST_DELETE| and \lstinline|PERSIST_PERSISTENT|.}
+  
+\index{read_array()@{\tt read\_array()}!AMI|(} \entry{AMI\_err
+  \textbf{read\_array}(T *mm\_array, off\_t *len);} {Read
+  \lstinline|*len| items from the current position of the stream into
+  the array \lstinline|mm_array|. The ``current position'' pointer is
+  increased accordingly.  }  \index{read_array()@{\tt
+    read\_array()}!AMI|)}
+
+\index{read_item()@{\tt read\_item()}!AMI|(} \entry{AMI\_err
+  \textbf{read\_item}(T **elt);} {Read the current item from the
+  stream and advance the ``current item'' pointer to the next item.
+  The item read is pointed to by \lstinline|*elt|. If no error has
+  occurred, return \lstinline|AMI_ERROR_NO_ERROR|. If the ``current
+  item'' pointer is beyond the last item in the stream, return
+  \lstinline|AMI_ERROR_END_OF_STREAM|.}  \index{read_item()@{\tt
+    read\_item()}!AMI|)}
+    
+\index{seek()@{\tt seek()}!AMI|(} \entry{AMI\_err \textbf{seek}(off\_t
+  off);} {Move the current position to \lstinline|off| (measured in
+  terms of items).}
+\index{seek()@{\tt seek()}!AMI|)}
+
+\index{tell()@{\tt tell()}!AMI|(} \entry{TPIE\_OS\_OFFSET
+  \textbf{tell}() const;} {Returns the current position in the stream
+  (measured in terms of items).}  \index{tell()@{\tt tell()}!AMI|)}
+    
+
+    \entry{const tpie\_stats\_stream\& \textbf{stats}() const;}
+    {Return an object containing the statistics of this
+      stream. The types of
+        statistics computed for a collection are tabulated
+        below. See also \lstinline|gstats()|.\\[1mm]
+      \begin{tabular}{|l|l|} \hline \lstinline|BLOCK_READ| & Number of
+        block reads\\ \lstinline|BLOCK_WRITE| & Number of block
+        writes \\ \lstinline|ITEM_READ| & Number of item reads\\
+        \lstinline|ITEM_WRITE| & Number of item writes\\ 
+        \lstinline|ITEM_SEEK| & Number of item seek operations\\ 
+        \lstinline|STREAM_OPEN| & Number of stream open operations\\ 
+        \lstinline|STREAM_CLOSE| & Number of stream close operations
+        \\ \lstinline|STREAM_CREATE| & Number of stream create
+        operations\\ \lstinline|STREAM_DELETE| & Number of stream
+        delete operations \\ \lstinline|SUBSTREAM_CREATE| & Number of
+        substream create operations\\ \lstinline|SUBSTREAM_DELETE| &
+        Number of substream delete operations \\ \hline \end{tabular}
+    }
+
+\etabb
+
+\comment{LA: We should really have different objects for
+         stats and gstats!! AND is it all correct?}
+
+  
+%% \clearpage
+
+  \btabb
+    \entry{AMI\_stream\_status \textbf{status}() const;} {Return the status
+    of the stream instance. The result is either
+    \lstinline|AMI_STREAM_STATUS_VALID| or
+    \lstinline|AMI_STREAM_STATUS_INVALID|. The only operation that can
+    leave the stream invalid is the constructor (if that happens, the log
+    file contains more information). No items should be read from or
+    written to an invalid stream.}
+  
+  \index{stream_len()@{\tt stream\_len()}!AMI|(} \entry{off\_t
+    \textbf{stream\_len}(void);} {Return the number of items stored in
+    the stream.}  \index{stream_len()@{\tt stream\_len()}!AMI|)}
+    
+    \index{truncate()@{\tt truncate()}!AMI|(} \entry{AMI\_err
+      \textbf{truncate}(off\_t off);} {Resize the stream to
+      \lstinline|off| items. If \lstinline|off| is less than the
+      number of objects in the stream, \lstinline|truncate()|
+      truncates the stream to \lstinline|off| objects. If
+      \lstinline|off| is more than the number of objects in the
+      stream, \lstinline|truncate()| extends the stream to the
+      specified number of objects. In either case, the ``current
+      item'' pointer will be moved to the new end of the stream.}
+    \index{truncate()@{\tt truncate()}!AMI|)}
+    
+    \index{write_array()@{\tt write\_array()}!AMI|(} \entry{AMI\_err
+      \textbf{write\_array}(const T *mm\_array, off\_t len);} {Write
+      \lstinline|len| items from array \lstinline|mm_array| to the
+      stream, starting in the current position. The ``current item''
+      pointer is increased accordingly.}  \index{write_array()@{\tt
+        write\_array()}!AMI|)}
+    
+    \index{write_item()@{\tt write\_item()}!AMI|(} \entry{AMI\_err
+      \textbf{write\_item}(const T \&elt);} {Write \lstinline|elt| to
+      the stream in the current position. Advance the ``current item''
+      pointer to the next item. If no error has occurred
+      \lstinline|AMI_ERROR_NO_ERROR| is
+      returned.} \index{write_item()@{\tt write\_item()}!AMI|)}
+  
+  \etabb
+\index{streams!AMI|)}
+
+\comment{LA: In above return values sometimes mentioned sometimes not}
+
+\clearpage
+%%%%%%% Scanning %%%%%%%%
+       \mysection{Scanning} \plabel{sec:ref-ami-scan}
+       \index{scanning|(} \index{AMI_scan()@{\tt AMI\_scan()}|(}
+
+\subsection{Files}
+  \btabb
+    \entry{\#include <ami\_scan.h>} {}
+  \etabb
+
+\subsection{Function Declaration}
+\btabb \entry{template<class T1, class T2, ..., class ST, class U1,
+  class U2, ...> AMI\_err \textbf{AMI\_scan}(AMI\_STREAM<T1> *in1,
+  AMI\_STREAM<T2> *in2, ..., ST *smo, AMI\_STREAM<U1> *out1,
+  AMI\_STREAM<U2> *out2, ...);} {} \etabb
+
+\subsection{Description}
+
+\lstinline|AMI_scan()| reads zero, one or multiple input streams (up
+to four), each potentially of a different type, and writes zero, one
+or multiple output streams (up to four), each potentially of a
+different type.  \lstinline|smo| is a pointer to a {\em scan
+  management object} of user-defined class \lstinline|ST|, as
+described below.
+%%\lstinline|ST| should provide member functions 
+%%\lstinline|AMI_err initialize(void)| and 
+%%\lstinline|AMI_err operate(const T1 &in1,
+%const T2 &in2, ..., AMI_SCAN_FLAG *sfin, U1 *out1, U2 *out2, ...,
+%AMI_SCAN_FLAG  *sfout)|.
+
+\subsection{Scan Management Objects}
+
+\index{operation management objects!scan|(}
+
+A scan management object class must inherit from
+\lstinline|AMI_scan_object|:
+\begin{lstlisting}
+  template<class T1, class T2,..., class U1, class U2,...> class ST:
+  public AMI_scan_object;
+\end{lstlisting}
+In addition, it must provide two member functions for
+\lstinline|AMI_scan()| to call: \lstinline|initialize()| and
+\lstinline|operate()|.  \index{initialize()@{\tt initialize()}|(}
+\begin{lstlisting}
+    AMI_err initialize(void);
+\end{lstlisting}
+    Initializes a scan management object to prepare
+    it for a scan.  This member function is called once by
+    each call to \lstinline|AMI_scan()| in order to initialize
+    the scan management object before any data processing
+    takes place.  This function should return
+    \lstinline|AMI_ERROR_NO_ERROR| if successful, or an
+    appropriate error otherwise. See
+    Section~\ref{sec:ami-errors} for a list of error codes.
+\index{initialize()@{\tt initialize()}|)}
+    
+\index{operate()@{\tt operate()}|(} Most of the work of a scan is
+typically done in the scan management object's \lstinline|operate()|
+member function:
+\begin{lstlisting}
+  AMI_err operate(const T1 &in1, const T2 &in2,..., AMI_SCAN_FLAG
+  *sfin, U1 *out1, U2 *out2,..., AMI_SCAN_FLAG *sfout);
+\end{lstlisting}
+    
+One or more input objects or one or more output parameters must be
+specified.  These must correspond in number and type to the streams
+passed to the polymorph of \lstinline|AMI_scan()| with which this scan
+management object is to be used.
+    
+If present, the inputs \lstinline|*in1, ...| are application data
+items of type \lstinline|T1|, and \lstinline|sfin| points to an array
+of flags, one for each input.  On entry to \lstinline|operate()|,
+flags that are set (non-zero) indicate that the corresponding inputs
+contain data.  If on exit from \lstinline|operate()|, the input flags
+are left untouched, \lstinline|AMI_scan()| assumes that the
+corresponding inputs were processed.  If one or more input flags are
+cleared (set to zero) then \lstinline|AMI_scan()| assumes that the
+corresponding inputs were not processed and should be presented again
+on the next call to \lstinline|operate()|.  This permits out of step
+scanning\index{scanning!out of step}, as illustrated in
+Section~\ref{sec:tut-out-of-step}.
+    
+If present, the outputs \lstinline|*out1, ...| are application data
+items of type \lstinline|U1|, and \lstinline|sfout| points to an array
+of flags, one for each output. On exit from \lstinline|operate()|, the
+outputs should contain any objects to be written to the output
+streams, and the output flags must be set to indicate to
+\lstinline|AMI_scan()| which outputs are valid and should be written
+to the output streams.
+    
+The return value of \lstinline|operate()| will normally be one of the
+following:
+    \begin{itemize}
+    \item \lstinline|AMI_SCAN_CONTINUE|: \index{AMI_SCAN_CONTINUE@{\tt
+          AMI\_SCAN\_CONTINUE}} indicates that the function should be
+      called again with any ``taken'' inputs replaced by the next
+      objects from their respective streams
+    \item \lstinline|AMI_SCAN_DONE|: \index{AMI_SCAN_DONE@{\tt
+          AMI\_SCAN\_DONE}} indicates that the scan is complete and no
+      more input needs to be processed.
+    \end{itemize}
+    
+    Note that \lstinline|operate()| is permitted to return
+    \lstinline|AMI_SCAN_CONTINUE| even when the input flags indicate
+    that there is no more input to be processed.  This is useful if
+    the scan management object maintains some internal state that must
+    be written out after all input has been processed.
+
+\index{operate()@{\tt operate()}|)} 
+
+
+\index{operation management objects!scan|)}
+\index{AMI_scan()@{\tt AMI\_scan()}|)}
+\index{scanning|)}
+
+\clearpage
+%%%%%%%%% Scanning from a C++ stream %%%%%%%%%%
+\mysection{Scanning from a \CPP{} stream}
+\plabel{sec:ref-cxx-stream-input}
+
+\subsection{Files}
+  \btabb
+    \entry{\#include <ami\_scan\_utils.h>} {}
+  \etabb
+
+
+\subsection{Class Declaration}
+  \btabb
+    \entry{template<class T> class \textbf{cxx\_istream\_scan};} {}
+  \etabb
+
+\subsection{Description}
+A scan management class template for reading the contents of an
+ordinary \CPP{} input stream into a TPIE stream.  It works with
+streams of any type for which a \lstinline|>>| operator is defined for
+\CPP{} stream input.
+
+\subsection{Constructor}
+\btabb \entry{\textbf{cxx\_istream\_scan}(istream *instr = \&cin);}
+{Create a scan management object for scanning the contents of \CPP{}
+  stream \lstinline|*instr|. The actual scanning is done using
+  \lstinline|AMI_scan| with no input streams and one output stream.}
+\etabb
+
+\clearpage
+%%%%%%%%% Scanning into a C++ stream %%%%%%%%%%
+\mysection{Scanning into a \CPP{} stream}
+\plabel{sec:ref-cxx-stream-output}
+
+\subsection{Files}
+  \btabb
+    \entry{\#include <ami\_scan\_utils.h>} {}
+  \etabb
+
+
+\subsection{Class Declaration}
+\btabb \entry{template<class T> class \textbf{cxx\_ostream\_scan};} {}
+\etabb
+
+\subsection{Description}
+A scan management class template for writing the contents of a TPIE
+stream into an ordinary \CPP{} output stream.  It works with streams
+of any type for which a \lstinline|<<| operator is defined for \CPP{}
+stream output.
+
+\subsection{Constructor} 
+\btabb \entry{\textbf{cxx\_ostream\_scan}(istream *outstr = \&cout);}
+{Create a scan management object for scanning into \CPP{} stream
+  \lstinline|*outstr|. The actual scanning is done using
+  \lstinline|AMI_scan| with one input stream and no output streams.}
+\etabb
+
+\clearpage
+%%%%%%%% Stream Merging %%%%%%%%%
+\mysection{Stream Merging}
+\index{merging|(}
+\index{AMI_merge()@{\tt AMI\_merge()}|(}
+
+\comment{LA: Andy please check. AD: OK}
+
+\subsection{Files}
+  \btabb
+    \entry{\#include <ami\_merge.h>} {}
+  \etabb
+
+\subsection{Function Declaration}
+  \btabb
+    \entry{template<class T, class MergeMgr>\\ 
+           AMI\_err \textbf{AMI\_merge}(AMI\_STREAM<T> **instreams, 
+           arity\_t arity, AMI\_STREAM<T> *outstream, MergeMgr *mo);} {}
+  \etabb
+
+\subsection{Description}
+TPIE entry point \lstinline|AMI_merge()| allows an arbitrary number of
+streams to be merged into one stream in one pass, subject to the
+available main memory.  TPIE\comment{LA: This doesn't seem to fit in
+  reference manual} will attempt to read the first block of each
+stream into the internal memory, and will update the contents of these
+buffers as the merge progresses. At least one block buffer is also
+required for the output stream from the merge.  The function takes
+four arguments: \lstinline|instreams| is an array of pointers to the
+input streams, all of which are of type \lstinline|AMI_STREAM<T>|,
+\lstinline|arity| is the number of input streams,
+\lstinline|outstream| is the output stream, of type
+\lstinline|AMI_STREAM<T>|, and \lstinline|mo| points to a merge
+management object that controls the merge (merge management objects
+are described below).
+
+If the merge cannot be completed in one pass due to insufficient
+memory, the function fails and it returns
+\lstinline|AMI_ERROR_INSUFFICIENT_MAIN_MEMORY|. Otherwise, it returns
+\lstinline|AMI_ERROR_NO_ERROR|.
+
+\index{AMI_merge()@{\tt AMI\_merge()}|)}
+
+
+\subsection{Merge Management Objects}\label{ssec:mmo}
+\index{operation management objects!merge|(} 
+
+A merge management object class must inherit from
+\lstinline|AMI_merge_base|:
+\begin{lstlisting}
+template<class T>
+class MergeMgr: public AMI_merge_base;
+\end{lstlisting}
+In addition, a merge management object must provide
+\lstinline|initialize()| and \lstinline|operate()| member functions,
+whose purposes are analogous to their namesakes for scan management
+objects.
+
+\index{initialize()@{\tt initialize()}|(} The user's
+\lstinline|initialize()| member function is called by the merge
+function once so that application-specific data structures (if any)
+can be initialized.
+\begin{lstlisting}
+    AMI_err initialize(arity_t arity, const T * const *in,
+                       AMI_merge_flag *taken_flags,
+                       int &taken_index);
+\end{lstlisting}
+ 
+where
+    \begin{itemize}
+    \item \lstinline|arity| is the number of input streams in the
+      merge,
+      \item \lstinline|in| is a pointer to an array of pointers to
+        input objects, each of which is the first objects appearing in
+        one of the input streams,
+      \item \lstinline|taken_flags| an array of flags indicating which
+        of the inputs are present (i.e.  which of the input streams is
+        not empty), and a pointer to an output object.
+    \end{itemize}
+    
+    The typical behavior of \lstinline|initialize()| is to place all
+    the input objects into a data structure and then return
+    \lstinline|AMI_MERGE_READ_MULTIPLE| to indicate that it used (and
+    is now finished with) all of the inputs which were indicated to be
+    valid by \lstinline|taken_flags|.  \lstinline|initialize| need not
+    process all inputs; it can turn off any flags in
+    \lstinline|taken_flags| corresponding to inputs that should be
+    presented to \lstinline|operate()|.  Alternatively, it can set
+    \lstinline|taken_index| to the index of a single input it
+    processed and return \lstinline|AMI_MERGE_CONTINUE|.
+    \index{initialize()@{\tt initialize()}|)}
+    
+    \index{operate()@{\tt operate()}|(} When performing a merge, TPIE
+    relies on the application programmer to provide code to determine
+    the order of any two application data elements, and certain other
+    application-specific processing. By convention, TPIE expects these
+    decisions to be made by the \lstinline|operate()| function:
+\begin{lstlisting}
+  AMI_err operate(const T * const *in, AMI_merge_flag *taken_flags,
+  int &taken_index, T *out);
+\end{lstlisting}
+The \lstinline|operate()| member function is called repeatedly to
+process input objects.  Typically, \lstinline|operate()| will choose a
+single input object to process, and set \lstinline|taken_index| to the
+index of the pointer to that object in the input array.  This object
+is then typically added to a dynamic data structure maintained by the
+merge management object.  If output is generated, for example by
+removing an object from the dynamic data structure,
+\lstinline|operate()| should return \lstinline|AMI_MERGE_OUTPUT|,
+otherwise, it returns either \lstinline|AMI_MERGE_CONTINUE| to
+indicate that more input should be presented, or
+\lstinline|AMI_MERGE_DONE| to indicate that the merge has completed.
+    
+Alternatively, \lstinline|operate()| can clear the elements of
+\lstinline|taken_flags| that correspond to inputs it does not
+currently wish to process, and then return
+\lstinline|AMI_MERGE_READ_MULTIPLE|.  This is generally undesirable
+because, if only one input is taken, it is far slower than using
+\lstinline|taken_index| to indicate which input was taken.  The merge
+management object must clear all other flags, and then TPIE must test
+all the flags to see which inputs were or were not processed.
+\index{operate()@{\tt operate()}|)}
+
+
+\index{operation management objects!merge|)}
+\index{merging|)}
+
+\clearpage
+%%%%%%%% Stream Merging %%%%%%%%%
+\mysection{Sorted Stream Merging}
+\index{merging!sorted runs|(}
+\index{AMI_merge_sorted_runs()@{\tt AMI\_merge\_sorted\_runs()}|(}
+\plabel{sec:ref-ami-merge}
+
+
+\subsection{Files}
+\comment{LA: Andy please check! AD: OK}
+  \btabb
+    \entry{\#include <ami\_merge\_sorted\_runs.h>} {}
+  \etabb
+
+\subsection{Function Declarations}
+  \btabb
+    \entry{template<class T>\\  AMI\_err \textbf{AMI\_merge\_sorted\_runs}(AMI\_STREAM<T> **instreams,
+                      arity\_t arity, AMI\_STREAM<T> *outstream);} {}
+    \entry{template<class T>\\ AMI\_err \textbf{AMI\_merge\_sorted\_runs}(AMI\_STREAM<T> **instreams,
+                      arity\_t arity, AMI\_STREAM<T> * outstream, CmpObj *co);} {}
+    \entry{template<class T, class KEY>\\ AMI\_err \textbf{AMI\_merge\_sorted\_runs}(AMI\_STREAM<T> **instreams,
+                   arity\_t arity, AMI\_STREAM<T> *outstream, int keyoff, KEY dummy);} {}
+  \etabb
+
+\subsection{Description}
+
+TPIE provides several merge entry points for merging sorted streams to
+produce a single, interleaved output stream.
+\lstinline|AMI_merge_sorted_runs| has three polymorphs, namely the
+comparison operator, comparison class and the key-based
+polymorphs.\comment{LA: Syntax of comparator?}  The comparison
+operator version tends to be the fastest and most straightforward to
+use. The comparison class version is comparable in speed (maybe
+slightly slower), but somewhat more flexible, as it can support
+multiple, different merges on the same keys.\comment{LA: Key based?}
+
+\index{AMI_merge_sorted_runs()@{\tt AMI\_merge\_sorted\_runs()}|)}
+\index{merging!sorted runs|)}
+
+
+\clearpage
+%%%%%%%% Stream Partitioning and Merging %%%%%%%%%
+\mysection{ Stream Partitioning and Merging}
+\index{AMI_partition_and_merge()@{\tt AMI\_partition\_and\_merge()}|(}
+\plabel{sec:ref-ami-gpmerge}
+
+\comment{LA: Andy please check. AD: OK}
+
+\subsection{Files}
+  \btabb
+    \entry{\#include <ami\_merge.h>} {}
+  \etabb
+
+\subsection{Function Declaration}
+  \btabb
+    \entry{template<class T, class MergeMgr>\\
+           AMI\_err \textbf{AMI\_partition\_and\_merge}(AMI\_STREAM<T> *instream, AMI\_STREAM<T> *outstream, MergeMgr *mo);} {}
+  \etabb
+
+\subsection{Description}
+This function partitions a stream into substreams small enough to fit
+in main memory, operates on each in main memory, and then merges them
+together, possibly in several passes if low memory conditions dictate.
+This function takes three arguments: \lstinline|instream| points to
+the input stream, \lstinline|outstream| points to the output stream,
+and \lstinline|mo| points to a merge management object that controls
+the merge.  This function takes care of all the details of determining
+how much main memory is available, how big the initial substreams can
+be, how many streams can be merged at a time, and how many levels of
+merging must take place.
+
+In order to complete the merge successfully, the function needs
+sufficient memory for a binary merge. If not enough memory is
+available, the function fails and it returns
+\lstinline|AMI_ERROR_INSUFFICIENT_MAIN_MEMORY|. Otherwise, it returns
+\lstinline|AMI_ERROR_NO_ERROR|.  \index{AMI_partition_and_merge()@{\tt
+    AMI\_partition\_and\_merge()}|)}
+
+\subsection{Merge Management Objects}
+\index{operation management objects!merge|(}
+
+The \lstinline|AMI_partition_and_merge()| entry point requires a merge
+management object similar to the one described in
+Section~\ref{ssec:mmo}. The following three additional member
+functions must also be provided.
+
+\begin{itemize}
+    \item \index{main_mem_operate()@{\tt main\_mem\_operate()}}
+\begin{lstlisting}
+  AMI_err main_mem_operate(T* mm_stream, size_t len);
+\end{lstlisting}
+\noindent
+where
+    \begin{itemize}
+    \item \lstinline|mm_stream| is a pointer to an array of objects
+      that have been read into main memory,
+    \item \lstinline|len| is the number of objects in the array.
+    \end{itemize}
+    
+    This function is called by \lstinline|AMI_partition_and_merge()|
+    when a substream of the data is small enough to fit into main
+    memory, and the (application-specific) processing of this subset
+    of the data can therefore be completed in internal memory.
+
+    
+  \item \index{space_usage_per_stream()@{\tt
+        space\_usage\_per\_stream()}}
+\begin{lstlisting}
+  size_t space_usage_per_stream(void);
+\end{lstlisting}
+This function should return the amount of main memory that the merge
+management object will need per per input stream. Merge management
+objects are allowed to maintain data structures whose size is linear
+in the number of input streams being processed.
+
+\item \index{space_usage_overhead()@{\tt space\_usage\_overhead()}}
+\begin{lstlisting}
+  size_t space_usage_overhead(void);
+\end{lstlisting}
+This function should return an upper bound on the number of bytes of
+main memory the merge management object will allocate in addition to
+the portion that is linear in the number of streams.
+    
+\end{itemize}
+
+\index{operation management objects!merge|)}
+
+\clearpage
+%%%%%%%%% Merge Sorting %%%%%%%%
+\mysection{Merge Sorting}\plabel{sec:ref-ami-sort}
+\index{sorting!merge|)} \index{AMI_key_sort@{\tt AMI\_key\_sort}|(}
+\index{AMI_ptr_sort@{\tt AMI\_ptr\_sort}|(} \index{AMI_sort@{\tt
+    AMI\_sort}|(}
+
+\comment{LA: Andy please check}
+
+\subsection{Files}
+  \btabb
+     \entry{\#include <ami\_sort.h>} {}
+  \etabb
+
+\subsection{Function Declarations}
+
+\btabb
+\entry{template<class T>\\
+  AMI\_err \textbf{AMI\_sort}(AMI\_STREAM<T> *instream, AMI\_STREAM<T>
+  *outstream);} {}
+  
+  \entry{template<class T, class CMPR>\\
+    AMI\_err \textbf{AMI\_sort}(AMI\_STREAM<T> *instream,
+    AMI\_STREAM<T> *outstream, CMPR *cmp);} {}
+
+  \entry{template<class T>\\
+              AMI\_err \textbf{AMI\_ptr\_sort}(AMI\_STREAM<T> *instream,
+       AMI\_STREAM<T> *outstream);} {}
+
+     \entry{template<class T, class CMPR>\\
+       AMI\_err \textbf{AMI\_ptr\_sort}(AMI\_STREAM<T> *instream,
+       AMI\_STREAM<T> *outstream, CMPR *cmp);} {}
+
+     \entry{template<class T, class KEY, class CMPR>\\
+AMI\_err \textbf{AMI\_key\_sort}(AMI\_STREAM<T> *instream, AMI\_STREAM<T> *outstream,
+         KEY dummykey, CMPR *cmp) ;} {}
+
+  \entry{template<class T>\\
+  AMI\_err \textbf{AMI\_sort}(AMI\_STREAM<T> *instream);} {}
+
+  \entry{template<class T, class CMPR>\\
+   AMI\_err \textbf{AMI\_sort}(AMI\_STREAM<T> *instream, CMPR *cmp);} {}
+
+  \entry{template<class T>\\
+  AMI\_err \textbf{AMI\_ptr\_sort}(AMI\_STREAM<T> *instream);} {}
+
+  \entry{template<class T, class CMPR>\\
+  AMI\_err \textbf{AMI\_ptr\_sort}(AMI\_STREAM<T> *instream, CMPR *cmp);} {}
+
+  \entry{template<class T, class KEY, class CMPR>\\
+   AMI\_err \textbf{AMI\_key\_sort}(AMI\_STREAM<T> *instream,
+   KEY dummykey, CMPR *cmp) ;} {}
+
+\etabb
+
+\subsection{Description}
+Currently,\comment{LA: Same text as in tutorial} TPIE offers three
+merge sorting variants. The user must decide which variant is most
+appropriate for their circumstances.  All accomplish the same goal,
+but the performance can vary depending on the situation. They differ
+mainly in the way they perform the merge phase of merge sort,
+specifically how they maintain their heap data structure used in the
+merge phase. The three variants are as follows:
+\begin{itemize}
+\item \lstinline|AMI_sort|: keeps the (entire) first record of each
+  sorted run (each is a stream) in a heap. This approach is most
+  suitable when the record consists entirely of the record key.
+    
+\item \lstinline|AMI_ptr_sort|: keeps a pointer to the first record of
+  each stream in the heap. This approach works best when records are
+  very long and the key field(s) take up a large percentage of the
+  record.
+  
+\item \lstinline|AMI_key_sort|: keeps the key field(s) and a pointer
+  to the first record of each stream in the heap. This approach works
+  best when the key field(s) are small in comparison to the record
+  size.
+\end{itemize}
+
+Any of these variants will accomplish the task of sorting an input
+stream in an I/O efficient way, but there can be noticeable
+differences in processing time between the variants. As an example,
+\lstinline|AMI_key_sort| appears to be more cache-efficient than the
+others in many cases, and therefore often uses less processor time,
+despite extra data movement relative to \lstinline|AMI_ptr_sort|.
+
+In addition to the three variants discussed above, there are multiple
+choices within each variant regarding how the actual comparison
+operations are to be performed. These choices are described in detail
+for \lstinline|AMI_sort|, below.
+ 
+Any sort variant above can sort given an input stream and output stream,
+or just an input stream. When just an input stream is specified, the
+original input elements are deleted the input stream is rewritten with the
+sorted output elements. If both the input stream and output stream are
+specified, the original input elements are saved. During sorting, a
+temporary copy of each element is stored on disk as part of intermediate
+sorting results. If $N$ is the size on disk of the original input stream,
+the polymorphs of sorting with both input and output streams use $3N$
+space, whereas if just an input stream is specified, $2N$ space is used.
+If the original unsorted input stream is not needed after sorting, it is
+recommended that users use the \lstinline|AMI_sort| polymorph with with just
+an input stream, to save space and avoid having to maintain both an input
+and output stream. 
+
+\subsubsection{AMI\_sort()}
+\lstinline|AMI_sort()| has two polymorphs, namely the comparison
+operator and comparison class polymorphs. The comparison operator
+version tends to be the fastest and most straightforward to use. The
+comparison class version is comparable in speed (maybe slightly
+slower), but somewhat more flexible, as it can support multiple,
+different sorts on the same keys.
+
+\paragraph{Comparison operator version.} This version works on streams of
+objects for which the operator \lstinline|<| is defined.
+
+\paragraph{Comparison class version.} 
+This version of \lstinline|AMI_sort()| uses a method of a user-defined
+comparison object to determine the order of two input objects. The
+object must have a public member function named \lstinline|compare|,
+having the following prototype:
+\begin{lstlisting}
+  inline int compare (const KEY & k1, const KEY & k2);
+\end{lstlisting}
+
+The user-written \lstinline|compare| function computes the order of
+the two user-defined keys \lstinline|k1| and \lstinline|k2|, and
+returns $-1$, $0$, or $+1$ to indicate that $k1<k2$, $k1==k2$, or
+$k1>k2$ respectively.
+
+\index{AMI_sort@{\tt AMI\_sort}|)}
+
+\subsubsection{AMI\_ptr\_sort()}
+
+The \lstinline|AMI_ptr_sort| variant of merge sort in TPIE keeps only
+a pointer to each record in the heap used to perform merging of runs.
+Similar to \lstinline|AMI_sort| above, it offers comparison operator,
+comparison function, and comparison class polymorphs. The syntax is
+identical to that illustrated in the \lstinline|AMI_sort| examples;
+simply replace \lstinline|AMI_sort| by \lstinline|AMI_ptr_sort|.
+
+\index{AMI_ptr_sort@{\tt AMI\_ptr\_sort}|)}
+
+\subsubsection{AMI\_key\_sort()}
+
+The \lstinline|AMI_key_sort| variant of TPIE merge sort keeps the key
+field(s) plus a pointer to the corresponding record in an internal
+heap during the merging phase of merge sort.  It requires a sort
+management object with member functions \lstinline|compare| and
+\lstinline|copy|.  The \lstinline|dummyKey| argument of
+\lstinline|AMI_key_sort()| is a a dummy argument having the same type
+as the user key,\comment{LA: Clear why we do this?} and
+\lstinline|*smo| is the sort management object, having user-defined
+\lstinline|compare| and \lstinline|copy| member functions as described
+below.
+
+The \lstinline|compare| member function has the following
+prototype:\comment{LA: ``prototype''? AD: Yes, standard C++ term}
+\begin{lstlisting}
+  inline int compare (const KEY & k1, const KEY & k2);
+\end{lstlisting}
+
+The user-written \lstinline|compare| function computes the order of
+the two user-defined keys \lstinline|k1| and \lstinline|k2|, and
+returns $-1$, $0$, or $+1$ to indicate that $k1<k2$, $k1==k2$, or
+$k1>k2$ respectively.
+
+The \lstinline|copy| member function has the following prototype:
+\begin{lstlisting}
+   inline void copy (KEY *key, const T &record);
+\end{lstlisting}
+
+The user-written \lstinline|copy| function constructs the user-defined
+key \lstinline|*key| from the contents of the user-defined record
+\lstinline|record|. It will be called by the internals of
+\lstinline|AMI_key_sort| to make copies of record keys as necessary
+during the sort.
+
+\index{AMI_key_sort@{\tt AMI\_key\_sort}|)}
+\index{sorting!merge|)} 
+
+\clearpage
+%%%%%%%%% Internal Memory Sorting %%%%%%%%
+\mysection{Internal Memory Sorting} \plabel{sec:ref-ami-memsort}
+\index{sorting!internal memory|(}
+
+\comment{LA: Andy please check + add STL stuff. AD: OK, STL is part of
+internal\_sort.h, which is not exported to user here}
+
+\subsection{Files}
+  \btabb
+        \entry{\#include <quicksort.h>} {}
+  \etabb
+
+\subsection{Function Declarations}
+
+  \btabb
+     \entry{template<class T>\\
+     void \textbf{quick\_sort\_op}(T *data, size\_t len);} {}
+
+     \entry{template<class T>\\
+     void \textbf{quick\_sort\_obj}(T *data, size\_t len, 
+     CMPR *cmp);} {}
+  \etabb
+
+\subsection{Description}
+
+These are internal memory in-place sorting routines that implement the
+quicksort\index{quicksort} algorithm (randomized).\comment{LA:
+  Really? AD: yes}  These routines are used by the external memory sorting
+routines (see Section~\ref{sec:ref-ami-sort}) on streams that are
+small enough to fit in memory.  The two polymorphs use different
+comparison methods: \lstinline|quick_sort_op| uses the comparison
+operator $<$ and \lstinline|quick_sort_obj| uses a comparison object
+of type \lstinline|CMPR|.
+
+\index{sorting!internal memory|)}
+
+\clearpage
+%%%%%%%%% Distribution %%%%%%%%%
+\mysection{Distribution}
+\index{distribution|(}
+
+\tobewritten
+
+\index{distribution|)}
+
+\clearpage
+%%%%%%%%% Key bucket sort %%%%%%%%%
+\mysection{Key bucket sort}
+\index{key bucket sort|(}
+
+\tobewritten
+
+\index{key bucket sort|)}
+
+\clearpage
+%%%%%%%%% Permuting %%%%%%%%%
+\mysection{Permuting}
+\index{permuting|(}
+
+\tobewritten
+
+\index{permuting|)}
+
+\clearpage
+%%%%%%%%% Stacks %%%%%%%%%
+\mysection{Stacks}
+\plabel{sec:ref-ami-stack}
+\index{AMI_stack@{\tt AMI\_stack}|(}
+\index{stacks|(}
+
+\subsection{Files}
+  \btabb
+        \entry{\#include <ami\_stack.h>} {}
+  \etabb
+
+\subsection{Class Declaration}
+   \btabb
+        \entry{template<class T> class \textbf{AMI\_stack};} {}
+   \etabb
+
+\subsection{Description}
+External stacks are derived from \lstinline|AMI_STREAM<T>|.
+\comment{LA: Do we care here? AD: means there are additional public
+  member functions not listed below that we can use} As a consequence,
+it inherits all public members of \lstinline|AMI_STREAM<T>|, including
+its constructors. See Section~\ref{sec:ref-ami-stream}.  \comment{JV:
+  I'm not sure inheriting from \lstinline|AMI\_STREAM| is the smartest
+  way of doing this. This would allow the user to do all kinds of
+  stuff with a stack (such as sorting it\ldots). Why don't we
+  aggregate a stream instead?}
+
+\subsection{Public Member Functions}
+   \btabb 
+   
+   \entry{AMI\_err \textbf{push}(const \&T t);} {Insert a copy of the
+     object \lstinline|t| to the top of the stack, increasing its
+     length by one.}
+   
+   \entry{AMI\_err \textbf{pop}(T **ppt);} {Remove the top object from
+     the stack, decreasing its length by one and returning the address
+     of a pointer to the popped object in \lstinline|ppt|.}
+
+   \etabb
+
+\index{stacks|)}
+\index{AMI_stack@{\tt AMI\_stack}|)}
+
+\clearpage
+%%%%%%%%% Queues %%%%%%%%%
+\mysection{Queue}
+\plabel{sec:ref-ami-queue}
+\index{AMI_queue@{\tt AMI\_queue}|(}
+\index{queue|(}
+
+
+\subsection{Files}
+  \btabb
+        \entry{\#include <ami\_queue.h>} {}
+  \etabb
+
+\subsection{Class Declaration}
+   \btabb
+        \entry{template<class T> class \textbf{AMI\_queue};} {}
+   \etabb
+
+\subsection{Description}
+Provides an external FIFO queue. 
+
+\subsection{Public Member Functions}
+   \btabb 
+   
+   \entry{AMI\_err \textbf{enqueue}(const \&T t);} {Insert a copy of the
+     object \lstinline|t| to the back of queue, increasing its
+     length by one.}
+   
+   \entry{AMI\_err \textbf{dequeue}(T **ppt);} {Remove the first element
+     from the front of queue, decreasing its length by one and returning
+     the address of a pointer to the dequeued object in \lstinline|ppt|.}
+
+   \entry{bool \textbf{is\_empty}();} {Return true if the queue is empty, 
+      false otherwise.}
+
+   \entry{TPIE\_OS\_OFFSET \textbf{size}();} {Returns the size of the 
+      queue.}
+
+   \entry{AMI\_err \textbf{peek}(T **t);} {Store the front element 
+      in \lstinline|t|.}
+
+   \entry{void \textbf{persist}(persistence p);} {Set persistence flag 
+      to \lstinline|p|.}
+
+   \entry{void \textbf{trim}();} {Truncates the underlying stream to 
+      the exact size (rounded up to the next block) of items.}
+
+   \etabb
+
+\index{queue|)}
+\index{AMI_queue@{\tt AMI\_queue}|)}
+
+
+
+\clearpage
+%%%%%%%%% Distribution sweeping %%%%%%%%%
+\mysection{Distribution sweeping}
+\index{distribution sweeping|(}
+
+\tobewritten
+
+\index{distribution sweeping|)}
+
+\clearpage
+%%%%%%%%% Matrix %%%%%%%%%
+\mysection{Matrix operations}
+\index{matrix operations|(}
+
+\tobewritten
+
+\index{matrix operations|)}
+
+
+
+\clearpage
+%%%%%%%%Blocks %%%%%%%%%
+\mysection{Blocks}
+\index{AMI_block@{\tt AMI\_block}|(}
+
+\subsection{Files}
+  \btabb
+        \entry{\#include <ami\_block.h>} {}
+  \etabb
+
+\subsection{Class Declaration}
+\btabb \entry{template<class E, class I> class \textbf{AMI\_block};
+}{The types \lstinline|E| and \lstinline|I| should have a default
+  constructor, a copy constructor and an assignment operator. The size
+  returned by \lstinline|sizeof(E)| and \lstinline|sizeof(I)| should
+  be the total size of the items copied by the copy
+  constructor/assignment operator.}
+
+   \etabb
+
+\subsection{Description}
+
+An instance of class \lstinline|AMI_block<E,I>| is a typed
+view of a logical block, which is the unit amount of data transfered
+between external storage and main memory. 
+
+The \lstinline|AMI_block| class serves a dual purpose: (a) to provide an
+interface for seamless transfer of blocks between disk and main memory,
+and (b) to provide a structured access to the contents of the block.
+The first purpose is achieved through internal mechanisms, transparent
+to the user. When creating an instance of class \lstinline|AMI_block|, the
+constructor is responsible for making the contents of the block
+available in main memory. When the object is deleted, the destructor is
+responsible for writing back the data, if necessary, and freeing the
+memory. Consequently, during the life of an \lstinline|AMI_block| object, the
+contents of the block is available in main memory.
+The second purpose is achieved by partitioning the contents of the block
+into three fields:
+\begin{itemize}
+\item[] Links: an array of pointers to other blocks, represented as
+block identifiers, of type \lstinline|AMI_bid|;
+\item[] Elements: an array of elements of parameter type \lstinline|E|;
+\item[] Info: an info field of parameter type \lstinline|I|, used to store a 
+constant amount of administrative data;
+\end{itemize}
+
+The number of elements and links that can be stored is set during
+construction: the number of links is passed to the constructor, and the
+number of elements is computed using the following formula:
+\[\mbox{\rm number\_of\_elements} = \left\lfloor\frac{\mbox{\rm
+block\_size} - (\mbox{\tt sizeof}(I) + \mbox{\tt sizeof(AMI\_bid)} *
+\mbox{\rm number\_of\_links})}{\mbox{\tt sizeof}(E)}\right\rfloor \]
+
+\subsection{Constructors and Destructor}
+
+   \btabb 
+
+        \entry{\textbf{AMI\_block}(AMI\_COLLECTION *pcoll, unsigned int l, AMI\_bid
+        bid);} {{\em Read the block} with id \lstinline|bid| from block collection
+        \lstinline|*pcoll| in newly allocated memory and format it using the
+        template types and the maximum number of links \lstinline|l|.
+        Persistence is set to \lstinline|PERSIST_PERSISTENT|.}
+
+        \entry{\textbf{AMI\_block}(AMI\_COLLECTION *pcoll, unsigned int l);} {{\em
+        Create a new block} in collection \lstinline|*pcoll|, allocate memory for
+        it, and format it using the template types and the maximum number
+        of links \lstinline|l|. Persistence is set to \lstinline|PERSIST_PERSISTENT|. The id of the block can be inquired using the
+        access member function \lstinline|bid()|.}
+
+        \entry{\textbf{$\sim$AMI\_block}();} {Destructor. If persistency 
+        is \lstinline|PERSIST_DELETE|, remove the block from the collection. 
+        If it is \lstinline|PERSIST_PERSISTENT|, write the block to the 
+        collection. Deallocate the memory.}
+
+   \etabb
+
+\subsection{Public Member Objects}
+
+   \btabb
+
+        \entry{b\_vector<E> \textbf{el};} {Access to the elements is done through
+        this object, using the public methods of the \lstinline|b_vector| class
+        (described below).}
+
+        \entry{b\_vector<AMI\_bid> \textbf{lk};} {Access to the links is done
+        through this object, using the public methods of the \lstinline|b_vector| class (described below).}
+
+   \etabb
+
+\subsection{Public Member Functions}
+
+   \btabb
+        
+        \entry{AMI\_block<E,I>\& \textbf{operator=}(AMI\_block<E,I>\& B);} {Copy
+        block \lstinline|B| into the current block, if both blocks are associated
+        with the same collection. Returns a reference to this block.}
+
+        \entry{bool \textbf{operator!}() const;} {Return \lstinline|true| if the block's status 
+        is not \lstinline|AMI_BLOCK_STATUS_VALID|. See also \lstinline|is_valid()| and 
+        \lstinline|status()|.}
+
+        \entry{AMI\_bid \textbf{bid}() const;} {Return the block id.}
+
+        \entry{size\_t \textbf{block\_size}() const;} {Return the size of this block
+        in bytes.}
+
+        \entry{char\& \textbf{dirty}();} {Return a reference to the dirty bit. The
+        dirty bit is used to optimize writing in some implementations of
+        the block collection class. It should be set to $1$ whenever the
+        block data is modified. See the implementation details for more.}
+
+        \entry{char \textbf{dirty}() const;} {Return the value of the dirty bit.}
+
+        \entry{static size\_t \textbf{el\_capacity}(size\_t bsz, size\_t l);} 
+        {Return the capacity of the \lstinline|el| vector of a block with size 
+        \lstinline|bsz| and number of links \lstinline|l|.}
+
+        \entry{I *\textbf{info}();} {Return a pointer to the info element.}
+        
+        \entry{const I* \textbf{info}() const;} {Return a const pointer to the 
+        info element.}
+
+        \entry{bool \textbf{is\_valid}() const;} {Return \lstinline|true| if the block's 
+        status is \lstinline|AMI_BLOCK_STATUS_VALID|. See also \lstinline|status()|.}
+
+        \entry{void \textbf{persist}(persistence p);} {Set the persistency flag to
+        \lstinline|p|. The possible values for \lstinline|p| are \lstinline|PERSIST_PERSISTENT| and \lstinline|PERSIST_DELETE|.}
+
+        \entry{persistence \textbf{persist}() const;} {Return the value of the 
+        persistency flag.} 
+
+        \entry{AMI\_block\_status \textbf{status}() const;} {Return the status of the
+        block. The result is either
+        \lstinline|AMI_BLOCK_STATUS_VALID| or 
+      \lstinline|AMI_BLOCK_STATUS_INVALID|. The status of an \lstinline|AMI_block|
+        instance is set during construction. The methods of an invalid
+        block can give erroneous results or fail.}
+
+        \entry{AMI\_err \textbf{sync}();} {Synchronize the in-memory image of the
+        block with the one stored in external storage.}
+
+   \etabb
+
+\subsection{The  b\_vector class}
+
+The \lstinline|b_vector| class stores an array of objects of a templated type
+\lstinline|T|. It has a fixed maximum size, or capacity, which is set during
+construction (since instances of this class are created only by the
+\lstinline|AMI_block| class, the constructors are not part of the public
+interface). The items stored can be accessed through the array operator.
+
+\subsubsection{Class Declaration}
+   \btabb 
+        \entry{template<class T> class \textbf{b\_vector};} {The type \lstinline|T|
+        should have a default constructor, as well as copy constructor and
+        assignment operator.}
+   \etabb
+
+%\subsection{Constructors and Destructor}
+%   \begin{tabbing}
+%   \hspace*{.3in} \= \hspace{.5in} \= \\ 
+%
+%      \> {\tt b\_vector(T* p, size\_t cap)}\\
+%      \>\>\parbox[t]{5.5in}{Create a b\_vector instance using {\tt p}
+%      as the underlying array, of capacity {\tt cap}.}
+%
+%   \end{tabbing}
+
+\subsubsection{Member Functions}
+
+   \btabb
+
+      \entry{T\& \textbf{operator[]}(size\_t i);}{Return
+      a reference to the $i$th item.}
+
+      \entry{const T\& \textbf{operator[]}(size\_t i) const;}{Return a const reference to the $i$th      item.}
+
+      \entry{size\_t \textbf{capacity}() const;}{Return the
+      capacity (i.e., maximum number of \lstinline|T| elements) of this \lstinline|b_vector|.}
+
+      \entry{size\_t \textbf{copy}(size\_t start, size\_t length,
+      b\_vector<T>\& src, size\_t src\_start = 0);}{Copy \lstinline|length| items from the \lstinline|src|
+      vector, starting with item \lstinline|src_start|, to this vector,
+      starting with item \lstinline|start|. Return the number of items
+      copied. Source can be \lstinline|*this|.}
+
+      \entry{size\_t \textbf{copy}(size\_t start, size\_t length, const T* src);}{Copy \lstinline|length| items from the array \lstinline|src| to this vector, starting in position \lstinline|start|. Return the
+      number of items copied.}
+
+      \entry{void \textbf{insert}(const T\& t, size\_t pos);}{Insert item \lstinline|t| in position \lstinline|pos|; all
+      items from position \lstinline|pos| onward are shifted one position higher;
+      the last item is lost.}
+
+      \entry{void \textbf{erase}(size\_t pos);}{Erase
+      the item in position \lstinline|pos| and shift all items from position
+      \lstinline|pos+1| onward one position lower; the last item becomes
+      identical with the next to last item.}
+
+   \etabb
+
+\index{AMI_block@{\tt AMI\_block}|)}
+
+\clearpage
+%%%%%%%% AMI Block Collection %%%%%%%%%
+\mysection{Block Collections}
+\index{AMI_COLLECTION@{\tt AMI\_COLLECTION}|(}
+
+\subsection{Files}
+   \btabb
+       \entry{\#include <ami\_coll.h>} {}
+   \etabb
+
+\subsection{Class declaration}
+
+   \btabb
+        \entry{class \textbf{AMI\_COLLECTION};} {}
+   \etabb
+
+\subsection{Description}
+
+A block collection is a set of fixed size blocks. Each block inside the
+collection is identified by a block ID, of type \lstinline|AMI_bid|.
+
+\subsection{Constructors and Destructor}
+
+   \btabb
+        
+        \entry{\textbf{AMI\_COLLECTION}(size\_t lbf = 1);} {Create a {\em new}
+        collection with access type \lstinline|AMI_WRITE_COLLECTION| using
+        temporary file names. The files are created in a directory given by
+        the \lstinline|AMI_SINGLE_DEVICE| environment variable (or 
+        \path"/var/tmp/" if that variable is not set).  The \lstinline|lbf|
+        (logical block factor) parameter determines the size of the blocks
+        stored (the block size is \lstinline|lbf| times the operating system
+        page size). The persistency of the collection is set to 
+        \lstinline|PERSIST_DELETE|.}
+
+        \entry{\textbf{AMI\_COLLECTION}(char *base\_file\_name,
+        AMI\_collection\_type t = AMI\_READ\_WRITE\_COLLECTION, size\_t lbf
+= 1);} {Create a new or open an 
+        existing collection using \lstinline|base_file_name| to find the
+        necessary files. The access type is set to \lstinline|t|. It has one of
+        the following values:
+        \begin{itemize} 
+          \item[]\lstinline|AMI_READ_COLLECTION| Open an existing collection
+          read-only;
+          \item[]\lstinline|AMI_WRITE_COLLECTION| If the files specified by
+          \lstinline|base_file_name| exist, open a collection using those files
+          for reading and writing. If the files do not exist, create a new
+          collection with read and write access;
+        \end{itemize}
+        The \lstinline|lbf| (logical block factor) parameter determines the size
+        of the blocks stored (the block size is \lstinline|lbf| times the
+        operating system page size). The persistency of the collection is
+        set to \lstinline|PERSIST_PERSISTENT|.}
+
+      \entry{\textbf{$\sim$AMI\_COLLECTION}();} {Destructor.
+      Closes all files. If persistency is set to \lstinline|PERSIST_DELETE|, it
+      also removes the files. There should be no blocks in memory. If the
+      destructor detects in-memory blocks, it issues a warning in the TPIE
+      log file (if logging is turned on). The memory held by those blocks
+      is lost to this program.}
+
+   \etabb
+
+\subsection{Member Functions}
+
+   \btabb
+
+        \entry{bool \textbf{operator!}() const;} {Return \lstinline|true| if
+        the status of the collection is not
+        \lstinline|AMI_COLLECTION_STATUS_VALID|, \lstinline|false|
+        otherwise. See also \lstinline|is_valid()| and \lstinline|status()|.}
+
+        \entry{size\_t \textbf{block\_factor}() const;} {Return the logical
+        block factor. The block size is obtained by multiplying the
+        operating system page size by this value.}
+
+        \entry{size\_t \textbf{block\_size}() const;} {Return the size of a block
+        stored in this collection, in bytes (all blocks in a collection
+        have the same size).}
+
+        \entry{static const tpie\_stats\_collection\& \textbf{gstats}();}
+        {Return an object containing the statistics of all collections
+        opened by the application (global statistics). See also
+        \lstinline|stats()|.}
+
+        \entry{bool \textbf{is\_valid}() const;} {Return \lstinline|true| if the status
+        of the collection is \lstinline|AMI_COLLECTION_STATUS_VALID|, \lstinline|false|
+        otherwise. See also \lstinline|status()|.}
+
+        \entry{void \textbf{persist}(persistence p);} {Set the persistency flag to
+        \lstinline|p|. The possible values for \lstinline|p| are 
+        \lstinline|PERSIST_PERSISTENT| and \lstinline|PERSIST_DELETE|.}
+
+        \entry{persistence \textbf{persist}() const;} {Return the value of the 
+        persistency flag.}
+
+        \entry{size\_t \textbf{size}() const;} {Return the number of blocks in the
+        collection.}
+
+        \entry{const tpie\_stats\_collection\& \textbf{stats}() const;}
+        {Return an object containing the statistics of this collection. The
+        types of statistics computed for a collection are tabulated
+        below. See also \lstinline|gstats()|.\\[1mm] \begin{tabular}{|l|l|} \hline \lstinline|BLOCK_GET| & Number
+        of block reads\\ \lstinline|BLOCK_PUT| & Number of block writes \\
+        \lstinline|BLOCK_NEW| & Number of block creates\\
+        \lstinline|BLOCK_DELETE| & Number of block deletes\\
+        \lstinline|BLOCK_SYNC| & Number of block sync operations\\
+        \lstinline|COLLECTION_OPEN| & Number of collection open operations\\
+        \lstinline|COLLECTION_CLOSE| & Number of collection close
+        operations\\ \lstinline|COLLECTION_CREATE| & Number of collection
+        create operations\\ \lstinline|COLLECTION_DELETE| & Number of
+        collection delete operations\\ \hline \end{tabular} }
+
+        \entry{AMI\_collection\_status \textbf{status}() const;} {Return
+        the status of the collection. The result is either
+        \lstinline|AMI_COLLECTION_STATUS_VALID| or
+        \lstinline|AMI_COLLECTION_STATUS_INVALID|. The only operation that
+        can leave the collection invalid is the constructor (if that
+        happens, the log file contains more information). No blocks should
+        be read from or written to an invalid collection.}
+
+        \entry{void *\textbf{user\_data}();} {Return a pointer to a 512-byte array
+        stored in the header of the collection. This can be used by the
+        application to store initialization information (e.g., the id of
+        the block containing the root of a B-tree).}
+
+   \etabb
+\index{AMI_COLLECTION@{\tt AMI\_COLLECTION}|)}
+
+\clearpage
+%%%%%%%%%% AMI B+-tree %%%%%%%%%%%
+\mysection{B+-tree}
+\index{AMI_btree@{\tt AMI\_btree}|(}
+
+\subsection{Files}
+\btabb
+   \entry{\#include <ami\_btree.h>} {}
+\etabb
+
+\subsection{Class Declaration}
+
+\btabb
+   \entry{template<class Key, class Value, class Compare, class
+   KeyOfValue>\\ class \textbf{AMI\_btree};} {}
+\etabb
+
+\subsection{Description}
+
+The \lstinline|AMI_btree<Key, Value, Compare, KeyOfValue>| class implements the
+behavior of a dynamic B+-tree or $(a,b)$-tree storing fixed-size data
+items. All data elements (of type \lstinline|Value|) are stored in the leaves of
+the tree, with internal nodes containing keys (of type \lstinline|Key|) and links
+to other nodes. The keys are ordered using the \lstinline|Compare| function
+object, which should define a strict weak ordering (as in the STL sorting
+algorithms). Keys are extracted from the \lstinline|Value| data elements using
+the \lstinline|KeyOfValue| function object.
+
+\subsection{Constructors and Destructor}
+
+\btabb
+
+   \entry{\textbf{AMI\_btree}(const AMI\_btree\_params \&params = btree\_params\_default);}
+   {Construct an empty AMI\_btree using temporary files. The tree is stored in a
+   directory given by the \lstinline|AMI_SINGLE_DEVICE| environment variable (or \path"/var/tmp/" if that variable is not set). The persistency flag is set to
+   \lstinline|PERSIST_DELETE|. The \lstinline|params| object contains the
+   user-definable parameters (see Appendix for an explanation of the 
+   \lstinline|AMI_btree_params| class and the default values).}
+
+   \entry{\textbf{AMI\_btree}(const char *bfn, BTE\_collection\_type t =
+   BTE\_WRITE\_COLLECTION, const AMI\_btree\_params \&params =
+   btree\_params\_default);}{Construct a B-tree
+   using the files given by \lstinline|bfn| (base file name).  The files
+   created/used by a Btree instance are outlined in the following
+   table.\\[1mm] \begin{tabular}{|l|l|} \hline {\em bfn}\path".l.blk" &
+   Contains the leaves block collection.\\ \hline {\em bfn}\path".l.stk" &
+   Contains the free blocks stack for the leaves block collection.\\ \hline
+   {\em bfn}\path".n.blk" & Contains the nodes block collection.\\ \hline
+   {\em bfn}\path".n.stk" & Contains the free blocks stack for the nodes
+   block collection.\\ \hline \end{tabular}\\[2mm] The persistency flag is
+   set to \lstinline|PERSIST_PERSISTENT|. The \lstinline|params| object contains the
+   user-definable parameters (see Appendix for an explanation of the 
+   \lstinline|AMI_btree_params| class and the default values).}
+
+   \entry{\textbf{$\sim$AMI\_btree}();} {Destructor. Either remove or close the supporting
+   files, depending on the persistency flag (see method \lstinline|persist()|).}
+
+\etabb
+
+\subsection{Member functions}
+
+\btabb
+
+   \entry{bool \textbf{erase}(const Key\& k);} {Delete the element with key \lstinline|k|
+   from the tree. Return true if succeeded, false otherwise (key not
+   found).}
+
+   \entry{bool \textbf{find}(const Key\& k, Value\& v);} {Find an element based on
+   its key. If found, store it in \lstinline|v| and return true.}
+
+   \entry{size\_t \textbf{height}() const;} {Return the height of the tree, including
+   the leaf level. A value of $0$ represents an empty tree.}
+
+   \entry{bool \textbf{insert}(const Value\& v);} {Insert an element \lstinline|v| into the
+   tree. Return true if the insertion succeeded, false otherwise (duplicate
+   key).}
+
+   \entry{bool \textbf{is\_valid}() const;} {Return \lstinline|true| if the status
+   of the tree is \lstinline|AMI_BTREE_STATUS_VALID|, \lstinline|false|
+   otherwise. See also \lstinline|status()|.}
+
+   \entry{AMI\_err \textbf{load}(AMI\_STREAM<Value>* is, float lf = 0.7,
+   float nf = 0.5)} {Bulk load from the stream \lstinline|is| of elements. Leaves
+   are filled to \lstinline|lf|$\times$capacity, and nodes are filled to 
+   \lstinline|nf|$\times$capacity.}
+
+   \entry{AMI\_err \textbf{load}(AMI\_btree<Key, Value, Compare,
+   KeyOfValue>* bt, float leaf\_fill = .7, float node\_fill =
+   .5);}{Bulk load from another B-tree. This is a means of reorganizing a
+   B-tree after a lot of updates. A newly loaded structure may use less
+   space and may answer range queries faster.}
+
+   \entry{AMI\_err \textbf{load\_sorted}(AMI\_STREAM<Value>* is, float lf =
+   0.7, float nf = 0.5);} {Same as \lstinline|load()| above, but bypasses the
+   expensive sorting step, by assuming that the stream \lstinline|is| is sorted.}
+
+   \entry{const AMI\_btree\_params\& \textbf{params}() const;} {Return a const
+   reference to the \lstinline|AMI_btree_params| object used by the B-tree. This
+   object contains the true values of all parameters (unlike the object
+   passed to the constructor, which may contain $0$-valued parameters to
+   indicate default behavior; see Section~\ref{ssec:params} below).}
+
+   \entry{void \textbf{persist}(persistence p);} {Set the persistency
+     flag to \lstinline|p|. The persistency flag dictates the behavior of the destructor of
+   this \lstinline|AMI_btree| object. If \lstinline|p| is \lstinline|PERSIST_DELETE|, all files
+   associated with the tree will be removed, and all the elements stored in
+   the tree will be lost after the destruction of this \lstinline|AMI_btree| object. If
+   \lstinline|p| is \lstinline|PERSIST_PERSISTENT|, all files associated with the tree
+   will be closed during the destruction of this \lstinline|AMI_btree| object, and all the
+   information needed to reopen this tree will be saved.}
+
+   \entry{bool \textbf{pred}(const Key\& k, Value\& v);} {Find the highest
+   element stored in the tree whose key is lower than \lstinline|k|. If such
+   an element exists, return \lstinline|true| and store the result in
+   \lstinline|v|. Otherwise, return \lstinline|false|.}
+
+   \entry{void \textbf{range\_query}(const Key\& k1, const Key\& k2,
+   AMI\_STREAM<Value>* os);} {Find all elements within the range given by
+   keys \lstinline|k1| and \lstinline|k2| and write them to stream \lstinline|os|.}
+
+
+   \entry{size\_t \textbf{size}() const;} {Return the number of elements
+   stored in the leaves of this tree.}
+
+   \entry{AMI\_err \textbf{sort}(AMI\_STREAM<Value>* is,
+   AMI\_STREAM<Value>* \&os);} {As a convenience, this function sorts the
+   stream \lstinline|is| and stores the result in \lstinline|os|. If the value of \lstinline|os| passed to the function is \lstinline|NULL|, a new stream is created and
+   \lstinline|os| points to it.}
+
+   \entry{AMI\_btree\_status \textbf{status}() const;} {Return the status
+   of the collection. The result is either
+   \lstinline|AMI_BTREE_STATUS_VALID| or
+   \lstinline|AMI_BTREE_STATUS_INVALID|. The only operation that can leave
+   the tree invalid is the constructor (if that happens, the log file
+   contains more information).}
+
+   \entry{bool \textbf{succ}(const Key\& k, Value\& v);} {Find the lowest
+   element stored in the tree whose key is higher than \lstinline|k|. If such
+   an element exists, return \lstinline|true| and store the result in
+   \lstinline|v|. Otherwise, return \lstinline|false|.}
+
+   \entry{AMI\_err \textbf{unload}(AMI\_STREAM<Value>* s);} {Write all
+   elements stored in this tree to the given stream, in sorted order. No
+   changes are performed on the tree.}
+
+%   \> \lstinline|bool defragment()}\\ \>\>\parbox[t]{5.5in}{Rearrange the nodes
+%   and leaves of the tree so that they take the minimum disk space. This is
+%   a very time-consuming operation. Return true if completed
+%   successfully.}\\[3mm]
+\etabb
+
+\subsection{The \texttt{AMI\_btree\_params} Class}\label{ssec:params}
+\index{AMI_btree_params@{\tt AMI\_btree\_params}|(}
+The \lstinline|AMI_btree_params| class encapsulates all user-definable B-tree
+parameters. These parameters dictate the layout of the tree and its
+behavior under insertions and deletions. An instance of the class created
+using the default constructor gives default values to all parameters. Each
+parameter can then be changed independently.
+
+\subsubsection{Class Declaration}
+
+\btabb
+
+  \entry{class \textbf{AMI\_btree\_params};} {}
+
+\etabb
+
+\subsubsection{Constructor}
+
+\btabb
+
+  \entry{\textbf{AMI\_btree\_params}()} {Initialize a \lstinline|Btree_params| object with
+  default values. The default values are given in the following table.\\[1mm]
+  \begin{tabular}{|l|c|}
+    \hline
+    {\em Parameter} & {\em Value} \\ \hline
+    \lstinline|leaf_size_min| & 0 \\ \hline
+    \lstinline|node_size_min| & 0 \\ \hline
+    \lstinline|leaf_size_max| & 0 \\ \hline
+    \lstinline|node_size_max| & 0 \\ \hline
+    \lstinline|leaf_block_factor| & 1 \\ \hline
+    \lstinline|node_block_factor| & 1 \\ \hline
+    \lstinline|leaf_cache_size| & 5 \\ \hline
+    \lstinline|node_cache_size| & 10 \\ \hline
+  \end{tabular}
+  }
+
+\etabb
+
+\subsubsection{Public Member Objects}
+
+\btabb
+
+  \entry{size\_t \textbf{leaf\_size\_min}} {Minimum number of elements in a leaf. A
+  value of $0$ tells the class to use the default B+-tree behavior. This
+  parameter is a guideline. To improve performance, some leaves may have
+  fewer elements.}
+
+  \entry{size\_t \textbf{node\_size\_min}} {Minimum number of keys in an internal
+  node. A value of $0$ tells the class to use the default B+-tree
+  behavior. As above, this parameter is a guideline.}
+
+  \entry{size\_t \textbf{leaf\_size\_max}} {Maximum number of elements in a leaf. A
+  value of $0$ tells the class to fill a leaf to capacity. This value is
+  strictly enforced.}
+
+  \entry{size\_t \textbf{node\_size\_max}} {Maximum number of keys in an internal
+  node. A value of $0$ tells the class to fill a node to capacity. This
+  value is strictly enforced.}
+
+  \entry{size\_t \textbf{leaf\_block\_factor}} {The size (in bytes) of a leaf block
+  is \lstinline|leaf_block_factor|$\times$\lstinline|os_block_size|, where \lstinline|os_block_size| is the operating-system specific page size.}
+
+  \entry{size\_t \textbf{node\_block\_factor}} {The size (in bytes) of an internal
+  node block is \lstinline|node_block_factor|$\times$\lstinline|os_block_size|.}
+
+  \entry{size\_t \textbf{leaf\_cache\_size}} {The size (in number of leaf blocks) of
+  the leaf block cache. The cache implements an LRU replacement policy.}
+
+  \entry{size\_t \textbf{node\_cache\_size}} {The size (in number of node blocks) of
+  the node block cache. The cache implements an LRU replacement policy.}
+
+\etabb
+\index{AMI_btree_params@{\tt AMI\_btree\_params}|)}
+\index{AMI_btree@{\tt AMI\_btree}|)}
+
+\clearpage
+%%%%%%%% AMI Cache Manager %%%%%%%%%%
+\mysection{Cache Manager}
+
+\subsection{Files}
+   \btabb
+      \entry{\#include <ami\_cache.h>} {}
+   \etabb
+
+\subsection{Class Declaration}
+   \btabb
+      \entry{template<class T, class W> class \textbf{AMI\_CACHE\_MANAGER};} {}
+   \etabb
+
+\subsection{Description}
+
+\subsection{Constructors and Destructor}
+   \btabb
+      \entry{\textbf{AMI\_CACHE\_MANAGER}(size\_t capacity);}{Construct a fully-associative cache manager with the given capacity.}
+      \entry{\textbf{AMI\_CACHE\_MANAGER}(size\_t capacity, size\_t assoc);}{Construct a cache manager with the given capacity and associativity.}
+      \entry{\textbf{$\sim$AMI\_CACHE\_MANAGER}();}{Destructor. Write out all items still in the cache.}
+   \etabb
+
+\subsection{Member Functions}
+   \btabb
+       \entry{bool \textbf{read}(size\_t k, T \& item);}{Read an item from the cache based on key \lstinline|k| and store it in \lstinline|item|. If found, the item is removed from the cache. Return true if the key was found.}
+      \entry{bool \textbf{write}(size\_t k, const T \& item);}{Write an item in the cache based on the given key \lstinline|k|. If the cache was full, the least recently used item is written out using the \lstinline|W| function object, and it is removed from the cache.}
+      \entry{bool \textbf{erase}(size\_t k);}{Erase an item from the cache based on the given key \lstinline|k|. Return true if the key was found.}
+   \etabb
+
+\clearpage
+%%%%%%%% Progress Indicators %%%%%%%%
+\mysection{Progress Indicators}
+
+\subsection{Files}
+\btabb
+   \entry{\#include <progress\_indicator\_arrow.h>} {}
+   \entry{\#include <progress\_indicator\_spin.h>} {}
+\etabb
+
+\subsection{Class Declaration}
+
+\btabb
+   \entry{class \textbf{progress\_indicator\_arrow};} {}
+   \entry{class \textbf{progress\_indicator\_spin};} {}
+\etabb
+
+\subsection{Description}
+
+At times, especially when processing large data sets, the user might
+want the program to provide information about how much progress has
+been made. TPIE provides a class hierarchy with an abstract base class
+\lstinline|progress_indicator_base| for realizing such
+indicators. TPIE offers terminal-based indicators, such as
+\lstinline|progress_indicator_arrow| that shows an extending arrow or
+\lstinline|progress_indicator_spin| that shows a spinning
+``wheel''. To allow for other types of indicators such as
+graphics-based indicators for (interfaces to) indicators provided by
+other APIs, the terminal-based indicators inherit from
+\lstinline|progress_indicator_terminal| which in turn inherits from
+\lstinline|progress_indicator_base|. To include other types of
+non-terminal-based indicators, the user thus should subclass
+\lstinline|progress_indicator_base|. 
+
+All indicators are based upon the following concept: The indicator is
+given a range $[\mathit{minRange},\mathit{maxRange}]$ and a parameter
+$\mathit{stepValue}$. For each update to the indicator and starting at
+$\mathit{minRange}$, the progress status will be advanced by
+$\mathit{stepValue}$ units.
+
+\subsection{Constructor}
+
+\btabb
+
+   \entry{\textbf{progress\_indicator\_arrow}(const char* title, 
+     const char* description, 
+     TPIE\_OS\_OFFSET minRange, 
+     TPIE\_OS\_OFFSET maxRange, 
+     TPIE\_OS\_OFFSET stepValue)}{Constructs a progress
+     indicator with a given title and task description that can
+     ``count'' from $\mathit{minRange}$ to $\mathit{maxRange}$ by
+     advancing $\mathit{stepValue}$ units per step.}
+
+\etabb
+
+\subsection{Member functions}
+
+\btabb
+
+    \entry{void init(const char* description=NULL)}{Display a zero
+      count. This method may also be used to simultaneously set a new
+      description.} 
+
+    \entry{void reset()}{Reset the counter. The current position is
+      reset to the lower bound of the counting range.}
+
+    \entry{void done(const char* text = NULL)}{Advance the indicator
+      to the end and print an (optional) message that is followed by a
+      newline.} 
+
+    \entry{void set\_range(TPIE\_OS\_OFFSET minRange, TPIE\_OS\_OFFSET
+      maxRange, TPIE\_OS\_OFFSET stepValue)}{Simultaneously set the
+      upper and lower bound of the counting range. Also, set the
+      increment for each step. There is a sanity check that ensures
+      that $\mathit{minRange} \leq \mathit{maxRange}$ and that
+      $\mathit{stepValue} \in [1,\mathit{maxRange}-\mathit{minRange}]$.}
+    
+    \entry{void set\_percentage\_range(TPIE\_OS\_OFFSET minRange,
+      TPIE\_OS\_OFFSET maxRange, unsigned short percentageUnit =
+      100)}{Simultaneously set the upper and lower bound of the
+      counting range and set the increment to be
+      $\max\{1,(1/\mathit{percentageUnit})(\mathit{maxRange}-\mathit{minRange})\}$.
+      There is a sanity check that ensures that $\mathit{minRange}
+      \leq \mathit{maxRange}$.}
+
+    \entry{void step()}{Record an increment to the indicator and advance
+      the indicator.} 
+    
+    \entry{void step\_percentage()}{Record an increment but only
+      advance the indicator if it will be advance by at least one
+      $\mathit{percentageUnit}$ (as defined in \lstinline|setPercentageRange|).}
+
+    \entry{void set\_min\_range(TPIE\_OS\_OFFSET minRange)}{Set the
+      lower bound of the counting range. This method also implies a
+      reset of the counter. In order to be able to set the lower bound
+      independent of setting the upper bound,  no range checking is
+      done.} 
+    
+    \entry{void set\_max\_range(TPIE\_OS\_OFFSET maxRange)}{Set the
+      upper bound of the counting range. This method also implies a
+      reset of the counter. In order to be able to set the upper bound
+      independent of setting the lower bound, no range checking is
+      done.}
+
+    \entry{void set\_step\_value(TPIE\_OS\_OFFSET stepValue)}{Set the
+      increment by which the counter is advanced upon each call to
+      \lstinline|step()|. In order to be able to reset the counter, no
+      range checking is done.} 
+
+    \entry{void set\_title(const char* title)}{Set the title of a new
+      task to be monitored. For terminal-based indicators, the
+      following holds: The terminal line will be newline'd, and the
+      title will be followed by a newline as well.}
+    
+    \entry{void set\_description(const char* description)}{Set the
+      description of the task currently being monitored. For
+      terminal-based indicators, the following holds: Invoking this
+      method will clear the terminal line.}  
+
+\etabb
+
+\vspace*{2\baselineskip}
+
+The following method is realized for terminal-based indicators only.
+
+\btabb
+    \entry{void set\_indicator\_length(int indicatorLength)}{Set the
+      maximum length of the indicator, i.e., the number of characters
+      the indicator occupies on a single line. The length is enforced 
+      to be an integer in $[2,60]$.}
+\etabb
+
+\vspace*{2\baselineskip}
+
+\clearpage
+\subsection{Example Program}
+The following program is meant to illustrate the use of a progress
+indicator:
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,caption={A
+  sample program illustrating the use of a progress indicator.}]{src/progress.cpp}
+
+%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "tpie"
+%%% End: 
+%%%

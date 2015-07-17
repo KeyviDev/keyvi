@@ -1,0 +1,61 @@
+/**
+\page btree Augmented B-tree
+
+TPIE provides an implementation of augmented B-trees that can be stored in both internal and external memory. The btree is implemented in the file \ref btree/btree.h in the tpie namespace. 
+
+\section sec_stores Stores
+
+The storage of nodes is deligated to a store class. TPIE comes with two stores; the \ref btree_internal_store defined in \ref btree/internal_store.h and \ref btree_external_store defined in \ref btree/external_store.h.
+
+The internal store stores the nodes in internal memory. The nodes in the internal has between 2 and 4 children by default, however this can be changed by setting a template parameter. The usage of the internal store is straightforward:
+\code
+typedef tpie::btree_internal_store<int> store_t;
+		
+store_t store;
+tpie::btree<store_t> tree(store);
+tree.insert(42);
+\endcode
+
+The external store stores the nodes in external memory. The minimum and maximum number of children of a node is determined by the library. The store is initialized with a file, designating where the nodes will be stored. It is possible to reopen an external store by simply using a file that was previously used by an external store.
+\code
+typedef tpie::btree_external_store<int> store_t;
+
+tpie::temp_file file;
+store_t store(file.path());
+tpie::btree<store_t> tree(store);
+tree.insert(42);
+\endcode
+
+\section sec_traversal Traversal
+The btree can be traversed by using the interface provided by the node class defined in \ref btree/node.h. The root node of the tree can be retrieved by calling \c root().
+
+\section sec_augmentation Augmentation of nodes
+The nodes in the btree can be augmented by defining an augment and an augmenter and passing these as template parameters to the tree. The following example computes the averages of nodes in the tree using the augment interface.
+\code
+@DOCCODE_BTREE_AUGMENT@
+\endcode
+
+\code
+typedef tpie::btree_internal_store<int, average_augment> store_t;
+
+store_t store;
+tpie::btree<store_t, std::less<int>, average_augmenter> tree(store);
+\endcode
+
+\section sec_key Key extract functor
+In all the previous examples, the values inserted into the tree acted as keys themselves. In order to have a seperate key, a key extractor can be defined. The following example demonstrates this.
+\code
+@DOCCODE_BTREE_KEY@
+\endcode
+
+\code
+typedef tpie::btree_internal_store<point, tpie::empty_augment, point_key_func> store_t;
+
+store_t store;
+tpie::btree<store_t> tree(store);
+
+tree.insert(std::make_pair(1, 3));
+tree.insert(std::make_pair(3, 9));
+\endcode
+
+*/

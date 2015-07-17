@@ -1,0 +1,224 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+\chapter{Test and Sample Applications}
+
+\section{General Structure and Operation}
+
+The test and sample applications distributed with TPIE are in the
+\path"test/" directory.  The test programs are designed primarily to
+test the operation of the system to verify that it has been installed
+correctly and is as bug free as possible.  These applications all have
+names of the form \path"test_*".  The sample applications are designed
+to demonstrate the use of TPIE in the solution of non-trivial
+problems.
+
+The test and sample applications all share a small amount of common
+initialization and argument parsing code.  They all include the header
+file \path"app_config.h", which selects a particular implementation of
+streams at the AMI and BTE levels. They also all use the same argument
+parsing function \lstinline|parse_args()|, which parses certain
+default arguments and then uses a callback function for arguments
+specific to the particular application.
+
+Much of the functionality provided by the common initialization and
+argument passing code is intended to eventually be subsumed by
+operating system provided services.  For example, the amount of main
+memory a particular application is permitted to use can be set via a
+command line argument.  It is up to the user to be sure that this
+number is reasonable and does not exceed the true amount of main
+memory available to the application.  In the future, it is hoped that
+this information will be provided by the operating system.
+
+\comment{JV: The argument parsing has changed. This section needs to
+  be rewritten accordingly. LA: please do! :-)}
+
+\lstinline|parse_args()| is declared as follows:
+
+\begin{lstlisting}
+    parse_args();
+\end{lstlisting}
+
+
+The following is a summary of the common command line arguments that
+are parsed by \lstinline|parse_args()|.
+\begin{description}
+\item\lstinline|-t testsize| Set the size of the test to be run to
+  \lstinline|testsize|.  Typically this is the number of objects to be
+  put into the application produced input stream.  In matrix tests,
+  however, it is the number of rows and columns in the test matrices.
+  If this argument is not provided, then a default value of 8 MB is
+  used.
+\item\lstinline|-m memsize| The number of bytes of main memory that
+  the application is permitted to use.  The TPIE Memory
+  Manager\index{memory manager} will ensure that no more than this
+  amount is used.  If this option is not specified, then a default
+  value of 2 MB is used.
+\item\lstinline|-z randomseed| Seed the random number generator with
+  the value \lstinline|randomseed|.  This is useful for debugging or
+  testing, when we want several runs of the application to rely on the
+  same series of pseudo-random numbers.  For applications that do not
+  generate test data randomly, this has no effect.
+\item\lstinline|-v| Turns on verbose mode.  When running in verbose
+  mode, report major actions of the running program to
+  \lstinline|stdout|.
+\end{description}
+
+Each application specific argument appears in the string pointed to by
+\lstinline|aso| as a single character, possibly followed by the single
+character `\lstinline|:|', indicating that the argument requires a
+value.  For example, if \lstinline|aso| pointed to the string
+``\lstinline|ax:z|'' then the following command line arguments would
+all be parsed correctly:
+
+\begin{description}
+\item\lstinline|-a|
+\item\lstinline|-x 123|
+\item\lstinline|-a -x 123|
+\item\lstinline|-ax123|
+\item\lstinline|-x123 -a|
+\end{description}
+
+In each case, \lstinline|parse_app()| would be called to take some
+application specific action for each of the arguments.  It would be
+called once with \lstinline|opt| set to `\lstinline|a|' and
+\lstinline|optarg| set to \lstinline|NULL|, and/or once with
+\lstinline|opt| set to `\lstinline|x' and \lstinline|optarg| pointing
+to the string ``\lstinline|123|''  When multiple arguments are present
+on the command line, they are parsed from left to right.
+
+The following is an example of how a test application, in this case
+\lstinline|test_ami_sort|, can use application specific command line
+arguments to set up its global state.
+
+\begin{lstlisting}
+static const char as_opts[] = "R:S:rsao";
+void parse_app_opt(char c, char *optarg)
+{
+    switch (c) {
+        case 'R':
+            rand_results_filename = optarg;
+        case 'r':
+            report_results_random = true;
+            break;
+        case 'S':
+            sorted_results_filename = optarg;
+        case 's':
+            report_results_sorted = true;
+            break;
+        case 'a':
+            sort_again = !sort_again;
+            break;
+        case 'o':
+            use_operator = !use_operator;
+            break;
+    }
+}
+
+int main(int argc, char **argv)
+{
+    parse_args(argc,argv,as_opts,parse_app_opt);
+
+    ...
+
+    return 0;
+}
+\end{lstlisting}
+
+\section{Test Programs}
+
+The test programs include with TPIE are as follows:\comment{LA: Is this
+still correct?}
+
+\begin{description}
+\item\lstinline|test_ami_merge| Test fixed way merging with direct
+  calls to \lstinline|AMI_merge()|, as described in
+  Section~\ref{sec:ref-ami-merge}.
+\item\lstinline|test_ami_pmerge| Test many-way merging using
+  \lstinline|AMI_partition_and_merge()|, as described in
+  Section~\ref{sec:ref-ami-merge}.
+\item\lstinline|test_ami_sort| Test sorting using
+  \lstinline|AMI_sort()| as described in
+  Section~\ref{sec:ref-ami-sort}.
+\item\lstinline|test_ami_gp| Test general permutation using
+  \lstinline|AMI_general_permute()| as described in
+  Section~\ref{sec:ref-imp-ami-gp}.  The program generates an input
+  stream consisting of sequential integers, and outputs a stream
+  consisting of the same integers, in reverse order.
+\item\lstinline|test_ami_bp| Test bit permutations using
+  \lstinline|AMI_BMMC_permute()| as described in
+  Section~\ref{sec:ref-imp-ami-bp}.  The program generates an input
+  stream consisting of sequential integers, and outputs a stream
+  consisting of a permutation of these integers, as described in the
+  example given in the Tutorial, Section~\ref{sec:tut-bit-permuting}.
+\item\lstinline|test_matrix|
+\item\lstinline|test_bit_matrix| Test main memory matrix manipulation
+  and arithmetic.  This is used both by the bit permuting code
+  described in Section~\ref{sec:ref-imp-ami-bp} and the dense matrix
+  multiplication code described in Section~\ref{sec:ref-imp-ami-matrix}
+  for internal manipulation of sub-matrices of external memory
+  matrices.
+\item\lstinline|test_ami_matrix_pad| Test padding of external
+  matrices.  This is the preprocessing step for the external dense
+  matrix multiplication algorithm TPIE uses, which is described in 
+  Section~\ref{sec:ref-imp-ami-matrix}. 
+\item\lstinline|test_ami_matrix| Test external dense matrix arithmetic
+  as described in Section~\ref{sec:ref-imp-ami-matrix}.
+\item\lstinline|test_ami_sm| Test external sparse matrix arithmetic as
+  described in Section~\ref{sec:ref-imp-ami-sm}.
+\item\lstinline|test_ami_stack| Test external memory stacks as
+  described in Section~\ref{sec:ref-ami-stack}.
+\item\lstinline|test_ami_arith| Test elementwise arithmetic on
+  external memory streams as described in
+  Section~\ref{sec:ref-imp-ami-arith}.  The program generates an input
+  stream consisting of sequential integers, squares them, and performs
+  elementwise division between the resulting stream and the input
+  stream.
+\end{description}
+
+\section{Sample Applications}
+
+The sample applications included with TPIE are as follows:\comment{LA:
+  True?}
+
+\begin{description}
+\item\lstinline|ch2| Two dimensional convex hull\index{convex hull}
+  program using Graham's scan.  It is implemented using a scan
+  management object that maintains the upper and lower hull internally
+  as external memory stacks.  Much of the code in this application
+  appears in Section~\ref{sec:convex-hull}.
+\item\lstinline|lr| An implementation of an asymptotically optimal list
+  ranking \index{list ranking} algorithm.  The idea of geometrically
+  decreasing computation is used.  Much of the code in this
+  application appears in Section~\ref{sec:list-ranking}.
+\item\lstinline|nas_ep| An I/O-efficient implementation of the NAS EP
+  parallel benchmark.  This benchmark generates pairs of independent
+  Gaussian random variates.
+\item\lstinline|nas_is| An I/O-efficient implementation of the NAS IS
+  parallel benchmark.  This benchmark sorts integers using one of a
+  variety of approaches.
+\end{description}
+
+Detailed descriptions of the parallel benchmarks are available
+from the NAS Parallel Benchmark Report at URL \href{http://www.nas.nasa.gov/Research/Reports/Techreports/1994/HTML/npbspec.html}{\path"http://www.nas.nasa.gov/Research/Reports/Techreports/1994/HTML/npbspec.html"}.
+
+%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "tpie"
+%%% End: 
+%%%

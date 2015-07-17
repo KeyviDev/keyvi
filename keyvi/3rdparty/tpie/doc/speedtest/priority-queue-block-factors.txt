@@ -1,0 +1,34 @@
+Priority queue block factor tests
+
+Running the speed-pq.sh batch tester for the priority queue given different
+block sizes (actually block factors ranging from 2^-7 to 2^0, yielding block
+sizes between 2^4 KiB and 2^11 KiB), we see that 128 KiB is the overall best
+choice of block size when the priority queue contains uint64s.
+
+Tests run on the machine `grits' at MADALGO, running Ubuntu Linux 11.04, kernel
+2.6.38-11-generic, from October 31 to November 3, 2011, using filestream
+branch, commit c48ac80..., 350 GB data, 2 TB RAID array, ext4.
+
+Block size   Elements       Time to push   Time to pop    Total time
+    16 KiB   46976204800    17080.455237    8715.618900   25796.074137
+    32 KiB   46976204800    16460.844423    9155.754790   25616.599213
+    64 KiB   46976204800    15341.110747    9534.675143   24875.785890
+   128 KiB   46976204800    15285.954075    9572.589590   24858.543665
+   256 KiB   46976204800    15801.956408    9933.776107   25735.732515
+   512 KiB   46976204800    18489.511108   10982.458784   29471.969892
+     1 MiB   46976204800    21321.402241   11117.001435   32438.403676
+     2 MiB   46976204800    27136.143070   13863.666662   40999.809732
+
+Tests run on the machine `gonzales', running Arch Linux, kernel 3.0-ARCH, on
+November 8, 2011, using filestream branch, commit e62e1ff..., 21.9 GB data,
+160 GB ext4 partition on an unused 2 TB disk.
+
+Block size   Elements    Time to push  Time to pop  Total time
+    16 KiB   2936012800   1613.029407   359.966223  1972.995630
+    32 KiB   2936012800   1600.307575   391.046835  1991.354410
+    64 KiB   2936012800   1222.128689   426.446854  1648.575543
+   128 KiB   2936012800    866.049080   422.258873  1288.307953
+   256 KiB   2936012800    862.587745   399.528451  1262.116196
+   512 KiB   2936012800   1453.074571   388.262737  1841.337308
+     1 MiB   2936012800   1628.792704   405.095782  2033.888486
+     2 MiB   2936012800   1874.059528   428.442642  2302.502170

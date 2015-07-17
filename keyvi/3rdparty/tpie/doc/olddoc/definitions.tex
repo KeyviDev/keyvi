@@ -1,0 +1,178 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+\hbadness=10000
+
+% For text shading.
+\definecolor{lgray}{gray}{.85}
+% Section command that displays the section name on a light gray background.
+%\newcommand{\mysection}[1]{\penalty-600\vspace*{12mm}\noindent%
+%\colorbox{lgray}{\rule{0cm}{4.7mm}\rule{\textwidth}{0cm}}%
+%\vspace*{-13.3mm}\section{#1}\penalty+600}
+%\newcommand{\mysection}[1]{\section{#1}}
+\makeatletter
+\newcommand\mysection{\@startsection {section}{1}{\z@}%
+                                   {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                   {2.3ex \@plus.2ex}%
+                                   {\normalfont\Large\bfseries\hspace*{-9mm}\colorbox{lgray}{\rule{0cm}{4.7mm}\rule{15.1cm}{0cm}}\hspace{-15.1cm} }}
+\makeatother
+
+% plabel allows the label value to be printed for easier
+% writing of the manual
+%\newcommand{\plabel}[1]{{\tiny #1}\label{#1}}
+\newcommand{\plabel}[1]{\label{#1}}
+
+%%%
+%%%  The following macros are obsolete due to switching to
+%%%  the listings package
+%%% 
+
+%% % use this instead of \verb, which is not allowed as parameter [tavi]
+%% %app_config@{\tt app\_config.h}}
+%% %\newcommand{\myverb}[1]{\texttt{#1}\index{#1@{\tt #1}}}
+%% %\newcommand{\myv}[1]{\texttt{#1}\index{#1@{\tt #1}}}
+%% %%\newcommand{\myverb}[1]{\noiv{#1}\index{#1@{\small\tt #1}}}
+%%\newcommand{\myv}[1]   {\noiv{#1}\index{#1@{\small\tt #1}}}
+
+%% % use this instead of \myverb if you don't want its
+%% % parameter in the index
+%% %\newcommand{\noiverb}[1]{\texttt{#1}}
+%% %\newcommand{\noiv}[1]{\texttt{#1}}
+%% \newcommand{\noiverb}[1]{{\small \tt #1}}
+%% \newcommand{\noiv}[1]{{\small \tt #1}}
+
+%%%
+%%% End
+%%% 
+
+% emphasize and put into index
+\newcommand{\emphd}[1]{\emph{#1}\index{#1}}
+
+% used for algorithms
+\newcommand{\step}[2] {\begin{enumerate}\item[#1]#2\end{enumerate}}
+
+% for the reference manual [tavi]
+\newcommand{\entry}[2]{\> \parbox[t]{6.3in}{{\ttfamily #1}}\\ \>\>\parbox[t]{5.5in}{#2}\\[3mm]}
+\newcommand{\btabb}{\begin{tabbing} \hspace*{.3in} \= \hspace{.5in}\=\\ }
+\newcommand{\etabb}{\end{tabbing}\vspace*{-12mm}}
+
+%%%
+%%%  The following macros are obsolete due to switching to
+%%%  the listings package
+%%% 
+
+%% \makeatletter    % '@' is now a normal letter for TeX
+%% % this makes verbatim text smaller and indented [tavi]
+%% \def\verbatim@startline{\small%
+%%   \def\verbatim@startline{\hspace*{5mm}\verbatim@line{}}%
+%%   \verbatim@startline}
+%% % remove some space before the text
+%% \addto@hook\every@verbatim{\vspace*{-1mm}}
+%% % remove some space after the text
+%% \def\verbatim@finish{\def\verbatim@finish{\ifcat$\the\verbatim@line$\else%
+%%  \verbatim@processline\fi}\vspace*{-4mm}\verbatim@finish}
+%% \makeatother    % '@' is restored as a non-letter character
+
+%%%
+%%% End
+%%% 
+
+% normal margins for US-size paper
+\setlength{\topmargin}{-.5in}   
+\setlength{\oddsidemargin}{.175in} % distance from left edge of page to text
+\setlength{\evensidemargin}{.175in} % distance from left edge of page to text
+\setlength{\textwidth}{6.1in}
+\setlength{\textheight}{9in}
+
+
+%% Macro for writing in the margin comments on what is left to be done.
+%% Use \withcomments in the preamble if you want comments to appear.
+\def\comment#1{}
+\def\withcomments{
+% Set \marginparwidth to ensure comment does not runs off the end of the page. 
+\setlength{\marginparwidth}{8.5in}
+\addtolength{\marginparwidth}{-1.0in}
+\addtolength{\marginparwidth}{-\oddsidemargin}
+\addtolength{\marginparwidth}{-\textwidth}
+\addtolength{\marginparwidth}{-2.0\marginparsep} 
+% To get the same space on both sides of the margin text
+% because Duke printers use weird margins:
+\addtolength{\marginparwidth}{-0.3in} %was -0.125
+\newcounter{mycomments}
+\def\comment##1{\refstepcounter{mycomments}%
+\ifhmode%
+\unskip%
+{\dimen1=\baselineskip \divide\dimen1 by 2 %
+\raise\dimen1\llap{\tiny -\themycomments-}}\fi%
+\marginpar{\tiny [\themycomments]: ##1}}%
+}
+
+
+
+
+% Additions to makeidx.sty
+%\makeatletter
+%\@ifundefined{alsoname}%
+%   {\def\alsoname{also}}{}
+
+%\def\seealso#1#2{{\em \seename\ \alsoname\/} #1}
+%\makeatother
+
+% This manual applies to the following version of TPIE
+\newcommand{\edition}{082902}
+\newcommand{\version}{082902}
+% minimum GNU release required
+\newcommand{\gxxversion}{2.95}
+% current GNU release we use for development
+\newcommand{\gxxcurrent}{2.95}
+
+\newcommand{\tobewritten}{\vspace{\baselineskip}$<$TO BE WRITTEN$>$\vspace{\baselineskip}}
+\newcommand{\tobeextended}{\vspace{\baselineskip}$<$TO BE EXTENDED$>$\vspace{\baselineskip}}
+
+%%%
+%%% Setup for printing C++ code using the listings package
+%%% 
+
+\DeclareFontShape{OT1}{cmtt}{bx}{n}
+     {<5><6><7><8>cmbtt8%
+      <9>cmbtt9%
+      <10><10.95>cmbtt10%
+      <12><14.4><17.28><20.74><24.88>cmbtt10%
+      }{}
+
+\lstset{language=[ANSI]C++}
+\lstset{basicstyle=\ttfamily}
+\lstset{showstringspaces=false}
+\lstset{numbers=none}
+\lstset{numberstyle=\tiny}
+\lstset{stepnumber=10}
+\lstset{captionpos=b}
+
+\makeatletter
+\providecommand{\toclevel@lstlisting}{1}
+\makeatother
+
+\newcommand{\CPP}{\texttt{C++}}
+
+%%%
+%%% End
+%%%
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "tpie"
+%%% End: 

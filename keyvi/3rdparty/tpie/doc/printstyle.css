@@ -1,0 +1,14 @@
+#top, #side-nav { display: none }
+#nav-path li { display: none }
+#nav-path .footer { display: block }
+#nav-path, #doc-content {
+	margin: 0 auto !important;
+	height: auto !important;
+	width: 80%;
+}
+.textblock {
+	max-width: none;
+}
+body, table, div, p, dl {
+	font-family: serif !important;
+}

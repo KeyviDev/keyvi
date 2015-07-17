@@ -1,0 +1,20 @@
+/**
+\page compressed Compressed streams
+
+The TPIE stream header has a bit that indicates whether compression is used for
+the stream.
+An uncompressed stream has blocks that begin on regular B-sized boundaries.
+A compressed stream has blocks of varying length that have a block header in
+the beginning and in the end of the block.
+The block header indicates what compression algorithm has been used for the block.
+
+When opening a new stream for writing, the \c compressionFlags parameter sets
+whether compression should be enabled for the stream or not.
+If compression is enabled, blocks are compressed with the currently preferred
+compression scheme, which can be changed as follows:
+\code
+tpie::compressor_thread_lock l(tpie::the_compressor_thread());
+tpie::the_compressor_thread().set_preferred_compression(l, tpie::compression_scheme::snappy);
+\endcode
+where \c snappy may be replaced with any scheme defined in \c tpie/compressed/scheme.h.
+*/

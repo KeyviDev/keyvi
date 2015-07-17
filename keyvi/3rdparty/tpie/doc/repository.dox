@@ -1,0 +1,19 @@
+/**
+\page repository Repository overview
+
+\section sec_overview Repository overview
+
+The library source code mainly resides in the \c tpie/ directory. See \ref files.
+
+The \c test/ directory contains test code. \c test/unit/ contains source code for
+unit tests used by CTest, and \c test/speed_regression/ contains programs for
+measuring TPIE performance.
+
+The \c cpp0xtest/ directory contains code that might not compile on all modern
+compilers. CMake uses this to determine if the system compiler supports
+variadic templates and rvalues.
+
+The \c example/ directory contains a simple example of how to use TPIE
+in your application, this includes a small CMakeLists.txt example.
+
+*/
