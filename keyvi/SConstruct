@@ -1,0 +1,88 @@
+import os
+import fnmatch
+import multiprocessing
+from multiprocessing import cpu_count
+
+buildmode = ARGUMENTS.get('mode', 'debug')   #holds current mode
+
+cpus = multiprocessing.cpu_count() - 1
+if not cpus:
+    cpus = 1
+
+SetOption('num_jobs', cpus)
+print "running with -j", GetOption('num_jobs')
+
+#check if the user has been naughty: only 'debug' or 'release' allowed
+if not (buildmode in ['debug', 'release']):
+   print "Error: expected 'debug' or 'release', found: " + mymode
+   Exit(1)
+
+#tell the user what we're doing
+print '**** Compiling in ' + buildmode + ' mode...'
+
+debugcompilerflags = ['-ggdb3']   #extra compile flags for debug
+releasecompilerflags = ['-O3']         #extra compile flags for release
+
+linklibraries =  [ "tpie",
+   "boost_program_options",
+   "boost_iostreams",
+   "boost_filesystem",
+   "boost_system",
+   "boost_regex",
+   "boost_thread",
+   "z",
+   "snappy"
+   ]
+
+env = Environment()
+
+launch_dir = env.GetLaunchDir()
+env.Append(CPPFLAGS = ['-std=c++11'])
+env.Append(CPPPATH=[launch_dir + '/3rdparty/rapidjson/include',
+                    launch_dir + '/3rdparty/msgpack-c/include',
+                    launch_dir + '/3rdparty/utf8',
+                    launch_dir + '/3rdparty/misc',
+                    launch_dir + '/3rdparty/tpie/build/install/include'
+                    ])
+
+# Mac buid
+if env['PLATFORM'] == 'darwin':
+    env.Append(CPPDEFINES=['OS_MACOSX'])
+    env.Append(LIBPATH=['/usr/local/lib']) 
+    env.Append(CPPPATH=['/usr/local/include'])
+    linklibraries.remove('boost_thread')
+    linklibraries.append('boost_thread-mt')
+    
+
+#make sure the sconscripts can get to the variables
+Export('env', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'linklibraries')
+
+#put all .sconsign files in one place
+env.SConsignFile()
+    
+#build tpie dependency
+env.Command(["3rdparty/tpie/build/install/lib/libtpie.a","3rdparty/tpie/build/install/include/tpie/tpie.h"], "",
+            "cd 3rdparty/tpie && mkdir -p build && cd build && cmake -D CMAKE_BUILD_TYPE:STRING=Release -D CMAKE_INSTALL_PREFIX=install -D TPIE_PARALLEL_SORT=1 -D CMAKE_CXX_FLAGS=\"-fPIC -std=c++11\" .. && " +
+            "make -j " + str(cpus) + " && make install")
+
+env.Append(LIBPATH=[launch_dir + '/3rdparty/tpie/build/install/lib'])
+
+#specify the sconscript for dictionaryfsa
+project = 'dictionaryfsa'
+SConscript('src/cpp/dictionary/SConscript', exports=['project'])
+
+#specify the sconscript for dictionarycompiler
+project = 'dictionarycompiler'
+SConscript('src/cpp/dictionarycompiler/SConscript', exports=['project'])
+
+#specify the sconscript for dictionaryinspector
+project = 'dictionaryinspector'
+SConscript('src/cpp/dictionaryinspector/SConscript', exports=['project'])
+
+#specify the sconscript for unit tests
+project = 'dictionaryfsa_unittests'
+SConscript('tests/cpp/SConscript', exports=['project'])
+
+# packaging mode
+if 'debian' in COMMAND_LINE_TARGETS:
+      SConscript("deb/SConscript")
