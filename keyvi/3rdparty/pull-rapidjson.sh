@@ -1,2 +1,3 @@
 #!/bin/sh
-git pull -s subtree rapidjson master
+git subtree pull --prefix keyvi/3rdparty/rapidjson rapidjson master --squash
+

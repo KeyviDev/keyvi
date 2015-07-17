@@ -1,2 +1,2 @@
 #!/bin/sh
-git pull -s subtree msgpack-c master
+git subtree pull --prefix keyvi/3rdparty/mspack-c msgpack-c master --squash
