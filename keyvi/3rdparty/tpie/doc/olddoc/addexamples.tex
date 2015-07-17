@@ -1,0 +1,194 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+\chapter{Additional Examples} \label{ch:examples}
+\index{examples}
+
+This chapter contains some additional annotated examples of 
+TPIE application code.\comment{LA: Is this chapter still ok?}
+
+\section{Convex Hull}
+\label{sec:convex-hull}
+\index{convex hull|(}
+
+The convex hull of a set of points in the plane is the smallest convex
+polygon which encloses all of the points.  Graham's scan is a simple
+algorithm for computing convex hulls.  It should be discussed in any
+introductory book on computational geometry, such
+as~\cite{preparata:computational}.  Although Graham's scan was not
+originally designed for external memory, it can be implemented optimally in
+this setting.  What is interesting about this implementation is that
+external memory stacks are used within the implementation of a scan
+management object.
+
+First, we need a data type for storing points.  We use the following
+simple class, which is templated to handle any numeric type.
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=15,lastline=47,caption={Code taken from \texttt{tpie\_\version/apps/convex\_hull/point.h}}]{../apps/convex_hull/point.h}
+
+Once the points are s by their $x$ values, we simply scan them to
+produce the upper and lower hulls, each of which are stored as a stack
+pointed to by the scan management object.  We then concatenate the
+stacks to produce the final hull.  The code for computing the convex
+hull of a set of points is thus
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=204,lastline=258,caption={Code taken from \texttt{tpie\_\version/apps/convex\_hull/convex\_hull.cpp}}]{../apps/convex_hull/convex_hull.cpp}
+
+The only thing that remains is to define a scan management object that
+is capable of producing the upper and lower hulls by scanning the
+points.  According to the Graham's scan algorithm, we produce the
+upper hull by moving forward in the $x$ direction, adding each
+point we encounter to the upper hull, until we find one that induces a
+concave turn on the surface of the hull.  We then move backwards
+through the list of points that have been added to the hull,
+eliminating points until a convex path is reestablished.  This process
+is made efficient by storing the points on the hull so far in a stack.
+The code for the scan management object, which relies on the function
+\lstinline|ccw()| to actually determine whether a corner is
+convex or not, is as follows:
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=30,lastline=199,caption={Code taken from \texttt{tpie\_\version/apps/convex\_hull/convex\_hull.cpp}}]{../apps/convex_hull/convex_hull.cpp}
+
+The function \lstinline|ccw()| computes twice the signed area of a triangle in
+the plane by evaluating a 3 by 3 determinant.  The result is positive
+if and only if the the three points in order form a counterclockwise
+cycle.
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=61,lastline=74,caption={Code taken from \texttt{tpie\_\version/apps/convex\_hull/point.h}}]{../apps/convex_hull/point.h}
+
+\index{convex hull|)}
+
+\section{List-Ranking}
+\label{sec:list-ranking}
+\index{list ranking|(}
+
+List ranking is a fundamental problem in graph theory.  The problem is
+as follows: We are given the directed edges of a linked list in some
+arbitrary order.  Each edge is an ordered pair of node ids.  The first
+is the source of the edge and the second is the destination of the
+edge.  Our goal is to assign a weight to each edge corresponding to
+the number of edges that would have to be traversed to get from the
+head of the list to that edge.
+
+The code given below solves the list ranking problem using a simple
+randomized algorithm due to Chiang {\em et al}.~\cite{chiang:external}.
+As was the case in the code examples in the tutorial in
+Chapter~\ref{ch:tutorial}, \lstinline|#include| statements
+for header files and definitions of some classes and functions as well
+as some error and consistency checking code are left out so that the
+reader can concentrate on the more important details of how TPIE is
+used.  A complete ready to compile version of this code is included in
+the TPIE source distribution.
+
+First, we need a class to represent edges.  Because the algorithm will
+set a flag for each edge and then assign weights to the edges, we
+include fields for these values.
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=16,lastline=24,caption={Code taken from \texttt{tpie\_\version/apps/list\_rank/list\_edge.h}}]{../apps/list_rank/list_edge.h}
+
+As the algorithm runs, it will sort the edges.  At times this will be
+done by their sources and at times by their destinations.  The
+following simple functions are used to compare these values:
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=28,lastline=36,caption={Code taken from \texttt{tpie\_\version/apps/list\_rank/list\_edge.h}}]{../apps/list_rank/list_edge.h}
+
+The first step of the algorithm is to assign a randomly chosen flag,
+whose value is 0 or 1 with equal probability, to each edge.  This is
+done using \lstinline|AMI_scan()| with a scan management object of the
+class \lstinline|random_flag_scan|, which is defined as follows:
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=199,lastline=220,caption={Code taken from \texttt{tpie\_\version/apps/list\_rank/lr.cpp}}]{../apps/list_rank/lr.cpp}
+
+The next step of the algorithm is to separate the edges into an active
+list and a cancel list.  In order to do this, we sort one copy of the
+edges by their sources (using \lstinline|edgefromcmp|) and sort another copy by
+their destinations (using \lstinline|edgetocmp|).  We then call
+\lstinline|AMI_scan()| to scan the two lists and produce an active list and
+a cancel list.  A scan management object of class
+\lstinline|separate_active_from_cancel| is used.
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=222,lastline=315,caption={Code taken from \texttt{tpie\_\version/apps/list\_rank/lr.cpp}}]{../apps/list_rank/lr.cpp}
+
+The next step of the algorithm is to strip the cancelled edges away
+from the list of all edges.  The remaining active edges will form a
+recursive subproblem.  Again, we use a scan management object, this
+time of the class \lstinline|strip_active_from_cancel|, which is defined as
+follows:
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=317,lastline=385,caption={Code taken from \texttt{tpie\_\version/apps/list\_rank/lr.cpp}}]{../apps/list_rank/lr.cpp}
+
+After recursion, we must patch the cancelled edges back into the
+recursively ranked list of active edges.  This is done using a scan
+with a scan management object of the class
+\lstinline|interleave_active_cancel|, which is implemented as follows:
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=388,lastline=464,caption={Code taken from \texttt{tpie\_\version/apps/list\_rank/lr.cpp}}]{../apps/list_rank/lr.cpp}
+
+Finally, here is the actual function to rank the list.
+
+\lstinputlisting[numbers=left,basicstyle=\ttfamily\small,firstline=468,lastline=656,caption={Code taken from \texttt{tpie\_\version/apps/list\_rank/lr.cpp}}]{../apps/list_rank/lr.cpp}
+
+Our recursion bottoms out when the problem is small enough to fit
+entirely in main memory, in which case we read it in and call a
+function to rank a list in main memory.  The details of this function
+are omitted here.
+
+\begin{lstlisting}[basicstyle=\ttfamily\small,caption={Code taken from \texttt{tpie\_\version/apps/list\_rank/lr.cpp}}]
+////////////////////////////////////////////////////////////////////////
+// main_mem_list_rank()
+//
+// This function ranks a list that can fit in main memory.  It is used
+// when the recursion bottoms out.
+//
+////////////////////////////////////////////////////////////////////////
+
+int main_mem_list_rank(edge *edges, size_t count)
+{
+    // Rank the list in main memory
+
+    ...
+        
+    return 0;  
+}
+\end{lstlisting}
+\index{list ranking|)}
+
+\section{NAS Parallel Benchmarks}
+
+\tobeextended
+
+Code designed to implement external memory versions of a number of the
+NAS parallel benchmarks is included with the TPIE distribution.
+Examine this code for examples of how the various primitives TPIE
+provides can be combined into powerful applications capable of solving
+real-world problems.
+
+Detailed descriptions of the parallel benchmarks are available
+from the NAS Parallel Benchmark Report at URL \href{http://www.nas.nasa.gov/Research/Reports/Techreports/1994/HTML/npbspec.html}{\path"http://www.nas.nasa.gov/Research/Reports/Techreports/1994/HTML/npbspec.html"}.
+
+\section{Spatial Join}
+
+\tobewritten
+
+\comment{LA: Distribution sweeping, SSSJ, ect}
+
+\comment{LA: Someting about R-tree building at some point}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "tpie"
+%%% End: 

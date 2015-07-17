@@ -1,0 +1,575 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+\chapter{Configuration and Performance Tuning}
+\plabel{sec:tuning}\index{Configuration}\plabel{sec:configuration}
+
+\comment{LA: Jan please check this and add something about
+  portability. Also add something about compiling?}
+
+\section{TPIE Configuration}
+Certain behaviours of TPIE at run-time are controlled by compile-time
+variables, whose values should be defined before including any TPIE
+headers. Depending on the options desired, the values of these
+variables can be specified as early as when TPIE is installed, or as
+late as when an individual application program is compiled. Section
+\ref{sec:customization} described the options available at
+installation time. Section \ref{sec:tun-appconfig} describes how TPIE
+can be configured differently for individual TPIE applications.
+
+\subsection{Installation Options}
+\index{Customization} \plabel{sec:customization}
+
+\comment{LA: Has this been updated after we changed logging, i.e., is
+  it correct?} It is possible to customize certain TPIE behaviours by
+providing arguments to the {configure} script when TPIE is first
+installed (see Section
+\ref{sec:tut-installation}).\index{configuration:options} None of
+these arguments are necessary and the first time you build TPIE you
+should not need any of them. The arguments recognized are as follows:
+
+\begin{description}
+  
+\item[\texttt{--enable-log-lib}] \index{enable-log-lib@{\tt
+      --enable-log-lib}} Enable logging in TPIE library code.  This
+  can also be accomplished at compile time by defining the macro
+  \lstinline|TP_LOG_LIB| using the syntax
+\lstinline|make lib  TP_LOG_LIB=1|.  
+This is useful for debugging the TPIE library, but
+  slows it down.  This option works by defining
+  \lstinline|TPL_LOGGING| \index{TPL\_LOGGING@{\tt TPL\_LOGGING}} when
+  compiling the library.  Section \ref{sec:logging} discusses TPIE
+  logging.
+  
+\item[\texttt{--enable-assert-lib}] \index{enable-assert-lib@{\tt
+      --enable-assert-lib}} Enable assertions in the TPIE library code
+  for debugging purposes.  This can also be accomplished at compile
+  time by defining the macro \lstinline|TP_ASSERT_LIB| using the
+  syntax \lstinline|make lib TP_ASSERT_LIB=1|.  This option works by
+  defining \lstinline|DEBUG_ASSERTION| \index{DEBUG_ASSERTIONS@{\tt
+      DEBUG\_ASSERTIONS}} when compiling the library.
+
+\item[\texttt{--enable-log-apps}] and
+  
+\item[\texttt{--enable-assert-apps}]
+  \index{enable-assert-apps@{\tt --enable-assert-apps}}
+  \index{enable-log-apps@{\tt --enable-log-apps}} Similar
+  to \texttt{--enable-log-lib} and \texttt{--enable-assert-lib},
+  but they apply to the test application code.  Running
+  \lstinline|make test| with the option
+  \lstinline|TP_LOG_APPS=1| and/or the option
+  \lstinline|TP_ASSERT_APPS=1| accomplishes the same thing.
+  
+\item[\texttt{--enable-expand-ami-scan}] Expand the macros in the file
+  \path"ami_scan.h" when making the include directory with the command
+  \lstinline|make include| (or \lstinline|make all|).  This is mainly
+  useful for debugging the code in \path"ami_scan.h" itself, and is
+  not normally needed by TPIE programmers.  It may make compilation of
+  TPIE programs slightly faster because the macro processor of the C++
+  compiler will have less work to do.  In addition to the standard GNU
+  tools mentioned in Section~\ref{sec:tut-gnu-software}, this requires
+  \texttt{perl}.
+  
+\item[\texttt{--disable-*}] Any of the options above can be explicitly
+  disabled by using this syntax.  For example
+  \texttt{--disable-expand-ami-scan}.
+\end{description}
+
+\subsection{Configuring TPIE for Individual Applications}
+\plabel{sec:tun-appconfig}
+
+Certain TPIE configuration options can be selected by setting
+compile-time variables in the file \path"test/app_config.h" which is
+then included in an application program. A typical example of this
+file can be found in the \path"test/" directory. Selected parts of the
+file are shown and discussed below. \comment{LA: Something general
+  about TPIE configuration as set up by the configure-script needs to
+  be included here (e.g. discuss config.h file).}
+
+\subsubsection{The File \texttt{test/app\_config.h}}
+
+\lstinputlisting[numbers=left,caption={The application configuration
+  file.}]{../test/app_config.h}
+
+\comment{LA: add some intro text here}
+
+\subsubsection{Compile-Time Options in \texttt{test/app\_config.h}}
+
+\begin{description}
+\item\lstinline|BTE_STREAM_IMP_MMAP:| 
+\item\lstinline|BTE_STREAM_IMP_STDIO:| 
+\item\lstinline|BTE_STREAM_IMP_UFS:| Used to choose which of
+  the available Block Transfer Engine (see
+  Section~\ref{sec:ref-bte}) implementations to use.
+  Version \version~of TPIE is distributed with three BTEs
+  and the desired BTE is chosen by defining
+  \lstinline|BTE_STREAM_IMP_STDIO|, \lstinline|BTE_STREAM_IMP_MMAP| or
+  \lstinline|BTE_STREAM_IMP_UFS|. See Section~\ref{sec:ref-bte}
+  for a discussion of the implementation details in these
+  BTEs. The next section discusses how to choose an
+  appropriate BTE for a given application in order to
+  obtain maximal performance.
+  
+%  \index{BTE_IMP_*@{\tt BTE\_IMP\_*}}
+  \index{block transfer engine!implementation}
+  \index{implementation!BTE}
+\end{description}
+
+\noindent
+If \lstinline|BTE_STREAM_IMP_MMAP| or \lstinline|BTE_STREAM_IMP_UFS|
+is defined, the following macros are used to control BTE options (how
+to set the options for maximal performance is discussed in the next
+section):
+
+\begin{description}
+  
+\item\lstinline|BTE_STREAM_MMAP_BLOCK_FACTOR:|
+\item\lstinline|STREAM_UFS_BLOCK_FACTOR:| The value of this
+  variable determines the logical blocksize used by the BTE as a
+  multiple of the physical block size (refer to
+  Section~\ref{sec:ref-bte}). A value of 1 indicates that the logical
+  blocksize is the same as the physical blocksize of the OS.
+
+\item\lstinline|BTE_STREAM_MMAP_READ_AHEAD:| 
+\item\lstinline|STREAM_UFS_READ_AHEAD:| Defining this variable
+  instructs the corresponding BTE (\lstinline|BTE_stream_mmap| or
+  \lstinline|BTE_stream_ufs|) to optimize for sequential read speed by
+  reading blocks into main memory before the data they contain is
+  actually needed.  \index{read ahead}
+ 
+
+% AIO is no longer supported
+%\item\lstinline|USE_LIBAIO:| If \lstinline|BTE_STREAM_MMAP_READ_AHEAD|
+%  is defined, defining \lstinline|USE_LIBAIO| results in read ahead
+%  being performed using the asynchronous I/O library
+%  \lstinline|libaio|. If the macro \lstinline|USE_LIBAIO| is not
+%  defined the read ahead is done using \lstinline|mmap| and double
+%  buffering in the case of \lstinline|BTE_STREAM_IMP_MMAP| and not
+%  done at all in the case of \lstinline|BTE_STREAM_IMP_UFS| (refer to
+%  Section~\ref{sec:ref-bte}).  \index{libaio library@{\tt libaio}}
+  %%  \index{USE\_LIBAIO }
+\end{description}
+
+\noindent
+The rest of the compile-time variables are normally not modified by
+TPIE application programmers:
+
+\begin{description}
+\item\lstinline|AMI_STREAM_IMP_SINGLE:| This macro controls which
+  Access Method Interface implementation (see
+  Section~\ref{sec:ref-bte}) to use. Version \version~of TPIE is
+  distributed with a single AMI implementation, which stores the
+  contents of a given stream on a single disk. This implementation is
+  selected by defining \lstinline|AMI_STREAM_IMP_SINGLE|.
+  %%  \index{AMI_IMP_*@{\tt AMI\_IMP\_*}}
+  \index{access method interface!implementation}
+  \index{implementation!AMI}
+  \index{implementation!AMI!single disk}
+  
+  
+\item\lstinline|TPL_LOGGING:| Set to a non-zero value to enable
+  logging of TPIE's internal behavior.\comment{LA: Is this correct?}
+  By default, information is logged to the log file\index{log file}
+  \path"/tmp/TPLOG_XXX" where \texttt{XXX} is a unique system
+  dependent identifier.  Typically it encodes the process ID of the
+  TPIE process that produced it in some way. See
+  Section~\ref{sec:logging} for information on exactly what TPIE
+  writes to the log file.
+
+  \index{TPL_LOGGING@{\tt TPL\_LOGGING}}
+  
+\item\lstinline|DEBUG_ASSERTIONS:| Define to enable TPIE assertions.
+  These assertions check for inconsistent or erroneous conditions
+  within TPIE itself. They are primarily intended to aid in the
+  debugging of TPIE. Some overhead is added to programs compiled with
+  this macro set.
+
+  \index{DEBUG_ASSERTIONS@{\tt DEBUG\_ASSERTIONS}}
+  \index{debugging!TPIE}
+  
+\item\lstinline|DEBUG_CERR:| Defining this macro tells TPIE to write
+  all internal assertion messages to the C++ standard error stream
+  \lstinline|cerr| in addition to the TPIE log file.
+
+ \index{DEBUG_CERR@{\tt DEBUG\_CERR}}
+ \index{debugging!TPIE}
+ 
+\item\lstinline|DEBUG_STR:| Defining this macro enables certain
+  debugging messages that report on the internal behavior of TPIE but
+  do not necessarily indicate error conditions. In some cases this can
+  increase the size of the log dramatically.
+
+  \index{DEBUG_STR@{\tt DEBUG\_STR}}
+  \index{debugging!TPIE}
+
+\end{description}
+
+
+\subsection{Environment Variables}
+\index{Environment variables}\plabel{sec:environment}
+
+In the current version \version~of TPIE there is only one environment
+variable.  The environment variable is called
+\lstinline|AMI_SINGLE_DEVICE| and defines where TPIE places temporary
+streams\index{temporary streams}.  The default location is
+\path"/var/tmp". If a different location is desired,
+\lstinline|AMI_SINGLE_DEVICE| must be set accordingly. For example (in
+C-shell): \texttt{setenv AMI\_SINGLE\_DEVICE}
+\path"/usr/project/tmp/".  \index{configuration|)}
+
+
+
+\section{TPIE Performance Tuning}
+\index{performance tuning}
+
+\subsection{Choosing and Configuring a BTE Implementation}
+\plabel{sec:choosingbte}
+
+Choosing an appropriate BTE implementation (and BTE parameter
+settings) for best performance is both application and system
+dependent. (See section~\ref{sec:ref-bte} for a description of the
+three existing BTEs). Theoretically, \lstinline|BTE_stream_mmap|
+should have the best performance for most applications, because space
+and copy time is saved relative to \lstinline|BTE_stream_stdio| and
+\lstinline|BTE_stream_ufs| as steam objects do not have to pass
+through kernel level buffer space when accessed. On the other hand,
+buffering and prefetching has to be explicitly implemented in
+\lstinline|BTE_stream_mmap| whereas it is (typically) done by the OS
+in \lstinline|BTE_stream_stdio| and \lstinline|BTE_stream_ufs|.  Also
+theoretically, \lstinline|BTE_stream_ufs| (and
+\lstinline|BTE_stream_mmap|) should perform better than
+\lstinline|BTE_stream_stdio| because of fewer kernel calls and because
+of the (possible) larger logical block size.  However, in practice the
+performance of the three BTE's are very system (and application)
+dependent.  This is for example due to different implementations of
+the \lstinline|fread()|, \lstinline|fwrite()|, \lstinline|read()|,
+\lstinline|write()|, \lstinline|mmap()|, and \lstinline|munmap()|
+calls on different machines.\comment{LA: Other reasons?}
+
+The most important BTE configuration parameter is
+\lstinline|BTE_LOGICAL_BLOCKSIZE_FACTOR| (but note that this parameter
+only applies to \lstinline|BTE_stream_mmap| and
+\lstinline|BTE_stream_ufs|).  The size of each buffer and the size of
+each I/O in the BTE stream is \lstinline|BTE_LOGICAL_BLOCKSIZE_FACTOR|
+times the operating system blocksize, so this roughly corresponds to
+the amount of data brought in or written out at the cost of a single
+disk operation. Increasing this parameter, therefore, can reduce the
+number of I/O operations required to read through a stream from
+beginning to end. However, the amount of memory dedicated to a stream
+is either \lstinline|BTE_LOGICAL_BLOCKSIZE_FACTOR| times the operating
+system blocksize (if prefetching is disabled) or twice
+\lstinline|BTE_LOGICAL_BLOCKSIZE_FACTOR| times the operating system
+blocksize (if prefetching is enabled). Consequently, the value of the
+parameter \lstinline|BTE_LOGICAL_BLOCKSIZE_FACTOR|, together with
+available memory, determines the number of BTE streams (and hence AMI
+streams) that can be active at the same time. This gives an upper
+bound on the arity of a multi-way merge or a multi-way distribution
+operation that can be undertaken by a TPIE application. This in turn
+can have a crucial impact on (say, the number of passes required in
+external sorting and hence the) net running time. A large value for
+\lstinline|BTE_LOGICAL_BLOCKSIZE_FACTOR| increases performance due to
+fewer kernel calls and due to the (track) buffering and prefetching in
+the disk controller. Too large a value results in decreased
+performance due to the BTE's use of main memory. Thus this parameter
+should be chosen carefully.
+
+As far at the other BTE configuration parameters (prefetching) are
+concerned, the default settings in the \path"app_config.h" file in the
+\path"test/" directory are normally the best.
+
+%The latter observation suggests that
+%\lstinline|BTE_LOGICAL_BLOCKSIZE_FACTOR| should be set to a
+%high value; but a high value for this parameter inhibits the
+%number of streams active at a time and hence can result in
+%an increase in the number of passes required in sorting.
+%%In the case of external memory indexing data structures based on trees, the
+%value of the \lstinline|BTE_LOGICAL_BLOCKSIZE_FACTOR| for
+%any BTE stream (or BTE 
+%block collection, in future TPIE versions) used to implement the external
+%memory data structure should be made as close to the size of the tree node
+%as possible.
+
+In order to help in deciding which BTE to choose for a given
+application/system, as well as deciding on what logical block size to
+use (in \lstinline|BTE_stream_mmap| and \lstinline|BTE_stream_ufs|),
+we have included a C program in the \path"test/" directory of the TPIE
+distribution called \path"bte_test.c".  This program can be used to
+determine the streaming speeds attained by
+\lstinline|BTE_stream_stdio|, \lstinline|BTE_stream_mmap|, and
+\lstinline|BTE_stream_ufs| streams on a given system. The program
+simulates the buffering and I/O mechanisms used by each of the BTE
+stream implementations so that the ``raw'' (in the sense that there is
+no TPIE layer between the program and the filesystem) streaming speed
+of an I/O-buffering mechanism combination can be determined. To use
+the program, define one of \lstinline|MMAP_TEST|,
+\lstinline|READ_WRITE_TEST|\comment{LA: Why not UFS\_TEST?}  or
+\lstinline|STDIO_TEST| in the program depending on whether you want to
+test the streaming speed of \lstinline|BTE_stream_mmap|,
+\lstinline|BTE_stream_ufs| or \lstinline|BTE_stream_stdio|. Also
+define the \lstinline|BLOCKSIZE_BASE| parameter to be equal to the
+underlying operating system blocksize.\comment{LA: Why not automatic?}
+Compile the program using a C compiler. In order to test the streaming
+performance of BTE streams of objects of size \lstinline|ItemSize|,
+the program first writes out some specified number
+\lstinline|NumStreams| of BTE streams containing a specified number
+\lstinline|NumItems| of items.  Then it carries out a perfect
+\lstinline|NumStreams|-way interleaving of the streams via a simple
+merge like process, writing the output to an output stream. During the
+computation, each of the \lstinline|NumStreams| streams input to the
+merge, as well as the stream being output by the merge uses either one
+(when \lstinline|READ_WRITE_TEST| or \lstinline|STDIO_TEST| are set to
+1) or two (when \lstinline|MMAP_TEST| is set to 1) buffers.  In case
+of \lstinline|STDIO_TEST|, the buffers are not maintained in the
+program but by the stdio library. In the case of \lstinline|MMAP_TEST|
+or \lstinline|READ_WRITE_TEST|, each buffer is set to be of size
+\lstinline|block_factor| times \lstinline|BLOCKFACTOR_BASE|, and each
+I/O operation corresponds to a buffer-sized operation. To test the
+streaming performance of a BTE stream with \lstinline|items_in_block|
+items in each block simply execute:
+
+\begin{lstlisting}[basicstyle=\ttfamily\small]
+bte_test NumItems ItemSize NumStreams block_factor items_in_block DataFile 
+\end{lstlisting}
+
+The output of the program (streaming speed) is appended to the file
+\path"DataFile". The streaming speed, alternatively called I/O
+Bandwidth, is given in units of MB/s, and can be used to decide which
+BTE to use and how to configure it.
+
+\subsection{Other Factors Affecting Performance}
+
+In addition to the choice (and configuration) of BTE, a number of other
+factors, not all of which are TPIE specific, can effect the performance of
+a TPIE application.
+
+\begin{description}
+\item[Inlining operation management object methods.] Failing to inline
+  the \lstinline|operate()| method of operation management objects can
+  be a major source of lackluster performance of an application, since
+  \lstinline|operate()| is called once for every object in a stream
+  being scanned. Inlining of \lstinline|operate()| is, however, just a
+  suggestion to the compiler, which can choose to ignore it. In order
+  to maximize the likelihood of inlining, it is a good idea to keep
+  the function short and simple. One way of doing this is to wrap
+  complex pieces of code that are called less often in separate
+  functions.
+  
+\item[\texttt{gcc} optimization.] We recommend using the \texttt{-O2}
+  level of optimization of \texttt{gcc} in order to obtain the best
+  overall performance. Although better performance can normally be
+  obtained using \texttt{-O3}, this optimization leads to increased
+  program size which can potentially result in decreased performance.
+  
+\item[Memory size.] To insure that no disk swapping is done by the OS,
+  the size of main memory used by TPIE (set by
+  \lstinline|MM_manager.set_memory_limit()|, see
+  Section~\ref{sec:tut-compiling} and Section~\ref{sec:mm-ref}) should
+  be set to a realistic value. The best value is usually much smaller
+  than the size of the memory installed in the computer (due to memory
+  use of operating system resources and daemons).
+\end{description}
+
+%\section{Using Multiple Physical Devices}
+
+
+\section{TPIE Logging}\index{logging}
+\plabel{sec:logging}
+
+\comment{LA: Is all this true?}  When logging is turned on (see
+Section \ref{sec:configuration}), TPIE creates a log file\index{log
+  file} in \path"/tmp/TPLOG_XXXXXX", where \texttt{XXXXXX} is a unique
+system dependent identifier. TPIE writes into this file using a
+\lstinline|logstream| class, which is derived from
+\lstinline|ofstream| and has the additional functionality of setting a
+priority and a threshold for logging. If the priority of a message is
+below the threshold, the message is not logged. There are four
+priority levels defined in TPIE, as follows.
+
+\begin{description}
+\item\lstinline|TP_LOG_FATAL| is the highest level and is used for
+  all kinds of errors that would normally impair subsequent
+  computations. Errors are always logged;
+  
+\item\lstinline|TP_LOG_WARNING| is the next lowest and is used for
+  warnings.
+  
+\item\lstinline|TP_LOG_APP_DEBUG| can be used by applications built on
+  top of TPIE, for logging debugging information.
+  
+\item\lstinline|TP_LOG_DEBUG| is the lowest level and is used by the
+  TPIE library for logging debugging information.
+\end{description}
+
+By default, the threshold of the log is set to the lowest level,
+\lstinline|TP_LOG_WARNING|. To change the threshold level, the
+following macro is provided:
+\begin{quote}
+    \lstinline|LOG_SET_THRESHOLD(|{\em level}\lstinline|)|
+\end{quote}
+where \emph{level} is one of \lstinline|TP_LOG_FATAL|,
+\lstinline|TP_LOG_WARNING|, \lstinline|TP_LOG_APP_DEBUG|, or
+\lstinline|TP_LOG_DEBUG|.
+
+The threshold level can be reset as many times as needed in a program.
+This enables the developer to focus the debugging effort on a certain
+part of the program.
+
+The following compile-time macros are provided for writing
+into the log:
+\begin{quote}
+\lstinline|LOG_FATAL|({\em msg})
+\lstinline|LOG_FATAL_ID|({\em msg})
+
+\lstinline|LOG_WARNING|({\em msg})
+\lstinline|LOG_WARNING_ID|({\em msg})
+
+\lstinline|LOG_APP_DEBUG|({\em msg})
+\lstinline|LOG_APP_DEBUG_ID|({\em msg})
+
+\lstinline|LOG_DEBUG|({\em msg})
+\lstinline|LOG_DEBUG_ID|({\em msg})
+\end{quote}
+where \emph{msg} is the information to be logged; \emph{msg} can be
+any type that is supported by the \CPP{} \lstinline|fstream| class.
+Each of these macros sets the corresponding priority and sends
+\emph{msg} to the log stream. The macros ending in \lstinline|_ID|
+record the source code filename and line number in the log, while the
+corresponding macros without the \lstinline|_ID| suffix do not.
+
+%{\em Logging should always be done using one of the above macros.} Any
+%other method of logging could hinder the ability of TPIE to turn off
+%logging and, as a result, could affect performance.
+
+%\subsection{Template Instantiation}
+
+%{\bf Important Note:} Much of the information in this section is
+%likely to change as the template instantiation mechanism of the 
+%{\tt g++}\index{g++@{\tt g++}} compiler improves.  If you are
+%interested in the nitty gritty details of template instantiation,
+%consult~\cite{ellis:arm} or one of the frequent discussions on the
+%topic in the newsgroup {\tt comp.lang.c++}
+%\index{comp.lang.c++@{\tt comp.lang.c++}}.
+
+%\index{templates!instantiation|(}
+%\noindent Most of the classes and functions TPIE defines are
+%templated.  Furthermore, many user written operation management
+%object\index{operation management objects!user supplied} classes are
+%likely to be templated; many of those supplied with the test and
+%sample applications are.
+
+%Unfortunately, many C++\index{C++} compilers do not properly implement
+%templated function and/or classes.  In particular, the GNU C++
+%compiler, {\tt g++}\index{g++@{\tt g++}}, version \gxxversion, which
+%was used in the development of TPIE has some deficiencies when it
+%comes to template instantiation.  It also has a well defined mechanism
+%for working around these deficiencies, which TPIE takes significant
+%advantage of.  This mechanism prevents the compiler from implicitly
+%instantiating any template.  Thus, all templates used by a program
+%must be explicitly instantiated at compile time or they will not be
+%available at link time and linking will fail.
+
+%In order to tell {\tt g++}\index{g++@{\tt g++}} not to implicitly
+%instantiate any templates, the {\tt -fno-implicit-templates} flag is
+%used.  Additionally, the macro {\tt NO\_IMPLICIT\_TEMPLATES} should be
+%defined on the command line, using {\tt -D}.  This macro informs TPIE
+%that it should not rely on the presence of implicit template
+%instantiation.  In response to the fact that this macro is set, TPIE
+%defines a series of new macros with names of the form {\tt
+%  TEMPLATE\_INSTANTIATE\_*}.  
+%\index{TEMPLATE_INSTANTIATE_*@{\tt TEMPLATE\_INSTANTIATE\_*}|(}
+%Each of these macros can be used to
+%actually instantiate some set of functions and/or classes that TPIE
+%needs to provide a given operation.  These macros should be used at
+%the end of your source file in order to perform the proper
+%instantiations.
+
+%The {\tt TEMPLATE\_INSTANTIATE\_*} macros likely to be needed by TPIE
+%programmers are as follows:
+%\begin{description}
+%\item[{\tt TEMPLATE\_INSTANTIATE\_STREAMS(T)}] Instantiate AMI and
+%  BTE level streams of objects of type {\tt T}.  If your
+%  application uses streams of several types, this macro must be called
+%  once for each of them.
+%\item[{\tt TEMPLATE\_INSTANTIATE\_ISTREAM(T)}]
+%\item[{\tt TEMPLATE\_INSTANTIATE\_OSTREAM(T)}] Instantiate ASCII
+%  input and output scan management objects for the type {\tt T}.
+%  See Section~\ref{sec:ascii-io} for details on these objects.
+%  \index{scanning!ASCII I/O}
+%\item[{\tt TEMPLATE\_INSTANTIATE\_AMI\_MERGE}] Instantiate merging entry
+%  points for streams of objects of type {\tt T}.  Merging is described
+%  in Section~\ref{sec:merging}.
+%\item[{\tt TEMPLATE\_INSTANTIATE\_SORT\_OP(T)}]
+%\item[{\tt TEMPLATE\_INSTANTIATE\_SORT\_CMP(T)}]
+%\item[{\tt TEMPLATE\_INSTANTIATE\_SORT\_OBJ(T)}] Instantiate
+%  respectively operator, comparison function, and comparison object
+%  based sorting of objects of type {\tt T}.  See
+%  Section~\ref{sec:cmp-sorting} for details on these types of sorting.
+%\item[{\tt TEMPLATE\_INSTANTIATE\_KB\_SORT(T)}] 
+%\item[{\tt TEMPLATE\_INSTANTIATE\_KB\_SORT\_KEY(T,K)}] Instantiate key
+%  bucket distribution sorting of objects of type {\tt T}.  The latter
+%  form uses key {\tt K} for sorting.  Section~\ref{sec:kb-sorting}
+%  describes key bucket sorting.
+%\item[{\tt TEMPLATE\_INSTANTIATE\_STREAM\_ADD(T)}]
+%\item[{\tt TEMPLATE\_INSTANTIATE\_STREAM\_SUB(T)}]
+%\item[{\tt TEMPLATE\_INSTANTIATE\_STREAM\_MULT(T)}]
+%\item[{\tt TEMPLATE\_INSTANTIATE\_STREAM\_DIV(T)}]
+%  Instantiate elementwise arithmetic operations on streams of objects
+%  of type {\tt T} as described in Section~\ref{sec:elementwise}.
+%\item[{\tt TEMPLATE\_INSTANTIATE\_AMI\_MATRIX}]
+%  Instantiate dense matrices of objects of type {\tt T} and the
+%  standard operations on them.  Dense
+%  matrices are described in
+%  Section~\ref{sec:dense-mat}.\index{matrices!dense}
+%\item[{\tt TEMPLATE\_INSTANTIATE\_AMI\_SPARSE\_MATRIX}]
+%  Instantiate sparse matrices of objects of type {\tt T} and the
+%  standard operations on them.  Sparse
+%  matrices are described in
+%  Section~\ref{sec:dense-mat}.\index{matrices!sparse}
+%\end{description}
+%\index{TEMPLATE_INSTANTIATE_*@{\tt TEMPLATE\_INSTANTIATE\_*}|)}
+
+%In addition to instantiating functions and classes using the macros
+%described above, it is often necessary to explicitly instantiate
+%particular instances of AMI entry points for user supplied operation
+%management objects.  For example, suppose we declare a scan management
+%object class such as
+%\begin{lstlisting}
+%class my_scan_class : AMI_scan_object {
+%public:
+%    AMI_err initialize(void);
+%    AMI_err operate(const int &in1, const int &in2, AMI_SCAN_FLAG *sfin,
+%                    float *out, AMI_SCAN_FLAG *sfout); 
+%}
+%\end{lstlisting}
+%Then, in order to explicitly instantiate \lstinline|AMI_scan()| to use
+%objects of this type, we would use the following code:
+%\begin{lstlisting}
+%template AMI_err AMI_scan(AMI_STREAM<int> *, AMI_STREAM<int> *, 
+%                          my_scan_class *, AMI_STREAM<float> *); 
+%\end{lstlisting}
+%This instantiates an instance of \lstinline|AMI_scan()| that takes two input
+%streams of \lstinline|int|s, operates on them with an object of type
+%\lstinline|my_scan_class|, and produces an output stream of \lstinline|float|s.  
+%Note the correspondence between the types of input and output streams
+%and the types of the operands to the \lstinline|operate()| member function
+%of the class \lstinline|my_scan_class|.
+%\index{templates!instantiation|)}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "tpie"
+%%% End: 

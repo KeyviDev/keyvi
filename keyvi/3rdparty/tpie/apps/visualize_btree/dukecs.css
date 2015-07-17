@@ -1,0 +1,67 @@
+body {
+  background-color: white;
+}
+a:link {
+       COLOR: #0000bb; TEXT-DECORATION: none;
+}
+a:visited {
+	  COLOR: #00009c; TEXT-DECORATION: none;
+}
+a:hover {
+	COLOR: #cc9900; TEXT-DECORATION: none;
+}
+.maintext {
+	  FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; FONT-SIZE: 9pt; TEXT-DECORATION: none;
+}
+.boldtext {
+	  FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; FONT-SIZE: 10pt; FONT-WEIGHT: bold; TEXT-DECORATION: none;
+}
+h1,h2 {
+  text-align: left;
+  vertical-align: middle;
+  color: #cccccc;
+  font-family: Verdana, Helvetica, Arial, sans-serif; 
+}
+h1 {
+  background-color: #000080;
+  padding: 6px 10px 3px;
+  margin: -8px -8px 0px;
+  letter-spacing: 5px;
+  font-size: 24px;
+  font-weight: bold;
+  height: 50px;
+}
+h1 div#small {
+  display: inline;
+  font-size: 20px;
+  letter-spacing: 3px;  
+}
+h2 {
+  background-color: #0000bb;
+  margin: 9px -8px 9px;
+  padding: 3px 10px 0px;
+  font-size: 14px;
+  font-weight: bold; 
+  height: 21px;
+  letter-spacing: 2px;
+}
+h3 {
+  font-size: 14px;
+  font-family: Verdana, Arial, Helvetica, sans-serif; 
+}
+div#menu {
+  background-color: #0000b5; 
+  margin: 0px -8px 9px; 
+  padding: 4px 10px 0px; 
+  font-size: 14px;
+  font-weight: bold; 
+  height: 21px; 
+  color: #cccccc;
+  font-family: Verdana, Arial, Helvetica, sans-serif;  
+}
+div#menu a {
+  color: #cccccc; 
+}
+div#menu a:hover {
+  COLOR: #cc9900; TEXT-DECORATION: none; 
+}

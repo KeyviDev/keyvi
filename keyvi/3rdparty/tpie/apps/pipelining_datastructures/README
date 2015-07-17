@@ -1,0 +1,1 @@
+Generate a list of integers, store the largest 20 integers in a datastructure and use this datastructure to compute the sum of distances between the largest integers and every integer.

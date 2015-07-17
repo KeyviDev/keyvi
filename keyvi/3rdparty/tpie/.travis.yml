@@ -1,0 +1,12 @@
+addons:
+  apt:
+    packages:
+      - libboost-date-time-dev
+      - libboost-thread-dev
+      - libboost-filesystem-dev
+      - libboost-system-dev
+      - libboost-regex-dev
+      - libsnappy-dev
+language: cpp
+script: mkdir build && cd build && cmake .. && make -j2 && make test
+sudo: false

@@ -1,0 +1,27 @@
+/**
+\page sorting_internal Internal sorting
+
+Internal memory sorting is implemented in \ref parallel_sort.h as a parallel
+quick sort with a sequential partition step. The implementation uses the TPIE
+job manager, implemented in \ref job.h and job.cpp.
+
+Like std::sort, the input to parallel sorting is given as two forward
+iterators, \c begin and \c end. It is then up to the implementation to spawn as
+many quick sort jobs as needed. If the input is sufficiently small,
+\c std::sort is used directly. Otherwise, the input is repeatedly partitioned
+(using a sequential partition), and a new job is spawned on the smaller half of
+the result from the partition. When the job size is sufficiently small,
+\c std::sort is used.
+
+Example \c sorting.cpp:
+
+\code
+@DOCCODE_SORTING_INTERNAL@
+\endcode
+
+Place in your \c tpie project folder, and on Linux, compile with:
+\code
+$ g++ -I. -Ibuild -c sorting.cpp -Wall -Wextra -O3
+$ g++ sorting.o -o sorting build/tpie/libtpie.a -lboost_date_time-mt -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt 
+\endcode
+*/

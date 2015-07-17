@@ -1,0 +1,102 @@
+/**
+\page queue External memory queue implementation
+
+Let us see how to implement an external memory (EM) queue using TPIE's files and
+streams. TPIE already has an EM queue implementation in \ref tpie::queue, but
+this page will motivate the implementation and illustrate how to use \ref
+tpie::file and \ref tpie::file::stream.
+
+For an EM queue we need a back buffer and a front buffer for items just
+enqueued and items to dequeue next, respectively. A \ref tpie::file_stream is
+insufficient, since one would have to seek between the front and the back of
+the stream performing unnecessary block flushes and reads.
+
+\code
+tpie::file<T> queue;
+queue.open(); // open anonymous temporary file for reading and writing
+tpie::file<T>::stream front(queue);
+tpie::file<T>::stream back(queue);
+tpie::stream_size_type enqueued = 0;
+\endcode
+
+In the above code fragment, we associate two streams to one tpie::file. For
+each stream, TPIE allocates a block buffer, meaning the above code will have
+about twice the memory footprint compared to an ordinary tpie::file_stream.
+TPIE transparently shares buffers between streams whose file positions are in
+the same block, so we do not have to worry about blocks being flushed
+prematurely and data getting lost between streams.
+To count the number of items in the queue, we use a counter of type
+stream_size_type. This is significant on 32-bit platforms where a size_t or
+memory_size_type would overflow after 2**32 elements.
+
+To enqueue and dequeue elements, we use the following two functions.
+
+\code
+void enqueue(const T & item) {
+	back.write(item);
+	++enqueued;
+}
+
+T dequeue() {
+	assert(enqueued > 0);
+	--enqueued;
+	return front.read();
+}
+\endcode
+
+Recall that we used the zero-parameter open() of tpie::file, meaning the
+temporary file containing the contents of the queue will be deleted once our
+tpie::file is closed.
+
+To implement an EM queue whose contents persist the lifetime of the tpie::file,
+we need to store the position of the front stream reader along with our file.
+(The back stream writer should always point to the end of the file, since we do
+not support popping from the back.) Luckily, this information can be stored
+with the file header using <i>TPIE user data</i>.
+
+\code
+tpie::file<T> queue;
+tpie::file<T>::stream front;
+tpie::file<T>::stream back;
+tpie::stream_size_type enqueued;
+\endcode
+
+Now, when opening the queue file, we need to specify the maximum user data
+size. We only need to store a stream_size_type, namely the offset of the front
+stream, so our maximum user data size will be sizeof(stream_size_type).
+
+After opening, we need to check if user data has been written. If so, we use
+this as the offset of the front stream.
+
+When closing the queue, we must remember to write the offset of the front
+stream.
+
+\code
+void open_queue(tpie::temp_file & fileName) {
+	queue.open(fileName, tpie::access_read_write, sizeof(tpie::stream_size_type));
+	front.attach(queue);
+	back.attach(queue);
+	back.seek(0, tpie::file_base::stream::end);
+	enqueued = queue.size();
+	if (queue.user_data_size() > 0) {
+		tpie::stream_size_type dequeued;
+
+		queue.read_user_data(dequeued);
+		// The above line is roughly equivalent to:
+		queue.read_user_data(&dequeued, sizeof(tpie::stream_size_type));
+
+		front.seek(dequeued);
+		enqueued -= dequeued;
+	}
+}
+
+void close_queue() {
+	queue.write_user_data(front.offset());
+	front.detach();
+	back.detach();
+	queue.close();
+}
+\endcode
+
+\c enqueue and \c dequeue as above.
+*/

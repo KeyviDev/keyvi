@@ -1,0 +1,2765 @@
+\input texinfo   @c -*-texinfo-*-
+@c
+@c Copyright (c) 1994 Darren Vengroff
+@c
+@c File: tpie.texi
+@c Author: Darren Vengroff <darrenv@eecs.umich.edu>
+@c Created: 12/9/94
+@c
+@c $Id: tpie.texi,v 1.6 1995-06-21 18:27:47 darrenv Exp $
+@c
+@comment %**start of header
+
+@setfilename tpie.info
+@settitle TPIE User Manual and Reference
+@setchapternewpage odd
+
+@comment %**end of header 
+
+@set EDITION 0.5.1a
+@set VERSION 0.7.0a
+
+@ifinfo
+@format
+START-INFO-DIR-ENTRY
+* TPIE: (tpie).                 A Transparent Parallel I/O Environment
+END-INFO-DIR-ENTRY
+@end format
+
+This file documents TPIE, A Transparent Parallel I/O Environment
+
+@today{}
+
+Copyright @copyright{} 1994 Darren Erik Vengroff
+
+This is a DRAFT version of this document.
+
+Permission will be granted to copy and distribute a future version of
+this manual under the terms of the GNU lesser general public license, version 3.
+@end ifinfo
+
+@comment Un-comment the next line to get the GNU small book format.
+@comment @smallbook
+
+@titlepage
+@title TPIE User Manual and Reference
+@subtitle Edition @value{EDITION}, for TPIE version @value{VERSION}
+@author by Darren Erik Vengroff
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 1994 Darren Erik Vengroff
+
+@today{}
+
+This is a DRAFT version of this document.
+
+Permission will be granted to copy and distribute a future version of
+this manual under the terms of the GNU lesser general public license, version 3.
+
+@c If we are producing html, sneak the copyright notice in as part of
+@c the author's name so that it goes onto the table of contents page.
+
+@ifset html
+@author by <A HREF="http://www.cs.duke.edu/~dev/HomePage.html">Darren Erik Vengroff</A><P> <P> <P> Copyright @copyright{} 1994 Darren Erik Vengroff<P>@today{}<P>This is a DRAFT version of this document.<P>Permission will be granted to copy and distribute a future version of this manual under the terms of the GNU lesser public license, version 3.
+@end ifset
+@end titlepage
+
+@node Top, Overview, (dir), (dir)
+@comment  node-name,  next,  previous,  up
+
+@menu
+* Overview::		        What is TPIE and what is it good for?
+* Obtaining and Installing TPIE::
+                                How to obtain and install TPIE.
+* Tutorial::                    A step by step introduction to TPIE.
+* AMI Reference::               Detailed description of the AMI.
+* Implementation::              The design and implementation of TPIE
+* Examples::                    Code to solve real problems with TPIE.
+* Test and Sample Applications::
+                                Descriptions of code provided with TPIE.
+
+* Acknowledgements::            Thanks to everyone who contributed.
+
+* Function Index::              Index of TPIE functions.
+* Concept Index::               Index of concepts in the manual.
+
+ --- The Detailed Node Listing ---
+
+Installing TPIE
+
+* Licensing::                   The terms under which TPIE is distributed
+* Where to get TPIE::           How to get the source code to TPIE
+* Prerequisites::               What you need to build TPIE from sources
+* Installation::                How to build and install TPIE
+
+Tutorial
+
+* Basic Concepts::              Basic concepts of TPIE.
+* Basic Scanning::              Using @code{AMI_scan()}.
+* ASCII Input/Output::          I/O between streams and human readable files.
+* Multi-Type Scanning::         Scanning streams of different types.
+* Out of Step Scanning::        An advanced scanning technique.
+* Merging::                     Using @code{AMI_merge()}.
+* Implementing mergesort::      An extended example.
+* Distribution::                Using @code{AMI_distribute()}.
+* General Permuting::           Using @code{AMI_general permute()}.
+* Bit Permuting::               Using @code{AMI_BMMC_permute()}.
+* Sorting::                     Using @code{AMI_sort()}.
+* Basic Matrix Operations::     Matrix arithmetic.
+
+AMI Reference
+
+* AMI Streams::                 Streams of data.
+* AMI Operation Managers::      Operation Managers
+* AMI Entry Points::            Entry Points
+
+AMI Entry Points
+
+* AMI_scan()::                  Scan, select, and/or transform stream(s).
+* AMI_partition_and_merge()::   Partition and then merge sub-streams.
+* AMI_general_permute()::          
+* AMI_sort()::                  Sort objects in a stream.
+
+The Implementation of TPIE
+
+* Structure::                   
+* AMI::
+* BTE::                         
+* MM::                          
+
+Examples
+
+* Convex Hull::                 Graham's scan for 2-D convex hull
+* List-Ranking::                Based on an algorithm from SODA '95
+
+Test and Sample Applications
+
+* General Structure and Operation::  
+* Test Programs::               
+* Sample Applications::         
+@end menu
+
+@node    Overview, Obtaining and Installing TPIE, Top, Top
+@comment  node-name,  next,  previous,  up
+@chapter Overview
+@cindex Overview
+
+As of today, gigabyte computer systems exist on desktops, and terabyte
+systems are not unheard of.  In the not too distant future, systems
+designed to manage petabytes of information
+will come on-line.  The most important characteristic of such vast
+amounts of data is that they cannot possibly be stored in the primary
+memories of even the most powerful computers.  Instead, they must be
+stored on secondary memory, such as magnetic disks, or tertiary
+memory, such as tapes and optical memory.  Compared to CPUs and solid
+state random access memory, these devices are extraordinarily slow;
+the difference in access time is typically 2 to 5 orders of magnitude.
+Because of the low speed of secondary storage, good performance in the
+Input/Output (I/O) system that links secondary storage to main memory
+and the CPU or CPUs is critical if good performance is to be achieved
+overall.  Performance can be further improved if many disks can be
+efficiently used in parallel.  Unfortunately, existing I/O systems
+generally do not perform adequately @cite{Patt Candidate Improvement}.
+
+In recent years, computer science theorists have studied the problem
+of efficiently using parallel disks to solve a variety of
+computational problems.  At the same time, a number of parallel I/O
+systems have become available, though in most cases they have failed
+to take adequate advantage of the insights theorists have had to offer
+@cite{Cormen Kotz Theory Practice}.  TPIE, a transparent parallel I/O
+environment, is designed to bridge
+the gap between the theory and practice of parallel I/O systems.  It
+is intended to demonstrate that a parallel I/O system can do all of
+the following simultaneously:
+
+@itemize @bullet
+@item 
+Abstract away the details of how I/O is performed so that programmers need only deal with a simple high level interface.
+@item 
+Implement I/O-optimal paradigms for large scale computation that are efficient not only in theory, but also in practice.
+@item 
+Remain flexible, allowing programmers to specify the functional details of computation taking place within the supported paradigms.  This will allow a wide variety of algorithms to be implemented within the system.
+@item 
+Be portable across a variety hardware platforms.
+@item 
+Be extensible, so that new features can be easily added later.  
+@end itemize
+
+TPIE is implemented as a set of templated classes and functions in
+C++.  It also includes a small library and a set of test and sample
+applications.
+
+If you would like the use TPIE but are not familiar with the C++
+language, a number of good books are available.  If you are familiar
+with C, a good book is @cite{C++ for C Programmers} by Ira Pohl.  A more
+basic, but very comprehensive book is @cite{C++: How to Program}
+by Deitel and Deitel, Prentice-Hall, 1994.  Once you know the basics,
+an excellent source of information on intermediate and advanced C++ is
+@cite{Effective C++} by Scott Meyers, Addison Wesley, 1992.  Finally,
+the definitive book on C++, though not necessarily the bast place for
+new programmers to start, is @cite{The Annotated C++ Reference Manual}
+by Ellis and Stroustrup, Addison Wesley, 1990. 
+
+@node Obtaining and Installing TPIE, Tutorial, Overview, Top
+@comment  node-name,  next,  previous,  up
+@chapter Installing TPIE
+@cindex Obtaining and Installing TPIE
+
+
+@menu
+* Licensing::                   The terms under which TPIE is distributed
+* Where to get TPIE::           How to get the source code to TPIE
+* Prerequisites::               What you need to build TPIE from sources
+* Installation::                How to build and install TPIE
+@end menu
+
+@node Licensing, Where to get TPIE, Obtaining and Installing TPIE, Obtaining and Installing TPIE
+@comment  node-name,  next,  previous,  up
+@section Licensing
+
+Once TPIE enters beta testing it will be made available to all under
+the terms of the GNU Lesser General Public License, version 3.
+
+For now it is being made available to alpha testers with NO WARRANTEE
+whatsoever.
+
+@node Where to get TPIE, Prerequisites, Licensing, Obtaining and Installing TPIE
+@comment  node-name,  next,  previous,  up
+@section Where to get TPIE
+
+TPIE is currently available to alpha testers.  If you would like to be
+a tester, please send email to @code{dev@@cs.duke.edu} to make
+arrangements to receive a copy.  Once TPIE enters beta testing it will
+be make generally available under the terms of the GNU  Lesser General Public
+License, version 3.
+
+@node Prerequisites, Installation, Where to get TPIE, Obtaining and Installing TPIE
+@comment  node-name,  next,  previous,  up
+@section Prerequisites
+
+@cindex GNU software
+
+TPIE relies heavily on GNU software distributed by the Free Software
+Foundation.  In particular, programs and library listed below are
+required.  Note that version numbers indicate the versions used in the
+development of TPIE version 0.5a.  Later versions of the GNU tools
+should work as well, though no guarantees can be made about earlier
+versions.  This is particularly true of @code{g++}.  If you already
+have the required programs but are not sure what version they are, try
+invoking each with the single command line argument @code{--version}.
+
+@table @code
+@item g++
+The GNU C++ compiler, version 2.6.3.  This is distributed as part of @code{gcc}, the GNU C compiler.
+@item libg++
+The GNU C++ library, version 2.6.  This is not a program, but rather run-time support for programs compiled with @code{g++}.  It is distributed separately from @code{g++}, but if you have one you probably have the other.
+@item make 
+The GNU Make utility, version 3.71
+@item gzip
+The GNU compression/decompression utility, version 1.2.4.  This is needed to uncompress the TPIE distribution.
+@item tar 
+The GNU tape archive utility, version 1.11.2.  This is needed to extract the components of the TPIE package from the source distribution.
+@end table
+
+For information on where and how to obtain GNU software via FTP,
+@ifset html
+click <A HREF="ftp://prep.ai.mit.edu:/pub/gnu/GNUinfo/FTP">here</A>.
+@end ifset
+@ifclear html
+connect to the machine @code{prep.ai.mit.edu} via anonymous FTP, and consult the file @file{/pub/gnu/GNUinfo/FTP}.
+@end ifclear
+For a variety of information about GNU software and how it is written
+and distributed, 
+@ifset html
+click <A HREF="ftp://prep.ai.mit.edu:/pub/gnu/GNUinfo">here</A>.
+@end ifset
+@ifclear html
+consult the various other files in the directory
+@file{/pub/gnu/GNUinfo/} on @code{prep}.
+@end ifclear
+ 
+@node Installation,  , Prerequisites, Obtaining and Installing TPIE
+@comment  node-name,  next,  previous,  up
+@section Installation
+
+Once you have obtained the source distribution file
+@file{tpie.tar.gz}, you must decide where to install it.
+@file{/usr/local/} is a typical place.
+
+Place @file{tpie.tar.gz} in the directory in which TPIE is to be
+installed, and execute the command
+
+@smallexample
+tar czf tpie.tar.gz
+@end smallexample
+
+This will produce a directory @file{tpie} with subdirectories
+@file{inc}, @file{lib}, @file{test}, and @file{apps}.  Enter the 
+directory @file{tpie}.  You must now configure TPIE for your
+particular system.  To do this, use the command
+
+@smallexample
+./configure
+@end smallexample
+
+The configuration program will take some time to examine the
+parameters of your system.  Once it has done so, it will produce the
+various makefiles and configuration files required to build TPIE on
+your system.  When this is done, simply type
+
+@smallexample
+make all
+@end smallexample
+
+to build the complete TPIE system.  This will build the following
+components:
+
+@table @code
+@item inc
+The TPIE header files.
+@item lib
+The TPIE library.  This is relatively small, as most of the TPIE system remains in the form of templated header files.
+@item test
+A series of test applications designed to verify that TPIE is operating correctly.  This directory also includes the code to examples in this document.  @xref{Examples}
+@item doc
+Complete documentation for TPIE, consisting of the document you are
+reading right now in three formats: info for viewing on-line in GNU
+Emacs; HTML for viewing with Mosaic and similar programs; and DVI and
+Postscript(TM) for printing.
+@end table
+
+Alternatively, individual components can be built one at a time.  For
+example, to build only the header files, type 
+
+@smallexample
+make inc
+@end smallexample
+
+@node Tutorial, AMI Reference, Obtaining and Installing TPIE, Top
+@comment  node-name,  next,  previous,  up
+@chapter Tutorial
+@cindex Tutorial
+
+@menu
+* Basic Concepts::              Basic concepts of TPIE.
+* Basic Scanning::              Using @code{AMI_scan()}.
+* ASCII Input/Output::          I/O between streams and human readable files.
+* Multi-Type Scanning::         Scanning streams of different types.
+* Out of Step Scanning::        An advanced scanning technique.
+* Merging::                     Using @code{AMI_merge()}.
+* Implementing mergesort::      An extended example.
+* Distribution::                Using @code{AMI_distribute()}.
+* General Permuting::           Using @code{AMI_general permute()}.
+* Bit Permuting::               Using @code{AMI_BMMC_permute()}.
+* Sorting::                     Using @code{AMI_sort()}.
+* Basic Matrix Operations::     Matrix arithmetic.
+@end menu
+
+@node Basic Concepts, Basic Scanning, Tutorial, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Basic Concepts
+@cindex Basic Concepts
+
+Conceptually, TPIE programs work with streams of data stored on
+external memory.  A stream is an ordered collection of
+objects of a particular type.  Various paradigms of computation are
+defined on these streams, though the functional details of the
+computation performed within these paradigms is left to the TPIE
+programmer to specify.  These details are specified using an operation
+manager, which is an object with member functions designed to work
+with the particular paradigm being used.
+
+The paradigms TPIE provides include scanning (@pxref{Basic Scanning}), merging
+(@pxref{Merging}), and permuting (@pxref{General Permuting}), to name
+but a few.
+
+@node Basic Scanning, ASCII Input/Output, Basic Concepts, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Scanning
+@cindex Scanning
+
+The simplest paradigm available in TPIE is scanning.  Scanning can be
+used to produce streams, examine the contents of streams, or transform
+streams.  In the following example, we create a stream of integers
+consisting of the first 10000 natural numbers.
+
+@smallexample
+class scan_count : AMI_scan_object @{
+private:
+    int maximum;
+public:
+    int ii;
+
+    scan_count(int max = 1000) : maximum(max), ii(0) @{@};
+
+    AMI_err initialize(void) 
+    @{
+        ii = 0;
+        return AMI_ERROR_NO_ERROR;
+    @};
+
+    AMI_err operate(int *out1, AMI_SCAN_FLAG *sf)
+    @{
+        *out1 = ++ii;
+        return (*sf = (ii <= maximum)) ? AMI_SCAN_CONTINUE : 
+            AMI_SCAN_DONE;
+    @};
+@};
+
+scan_count sc(10000);
+AMI_STREAM<int> amis0;    
+
+void f()
+@{
+    AMI_scan(&sc, &amis0);
+@}
+@end smallexample
+
+The class @code{scan_count} is a class of scan management object.  It
+has two member functions, @code{initialize()} and @code{operate()},
+which TPIE calls when asked to perform a scan.  The first member
+function, @code{initialize()} is called at the beginning of the scan.
+TPIE expects that a call to this member function will cause the
+object to initialize any internal state it may maintain in preparation
+for performing a scan.  The second member function, @code{operate()},
+is called repeatedly during the scan to create objects to go into the
+output stream.  @code{operate()} sets the flag @code{*sf} to indicate
+whether it generated output or not.  Only when @code{operate()}
+returns either an error or @code{AMI_SCAN_DONE} does TPIE stop calling
+it.
+
+The call to @code{AMI_scan} behaves as the following pseudo-code:
+
+@smallexample 
+AMI_err AMI_scan(scan_count &sc, AMI_STREAM<int> *pamis)
+@{
+    int ii;
+    AMI_err ae;    
+    AMI_SCAN_FLAG sf;
+
+    sc.initialize();    
+    while ((ae = sc.operate(&ii, &sf)) == AMI_SCAN_CONTINUE) @{
+        if (sf) @{
+            write ii to *pamis;
+        @}
+    @}
+
+    if (ae != AMI_SCAN_DONE) @{
+        handle error conditions;
+    @}
+
+    return AMI_ERROR_NO_ERROR;
+@}
+@end smallexample
+
+Thus, after the function @code{f()} in the original example code is
+called, the stream @code{amis0} contains the integers from 1 to 10000
+in order.
+
+Now that we have produced a stream, there are a variety of things we
+can do with it.  One of the simplest things we can do with a stream of
+objects is scan it in order to transform it in some way.  As an
+example, suppose we wanted to square every integer in the stream
+@code{amis0}.  We could do so using the following code:
+
+@smallexample
+class scan_square : AMI_scan_object @{
+public:
+    AMI_err initialize(void)
+    @{
+        return AMI_ERROR_NO_ERROR;
+    @};
+
+    AMI_err operate(const int &in, AMI_SCAN_FLAG *sfin,
+                    int *out, AMI_SCAN_FLAG *sfout)
+    @{
+        if (*sfout = *sfin) @{
+            *out = in * in;
+            return AMI_SCAN_CONTINUE;
+        @} else @{
+            return AMI_SCAN_DONE;
+        @}
+    @};
+@};
+
+scan_square ss;
+AMI_STREAM<int> amis1;    
+
+void g() 
+@{
+    AMI_scan(&amis0, &ss, &amis1);
+@}
+@end smallexample
+
+Notice that the call to @code{AMI_scan()} in @code{g()} differs from
+the one we used in @code{f()} in that it takes two stream pointers and
+a scan management object.  By convention, the stream @code{amis0} is
+an input stream, because it appears before the scan management object
+@code{ss} in the argument list.  By similar convention, @code{amis1}
+is an output stream.  Because the call to @code{AMI_scan} has one
+input stream and one output stream, TPIE expects the @code{operate()}
+member function of @code{ss} to have one input argument (which is
+called @code{in} in the example above) and one output argument (called
+@code{out} in the example above).  Note that the @code{operate()}
+member function of the class @code{square_scan} also takes two
+pointers to flags, one for input (@code{sfin}) and one for output
+(@code{sfout}).  @code{*sfin} is set by TPIE to indicate that there is
+more input to be processed.  @code{*sfout} is set by the scan
+management object to indicate when output is generated.
+If a scan management object has no polymorph of @code{operate()} that
+takes the appropriate type number of arguments for the invocation of
+@code{AMI_scan()} that uses it then a compile-time error is generated.
+
+A call to @code{AMI_scan} with one input stream and one output stream
+behaves as the following pseudo-code:
+
+@smallexample 
+AMI_err AMI_scan(AMI_STREAM<int> *instream, scan_square &ss, 
+        AMI_STREAM<int> *outstream)
+@{
+    int in, out;
+    AMI_err ae;    
+    AMI_SCAN_FLAG sfin, sfout;
+
+    sc.initialize();
+
+    while (1) @{
+        @{
+             read in from *instream;
+             sfin = (read succeeded);
+        @}
+        if ((ae = ss.operate(in, &sfin, &out, &sf)) == 
+            AMI_SCAN_CONTINUE) @{
+            if (sfout) @{
+                write out to *outstream;
+            @}
+            if (ae == AMI_SCAN_DONE) @{
+                return AMI_ERROR_NO_ERROR;
+            @}
+            if (ae != AMI_SCAN_CONTINUE) @{
+                handle error conditions;
+            @}
+        @}
+    @}
+@}
+@end smallexample
+
+More complicated invocations of @code{AMI_scan()} can operate on up
+to four input streams and four output streams.  Here is an example
+that takes two input streams of values, @code{x} and @code{y}, and
+produces four output streams, 
+one consisting of the running sum of the
+@code{x} values,
+one consisting of the running sum of the
+@code{y} values,
+one consisting of the running sum of the
+squares of the @code{x} values,
+and
+one consisting of the running sum of the
+squares of the @code{y} values.
+
+@smallexample
+class scan_sum : AMI_scan_object @{
+private:
+    double sumx, sumx2, sumy, sumy2;
+public:
+    AMI_err initialize(void)
+    @{
+        sumx = sumy = sumx2 = sumy2 = 0.0;
+        return AMI_ERROR_NO_ERROR;
+    @};
+
+    AMI_err operate(const double &x, const double &y, 
+                    AMI_SCAN_FLAG *sfin,
+                    double *sx, double *sy, 
+                    double *sx2, double *sy2, 
+                    AMI_SCAN_FLAG *sfout)
+    @{
+        if (sfout[0] = sfout[2] = sfin[0]) @{
+            *sx = (sumx += x);
+            *sx2 = (sumx2 += x * x);
+        @}
+        if (sfout[1] = sfout[3] = sfin[1]) @{
+            *sy = (sumx += y);
+            *sy2 = (sumy2 += y * y);
+        @}        
+        return (sfin[0] || sfin[1]) ? AMI_SCAN_CONTINUE : AMI_SCAN_DONE;
+    @};
+@};
+
+AMI_STREAM<double> xstream, ystream;
+
+AMI_STREAM<double> sum_xstream, sum_ystream, sum_x2stream, sum_y2stream;
+
+scan_sum ss;
+
+void h()
+@{
+    AMI_scan(&xstream, &ystream, &ss, 
+             &sum_xstream, &sum_ystream, &sum_x2stream, &sum_y2stream);
+@}
+@end smallexample
+
+@node ASCII Input/Output, Multi-Type Scanning, Basic Scanning, Tutorial
+@comment  node-name,  next,  previous,  up
+@section ASCII Input/Output
+@cindex ASCII Input/Output
+
+TPIE provides a number of predefined scan management objects.  Among
+the most useful are instances of the template classes
+@code{cxx_ostream_scan<T>} and @code{cxx_ostream_scan<T>}, which are
+used for reading ASCII data into streams and writing the contents of
+streams in ASCII respectively.  This is done in conjunction with the
+@code{iostream} facilities provided in the standard C++ library.  Any
+class @code{T} for which the operators @code{ostream
+&operator<<(ostream &s, T &t)} and @code{istream &operator>>(T &t)}
+are defined can be used with this mechanism.
+
+As an example, suppose we have a file called @file{input_nums.txt}
+containing one integer per line, such as
+
+@smallexample
+17
+289
+4195835
+3145727
+.
+.
+.
+@end smallexample
+
+To read this file into a TPIE stream of integers, square each, and
+write them out to the file @file{output_nums.txt} we could use the
+following code:
+
+@smallexample
+void f()
+@{
+    ifstream in_ascii("input_nums.txt");
+    ofstream out_ascii("input_nums.txt");
+    cxx_istream_scan<int> in_scan(in_ascii);
+    cxx_ostream_scan<int> out_scan(out_ascii);
+    AMI_STREAM<int> in_ami, out_ami;
+    scan_square ss;    
+
+    // Read them.
+    AMI_scan(&in_scan, &in_ami);
+
+    // Square them.
+    AMI_scan(&in_ami, &ss, &out_scan);
+    
+    // Write them.
+    AMI_scan(&out_ami, out_scan);
+
+@}    
+@end smallexample
+
+In order to read from an input file using the scan object
+@code{in_scan}, @code{AMI_scan()} repeatedly calls
+@code{in_scan->operate()}, just as it would for any scan object.  Each
+time @code{in_scan->operate()} is called, it uses the @code{>>}
+operator to read a single integer from the input file.  When the input
+file is exhausted, @code{in_scan->operate()} returns
+@code{AMI_SCAN_DONE}, and @code{AMI_scan()} returns to its caller.
+The behaviour of @code{out_scan} is similar to that of @code{in_scan},
+except that it writes to a file instead of reading from one.
+
+@node Multi-Type Scanning, Out of Step Scanning, ASCII Input/Output, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Multi-Type Scanning
+@cindex Multi-Type Scanning
+
+In all of the examples presented up to this point, scanning has been
+done on streams of objects that are all of the same type.
+@code{AMI_scan()} is not limited to such scans, however.  In the
+following example, we have a scan management class that takes two
+streams of @code{double}s and returns a stream of complex numbers.
+
+@smallexample
+class complex @{
+public:
+    complex(double real_part, imaginary_part);
+    ...
+@};
+
+class scan_build_complex : AMI_scan_object @{
+public:
+    AMI_err initialize(void) @{@};
+    AMI_err operate(const double &r, const double &i, 
+                    AMI_SCAN_FLAG *sfin,
+                    complex *out, AMI_SCAN_FLAG *sfout)
+    @{
+        if (*sfout = (sfin[0] || sfin[1])) @{
+            *out = complex((sfin[0] ? r : 0.0), (sfin[1] ? i : 0.0));
+            return AMI_SCAN_CONTINUE;
+        @} else @{
+            return AMI_SCAN_DONE;
+        @}   
+    @};
+@};
+@end smallexample
+
+@node Out of Step Scanning, Merging, Multi-Type Scanning, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Out of Step Scanning
+@cindex Out of Step Scanning
+
+In all the examples up to this point, every call to the
+@code{operate()} member function of a scan management object has been
+called with each object in the input stream(s) exactly once.  In this
+section, we introduce the concept of out of step scanning, which
+allows a scan management object to reject certain inputs and ask that
+they be resubmitted in subsequent calls to the @code{operate()} member
+function.
+
+Suppose we have two streams of integers, each of which we know is
+sorted in ascending order.  We would like to merge the two streams
+into a single output stream consisting of all the integers in the two
+input streams, in sorted order.  In order to do this with a scan, we
+must have the ability to look at the next integer from each stream,
+choose the smaller of the two and write it to the output stream, and
+then ask for the next number from the stream from which it was taken.
+Luckily, there is a simple mechanism for doing this.  The same flags
+that TPIE uses to tell the scan management object which inputs are
+available can be used by the scan management object to indicate which
+inputs were used and which should be presented again.
+
+Consider the following example of a scan management object class which
+performs exactly the sort of binary merge described in the preceding
+paragraph:
+
+@smallexample
+class scan_binary_merge : AMI_scan_object @{
+public:
+    AMI_err initialize(void) @{@};
+    
+    AMI_err operate(const int &in0, const int &in1, AMI_SCAN_FLAG *sfin,
+                    int *out, AMI_SCAN_FLAG *sfout) 
+    @{
+        if (sfin[0] && sfin[1]) @{
+            if (in0 < in1) @{
+                sfin[1] = false;
+                *out = in0;
+            @} else @{
+                sfin[0] = 0;
+                *out = in1;
+            @}
+        @} else if (!sfin[0]) @{
+            if (!sfin[1]) @{
+                *sfout = 0;
+                return AMI_SCAN_DONE;
+            @} else @{
+                *out = in1;
+            @}
+        @} else @{
+            *out = in0;
+        @}
+        *sfout = 1;
+        return AMI_SCAN_CONTINUE;
+    @}    
+@};
+@end smallexample
+
+In the operate method, we first check that both inputs are valid by
+looking at the flags pointed to by @code{sfin}.  If both are valid,
+then we select the smaller of the inputs and copy it to the output.
+We then clear the other input flag to let TPIE know that we did not
+use that input, but we will need it later and it should be resubmitted
+on the next call to operate.  The remainder of the function handles
+the cases when one of more of the input streams in empty.
+
+@node Merging, Implementing mergesort, Out of Step Scanning, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Merging
+@cindex Merging
+
+The binary merging scan management class presented in the previous
+section (@pxref{Out of Step Scanning}) could be used recursively to
+implement a merge sorting algorithm.  We could simply divide the input
+stream into sub-streams small enough to fit into main memory, read each
+sub-stream into memory and sort it, and then merge pairs of streams,
+then pairs of merged pairs of streams, and so on, until we had merged
+all the input back into one completely sorted stream.  While this
+approach would correctly sort the input, it would not be nearly as
+efficient as possible on most machines.  The reason is that we
+typically have enough main memory available to merge many streams
+together at one time.
+
+Taking advantage of all available main memory can be difficult, since
+we must explicitly keep track to the space needed for input blocks
+form each of the streams being merged, as well as the overhead of any
+data structures needed for the merge.  Luckily, TPIE provides a
+mechanism that does most of the work for us.  The function
+@code{AMI_partition_and_merge()} divides an input stream into
+sub-streams just small enough to fit into main memory, operates on
+each in main memory, then merges them back into a single output
+stream, using intermediate streams if memory constraints dictate.  As
+was the case with @code{AMI_scan()}, the functional details of
+@code{AMI_partition_and_merge()} are specified via an operation
+management object, as shown in the following example:
+
+@smallexample
+class my_merger : AMI_merge_manager @{
+public:
+    AMI_err initialize(arity_t arity, const T * const *in,
+                       AMI_merge_flag *taken_flags,
+                       int &taken_index);
+    AMI_err operate(const T * const *in, AMI_merge_flag *taken_flags,
+                    int &taken_index, T *out);
+    AMI_err main_mem_operate(T* mm_stream, size_t len);
+    size_t space_usage_overhead(void);
+    size_t space_usage_per_stream(void);
+@};
+
+AMI_STREAM<T> instream, outstream;
+
+void f() 
+@{
+    my_merger mm;    
+    AMI_partition_and_merge(&instream, &outstream, &mm);
+@}
+@end smallexample
+
+The class members are as follows:
+
+@table @code
+@item initialize()
+Tells the object how many streams it should merge (@code{arity}) and what the first item from each stream is (@code{in}).   @code{taken_flags} and @code{taken_index} provide two mechanisms for the merge manager to tell TPIE what objects it took from the input streams.  These are discussed in more detail later in the context of a merge sorting example. @xref{Implementing mergesort}.
+@item operate()
+Just as in scanning, this member function is called repeatedly to process input objects.
+@item main_mem_operate()
+Operates on an array of data in main memory when a sub-stream is small enough to fit entirely in main memory.
+@item space_usage_overhead()
+Called by TPIE prior to initialization to asses how much main memory this object will use.
+@item space_usage_per_item()
+Called by TPIE prior to initialization to asses how much main memory may be used per input stream.  Merge management objects are allowed to use main memory space linear in the number of input streams.
+@end table
+
+@code{AMI_partition_and_merge()} behaves as indicated by the following
+pseudo-code.  Note that for simplicity of presentation, boundary
+conditions are not covered.
+
+@smallexample
+AMI_err AMI_partition_and_merge(instream, outstream, mm)
+@{
+    max_ss = max # of items that can fit in main memory;
+    partition instream into num_substreams substreams of size max_ss;
+
+    foreach substream[i] @{
+        read substream[i] into main memory;
+        mm->main_mem_operate(substream[i]);
+        write substream[i];
+    @}
+
+    call mm->space_usage_overhead() and mm->space_usage_per_stream;
+    
+    compute merge_arity; // Maximum # of streams we can merge.     
+
+    while (num_substreams > 1) @{
+        for (i = 0; i < num_substreams; i += merge_arity) @{
+            merge substream[i] .. substream[i+merge_arity-1];
+        @}
+        num_substreams /= merge_arity;
+        max_ss *= merge_arity;
+    @}
+
+    write single remaining substream to outstream;
+        
+    return AMI_ERROR_NO_ERROR;
+@}
+@end smallexample
+
+@node Implementing mergesort, Distribution, Merging, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Implementing Mergesort: An Extended Example
+@cindex Implementing Mergesort
+
+Here is an example of the implementation and use of a merge management
+object for merge sorting integers.  First, we declare the class:
+
+@smallexample
+class s_merge_manager : public AMI_merge_base<int> @{
+private:
+    arity_t input_arity;
+    pqueue *pq;
+public:
+    s_merge_manager(void);
+    virtual ~s_merge_manager(void);
+    AMI_err initialize(arity_t arity, const int * const *in,
+                       AMI_merge_flag *taken_flags,
+                       int &taken_index);
+    AMI_err operate(const int * const *in, AMI_merge_flag *taken_flags,
+                    int &taken_index, int *out);
+    AMI_err main_mem_operate(int* mm_stream, size_t len);
+    size_t space_usage_overhead(void);
+    size_t space_usage_per_stream(void);
+@};
+@end smallexample
+
+In addition to the standard class members for a merge management
+object, we have the following:
+
+@table @code
+@item input_arity
+The number of input streams the merge management object must handle.
+@item pq
+A priority queue into which items will be placed.
+@item s_merge_manger()
+A constructor.
+@item ~s_merge_manger()
+A destructor.
+@end table
+
+Construction and destruction are fairly straightforward.  At
+construction time, we have no priority queue because we do not yet
+know how big the priority queue should be.  @code{pq} will be set up
+when @code{initialize} is called.  The destructor checks whether
+@code{pq} is valid, and deletes it if it is.  The constructor and
+destructor are implemented as follows:
+
+@smallexample
+s_merge_manager::s_merge_manager(void)
+@{
+    pq = NULL;
+@}
+
+s_merge_manager::~s_merge_manager(void)
+@{
+    if (pq != NULL) @{
+        delete pq;
+    @}
+@}
+@end smallexample
+
+When @code{AMI_merge()} is called with a merge management object of
+type @code{s_merge_manager}, the first member functions called are
+@code{space_usage_overhead()} and @code{space_usage_per_stream()}.
+These return the number of bytes of main memory that the merge
+management object will allocate when initialized.  
+@code{space_usage_overhead()}'s return value indicates that space will
+be needed for a priority
+queue.  
+@code{space_usage_per_stream()}'s return value indicates that for each
+input stream, space (which is to be allocated when the priority
+queue is constructed) will be needed for an integer and an arity type.
+
+@smallexample
+size_t s_merge_manager::space_usage_overhead(void)
+@{
+    return sizeof(pqueue<arity_t,int>);
+@}
+
+
+size_t s_merge_manager::space_usage_per_stream(void)
+@{
+    return sizeof(arity_t) + sizeof(int);
+@}
+@end smallexample
+
+The next member function called by @code{AMI_merge()} is
+@code{main_mem_operate()}, which is called to handle the initial
+substreams that are small enough to fit in main
+memory. @xref{Merging}.  Since we are sorting, we will simply use
+quicksort.
+
+@smallexample
+AMI_err s_merge_manager::main_mem_operate(int* mm_stream, size_t len)
+@{
+    qsort(mm_stream, len, sizeof(int), c_int_cmp);
+    return AMI_ERROR_NO_ERROR;
+@}
+@end smallexample
+
+Having sorted all of the initial substreams, @code{AMI_merge()} begins
+to merge them.  Before merging a set of substreams, the merge
+management object's member function @code{initialize()} is called to
+inform the merge management object of the number of streams it should
+be prepared to merge.  The object is also provided with the first
+object from each of the streams to be merged.  For objects of the
+class @code{s_merge_manager}, the @code{initialize()} member function
+is as follows:
+
+@smallexample
+AMI_err s_merge_manager::initialize(arity_t arity, CONST int * CONST *in,
+                                          AMI_merge_flag *taken_flags,
+                                          int &taken_index)
+@{
+    arity_t ii;
+
+    input_arity = arity;
+
+    if (pq != NULL) @{
+        delete pq;
+    @}
+
+    // Construct a priority queue that can hold arity items.
+    pq = new pqueue_heap_op(arity);
+
+    for (ii = arity; ii--; ) @{
+        if (in[ii] != NULL) @{
+            taken_flags[ii] = 1;
+            pq->insert(ii,*in[ii]);
+        @} else @{
+            taken_flags[ii] = 0;
+        @}
+    @}
+
+    taken_index = -1;
+    return AMI_MERGE_READ_MULTIPLE;
+@}
+@end smallexample
+
+Note the use of the return value @code{AMI_MERGE_READ_MULTIPLE}.  This
+indicates that the flags pointed to by @code{*taken_flags} are set to
+indicate which of the inputs were used and should not be presented
+again.  This is very similar to the use of input flags to indicate
+which inputs were used by a scan management object @xref{Out of Step
+Scanning}.  The reason that we have a special return value to indicate
+when these flags are used to increase performance.  In order for
+@code{AMI_scan()} to determine which inputs were taken, it must
+examine all the flags.  In a many way merge, this might be time
+consuming.  In cases where only one item is taken, its index can be
+returned in @code{taken_index} in order to save the time that would be
+spent scanning the flags.  This technique is used in the
+@code{operate()} member function, whose implementation is as follows:
+
+@smallexample
+AMI_err s_merge_manager::operate(CONST int * CONST *in,
+                                       AMI_merge_flag *taken_flags,
+                                       int &taken_index,
+                                       int *out)
+@{
+    // If the queue is empty, we are done.  There should be no more
+    // inputs.
+    if (!pq->num_elts()) @{
+        return AMI_MERGE_DONE;
+    @} else @{
+        arity_t min_source;
+        int min_t;
+
+        pq->extract_min(min_source,min_t);
+        *out = min_t;
+        if (in[min_source] != NULL) @{
+            pq->insert(min_source,*in[min_source]);
+            taken_index = min_source;
+        @} else @{
+            taken_index = -1;
+        @}
+        return AMI_MERGE_OUTPUT;
+    @}
+@}
+@end smallexample
+
+@node Distribution, General Permuting, Implementing mergesort, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Distribution
+@cindex Distribution
+
+Distribution has not been implemented in the current version of TPIE.
+It is primarily useful for parallel disks, and will be implemented in
+the parallel disk version of TPIE.  On a single disk, merging should
+be adequate for all applications where distribution might be
+considered.
+
+On a single disk, distribution will tend to result in algorithms that
+take roughly twice as long as similar algorithms that use merging.
+This is because distribution is done to the square root of the number
+of streams that can be buffered in main memory rather than the full
+number.  This results in recursion that is twice as deep.
+
+@node General Permuting, Bit Permuting, Distribution, Tutorial
+@comment  node-name,  next,  previous,  up
+@section General Permuting
+@cindex General Permuting
+
+Permutation is a basic building block for many I/O algorithms.
+Routing a general permutation in the I/O model is asymptotically as
+complex as sorting, though for some important classes of permutations,
+such as BMMC permutations (@pxref{Bit Permuting}) faster algorithms
+are possible.  In this section, we discuss
+@code{AMI_general_permute()}, which routes arbitrary permutations, but
+always takes as long as sorting, regardless of whether the particular
+permutation can be done more quickly or not.
+
+General permutations are routed using the function
+@code{AMI_general_permute()}.  Like other AMI functions,
+@code{AMI_general_permute()} relies on an operation management object
+to determine its precise behavior.  Unlike functions covered up to
+now, however, the type of the operation management object need not
+depend on the type of object in the stream being permuted.
+
+A general permutation management object must provide two member
+functions, @code{initialize()} and @code{destination}.
+@code{initialize()} is called to inform the general permutation object
+of the length of the stream to be permuted.  @code{destination()} is
+then called repeatedly to determine the destination for each object in
+the stream based on it's initial position.
+
+Here is an example of using general permutation to reverse the order
+of the items in a stream.
+
+@smallexample
+class reverse_order : public AMI_gen_perm_object @{
+private:
+    off_t total_size;
+public:
+    AMI_error initialize(off_t ts) @{ 
+        total_size = ts; 
+        return AMI_ERROR_NO_ERROR;
+    @};
+    off_t destination(off_t source) @{
+        return total_size - 1 - source;
+    @};
+@};
+
+AMI_STREAM<int> amis0, amis1;    
+
+void f()
+@{
+    reverse_order ro;
+
+    AMI_general_permute(&amis0, &amis1, (AMI_gen_perm_object *)&ro);
+@}
+@end smallexample
+
+@node Bit Permuting, Sorting, General Permuting, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Bit Permuting
+@cindex Bit Permuting
+
+Bit permuting is a permutation technique in which the destination
+address of a given item is computed by manipulating the bits of its
+source address.  The particular class of bit permutations that TPIE
+supports is the set of bit matrix multiply complement (BMMC)
+permutations.  These permutations are defined on sets of objects whose
+size is a power of 2.
+
+Suppose we have an input consisting of
+@iftex 
+@math{N = 2^n}
+@end iftex
+@ifinfo
+@var{N = 2^n}
+@end ifinfo
+@ifset html
+@var{N = 2^n}
+@end ifset
+objects.
+A BMMC permutation on the input is defined by a nonsingular
+@iftex
+@math{n @times n}
+@end iftex
+@ifinfo
+@var{n} by @var{n}
+@end ifinfo
+@ifset html
+@var{n} by @var{n}
+@end ifset
+bit matrix 
+@iftex
+@math{A}
+@end iftex
+@ifinfo
+@var{A}
+@end ifinfo
+@ifset html
+@var{A}
+@end ifset
+and an 
+@iftex
+@math{n}
+@end iftex
+@ifinfo
+@var{n}
+@end ifinfo
+@ifset html
+@var{n}
+@end ifset
+element column vector 
+@iftex
+@math{c}
+@end iftex
+@ifinfo
+@var{c}
+@end ifinfo
+@ifset html
+@var{c}
+@end ifset
+of bits.
+Source and destination addresses are iterpreted as column vectors of
+bits, with the low order bit of the address at the top. 
+The destination address 
+@iftex
+@math{x'}
+@end iftex
+@ifinfo
+@var{x'}
+@end ifinfo
+@ifset html
+@var{x'}
+@end ifset
+correspoinding to a given source address 
+@iftex
+@math{x}
+@end iftex
+@ifinfo
+@var{x}
+@end ifinfo
+@ifset html
+@var{x}
+@end ifset
+is computed as
+@iftex
+@math{x' = Ax + c}
+@end iftex
+@ifinfo
+@var{x' = Ax + c}
+@end ifinfo
+@ifset html
+@var{x' = Ax + c}
+@end ifset
+where addition and multiplication of matrix elements is done over
+GF(2).
+For a detailed description of BMMC permutations, refer to
+@ifset html
+<A HREF="ftp://cs.dartmouth.edu:/pub/CS-techreports/TR94-223.ps.Z">Dartmouch College Technical Report PCS-TR94-223</A>
+@end ifset
+@ifclear html
+Dartmouch College Technical Report PCS-TR94-223
+@end ifclear
+ by Cormen, Sundquist, and Wisneiwski.
+@ifclear html
+A postscript version of this report is available by anonymous ftp from
+@code{cs.dartmouth.edu} as @code{/pub/CS-techreports/TR94-223.ps.Z}.
+@end ifclear
+
+Routing BMMC permutations in TPIE is done using the
+@code{AMI_BMMC_permute()} entry point, which takes an input stream,
+and output stream, and a pointer to a bit permutation managmement
+object.  In the following example, we route a permutation that simply
+reverss the order of the source address bits to produce the
+destination address.
+
+First, we construct the matrices the permutation will use.
+@smallexample
+    bit_matrix A(n,n);
+    bit_matrix c(n,1);
+
+    @{
+        unsigned int ii,jj;
+
+        for (ii = n; ii--; ) @{
+            c[ii][0] = 0;
+            for (jj = n; jj--; ) @{
+                A[n-1-ii][jj] = (ii == jj);
+            @}
+        @}
+    @}
+@end smallexample
+Now we simply construct a permutation management object from the
+matrices and perform the permutation.
+@smallexample
+    AMI_bit_perm_object bpo(A,c);
+    
+    ae = AMI_BMMC_permute(&amis0, &amis1, (AMI_bit_perm_object *)&bpo);
+@end smallexample
+
+
+
+@node Sorting, Basic Matrix Operations, Bit Permuting, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Sorting
+@cindex Sorting
+
+Sorting is a common primitive operation in many algorithms.  It can be
+performed in a variety of ways, such as by merging (@pxref{Merging}),
+distribution (@pxref{Distribution}), and Aggarwal and Plaxton's
+Sharesort, which combines elements of both along with simple bit
+permutations (@pxref{Bit Permuting}).  Because the best choice of
+sorting algorithm varies from one I/O system to the next, TPIE
+provides a single function @code{AMI_sort()}, which selects an
+appropriate algorithm based on the underlying hardware characteristics.
+
+@code{AMI_sort()} has two polymorphs.  The first works on streams of
+objects for which the operator @code{<} is defined.  It is invoked as
+follows:
+
+@smallexample
+AMI_STREAM<int> instream;
+AMI_STREAM<int> outstream;
+
+void f()
+@{
+    AMI_sort(&instream, &outstream);
+@}
+@end smallexample
+
+The second polymorph of @code{AMI_sort()} uses an explicit function to
+determine the relative order of two objects in the input stream.  This
+is useful in cases where we may want to sort a stream of objects in
+several different ways.  For example, the following code sorts a
+stream of complex numbers in two ways, by their real parts and by
+their imaginary parts.
+
+@smallexample
+class complex @{
+public:
+    complex(double real_part, imaginary_part);
+    double re(void);
+    double im(void);
+    ...
+@};
+
+int compare_re(const complex &c1, const complex &c2)
+@{
+    return (c1.re() < c2.re()) ? -1 :
+           ((c1.re() > c2.re()) ? 1 : 0);
+@}
+
+int compare_im(const complex &c1, const complex &c2)
+@{
+    return (c1.im() < c2.im()) ? -1 :
+           ((c1.im() > c2.im()) ? 1 : 0);
+@}
+
+AMI_STREAM<complex> instream;
+AMI_STREAM<complex> outstream_re;
+AMI_STREAM<complex> outstream_im;
+
+void f()
+@{
+    AMI_sort(&instream, &outstream_re, compare_re);
+    AMI_sort(&instream, &outstream_im, compare_im);
+@}
+@end smallexample
+
+@node Basic Matrix Operations,  , Sorting, Tutorial
+@comment  node-name,  next,  previous,  up
+@section Basic Matrix Operations
+
+In addition to streams, which are linearly ordered collections of
+objects, the AMI provides a mechanism for storing large matrices in
+external memory.  Matrices are a subclass of streams, and thus can be
+used with any of the stream operations discussed above.  When a matrix
+is treated as a stream its elements appear in row major order.  In
+addition to stream operations, matrices support three simple
+arithmetic operations, addition, subtraction, and multiplication.
+
+It is assumed that the class @code{T} of the elements in a matrix
+forms a quasiring with the operators @code{+} and @code{*}.
+Furthermore, the object @code{T((int)0)} is assumed to be an identity
+for @code{+}.  At the moment, it is not assumed that the operator
+@code{-} in an inverse of @code{+}, and therefore no reduced
+complexity matrix multiplication algorithms analogous to Strassen's
+algorithm are used.
+
+Matrices can be filled using @code{AMI_scan()}, though typically they
+are filled using the function @code{AMI_matrix_fill()}, which uses a
+scan management object that is given the row and column of each
+element of the matrix and asked to fill them in.  In the following
+example, we create a 1000 by 1000 upper triangular matrix of ones and
+zeroes:
+
+@smallexample
+template<class T>
+class fill_upper_tri : public AMI_matrix_filler<T> @{
+    AMI_err initialize(unsigned int rows, unsigned int cols)
+    @{
+        return AMI_ERROR_NO_ERROR;
+    @};
+    T element(unsigned int row, unsigned int col)
+    @{
+        return (row <= col) ? T(1) : T(0);
+    @};
+@};
+
+AMI_matrix m(1000, 1000);
+
+void f()
+@{
+    fill_upper_tri<double> fut;
+
+    AMI_matrix_fill(&em, (AMI_matrix_filler<T> *)&fut);
+@}
+@end smallexample
+
+Arithmetic on matrices is performed in a straightforward way using the
+functions @code{AMI_matrix_add()}, @code{AMI_matrix_subtract()}, and
+@code{AMI_matrix_multiply()}, as is the following example:
+
+@smallexample
+AMI_matrix m0(1000, 500), m1(500, 2000), m2(1000, 2000);
+AMI_matrix m3(1000, 500), m4(1000, 500);
+
+void f()
+@{
+    // Add m3 to m4 and put the result in m0.
+    AMI_matrix_add(em3, em4, em0);
+   
+    // Multiply m0 by em1 to get m2.
+    AMI_matrix_mult(em0, em1, em2);
+
+    // Subtract m4 from m3 and put the result in m0.
+    AMI_matrix_subtract(em3, em4, em0);        
+@}
+@end smallexample
+
+
+@node AMI Reference, Implementation, Tutorial, Top
+@comment  node-name,  next,  previous,  up
+@chapter AMI Reference
+
+This chapter is an AMI reference manual.  It gives more complete and
+detailed information about using the AMI than was given in the
+Tutorial. @xref{Tutorial}
+
+@menu
+* AMI Streams::                 Streams of data.
+* AMI Operation Managers::      Operation Managers
+* AMI Entry Points::            Entry Points
+@end menu
+
+@node AMI Streams, AMI Operation Managers, AMI Reference, AMI Reference
+@comment  node-name,  next,  previous,  up
+@section AMI Streams
+@cindex AMI Streams
+@cindex Streams
+
+An @dfn{AMI stream} is nothing more than an abstraction of an ordered
+set of objects of any one class which is stored in secondary memory.
+In some applications, the elements of a stream might be nothing more
+than integers.  In others, they might be objects of an arbitrarily
+complex user defined class.  Creating a stream of objects of class
+@code{foo} called @code{foo_stream} requires nothing more than the
+definition
+
+@smallexample
+AMI_STREAM<foo> foo_stream;
+@end smallexample
+
+@code{AMI_STREAM} is a macro that resolves to a class
+template declared to match the underlying semantics of the target I/O
+architecture by using an appropriate BTE 
+(@xref{BTE}.) and MM (@xref{MM}).
+
+
+@node AMI Operation Managers, AMI Entry Points, AMI Streams, AMI Reference
+@comment  node-name,  next,  previous,  up
+@section AMI Operation Managers
+@cindex AMI Operation Managers
+@cindex Operation Managers
+
+
+@node    AMI Entry Points,  , AMI Operation Managers, AMI Reference
+@comment  node-name,  next,  previous,  up
+@section AMI Entry Points
+@cindex AMI Entry Points
+
+This section describes all the AMI entry points.
+
+@menu
+* AMI_scan()::                  Scan, select, and/or transform stream(s).
+* AMI_partition_and_merge()::   Partition and then merge sub-streams.
+* AMI_general_permute()::          
+* AMI_sort()::                  Sort objects in a stream.
+@end menu
+
+@node    AMI_scan(), AMI_partition_and_merge(), AMI Entry Points, AMI Entry Points
+@comment  node-name,  next,  previous,  up
+@subsection AMI_scan()
+
+@deftypefun AMI_err AMI_scan (AMI_STREAM<@var{T0}> *@var{instream0} [, AMI_STREAM<@var{T1}> *@var{instream1}, ...,]  AMI_scan_object *@var{s_obj}, AMI_STREAM<@var{U0}> *@var{outstream0} [, AMI_STREAM<@var{U1}> *@var{outstream1}, ...])
+@deftypefunx AMI_err AMI_scan (AMI_scan_object *@var{s_obj}, AMI_STREAM<@var{U0}> *@var{outstream0} [, AMI_STREAM<@var{U1}> *@var{outstream1}, ...])
+@deftypefunx AMI_err AMI_scan (AMI_STREAM<@var{T0}> *@var{instream0} [, AMI_STREAM<@var{T1}> *@var{instream1}, ...,]  AMI_scan_object *@var{s_obj})
+The first form scans one or more streams and produces one or more
+output streams.  The second form does no scanning, it just produces
+output.  The third form scans input but produces no output.
+@end deftypefun
+
+@node AMI_partition_and_merge(), AMI_general_permute(), AMI_scan(), AMI Entry Points
+@comment  node-name,  next,  previous,  up
+@subsection AMI_partition_and_merge()
+
+@deftypefun AMI_err AMI_partition_and_merge (AMI_STREAM<@var{T}> *@var{instream}, AMI_STREAM<@var{T}> *@var{outstream}, @var{M} *\@var{m_obj})
+The input stream is partitioned int as many sub-streams as is required
+to make them small enough to fit in main memory.  Each sub-stream is
+read in and processed by @var{m_obj->main_mem_operate()}.  They are
+then merged together repeatedly until the final output stream
+containing all the original values is returned.
+@end deftypefun
+
+
+@node    AMI_general_permute(), AMI_sort(), AMI_partition_and_merge(), AMI Entry Points
+@comment  node-name,  next,  previous,  up
+@subsection AMI_general_permute()
+
+@node    AMI_sort(),  , AMI_general_permute(), AMI Entry Points
+@comment  node-name,  next,  previous,  up
+@subsection AMI_sort()
+
+@node Implementation, Examples, AMI Reference, Top
+@comment  node-name,  next,  previous,  up
+@chapter The Implementation of TPIE
+
+This chapter discusses the implementation of TPIE.  It is currently
+incomplete.  
+
+@menu
+* Structure::                   
+* AMI::
+* BTE::                         
+* MM::                          
+@end menu
+
+@node Structure, AMI, Implementation, Implementation
+@comment  node-name,  next,  previous,  up
+@section The Structure of TPIE
+@cindex Structure of TPIE
+
+TPIE has three main components, the The Access Method Interface (AMI),
+the Block Transfer Engine (BTE), and the Memory Manager (MM).  The BTE
+handles block transfer for a single processor.  The MM performs low
+level memory management across all the processors in the system.  The
+AMI works on top of the MM and one or more BTEs, each running on a
+single processor, to provide a uniform interface for application
+programs.  Applications that use this interface are portable across
+hardware platforms, since they never have to deal with the underlying
+details of how I/O is performed on a particular machine.
+
+The BTE is intended to bridge the gap between the I/O hardware and the
+rest of our system.  It works alongside the traditional buffer cache
+in a UNIX system.  Unlike the buffer cache, which must support
+concurrent access to files from multiple address spaces, the BTE is
+specifically designed to support high throughput processing of data
+from secondary memory through a single user level address space.  In
+order to efficiently support the merging, distribution, and scanning
+paradigms, the buffer manager provides stream oriented buffer
+replacement policies.  To further improve performance, some
+implementations of the BTE move data from disk directly into user
+space rather than using a kernel level buffer cache.  This saves both
+main memory space and copying time.  Although the BTE runs on a single
+processor, it can support concurrent access to multiple disks,
+allocating and managing buffer space for all of them concurrently.
+
+The MM manages random access memory on behalf of TPIE.  It is the most
+architecture-dependent component of the system.  On a single processor
+or multiprocessor system with a single global address space, the MM
+is relatively simple; its task is to allocate and manage
+the physical memory used by the BTE.  On a distributed memory system,
+the MM has the additional task of coordinating communication between
+processors and memory modules in order to support the primitives that
+the AMI provides.
+
+The AMI is a layer between the BTE and user level processes.  It
+implements fundamental access methods, such as scanning, permutation
+routing, merging, distribution, and batch filtering. It also provides a
+consistent, object-oriented interface to application programs.
+The details of how these access methods are implemented depends on
+the hardware on which the system is running.  For example, recursive
+distribution will be done somewhat differently on a parallel disk
+machine than on a single disk machine.  The AMI abstracts this
+fact away, allowing an application program that calls a function such
+as @code{AMI_recursive_distribute()} to work correctly regardless of the
+underlying I/O system.
+
+The key to keeping the AMI simple and flexible is the fact that its
+user accessible functions serve more as templates for computation than
+as actual problem solving functions.  The details of how a computation
+proceeds within the template is up to the application programmer, who
+is responsible for providing the functions that the template applies
+to data.
+
+@node    AMI, BTE, Structure, Implementation
+@comment  node-name,  next,  previous,  up
+@section The Access Method Interface (AMI)
+@cindex Access Method Interface
+@cindex AMI
+
+Talk about AMI streams and the member functions an implementation must
+support. 
+
+@node    BTE, MM, AMI, Implementation
+@comment  node-name,  next,  previous,  up
+@section The Block Transfer Engine (BTE)
+@cindex Block Transfer Engine
+@cindex BTE
+
+The BTE is lowest layer of TPIE.  It is the layer that is ultimately
+responsible for moving blocks of data from physical disk devices to
+main memory and back.  We hope that in most cases it will be possible
+for the BTE to work with device drivers provided by the machine
+vendor's operating system.  In some cases, however, new drivers will
+undoubtedly have to be written.  The BTE is also responsible for
+maintaining the integrity of streams striped across multiple disks
+attached to a single CPU, which it will do as described in [. Vitter
+Shriver vs1 .].  The BTE is not, however, responsible for coordinating
+the actions of multiple CPU's and the disks attached to them.  A
+separate instance of the BTE will run on each such CPU, and their
+actions will be coordinated by a single multi-threaded MM running at a
+higher level.  The reason for the functional split between the two
+levels is that it will likely be advantageous to be able to use a
+single BTE written for a specific piece of hardware with more than one
+MM, for example, one MM written for a homogeneous environment and one
+for a heterogeneous environment.
+
+Implementations of BTE streams are written as subclasses of the class
+@code{BTE_stream}, which is defined as follows:
+
+BTE stream implementations must support the following member
+functions:
+
+@node    MM,  , BTE, Implementation
+@comment  node-name,  next,  previous,  up
+@section The Memory Manager (MM)
+@cindex Memory Manager
+@cindex MM
+
+The MM is the layer of TPIE that sits between the AMI interface and the
+BTE.  Its primary role is managing main memory, including memory that
+may be distributed across multiple physical machines.  The performance
+of many of the AMI stream operations, such as sorting, permuting,
+merging, and distribution depend critically on the efficient use of
+main memory.  The first thing the MM will have to do to achieve this
+is bypass the virtual memory system provided by UNIX and related
+operating systems.  The second thing it has to do is bypass the
+traditional UNIX buffer cache and take charge of managing the blocks
+of data provided by the BTE.  In some cases, operating system kernels
+will have to be modified in order for the MM to do its job.  In modern
+micro-kernel operating systems, however, the MM may be able to operate
+entirely as a user level process.
+
+In multiple CPU environments, the job of the MM will be complicated by
+the need to manage multiple banks of memory.  In tightly coupled
+homogeneous parallel environments, this task is likely to be made far
+simpler by existing hardware and operating system support.  In
+distributed, and in particular in heterogeneous environments, the MM
+will have to work with various network protocols and drivers to
+accomplish its task.
+
+Some comments on the current simple MM that we have and some OS issues
+that come up in attempting to make it more robust.
+
+@node Examples, Test and Sample Applications, Implementation, Top
+@comment  node-name,  next,  previous,  up
+@chapter Examples
+@cindex Examples
+
+This chapter contains a series of annotated examples of code written
+to solve problems using TPIE.
+
+@menu
+* Convex Hull::                 Graham's scan for 2-D convex hull
+* List-Ranking::                Based on an algorithm from SODA '95
+@end menu
+
+@node Convex Hull, List-Ranking, Examples, Examples
+@comment  node-name,  next,  previous,  up
+@section Convex Hull
+@cindex Convex Hull
+
+The convex hull of a set of points in the plane is the smallest convex
+polygon which encloses all of the points.  Graham's scan is a simple
+algorithm for computing convex hulls.  It should be discussed in any
+introductory book on computational geometry, such as @cite{Preparata
+and Shamos}.  Although Graham's scan was not orginally designed for
+external memory, it can be implemented optimally in this setting.
+What is interesting about this implementation is that external memory
+stacks are used within the implementation of a scan management object.
+
+First, we need a data type for storing points.  We use the following
+simple class, which is templated to handle any numeric type.
+
+@smallexample
+template<class T>
+class point @{
+public:
+    T x;
+    T y;
+    point() @{@};
+    point(const T &rx, const T &ry) : x(rx), y(ry) @{@};
+    ~point() @{@};
+
+    inline int operator==(const point<T> &rhs) const @{
+        return (x == rhs.x) && (y == rhs.y);
+    @}
+    inline int operator!=(const point<T> &rhs) const @{
+        return (x != rhs.x) || (y != rhs.y);
+    @}
+
+    // Comparison is done by x.
+    int operator<(const point<T> &rhs) const @{
+        return (x < rhs.x);
+    @}
+
+    int operator>(const point<T> &rhs) const @{
+        return (x > rhs.x);
+    @}
+    
+    friend ostream& operator<<(ostream& s, const point<T> &p);
+    friend istream& operator>>(istream& s, point<T> &p);
+@};
+@end smallexample
+
+Once the points are s by their @var{x} values, we simply scan them to
+produce the upper and lower hulls, each of which are stored as a stack
+pointed to by the scan management object.  We then concatenate the
+stacks to produce the final hull.  The code for computing the convex
+hull of a set of points is thus
+
+@smallexample
+template<class T>
+AMI_err convex_hull(AMI_STREAM< point<T> > *instream,
+                    AMI_STREAM< point<T> > *outstream)
+@{
+    AMI_err ae;
+
+    point<T> *pt;
+
+    AMI_stack< point<T> > uh((unsigned int)0, instream->stream_len());
+    AMI_stack< point<T> > lh((unsigned int)0, instream->stream_len());
+
+    AMI_STREAM< point<T> > in_sort((unsigned int)0,
+                                   instream->stream_len());
+        
+    // Sort the points by x.
+
+    ae = AMI_sort(instream, &in_sort);
+    
+    // Compute the upper hull and lower hull in a single scan.
+
+    scan_ul_hull<T> sulh;
+
+    sulh.uh_stack = &uh;
+    sulh.lh_stack = &lh;
+    
+    ae = AMI_scan(&in_sort, &sulh);
+
+    // Copy the upper hull to the output.
+
+    uh.seek(0);
+    
+    while (1) @{
+        ae = uh.read_item(&pt);
+        if (ae == AMI_ERROR_END_OF_STREAM) @{
+            break;
+        @} else if (ae != AMI_ERROR_NO_ERROR) @{
+            return ae;
+        @}
+
+        ae = outstream->write_item(*pt);
+        if (ae != AMI_ERROR_NO_ERROR) @{
+            return ae;
+        @}
+    @}
+    
+    // Reverse the lower hull, concatenating it onto the upper hull.
+
+    while (lh.pop(&pt) == AMI_ERROR_NO_ERROR) @{
+        ae = outstream->write_item(*pt);
+        if (ae != AMI_ERROR_NO_ERROR) @{
+            return ae;
+        @}
+    @}
+
+    return AMI_ERROR_NO_ERROR;
+@}
+@end smallexample
+
+The only thing that remains is to define a scan management object that
+is capable of producing the upper and lower hulls by scanning the
+points.  According to the Graham's scan algorithm, we produce the
+upper hull by moving forward in the @var{x} direction, adding each
+point we encounter to the upper hull, until we find one that induces a
+concave turn on the surface of the hull.  We then move backwards
+through the list of points that have been added to the hull,
+eliminating points until a convex path is reestablished.  This process
+is made efficient by storing the points on the hull so far in a stack.
+The code for the scan management object, which relies on the function
+@code{ccw()} to actually determine whether a corner is
+convex or not, is as follows:
+
+@smallexample
+template<class T>
+class scan_ul_hull : AMI_scan_object @{
+public:
+    AMI_stack< point <T> > *uh_stack, *lh_stack;
+
+    scan_ul_hull(void);
+    virtual ~scan_ul_hull(void);
+    AMI_err initialize(void);
+    AMI_err operate(const point<T> &in, AMI_SCAN_FLAG *sfin);
+@};
+
+template<class T>
+scan_ul_hull<T>::scan_ul_hull(void) : uh_stack(NULL), lh_stack(NULL)
+@{
+@}
+
+template<class T>
+scan_ul_hull<T>::~scan_ul_hull(void)
+@{
+@}
+
+template<class T>
+AMI_err scan_ul_hull<T>::initialize(void)
+@{
+    return AMI_ERROR_NO_ERROR;
+@}
+
+
+template<class T>
+AMI_err scan_ul_hull<T>::operate(const point<T> &in,
+                                 AMI_SCAN_FLAG *sfin)
+@{
+    AMI_err ae;
+
+    // If there is no more input we are done.
+    if (!*sfin) @{
+        return AMI_SCAN_DONE;
+    @}
+
+    if (!uh_stack->stream_len()) @{
+
+        // If there is nothing on the stacks then put the first point
+        // on them.
+        ae = uh_stack->push(in);
+        if (ae != AMI_ERROR_NO_ERROR) @{
+            return ae;
+        @}
+
+        ae = lh_stack->push(in);
+        if (ae != AMI_ERROR_NO_ERROR) @{
+            return ae;
+        @}
+
+    @} else @{
+
+        // Add to the upper hull.
+
+        @{
+            // Pop the last two points off.
+
+            point<T> *p1, *p2;
+
+            tp_assert(uh_stack->stream_len() >= 1, "Stack is empty.");
+            
+            uh_stack->pop(&p2);
+
+            // If the point just popped is equal to the input, then we
+            // are done.  There is no need to have both on the stack.
+            
+            if (*p2 == in) @{
+                uh_stack->push(*p2);
+                return AMI_SCAN_CONTINUE;
+            @}
+            
+            if (uh_stack->stream_len() >= 1) @{
+                uh_stack->pop(&p1);
+            @} else @{
+                p1 = p2;
+            @}
+            
+            // While the turn is counter clockwise and the stack is
+            // not empty pop another point.
+            
+            while (1) @{                
+                if (ccw(*p1,*p2,in) >= 0) @{
+                    // It does not turn the right way.  The points may
+                    // be colinear.
+                    if (uh_stack->stream_len() >= 1) @{
+                        // Move backwards to check another point.
+                        p2 = p1;
+                        uh_stack->pop(&p1);
+                    @} else @{
+                        // Nothing left to pop, so we can't move
+                        // backwards.  We're done.
+                        uh_stack->push(*p1);
+                        if (in != *p1) @{
+                            uh_stack->push(in);
+                        @}
+                        break;
+                    @}
+                @} else @{
+                    // It turns the right way.  We're done.
+                    uh_stack->push(*p1);
+                    uh_stack->push(*p2);
+                    uh_stack->push(in);
+                    break;
+                @}
+            @}
+        @}
+
+        // Add to the lower hull.
+
+        @{
+            // Pop the last two points off.
+
+            point<T> *p1, *p2;
+
+            tp_assert(lh_stack->stream_len() >= 1, "Stack is empty.");
+            
+            lh_stack->pop(&p2);
+
+            // If the point just popped is equal to the input, then we
+            // are done.  There is no need to have both on the stack.
+            
+            if (*p2 == in) @{
+                lh_stack->push(*p2);
+                return AMI_SCAN_CONTINUE;
+            @}
+            
+            if (lh_stack->stream_len() >= 1) @{
+                lh_stack->pop(&p1);
+            @} else @{
+                p1 = p2;
+            @}
+            
+            // While the turn is clockwise and the stack is
+            // not empty pop another point.
+            
+            while (1) @{                
+                if (ccw(*p1,*p2,in) <= 0) @{
+                    // It does not turn the right way.  The points may
+                    // be colinear.
+                    if (lh_stack->stream_len() >= 1) @{
+                        // Move backwards to check another point.
+                        p2 = p1;
+                        lh_stack->pop(&p1);
+                    @} else @{
+                        // Nothing left to pop, so we can't move
+                        // backwards.  We're done.
+                        lh_stack->push(*p1);
+                        if (in != *p1) @{
+                            lh_stack->push(in);
+                        @}
+                        break;
+                    @}
+                @} else @{
+                    // It turns the right way.  We're done.
+                    lh_stack->push(*p1);
+                    lh_stack->push(*p2);
+                    lh_stack->push(in);
+                    break;
+                @}
+            @}
+        @}       
+    @}
+
+    return AMI_SCAN_CONTINUE;    
+@}
+@end smallexample
+
+The function @code{ccw()} computes twice the signed area of a triangle in
+the plane by evaluating a 3 by 3 determinant.  The result is positive
+if and only if the the three points in order form a counterclockwise
+cycle.
+
+@smallexample
+template<class T>
+T ccw(const point<T> &p1, const point<T> &p2, const point<T> &p3)
+@{
+    T sa;
+    
+    sa = ((p1.x * p2.y - p2.x * p1.y) -
+          (p1.x * p3.y - p3.x * p1.y) +
+          (p2.x * p3.y - p3.x * p2.y));
+
+    return sa;
+@}
+@end smallexample
+
+@node List-Ranking,  , Convex Hull, Examples
+@comment  node-name,  next,  previous,  up
+@section List-Ranking
+@cindex List-Ranking
+
+List ranking is a fundamental problem in graph theory.  The problem is
+as follows: We are given the directed edges of a linked list in some
+arbitrary order.  Each edge is an ordered pair of node ids.  The first
+is the source of the edge and the second is the destination of the
+edge.  Our goal is to assign a weight to each edge corresponding to
+the number of edges that would have to be traversed to get from the
+head of the list to that edge.
+
+The code given below solves the list ranking problem using a simple
+randomized algorithm due to Chiang, Goodrich, Grove, Tamassia,
+Vengroff, and Vitter, which appears in the proceedings of SODA '95.
+As was the case in the code examples in the tutorial
+(@pxref{Tutorial}), @code{#include} statements for header files and
+definitions of some classes and functions as well as some error and
+consistency checking code are left out so that the reader can
+concentrate on the more important details of how TPIE is used.  A
+complete ready to compile version of this code is included in the TPIE
+source distribution.
+
+First, we need a class to represent edges.  Because the algorithm will
+set a flag for each edge and then assign weights to the edges, we
+include fields for these values.
+
+@smallexample
+class edge @{
+public:
+    unsigned long int from;        // Node it is from
+    unsigned long int to;          // Node it is to
+    unsigned long int weight;      // Position when ranked.
+    bool flag;            // A flag used to randomly select some edges.
+
+    friend ostream& operator<<(ostream& s, const edge &e);
+@};    
+@end smallexample
+
+As the algorithm runs, it will sort the edges.  At times this will be
+done by their sources and at times by their destinations.  The
+following simple functions are used to compare these values:
+
+@smallexample
+int edgefromcmp(CONST edge &s, CONST edge &t)
+@{
+    return (s.from < t.from) ? -1 : ((s.from > t.from) ? 1 : 0);
+@}
+  
+int edgetocmp(CONST edge &s, CONST edge &t)
+@{
+    return (s.to < t.to) ? -1 : ((s.to > t.to) ? 1 : 0);
+@}
+@end smallexample
+
+The first step of the algorithm is to assign a randomly chosen flag,
+whose value is 0 or 1 with equal probability, to each edge.  This is
+done using @code{AMI_scan()} with a scan management object of the
+class @code{random_flag_scan}, which is defined as follows:
+
+@smallexample
+class random_flag_scan : AMI_scan_object @{
+public:
+    AMI_err initialize(void);  
+    AMI_err operate(const edge &in, AMI_SCAN_FLAG *sfin,
+                    edge *out, AMI_SCAN_FLAG *sfout);
+@};
+
+AMI_err random_flag_scan::initialize(void) @{
+    return AMI_ERROR_NO_ERROR;
+@}
+
+AMI_err random_flag_scan::operate(const edge &in, AMI_SCAN_FLAG *sfin,
+                                  edge *out, AMI_SCAN_FLAG *sfout)
+@{ 
+    if (!(sfout[0] = *sfin)) @{
+        return AMI_SCAN_DONE;
+    @}
+    *out = in;
+    out->flag = (random() & 1);
+    
+    return AMI_SCAN_CONTINUE;
+@}
+@end smallexample
+
+The next step of the algorithm is to separate the edges into an active
+list and a cancel list.  In order to do this, we sort one copy of the
+edges by their sources (using @code{edgefromcmp}) and sort another copy by
+their destinations (using @code{edgetocmp}).  We then call
+@code{AMI_scan()} to scan the two lists and produce an active list and
+a cancel list.  A scan management object of class
+@code{separate_active_from_cancel}, which is defined below, is used.
+
+@smallexample
+////////////////////////////////////////////////////////////////////////
+// separate_active_from_cancel
+//
+// A class of scan object that takes two edges, one to a node and one 
+// from it, and writes an active edge and possibly a canceled edge.
+//
+// Let e1 = (x,y,w1,f1) be the first edge and e2 = (y,z,w2,f2) the second.
+// If e1's flag (f1) is set and e2's (f2) is not, then we write 
+// (x,z,w1+w2,?) to the active list and e2 to the cancel list.  The
+// effect of this is to bridge over the node y with the new active edge.
+// f2, which was the second half of the bridge, is saved in the cancellation
+// list so that it can be ranked later after the active list is recursively 
+// ranked.
+//
+// Since all the flags should have been set randomly before this function
+// is called, the expected size of the active list is 3/4 the size of the
+// original list.
+////////////////////////////////////////////////////////////////////////
+class separate_active_from_cancel : AMI_scan_object @{
+public:
+    AMI_err initialize(void);
+    AMI_err operate(CONST edge &e1, CONST edge &e2, AMI_SCAN_FLAG *sfin,
+                    edge *active, edge *cancel, AMI_SCAN_FLAG *sfout);
+@};
+
+AMI_err separate_active_from_cancel::initialize(void)
+@{
+    return AMI_ERROR_NO_ERROR;
+@}
+
+// e1 is from the list of edges sorted by where they are from.
+// e2 is from the list of edges sorted by where they are to.
+AMI_err separate_active_from_cancel::operate(CONST edge &e1,
+                                             CONST edge &e2, 
+                                             AMI_SCAN_FLAG *sfin,
+                                             edge *active, edge *cancel, 
+                                             AMI_SCAN_FLAG *sfout)
+@{
+    // If we have both inputs.
+    if (sfin[0] && sfin[1]) @{
+        // If they have a node in common we may be in a bridging situation.
+        if (e2.to == e1.from) @{
+            // We will write to the active list no matter what.
+            sfout[0] = 1;
+            *active = e2;
+            if (sfout[1] = (e2.flag && !e1.flag)) @{
+                // Bridge.  Put e1 on the cancel list and add its
+                // weight to the active output.
+                active->to = e1.to;
+                active->weight += e1.weight;
+                *cancel = e1;
+                sfout[1] = 1;
+            @} else @{
+                // No bridge.
+                sfout[1] = 0;
+            @}
+        @} else @{
+            // They don't have a node in common, so one of them needs
+            // to catch up with the other.  What happened is that
+            // either e2 is the very last edge in the list or e1 is
+            // the very first or we just missed a bridge because of
+            // flags.
+            sfout[1] = 0;                
+            if (e2.to > e1.from) @{
+                // e1 is behind, so just skip it.
+                sfin[1] = 0;
+                sfout[0] = 0;
+            @} else @{
+                // e2 is behind, so put it on the active list.
+                sfin[0] = 0;
+                sfout[0] = 1;
+                *active = e2;
+            @}
+        @}
+        return AMI_SCAN_CONTINUE;
+    @} else @{
+        // If we only have one input, either just leave it active.
+        if (sfin[0]) @{
+            *active = e1;
+            sfout[0] = 1;
+            sfout[1] = 0;
+            return AMI_SCAN_CONTINUE;
+        @} else if (sfin[1]) @{
+            *active = e2;
+            sfout[0] = 1;
+            sfout[1] = 0;
+            return AMI_SCAN_CONTINUE;
+        @} else @{
+            // We have no inputs, so we're done.
+            sfout[0] = sfout[1] = 0;            
+            return AMI_SCAN_DONE;
+        @}
+    @}
+@}
+@end smallexample
+
+The next step of the algorithm is to strip the cancelled edges away
+from the list of all edges.  The remaining active edges will form a
+recursive subproblem.  Again, we use a scan management object, this
+time of the class @code{strip_active_from_cancel}, which is defined as
+follows:
+
+@smallexample
+////////////////////////////////////////////////////////////////////////
+//
+// strip_cancel_from_active
+//
+// A scan management object to take an active list and remove the
+// smaller weighted edge of each pair of consecutive edges with the
+// same destination.  The purpose of this is to strip edges out of the
+// active list that were sent to the cancel list.
+//
+////////////////////////////////////////////////////////////////////////
+class strip_cancel_from_active : AMI_scan_object @{
+private:
+    bool holding;
+    edge hold;
+public:
+    AMI_err initialize(void);  
+    AMI_err operate(const edge &active, AMI_SCAN_FLAG *sfin,
+                    edge *out, AMI_SCAN_FLAG *sfout);
+@};
+
+AMI_err strip_cancel_from_active::initialize(void) @{
+    holding = false;
+    return AMI_ERROR_NO_ERROR;
+@}
+
+// Edges should be sorted by destination before being processed by
+// this object.
+AMI_err strip_cancel_from_active::operate(const edge &active,
+                                  AMI_SCAN_FLAG *sfin,
+                                  edge *out, AMI_SCAN_FLAG *sfout)
+@{
+    // If no input then we're done, except that we might still be
+    // holding one.
+    if (!*sfin) @{
+        if (holding) @{
+            *sfout = 1;
+            *out = hold;
+            holding = false;
+            return AMI_SCAN_CONTINUE;
+        @} else @{
+            *sfout = 0;
+            return AMI_SCAN_DONE;
+        @}
+    @}
+
+    if (!holding) @{
+        // If we are not holding anything, then just hold the current
+        // input.
+        hold = active;
+        holding = true;
+        *sfout = 0;
+    @} else @{
+        *sfout = 1;
+        
+        if (active.to == hold.to) @{
+            if (active.weight > hold.weight) @{
+                *out = active;
+            @} else @{
+                *out = hold;
+            @}
+
+            holding = false;
+        @} else @{
+            *out = hold;
+            hold = active;
+        @}
+    @}
+
+    return AMI_SCAN_CONTINUE;
+@}
+@end smallexample
+
+After recursion, we must patch the cancelled edges back into the
+recursively ranked list of active edges.  This is done using a scan
+with a scan management object of the class
+@code{interleave_active_cancel}, which is implemented as follows:
+
+@smallexample
+////////////////////////////////////////////////////////////////////////
+// interleave_active_cancel
+//
+// This is a class of merge object that merges two lists of edges
+// based on their to fields.  The first list of edges should be active
+// edges, while the second should be cancelled edges.  When we see two
+// edges with the same to field, we know that the second was cancelled
+// when the first was made active.  We then fix up the weights and
+// output the two of them, one in the current call and one in the next
+// call.
+//
+// The streams this operates on should be sorted by their terminal
+// (to) nodes before AMI_scan() is called.
+// 
+////////////////////////////////////////////////////////////////////////
+
+class patch_active_cancel : AMI_scan_object @{
+private:
+    bool holding;
+    edge hold;
+public:
+    AMI_err initialize(void);
+    AMI_err operate(CONST edge &active, CONST edge &cancel,
+                    AMI_SCAN_FLAG *sfin,
+                    edge *patch, AMI_SCAN_FLAG *sfout);
+@};
+
+AMI_err patch_active_cancel::initialize(void)
+@{
+    holding = false;
+    return AMI_ERROR_NO_ERROR;
+@}
+
+AMI_err patch_active_cancel::operate(CONST edge &active, CONST edge &cancel,
+                                     AMI_SCAN_FLAG *sfin,
+                                     edge *patch, AMI_SCAN_FLAG *sfout)
+@{
+    // Handle the special cases that occur when holding an edge and/or
+    // completely out of input.
+    if (holding) @{
+        sfin[0] = sfin[1] = 0;
+        *patch = hold;
+        holding = false;
+        *sfout = 1;
+        return AMI_SCAN_CONTINUE;
+    @} else if (!sfin[0]) @{
+        *sfout = 0;
+        return AMI_SCAN_DONE;
+    @}
+
+    if (!sfin[1]) @{
+        // If there is no cancel edge (i.e. all have been processed)
+        // then just pass the active edge through.
+        *patch = active;
+    @} else @{
+        if (holding = (active.to == cancel.to)) @{
+            patch->from = active.from;
+            patch->to = cancel.from;
+            patch->weight = active.weight - cancel.weight;
+            hold.from = cancel.from;
+            hold.to = active.to;
+            hold.weight = active.weight;
+        @} else @{
+            *patch = active;
+            sfin[1] = 0;
+        @}
+    @}
+
+    *sfout = 1;
+    return AMI_SCAN_CONTINUE;
+
+@}
+@end smallexample
+
+Finally, here is the actual function to rank the list.
+
+@smallexample
+////////////////////////////////////////////////////////////////////////
+// list_rank()
+//
+// This is the actual recursive function that gets the job done.
+// We assume that all weights are 1 when the initial call is made to
+// this function.
+//
+// Returns 0 on success, nonzero otherwise.
+////////////////////////////////////////////////////////////////////////
+
+int list_rank(AMI_STREAM<edge> *istream, AMI_STREAM<edge> *ostream)
+@{
+    AMI_err ae;
+    
+    off_t stream_len = istream->stream_len();
+
+    AMI_STREAM<edge> *edges_rand;
+    AMI_STREAM<edge> *active;
+    AMI_STREAM<edge> *active_2;
+    AMI_STREAM<edge> *cancel;
+    AMI_STREAM<edge> *ranked_active;
+
+    AMI_STREAM<edge> *edges_from_s;
+    AMI_STREAM<edge> *cancel_s;
+    AMI_STREAM<edge> *active_s;
+    AMI_STREAM<edge> *ranked_active_s;
+
+    // Scan/merge management objects.
+    random_flag_scan my_random_flag_scan;
+    separate_active_from_cancel my_separate_active_from_cancel;
+    strip_cancel_from_active my_strip_cancel_from_active;
+    patch_active_cancel my_patch_active_cancel;
+    
+    // Check if the recursion has bottomed out.  If so, then read in the
+    // array and rank it.
+
+    @{
+        size_t mm_avail;
+        
+        MM_manager.available(&mm_avail);
+
+        if (stream_len * sizeof(edge) < mm_avail / 2) @{
+            edge *mm_buf = new edge[stream_len];
+            istream->seek(0);
+            istream->read_array(mm_buf,&stream_len);
+            main_mem_list_rank(mm_buf,stream_len);
+            ostream->write_array(mm_buf,stream_len);
+            return 0;
+        @}
+    @}
+    
+    // Flip coins for each node, setting the flag to 0 or 1 with equal
+    // probability.
+
+    edges_rand = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+    
+    AMI_scan(istream, &my_random_flag_scan, edges_rand);
+
+    // Sort one stream by source.  The original input was sorted by
+    // destination, so we don't need to sort it again.
+
+    edges_from_s = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+
+    ae = AMI_sort(edges_rand, edges_from_s, edgefromcmp);
+
+    // Scan to produce and active list and a cancel list.
+
+    active = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+    cancel = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+
+    ae = AMI_scan(edges_from_s, edges_rand,
+                  &my_separate_active_from_cancel,
+                  active, cancel);
+
+    delete edges_from_s;
+    delete edges_rand;
+    
+    // Strip the edges that went to the cancel list out of the active list.
+
+    active_s = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+
+    ae = AMI_sort(active, active_s, edgetocmp);
+
+    delete active;
+
+    active_2 = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+
+    ae = AMI_scan(active_s,
+                  &my_strip_cancel_from_active,
+                  active_2);
+
+    delete active_s;
+
+    // Recurse on the active list.  The list we pass in is sorted by
+    // destination.  The recursion will return a list sorted by
+    // source.
+
+    ranked_active = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+    
+    list_rank(active_2, ranked_active);
+
+    delete active_2;
+
+    cancel_s = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+
+    AMI_sort(cancel, cancel_s, edgetocmp);
+
+    delete cancel;
+
+    // The output of the recursive call is not necessarily sorted by
+    // destination.  We'll make it so before we try to merge in the
+    // cancel list.
+
+    ranked_active_s = new AMI_STREAM<edge>((unsigned int)0, stream_len);
+
+    AMI_sort(ranked_active, ranked_active_s, edgetocmp);
+
+    delete ranked_active;
+    
+    // Now merge the recursively ranked active list and the sorted 
+    // cancel list.
+
+    ae = AMI_scan(ranked_active_s, cancel_s,
+                  &my_patch_active_cancel, ostream);
+
+    delete ranked_active_s;
+    delete cancel_s;
+    
+    return 0;
+@}
+@end smallexample
+
+Our recursion bottoms out when the problem is small enough to fit
+entirely in main memory, in which case we read it in and call a
+function to rank a list in main memory.  The details of this function
+are omitted here.
+
+@smallexample
+////////////////////////////////////////////////////////////////////////
+// main_mem_list_rank()
+//
+// This function ranks a list that can fit in main memory.  It is used
+// when the recursion bottoms out.
+//
+////////////////////////////////////////////////////////////////////////
+
+int main_mem_list_rank(edge *edges, size_t count)
+@{
+    // Rank the list in main memory
+
+    ...
+        
+    return 0;  
+@}
+@end smallexample
+
+@node Test and Sample Applications, Acknowledgements, Examples, Top
+@comment  node-name,  next,  previous,  up
+@chapter Test and Sample Applications
+
+@menu
+* General Structure and Operation::  
+* Test Programs::               
+* Sample Applications::         
+@end menu
+
+@node General Structure and Operation, Test Programs, Test and Sample Applications, Test and Sample Applications
+@comment  node-name,  next,  previous,  up
+@section General Structure and Operation
+
+The test and sample applications distributed with TPIE are in the
+@file{test} directory.  The test programs are designed primarily to
+test the operation of the system to verify that it has been installed
+correctly and is as bug free as possible.  These applications all have
+names of the form @file{test_*}.  The sample applications are designed
+to demonstrate the use of TPIE in the solution of non-trivial
+problems.
+
+The test and sample applications all share a small amount of common
+initialization and argument parsing code.  They all include the header
+file @file{app_config.h}, which selects a particular implementation of
+streams at the AMI (@pxref{AMI}) and BTE (@pxref{BTE}) levels.  They
+also all use the same argument parsing function @code{parse_args()},
+which parses certain default arguments and then uses a callback
+function for arguments specific to one particular application.
+
+Much of the functionality provided by the common initialization and
+argument passing code is intended to eventually be subsumed by
+operating system provided services.  For example, the amount of main
+memory a particular application is permitted to use can be set via a
+command line argument.  It is up to the user to be sure that this
+number is reasonable and does not exceed the true amount of main
+memory available to the application.  In the future, it is hoped that
+this information will be provided by the operating system.
+
+@code{parse_args()} is declared as follows:
+
+@deftypefun void parse_args(int @var{argc}, char **@var{argv}, const char *@var{aso} = NULL, void (*@var{parse_app})(char @var{opt}, char *@var{optarg}) = NULL);
+Given @var{argc} and @var{argv} as passed to @code{main()} at program
+startup, parse common arguments as outlined below.
+If @var{aso} is not @code{NULL}, it should point to a string of
+command line arguments valid for this particular application and
+@var{parse_app} should point to a callback function to perform
+application specific setup based on arguments appearing in @var{aso}.
+@end deftypefun
+
+The following is a summary of the common command line arguments that
+are parsed by @code{parse_args()}.
+@table @samp
+@item -t testsize
+Set the size of the test to be run to @var{testsize}.  Typically this
+is the number of objects to be put into the application produced input
+stream.  In matrix tests, however, it is the number of rows and
+columns is the test matrices.  If this argument is not passed, then
+the default value of 8 Meg is used.
+@item -m memsize
+The number of bytes of main memory that the application is permitted to
+use.  The MM (@pxref{MM}) will ensure that no more than this amount is
+used.  If this option is not specified, then a default value of 2 Mb
+is used.
+@item -z randomseed
+Seed the random number generator with the value @var{randomseed}.
+This is useful for debugging or testing, when we want several runs of
+the application to rely on the same series of pseudo-random numbers.
+For applications that do not generate test data randomly, this has no
+effect. 
+@item -v
+Toggle verbose mode.  When running in verbose mode, report major
+actions of the running program to @file{stdout}.
+@end table
+
+Each application specific argument appears in the string pointed to by
+@var{aso} as a single character, possibly followed by the single
+character @samp{:}, indicating that the argument requires a value.
+For example, if @var{aso} pointed to the string @samp{ax:z} then the
+following command line arguments would all be parsed correctly:
+@table @samp
+@item -a
+
+@item -x 123
+
+@item -a -x 123
+
+@item -ax123
+
+@item -x123 -a
+@end table
+In each case, @var{parse_app()} would be called to take some
+application specific action for each of the arguments.  It would be
+called once with @var{opt} set to @samp{a} and @var{optarg} set to
+@code{NULL}, and/or once with @var{opt} set to @samp{x} and
+@var{optarg} pointing to the string @samp{123}.  When multiple arguments
+are present on the command line, they are parsed from left to right.
+
+The following is an example of how a test application, in this case
+@code{test_ami_sort}, can use application specific command line
+arguments to set up it's global state.
+
+@smallexample
+static const char as_opts[] = "R:S:rsao";
+void parse_app_opt(char c, char *optarg)
+@{
+    switch (c) @{
+        case 'R':
+            rand_results_filename = optarg;
+        case 'r':
+            report_results_random = true;
+            break;
+        case 'S':
+            sorted_results_filename = optarg;
+        case 's':
+            report_results_sorted = true;
+            break;
+        case 'a':
+            sort_again = !sort_again;
+            break;
+        case 'o':
+            use_operator = !use_operator;
+            break;
+    @}
+@}
+
+int main(int argc, char **argv)
+@{
+    parse_args(argc,argv,as_opts,parse_app_opt);
+
+    ...
+
+    return 0;
+@}
+@end smallexample
+
+@node Test Programs, Sample Applications, General Structure and Operation, Test and Sample Applications
+@comment  node-name,  next,  previous,  up
+@section Test Programs
+
+The test programs include with TPIE are as follows:
+
+@table @file
+@item test_ami_pmerge
+Test @code{AMI_partition_and_merge()}.
+@xref{Merging}.
+@item test_ami_sort
+Test @code{AMI_sort()}.
+@xref{Sorting}.
+@item test_ami_gp
+Test @code{AMI_general_permute()}.
+@xref{General Permuting}.
+@item test_matrix test_bit_matrix
+Test main memory matrix manipulation and arithmetic.  This is used
+both by the bit permuting code (@pxref{Bit Permuting}) and for
+internal manipulation of sub-matrices of external memory matrices
+(@pxref{Basic Matrix Operations}).
+@item test_ami_matrix
+Test external matrix arithmetic.
+@xref{Basic Matrix Operations}.
+@item test_ami_stack
+Test external memory stacks.
+@item test_ami_arith
+Test element-wise arithmetic on external memory streams.
+@end table
+
+@node Sample Applications,  , Test Programs, Test and Sample Applications
+@comment  node-name,  next,  previous,  up
+@section Sample Applications
+
+The sample applications included with TPIE are as follows:
+
+@table @file
+@item ch2
+Two dimensional convex hull program using Graham's scan.  It is
+implemented using a scan management object that maintains the upper
+and lower hull internally as external memory stacks.  Much of the code
+in this application appears in this document.  @xref{Convex Hull}
+@item lr
+An implementation of an asymptotically optimal list ranking algorithm.
+The idea of geometrically decreasing computation is used.  Much of the code
+in this application appears in this document.  @xref{List-Ranking}.
+@item nas_ep
+An I/O-efficient implementation of the NAS EP parallel benchmark.
+This benchamrk generates pairs of independent Gaussian random variates.
+@item nas_is
+An I/O-efficient implementation of the NAS IS parallel benchmark.
+This benchmark sorts integers.
+@end table
+
+Detailed description of the NAS parallel benchmarks are available
+@ifset html
+from the <A HREF="http://www.nas.nasa.gov/NAS/NPB/">NAS Parallel
+Benchmark Home Page</A>.
+@end ifset
+@ifclear html
+via WWW a`<t @code{http://www.nas.nasa.gov/NAS/NPB/}.
+@end ifclear
+
+
+@node Acknowledgements, Function Index, Test and Sample Applications, Top
+@comment  node-name,  next,  previous,  up
+@unnumbered Acknowledgements
+
+The development of TPIE was supported in part by the National Science
+Foundation under grant CCR-9007851 and by the U.S. Army Research
+Office under grant DAAL03-91-G-0035.
+
+I would like to thank the following people for helpful discussions
+concerning algorithms and implementation techniques which influenced
+the development of TPIE: 
+@ifset html
+<A HREF="http://www.cs.duke.edu/~jsv/HomePage.html">Jeff Vitter</A>, 
+<A HREF="http://www.cs.duke.edu/cgi-bin/facinfo?efg">Eddie Grove</A>, 
+<A HREF="http://www.cs.brown.edu/people/rt/">Roberto Tamassia</A>, 
+<A HREF="http://www.cs.brown.edu/people/yjc/">Yi-Jen Chiang</A>, 
+<A HREF="http://www.cs.jhu.edu/goodrich/home.html">Mike Goodrich</A>, 
+Jyh-Jong Tsay, 
+<A HREF="http://www.daimi.aau.dk/~large/">Lars Arge</A>,
+<A HREF="http://www.cs.dartmouth.edu/faculty/cormen.html">Tom Cormen</A>, 
+Len Wisniewski, 
+Liddy Shriver,
+and 
+<A HREF="http://www.cs.dartmouth.edu/faculty/kotz.html">David Kotz</A>.
+@end ifset
+@ifclear html
+Jeff Vitter, Eddie Grove, Roberto Tamassia, Yi-Jen Chiang, Mike
+Goodrich, Jyh-Jong Tsay, Lars Arge, Tom Cormen, Len Wisniewski, Liddy Shriver,
+and David Kotz.
+@end ifclear
+
+I would also like to thank the following people and institutions for
+providing access to the hardware on which TPIE design and development
+are ongoing:
+@ifset html
+<A HREF="http://www.cs.brown.edu">Brown University Department of Computer Science</A>, 
+for Sun Sparc 10s running Solaris;
+<A HREF="http://www.cs.duke.edu">Duke University Department of Computer Science</A>, 
+for a variety of Sun workstations running SunOS and for DEC Alphas
+running OSF/1;
+Yale Patt and the ACAL Lab in the 
+<A HREF="http://www.eecs.umich.edu">Department of Electrical Engineering
+and Computer Science</A> at the University of Michigan, for a DEC
+Alpha running OSF/1 and for an HP 9000 running HP-UX;
+<A HREF="http://www.cs.dartmouth.edu/faculty/kotz.html">David Kotz</A>
+and the <A HREF="http://www.cs.dartmouth.edu">Dartmouth College
+Department of Computer Science</A>, for MIPS based DECstations
+running Ultrix. 
+@end ifset
+@ifclear html
+Brown University Dept. of Computer Science, for Sun Sparc 10s running
+Solaris; Duke University Department of Computer Science, for a variety
+of Sun workstations running SunOS and for a DEC Alpha running OSF/1;
+Yale Patt and the ACAL Lab in the Department of Electrical Engineering
+and Computer Science at the University of Michigan, for a DEC
+Alpha running OSF/1 and for an HP 9000 running HP-UX; David Kotz and the
+Dartmouth College Department of Computer Science, for MIPS based
+DECstations running Ultrix.
+@end ifclear
+
+Finally, I would like to thank 
+@ifset html
+<A HREF="http://www.cs.duke.edu/~ola/HomePage.html">Owen Astrachan</A>
+@end ifset
+@ifclear html
+Owen Astrachan
+@end ifclear
+for his helpful discussions on some of the finer points of the C++
+language.
+
+@node Function Index, Concept Index, Acknowledgements, Top
+@comment    node-name,         next,       previous, up
+@unnumbered Function Index
+
+@printindex fn
+
+@node     Concept Index,  , Function Index, Top
+@comment      node-name, next,       previous, up
+@unnumbered Concept Index
+
+@printindex cp
+
+@summarycontents
+@contents
+
+@bye

@@ -1,0 +1,30 @@
+/**
+\page sorting_external External sorting
+
+The recommended way to sort large data set (which will typically be
+stored in a \ref tpie::file_stream in TPIE) is to use one of the \ref
+tpie::sort functions defined in \ref sort.h.
+
+When you have a \ref tpie::file_stream over some type \c T (opened for
+reading and writing), you can order the elements of this stream
+according to the order defined by the \c < operator (i.e. using \c
+T::operator< or \c operator<(T,T) ) simply invoke \ref tpie::sort
+(mystream, mystream). When the input and output stream is the same,
+the temporary space usage of \ref tpie::sort is the same as the space
+used by the input stream.
+
+If you wish to store the result in a stream different from the input
+stream, supply this stream as the second argument to \r tpie::sort,
+this requires extra space equivalent to twice the space used by the
+input stream.
+
+\code
+@DOCCODE_SORTING_EXTERNAL@
+\endcode
+
+The current interface is
+defined in the \c tpie namespace, but legacy definitions exist in the
+\c tpie::ami namespace.
+
+
+*/

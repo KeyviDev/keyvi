@@ -1,0 +1,73 @@
+/**
+\page progress Progress reporting
+
+TPIE has a couple classes for reporting progress to the user. The central
+concept is the progress_indicator, fleshed out in
+\ref tpie::progress_indicator_base. A progress indicator must have the methods
+init(stream_size_type steps), step() and done(). It should inherit from the
+virtual base class \ref tpie::progress_indicator_base.
+
+The simplest way of reporting progress is settling on a concrete progress
+indicator, for instance \ref tpie::progress_indicator_arrow, and passing around
+pointers or references to this in your code. You may then call init() once with
+the number of items to process and step() for each item and finally done() when
+you have completed processing. The following piece of code is from the file
+\c example/helloworld.cpp (albeit slightly modified).
+
+\code
+@DOCCODE_PROGRESS1@
+\endcode
+
+\section fractional Fractional progress reporting
+
+Often, you will divide your algorithm into several sequential steps. In this
+case, you may choose to have more than one progress indicator. If you wish to
+display just a single progress bar showing the total progress towards the goal,
+TPIE provides a fractional progress indicator implementation.
+
+A fractional progress indicator wraps another progress indicator and provides
+as many fractional subindicators as the user needs. A fractional subindicator
+adheres to the progress indicator concept. Behind the scenes, the fractional
+progress indicator measures the time it takes each step of the algorithm to
+complete. Using the execution time predictor, over several runs of the
+algorithm it will become better at predicting the amount of time each
+subindicator spends. In the simplest case, a program will first write items to
+a stream, and then read them back. Using a fractional progress indicator, TPIE
+will eventually figure out the ratio of time spent between reading and writing.
+Eventually, the amount of progress reported to the user will increase linearly
+with wall clock time.
+
+The following example is taken from the file \c example/helloworld.cpp.
+\code
+@DOCCODE_PROGRESS2@
+\endcode
+
+\section dummyprogress Disabling progress reporting
+
+There are two ways in which you may optionally disable progress reporting at
+runtime.
+
+The first is polymorphically. If you pass around pointers to the
+progress_indicator_base class, you may instantiate
+tpie::progress_indicator_null rather than, say, tpie::progress_indicator_arrow.
+This is a virtual null object implementation of the progress indicator base
+class. Although no progress is reported, you still pay the price of a virtual
+method call for each call to step().
+
+The second is using templates. TPIE provides a light-weight null object
+implementation of the progress indicator \b concept called
+tpie::dummy_progress_indicator. This, in conjunction with the
+tpie::progress_types helper class and a boolean template parameter indicating
+whether to report progress or not, allows you to generate two versions of code
+at compile time: One with progress enabled, and one without.
+
+\code
+@DOCCODE_PROGRESS3@
+\endcode
+
+Since dummy_progress_indicator has non-virtual, inline implementations of the
+init, step and done methods, we save a lot of CPU work at run time when the
+user wishes to disable progress reporting. However, twice the amount of code is
+generated, which may lead to more frequent cache misses, which can incur
+performance penalty at run time.
+*/

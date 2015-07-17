@@ -1,0 +1,19 @@
+/**
+\page file_stream Reading and writing file streams
+
+The central class in TPIE for reading from files and writing to files is the
+file_stream class. It reads and writes primitives and primitive structures to
+files.
+
+\code
+@DOCCODE_FILE_STREAM@
+\endcode
+
+The main methods of interest are \ref tpie::file_stream::open(),
+\ref tpie::file_stream::close(), \ref tpie::file_stream::read(),
+\ref tpie::file_stream::write(), \ref tpie::file_stream::seek().
+
+By default, \ref tpie::file_stream reads and writes blocks of size 2 MB at a
+time. You can change this by passing a block factor to the constructor of
+file_stream.
+*/

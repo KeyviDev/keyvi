@@ -1,0 +1,129 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+\chapter{TPIE Error Codes and Management Object Return Values}
+
+\comment{LA: I added the managment object stuff in title since it was
+  there. Is there other stuff that needs to go in this appendix?}
+
+\section{AMI Error Codes}
+\label{sec:ami-errors}
+\index{error codes|(}
+
+
+AMI entry points typically return error codes of the enumerated type
+\lstinline|AMI_err|.  Member functions of operation management
+objects\index{operation management objects} also typically return this
+type.  Possible values for error codes include those listed below.  It
+is expected that in future releases of TPIE, many of these error codes
+will be replaced by exceptions.
+%Exceptions are not currently used by TPIE because the {\tt
+%g++} compiler does not fully support them.
+
+%%
+%%  Note: Do not attempt to add ``[]'' to the items, otherwise
+%%        \lstinline will not work. (JV)
+%%
+\begin{description}\index{AMI\_ERROR\_*@{\tt AMI\_ERROR\_*}|(}
+\item\lstinline|AMI_ERROR_NO_ERROR:| No error occurred.  The call the the
+  entry point returned normally.
+\item\lstinline|AMI_ERROR_IO_ERROR:| A low level I/O error occurred.
+\item\lstinline|AMI_ERROR_END_OF_STREAM:| An attempt was made to read
+  past the end of a stream or write past the end of a substream.
+\item\lstinline|AMI_ERROR_READ_ONLY:| An attempt was made to write to a
+  read-only stream.
+\item\lstinline|AMI_ERROR_OS_ERROR:|  An unexpected operating system
+  error occurred.  Details should appear in the log file if logging is
+  enabled.  See Section~\ref{sec:logging}.
+\item\lstinline|AMI_ERROR_BASE_METHOD:| An attempt was made to call a
+  member function of the virtual base class of \lstinline|AMI_STREAM|.  This
+  indicates a bug in the implementation of AMI streams.
+\item\lstinline|AMI_ERROR_BTE_ERROR:| An error occurred at the BTE
+  level.  
+\item\lstinline|AMI_ERROR_MM_ERROR:| An error occurred within the memory
+  manager.
+\item\lstinline|AMI_ERROR_OBJECT_INITIALIZATION:| An AMI entry point was
+  not able to properly initialize the operation management object that
+  was passed to it.  This generally indicates a bug in the operation
+  management object's initialization code.
+%\item\lstinline|AMI_ERROR_PERMISSION_DENIED:|
+\item\lstinline|AMI_ERROR_INSUFFICIENT_MAIN_MEMORY:| The MM could not
+  make adequate main memory available to complete the requested
+  operation.  Many operations adapt themselves to use whatever main
+  memory is available, but in some cases, when memory is extremely
+  tight, they may not be able to function.
+\item\lstinline|AMI_ERROR_INSUFFICIENT_AVAILABLE_STREAMS:|
+  The AMI could not allocate enough intermediate streams to perform
+  the requested operation.  Certain operating system restrictions
+  limit the number of streams that can be created on certain
+  platforms.  Only in unusual circumstances, such as when the
+  application itself has a very large number of open streams, will
+  this error occur. 
+\item\lstinline|AMI_ERROR_ENV_UNDEFINED:|
+  An environment variable necessary to initialize the AMI was not defined.
+\item\lstinline|AMI_ERROR_BIT_MATRIX_BOUNDS:|
+  A bit matrix larger than the number of bits in an offset into a
+  stream was passed to \lstinline|ami_gp()|.
+\item\lstinline|AMI_ERROR_NOT_POWER_OF_2:|
+  The length of a stream on which a bit permutation was to be
+  performed is not a power of two.
+\item\lstinline|AMI_MATRIX_BOUNDS:| An attempt was made to perform a
+  matrix operation on matrices whose bounds did not match appropriately.
+\index{AMI\_ERROR\_*@{\tt AMI\_ERROR\_*}|)}
+\end{description}
+
+\section{Management Object Return Values}
+\index{Management object return values|(}
+
+\subsection{Return Values for Scan Management Objects}
+
+
+More information on the precise semantics of these values appears in
+Section~\ref{sec:ref-ami-scan}.
+\begin{description}
+\item\lstinline|AMI_SCAN_CONTINUE:| \index{AMI\_SCAN\_CONTINUE@{\tt
+AMI\_SCAN\_CONTINUE}} Tells \lstinline|AMI_scan()|\index{AMI\_scan()@{\tt AMI\_scan()}} to continue
+  to call the \lstinline|operate()| member function of the scan management
+  object with more data.
+\item\lstinline|AMI_SCAN_DONE:| \index{AMI\_SCAN\_DONE@{\tt AMI\_SCAN\_DONE}} Tells \lstinline|AMI_scan()| that the scan is
+  complete. 
+\end{description}
+
+\subsection{Return Values for Merge Management Objects}
+
+More information on the precise semantics of these values appears in
+Section~\ref{sec:ref-ami-merge}.
+\begin{description}\index{AMI\_MERGE\_*@{\tt AMI\_MERGE\_*}}
+\item\lstinline|AMI_MERGE_CONTINUE:| Tells
+\lstinline|AMI_merge()|\index{AMI\_merge()@{\tt AMI\_merge()}} to continue
+  to call the \lstinline|operate()| member function of the scan management
+  object with more data.
+\item\lstinline|AMI_MERGE_DONE:| Tells \lstinline|AMI_merge()| that the scan is
+  complete. 
+\item\lstinline|AMI_MERGE_OUTPUT:|  Tells \lstinline|AMI_merge()| that the
+  last call generated output for the output stream.
+\item\lstinline|AMI_MERGE_READ_MULTIPLE:|  Tells \lstinline|AMI_merge()| that
+  more than one input object was consumed and thus the input flags
+  should be consulted.
+\end{description}
+
+\index{error codes|)}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "tpie"
+%%% End: 

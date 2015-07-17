@@ -1,0 +1,101 @@
+/**
+\page serialization Serialization streams
+
+\section sec_serintro Motivation
+
+If you want to read and write text strings with TPIE \c file_streams,
+the interface requires a fixed string size.
+In some cases this may be unreasonable:
+space is wasted on strings that are smaller than the given size limit,
+and it may be impossible to give a fixed upper bound on the length of the
+strings a program has to operate on.
+
+For this, TPIE provides a serialization framework with a
+distinct set of stream readers and writers that support,
+in essence, variable-length item types, such as strings and arrays.
+With the library support for reversing and sorting such serialization streams,
+it becomes reasonably easy to implement external memory algorithms operating on
+variable length items.
+
+The goal of TPIE serialization is \em not to be portable across machines,
+nor is it to provide type-checking on the serialized input.
+We do not track endianness or integer widths,
+so it is not in general supported to read serialized streams
+written on a different platform.
+Indeed, the motivation for TPIE serialization is to support
+temporary streams of variable-width items in external memory;
+it is not intended as a persistent store or as a data transfer format.
+
+TPIE serialization has built-in support for plain old data,
+also known as POD types.
+This built-in POD support excludes pointer types, however.
+POD types are serialized and unserialized by their in-memory representation.
+This is intended to be fast, not safe or portable.
+
+The framework also supports certain library types out of the box,
+such as \c std::vector, \c std::string and plain old arrays of
+serializable data.
+
+\section sec_serusage Usage
+
+The interface and usage is straightforward.
+See the included test program \c lines, the bulk of which is reproduced below.
+
+\code
+@DOCCODE_SERIALIZATION@
+\endcode
+
+\section sec_ser_user User-supplied serializable types
+
+For types other than those supported natively by TPIE serialization,
+the user can provide implementations of the \c serialize and \c unserialize
+procedures.
+For example, we can implement simple serialization/unserialization of a point type:
+
+\code
+namespace userland {
+
+struct point2 {
+	double x;
+	double y;
+};
+
+template <typename Dst>
+void serialize(Dst & d, const point2 & pt) {
+	using tpie::serialize;
+	serialize(d, pt.x);
+	serialize(d, pt.y);
+}
+
+template <typename Src>
+void unserialize(Src & s, point2 & pt) {
+	using tpie::unserialize;
+	unserialize(s, pt.x);
+	unserialize(s, pt.y);
+}
+
+} // namespace userland
+\endcode
+
+For a more complicated example,
+consider how we might serialize and unserialize a \c std::vector.
+
+\code
+template <typename D, typename T, typename alloc_t>
+void serialize(D & dst, const std::vector<T, alloc_t> & v) {
+	using tpie::serialize;
+	serialize(dst, v.size());
+	serialize(dst, v.begin(), v.end());
+}
+
+template <typename S, typename T, typename alloc_t>
+void unserialize(S & src, std::vector<T, alloc_t> & v) {
+	typename std::vector<T>::size_type s;
+	using tpie::unserialize;
+	unserialize(src, s);
+	v.resize(s);
+	unserialize(src, v.begin(), v.end());
+}
+\endcode
+
+*/

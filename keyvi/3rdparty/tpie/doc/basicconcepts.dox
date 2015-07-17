@@ -1,0 +1,159 @@
+/**
+\page basicconcepts Overview and basic concepts
+
+The data sets
+involved in some modern applications are too large to fit in the main
+memory of even the most powerful computers and must therefore reside
+on disk.  Thus communication between internal and external memory, and
+not actual computation time, often becomes the bottleneck in the
+computation. This is due to the huge difference in access time of fast
+internal memory and slower external memory such as disks. While
+typical access time of main memory is measured in nanoseconds, a
+typical access time of a disk is on the order of
+milliseconds. So roughly speaking there is a
+factor of a million difference in the access time of internal and
+external memory.
+
+The goal of theoretical work in the area of <em>external memory (EM)
+  algorithms</em> (also called <em>I/O algorithms</em> or <em>out-of-core
+  algorithms</em>) is to eliminate or minimize the I/O bottleneck through
+better algorithm design. In order to cope with the high cost of
+accessing data, efficient EM algorithms exploit locality in their
+design.  They access a large \em block of \em B contiguous data
+elements at a time and perform the necessary algorithmic steps on the
+elements in the block while in the high-speed memory. The speedup can
+be considerable. See the surveys by Vitter [<a href="#vitteriosurvey" id="backlink1">1</a>] and Arge
+[<a href="#argehandbook" id="backlink2">2</a>] for other results, including I/O-efficient algorithms for
+various geometric and graph problems.
+
+The objectives of the TPIE project include the following:
+
+- <em>Abstract away the details of how I/O is performed</em> so that
+  programmers need only deal with a simple high level interface.
+- <em>Provide a collection of I/O-optimal paradigms</em> for large
+  scale computation that are efficient not only in theory, but also in
+  practice.
+- <em>Be flexible</em>, allowing programmers to specify the
+  functional details of computation taking place within the supported
+  paradigms.  This will allow a wide variety of algorithms to be
+  implemented within the system.
+- <em>Be portable</em> across a variety hardware platforms.
+- <em>Be extensible</em>, so that new features can be easily added
+  later.
+
+\section basicconcepts Basic concepts
+
+TPIE is written in the C++ language, and this manual assumes that
+the reader is familiar with C++.
+
+Familiarity with the theoretical results on I/O-efficient algorithms
+is not necessary in order to use TPIE. However, this manual may be easier to
+follow with some general
+background information such as how a theoretically optimal external
+merge sort algorithm works. Some of the basic concepts
+required for understanding the discussion of I/O issues and external
+memory algorithms in this manual are outlined below.
+
+Roughly speaking there is a factor of a million difference in the
+access time of internal and external memory.  In order to cope with
+the high cost of accessing externally-stored data, efficient EM
+algorithms exploit locality in their design.  They access a large
+\em block of \em B contiguous data elements at a time and perform
+the necessary algorithmic steps on the elements in the block while it
+is in the high-speed memory. The speedup can be considerable.
+
+The performance of an EM algorithm on a given set of data is affected
+directly by how much internal memory is available for its use. We use
+\em M to denote the number of application data elements that fit into
+the internal memory available to the algorithm, and \em m = \em M / \em B denotes
+the number of blocks that fit into the available internal memory. Such
+a block is more precisely called a <em>logical block</em> because it
+may be a different size (usually larger) than either the physical
+block size or the system block size. We will reserve the term
+<em>physical block</em> size to mean the block size used by a disk
+controller to communicate with a physical disk, and the <em>system
+block</em> size will be the size of block used within the operating
+system for I/O operations on disk devices. In EM algorithms we will
+assume that the logical block size is a multiple of the system block
+size.
+
+TPIE is implemented as a set of templated classes and functions in
+C++, and employs an object-oriented abstraction to EM computation.
+TPIE provides C++ templates of various optimal EM computation
+\em patterns or \em paradigms.  Examples of such paradigms are
+the EM algorithms for merge sorting, distribution sweeping, time
+forward processing, etc. In a TPIE
+program, the application programmer provides application-specific
+details of the specific computation paradigm used, such as C++
+object definitions of the application data records, and code for
+application-specific sub-computations at critical points in the
+computation pattern, but TPIE provides the application-independent
+parts of the pattern.
+
+The definition of an application data element (or record) is provided
+by the user as a class definition.  Such a class definition is
+typically used as a template parameter in a TPIE code fragment (e.g. a
+templated function).
+
+
+\section stream Streams
+
+In TPIE, a \em stream is an ordered collection of
+objects of a particular type, stored in external memory, and accessed
+in sequential order. Streams can be thought of as fundamental TPIE
+objects which map volatile, typed application data elements in
+internal memory to persistent, untyped data elements in external
+memory, and vice-versa. See \ref tpie::file_stream.
+Streams are read and written like files in
+Unix and support a number of primitive file-like operations such as
+\c read(), \c write(), \c truncate(), etc.
+TPIE also supports the concept of a \em substream, see \ref tpie::file, which
+permits a contiguous subset of the elements in a stream to
+accessed sequentially.
+
+Various paradigms of external memory computation are supported.
+TPIE reduces the
+programming effort required to perform an external sort, merge, etc.,
+by providing the high level flow of control within each paradigm, and
+therefore structuring this part of the computation so that it will be
+I/O efficient. The programmer is left with the task of providing what
+amount to event handlers, specifying the application-specific
+details of the computation. For instance in sorting, the programmer
+defines a stream of input data, a comparison operator (the event handler
+for the task of comparing two application data elements), and an
+output stream for the results. See also \ref tpie::sort.
+
+Creating a stream of objects in TPIE is very much like creating any
+other object in C++. The only difference is that the data placed in
+the stream is stored in external memory (on disk).
+
+\section introreferences References
+
+<a href="#backlink1">^</a> <span id="vitteriosurvey">1: J. S. Vitter: External Memory Algorithms and Data Structures: Dealing with MASSIVE Data, ACM Computing Surveys (2001)</span>
+
+<a href="#backlink2">^</a> <span id="argehandbook">2: L. Arge: External Memory Data Structures, from Handbook of Massive Data Sets (2002)</span>
+
+<!--
+@article{vitter:iosurvey,
+author = {J. S. Vitter},
+title  = {External Memory Algorithms and Data Structures: 
+Dealing with {MASSIVE} Data},  
+journal  = survey,
+volume = 33,
+number = 2,
+year = {2001},
+pages = {209--271}
+}
+
+@incollection{arge:handbook,
+ author =      {L. Arge},
+ title =       {External Memory Data Structures},
+ booktitle =   {Handbook of Massive Data Sets},
+ editor =      {J. Abello and P. M. Pardalos and M. G. C. Resende},
+ publisher =   {Kluwer Academic Publishers},
+ pages =       {313-358},
+ year =        2002
+}
+-->
+
+*/
