@@ -1,0 +1,23 @@
+/**
+\page fractiondb Fraction database
+
+When using fractional progress reporting, TPIE is able to measure and remember
+the proportion of execution time spent between the fractions.
+
+The TPIE Hello world example program writes, sorts and verifies a stream of
+numbers. In the source code we do not have to specify how much time writing
+takes compared to sorting. Instead, we keep track of this information in an
+auxiliary file.
+
+If \c helloworld is compiled without the \c NO_FRACTION_STATS define, upon
+exiting, the program will write the fraction database to a file named
+\c fractiondb.gen.inl. When compiled with the \c NO_FRACTION_STATS define, this
+file is included in the source code.
+
+The following example is from the \c main function in \c helloworld.cpp.
+For \c load_fractions and \c save_fractions, include \c fractional_progress.h.
+
+\code
+@DOCCODE_FRACTIONDB@
+\endcode
+*/

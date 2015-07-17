@@ -1,0 +1,36 @@
+/**
+\page priority_queue Priority queue
+
+TPIE provides a very efficient external memory priority queue based off
+Sanders, Fast Priority Queues for Cached Memory. It is implemented in the file
+\ref priority_queue.h and exists in the tpie::ami namespace.
+
+It is conceptually compatible with std::priority_queue, except it operates by
+default as a min-heap rather than a max-heap, as is common in research
+literature.
+
+One may \c push() and \c pop() elements, and \c top() will always return the
+least element pushed that has not yet been popped.  \c size() will return the
+number of elements pushed that have not been popped, and \c empty() returns
+<tt>size() == 0</tt>.
+
+You must set a memory limit for the memory manager using
+\ref tpie::memory_manager::set_limit() before using the priority queue, as its
+initialization depends on knowing how much memory is available.
+
+Example \c pq.cpp:
+
+\code
+@DOCCODE_PRIORITY_QUEUE@
+\endcode
+
+The above code initializes TPIE, sets the memory limit to 1 GB, initializes a
+priority queue, pushes 10 elements onto it, verifies that they are returned in
+the correct order.
+
+Place the code file in your \c tpie project folder, and on Linux, compile with:
+\code
+$ g++ -I. -Ibuild -c pq.cpp -Wall -Wextra -O3
+$ g++ pq.o -o pq build/tpie/libtpie.a -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt 
+\endcode
+*/

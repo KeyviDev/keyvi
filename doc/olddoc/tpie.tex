@@ -1,0 +1,142 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+\documentclass[10pt]{book}
+%\usepackage{html} % for inserting html links to be used by latex2html
+\ifx\pdfoutput\undefined 
+\usepackage[dvips]{hyperref}
+\else
+\usepackage[pdftex,colorlinks=true]{hyperref}
+\fi
+\usepackage{path}
+\usepackage{makeidx}
+\usepackage{verbatim} % new verbatim package.
+\usepackage{listings}
+%\usepackage{times} % for better pdf output.
+\usepackage{color} % for colorbox
+\input{definitions}
+
+\usepackage{graphicx}
+%% Comment this out to produce distribution version of manual.
+\withcomments
+
+\makeindex
+
+\begin{document}
+
+\title{{\Huge TPIE}\\ User Manual and Reference}
+\author{%
+Lars Arge \and 
+Rakesh Barve \and
+Andrew Danner \and
+David Hutchinson \and 
+Thomas M\o lhave, \and
+Octavian Procopiuc \and 
+J\"{o}rg Rotthowe \and
+Laura Toma \and
+Jan Vahrenhold \and
+Darren Erik Vengroff \and 
+Markus Vogel \and
+Rajiv Wickeremesinghe}
+
+
+\date{{\bf DRAFT} of \today}
+
+\maketitle
+
+\begin{titlepage}
+\mbox{ }
+
+\vspace{\fill}
+
+\noindent TPIE User Manual and Reference
+
+\noindent Edition \edition, for TPIE version \version.
+
+\vspace{2ex}
+
+\noindent Copyright \copyright 1994, 1995 Darren Erik Vengroff, 2002 Lars
+Arge, Rakesh Barve, David Hutchinson, Octavian Procopiuc, Laura Toma,
+Darren Erik Vengroff, Rajiv Wickeremesinghe, 2005 Lars Arge, Andrew
+Danner, Thomas M\o lhave, Octavian Procopiuc, J\"{o}rg Rotthowe,
+Laura Toma, Jan Vahrenhold, Markus Vogel.
+
+
+\vspace{2ex}
+
+This file is part of TPIE.
+
+TPIE is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+TPIE is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with TPIE.  If not, see \texttt{http://www.gnu.org/licenses/}.
+
+
+\end{titlepage}
+
+\tableofcontents
+
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+This manual describes TPIE, a Transparent Parallel I/O Environment,
+designed to assist programmers in writing high performance
+I/O-efficient programs for a variety of platforms.\comment{LA: Before
+  distribution add a note about block collection stuff not documented
+  yet}
+
+\emph{This manual, like the whole of the TPIE project, is work in
+  progress. The authors are making it available in its current state
+  in the hopes that it will be useful, but without any warranty
+  whatsoever. Refer to the copyright page at the beginning of this
+  manual for full details. Please send comments, bug reports\index{bug
+    reports}, etc., to \path"tpie@cs.duke.edu".}
+
+\input{acknowledgements} % Chapter: Acknowledgments
+
+\part{User Manual}
+  \input{user_manual}
+
+\part{Reference}
+  \input{ami_reference} % Chapter: AMI Programmer's Reference
+  \input{implementation} % Chapter: The Implementation of TPIE
+  \input{tuning} % Chapter: TPIE Performance Tuning
+\part{Appendices}
+\appendix
+  \input{applications} %  Chapter: Test and Sample Applications
+  \input{addexamples}
+  \input{errorcodes}
+  \input{lgpl-3.0}
+
+\bibliographystyle{abbrv}
+\newpage
+\addcontentsline{toc}{part}{Bibliography}
+\bibliography{tpie}
+\newpage
+\addcontentsline{toc}{part}{Index}
+\printindex
+\end{document}
+
+

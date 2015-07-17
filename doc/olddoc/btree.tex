@@ -1,0 +1,292 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+%% AMI_btree documentation.
+
+\chapter{B-tree: User's guide}
+\label{btree:overview}
+\index{AMI_btree@{\tt AMI\_btree}|(}
+The {\tt AMI\_btree<Key, Value, Compare, KeyOfValue>} class implements the
+behavior of a dynamic B+-tree or $(a,b)$-tree storing fixed-size data
+items. All data elements (of type {\tt Value}) are stored in the leaves of
+the tree, with internal nodes containing keys (of type {\tt Key}) and links
+to other nodes. The keys are ordered using the {\tt Compare} function
+object, which should define a strict weak ordering (as in the STL sorting
+algorithms). Keys are extracted from the {\tt Value} data elements using
+the {\tt KeyOfValue} function object.
+
+The following main operations are supported:
+\begin{itemize}
+
+  \item {\tt load(AMI\_STREAM<Value>* s)}, which bulk loads the tree from
+  the given set of elements;
+
+  \item {\tt find(const Key\& k, Value\&v)}, which searches for an element
+  based on key;
+
+  \item {\tt range\_query(const Key\& k1, const Key\& k2,
+  AMI\_STREAM<Value>* os)}, which searches for elements within a range;
+
+  \item {\tt insert(const Value\& v)}, which inserts an element and does
+  the appropriate rebalancing;
+
+  \item {\tt erase(const Key\& k)}, which deletes an element based on its
+  key and does the appropriate rebalancing;
+\end{itemize}
+
+Note that elements with duplicate keys are not allowed.
+
+
+\section{Example}
+{\small
+\begin{verbatim}
+// The Key type.
+typedef size_t tKey;
+
+// The Value class.
+class tValue {
+public:
+  tKey key;
+  char data[100];
+};
+
+// The KeyOfValue class (containing the function operator).
+class tKeyOfValue {
+public:
+  tKey operator()(const tValue& v) const { return v.key; }
+};
+
+// Constructing a B-tree.
+AMI_btree<tKey, tValue, less<tKey>, tKeyOfValue> tree("/var/tmp/btree");
+\end{verbatim}
+}
+\index{AMI_btree@{\tt AMI\_btree}|)}
+
+\chapter{B-tree: Programmer's Reference}
+
+\section{Class Declaration}
+\index{AMI_btree@{\tt AMI\_btree}|(}
+\btabb
+
+   \> {\tt template<class Key, class Value, class Compare, class
+   KeyOfValue> class AMI\_btree;}
+
+\etabb
+
+\section{Constructors and Destructor}
+
+\btabb
+
+   \entry{AMI\_btree(const AMI\_btree\_params \&params = btree\_params\_default)}
+   {Construct an empty AMI\_btree using temporary files. The tree is stored in a
+   directory given by the {\tt AMI\_SINGLE\_DEVICE} environment variable (or {\tt
+   "/var/tmp/"} if that variable is not set). The persistency flag is set to
+   {\tt PERSIST\_DELETE}. The {\tt params} object contains the
+   user-definable parameters (see Appendix for an explanation of the {\tt
+   AMI\_btree\_params} class and the default values).}
+
+   \entry{AMI\_btree(const char *bfn, BTE\_collection\_type t =
+   BTE\_WRITE\_COLLECTION, } { {\tt\qquad\qquad\qquad\qquad const
+   AMI\_btree\_params \&params = btree\_params\_default)}\\ Construct a B-tree
+   using the files given by {\tt bfn} (base file name).  The files
+   created/used by a Btree instance are outlined in the following
+   table.\\[1mm] \begin{tabular}{|l|l|} \hline {\em bfn}{\tt .l.blk} &
+   Contains the leaves block collection.\\ \hline {\em bfn}{\tt .l.stk} &
+   Contains the free blocks stack for the leaves block collection.\\ \hline
+   {\em bfn}{\tt .n.blk} & Contains the nodes block collection.\\ \hline
+   {\em bfn}{\tt .n.stk} & Contains the free blocks stack for the nodes
+   block collection.\\ \hline \end{tabular}\\[2mm] The persistency flag is
+   set to {\tt PERSIST\_PERSISTENT}. The {\tt params} object contains the
+   user-definable parameters (see Appendix for an explanation of the {\tt
+   AMI\_btree\_params} class and the default values).}
+
+   \entry{$\sim$AMI\_btree()} {Destructor. Either remove or close the supporting
+   files, depending on the persistency flag (see method {\tt persist()}).}
+
+\etabb
+
+\section{Member functions}
+
+\btabb
+
+   \entry{AMI\_err load(AMI\_STREAM<Value>* is, float lf = 0.7, float nf = 0.5)}
+   {Bulk load from the stream {\tt is} of elements. Leaves are filled to {\tt
+   lf}$\times$capacity, and nodes are filled to {\tt nf}$\times$capacity.}
+
+   \entry{AMI\_err load\_sorted(AMI\_STREAM<Value>* is, float lf = 0.7, float nf =
+   0.5)} {Same as {\tt load()} above, but bypasses the expensive sorting
+   step, by assuming that the stream {\tt is} is sorted.}
+
+   \entry{AMI\_err sort(AMI\_STREAM<Value>* is, AMI\_STREAM<Value>* \&os)} {As a
+   convenience, this function sorts the stream {\tt is} and stores the
+   result in {\tt os}. If the value of {\tt os} passed to the function is
+   {\tt NULL}, a new stream is created and {\tt os} points to it.}
+
+   \entry{AMI\_err load(AMI\_btree<Key, Value, Compare, KeyOfValue>* bt,}
+   {{\tt\qquad\qquad\qquad\qquad float leaf\_fill = .7, float node\_fill =
+   .5)} \\ Bulk load from another B-tree. This is a means of reoganizing a
+   B-tree after a lot of updates. A newly loaded structure may use less
+   space and may answer range queries faster.}
+
+   \entry{AMI\_err unload(AMI\_STREAM<Value>* s)} {Write all elements stored in
+   this tree to the given stream, in sorted order. No changes are performed
+   on the tree.}
+
+   \entry{bool insert(const Value\& v)} {Insert an element {\tt v} into the
+   tree. Return true if the insertion succeded, false otherwise (duplicate
+   key).}
+
+   \entry{bool erase(const Key\& k)} {Delete the element with key {\tt k}
+   from the tree. Return true if succeded, false otherwise (key not
+   found).}
+
+   \entry{bool find(const Key\& k, Value\& v)} {Find an element based on
+   its key. If found, store it in {\tt v} and return true.}
+
+   \entry{void range\_query(const Key\& k1, const Key\& k2,
+   AMI\_STREAM<Value>* os)} {Find all elements within the range given by
+   keys {\tt k1} and {\tt k2} and write them to stream {\tt os}.}
+
+%   \> {\tt bool defragment()}\\ \>\>\parbox[t]{5.5in}{Rearrange the nodes
+%   and leaves of the tree so that they take the minimum disk space. This is
+%   a very time-consuming operation. Return true if completed
+%   successfully.}\\[3mm]
+
+   \entry{size\_t size() const} {Return the number of elements
+   stored in the leaves of this tree.}
+
+   \entry{size\_t height() const} {Return the height of the tree, including
+   the leaf level. A value of $0$ represents an empty tree.}
+
+   \entry{void persist(persistence p)} {Set the persistency flag to {\tt
+   p}. The persistency flag dictates the behavior of the destructor of
+   this AMI\_btree object. If {\tt p} is {\tt PERSIST\_DELETE}, all files
+   associated with the tree will be removed, and all the elements stored in
+   the tree will be lost after the destruction of this AMI\_btree object. If
+   {\tt p} is {\tt PERSIST\_PERSISTENT}, all files associated with the tree
+   will be closed during the destruction of this AMI\_btree object, and all the
+   information needed to reopen this tree will be saved.}
+
+   \entry{const AMI\_btree\_params\& params() const} {Return a const
+   reference to the {\tt AMI\_btree\_params} object used by the B-tree. This
+   object contains the true values of all parameters (unlike the object
+   passed to the constructor, which may contain $0$-valued parameters to
+   indicate default behavior; see Appendix).}
+\etabb
+
+\section{The {\tt AMI\_btree\_params} Class}
+\index{AMI_btree_params@{\tt AMI\_btree\_params}|(}
+The {\tt AMI\_btree\_params} class encapsulates all user-definable B-tree
+parameters. These parameters dictate the layout of the tree and its
+behavior under insertions and deletions. An instance of the class created
+using the default constructor gives default values to all parameters. Each
+paramter can then be changed independently.
+
+\subsection{Class Declaration}
+
+\btabb
+
+  \entry{class AMI\_btree\_params;} {}
+
+\etabb
+
+\subsection{Constructor}
+
+\btabb
+
+  \entry{AMI\_btree\_params()} {Initialize a {\tt Btree\_params} object with
+  default values. The default values are given in the following table.\\[1mm]
+  \begin{tabular}{|l|c|}
+    \hline
+    {\em Parameter} & {\em Value} \\ \hline
+    {\tt leaf\_size\_min} & 0 \\ \hline
+    {\tt node\_size\_min} & 0 \\ \hline
+    {\tt leaf\_size\_max} & 0 \\ \hline
+    {\tt node\_size\_max} & 0 \\ \hline
+    {\tt leaf\_block\_factor} & 1 \\ \hline
+    {\tt node\_block\_factor} & 1 \\ \hline
+    {\tt leaf\_cache\_size} & 5 \\ \hline
+    {\tt node\_cache\_size} & 10 \\ \hline
+  \end{tabular}
+  }
+
+\etabb
+
+\subsection{Public Member Objects}
+
+\btabb
+
+  \entry{size\_t leaf\_size\_min} {Minimum number of elements in a leaf. A
+  value of $0$ tells the class to use the default B+-tree behavior. This
+  parameter is a guideline. To improve performance, some leaves may have
+  fewer elements.}
+
+  \entry{size\_t node\_size\_min} {Minimum number of keys in an internal
+  node. A value of $0$ tells the class to use the default B+-tree
+  behavior. As above, this parameter is a guideline.}
+
+  \entry{size\_t leaf\_size\_max} {Maximum number of elements in a leaf. A
+  value of $0$ tells the class to fill a leaf to capacity. This value is
+  strictly enforced.}
+
+  \entry{size\_t node\_size\_max} {Maximum number of keys in an internal
+  node. A value of $0$ tells the class to fill a node to capacity. This
+  value is strictly enforced.}
+
+  \entry{size\_t leaf\_block\_factor} {The size (in bytes) of a leaf block
+  is {\tt leaf\_block\_factor$\times$ os\_block\_size}, where {\tt
+  os\_block\_size} is the operating-system specific page size.}
+
+  \entry{size\_t node\_block\_factor} {The size (in bytes) of an internal
+  node block is {\tt node\_block\_factor$\times$ os\_block\_size}.}
+
+  \entry{size\_t leaf\_cache\_size} {The size (in number of leaf blocks) of
+  the leaf block cache. The cache implements an LRU replacement policy.}
+
+  \entry{size\_t node\_cache\_size} {The size (in number of node blocks) of
+  the node block cache. The cache implements an LRU replacement policy.}
+
+\etabb
+\index{AMI_btree_params@{\tt AMI\_btree\_params}|)}
+\index{AMI_btree@{\tt AMI\_btree}|)}
+
+\chapter{B-tree: Implementation Details}
+\index{AMI_btree@{\tt AMI\_btree}!implementation|(}
+In addition to the {\tt AMI\_btree} class itself, the implementation uses two
+more classes, {\tt AMI\_btree\_node} and {\tt AMI\_btree\_leaf}, representing
+the internal nodes, and leaf nodes, respectively. Both inherit from
+the AMI\_block class, allowing transparent read/write operations. In
+addition, these two classes implement technical operations needed for
+keeping the tree in balance: merge and split. 
+
+The tree grows from the top, by splitting the root node. All the
+internal nodes except the root must be at least half full. This holds
+true for the leaves as well.
+
+The fanout of the tree is given by the block size chosen for the
+internal nodes. To search for a key inside a node, STL's binary search
+is used.
+
+A B-tree instance can be created from a previously-saved instance. This
+consists of four files, two for each collection (the blocks file and
+the stack file). In the user part of the nodes collection's header,
+the B-tree stores some initialization information: the id of the root
+node, the height and the size of the tree. Note that the id of the
+root may not be
+from the node collection: if the height is 1, the root is a leaf.
+\index{AMI_btree@{\tt AMI\_btree}!implementation|)}
+

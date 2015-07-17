@@ -1,0 +1,26 @@
+# File: magic_tpie
+# Author: Octavian Procopiuc <tavi@cs.duke.edu>
+# $Id: magic_tpie,v 1.1 2002-01-25 21:44:18 tavi Exp $
+#
+# Magic numbers for files created by the TPIE library.
+# For format explanation, see magic(4).
+# Usage: file -m magic_tpie file ...
+# For more usage explanation, see file(1).
+#
+0	long	0xFEDCBA	TPIE UFS stream version 1 (deprecated)
+0	long	0xABCDEF	TPIE MMB stream version 1 (deprecated)
+0	long	0x666777	TPIE STDIO stream version 1 (deprecated)
+0	long	0x54505354	TPIE stream
+>4	long	2		version 2,
+>8	long	85		BTE: UFS,
+>8	long	77		BTE: MMAP,
+>8	long	83		BTE: STDIO,
+>16	long	>0		item size: %u bytes,
+>24	long	>0		block size: %u bytes,
+>28	long	>0		length: %u items
+0	long	0x54504243	TPIE block collection
+>4	long	1		version 1,
+>8	long	85		BTE: UFS,
+>8	long	77		BTE: MMAP,
+>24	long	x		length: %u blocks,
+>32	long	>0		block size: %u bytes

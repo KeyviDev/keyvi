@@ -1,0 +1,66 @@
+%% Copyright 2008, The TPIE development team
+%% 
+%% This file is part of TPIE.
+%% 
+%% TPIE is free software: you can redistribute it and/or modify it under
+%% the terms of the GNU Lesser General Public License as published by the
+%% Free Software Foundation, either version 3 of the License, or (at your
+%% option) any later version.
+%% 
+%% TPIE is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+%% License for more details.
+%% 
+%% You should have received a copy of the GNU Lesser General Public License
+%% along with TPIE.  If not, see <http:%%www.gnu.org/licenses/>
+
+\chapter{The Cache Manager}
+
+\section{Overview}
+\label{cache:overview}
+
+\section{Class Declaration}
+
+   \begin{tabbing}
+   \hspace*{.3in} \= \hspace{.5in} \= \\
+
+   \> {\tt template<class T, class W> class AMI\_CACHE\_MANAGER;}
+   \end{tabbing}
+
+\section{Constructors and Destructor}
+   \begin{tabbing}
+   \hspace*{.3in} \= \hspace{.5in} \= \\
+
+   \> {\tt AMI\_CACHE\_MANAGER(size\_t capacity)}\\ 
+   \>\>\parbox[t]{5.5in}{Construct a fully-associative cache manager with the given capacity.}\\[3mm]
+
+   \> {\tt AMI\_CACHE\_MANAGER(size\_t capacity, size\_t assoc)}\\ 
+   \>\>\parbox[t]{5.5in}{Construct a cache manager with the given capacity and associativity.}\\[3mm]
+
+   \> {\tt $\sim$AMI\_CACHE\_MANAGER()}\\ 
+   \>\>\parbox[t]{5.5in}{Destructor. Write out all items still in the cache.}\\[3mm]
+
+   \end{tabbing}
+
+\section{Member functions}
+   \begin{tabbing}
+   \hspace*{.3in} \= \hspace{.5in} \= \\ 
+
+   \> {\tt  bool read(size\_t k, T \& item);}\\ 
+   \>\>\parbox[t]{5.5in}{Read an item from the cache based on key {\tt k} and store it in {\tt item}. If found, the item is removed from the cache. Return true if the key was found.}\\[3mm]
+
+   \> {\tt  bool write(size\_t k, const T \& item);}\\ 
+   \>\>\parbox[t]{5.5in}{Write an item in the cache based on the given key {\tt k}. If the cache was full, the least recently used item is writen out using the {\tt W} function object, and it is removed from the cache.}\\[3mm]
+
+   \> {\tt  bool erase(size\_t k);}\\ 
+   \>\>\parbox[t]{5.5in}{Erase an item from the cache based on the given key {\tt k}. Return true if the key was found.}\\[3mm]
+   \end{tabbing}
+
+\section{Implementation Details}
+
+{\tt AMI\_CACHE\_MANAGER} is a macro definition which resolves to {\tt
+AMI\_cache\_manager\_lru}, an LRU cache manager, the only implementation.
+The cache is an array of pairs (key, item of type {\tt T}). The array is
+divided into (capacity/assoc) sets, and inside a set item are inserted in
+position 0 and deleted from the last position. This insures LRU behavior.

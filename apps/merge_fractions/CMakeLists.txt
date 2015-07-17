@@ -1,0 +1,3 @@
+add_executable(merge_fractions merge_fractions.cpp)
+set_target_properties(merge_fractions PROPERTIES FOLDER tpie)
+target_link_libraries(merge_fractions tpie)
