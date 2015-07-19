@@ -205,7 +205,7 @@ final {
             msgpack::pack(&msgpack_buffer_, value);
           }
 
-          // Josep's zlib compression
+          // zlib compression
           if (msgpack_buffer_.size() > 32) {
             packed_value = compress_string(msgpack_buffer_.data(), msgpack_buffer_.size());
           } else {
