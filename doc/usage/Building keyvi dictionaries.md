@@ -2,13 +2,13 @@
 
 First you need a keyvi installation.
 
-### The dictionarycompiler tool
+### The keyvicompiler tool
 
-The scons install target installs the dictionarycompiler in /usr/local/bin.
+The scons install target installs the keyvicompiler in /usr/local/bin.
 
-dictionarycompiler shall be available now:
+keyvicompiler shall be available now:
 
-    dictionarycompiler -h
+    keyvicompiler -h
     dictionary compiler options::
       -h [ --help ]                         Display this help message
       -v [ --version ]                      Display the version number
@@ -21,7 +21,7 @@ dictionarycompiler shall be available now:
 
 To compile simply run for example:
 
-    dictionarycompiler -i test.txt -o test.keyvi
+    keyvicompiler -i test.txt -o test.keyvi
 
 
 #### The different formats
@@ -45,6 +45,6 @@ keyvi dictionary compiler needs more memory to persist the data.
 
 #### Dumping keyvi dictionaries
 
-You can use dictionaryinspector to dump the data:
+You can use keyviinspector to dump the data:
 
-    dictionaryinspector -i test.keyvi -o ../test-dump.txt
+    keyviinspector -i test.keyvi -o ../test-dump.txt

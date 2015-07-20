@@ -25,9 +25,9 @@ localenv.VariantDir(builddir, ".", duplicate=0)
 
 
 # the compiler tool (static for now)
-source = ['dictionaryinspector.cpp']
-dictionaryinspector = localenv.Program(target = targetpath, source = source, LIBS = linklibraries)
+source = ['keyviinspector.cpp']
+keyviinspector = localenv.Program(target = targetpath, source = source, LIBS = linklibraries)
 
 # installer
 prefix = "/usr/local"
-localenv.Alias("install", localenv.Install(os.path.join(prefix, "bin"), dictionaryinspector))
+localenv.Alias("install", localenv.Install(os.path.join(prefix, "bin"), keyviinspector))

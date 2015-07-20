@@ -4,8 +4,8 @@
 
 Check [install guide](Using keyvi.md) try:
 
-    dictionarycompiler
-    dictionaryinspector
+    keyvicompiler
+    keyviinspector
     
 Try in ipython:
     
@@ -24,11 +24,11 @@ Open a text editor and put some keys in there, e.g.
     
 Compile:
 
-    dictionarycompiler -i in -o compiled.keyvi -d key-only
+    keyvicompiler -i in -o compiled.keyvi -d key-only
     
 Dump:
     
-    dictionaryinspector -i compiled.keyvi -o compiled.out
+    keyviinspector -i compiled.keyvi -o compiled.out
     
  
 #### Open the file in ipython
@@ -50,7 +50,7 @@ Go to [lookup examples](/pykeyvi/examples/lookup)
 
 Compile cities.tsv and run the tester:
     
-    dictionarycompiler -i cities.tsv -o cities.keyvi -d key-only
+    keyvicompiler -i cities.tsv -o cities.keyvi -d key-only
     python text_lookup_tester.py
 
 Try queries like: "Fahrradwerkstatt München", "Berlin Alexanderplatz", "San Francisco Coffee Bar"
@@ -62,7 +62,7 @@ Try pykeyvi/scripts/compile_json.py and compile your own JSON
 Check statistics:
 
 
-     dictionaryinspector -i your-own.keyvi -s
+     keyviinspector -i your-own.keyvi -s
 
 
 Check questions:
@@ -85,14 +85,14 @@ Have a look at the files completion-nw.tsv, completion.tsv it basically contains
 
 Compile and try:
 
-    dictionarycompiler -i completion-nw.tsv -o prefix-completion.keyvi 
+    keyvicompiler -i completion-nw.tsv -o prefix-completion.keyvi 
     python prefix_completion_tester.py
 
 Query: '80s'
  
 Now try:    
 
-    dictionarycompiler -i completion.tsv -o prefix-completion.keyvi
+    keyvicompiler -i completion.tsv -o prefix-completion.keyvi
     python prefix_completion_tester.py
 
 Check questions:
@@ -133,7 +133,7 @@ Go to [normalization examples](/pykeyvi/examples/normalization)
 
 Compile with:
 
-    dictionarycompiler -i normalization.tsv -o normalization.keyvi -d string
+    keyvicompiler -i normalization.tsv -o normalization.keyvi -d string
     
 and try:
 

@@ -17,7 +17,7 @@
 //
 
 /*
- * dictionaryinspector.cpp
+ * keyviinspector.cpp
  *
  *  Created on: May 13, 2014
  *      Author: hendrik
@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
   std::string output_file;
 
   boost::program_options::options_description description(
-      "dictionary inspector options:");
+      "keyvi inspector options:");
 
   description.add_options()("help,h", "Display this help message")
       ("version,v", "Display the version number")
