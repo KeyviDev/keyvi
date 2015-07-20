@@ -26,6 +26,7 @@
 #define MEMORY_MAP_MANAGER_H_
 
 #include <fstream>
+#include <string>
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
