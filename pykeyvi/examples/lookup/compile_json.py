@@ -31,7 +31,7 @@ def compile_file(input, output, jobs, shards):
 
     compilers = {}
     for i in range (0, shards):
-        compilers[i] = pykeyvi.JsonDictionaryCompilerCompact()
+        compilers[i] = pykeyvi.JsonDictionaryCompiler()
 
     if os.path.isdir(input):
         input_files = [os.path.join(input,d) for d in os.listdir(input)]

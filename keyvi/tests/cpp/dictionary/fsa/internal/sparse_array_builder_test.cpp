@@ -38,10 +38,10 @@ namespace internal {
 BOOST_AUTO_TEST_SUITE( SparseArrayBuilderTests )
 
 BOOST_AUTO_TEST_CASE( writeState ) {
-  SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint32_t> p(2048, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
-  SparseArrayBuilder<SparseArrayPersistence<>> b(limit, &p, false);
-  UnpackedState<SparseArrayPersistence<>> u1(&p);
+  SparseArrayBuilder<SparseArrayPersistence<uint32_t>> b(limit, &p, false);
+  UnpackedState<SparseArrayPersistence<uint32_t>> u1(&p);
   u1.Add(65, 100);
   u1.Add(66, 101);
   u1.Add(233, 102);

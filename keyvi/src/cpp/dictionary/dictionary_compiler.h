@@ -26,6 +26,7 @@
 #define DICTIONARY_COMPILER_H_
 
 #include <algorithm>
+#include <functional>
 #include "tpie/serialization_sorter.h"
 
 #include "dictionary/util/tpie_initializer.h"

@@ -19,8 +19,8 @@ DEBFILES = [
     # Where they should go, and where they should be copied from.
     # If you have a lot of files, you may wish to generate this
     # list in some other way.
-    ("usr/local/bin/dictionarycompiler",             "#release/dictionarycompiler/dictionarycompiler"),
-    ("usr/local/bin/dictionaryinspector",            "#release/dictionaryinspector/dictionaryinspector"),
+    ("usr/local/bin/keyvicompiler",             "#release/keyvicompiler/keyvicompiler"),
+    ("usr/local/bin/keyviinspector",            "#release/keyviinspector/keyviinspector"),
 
 ]
 

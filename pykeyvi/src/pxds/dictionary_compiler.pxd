@@ -13,15 +13,6 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile(callback_t, void*) nogil # wrap-ignore
         void WriteToFile(const_char*)
         
-    cdef cppclass CompletionDictionaryCompilerCompact:
-        CompletionDictionaryCompilerCompact() except +
-        CompletionDictionaryCompilerCompact(size_t memory_limit) except +
-        void Add(const_char*, int) except +
-        void __setitem__ (const_char*, int) except +
-        void Compile() nogil # wrap-ignore
-        void Compile(callback_t, void*) nogil # wrap-ignore
-        void WriteToFile(const_char*)
-
     cdef cppclass KeyOnlyDictionaryCompiler:
         KeyOnlyDictionaryCompiler() except +
         KeyOnlyDictionaryCompiler(size_t memory_limit) except +
@@ -30,18 +21,18 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile(callback_t, void*) nogil # wrap-ignore
         void WriteToFile(const_char*)
         
-    cdef cppclass JsonDictionaryCompilerCompact:
-        JsonDictionaryCompilerCompact() except +
-        JsonDictionaryCompilerCompact(size_t memory_limit) except +
+    cdef cppclass JsonDictionaryCompiler:
+        JsonDictionaryCompiler() except +
+        JsonDictionaryCompiler(size_t memory_limit) except +
         void Add(const_char*, const_char*) except +
         void __setitem__(const_char*, const_char*) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void WriteToFile(const_char*)
     
-    cdef cppclass StringDictionaryCompilerCompact:
-        StringDictionaryCompilerCompact() except +
-        StringDictionaryCompilerCompact(size_t memory_limit) except +
+    cdef cppclass StringDictionaryCompiler:
+        StringDictionaryCompiler() except +
+        StringDictionaryCompiler(size_t memory_limit) except +
         void Add(const_char*, const_char*) except +
         void __setitem__(const_char*, const_char*) except +
         void Compile() nogil # wrap-ignore

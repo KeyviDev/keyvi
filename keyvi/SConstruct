@@ -67,13 +67,13 @@ env.Command(["3rdparty/tpie/build/install/lib/libtpie.a","3rdparty/tpie/build/in
 
 env.Append(LIBPATH=[launch_dir + '/3rdparty/tpie/build/install/lib'])
 
-#specify the sconscript for dictionarycompiler
-project = 'dictionarycompiler'
-SConscript('src/cpp/dictionarycompiler/SConscript', exports=['project'])
+#specify the sconscript for the compiler
+project = 'keyvicompiler'
+SConscript('src/cpp/keyvicompiler/SConscript', exports=['project'])
 
-#specify the sconscript for dictionaryinspector
-project = 'dictionaryinspector'
-SConscript('src/cpp/dictionaryinspector/SConscript', exports=['project'])
+#specify the sconscript for the inspector
+project = 'keyviinspector'
+SConscript('src/cpp/keyviinspector/SConscript', exports=['project'])
 
 #specify the sconscript for unit tests
 project = 'dictionaryfsa_unittests'

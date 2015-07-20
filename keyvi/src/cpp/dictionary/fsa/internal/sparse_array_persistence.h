@@ -52,7 +52,7 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-template<class BucketT = uint32_t>
+template<class BucketT = uint16_t>
 class SparseArrayPersistence
 final {
    public:
