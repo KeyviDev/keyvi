@@ -43,19 +43,15 @@ typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::IntValueStoreWithInnerWeights> CompletionDictionaryCompiler;
 
 typedef keyvi::dictionary::DictionaryCompiler<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-    keyvi::dictionary::fsa::internal::IntValueStoreWithInnerWeights> CompletionDictionaryCompilerCompact;
-
-typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<>> KeyOnlyDictionaryCompiler;
 
 typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-    keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryCompilerCompact;
+    keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryCompiler;
 
 typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-    keyvi::dictionary::fsa::internal::StringValueStore> StringDictionaryCompilerCompact;
+    keyvi::dictionary::fsa::internal::StringValueStore> StringDictionaryCompiler;
 
 
 } /* namespace dictionary */

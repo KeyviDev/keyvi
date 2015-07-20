@@ -13,12 +13,11 @@ from cython.operator cimport dereference, preincrement
 cimport cython.operator as co
 from cluster cimport JumpConsistentHashString as _JumpConsistentHashString_cluster
 from dictionary_compiler cimport CompletionDictionaryCompiler as _CompletionDictionaryCompiler
-from dictionary_compiler cimport CompletionDictionaryCompilerCompact as _CompletionDictionaryCompilerCompact
 from dictionary cimport Dictionary as _Dictionary
 from forward_backward_completion cimport ForwardBackwardCompletion as _ForwardBackwardCompletion
 from predictive_compression cimport FsaPredictiveCompression as _FsaPredictiveCompression
 from normalization cimport FsaTransform as _FsaTransform
-from dictionary_compiler cimport JsonDictionaryCompilerCompact as _JsonDictionaryCompilerCompact
+from dictionary_compiler cimport JsonDictionaryCompiler as _JsonDictionaryCompiler
 from dictionary_compiler cimport KeyOnlyDictionaryCompiler as _KeyOnlyDictionaryCompiler
 from generator cimport KeyOnlyDictionaryGenerator as _KeyOnlyDictionaryGenerator
 from match cimport Match as _Match
@@ -26,7 +25,7 @@ from match_iterator cimport MatchIterator as _MatchIterator
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
 from multi_word_completion cimport MultiWordCompletion as _MultiWordCompletion
 from prefix_completion cimport PrefixCompletion as _PrefixCompletion
-from dictionary_compiler cimport StringDictionaryCompilerCompact as _StringDictionaryCompilerCompact
+from dictionary_compiler cimport StringDictionaryCompiler as _StringDictionaryCompiler
 cdef extern from "autowrap_tools.hpp":
     char * _cast_const_away(char *)
 
@@ -38,6 +37,128 @@ def JumpConsistentHashString(bytes in_0 ,  in_1 ):
     cdef uint32_t _r = _JumpConsistentHashString_cluster(input_in_0, (<uint32_t>in_1))
     py_result = <uint32_t>_r
     return py_result 
+
+cdef class StringDictionaryCompiler:
+
+    cdef shared_ptr[_StringDictionaryCompiler] inst
+
+    def __dealloc__(self):
+         self.inst.reset()
+
+    
+    def _init_0(self):
+        self.inst = shared_ptr[_StringDictionaryCompiler](new _StringDictionaryCompiler())
+    
+    def _init_1(self,  memory_limit ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+    
+        self.inst = shared_ptr[_StringDictionaryCompiler](new _StringDictionaryCompiler((<size_t>memory_limit)))
+    
+    def __init__(self, *args):
+        if not args:
+             self._init_0(*args)
+        elif (len(args)==1) and (isinstance(args[0], (int, long))):
+             self._init_1(*args)
+        else:
+               raise Exception('can not handle type of %s' % (args,))
+    
+    def Add(self, bytes in_0 , bytes in_1 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        cdef const_char * input_in_1 = <const_char *> in_1
+        self.inst.get().Add(input_in_0, input_in_1)
+    
+    def __setitem__(self, bytes in_0 , bytes in_1 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        cdef const_char * input_in_1 = <const_char *> in_1
+        self.inst.get().__setitem__(input_in_0, input_in_1)
+    
+    def WriteToFile(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        self.inst.get().WriteToFile(input_in_0)
+    
+    def __enter__(self):
+        return self
+
+    
+    def __exit__(self, type, value, traceback):
+        self.Compile()
+
+
+    def Compile(self, *args):
+        if not args:
+            with nogil:
+                self.inst.get().Compile()
+            return
+
+        cdef void* callback = <void*> args[0]
+        with nogil:
+            self.inst.get().Compile(callback_wrapper, callback) 
+
+cdef class JsonDictionaryCompiler:
+
+    cdef shared_ptr[_JsonDictionaryCompiler] inst
+
+    def __dealloc__(self):
+         self.inst.reset()
+
+    
+    def Add(self, bytes in_0 , bytes in_1 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        cdef const_char * input_in_1 = <const_char *> in_1
+        self.inst.get().Add(input_in_0, input_in_1)
+    
+    def _init_0(self):
+        self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler())
+    
+    def _init_1(self,  memory_limit ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+    
+        self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler((<size_t>memory_limit)))
+    
+    def __init__(self, *args):
+        if not args:
+             self._init_0(*args)
+        elif (len(args)==1) and (isinstance(args[0], (int, long))):
+             self._init_1(*args)
+        else:
+               raise Exception('can not handle type of %s' % (args,))
+    
+    def __setitem__(self, bytes in_0 , bytes in_1 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        cdef const_char * input_in_1 = <const_char *> in_1
+        self.inst.get().__setitem__(input_in_0, input_in_1)
+    
+    def WriteToFile(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        self.inst.get().WriteToFile(input_in_0)
+    
+    def __enter__(self):
+        return self
+
+    
+    def __exit__(self, type, value, traceback):
+        self.Compile()
+
+        
+    def Compile(self, *args):
+        if not args:
+            with nogil:
+                self.inst.get().Compile()
+            return
+
+        cdef void* callback = <void*> args[0]
+        with nogil:
+            self.inst.get().Compile(callback_wrapper, callback) 
 
 cdef class Dictionary:
 
@@ -195,67 +316,6 @@ cdef class PrefixCompletion:
         py_result.end = _r.end()
         return py_result 
 
-cdef class JsonDictionaryCompilerCompact:
-
-    cdef shared_ptr[_JsonDictionaryCompilerCompact] inst
-
-    def __dealloc__(self):
-         self.inst.reset()
-
-    
-    def __setitem__(self, bytes in_0 , bytes in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef const_char * input_in_1 = <const_char *> in_1
-        self.inst.get().__setitem__(input_in_0, input_in_1)
-    
-    def Add(self, bytes in_0 , bytes in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef const_char * input_in_1 = <const_char *> in_1
-        self.inst.get().Add(input_in_0, input_in_1)
-    
-    def _init_0(self):
-        self.inst = shared_ptr[_JsonDictionaryCompilerCompact](new _JsonDictionaryCompilerCompact())
-    
-    def _init_1(self,  memory_limit ):
-        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-    
-        self.inst = shared_ptr[_JsonDictionaryCompilerCompact](new _JsonDictionaryCompilerCompact((<size_t>memory_limit)))
-    
-    def __init__(self, *args):
-        if not args:
-             self._init_0(*args)
-        elif (len(args)==1) and (isinstance(args[0], (int, long))):
-             self._init_1(*args)
-        else:
-               raise Exception('can not handle type of %s' % (args,))
-    
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
-    
-    def __enter__(self):
-        return self
-
-    
-    def __exit__(self, type, value, traceback):
-        self.Compile()
-
-        
-    def Compile(self, *args):
-        if not args:
-            with nogil:
-                self.inst.get().Compile()
-            return
-
-        cdef void* callback = <void*> args[0]
-        with nogil:
-            self.inst.get().Compile(callback_wrapper, callback) 
-
 cdef class ForwardBackwardCompletion:
 
     cdef shared_ptr[_ForwardBackwardCompletion] inst
@@ -298,67 +358,6 @@ cdef class ForwardBackwardCompletion:
         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
         cdef shared_ptr[_Dictionary] input_in_1 = in_1.inst
         self.inst = shared_ptr[_ForwardBackwardCompletion](new _ForwardBackwardCompletion(input_in_0, input_in_1)) 
-
-cdef class StringDictionaryCompilerCompact:
-
-    cdef shared_ptr[_StringDictionaryCompilerCompact] inst
-
-    def __dealloc__(self):
-         self.inst.reset()
-
-    
-    def _init_0(self):
-        self.inst = shared_ptr[_StringDictionaryCompilerCompact](new _StringDictionaryCompilerCompact())
-    
-    def _init_1(self,  memory_limit ):
-        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-    
-        self.inst = shared_ptr[_StringDictionaryCompilerCompact](new _StringDictionaryCompilerCompact((<size_t>memory_limit)))
-    
-    def __init__(self, *args):
-        if not args:
-             self._init_0(*args)
-        elif (len(args)==1) and (isinstance(args[0], (int, long))):
-             self._init_1(*args)
-        else:
-               raise Exception('can not handle type of %s' % (args,))
-    
-    def Add(self, bytes in_0 , bytes in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef const_char * input_in_1 = <const_char *> in_1
-        self.inst.get().Add(input_in_0, input_in_1)
-    
-    def __setitem__(self, bytes in_0 , bytes in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef const_char * input_in_1 = <const_char *> in_1
-        self.inst.get().__setitem__(input_in_0, input_in_1)
-    
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
-    
-    def __enter__(self):
-        return self
-
-    
-    def __exit__(self, type, value, traceback):
-        self.Compile()
-
-
-    def Compile(self, *args):
-        if not args:
-            with nogil:
-                self.inst.get().Compile()
-            return
-
-        cdef void* callback = <void*> args[0]
-        with nogil:
-            self.inst.get().Compile(callback_wrapper, callback) 
 
 cdef class FsaPredictiveCompression:
 
@@ -676,72 +675,11 @@ cdef class Match:
             self.inst.get().SetAttribute(<libcpp_string> key, <bool> value)
         else:
             raise Exception("Unsupported Value Type") 
-
-cdef class CompletionDictionaryCompilerCompact:
-
-    cdef shared_ptr[_CompletionDictionaryCompilerCompact] inst
-
-    def __dealloc__(self):
-         self.inst.reset()
-
-    
-    def Add(self, bytes in_0 ,  in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-    
-        self.inst.get().Add(input_in_0, (<int>in_1))
-    
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
-    
-    def __setitem__(self, bytes in_0 ,  in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-    
-        self.inst.get().__setitem__(input_in_0, (<int>in_1))
-    
-    def _init_0(self):
-        self.inst = shared_ptr[_CompletionDictionaryCompilerCompact](new _CompletionDictionaryCompilerCompact())
-    
-    def _init_1(self,  memory_limit ):
-        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-    
-        self.inst = shared_ptr[_CompletionDictionaryCompilerCompact](new _CompletionDictionaryCompilerCompact((<size_t>memory_limit)))
-    
-    def __init__(self, *args):
-        if not args:
-             self._init_0(*args)
-        elif (len(args)==1) and (isinstance(args[0], (int, long))):
-             self._init_1(*args)
-        else:
-               raise Exception('can not handle type of %s' % (args,))
-    
-    def __enter__(self):
-        return self
-
-    
-    def __exit__(self, type, value, traceback):
-        self.Compile()
-
-        
-    def Compile(self, *args):
-        if not args:
-            with nogil:
-                self.inst.get().Compile()
-            return
-
-        cdef void* callback = <void*> args[0]
-        with nogil:
-            self.inst.get().Compile(callback_wrapper, callback) 
+ 
  
  
 # import uint32_t type
 from libc.stdint cimport uint32_t 
- 
  
 # same import style as autowrap
 from match cimport Match as _Match
@@ -783,6 +721,5 @@ cdef class MatchIterator:
         py_result.inst = shared_ptr[_Match](_r)
 
         return py_result 
- 
  
  
