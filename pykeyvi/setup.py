@@ -55,6 +55,7 @@ setup(
     version = '0.0.5',
     description = 'Python bindings for keyvi',
     author = 'Hendrik Muhs',
+    license="ASL 2.0",
     cmdclass = {'build_ext': build_ext},
     ext_modules = ext_modules,
     zip_safe = False

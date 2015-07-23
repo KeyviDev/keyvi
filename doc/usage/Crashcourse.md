@@ -2,7 +2,7 @@
 
 ### Install
 
-Check [install guide](Using keyvi.md) try:
+After installation you should have:
 
     keyvicompiler
     keyviinspector
