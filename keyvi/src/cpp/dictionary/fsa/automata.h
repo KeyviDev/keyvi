@@ -113,8 +113,13 @@ final {
     Automata& operator=(Automata const&) = delete;
     Automata(const Automata& that) = delete;
 
-    int GetStartState() {
-      return automata_properties_.get<int>("start_state");
+    /**
+     * Get the start(root) stage of the FSA
+     *
+     * @return index of root state.
+     */
+    uint32_t GetStartState() const {
+      return automata_properties_.get<uint32_t>("start_state");
     }
 
     uint32_t TryWalkTransition(uint32_t starting_state, unsigned char c) const {
