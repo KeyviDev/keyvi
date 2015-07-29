@@ -52,11 +52,16 @@ PACKAGE_NAME = 'pykeyvi'
 
 setup(
     name = PACKAGE_NAME,
-    version = '0.0.5',
+    version = '0.1',
     description = 'Python bindings for keyvi',
     author = 'Hendrik Muhs',
+    author_email = 'hendrik.muhs@gmail.com',
     license="ASL 2.0",
     cmdclass = {'build_ext': build_ext},
     ext_modules = ext_modules,
-    zip_safe = False
+    zip_safe = False,
+    url = 'https://github.com/cliqz/keyvi',
+    download_url = 'https://github.com/cliqz/keyvi/tarball/0.1',
+    keywords = ['FST'],
+    classifiers = [],
 )
