@@ -61,7 +61,7 @@ setup(
     ext_modules = ext_modules,
     zip_safe = False,
     url = 'https://github.com/cliqz/keyvi',
-    download_url = 'https://github.com/cliqz/keyvi/tarball/0.1',
+    download_url = 'https://github.com/cliqz/keyvi/tarball/v0.1',
     keywords = ['FST'],
     classifiers = [],
 )

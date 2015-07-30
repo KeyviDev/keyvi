@@ -7,12 +7,7 @@ A key value index based on finite state technology.
 The core part is a C++ header-only library, but the TPIE 3rdparty library needs to be compiled once. The commandline
 tools are also part of the C++ code. For instructions check the [Readme](/keyvi/README.md) file.
 
-The python extension pykeyvi can be installed via pip:
-
-    pip install pykeyvi
-
-For instructions to compile it yourself check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
-
+For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
 
 ## Usage
 
@@ -44,4 +39,4 @@ If you like to go deep down in the basics, keyvi is inspired by the following 2 
 keyvi is licenced under apache license 2.0, see [licence](LICENSE) for details.
 
 In addition keyvi uses 3rdparty libraries which define their own licence. Please check their respective licence. 
-The 3rdparty libraries can be found under [keyvi/3rdparty](/keyvi/3rdparty).
+The 3rdparty libraries can be found at [keyvi/3rdparty](/keyvi/3rdparty).
