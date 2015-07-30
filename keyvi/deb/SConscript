@@ -30,6 +30,9 @@ debpkg = '#%s_%s-%s_%s.deb' % (DEBNAME, DEBVERSION, minor_version, DEBARCH)
 # and we want it to be built when we build 'debian'
 env.Alias("debian", debpkg)
 
+if not os.path.exists("debian"):
+    os.makedirs("debian")
+
 DEBCONTROLFILE = os.path.join("debian/control")
 
 DEBCONTROLFILE_GEN = os.path.join(DEBNAME, "DEBIAN/control")
@@ -52,7 +55,7 @@ for f in DEBFILES:
 
 CONTROL_TEMPLATE = """
 Source: %s
-Maintainer: Hendrik <hendrik@cliqz.com>
+Maintainer: Hendrik <hendrik.muhs@gmail.com>
 
 Package: %s
 Priority: extra
