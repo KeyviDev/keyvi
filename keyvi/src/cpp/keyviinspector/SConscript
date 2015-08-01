@@ -29,6 +29,6 @@ source = ['keyviinspector.cpp']
 keyviinspector = localenv.Program(target = targetpath, source = source, LIBS = linklibraries)
 
 # installer
-usr_prefix = install_prefix
+prefix = install_prefix
 
-localenv.Alias("install", localenv.Install(os.path.join(usr_prefix, "bin"), keyviinspector))
+localenv.Alias("install", localenv.Install(os.path.join(prefix, "bin"), keyviinspector))
