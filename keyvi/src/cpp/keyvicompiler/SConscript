@@ -1,7 +1,7 @@
 import os
 
 #get all the build variables we need
-Import('env', 'project', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'linklibraries')
+Import('env', 'project', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'linklibraries', 'install_prefix')
 localenv = env.Clone()
 
 buildroot = '../../../' + buildmode  #holds the root of the build directory tree
@@ -30,5 +30,6 @@ keyvicompiler = localenv.Program(target = targetpath, source = source,
                                       LIBS = linklibraries)
 
 # installer
-prefix = "/usr/local"
+prefix = install_prefix
+
 localenv.Alias("install", localenv.Install(os.path.join(prefix, "bin"), keyvicompiler))

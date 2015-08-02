@@ -20,6 +20,18 @@ if not (buildmode in ['debug', 'release']):
 #tell the user what we're doing
 print '**** Compiling in ' + buildmode + ' mode...'
 
+#add a --prefix option
+AddOption('--prefix',
+                  dest='prefix',
+                  type='string',
+                  nargs=1,
+                  action='store',
+                  metavar='DIR',
+                  default='/usr/local',
+                  help='installation prefix')
+
+
+
 debugcompilerflags = ['-ggdb3']   #extra compile flags for debug
 releasecompilerflags = ['-O3']         #extra compile flags for release
 
@@ -35,6 +47,8 @@ linklibraries =  [ "tpie",
    ]
 
 env = Environment()
+
+install_prefix = GetOption('prefix')
 
 launch_dir = env.GetLaunchDir()
 env.Append(CPPFLAGS = ['-std=c++11'])
@@ -55,17 +69,18 @@ if env['PLATFORM'] == 'darwin':
     
 
 #make sure the sconscripts can get to the variables
-Export('env', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'linklibraries')
+Export('env', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'linklibraries', 'install_prefix')
 
 #put all .sconsign files in one place
 env.SConsignFile()
     
 #build tpie dependency
-env.Command(["3rdparty/tpie/build/install/lib/libtpie.a","3rdparty/tpie/build/install/include/tpie/tpie.h"], "",
+tpie = env.Command(["3rdparty/tpie/build/install/lib/libtpie.a","3rdparty/tpie/build/install/include/tpie/tpie.h"], "",
             "cd 3rdparty/tpie && mkdir -p build && cd build && cmake -D CMAKE_BUILD_TYPE:STRING=Release -D CMAKE_INSTALL_PREFIX=install -D TPIE_PARALLEL_SORT=1 -D CMAKE_CXX_FLAGS=\"-fPIC -std=c++11\" .. && " +
             "make -j " + str(cpus) + " && make install")
 
 env.Append(LIBPATH=[launch_dir + '/3rdparty/tpie/build/install/lib'])
+env.Clean(tpie, '3rdparty/tpie/build')
 
 #specify the sconscript for the compiler
 project = 'keyvicompiler'
