@@ -4,6 +4,16 @@ A key value index based on finite state technology.
 
 ## Install
 
+### Quick
+
+Precompiled binaries for Ubuntu 14.04LTS are available at the [keyvi PPA](https://launchpad.net/~hendrik-muhs/+archive/ubuntu/keyvi). To install use: 
+
+    sudo add-apt-repository ppa:hendrik-muhs/keyvi
+    sudo apt-get update
+    sudo apt-get install keyvi python-pykeyvi
+
+### From Source
+
 The core part is a C++ header-only library, but the TPIE 3rdparty library needs to be compiled once. The commandline
 tools are also part of the C++ code. For instructions check the [Readme](/keyvi/README.md) file.
 
