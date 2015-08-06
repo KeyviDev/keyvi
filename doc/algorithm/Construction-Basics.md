@@ -46,7 +46,7 @@ real control flows.
 	
 ![Construction example Daciuk/Watson](/doc/images/daciuk_watson.png)
 
-### Incremental Construction in Cliqztionary 
+### Incremental Construction in Keyvi 
 
 #### Algorithm
 
