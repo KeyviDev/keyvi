@@ -27,6 +27,7 @@
 
 #include <cstring>
 #include <fstream>
+#include <algorithm>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -158,6 +159,8 @@ final {
         // todo: this is rather pointless: 99% are small copies not worth the call overhead
         memcpy(transitions_ + offset - in_memory_buffer_offset_, buffer, length);
 
+        // persist the highest position we write into
+        highest_raw_write_bucket_ = std::max(highest_raw_write_bucket_, offset + length);
       return;
     }
 
@@ -192,16 +195,18 @@ final {
     void Flush() {
       // make idempotent, so it can be called twice or more);
       if (labels_) {
+        size_t highest_write_position = std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_);
+
         labels_extern_->Append(in_memory_buffer_offset_,
                                     labels_,
-                                    (highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE - in_memory_buffer_offset_));
+                                    (highest_write_position - in_memory_buffer_offset_));
 
         // in place re-write
-        HostOrderToPersistenceOrder(transitions_, highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE - in_memory_buffer_offset_);
+        HostOrderToPersistenceOrder(transitions_, highest_write_position - in_memory_buffer_offset_);
 
         transitions_extern_->Append(in_memory_buffer_offset_ * sizeof(BucketT),
                                     transitions_,
-                                    (highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE - in_memory_buffer_offset_) * sizeof(BucketT));
+                                    (highest_write_position - in_memory_buffer_offset_) * sizeof(BucketT));
 
         delete[] labels_;
         delete[] transitions_;
@@ -213,19 +218,22 @@ final {
     void Write(std::ostream& stream) {
       boost::property_tree::ptree pt;
       pt.put("version", GetVersion());
+
+      size_t highest_write_position = std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_);
+
       pt.put("size",
-             std::to_string((highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE)));
+             std::to_string(highest_write_position));
 
       internal::SerializationUtils::WriteJsonRecord(stream, pt);
       TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
       labels_extern_->Write(stream,
-                            highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE);
+                            highest_write_position);
 
       TRACE("Wrote Labels, stream at %d", stream.tellp());
 
       transitions_extern_->Write(
-          stream, (highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE) * sizeof(BucketT));
+          stream, (highest_write_position) * sizeof(BucketT));
       TRACE("Wrote Transitions, stream at %d", stream.tellp());
     }
 
@@ -240,6 +248,7 @@ final {
     size_t buffer_size_;
     size_t flush_size_;
     size_t highest_state_begin_ = 0;
+    size_t highest_raw_write_bucket_ = 0;
 
     inline void FlushBuffers() {
       labels_extern_->Append(in_memory_buffer_offset_,
