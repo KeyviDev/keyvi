@@ -282,6 +282,36 @@ final {
       return builder_->GetSize();
     }
 
+    /**
+     * Set a custom manifest to be embedded into the index file.
+     *
+     * @param manifest as JSON string
+     */
+    template<typename StringType>
+    inline void SetManifestFromString(StringType manifest){
+
+      std::string mf_string(c_stringify(manifest));
+
+      // sending an empty string clears the manifest
+      if (mf_string.empty()) {
+        manifest_.clear();
+
+        return;
+      }
+
+      std::istringstream string_stream(mf_string);
+      boost::property_tree::read_json(string_stream, manifest_);
+    }
+
+    /**
+     * Set a custom manifest to be embedded into the index file.
+     *
+     * @param manifest
+     */
+    inline void SetManifest(const boost::property_tree::ptree& manifest){
+      manifest_ = manifest;
+    }
+
    private:
     size_t memory_limit_;
     PersistenceT* persistence_;
@@ -294,6 +324,7 @@ final {
     generator_state state_ = generator_state::EMPTY;
     uint32_t start_state_ = 0;
     uint64_t number_of_states_ = 0;
+    boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
 
     void WriteHeader(std::ostream& stream) {
       boost::property_tree::ptree pt;
@@ -302,6 +333,8 @@ final {
       pt.put("number_of_keys", std::to_string(number_of_keys_added_));
       pt.put("value_store_type", std::to_string(value_store_->GetValueStoreType()));
       pt.put("number_of_states", std::to_string(number_of_states_));
+      pt.add_child("manifest", manifest_);
+
       internal::SerializationUtils::WriteJsonRecord(stream, pt);
     }
 
@@ -347,7 +380,6 @@ final {
         --highest_stack_;
       }
     }
-
   };
 
   } /* namespace fsa */

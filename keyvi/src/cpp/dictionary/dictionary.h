@@ -329,6 +329,10 @@ final {
       return MatchIterator::MakeIteratorPair(func);
     }
 
+   std::string GetManifestAsString() const {
+     return fsa_->GetManifestAsString();
+   }
+
    private:
     fsa::automata_t fsa_;
   };
