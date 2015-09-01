@@ -229,6 +229,19 @@ final {
       return buf.str();
     }
 
+    boost::property_tree::ptree GetManifest() const {
+      return automata_properties_.get_child("manifest", boost::property_tree::ptree());
+    }
+
+    std::string GetManifestAsString() const {
+      std::ostringstream buf;
+
+      const boost::property_tree::ptree &manifest = automata_properties_.get_child("manifest", boost::property_tree::ptree());
+      boost::property_tree::write_json (buf, manifest, false);
+
+      return buf.str();
+    }
+
    private:
     boost::property_tree::ptree automata_properties_;
     boost::property_tree::ptree sparse_array_properties_;

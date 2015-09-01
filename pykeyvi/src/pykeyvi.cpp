@@ -493,7 +493,7 @@ struct __pyx_obj_7pykeyvi_StringDictionaryCompiler {
 };
 
 
-/* "pykeyvi.pyx":102
+/* "pykeyvi.pyx":107
  *             self.inst.get().Compile(callback_wrapper, callback)
  * 
  * cdef class JsonDictionaryCompiler:             # <<<<<<<<<<<<<<
@@ -506,7 +506,7 @@ struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler {
 };
 
 
-/* "pykeyvi.pyx":163
+/* "pykeyvi.pyx":173
  *             self.inst.get().Compile(callback_wrapper, callback)
  * 
  * cdef class Dictionary:             # <<<<<<<<<<<<<<
@@ -519,7 +519,7 @@ struct __pyx_obj_7pykeyvi_Dictionary {
 };
 
 
-/* "pykeyvi.pyx":266
+/* "pykeyvi.pyx":281
  *         return self._item_iterator_wrapper(py_result)
  * 
  * cdef class FsaTransform:             # <<<<<<<<<<<<<<
@@ -532,7 +532,7 @@ struct __pyx_obj_7pykeyvi_FsaTransform {
 };
 
 
-/* "pykeyvi.pyx":286
+/* "pykeyvi.pyx":301
  *         self.inst = shared_ptr[_FsaTransform](new _FsaTransform(input_in_0))
  * 
  * cdef class PrefixCompletion:             # <<<<<<<<<<<<<<
@@ -545,7 +545,7 @@ struct __pyx_obj_7pykeyvi_PrefixCompletion {
 };
 
 
-/* "pykeyvi.pyx":319
+/* "pykeyvi.pyx":334
  *         return py_result
  * 
  * cdef class ForwardBackwardCompletion:             # <<<<<<<<<<<<<<
@@ -558,7 +558,7 @@ struct __pyx_obj_7pykeyvi_ForwardBackwardCompletion {
 };
 
 
-/* "pykeyvi.pyx":362
+/* "pykeyvi.pyx":377
  *         self.inst = shared_ptr[_ForwardBackwardCompletion](new _ForwardBackwardCompletion(input_in_0, input_in_1))
  * 
  * cdef class FsaPredictiveCompression:             # <<<<<<<<<<<<<<
@@ -571,7 +571,7 @@ struct __pyx_obj_7pykeyvi_FsaPredictiveCompression {
 };
 
 
-/* "pykeyvi.pyx":389
+/* "pykeyvi.pyx":404
  *         return py_result
  * 
  * cdef class CompletionDictionaryCompiler:             # <<<<<<<<<<<<<<
@@ -584,7 +584,7 @@ struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler {
 };
 
 
-/* "pykeyvi.pyx":454
+/* "pykeyvi.pyx":474
  *     (<object>py_callback)(a, b)
  * 
  * cdef class MultiWordCompletion:             # <<<<<<<<<<<<<<
@@ -597,7 +597,7 @@ struct __pyx_obj_7pykeyvi_MultiWordCompletion {
 };
 
 
-/* "pykeyvi.pyx":495
+/* "pykeyvi.pyx":515
  *                raise Exception('can not handle type of %s' % (args,))
  * 
  * cdef class KeyOnlyDictionaryGenerator:             # <<<<<<<<<<<<<<
@@ -610,7 +610,7 @@ struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryGenerator {
 };
 
 
-/* "pykeyvi.pyx":519
+/* "pykeyvi.pyx":539
  *         self.inst.get().WriteToFile(input_in_0)
  * 
  * cdef class KeyOnlyDictionaryCompiler:             # <<<<<<<<<<<<<<
@@ -623,7 +623,7 @@ struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler {
 };
 
 
-/* "pykeyvi.pyx":571
+/* "pykeyvi.pyx":596
  *             self.inst.get().Compile(callback_wrapper, callback)
  * 
  * cdef class Match:             # <<<<<<<<<<<<<<
@@ -636,7 +636,7 @@ struct __pyx_obj_7pykeyvi_Match {
 };
 
 
-/* "pykeyvi.pyx":688
+/* "pykeyvi.pyx":713
  * from match_iterator cimport MatchIterator as _MatchIterator
  * 
  * cdef class MatchIterator:             # <<<<<<<<<<<<<<
@@ -650,7 +650,7 @@ struct __pyx_obj_7pykeyvi_MatchIterator {
 };
 
 
-/* "pykeyvi.pyx":233
+/* "pykeyvi.pyx":248
  *         return py_result
  * 
  *     def _key_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -668,7 +668,7 @@ struct __pyx_obj_7pykeyvi___pyx_scope_struct___key_iterator_wrapper {
 };
 
 
-/* "pykeyvi.pyx":237
+/* "pykeyvi.pyx":252
  *             yield m.GetMatchedString()
  * 
  *     def _value_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -686,7 +686,7 @@ struct __pyx_obj_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper {
 };
 
 
-/* "pykeyvi.pyx":241
+/* "pykeyvi.pyx":256
  *             yield m.GetRawValueAsString()
  * 
  *     def _item_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -1007,12 +1007,12 @@ static PyTypeObject *__pyx_ptype_7pykeyvi___pyx_scope_struct___key_iterator_wrap
 static PyTypeObject *__pyx_ptype_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper = 0;
 static PyTypeObject *__pyx_ptype_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper = 0;
 static void __pyx_f_7pykeyvi_callback_wrapper(size_t, size_t, void *); /*proto*/
-static std::string __pyx_convert_string_from_py_std__in_string(PyObject *); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyObject_string_to_py_std__in_string(std::string const &); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyUnicode_string_to_py_std__in_string(std::string const &); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyStr_string_to_py_std__in_string(std::string const &); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyBytes_string_to_py_std__in_string(std::string const &); /*proto*/
 static CYTHON_INLINE PyObject *__pyx_convert_PyByteArray_string_to_py_std__in_string(std::string const &); /*proto*/
+static std::string __pyx_convert_string_from_py_std__in_string(PyObject *); /*proto*/
 #define __Pyx_MODULE_NAME "pykeyvi"
 int __pyx_module_is_main_pykeyvi = 0;
 
@@ -1026,35 +1026,38 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_2_init_0(struct __
 static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_4_init_1(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_memory_limit); /* proto */
 static int __pyx_pf_7pykeyvi_24StringDictionaryCompiler_6__init__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_8Add(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /* proto */
-static int __pyx_pf_7pykeyvi_24StringDictionaryCompiler_10__setitem__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_12WriteToFile(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_14__enter__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__exit__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_10WriteToFile(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static int __pyx_pf_7pykeyvi_24StringDictionaryCompiler_12__setitem__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_14SetManifestFromString(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__enter__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18__exit__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_20Compile(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
 static void __pyx_pf_7pykeyvi_22JsonDictionaryCompiler___dealloc__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_2Add(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_4_init_0(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_6_init_1(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_memory_limit); /* proto */
 static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_8__init__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
-static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_10__setitem__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12WriteToFile(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14__enter__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__exit__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_10WriteToFile(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12__setitem__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14SetManifestFromString(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__enter__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18__exit__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_20Compile(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
 static void __pyx_pf_7pykeyvi_10Dictionary___dealloc__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_2Get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_4Lookup(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6LookupText(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static int __pyx_pf_7pykeyvi_10Dictionary_8__init__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_filename); /* proto */
+static int __pyx_pf_7pykeyvi_10Dictionary_2__init__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_filename); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_4GetManifestAsString(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6Get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_8LookupText(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
 static int __pyx_pf_7pykeyvi_10Dictionary_10__contains__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key, PyObject *__pyx_v_default); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14__getitem__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16_key_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_19_value_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22_item_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12Lookup(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key, PyObject *__pyx_v_default); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16__getitem__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_18_key_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_21_value_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_24_item_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllKeys(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllValues(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_31GetAllItems(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self); /* proto */
 static void __pyx_pf_7pykeyvi_12FsaTransform___dealloc__(struct __pyx_obj_7pykeyvi_FsaTransform *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_12FsaTransform_2Normalize(struct __pyx_obj_7pykeyvi_FsaTransform *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
 static int __pyx_pf_7pykeyvi_12FsaTransform_4__init__(struct __pyx_obj_7pykeyvi_FsaTransform *__pyx_v_self, struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_in_0); /* proto */
@@ -1074,13 +1077,14 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_6Uncompress(struct
 static void __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler___dealloc__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self); /* proto */
 static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_2__setitem__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_4Add(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6_init_0(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_1(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_memory_limit); /* proto */
-static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12WriteToFile(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14__enter__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__exit__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6WriteToFile(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_0(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10_init_1(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_memory_limit); /* proto */
+static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12__init__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14SetManifestFromString(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__enter__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18__exit__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_20Compile(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
 static void __pyx_pf_7pykeyvi_19MultiWordCompletion___dealloc__(struct __pyx_obj_7pykeyvi_MultiWordCompletion *__pyx_v_self); /* proto */
 static int __pyx_pf_7pykeyvi_19MultiWordCompletion_2__init__(struct __pyx_obj_7pykeyvi_MultiWordCompletion *__pyx_v_self, struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_in_0); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(struct __pyx_obj_7pykeyvi_MultiWordCompletion *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
@@ -1096,10 +1100,11 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_2_init_0(struct _
 static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_4_init_1(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_memory_limit); /* proto */
 static int __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_6__init__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_8Add(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10WriteToFile(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12__enter__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__exit__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback); /* proto */
-static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10SetManifestFromString(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12WriteToFile(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__enter__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16__exit__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback); /* proto */
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_18Compile(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args); /* proto */
 static void __pyx_pf_7pykeyvi_5Match___dealloc__(struct __pyx_obj_7pykeyvi_Match *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_5Match_2SetEnd(struct __pyx_obj_7pykeyvi_Match *__pyx_v_self, PyObject *__pyx_v_end); /* proto */
 static PyObject *__pyx_pf_7pykeyvi_5Match_4GetStart(struct __pyx_obj_7pykeyvi_Match *__pyx_v_self); /* proto */
@@ -1968,7 +1973,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_8Add(struct __pyx_
  *         cdef const_char * input_in_1 = <const_char *> in_1
  *         self.inst.get().Add(input_in_0, input_in_1)             # <<<<<<<<<<<<<<
  * 
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):
+ *     def WriteToFile(self, bytes in_0 ):
  */
   try {
     __pyx_v_self->inst.get()->Add(__pyx_v_input_in_0, __pyx_v_input_in_1);
@@ -2000,51 +2005,49 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_8Add(struct __pyx_
 /* "pykeyvi.pyx":72
  *         self.inst.get().Add(input_in_0, input_in_1)
  * 
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
+ *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
  */
 
 /* Python wrapper */
-static int __pyx_pw_7pykeyvi_24StringDictionaryCompiler_11__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /*proto*/
-static int __pyx_pw_7pykeyvi_24StringDictionaryCompiler_11__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1) {
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_11WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_11WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
   CYTHON_UNUSED int __pyx_lineno = 0;
   CYTHON_UNUSED const char *__pyx_filename = NULL;
   CYTHON_UNUSED int __pyx_clineno = 0;
-  int __pyx_r;
+  PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("__setitem__ (wrapper)", 0);
+  __Pyx_RefNannySetupContext("WriteToFile (wrapper)", 0);
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_1), (&PyBytes_Type), 1, "in_1", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 72; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_10__setitem__(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0), ((PyObject*)__pyx_v_in_1));
+  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_10WriteToFile(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
   goto __pyx_L0;
   __pyx_L1_error:;
-  __pyx_r = -1;
+  __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_7pykeyvi_24StringDictionaryCompiler_10__setitem__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1) {
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_10WriteToFile(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
   const char *__pyx_v_input_in_0;
-  const char *__pyx_v_input_in_1;
-  int __pyx_r;
+  PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   const char *__pyx_t_2;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("__setitem__", 0);
+  __Pyx_RefNannySetupContext("WriteToFile", 0);
 
   /* "pykeyvi.pyx":73
  * 
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):
+ *     def WriteToFile(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().WriteToFile(input_in_0)
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
@@ -2057,153 +2060,26 @@ static int __pyx_pf_7pykeyvi_24StringDictionaryCompiler_10__setitem__(struct __p
   #endif
 
   /* "pykeyvi.pyx":74
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):
+ *     def WriteToFile(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef const_char * input_in_1 = <const_char *> in_1
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         self.inst.get().WriteToFile(input_in_0)
+ * 
  */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyBytes_Check(__pyx_v_in_1); 
-    if (unlikely(!(__pyx_t_1 != 0))) {
-      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    }
-  }
-  #endif
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
   /* "pykeyvi.pyx":75
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
- *         cdef const_char * input_in_1 = <const_char *> in_1
- *         self.inst.get().__setitem__(input_in_0, input_in_1)
- */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 75; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
-
-  /* "pykeyvi.pyx":76
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef const_char * input_in_1 = <const_char *> in_1             # <<<<<<<<<<<<<<
- *         self.inst.get().__setitem__(input_in_0, input_in_1)
- * 
- */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_1); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 76; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_input_in_1 = ((const char *)__pyx_t_2);
-
-  /* "pykeyvi.pyx":77
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef const_char * input_in_1 = <const_char *> in_1
- *         self.inst.get().__setitem__(input_in_0, input_in_1)             # <<<<<<<<<<<<<<
- * 
- *     def WriteToFile(self, bytes in_0 ):
- */
-  try {
-    __pyx_v_self->inst.get()->__setitem__(__pyx_v_input_in_0, __pyx_v_input_in_1);
-  } catch(...) {
-    __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  }
-
-  /* "pykeyvi.pyx":72
- *         self.inst.get().Add(input_in_0, input_in_1)
- * 
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
- */
-
-  /* function exit code */
-  __pyx_r = 0;
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("pykeyvi.StringDictionaryCompiler.__setitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = -1;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "pykeyvi.pyx":79
- *         self.inst.get().__setitem__(input_in_0, input_in_1)
- * 
- *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_13WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_13WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
-  CYTHON_UNUSED int __pyx_lineno = 0;
-  CYTHON_UNUSED const char *__pyx_filename = NULL;
-  CYTHON_UNUSED int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("WriteToFile (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_12WriteToFile(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
-
-  /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_12WriteToFile(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
-  const char *__pyx_v_input_in_0;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  const char *__pyx_t_2;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("WriteToFile", 0);
-
-  /* "pykeyvi.pyx":80
- * 
- *     def WriteToFile(self, bytes in_0 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         self.inst.get().WriteToFile(input_in_0)
- */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
-    if (unlikely(!(__pyx_t_1 != 0))) {
-      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    }
-  }
-  #endif
-
-  /* "pykeyvi.pyx":81
- *     def WriteToFile(self, bytes in_0 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
- *         self.inst.get().WriteToFile(input_in_0)
- * 
- */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 81; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
-
-  /* "pykeyvi.pyx":82
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         self.inst.get().WriteToFile(input_in_0)             # <<<<<<<<<<<<<<
  * 
- *     def __enter__(self):
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):
  */
   __pyx_v_self->inst.get()->WriteToFile(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":79
- *         self.inst.get().__setitem__(input_in_0, input_in_1)
+  /* "pykeyvi.pyx":72
+ *         self.inst.get().Add(input_in_0, input_in_1)
  * 
  *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -2222,8 +2098,233 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_12WriteToFile(stru
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":84
+/* "pykeyvi.pyx":77
  *         self.inst.get().WriteToFile(input_in_0)
+ * 
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ */
+
+/* Python wrapper */
+static int __pyx_pw_7pykeyvi_24StringDictionaryCompiler_13__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /*proto*/
+static int __pyx_pw_7pykeyvi_24StringDictionaryCompiler_13__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__setitem__ (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_1), (&PyBytes_Type), 1, "in_1", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 77; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_12__setitem__(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0), ((PyObject*)__pyx_v_in_1));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7pykeyvi_24StringDictionaryCompiler_12__setitem__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1) {
+  const char *__pyx_v_input_in_0;
+  const char *__pyx_v_input_in_1;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__setitem__", 0);
+
+  /* "pykeyvi.pyx":78
+ * 
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":79
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef const_char * input_in_1 = <const_char *> in_1
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_1); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 79; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":80
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_1 = <const_char *> in_1
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":81
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef const_char * input_in_1 = <const_char *> in_1             # <<<<<<<<<<<<<<
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_1); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 81; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_1 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":82
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef const_char * input_in_1 = <const_char *> in_1
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)             # <<<<<<<<<<<<<<
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):
+ */
+  try {
+    __pyx_v_self->inst.get()->__setitem__(__pyx_v_input_in_0, __pyx_v_input_in_1);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 82; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+
+  /* "pykeyvi.pyx":77
+ *         self.inst.get().WriteToFile(input_in_0)
+ * 
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("pykeyvi.StringDictionaryCompiler.__setitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":84
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_15SetManifestFromString(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_15SetManifestFromString(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("SetManifestFromString (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_14SetManifestFromString(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_14SetManifestFromString(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  const char *__pyx_v_input_in_0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("SetManifestFromString", 0);
+
+  /* "pykeyvi.pyx":85
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().SetManifestFromString(input_in_0)
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":86
+ *     def SetManifestFromString(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         self.inst.get().SetManifestFromString(input_in_0)
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":87
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().SetManifestFromString(input_in_0)             # <<<<<<<<<<<<<<
+ * 
+ *     def __enter__(self):
+ */
+  __pyx_v_self->inst.get()->SetManifestFromString(__pyx_v_input_in_0);
+
+  /* "pykeyvi.pyx":84
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("pykeyvi.StringDictionaryCompiler.SetManifestFromString", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":89
+ *         self.inst.get().SetManifestFromString(input_in_0)
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
  *         return self
@@ -2231,24 +2332,24 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_12WriteToFile(stru
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_15__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_15__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_17__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_17__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_14__enter__(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__enter__(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_14__enter__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self) {
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__enter__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__", 0);
 
-  /* "pykeyvi.pyx":85
+  /* "pykeyvi.pyx":90
  * 
  *     def __enter__(self):
  *         return self             # <<<<<<<<<<<<<<
@@ -2260,8 +2361,8 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_14__enter__(struct
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":84
- *         self.inst.get().WriteToFile(input_in_0)
+  /* "pykeyvi.pyx":89
+ *         self.inst.get().SetManifestFromString(input_in_0)
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
  *         return self
@@ -2275,7 +2376,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_14__enter__(struct
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":88
+/* "pykeyvi.pyx":93
  * 
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -2284,8 +2385,8 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_14__enter__(struct
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_17__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_17__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_19__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_19__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_type = 0;
   CYTHON_UNUSED PyObject *__pyx_v_value = 0;
   CYTHON_UNUSED PyObject *__pyx_v_traceback = 0;
@@ -2316,16 +2417,16 @@ static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_17__exit__(PyObjec
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_traceback)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -2340,20 +2441,20 @@ static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_17__exit__(PyObjec
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.StringDictionaryCompiler.__exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__exit__(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), __pyx_v_type, __pyx_v_value, __pyx_v_traceback);
+  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_18__exit__(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), __pyx_v_type, __pyx_v_value, __pyx_v_traceback);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__exit__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback) {
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18__exit__(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2364,14 +2465,14 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__exit__(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__exit__", 0);
 
-  /* "pykeyvi.pyx":89
+  /* "pykeyvi.pyx":94
  * 
  *     def __exit__(self, type, value, traceback):
  *         self.Compile()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_Compile); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 89; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_Compile); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 94; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -2384,16 +2485,16 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__exit__(struct 
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 89; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 94; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 89; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 94; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":88
+  /* "pykeyvi.pyx":93
  * 
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -2416,7 +2517,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__exit__(struct 
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":92
+/* "pykeyvi.pyx":97
  * 
  * 
  *     def Compile(self, *args):             # <<<<<<<<<<<<<<
@@ -2425,8 +2526,8 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_16__exit__(struct 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_19Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_19Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_21Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_21Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -2434,7 +2535,7 @@ static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_19Compile(PyObject
   if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "Compile", 0))) return NULL;
   __Pyx_INCREF(__pyx_args);
   __pyx_v_args = __pyx_args;
-  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
+  __pyx_r = __pyx_pf_7pykeyvi_24StringDictionaryCompiler_20Compile(((struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_args);
@@ -2442,7 +2543,7 @@ static PyObject *__pyx_pw_7pykeyvi_24StringDictionaryCompiler_19Compile(PyObject
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
+static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_20Compile(struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
   void *__pyx_v_callback;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -2450,7 +2551,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("Compile", 0);
 
-  /* "pykeyvi.pyx":93
+  /* "pykeyvi.pyx":98
  * 
  *     def Compile(self, *args):
  *         if not args:             # <<<<<<<<<<<<<<
@@ -2461,7 +2562,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":94
+    /* "pykeyvi.pyx":99
  *     def Compile(self, *args):
  *         if not args:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -2475,7 +2576,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
         #endif
         /*try:*/ {
 
-          /* "pykeyvi.pyx":95
+          /* "pykeyvi.pyx":100
  *         if not args:
  *             with nogil:
  *                 self.inst.get().Compile()             # <<<<<<<<<<<<<<
@@ -2485,7 +2586,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
           __pyx_v_self->inst.get()->Compile();
         }
 
-        /* "pykeyvi.pyx":94
+        /* "pykeyvi.pyx":99
  *     def Compile(self, *args):
  *         if not args:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -2503,7 +2604,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
         }
     }
 
-    /* "pykeyvi.pyx":96
+    /* "pykeyvi.pyx":101
  *             with nogil:
  *                 self.inst.get().Compile()
  *             return             # <<<<<<<<<<<<<<
@@ -2515,7 +2616,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
     goto __pyx_L0;
   }
 
-  /* "pykeyvi.pyx":98
+  /* "pykeyvi.pyx":103
  *             return
  * 
  *         cdef void* callback = <void*> args[0]             # <<<<<<<<<<<<<<
@@ -2524,7 +2625,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
  */
   __pyx_v_callback = ((void *)PyTuple_GET_ITEM(__pyx_v_args, 0));
 
-  /* "pykeyvi.pyx":99
+  /* "pykeyvi.pyx":104
  * 
  *         cdef void* callback = <void*> args[0]
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -2538,7 +2639,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
       #endif
       /*try:*/ {
 
-        /* "pykeyvi.pyx":100
+        /* "pykeyvi.pyx":105
  *         cdef void* callback = <void*> args[0]
  *         with nogil:
  *             self.inst.get().Compile(callback_wrapper, callback)             # <<<<<<<<<<<<<<
@@ -2548,7 +2649,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
         __pyx_v_self->inst.get()->Compile(__pyx_f_7pykeyvi_callback_wrapper, __pyx_v_callback);
       }
 
-      /* "pykeyvi.pyx":99
+      /* "pykeyvi.pyx":104
  * 
  *         cdef void* callback = <void*> args[0]
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -2566,7 +2667,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
       }
   }
 
-  /* "pykeyvi.pyx":92
+  /* "pykeyvi.pyx":97
  * 
  * 
  *     def Compile(self, *args):             # <<<<<<<<<<<<<<
@@ -2582,7 +2683,7 @@ static PyObject *__pyx_pf_7pykeyvi_24StringDictionaryCompiler_18Compile(struct _
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":106
+/* "pykeyvi.pyx":111
  *     cdef shared_ptr[_JsonDictionaryCompiler] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2605,7 +2706,7 @@ static void __pyx_pf_7pykeyvi_22JsonDictionaryCompiler___dealloc__(struct __pyx_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":107
+  /* "pykeyvi.pyx":112
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -2614,7 +2715,7 @@ static void __pyx_pf_7pykeyvi_22JsonDictionaryCompiler___dealloc__(struct __pyx_
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":106
+  /* "pykeyvi.pyx":111
  *     cdef shared_ptr[_JsonDictionaryCompiler] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2626,7 +2727,7 @@ static void __pyx_pf_7pykeyvi_22JsonDictionaryCompiler___dealloc__(struct __pyx_
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":110
+/* "pykeyvi.pyx":115
  * 
  * 
  *     def Add(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
@@ -2665,11 +2766,11 @@ static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_3Add(PyObject *__pyx
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_in_1)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("Add", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("Add", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "Add") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "Add") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -2682,14 +2783,14 @@ static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_3Add(PyObject *__pyx
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("Add", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("Add", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.JsonDictionaryCompiler.Add", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_1), (&PyBytes_Type), 1, "in_1", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_1), (&PyBytes_Type), 1, "in_1", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_2Add(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), __pyx_v_in_0, __pyx_v_in_1);
 
   /* function exit code */
@@ -2713,7 +2814,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_2Add(struct __pyx_ob
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Add", 0);
 
-  /* "pykeyvi.pyx":111
+  /* "pykeyvi.pyx":116
  * 
  *     def Add(self, bytes in_0 , bytes in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -2725,12 +2826,12 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_2Add(struct __pyx_ob
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":112
+  /* "pykeyvi.pyx":117
  *     def Add(self, bytes in_0 , bytes in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
@@ -2742,32 +2843,32 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_2Add(struct __pyx_ob
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_1); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 117; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":113
+  /* "pykeyvi.pyx":118
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         cdef const_char * input_in_1 = <const_char *> in_1
  *         self.inst.get().Add(input_in_0, input_in_1)
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 113; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":114
+  /* "pykeyvi.pyx":119
  *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef const_char * input_in_1 = <const_char *> in_1             # <<<<<<<<<<<<<<
  *         self.inst.get().Add(input_in_0, input_in_1)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_1); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_1); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_1 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":115
+  /* "pykeyvi.pyx":120
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef const_char * input_in_1 = <const_char *> in_1
  *         self.inst.get().Add(input_in_0, input_in_1)             # <<<<<<<<<<<<<<
@@ -2778,10 +2879,10 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_2Add(struct __pyx_ob
     __pyx_v_self->inst.get()->Add(__pyx_v_input_in_0, __pyx_v_input_in_1);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 115; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":110
+  /* "pykeyvi.pyx":115
  * 
  * 
  *     def Add(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
@@ -2801,7 +2902,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_2Add(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":117
+/* "pykeyvi.pyx":122
  *         self.inst.get().Add(input_in_0, input_in_1)
  * 
  *     def _init_0(self):             # <<<<<<<<<<<<<<
@@ -2831,7 +2932,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_4_init_0(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_0", 0);
 
-  /* "pykeyvi.pyx":118
+  /* "pykeyvi.pyx":123
  * 
  *     def _init_0(self):
  *         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler())             # <<<<<<<<<<<<<<
@@ -2842,11 +2943,11 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_4_init_0(struct __py
     __pyx_t_1 = new keyvi::dictionary::JsonDictionaryCompiler();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 118; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::JsonDictionaryCompiler> (__pyx_t_1);
 
-  /* "pykeyvi.pyx":117
+  /* "pykeyvi.pyx":122
  *         self.inst.get().Add(input_in_0, input_in_1)
  * 
  *     def _init_0(self):             # <<<<<<<<<<<<<<
@@ -2866,7 +2967,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_4_init_0(struct __py
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":120
+/* "pykeyvi.pyx":125
  *         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler())
  * 
  *     def _init_1(self,  memory_limit ):             # <<<<<<<<<<<<<<
@@ -2900,7 +3001,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_6_init_1(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_1", 0);
 
-  /* "pykeyvi.pyx":121
+  /* "pykeyvi.pyx":126
  * 
  *     def _init_1(self,  memory_limit ):
  *         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'             # <<<<<<<<<<<<<<
@@ -2922,28 +3023,28 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_6_init_1(struct __py
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_memory_limit_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 121; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 126; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":123
+  /* "pykeyvi.pyx":128
  *         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
  * 
  *         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler((<size_t>memory_limit)))             # <<<<<<<<<<<<<<
  * 
  *     def __init__(self, *args):
  */
-  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_memory_limit); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_memory_limit); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   try {
     __pyx_t_5 = new keyvi::dictionary::JsonDictionaryCompiler(((size_t)__pyx_t_4));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 123; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::JsonDictionaryCompiler> (__pyx_t_5);
 
-  /* "pykeyvi.pyx":120
+  /* "pykeyvi.pyx":125
  *         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler())
  * 
  *     def _init_1(self,  memory_limit ):             # <<<<<<<<<<<<<<
@@ -2963,7 +3064,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_6_init_1(struct __py
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":125
+/* "pykeyvi.pyx":130
  *         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler((<size_t>memory_limit)))
  * 
  *     def __init__(self, *args):             # <<<<<<<<<<<<<<
@@ -3005,7 +3106,7 @@ static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_8__init__(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":126
+  /* "pykeyvi.pyx":131
  * 
  *     def __init__(self, *args):
  *         if not args:             # <<<<<<<<<<<<<<
@@ -3016,18 +3117,18 @@ static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_8__init__(struct __pyx_obj
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":127
+    /* "pykeyvi.pyx":132
  *     def __init__(self, *args):
  *         if not args:
  *              self._init_0(*args)             # <<<<<<<<<<<<<<
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):
  *              self._init_1(*args)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 127; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 132; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3035,14 +3136,14 @@ static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_8__init__(struct __pyx_obj
     goto __pyx_L3;
   }
 
-  /* "pykeyvi.pyx":128
+  /* "pykeyvi.pyx":133
  *         if not args:
  *              self._init_0(*args)
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):             # <<<<<<<<<<<<<<
  *              self._init_1(*args)
  *         else:
  */
-  __pyx_t_6 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = ((__pyx_t_6 == 1) != 0);
   if (__pyx_t_1) {
   } else {
@@ -3071,18 +3172,18 @@ static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_8__init__(struct __pyx_obj
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":129
+    /* "pykeyvi.pyx":134
  *              self._init_0(*args)
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):
  *              self._init_1(*args)             # <<<<<<<<<<<<<<
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 129; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3091,36 +3192,36 @@ static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_8__init__(struct __pyx_obj
   }
   /*else*/ {
 
-    /* "pykeyvi.pyx":131
+    /* "pykeyvi.pyx":136
  *              self._init_1(*args)
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))             # <<<<<<<<<<<<<<
  * 
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):
+ *     def WriteToFile(self, bytes in_0 ):
  */
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 131; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_args);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_args);
     __Pyx_GIVEREF(__pyx_v_args);
-    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 131; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 131; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 131; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 131; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_L3:;
 
-  /* "pykeyvi.pyx":125
+  /* "pykeyvi.pyx":130
  *         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler((<size_t>memory_limit)))
  * 
  *     def __init__(self, *args):             # <<<<<<<<<<<<<<
@@ -3142,137 +3243,8 @@ static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_8__init__(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":133
+/* "pykeyvi.pyx":138
  *                raise Exception('can not handle type of %s' % (args,))
- * 
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
- */
-
-/* Python wrapper */
-static int __pyx_pw_7pykeyvi_22JsonDictionaryCompiler_11__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /*proto*/
-static int __pyx_pw_7pykeyvi_22JsonDictionaryCompiler_11__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1) {
-  CYTHON_UNUSED int __pyx_lineno = 0;
-  CYTHON_UNUSED const char *__pyx_filename = NULL;
-  CYTHON_UNUSED int __pyx_clineno = 0;
-  int __pyx_r;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("__setitem__ (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_1), (&PyBytes_Type), 1, "in_1", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_10__setitem__(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0), ((PyObject*)__pyx_v_in_1));
-
-  /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = -1;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_10__setitem__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1) {
-  const char *__pyx_v_input_in_0;
-  const char *__pyx_v_input_in_1;
-  int __pyx_r;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  const char *__pyx_t_2;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("__setitem__", 0);
-
-  /* "pykeyvi.pyx":134
- * 
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
-    if (unlikely(!(__pyx_t_1 != 0))) {
-      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 134; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    }
-  }
-  #endif
-
-  /* "pykeyvi.pyx":135
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef const_char * input_in_1 = <const_char *> in_1
- */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyBytes_Check(__pyx_v_in_1); 
-    if (unlikely(!(__pyx_t_1 != 0))) {
-      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 135; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    }
-  }
-  #endif
-
-  /* "pykeyvi.pyx":136
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
- *         cdef const_char * input_in_1 = <const_char *> in_1
- *         self.inst.get().__setitem__(input_in_0, input_in_1)
- */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 136; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
-
-  /* "pykeyvi.pyx":137
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef const_char * input_in_1 = <const_char *> in_1             # <<<<<<<<<<<<<<
- *         self.inst.get().__setitem__(input_in_0, input_in_1)
- * 
- */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_1); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_input_in_1 = ((const char *)__pyx_t_2);
-
-  /* "pykeyvi.pyx":138
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef const_char * input_in_1 = <const_char *> in_1
- *         self.inst.get().__setitem__(input_in_0, input_in_1)             # <<<<<<<<<<<<<<
- * 
- *     def WriteToFile(self, bytes in_0 ):
- */
-  try {
-    __pyx_v_self->inst.get()->__setitem__(__pyx_v_input_in_0, __pyx_v_input_in_1);
-  } catch(...) {
-    __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  }
-
-  /* "pykeyvi.pyx":133
- *                raise Exception('can not handle type of %s' % (args,))
- * 
- *     def __setitem__(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
- */
-
-  /* function exit code */
-  __pyx_r = 0;
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("pykeyvi.JsonDictionaryCompiler.__setitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = -1;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "pykeyvi.pyx":140
- *         self.inst.get().__setitem__(input_in_0, input_in_1)
  * 
  *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -3280,16 +3252,16 @@ static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_10__setitem__(struct __pyx
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_13WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_13WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_11WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_11WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
   CYTHON_UNUSED int __pyx_lineno = 0;
   CYTHON_UNUSED const char *__pyx_filename = NULL;
   CYTHON_UNUSED int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("WriteToFile (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 140; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12WriteToFile(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_10WriteToFile(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
   goto __pyx_L0;
@@ -3300,7 +3272,7 @@ static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_13WriteToFile(PyObje
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12WriteToFile(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_10WriteToFile(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
   const char *__pyx_v_input_in_0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -3311,7 +3283,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12WriteToFile(struct
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("WriteToFile", 0);
 
-  /* "pykeyvi.pyx":141
+  /* "pykeyvi.pyx":139
  * 
  *     def WriteToFile(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -3323,32 +3295,32 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12WriteToFile(struct
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 141; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 139; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":142
+  /* "pykeyvi.pyx":140
  *     def WriteToFile(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         self.inst.get().WriteToFile(input_in_0)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 142; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 140; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":143
+  /* "pykeyvi.pyx":141
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         self.inst.get().WriteToFile(input_in_0)             # <<<<<<<<<<<<<<
  * 
- *     def __enter__(self):
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):
  */
   __pyx_v_self->inst.get()->WriteToFile(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":140
- *         self.inst.get().__setitem__(input_in_0, input_in_1)
+  /* "pykeyvi.pyx":138
+ *                raise Exception('can not handle type of %s' % (args,))
  * 
  *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -3367,8 +3339,233 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12WriteToFile(struct
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":145
+/* "pykeyvi.pyx":143
  *         self.inst.get().WriteToFile(input_in_0)
+ * 
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ */
+
+/* Python wrapper */
+static int __pyx_pw_7pykeyvi_22JsonDictionaryCompiler_13__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1); /*proto*/
+static int __pyx_pw_7pykeyvi_22JsonDictionaryCompiler_13__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__setitem__ (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 143; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_1), (&PyBytes_Type), 1, "in_1", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 143; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12__setitem__(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0), ((PyObject*)__pyx_v_in_1));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12__setitem__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0, PyObject *__pyx_v_in_1) {
+  const char *__pyx_v_input_in_0;
+  const char *__pyx_v_input_in_1;
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__setitem__", 0);
+
+  /* "pykeyvi.pyx":144
+ * 
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 144; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":145
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef const_char * input_in_1 = <const_char *> in_1
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_1); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 145; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":146
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_1 = <const_char *> in_1
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 146; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":147
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef const_char * input_in_1 = <const_char *> in_1             # <<<<<<<<<<<<<<
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_1); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_1 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":148
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef const_char * input_in_1 = <const_char *> in_1
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)             # <<<<<<<<<<<<<<
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):
+ */
+  try {
+    __pyx_v_self->inst.get()->__setitem__(__pyx_v_input_in_0, __pyx_v_input_in_1);
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+
+  /* "pykeyvi.pyx":143
+ *         self.inst.get().WriteToFile(input_in_0)
+ * 
+ *     def __setitem__(self, bytes in_0 , bytes in_1 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("pykeyvi.JsonDictionaryCompiler.__setitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":150
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_15SetManifestFromString(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_15SetManifestFromString(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("SetManifestFromString (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14SetManifestFromString(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14SetManifestFromString(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  const char *__pyx_v_input_in_0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("SetManifestFromString", 0);
+
+  /* "pykeyvi.pyx":151
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().SetManifestFromString(input_in_0)
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":152
+ *     def SetManifestFromString(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         self.inst.get().SetManifestFromString(input_in_0)
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 152; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":153
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().SetManifestFromString(input_in_0)             # <<<<<<<<<<<<<<
+ * 
+ *     def __enter__(self):
+ */
+  __pyx_v_self->inst.get()->SetManifestFromString(__pyx_v_input_in_0);
+
+  /* "pykeyvi.pyx":150
+ *         self.inst.get().__setitem__(input_in_0, input_in_1)
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("pykeyvi.JsonDictionaryCompiler.SetManifestFromString", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":155
+ *         self.inst.get().SetManifestFromString(input_in_0)
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
  *         return self
@@ -3376,24 +3573,24 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_12WriteToFile(struct
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_15__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_15__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_17__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_17__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14__enter__(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__enter__(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14__enter__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self) {
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__enter__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__", 0);
 
-  /* "pykeyvi.pyx":146
+  /* "pykeyvi.pyx":156
  * 
  *     def __enter__(self):
  *         return self             # <<<<<<<<<<<<<<
@@ -3405,8 +3602,8 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14__enter__(struct _
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":145
- *         self.inst.get().WriteToFile(input_in_0)
+  /* "pykeyvi.pyx":155
+ *         self.inst.get().SetManifestFromString(input_in_0)
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
  *         return self
@@ -3420,7 +3617,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14__enter__(struct _
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":149
+/* "pykeyvi.pyx":159
  * 
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -3429,8 +3626,8 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_14__enter__(struct _
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_17__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_17__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_19__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_19__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_type = 0;
   CYTHON_UNUSED PyObject *__pyx_v_value = 0;
   CYTHON_UNUSED PyObject *__pyx_v_traceback = 0;
@@ -3461,16 +3658,16 @@ static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_17__exit__(PyObject 
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 149; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_traceback)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 149; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 149; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -3485,20 +3682,20 @@ static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_17__exit__(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 149; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.JsonDictionaryCompiler.__exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__exit__(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), __pyx_v_type, __pyx_v_value, __pyx_v_traceback);
+  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18__exit__(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), __pyx_v_type, __pyx_v_value, __pyx_v_traceback);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__exit__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback) {
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18__exit__(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3509,14 +3706,14 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__exit__(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__exit__", 0);
 
-  /* "pykeyvi.pyx":150
+  /* "pykeyvi.pyx":160
  * 
  *     def __exit__(self, type, value, traceback):
  *         self.Compile()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_Compile); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_Compile); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 160; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3529,16 +3726,16 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__exit__(struct __
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 160; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 160; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":149
+  /* "pykeyvi.pyx":159
  * 
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -3561,7 +3758,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__exit__(struct __
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":153
+/* "pykeyvi.pyx":163
  * 
  * 
  *     def Compile(self, *args):             # <<<<<<<<<<<<<<
@@ -3570,8 +3767,8 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_16__exit__(struct __
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_19Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_19Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_21Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_21Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -3579,7 +3776,7 @@ static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_19Compile(PyObject *
   if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "Compile", 0))) return NULL;
   __Pyx_INCREF(__pyx_args);
   __pyx_v_args = __pyx_args;
-  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
+  __pyx_r = __pyx_pf_7pykeyvi_22JsonDictionaryCompiler_20Compile(((struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_args);
@@ -3587,7 +3784,7 @@ static PyObject *__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_19Compile(PyObject *
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
+static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_20Compile(struct __pyx_obj_7pykeyvi_JsonDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
   void *__pyx_v_callback;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -3595,7 +3792,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("Compile", 0);
 
-  /* "pykeyvi.pyx":154
+  /* "pykeyvi.pyx":164
  * 
  *     def Compile(self, *args):
  *         if not args:             # <<<<<<<<<<<<<<
@@ -3606,7 +3803,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":155
+    /* "pykeyvi.pyx":165
  *     def Compile(self, *args):
  *         if not args:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -3620,7 +3817,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
         #endif
         /*try:*/ {
 
-          /* "pykeyvi.pyx":156
+          /* "pykeyvi.pyx":166
  *         if not args:
  *             with nogil:
  *                 self.inst.get().Compile()             # <<<<<<<<<<<<<<
@@ -3630,7 +3827,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
           __pyx_v_self->inst.get()->Compile();
         }
 
-        /* "pykeyvi.pyx":155
+        /* "pykeyvi.pyx":165
  *     def Compile(self, *args):
  *         if not args:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -3648,7 +3845,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
         }
     }
 
-    /* "pykeyvi.pyx":157
+    /* "pykeyvi.pyx":167
  *             with nogil:
  *                 self.inst.get().Compile()
  *             return             # <<<<<<<<<<<<<<
@@ -3660,7 +3857,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
     goto __pyx_L0;
   }
 
-  /* "pykeyvi.pyx":159
+  /* "pykeyvi.pyx":169
  *             return
  * 
  *         cdef void* callback = <void*> args[0]             # <<<<<<<<<<<<<<
@@ -3669,7 +3866,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
  */
   __pyx_v_callback = ((void *)PyTuple_GET_ITEM(__pyx_v_args, 0));
 
-  /* "pykeyvi.pyx":160
+  /* "pykeyvi.pyx":170
  * 
  *         cdef void* callback = <void*> args[0]
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -3683,7 +3880,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
       #endif
       /*try:*/ {
 
-        /* "pykeyvi.pyx":161
+        /* "pykeyvi.pyx":171
  *         cdef void* callback = <void*> args[0]
  *         with nogil:
  *             self.inst.get().Compile(callback_wrapper, callback)             # <<<<<<<<<<<<<<
@@ -3693,7 +3890,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
         __pyx_v_self->inst.get()->Compile(__pyx_f_7pykeyvi_callback_wrapper, __pyx_v_callback);
       }
 
-      /* "pykeyvi.pyx":160
+      /* "pykeyvi.pyx":170
  * 
  *         cdef void* callback = <void*> args[0]
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -3711,7 +3908,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
       }
   }
 
-  /* "pykeyvi.pyx":153
+  /* "pykeyvi.pyx":163
  * 
  * 
  *     def Compile(self, *args):             # <<<<<<<<<<<<<<
@@ -3727,7 +3924,7 @@ static PyObject *__pyx_pf_7pykeyvi_22JsonDictionaryCompiler_18Compile(struct __p
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":167
+/* "pykeyvi.pyx":177
  *     cdef shared_ptr[_Dictionary] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3750,7 +3947,7 @@ static void __pyx_pf_7pykeyvi_10Dictionary___dealloc__(struct __pyx_obj_7pykeyvi
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":168
+  /* "pykeyvi.pyx":178
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -3759,7 +3956,7 @@ static void __pyx_pf_7pykeyvi_10Dictionary___dealloc__(struct __pyx_obj_7pykeyvi
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":167
+  /* "pykeyvi.pyx":177
  *     cdef shared_ptr[_Dictionary] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -3771,434 +3968,8 @@ static void __pyx_pf_7pykeyvi_10Dictionary___dealloc__(struct __pyx_obj_7pykeyvi
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":171
+/* "pykeyvi.pyx":181
  * 
- * 
- *     def Get(self, bytes in_0 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_3Get(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_3Get(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
-  CYTHON_UNUSED int __pyx_lineno = 0;
-  CYTHON_UNUSED const char *__pyx_filename = NULL;
-  CYTHON_UNUSED int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("Get (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 171; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_2Get(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
-
-  /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_2Get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0) {
-  const char *__pyx_v_input_in_0;
-  keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
-  struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  const char *__pyx_t_2;
-  PyObject *__pyx_t_3 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("Get", 0);
-
-  /* "pykeyvi.pyx":172
- * 
- *     def Get(self, bytes in_0 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
- */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
-    if (unlikely(!(__pyx_t_1 != 0))) {
-      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 172; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    }
-  }
-  #endif
-
-  /* "pykeyvi.pyx":173
- *     def Get(self, bytes in_0 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
- *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 173; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
-
-  /* "pykeyvi.pyx":174
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)             # <<<<<<<<<<<<<<
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()
- */
-  __pyx_v__r = __pyx_v_self->inst.get()->Get(__pyx_v_input_in_0);
-
-  /* "pykeyvi.pyx":175
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()
- */
-  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
-  __pyx_t_3 = 0;
-
-  /* "pykeyvi.pyx":176
- *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
- *         py_result.end = _r.end()
- *         return py_result
- */
-  __pyx_v_py_result->it = __pyx_v__r.begin();
-
-  /* "pykeyvi.pyx":177
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
- *         return py_result
- * 
- */
-  __pyx_v_py_result->end = __pyx_v__r.end();
-
-  /* "pykeyvi.pyx":178
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()
- *         return py_result             # <<<<<<<<<<<<<<
- * 
- *     def Lookup(self, bytes in_0 ):
- */
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
-  __pyx_r = ((PyObject *)__pyx_v_py_result);
-  goto __pyx_L0;
-
-  /* "pykeyvi.pyx":171
- * 
- * 
- *     def Get(self, bytes in_0 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("pykeyvi.Dictionary.Get", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_py_result);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "pykeyvi.pyx":180
- *         return py_result
- * 
- *     def Lookup(self, bytes in_0 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_5Lookup(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_5Lookup(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
-  CYTHON_UNUSED int __pyx_lineno = 0;
-  CYTHON_UNUSED const char *__pyx_filename = NULL;
-  CYTHON_UNUSED int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("Lookup (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 180; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_4Lookup(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
-
-  /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_4Lookup(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0) {
-  const char *__pyx_v_input_in_0;
-  keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
-  struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  const char *__pyx_t_2;
-  PyObject *__pyx_t_3 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("Lookup", 0);
-
-  /* "pykeyvi.pyx":181
- * 
- *     def Lookup(self, bytes in_0 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
- */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
-    if (unlikely(!(__pyx_t_1 != 0))) {
-      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    }
-  }
-  #endif
-
-  /* "pykeyvi.pyx":182
- *     def Lookup(self, bytes in_0 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
- *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
-
-  /* "pykeyvi.pyx":183
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)             # <<<<<<<<<<<<<<
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()
- */
-  __pyx_v__r = __pyx_v_self->inst.get()->Lookup(__pyx_v_input_in_0);
-
-  /* "pykeyvi.pyx":184
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()
- */
-  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
-  __pyx_t_3 = 0;
-
-  /* "pykeyvi.pyx":185
- *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
- *         py_result.end = _r.end()
- *         return py_result
- */
-  __pyx_v_py_result->it = __pyx_v__r.begin();
-
-  /* "pykeyvi.pyx":186
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
- *         return py_result
- * 
- */
-  __pyx_v_py_result->end = __pyx_v__r.end();
-
-  /* "pykeyvi.pyx":187
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()
- *         return py_result             # <<<<<<<<<<<<<<
- * 
- *     def LookupText(self, bytes in_0 ):
- */
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
-  __pyx_r = ((PyObject *)__pyx_v_py_result);
-  goto __pyx_L0;
-
-  /* "pykeyvi.pyx":180
- *         return py_result
- * 
- *     def Lookup(self, bytes in_0 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("pykeyvi.Dictionary.Lookup", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_py_result);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "pykeyvi.pyx":189
- *         return py_result
- * 
- *     def LookupText(self, bytes in_0 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_7LookupText(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_7LookupText(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
-  CYTHON_UNUSED int __pyx_lineno = 0;
-  CYTHON_UNUSED const char *__pyx_filename = NULL;
-  CYTHON_UNUSED int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("LookupText (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_6LookupText(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
-
-  /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6LookupText(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0) {
-  const char *__pyx_v_input_in_0;
-  keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
-  struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  const char *__pyx_t_2;
-  PyObject *__pyx_t_3 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("LookupText", 0);
-
-  /* "pykeyvi.pyx":190
- * 
- *     def LookupText(self, bytes in_0 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
- */
-  #ifndef CYTHON_WITHOUT_ASSERTIONS
-  if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
-    if (unlikely(!(__pyx_t_1 != 0))) {
-      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    }
-  }
-  #endif
-
-  /* "pykeyvi.pyx":191
- *     def LookupText(self, bytes in_0 ):
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
- *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
-
-  /* "pykeyvi.pyx":192
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)             # <<<<<<<<<<<<<<
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()
- */
-  __pyx_v__r = __pyx_v_self->inst.get()->LookupText(__pyx_v_input_in_0);
-
-  /* "pykeyvi.pyx":193
- *         cdef const_char * input_in_0 = <const_char *> in_0
- *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()
- */
-  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
-  __pyx_t_3 = 0;
-
-  /* "pykeyvi.pyx":194
- *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
- *         py_result.end = _r.end()
- *         return py_result
- */
-  __pyx_v_py_result->it = __pyx_v__r.begin();
-
-  /* "pykeyvi.pyx":195
- *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
- *         return py_result
- * 
- */
-  __pyx_v_py_result->end = __pyx_v__r.end();
-
-  /* "pykeyvi.pyx":196
- *         py_result.it = _r.begin()
- *         py_result.end = _r.end()
- *         return py_result             # <<<<<<<<<<<<<<
- * 
- *     def __init__(self, bytes filename ):
- */
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
-  __pyx_r = ((PyObject *)__pyx_v_py_result);
-  goto __pyx_L0;
-
-  /* "pykeyvi.pyx":189
- *         return py_result
- * 
- *     def LookupText(self, bytes in_0 ):             # <<<<<<<<<<<<<<
- *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
- *         cdef const_char * input_in_0 = <const_char *> in_0
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("pykeyvi.Dictionary.LookupText", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF((PyObject *)__pyx_v_py_result);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "pykeyvi.pyx":198
- *         return py_result
  * 
  *     def __init__(self, bytes filename ):             # <<<<<<<<<<<<<<
  *         assert isinstance(filename, bytes), 'arg filename wrong type'
@@ -4206,8 +3977,8 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6LookupText(struct __pyx_obj_7py
  */
 
 /* Python wrapper */
-static int __pyx_pw_7pykeyvi_10Dictionary_9__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static int __pyx_pw_7pykeyvi_10Dictionary_9__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static int __pyx_pw_7pykeyvi_10Dictionary_3__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_7pykeyvi_10Dictionary_3__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_filename = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -4233,7 +4004,7 @@ static int __pyx_pw_7pykeyvi_10Dictionary_9__init__(PyObject *__pyx_v_self, PyOb
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -4244,14 +4015,14 @@ static int __pyx_pw_7pykeyvi_10Dictionary_9__init__(PyObject *__pyx_v_self, PyOb
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.Dictionary.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename), (&PyBytes_Type), 1, "filename", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 198; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_8__init__(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), __pyx_v_filename);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename), (&PyBytes_Type), 1, "filename", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_2__init__(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), __pyx_v_filename);
 
   /* function exit code */
   goto __pyx_L0;
@@ -4262,7 +4033,7 @@ static int __pyx_pw_7pykeyvi_10Dictionary_9__init__(PyObject *__pyx_v_self, PyOb
   return __pyx_r;
 }
 
-static int __pyx_pf_7pykeyvi_10Dictionary_8__init__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_filename) {
+static int __pyx_pf_7pykeyvi_10Dictionary_2__init__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_filename) {
   const char *__pyx_v_input_filename;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
@@ -4274,7 +4045,7 @@ static int __pyx_pf_7pykeyvi_10Dictionary_8__init__(struct __pyx_obj_7pykeyvi_Di
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":199
+  /* "pykeyvi.pyx":182
  * 
  *     def __init__(self, bytes filename ):
  *         assert isinstance(filename, bytes), 'arg filename wrong type'             # <<<<<<<<<<<<<<
@@ -4286,38 +4057,38 @@ static int __pyx_pf_7pykeyvi_10Dictionary_8__init__(struct __pyx_obj_7pykeyvi_Di
     __pyx_t_1 = PyBytes_Check(__pyx_v_filename); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_filename_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 199; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 182; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":200
+  /* "pykeyvi.pyx":183
  *     def __init__(self, bytes filename ):
  *         assert isinstance(filename, bytes), 'arg filename wrong type'
  *         cdef const_char * input_filename = <const_char *> filename             # <<<<<<<<<<<<<<
  *         self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_filename); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 200; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_filename); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_filename = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":201
+  /* "pykeyvi.pyx":184
  *         assert isinstance(filename, bytes), 'arg filename wrong type'
  *         cdef const_char * input_filename = <const_char *> filename
  *         self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))             # <<<<<<<<<<<<<<
  * 
- *     def __contains__(self, bytes in_0 ):
+ *     def GetManifestAsString(self):
  */
   try {
     __pyx_t_3 = new keyvi::dictionary::Dictionary(__pyx_v_input_filename);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::Dictionary> (__pyx_t_3);
 
-  /* "pykeyvi.pyx":198
- *         return py_result
+  /* "pykeyvi.pyx":181
+ * 
  * 
  *     def __init__(self, bytes filename ):             # <<<<<<<<<<<<<<
  *         assert isinstance(filename, bytes), 'arg filename wrong type'
@@ -4335,8 +4106,375 @@ static int __pyx_pf_7pykeyvi_10Dictionary_8__init__(struct __pyx_obj_7pykeyvi_Di
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":203
+/* "pykeyvi.pyx":186
  *         self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
+ * 
+ *     def GetManifestAsString(self):             # <<<<<<<<<<<<<<
+ *         cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+ *         py_result = <libcpp_string>_r
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_5GetManifestAsString(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_5GetManifestAsString(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("GetManifestAsString (wrapper)", 0);
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_4GetManifestAsString(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_4GetManifestAsString(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self) {
+  std::string __pyx_v__r;
+  std::string __pyx_v_py_result;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("GetManifestAsString", 0);
+
+  /* "pykeyvi.pyx":187
+ * 
+ *     def GetManifestAsString(self):
+ *         cdef libcpp_string _r = self.inst.get().GetManifestAsString()             # <<<<<<<<<<<<<<
+ *         py_result = <libcpp_string>_r
+ *         return py_result
+ */
+  __pyx_v__r = __pyx_v_self->inst.get()->GetManifestAsString();
+
+  /* "pykeyvi.pyx":188
+ *     def GetManifestAsString(self):
+ *         cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+ *         py_result = <libcpp_string>_r             # <<<<<<<<<<<<<<
+ *         return py_result
+ * 
+ */
+  __pyx_v_py_result = ((std::string)__pyx_v__r);
+
+  /* "pykeyvi.pyx":189
+ *         cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+ *         py_result = <libcpp_string>_r
+ *         return py_result             # <<<<<<<<<<<<<<
+ * 
+ *     def Get(self, bytes in_0 ):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* "pykeyvi.pyx":186
+ *         self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
+ * 
+ *     def GetManifestAsString(self):             # <<<<<<<<<<<<<<
+ *         cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+ *         py_result = <libcpp_string>_r
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("pykeyvi.Dictionary.GetManifestAsString", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":191
+ *         return py_result
+ * 
+ *     def Get(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_7Get(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_7Get(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("Get (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_6Get(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6Get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  const char *__pyx_v_input_in_0;
+  keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
+  struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("Get", 0);
+
+  /* "pykeyvi.pyx":192
+ * 
+ *     def Get(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 192; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":193
+ *     def Get(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":194
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)             # <<<<<<<<<<<<<<
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()
+ */
+  __pyx_v__r = __pyx_v_self->inst.get()->Get(__pyx_v_input_in_0);
+
+  /* "pykeyvi.pyx":195
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()
+ */
+  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 195; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 195; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
+  __pyx_t_3 = 0;
+
+  /* "pykeyvi.pyx":196
+ *         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
+ *         py_result.end = _r.end()
+ *         return py_result
+ */
+  __pyx_v_py_result->it = __pyx_v__r.begin();
+
+  /* "pykeyvi.pyx":197
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
+ *         return py_result
+ * 
+ */
+  __pyx_v_py_result->end = __pyx_v__r.end();
+
+  /* "pykeyvi.pyx":198
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()
+ *         return py_result             # <<<<<<<<<<<<<<
+ * 
+ *     def LookupText(self, bytes in_0 ):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
+  __pyx_r = ((PyObject *)__pyx_v_py_result);
+  goto __pyx_L0;
+
+  /* "pykeyvi.pyx":191
+ *         return py_result
+ * 
+ *     def Get(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("pykeyvi.Dictionary.Get", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_py_result);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":200
+ *         return py_result
+ * 
+ *     def LookupText(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_9LookupText(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_9LookupText(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("LookupText (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 200; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_8LookupText(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_8LookupText(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  const char *__pyx_v_input_in_0;
+  keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
+  struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("LookupText", 0);
+
+  /* "pykeyvi.pyx":201
+ * 
+ *     def LookupText(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 201; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":202
+ *     def LookupText(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 202; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":203
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)             # <<<<<<<<<<<<<<
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()
+ */
+  __pyx_v__r = __pyx_v_self->inst.get()->LookupText(__pyx_v_input_in_0);
+
+  /* "pykeyvi.pyx":204
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()
+ */
+  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
+  __pyx_t_3 = 0;
+
+  /* "pykeyvi.pyx":205
+ *         cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
+ *         py_result.end = _r.end()
+ *         return py_result
+ */
+  __pyx_v_py_result->it = __pyx_v__r.begin();
+
+  /* "pykeyvi.pyx":206
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
+ *         return py_result
+ * 
+ */
+  __pyx_v_py_result->end = __pyx_v__r.end();
+
+  /* "pykeyvi.pyx":207
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()
+ *         return py_result             # <<<<<<<<<<<<<<
+ * 
+ *     def __contains__(self, bytes in_0 ):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
+  __pyx_r = ((PyObject *)__pyx_v_py_result);
+  goto __pyx_L0;
+
+  /* "pykeyvi.pyx":200
+ *         return py_result
+ * 
+ *     def LookupText(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("pykeyvi.Dictionary.LookupText", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_py_result);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":209
+ *         return py_result
  * 
  *     def __contains__(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -4352,7 +4490,7 @@ static int __pyx_pw_7pykeyvi_10Dictionary_11__contains__(PyObject *__pyx_v_self,
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__contains__ (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_10__contains__(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -4377,7 +4515,7 @@ static int __pyx_pf_7pykeyvi_10Dictionary_10__contains__(struct __pyx_obj_7pykey
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__contains__", 0);
 
-  /* "pykeyvi.pyx":204
+  /* "pykeyvi.pyx":210
  * 
  *     def __contains__(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -4389,22 +4527,22 @@ static int __pyx_pf_7pykeyvi_10Dictionary_10__contains__(struct __pyx_obj_7pykey
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 204; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":205
+  /* "pykeyvi.pyx":211
  *     def __contains__(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         cdef bool _r = self.inst.get().__contains__(input_in_0)
  *         py_result = <bool>_r
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 205; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":206
+  /* "pykeyvi.pyx":212
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef bool _r = self.inst.get().__contains__(input_in_0)             # <<<<<<<<<<<<<<
@@ -4413,7 +4551,7 @@ static int __pyx_pf_7pykeyvi_10Dictionary_10__contains__(struct __pyx_obj_7pykey
  */
   __pyx_v__r = __pyx_v_self->inst.get()->__contains__(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":207
+  /* "pykeyvi.pyx":213
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef bool _r = self.inst.get().__contains__(input_in_0)
  *         py_result = <bool>_r             # <<<<<<<<<<<<<<
@@ -4422,18 +4560,18 @@ static int __pyx_pf_7pykeyvi_10Dictionary_10__contains__(struct __pyx_obj_7pykey
  */
   __pyx_v_py_result = ((bool)__pyx_v__r);
 
-  /* "pykeyvi.pyx":208
+  /* "pykeyvi.pyx":214
  *         cdef bool _r = self.inst.get().__contains__(input_in_0)
  *         py_result = <bool>_r
  *         return py_result             # <<<<<<<<<<<<<<
  * 
- *     def get (self, key, default = None):
+ *     def Lookup(self, bytes in_0 ):
  */
   __pyx_r = __pyx_v_py_result;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":203
- *         self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
+  /* "pykeyvi.pyx":209
+ *         return py_result
  * 
  *     def __contains__(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -4449,7 +4587,149 @@ static int __pyx_pf_7pykeyvi_10Dictionary_10__contains__(struct __pyx_obj_7pykey
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":210
+/* "pykeyvi.pyx":216
+ *         return py_result
+ * 
+ *     def Lookup(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_13Lookup(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_13Lookup(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("Lookup (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 216; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_12Lookup(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12Lookup(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  const char *__pyx_v_input_in_0;
+  keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
+  struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("Lookup", 0);
+
+  /* "pykeyvi.pyx":217
+ * 
+ *     def Lookup(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":218
+ *     def Lookup(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":219
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)             # <<<<<<<<<<<<<<
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()
+ */
+  __pyx_v__r = __pyx_v_self->inst.get()->Lookup(__pyx_v_input_in_0);
+
+  /* "pykeyvi.pyx":220
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()
+ */
+  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
+  __pyx_t_3 = 0;
+
+  /* "pykeyvi.pyx":221
+ *         cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
+ *         py_result.end = _r.end()
+ *         return py_result
+ */
+  __pyx_v_py_result->it = __pyx_v__r.begin();
+
+  /* "pykeyvi.pyx":222
+ *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
+ *         return py_result
+ * 
+ */
+  __pyx_v_py_result->end = __pyx_v__r.end();
+
+  /* "pykeyvi.pyx":223
+ *         py_result.it = _r.begin()
+ *         py_result.end = _r.end()
+ *         return py_result             # <<<<<<<<<<<<<<
+ * 
+ *     def get (self, key, default = None):
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
+  __pyx_r = ((PyObject *)__pyx_v_py_result);
+  goto __pyx_L0;
+
+  /* "pykeyvi.pyx":216
+ *         return py_result
+ * 
+ *     def Lookup(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_AddTraceback("pykeyvi.Dictionary.Lookup", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_py_result);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":225
  *         return py_result
  * 
  *     def get (self, key, default = None):             # <<<<<<<<<<<<<<
@@ -4458,8 +4738,8 @@ static int __pyx_pf_7pykeyvi_10Dictionary_10__contains__(struct __pyx_obj_7pykey
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_13get(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_13get(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_15get(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_15get(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_key = 0;
   PyObject *__pyx_v_default = 0;
   int __pyx_lineno = 0;
@@ -4493,7 +4773,7 @@ static PyObject *__pyx_pw_7pykeyvi_10Dictionary_13get(PyObject *__pyx_v_self, Py
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4508,20 +4788,20 @@ static PyObject *__pyx_pw_7pykeyvi_10Dictionary_13get(PyObject *__pyx_v_self, Py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("get", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.Dictionary.get", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_12get(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), __pyx_v_key, __pyx_v_default);
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_14get(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), __pyx_v_key, __pyx_v_default);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key, PyObject *__pyx_v_default) {
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key, PyObject *__pyx_v_default) {
   keyvi::dictionary::Match *__pyx_v__r;
   struct __pyx_obj_7pykeyvi_Match *__pyx_v_py_result = 0;
   PyObject *__pyx_r = NULL;
@@ -4534,7 +4814,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get", 0);
 
-  /* "pykeyvi.pyx":211
+  /* "pykeyvi.pyx":226
  * 
  *     def get (self, key, default = None):
  *         assert isinstance(key, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -4546,22 +4826,22 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_
     __pyx_t_1 = PyBytes_Check(__pyx_v_key); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":213
+  /* "pykeyvi.pyx":228
  *         assert isinstance(key, bytes), 'arg in_0 wrong type'
  * 
  *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])             # <<<<<<<<<<<<<<
  * 
  *         if _r.IsEmpty():
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_key); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 213; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_key); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v__r = new keyvi::dictionary::Match(((*__pyx_v_self->inst.get())[((const char *)__pyx_t_2)]));
 
-  /* "pykeyvi.pyx":215
+  /* "pykeyvi.pyx":230
  *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])
  * 
  *         if _r.IsEmpty():             # <<<<<<<<<<<<<<
@@ -4571,7 +4851,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_
   __pyx_t_1 = (__pyx_v__r->IsEmpty() != 0);
   if (__pyx_t_1) {
 
-    /* "pykeyvi.pyx":216
+    /* "pykeyvi.pyx":231
  * 
  *         if _r.IsEmpty():
  *             return default             # <<<<<<<<<<<<<<
@@ -4584,20 +4864,20 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_
     goto __pyx_L0;
   }
 
-  /* "pykeyvi.pyx":217
+  /* "pykeyvi.pyx":232
  *         if _r.IsEmpty():
  *             return default
  *         cdef Match py_result = Match.__new__(Match)             # <<<<<<<<<<<<<<
  *         py_result.inst = shared_ptr[_Match](_r)
  *         return py_result
  */
-  __pyx_t_3 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 217; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 232; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_Match *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pykeyvi.pyx":218
+  /* "pykeyvi.pyx":233
  *             return default
  *         cdef Match py_result = Match.__new__(Match)
  *         py_result.inst = shared_ptr[_Match](_r)             # <<<<<<<<<<<<<<
@@ -4606,7 +4886,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_
  */
   __pyx_v_py_result->inst = boost::shared_ptr<keyvi::dictionary::Match> (__pyx_v__r);
 
-  /* "pykeyvi.pyx":219
+  /* "pykeyvi.pyx":234
  *         cdef Match py_result = Match.__new__(Match)
  *         py_result.inst = shared_ptr[_Match](_r)
  *         return py_result             # <<<<<<<<<<<<<<
@@ -4618,7 +4898,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":210
+  /* "pykeyvi.pyx":225
  *         return py_result
  * 
  *     def get (self, key, default = None):             # <<<<<<<<<<<<<<
@@ -4638,7 +4918,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":222
+/* "pykeyvi.pyx":237
  * 
  * 
  *     def __getitem__ (self, key):             # <<<<<<<<<<<<<<
@@ -4647,19 +4927,19 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_12get(struct __pyx_obj_7pykeyvi_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_15__getitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_key); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_15__getitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_key) {
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_17__getitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_key); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_17__getitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_key) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__getitem__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_14__getitem__(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject *)__pyx_v_key));
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_16__getitem__(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject *)__pyx_v_key));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14__getitem__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key) {
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16__getitem__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key) {
   keyvi::dictionary::Match *__pyx_v__r;
   struct __pyx_obj_7pykeyvi_Match *__pyx_v_py_result = 0;
   PyObject *__pyx_r = NULL;
@@ -4673,7 +4953,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14__getitem__(struct __pyx_obj_7
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__getitem__", 0);
 
-  /* "pykeyvi.pyx":223
+  /* "pykeyvi.pyx":238
  * 
  *     def __getitem__ (self, key):
  *         assert isinstance(key, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -4685,22 +4965,22 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14__getitem__(struct __pyx_obj_7
     __pyx_t_1 = PyBytes_Check(__pyx_v_key); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":225
+  /* "pykeyvi.pyx":240
  *         assert isinstance(key, bytes), 'arg in_0 wrong type'
  * 
  *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])             # <<<<<<<<<<<<<<
  * 
  *         if _r.IsEmpty():
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_key); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 225; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_key); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v__r = new keyvi::dictionary::Match(((*__pyx_v_self->inst.get())[((const char *)__pyx_t_2)]));
 
-  /* "pykeyvi.pyx":227
+  /* "pykeyvi.pyx":242
  *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])
  * 
  *         if _r.IsEmpty():             # <<<<<<<<<<<<<<
@@ -4710,40 +4990,40 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14__getitem__(struct __pyx_obj_7
   __pyx_t_1 = (__pyx_v__r->IsEmpty() != 0);
   if (__pyx_t_1) {
 
-    /* "pykeyvi.pyx":228
+    /* "pykeyvi.pyx":243
  * 
  *         if _r.IsEmpty():
  *             raise KeyError(key)             # <<<<<<<<<<<<<<
  *         cdef Match py_result = Match.__new__(Match)
  *         py_result.inst = shared_ptr[_Match](_r)
  */
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_key);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_key);
     __Pyx_GIVEREF(__pyx_v_key);
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_KeyError, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":229
+  /* "pykeyvi.pyx":244
  *         if _r.IsEmpty():
  *             raise KeyError(key)
  *         cdef Match py_result = Match.__new__(Match)             # <<<<<<<<<<<<<<
  *         py_result.inst = shared_ptr[_Match](_r)
  *         return py_result
  */
-  __pyx_t_4 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 244; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 229; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_4, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 244; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_Match *)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "pykeyvi.pyx":230
+  /* "pykeyvi.pyx":245
  *             raise KeyError(key)
  *         cdef Match py_result = Match.__new__(Match)
  *         py_result.inst = shared_ptr[_Match](_r)             # <<<<<<<<<<<<<<
@@ -4752,7 +5032,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14__getitem__(struct __pyx_obj_7
  */
   __pyx_v_py_result->inst = boost::shared_ptr<keyvi::dictionary::Match> (__pyx_v__r);
 
-  /* "pykeyvi.pyx":231
+  /* "pykeyvi.pyx":246
  *         cdef Match py_result = Match.__new__(Match)
  *         py_result.inst = shared_ptr[_Match](_r)
  *         return py_result             # <<<<<<<<<<<<<<
@@ -4764,7 +5044,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14__getitem__(struct __pyx_obj_7
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":222
+  /* "pykeyvi.pyx":237
  * 
  * 
  *     def __getitem__ (self, key):             # <<<<<<<<<<<<<<
@@ -4784,9 +5064,9 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_14__getitem__(struct __pyx_obj_7
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_7pykeyvi_10Dictionary_20generator(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "pykeyvi.pyx":233
+/* "pykeyvi.pyx":248
  *         return py_result
  * 
  *     def _key_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -4795,19 +5075,19 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_17_key_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_17_key_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator) {
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_19_key_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_19_key_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_key_iterator_wrapper (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_16_key_iterator_wrapper(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject *)__pyx_v_iterator));
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_18_key_iterator_wrapper(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject *)__pyx_v_iterator));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16_key_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator) {
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_18_key_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator) {
   struct __pyx_obj_7pykeyvi___pyx_scope_struct___key_iterator_wrapper *__pyx_cur_scope;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -4828,7 +5108,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16_key_iterator_wrapper(CYTHON_U
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_iterator);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_iterator);
   {
-    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7pykeyvi_10Dictionary_18generator, (PyObject *) __pyx_cur_scope, __pyx_n_s_key_iterator_wrapper, __pyx_n_s_Dictionary__key_iterator_wrapper); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7pykeyvi_10Dictionary_20generator, (PyObject *) __pyx_cur_scope, __pyx_n_s_key_iterator_wrapper, __pyx_n_s_Dictionary__key_iterator_wrapper); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -4844,7 +5124,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16_key_iterator_wrapper(CYTHON_U
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_7pykeyvi_10Dictionary_20generator(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value) /* generator body */
 {
   struct __pyx_obj_7pykeyvi___pyx_scope_struct___key_iterator_wrapper *__pyx_cur_scope = ((struct __pyx_obj_7pykeyvi___pyx_scope_struct___key_iterator_wrapper *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
@@ -4867,9 +5147,9 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "pykeyvi.pyx":234
+  /* "pykeyvi.pyx":249
  * 
  *     def _key_iterator_wrapper(self, iterator):
  *         for m in iterator:             # <<<<<<<<<<<<<<
@@ -4880,25 +5160,25 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
     __pyx_t_1 = __pyx_cur_scope->__pyx_v_iterator; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_iterator); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_iterator); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       } else {
         if (__pyx_t_2 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       }
     } else {
@@ -4907,7 +5187,7 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 249; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         break;
       }
@@ -4918,14 +5198,14 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "pykeyvi.pyx":235
+    /* "pykeyvi.pyx":250
  *     def _key_iterator_wrapper(self, iterator):
  *         for m in iterator:
  *             yield m.GetMatchedString()             # <<<<<<<<<<<<<<
  * 
  *     def _value_iterator_wrapper(self, iterator):
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_m, __pyx_n_s_GetMatchedString); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_m, __pyx_n_s_GetMatchedString); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_5))) {
@@ -4938,10 +5218,10 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
       }
     }
     if (__pyx_t_6) {
-      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     } else {
-      __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -4962,9 +5242,9 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
     __Pyx_XGOTREF(__pyx_t_1);
     __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
     __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
-    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "pykeyvi.pyx":234
+    /* "pykeyvi.pyx":249
  * 
  *     def _key_iterator_wrapper(self, iterator):
  *         for m in iterator:             # <<<<<<<<<<<<<<
@@ -4974,7 +5254,7 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":233
+  /* "pykeyvi.pyx":248
  *         return py_result
  * 
  *     def _key_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -4998,9 +5278,9 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_18generator(__pyx_GeneratorObjec
   __Pyx_RefNannyFinishContext();
   return NULL;
 }
-static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_7pykeyvi_10Dictionary_23generator1(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "pykeyvi.pyx":237
+/* "pykeyvi.pyx":252
  *             yield m.GetMatchedString()
  * 
  *     def _value_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -5009,19 +5289,19 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_20_value_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_20_value_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator) {
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_22_value_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_22_value_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_value_iterator_wrapper (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_19_value_iterator_wrapper(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject *)__pyx_v_iterator));
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_21_value_iterator_wrapper(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject *)__pyx_v_iterator));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_19_value_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator) {
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_21_value_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator) {
   struct __pyx_obj_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper *__pyx_cur_scope;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -5042,7 +5322,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_19_value_iterator_wrapper(CYTHON
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_iterator);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_iterator);
   {
-    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7pykeyvi_10Dictionary_21generator1, (PyObject *) __pyx_cur_scope, __pyx_n_s_value_iterator_wrapper, __pyx_n_s_Dictionary__value_iterator_wrapp); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7pykeyvi_10Dictionary_23generator1, (PyObject *) __pyx_cur_scope, __pyx_n_s_value_iterator_wrapper, __pyx_n_s_Dictionary__value_iterator_wrapp); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -5058,7 +5338,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_19_value_iterator_wrapper(CYTHON
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_7pykeyvi_10Dictionary_23generator1(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value) /* generator body */
 {
   struct __pyx_obj_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper *__pyx_cur_scope = ((struct __pyx_obj_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
@@ -5081,9 +5361,9 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "pykeyvi.pyx":238
+  /* "pykeyvi.pyx":253
  * 
  *     def _value_iterator_wrapper(self, iterator):
  *         for m in iterator:             # <<<<<<<<<<<<<<
@@ -5094,25 +5374,25 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
     __pyx_t_1 = __pyx_cur_scope->__pyx_v_iterator; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_iterator); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_iterator); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       } else {
         if (__pyx_t_2 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       }
     } else {
@@ -5121,7 +5401,7 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 253; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         break;
       }
@@ -5132,14 +5412,14 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "pykeyvi.pyx":239
+    /* "pykeyvi.pyx":254
  *     def _value_iterator_wrapper(self, iterator):
  *         for m in iterator:
  *             yield m.GetRawValueAsString()             # <<<<<<<<<<<<<<
  * 
  *     def _item_iterator_wrapper(self, iterator):
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_m, __pyx_n_s_GetRawValueAsString); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_m, __pyx_n_s_GetRawValueAsString); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_5))) {
@@ -5152,10 +5432,10 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
       }
     }
     if (__pyx_t_6) {
-      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     } else {
-      __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -5176,9 +5456,9 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
     __Pyx_XGOTREF(__pyx_t_1);
     __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
     __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
-    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "pykeyvi.pyx":238
+    /* "pykeyvi.pyx":253
  * 
  *     def _value_iterator_wrapper(self, iterator):
  *         for m in iterator:             # <<<<<<<<<<<<<<
@@ -5188,7 +5468,7 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":237
+  /* "pykeyvi.pyx":252
  *             yield m.GetMatchedString()
  * 
  *     def _value_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -5212,9 +5492,9 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_21generator1(__pyx_GeneratorObje
   __Pyx_RefNannyFinishContext();
   return NULL;
 }
-static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_7pykeyvi_10Dictionary_26generator2(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value); /* proto */
 
-/* "pykeyvi.pyx":241
+/* "pykeyvi.pyx":256
  *             yield m.GetRawValueAsString()
  * 
  *     def _item_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -5223,19 +5503,19 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_23_item_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_23_item_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator) {
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_25_item_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_25_item_iterator_wrapper(PyObject *__pyx_v_self, PyObject *__pyx_v_iterator) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_item_iterator_wrapper (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_22_item_iterator_wrapper(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject *)__pyx_v_iterator));
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_24_item_iterator_wrapper(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self), ((PyObject *)__pyx_v_iterator));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22_item_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator) {
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_24_item_iterator_wrapper(CYTHON_UNUSED struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_iterator) {
   struct __pyx_obj_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper *__pyx_cur_scope;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -5256,7 +5536,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22_item_iterator_wrapper(CYTHON_
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_iterator);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_iterator);
   {
-    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7pykeyvi_10Dictionary_24generator2, (PyObject *) __pyx_cur_scope, __pyx_n_s_item_iterator_wrapper, __pyx_n_s_Dictionary__item_iterator_wrappe); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 241; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_GeneratorObject *gen = __Pyx_Generator_New((__pyx_generator_body_t) __pyx_gb_7pykeyvi_10Dictionary_26generator2, (PyObject *) __pyx_cur_scope, __pyx_n_s_item_iterator_wrapper, __pyx_n_s_Dictionary__item_iterator_wrappe); if (unlikely(!gen)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 256; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -5272,7 +5552,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22_item_iterator_wrapper(CYTHON_
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_7pykeyvi_10Dictionary_26generator2(__pyx_GeneratorObject *__pyx_generator, PyObject *__pyx_sent_value) /* generator body */
 {
   struct __pyx_obj_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper *__pyx_cur_scope = ((struct __pyx_obj_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
@@ -5296,9 +5576,9 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
     return NULL;
   }
   __pyx_L3_first_run:;
-  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 241; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 256; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "pykeyvi.pyx":242
+  /* "pykeyvi.pyx":257
  * 
  *     def _item_iterator_wrapper(self, iterator):
  *         for m in iterator:             # <<<<<<<<<<<<<<
@@ -5309,25 +5589,25 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
     __pyx_t_1 = __pyx_cur_scope->__pyx_v_iterator; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
     __pyx_t_3 = NULL;
   } else {
-    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_iterator); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_cur_scope->__pyx_v_iterator); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   for (;;) {
     if (likely(!__pyx_t_3)) {
       if (likely(PyList_CheckExact(__pyx_t_1))) {
         if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       } else {
         if (__pyx_t_2 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_4); __pyx_t_2++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_4 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #endif
       }
     } else {
@@ -5336,7 +5616,7 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         break;
       }
@@ -5347,14 +5627,14 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "pykeyvi.pyx":243
+    /* "pykeyvi.pyx":258
  *     def _item_iterator_wrapper(self, iterator):
  *         for m in iterator:
  *             yield (m.GetMatchedString(), m.GetRawValueAsString())             # <<<<<<<<<<<<<<
  * 
  *     def GetAllKeys(self):
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_m, __pyx_n_s_GetMatchedString); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_m, __pyx_n_s_GetMatchedString); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_5))) {
@@ -5367,14 +5647,14 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
       }
     }
     if (__pyx_t_6) {
-      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     } else {
-      __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_m, __pyx_n_s_GetRawValueAsString); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_m, __pyx_n_s_GetRawValueAsString); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_7 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_6))) {
@@ -5387,14 +5667,14 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
       }
     }
     if (__pyx_t_7) {
-      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     } else {
-      __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_6); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = __Pyx_PyObject_CallNoArg(__pyx_t_6); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyTuple_New(2); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_4);
@@ -5419,9 +5699,9 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
     __Pyx_XGOTREF(__pyx_t_1);
     __pyx_t_2 = __pyx_cur_scope->__pyx_t_1;
     __pyx_t_3 = __pyx_cur_scope->__pyx_t_2;
-    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(!__pyx_sent_value)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "pykeyvi.pyx":242
+    /* "pykeyvi.pyx":257
  * 
  *     def _item_iterator_wrapper(self, iterator):
  *         for m in iterator:             # <<<<<<<<<<<<<<
@@ -5431,7 +5711,7 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":241
+  /* "pykeyvi.pyx":256
  *             yield m.GetRawValueAsString()
  * 
  *     def _item_iterator_wrapper(self, iterator):             # <<<<<<<<<<<<<<
@@ -5457,7 +5737,7 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
   return NULL;
 }
 
-/* "pykeyvi.pyx":245
+/* "pykeyvi.pyx":260
  *             yield (m.GetMatchedString(), m.GetRawValueAsString())
  * 
  *     def GetAllKeys(self):             # <<<<<<<<<<<<<<
@@ -5466,19 +5746,19 @@ static PyObject *__pyx_gb_7pykeyvi_10Dictionary_24generator2(__pyx_GeneratorObje
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_26GetAllKeys(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_26GetAllKeys(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_28GetAllKeys(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_28GetAllKeys(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("GetAllKeys (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_27GetAllKeys(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self) {
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllKeys(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self) {
   keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
   struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
   PyObject *__pyx_r = NULL;
@@ -5492,7 +5772,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetAllKeys", 0);
 
-  /* "pykeyvi.pyx":246
+  /* "pykeyvi.pyx":261
  * 
  *     def GetAllKeys(self):
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()             # <<<<<<<<<<<<<<
@@ -5501,20 +5781,20 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetAllItems();
 
-  /* "pykeyvi.pyx":247
+  /* "pykeyvi.pyx":262
  *     def GetAllKeys(self):
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_1 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 262; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":248
+  /* "pykeyvi.pyx":263
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -5523,7 +5803,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":249
+  /* "pykeyvi.pyx":264
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -5532,7 +5812,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":250
+  /* "pykeyvi.pyx":265
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return self._key_iterator_wrapper(py_result)             # <<<<<<<<<<<<<<
@@ -5540,7 +5820,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
  *     def GetAllValues(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_key_iterator_wrapper); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_key_iterator_wrapper); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 265; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5553,16 +5833,16 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_py_result)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_py_result)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 265; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 265; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_py_result));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_py_result));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 265; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -5571,7 +5851,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":245
+  /* "pykeyvi.pyx":260
  *             yield (m.GetMatchedString(), m.GetRawValueAsString())
  * 
  *     def GetAllKeys(self):             # <<<<<<<<<<<<<<
@@ -5594,7 +5874,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":252
+/* "pykeyvi.pyx":267
  *         return self._key_iterator_wrapper(py_result)
  * 
  *     def GetAllValues(self):             # <<<<<<<<<<<<<<
@@ -5603,19 +5883,19 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_25GetAllKeys(struct __pyx_obj_7p
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_28GetAllValues(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_28GetAllValues(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_30GetAllValues(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_30GetAllValues(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("GetAllValues (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_29GetAllValues(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self) {
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllValues(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self) {
   keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
   struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
   PyObject *__pyx_r = NULL;
@@ -5629,7 +5909,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetAllValues", 0);
 
-  /* "pykeyvi.pyx":253
+  /* "pykeyvi.pyx":268
  * 
  *     def GetAllValues(self):
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()             # <<<<<<<<<<<<<<
@@ -5638,20 +5918,20 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetAllItems();
 
-  /* "pykeyvi.pyx":254
+  /* "pykeyvi.pyx":269
  *     def GetAllValues(self):
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_1 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":255
+  /* "pykeyvi.pyx":270
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -5660,7 +5940,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":256
+  /* "pykeyvi.pyx":271
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -5669,7 +5949,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":257
+  /* "pykeyvi.pyx":272
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return self._value_iterator_wrapper(py_result)             # <<<<<<<<<<<<<<
@@ -5677,7 +5957,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
  *     def GetAllItems(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_value_iterator_wrapper); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_value_iterator_wrapper); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 272; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5690,16 +5970,16 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_py_result)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_py_result)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 272; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 272; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_py_result));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_py_result));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 272; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -5708,7 +5988,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":252
+  /* "pykeyvi.pyx":267
  *         return self._key_iterator_wrapper(py_result)
  * 
  *     def GetAllValues(self):             # <<<<<<<<<<<<<<
@@ -5731,7 +6011,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":259
+/* "pykeyvi.pyx":274
  *         return self._value_iterator_wrapper(py_result)
  * 
  *     def GetAllItems(self):             # <<<<<<<<<<<<<<
@@ -5740,19 +6020,19 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_27GetAllValues(struct __pyx_obj_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_30GetAllItems(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_10Dictionary_30GetAllItems(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_32GetAllItems(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_10Dictionary_32GetAllItems(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("GetAllItems (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7pykeyvi_10Dictionary_31GetAllItems(((struct __pyx_obj_7pykeyvi_Dictionary *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self) {
+static PyObject *__pyx_pf_7pykeyvi_10Dictionary_31GetAllItems(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self) {
   keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_v__r;
   struct __pyx_obj_7pykeyvi_MatchIterator *__pyx_v_py_result = 0;
   PyObject *__pyx_r = NULL;
@@ -5766,7 +6046,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetAllItems", 0);
 
-  /* "pykeyvi.pyx":260
+  /* "pykeyvi.pyx":275
  * 
  *     def GetAllItems(self):
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()             # <<<<<<<<<<<<<<
@@ -5775,20 +6055,20 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetAllItems();
 
-  /* "pykeyvi.pyx":261
+  /* "pykeyvi.pyx":276
  *     def GetAllItems(self):
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_1 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":262
+  /* "pykeyvi.pyx":277
  *         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -5797,7 +6077,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":263
+  /* "pykeyvi.pyx":278
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -5806,7 +6086,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":264
+  /* "pykeyvi.pyx":279
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return self._item_iterator_wrapper(py_result)             # <<<<<<<<<<<<<<
@@ -5814,7 +6094,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7
  * cdef class FsaTransform:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_item_iterator_wrapper); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_item_iterator_wrapper); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5827,16 +6107,16 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7
     }
   }
   if (!__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_py_result)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, ((PyObject *)__pyx_v_py_result)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
     __Pyx_INCREF(((PyObject *)__pyx_v_py_result));
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, ((PyObject *)__pyx_v_py_result));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_py_result));
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -5845,7 +6125,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":259
+  /* "pykeyvi.pyx":274
  *         return self._value_iterator_wrapper(py_result)
  * 
  *     def GetAllItems(self):             # <<<<<<<<<<<<<<
@@ -5868,7 +6148,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_29GetAllItems(struct __pyx_obj_7
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":270
+/* "pykeyvi.pyx":285
  *     cdef shared_ptr[_FsaTransform] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -5891,7 +6171,7 @@ static void __pyx_pf_7pykeyvi_12FsaTransform___dealloc__(struct __pyx_obj_7pykey
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":271
+  /* "pykeyvi.pyx":286
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -5900,7 +6180,7 @@ static void __pyx_pf_7pykeyvi_12FsaTransform___dealloc__(struct __pyx_obj_7pykey
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":270
+  /* "pykeyvi.pyx":285
  *     cdef shared_ptr[_FsaTransform] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -5912,7 +6192,7 @@ static void __pyx_pf_7pykeyvi_12FsaTransform___dealloc__(struct __pyx_obj_7pykey
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":274
+/* "pykeyvi.pyx":289
  * 
  * 
  *     def Normalize(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -5929,7 +6209,7 @@ static PyObject *__pyx_pw_7pykeyvi_12FsaTransform_3Normalize(PyObject *__pyx_v_s
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("Normalize (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_12FsaTransform_2Normalize(((struct __pyx_obj_7pykeyvi_FsaTransform *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -5954,7 +6234,7 @@ static PyObject *__pyx_pf_7pykeyvi_12FsaTransform_2Normalize(struct __pyx_obj_7p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Normalize", 0);
 
-  /* "pykeyvi.pyx":275
+  /* "pykeyvi.pyx":290
  * 
  *     def Normalize(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -5966,22 +6246,22 @@ static PyObject *__pyx_pf_7pykeyvi_12FsaTransform_2Normalize(struct __pyx_obj_7p
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 290; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":277
+  /* "pykeyvi.pyx":292
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  * 
  *         cdef libcpp_string _r = self.inst.get().Normalize((<libcpp_string>in_0))             # <<<<<<<<<<<<<<
  *         py_result = <libcpp_string>_r
  *         return py_result
  */
-  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_v_in_0); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_v_in_0); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 292; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v__r = __pyx_v_self->inst.get()->Normalize(((std::string)__pyx_t_2));
 
-  /* "pykeyvi.pyx":278
+  /* "pykeyvi.pyx":293
  * 
  *         cdef libcpp_string _r = self.inst.get().Normalize((<libcpp_string>in_0))
  *         py_result = <libcpp_string>_r             # <<<<<<<<<<<<<<
@@ -5990,7 +6270,7 @@ static PyObject *__pyx_pf_7pykeyvi_12FsaTransform_2Normalize(struct __pyx_obj_7p
  */
   __pyx_v_py_result = ((std::string)__pyx_v__r);
 
-  /* "pykeyvi.pyx":279
+  /* "pykeyvi.pyx":294
  *         cdef libcpp_string _r = self.inst.get().Normalize((<libcpp_string>in_0))
  *         py_result = <libcpp_string>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -5998,13 +6278,13 @@ static PyObject *__pyx_pf_7pykeyvi_12FsaTransform_2Normalize(struct __pyx_obj_7p
  *     def __init__(self, Dictionary in_0 ):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 279; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":274
+  /* "pykeyvi.pyx":289
  * 
  * 
  *     def Normalize(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -6023,7 +6303,7 @@ static PyObject *__pyx_pf_7pykeyvi_12FsaTransform_2Normalize(struct __pyx_obj_7p
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":281
+/* "pykeyvi.pyx":296
  *         return py_result
  * 
  *     def __init__(self, Dictionary in_0 ):             # <<<<<<<<<<<<<<
@@ -6059,7 +6339,7 @@ static int __pyx_pw_7pykeyvi_12FsaTransform_5__init__(PyObject *__pyx_v_self, Py
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -6070,13 +6350,13 @@ static int __pyx_pw_7pykeyvi_12FsaTransform_5__init__(PyObject *__pyx_v_self, Py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.FsaTransform.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_12FsaTransform_4__init__(((struct __pyx_obj_7pykeyvi_FsaTransform *)__pyx_v_self), __pyx_v_in_0);
 
   /* function exit code */
@@ -6100,7 +6380,7 @@ static int __pyx_pf_7pykeyvi_12FsaTransform_4__init__(struct __pyx_obj_7pykeyvi_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":282
+  /* "pykeyvi.pyx":297
  * 
  *     def __init__(self, Dictionary in_0 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -6112,12 +6392,12 @@ static int __pyx_pf_7pykeyvi_12FsaTransform_4__init__(struct __pyx_obj_7pykeyvi_
     __pyx_t_1 = __Pyx_TypeCheck(((PyObject *)__pyx_v_in_0), ((PyObject*)__pyx_ptype_7pykeyvi_Dictionary)); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 297; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":283
+  /* "pykeyvi.pyx":298
  *     def __init__(self, Dictionary in_0 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst             # <<<<<<<<<<<<<<
@@ -6127,7 +6407,7 @@ static int __pyx_pf_7pykeyvi_12FsaTransform_4__init__(struct __pyx_obj_7pykeyvi_
   __pyx_t_2 = __pyx_v_in_0->inst;
   __pyx_v_input_in_0 = __pyx_t_2;
 
-  /* "pykeyvi.pyx":284
+  /* "pykeyvi.pyx":299
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
  *         self.inst = shared_ptr[_FsaTransform](new _FsaTransform(input_in_0))             # <<<<<<<<<<<<<<
@@ -6138,11 +6418,11 @@ static int __pyx_pf_7pykeyvi_12FsaTransform_4__init__(struct __pyx_obj_7pykeyvi_
     __pyx_t_3 = new keyvi::transform::FsaTransform(__pyx_v_input_in_0);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::transform::FsaTransform> (__pyx_t_3);
 
-  /* "pykeyvi.pyx":281
+  /* "pykeyvi.pyx":296
  *         return py_result
  * 
  *     def __init__(self, Dictionary in_0 ):             # <<<<<<<<<<<<<<
@@ -6161,7 +6441,7 @@ static int __pyx_pf_7pykeyvi_12FsaTransform_4__init__(struct __pyx_obj_7pykeyvi_
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":290
+/* "pykeyvi.pyx":305
  *     cdef shared_ptr[_PrefixCompletion] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -6184,7 +6464,7 @@ static void __pyx_pf_7pykeyvi_16PrefixCompletion___dealloc__(struct __pyx_obj_7p
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":291
+  /* "pykeyvi.pyx":306
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -6193,7 +6473,7 @@ static void __pyx_pf_7pykeyvi_16PrefixCompletion___dealloc__(struct __pyx_obj_7p
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":290
+  /* "pykeyvi.pyx":305
  *     cdef shared_ptr[_PrefixCompletion] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -6205,7 +6485,7 @@ static void __pyx_pf_7pykeyvi_16PrefixCompletion___dealloc__(struct __pyx_obj_7p
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":294
+/* "pykeyvi.pyx":309
  * 
  * 
  *     def GetFuzzyCompletions(self, bytes in_0 ,  max_edit_distance ):             # <<<<<<<<<<<<<<
@@ -6244,11 +6524,11 @@ static PyObject *__pyx_pw_7pykeyvi_16PrefixCompletion_3GetFuzzyCompletions(PyObj
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_max_edit_distance)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("GetFuzzyCompletions", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("GetFuzzyCompletions", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "GetFuzzyCompletions") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "GetFuzzyCompletions") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -6261,13 +6541,13 @@ static PyObject *__pyx_pw_7pykeyvi_16PrefixCompletion_3GetFuzzyCompletions(PyObj
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("GetFuzzyCompletions", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("GetFuzzyCompletions", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.PrefixCompletion.GetFuzzyCompletions", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 294; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_16PrefixCompletion_2GetFuzzyCompletions(((struct __pyx_obj_7pykeyvi_PrefixCompletion *)__pyx_v_self), __pyx_v_in_0, __pyx_v_max_edit_distance);
 
   /* function exit code */
@@ -6296,7 +6576,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_2GetFuzzyCompletions(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetFuzzyCompletions", 0);
 
-  /* "pykeyvi.pyx":295
+  /* "pykeyvi.pyx":310
  * 
  *     def GetFuzzyCompletions(self, bytes in_0 ,  max_edit_distance ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -6308,12 +6588,12 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_2GetFuzzyCompletions(struc
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":296
+  /* "pykeyvi.pyx":311
  *     def GetFuzzyCompletions(self, bytes in_0 ,  max_edit_distance ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(max_edit_distance, (int, long)), 'arg max_edit_distance wrong type'             # <<<<<<<<<<<<<<
@@ -6335,45 +6615,45 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_2GetFuzzyCompletions(struc
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_max_edit_distance_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 311; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":297
+  /* "pykeyvi.pyx":312
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(max_edit_distance, (int, long)), 'arg max_edit_distance wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetFuzzyCompletions(input_in_0, (<int>max_edit_distance))
  */
-  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 297; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_4);
 
-  /* "pykeyvi.pyx":299
+  /* "pykeyvi.pyx":314
  *         cdef const_char * input_in_0 = <const_char *> in_0
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetFuzzyCompletions(input_in_0, (<int>max_edit_distance))             # <<<<<<<<<<<<<<
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  */
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_max_edit_distance); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_max_edit_distance); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v__r = __pyx_v_self->inst.get()->GetFuzzyCompletions(__pyx_v_input_in_0, ((int)__pyx_t_5));
 
-  /* "pykeyvi.pyx":300
+  /* "pykeyvi.pyx":315
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetFuzzyCompletions(input_in_0, (<int>max_edit_distance))
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_6 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 300; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 300; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "pykeyvi.pyx":301
+  /* "pykeyvi.pyx":316
  *         cdef _MatchIteratorPair _r = self.inst.get().GetFuzzyCompletions(input_in_0, (<int>max_edit_distance))
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -6382,7 +6662,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_2GetFuzzyCompletions(struc
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":302
+  /* "pykeyvi.pyx":317
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -6391,7 +6671,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_2GetFuzzyCompletions(struc
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":303
+  /* "pykeyvi.pyx":318
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return py_result             # <<<<<<<<<<<<<<
@@ -6403,7 +6683,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_2GetFuzzyCompletions(struc
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":294
+  /* "pykeyvi.pyx":309
  * 
  * 
  *     def GetFuzzyCompletions(self, bytes in_0 ,  max_edit_distance ):             # <<<<<<<<<<<<<<
@@ -6423,7 +6703,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_2GetFuzzyCompletions(struc
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":305
+/* "pykeyvi.pyx":320
  *         return py_result
  * 
  *     def __init__(self, Dictionary in_0 ):             # <<<<<<<<<<<<<<
@@ -6459,7 +6739,7 @@ static int __pyx_pw_7pykeyvi_16PrefixCompletion_5__init__(PyObject *__pyx_v_self
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 320; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -6470,13 +6750,13 @@ static int __pyx_pw_7pykeyvi_16PrefixCompletion_5__init__(PyObject *__pyx_v_self
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 320; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.PrefixCompletion.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 320; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_16PrefixCompletion_4__init__(((struct __pyx_obj_7pykeyvi_PrefixCompletion *)__pyx_v_self), __pyx_v_in_0);
 
   /* function exit code */
@@ -6500,7 +6780,7 @@ static int __pyx_pf_7pykeyvi_16PrefixCompletion_4__init__(struct __pyx_obj_7pyke
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":306
+  /* "pykeyvi.pyx":321
  * 
  *     def __init__(self, Dictionary in_0 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -6512,12 +6792,12 @@ static int __pyx_pf_7pykeyvi_16PrefixCompletion_4__init__(struct __pyx_obj_7pyke
     __pyx_t_1 = __Pyx_TypeCheck(((PyObject *)__pyx_v_in_0), ((PyObject*)__pyx_ptype_7pykeyvi_Dictionary)); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 321; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":307
+  /* "pykeyvi.pyx":322
  *     def __init__(self, Dictionary in_0 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst             # <<<<<<<<<<<<<<
@@ -6527,7 +6807,7 @@ static int __pyx_pf_7pykeyvi_16PrefixCompletion_4__init__(struct __pyx_obj_7pyke
   __pyx_t_2 = __pyx_v_in_0->inst;
   __pyx_v_input_in_0 = __pyx_t_2;
 
-  /* "pykeyvi.pyx":308
+  /* "pykeyvi.pyx":323
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
  *         self.inst = shared_ptr[_PrefixCompletion](new _PrefixCompletion(input_in_0))             # <<<<<<<<<<<<<<
@@ -6538,11 +6818,11 @@ static int __pyx_pf_7pykeyvi_16PrefixCompletion_4__init__(struct __pyx_obj_7pyke
     __pyx_t_3 = new keyvi::dictionary::completion::PrefixCompletion(__pyx_v_input_in_0);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 308; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 323; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::completion::PrefixCompletion> (__pyx_t_3);
 
-  /* "pykeyvi.pyx":305
+  /* "pykeyvi.pyx":320
  *         return py_result
  * 
  *     def __init__(self, Dictionary in_0 ):             # <<<<<<<<<<<<<<
@@ -6561,7 +6841,7 @@ static int __pyx_pf_7pykeyvi_16PrefixCompletion_4__init__(struct __pyx_obj_7pyke
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":310
+/* "pykeyvi.pyx":325
  *         self.inst = shared_ptr[_PrefixCompletion](new _PrefixCompletion(input_in_0))
  * 
  *     def GetCompletions(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -6578,7 +6858,7 @@ static PyObject *__pyx_pw_7pykeyvi_16PrefixCompletion_7GetCompletions(PyObject *
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("GetCompletions (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 325; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_16PrefixCompletion_6GetCompletions(((struct __pyx_obj_7pykeyvi_PrefixCompletion *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -6604,7 +6884,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_6GetCompletions(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetCompletions", 0);
 
-  /* "pykeyvi.pyx":311
+  /* "pykeyvi.pyx":326
  * 
  *     def GetCompletions(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -6616,22 +6896,22 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_6GetCompletions(struct __p
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 311; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":312
+  /* "pykeyvi.pyx":327
  *     def GetCompletions(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":313
+  /* "pykeyvi.pyx":328
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)             # <<<<<<<<<<<<<<
@@ -6640,20 +6920,20 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_6GetCompletions(struct __p
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetCompletions(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":314
+  /* "pykeyvi.pyx":329
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 329; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 329; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pykeyvi.pyx":315
+  /* "pykeyvi.pyx":330
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -6662,7 +6942,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_6GetCompletions(struct __p
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":316
+  /* "pykeyvi.pyx":331
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -6671,7 +6951,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_6GetCompletions(struct __p
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":317
+  /* "pykeyvi.pyx":332
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return py_result             # <<<<<<<<<<<<<<
@@ -6683,7 +6963,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_6GetCompletions(struct __p
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":310
+  /* "pykeyvi.pyx":325
  *         self.inst = shared_ptr[_PrefixCompletion](new _PrefixCompletion(input_in_0))
  * 
  *     def GetCompletions(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -6703,7 +6983,7 @@ static PyObject *__pyx_pf_7pykeyvi_16PrefixCompletion_6GetCompletions(struct __p
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":323
+/* "pykeyvi.pyx":338
  *     cdef shared_ptr[_ForwardBackwardCompletion] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -6726,7 +7006,7 @@ static void __pyx_pf_7pykeyvi_25ForwardBackwardCompletion___dealloc__(struct __p
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":324
+  /* "pykeyvi.pyx":339
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -6735,7 +7015,7 @@ static void __pyx_pf_7pykeyvi_25ForwardBackwardCompletion___dealloc__(struct __p
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":323
+  /* "pykeyvi.pyx":338
  *     cdef shared_ptr[_ForwardBackwardCompletion] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -6747,7 +7027,7 @@ static void __pyx_pf_7pykeyvi_25ForwardBackwardCompletion___dealloc__(struct __p
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":327
+/* "pykeyvi.pyx":342
  * 
  * 
  *     def _GetCompletions_0(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -6764,7 +7044,7 @@ static PyObject *__pyx_pw_7pykeyvi_25ForwardBackwardCompletion_3_GetCompletions_
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_GetCompletions_0 (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 342; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_2_GetCompletions_0(((struct __pyx_obj_7pykeyvi_ForwardBackwardCompletion *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -6790,7 +7070,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_2_GetCompletions_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_GetCompletions_0", 0);
 
-  /* "pykeyvi.pyx":328
+  /* "pykeyvi.pyx":343
  * 
  *     def _GetCompletions_0(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -6802,22 +7082,22 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_2_GetCompletions_
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 343; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":329
+  /* "pykeyvi.pyx":344
  *     def _GetCompletions_0(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 329; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":330
+  /* "pykeyvi.pyx":345
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)             # <<<<<<<<<<<<<<
@@ -6826,20 +7106,20 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_2_GetCompletions_
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetCompletions(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":331
+  /* "pykeyvi.pyx":346
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pykeyvi.pyx":332
+  /* "pykeyvi.pyx":347
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -6848,7 +7128,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_2_GetCompletions_
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":333
+  /* "pykeyvi.pyx":348
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -6857,7 +7137,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_2_GetCompletions_
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":334
+  /* "pykeyvi.pyx":349
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return py_result             # <<<<<<<<<<<<<<
@@ -6869,7 +7149,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_2_GetCompletions_
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":327
+  /* "pykeyvi.pyx":342
  * 
  * 
  *     def _GetCompletions_0(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -6889,7 +7169,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_2_GetCompletions_
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":336
+/* "pykeyvi.pyx":351
  *         return py_result
  * 
  *     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):             # <<<<<<<<<<<<<<
@@ -6928,11 +7208,11 @@ static PyObject *__pyx_pw_7pykeyvi_25ForwardBackwardCompletion_5_GetCompletions_
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_in_1)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_GetCompletions_1", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 336; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_GetCompletions_1", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_GetCompletions_1") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 336; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_GetCompletions_1") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -6945,13 +7225,13 @@ static PyObject *__pyx_pw_7pykeyvi_25ForwardBackwardCompletion_5_GetCompletions_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_GetCompletions_1", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 336; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_GetCompletions_1", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.ForwardBackwardCompletion._GetCompletions_1", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 336; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_4_GetCompletions_1(((struct __pyx_obj_7pykeyvi_ForwardBackwardCompletion *)__pyx_v_self), __pyx_v_in_0, __pyx_v_in_1);
 
   /* function exit code */
@@ -6980,7 +7260,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_4_GetCompletions_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_GetCompletions_1", 0);
 
-  /* "pykeyvi.pyx":337
+  /* "pykeyvi.pyx":352
  * 
  *     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -6992,12 +7272,12 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_4_GetCompletions_
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 352; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":338
+  /* "pykeyvi.pyx":353
  *     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
@@ -7019,45 +7299,45 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_4_GetCompletions_
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 338; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":339
+  /* "pykeyvi.pyx":354
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))
  */
-  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_4);
 
-  /* "pykeyvi.pyx":341
+  /* "pykeyvi.pyx":356
  *         cdef const_char * input_in_0 = <const_char *> in_0
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))             # <<<<<<<<<<<<<<
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  */
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_in_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 341; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_in_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v__r = __pyx_v_self->inst.get()->GetCompletions(__pyx_v_input_in_0, ((int)__pyx_t_5));
 
-  /* "pykeyvi.pyx":342
+  /* "pykeyvi.pyx":357
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_6 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 342; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 342; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "pykeyvi.pyx":343
+  /* "pykeyvi.pyx":358
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -7066,7 +7346,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_4_GetCompletions_
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":344
+  /* "pykeyvi.pyx":359
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -7075,7 +7355,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_4_GetCompletions_
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":345
+  /* "pykeyvi.pyx":360
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return py_result             # <<<<<<<<<<<<<<
@@ -7087,7 +7367,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_4_GetCompletions_
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":336
+  /* "pykeyvi.pyx":351
  *         return py_result
  * 
  *     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):             # <<<<<<<<<<<<<<
@@ -7107,7 +7387,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_4_GetCompletions_
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":347
+/* "pykeyvi.pyx":362
  *         return py_result
  * 
  *     def GetCompletions(self, *args):             # <<<<<<<<<<<<<<
@@ -7149,14 +7429,14 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_6GetCompletions(s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetCompletions", 0);
 
-  /* "pykeyvi.pyx":348
+  /* "pykeyvi.pyx":363
  * 
  *     def GetCompletions(self, *args):
  *         if (len(args)==1) and (isinstance(args[0], bytes)):             # <<<<<<<<<<<<<<
  *             return self._GetCompletions_0(*args)
  *         elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
  */
-  __pyx_t_2 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 348; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 363; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_3 = ((__pyx_t_2 == 1) != 0);
   if (__pyx_t_3) {
   } else {
@@ -7172,7 +7452,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_6GetCompletions(s
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "pykeyvi.pyx":349
+    /* "pykeyvi.pyx":364
  *     def GetCompletions(self, *args):
  *         if (len(args)==1) and (isinstance(args[0], bytes)):
  *             return self._GetCompletions_0(*args)             # <<<<<<<<<<<<<<
@@ -7180,11 +7460,11 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_6GetCompletions(s
  *             return self._GetCompletions_1(*args)
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_GetCompletions_0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 349; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_GetCompletions_0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 349; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 349; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -7193,14 +7473,14 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_6GetCompletions(s
     goto __pyx_L0;
   }
 
-  /* "pykeyvi.pyx":350
+  /* "pykeyvi.pyx":365
  *         if (len(args)==1) and (isinstance(args[0], bytes)):
  *             return self._GetCompletions_0(*args)
  *         elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):             # <<<<<<<<<<<<<<
  *             return self._GetCompletions_1(*args)
  *         else:
  */
-  __pyx_t_2 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_5 = ((__pyx_t_2 == 2) != 0);
   if (__pyx_t_5) {
   } else {
@@ -7239,7 +7519,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_6GetCompletions(s
   __pyx_L6_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "pykeyvi.pyx":351
+    /* "pykeyvi.pyx":366
  *             return self._GetCompletions_0(*args)
  *         elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
  *             return self._GetCompletions_1(*args)             # <<<<<<<<<<<<<<
@@ -7247,11 +7527,11 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_6GetCompletions(s
  *                raise Exception('can not handle type of %s' % (args,))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_GetCompletions_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_GetCompletions_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 366; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 366; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 366; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -7261,35 +7541,35 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_6GetCompletions(s
   }
   /*else*/ {
 
-    /* "pykeyvi.pyx":353
+    /* "pykeyvi.pyx":368
  *             return self._GetCompletions_1(*args)
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))             # <<<<<<<<<<<<<<
  * 
  *     def __init__(self, Dictionary in_0 , Dictionary in_1 ):
  */
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_args);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_args);
     __Pyx_GIVEREF(__pyx_v_args);
-    __pyx_t_6 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_4); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_4); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_6);
     __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_4, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_4, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_6, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 353; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 368; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":347
+  /* "pykeyvi.pyx":362
  *         return py_result
  * 
  *     def GetCompletions(self, *args):             # <<<<<<<<<<<<<<
@@ -7310,7 +7590,7 @@ static PyObject *__pyx_pf_7pykeyvi_25ForwardBackwardCompletion_6GetCompletions(s
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":355
+/* "pykeyvi.pyx":370
  *                raise Exception('can not handle type of %s' % (args,))
  * 
  *     def __init__(self, Dictionary in_0 , Dictionary in_1 ):             # <<<<<<<<<<<<<<
@@ -7349,11 +7629,11 @@ static int __pyx_pw_7pykeyvi_25ForwardBackwardCompletion_9__init__(PyObject *__p
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_in_1)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -7366,14 +7646,14 @@ static int __pyx_pw_7pykeyvi_25ForwardBackwardCompletion_9__init__(PyObject *__p
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.ForwardBackwardCompletion.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_1), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_1", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_1), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_1", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_8__init__(((struct __pyx_obj_7pykeyvi_ForwardBackwardCompletion *)__pyx_v_self), __pyx_v_in_0, __pyx_v_in_1);
 
   /* function exit code */
@@ -7398,7 +7678,7 @@ static int __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_8__init__(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":356
+  /* "pykeyvi.pyx":371
  * 
  *     def __init__(self, Dictionary in_0 , Dictionary in_1 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -7410,12 +7690,12 @@ static int __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_8__init__(struct __pyx_
     __pyx_t_1 = __Pyx_TypeCheck(((PyObject *)__pyx_v_in_0), ((PyObject*)__pyx_ptype_7pykeyvi_Dictionary)); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 356; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 371; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":357
+  /* "pykeyvi.pyx":372
  *     def __init__(self, Dictionary in_0 , Dictionary in_1 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         assert isinstance(in_1, Dictionary), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
@@ -7427,12 +7707,12 @@ static int __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_8__init__(struct __pyx_
     __pyx_t_1 = __Pyx_TypeCheck(((PyObject *)__pyx_v_in_1), ((PyObject*)__pyx_ptype_7pykeyvi_Dictionary)); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":358
+  /* "pykeyvi.pyx":373
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         assert isinstance(in_1, Dictionary), 'arg in_1 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst             # <<<<<<<<<<<<<<
@@ -7442,7 +7722,7 @@ static int __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_8__init__(struct __pyx_
   __pyx_t_2 = __pyx_v_in_0->inst;
   __pyx_v_input_in_0 = __pyx_t_2;
 
-  /* "pykeyvi.pyx":359
+  /* "pykeyvi.pyx":374
  *         assert isinstance(in_1, Dictionary), 'arg in_1 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
  *         cdef shared_ptr[_Dictionary] input_in_1 = in_1.inst             # <<<<<<<<<<<<<<
@@ -7452,7 +7732,7 @@ static int __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_8__init__(struct __pyx_
   __pyx_t_2 = __pyx_v_in_1->inst;
   __pyx_v_input_in_1 = __pyx_t_2;
 
-  /* "pykeyvi.pyx":360
+  /* "pykeyvi.pyx":375
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
  *         cdef shared_ptr[_Dictionary] input_in_1 = in_1.inst
  *         self.inst = shared_ptr[_ForwardBackwardCompletion](new _ForwardBackwardCompletion(input_in_0, input_in_1))             # <<<<<<<<<<<<<<
@@ -7463,11 +7743,11 @@ static int __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_8__init__(struct __pyx_
     __pyx_t_3 = new keyvi::dictionary::completion::ForwardBackwardCompletion(__pyx_v_input_in_0, __pyx_v_input_in_1);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 360; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 375; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::completion::ForwardBackwardCompletion> (__pyx_t_3);
 
-  /* "pykeyvi.pyx":355
+  /* "pykeyvi.pyx":370
  *                raise Exception('can not handle type of %s' % (args,))
  * 
  *     def __init__(self, Dictionary in_0 , Dictionary in_1 ):             # <<<<<<<<<<<<<<
@@ -7486,7 +7766,7 @@ static int __pyx_pf_7pykeyvi_25ForwardBackwardCompletion_8__init__(struct __pyx_
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":366
+/* "pykeyvi.pyx":381
  *     cdef shared_ptr[_FsaPredictiveCompression] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -7509,7 +7789,7 @@ static void __pyx_pf_7pykeyvi_24FsaPredictiveCompression___dealloc__(struct __py
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":367
+  /* "pykeyvi.pyx":382
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -7518,7 +7798,7 @@ static void __pyx_pf_7pykeyvi_24FsaPredictiveCompression___dealloc__(struct __py
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":366
+  /* "pykeyvi.pyx":381
  *     cdef shared_ptr[_FsaPredictiveCompression] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -7530,7 +7810,7 @@ static void __pyx_pf_7pykeyvi_24FsaPredictiveCompression___dealloc__(struct __py
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":370
+/* "pykeyvi.pyx":385
  * 
  * 
  *     def __init__(self, Dictionary in_0 ):             # <<<<<<<<<<<<<<
@@ -7566,7 +7846,7 @@ static int __pyx_pw_7pykeyvi_24FsaPredictiveCompression_3__init__(PyObject *__py
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -7577,13 +7857,13 @@ static int __pyx_pw_7pykeyvi_24FsaPredictiveCompression_3__init__(PyObject *__py
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.FsaPredictiveCompression.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_24FsaPredictiveCompression_2__init__(((struct __pyx_obj_7pykeyvi_FsaPredictiveCompression *)__pyx_v_self), __pyx_v_in_0);
 
   /* function exit code */
@@ -7607,7 +7887,7 @@ static int __pyx_pf_7pykeyvi_24FsaPredictiveCompression_2__init__(struct __pyx_o
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":371
+  /* "pykeyvi.pyx":386
  * 
  *     def __init__(self, Dictionary in_0 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -7619,12 +7899,12 @@ static int __pyx_pf_7pykeyvi_24FsaPredictiveCompression_2__init__(struct __pyx_o
     __pyx_t_1 = __Pyx_TypeCheck(((PyObject *)__pyx_v_in_0), ((PyObject*)__pyx_ptype_7pykeyvi_Dictionary)); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 371; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":372
+  /* "pykeyvi.pyx":387
  *     def __init__(self, Dictionary in_0 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst             # <<<<<<<<<<<<<<
@@ -7634,7 +7914,7 @@ static int __pyx_pf_7pykeyvi_24FsaPredictiveCompression_2__init__(struct __pyx_o
   __pyx_t_2 = __pyx_v_in_0->inst;
   __pyx_v_input_in_0 = __pyx_t_2;
 
-  /* "pykeyvi.pyx":373
+  /* "pykeyvi.pyx":388
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
  *         self.inst = shared_ptr[_FsaPredictiveCompression](new _FsaPredictiveCompression(input_in_0))             # <<<<<<<<<<<<<<
@@ -7645,11 +7925,11 @@ static int __pyx_pf_7pykeyvi_24FsaPredictiveCompression_2__init__(struct __pyx_o
     __pyx_t_3 = new keyvi::compression::FsaPredictiveCompression(__pyx_v_input_in_0);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::compression::FsaPredictiveCompression> (__pyx_t_3);
 
-  /* "pykeyvi.pyx":370
+  /* "pykeyvi.pyx":385
  * 
  * 
  *     def __init__(self, Dictionary in_0 ):             # <<<<<<<<<<<<<<
@@ -7668,7 +7948,7 @@ static int __pyx_pf_7pykeyvi_24FsaPredictiveCompression_2__init__(struct __pyx_o
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":375
+/* "pykeyvi.pyx":390
  *         self.inst = shared_ptr[_FsaPredictiveCompression](new _FsaPredictiveCompression(input_in_0))
  * 
  *     def Compress(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -7685,7 +7965,7 @@ static PyObject *__pyx_pw_7pykeyvi_24FsaPredictiveCompression_5Compress(PyObject
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("Compress (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 375; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 390; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_24FsaPredictiveCompression_4Compress(((struct __pyx_obj_7pykeyvi_FsaPredictiveCompression *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -7710,7 +7990,7 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_4Compress(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Compress", 0);
 
-  /* "pykeyvi.pyx":376
+  /* "pykeyvi.pyx":391
  * 
  *     def Compress(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -7722,22 +8002,22 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_4Compress(struct _
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 391; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":378
+  /* "pykeyvi.pyx":393
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  * 
  *         cdef libcpp_string _r = self.inst.get().Compress((<libcpp_string>in_0))             # <<<<<<<<<<<<<<
  *         py_result = <libcpp_string>_r
  *         return py_result
  */
-  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_v_in_0); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_v_in_0); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v__r = __pyx_v_self->inst.get()->Compress(((std::string)__pyx_t_2));
 
-  /* "pykeyvi.pyx":379
+  /* "pykeyvi.pyx":394
  * 
  *         cdef libcpp_string _r = self.inst.get().Compress((<libcpp_string>in_0))
  *         py_result = <libcpp_string>_r             # <<<<<<<<<<<<<<
@@ -7746,7 +8026,7 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_4Compress(struct _
  */
   __pyx_v_py_result = ((std::string)__pyx_v__r);
 
-  /* "pykeyvi.pyx":380
+  /* "pykeyvi.pyx":395
  *         cdef libcpp_string _r = self.inst.get().Compress((<libcpp_string>in_0))
  *         py_result = <libcpp_string>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -7754,13 +8034,13 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_4Compress(struct _
  *     def Uncompress(self, bytes in_0 ):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 395; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":375
+  /* "pykeyvi.pyx":390
  *         self.inst = shared_ptr[_FsaPredictiveCompression](new _FsaPredictiveCompression(input_in_0))
  * 
  *     def Compress(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -7779,7 +8059,7 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_4Compress(struct _
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":382
+/* "pykeyvi.pyx":397
  *         return py_result
  * 
  *     def Uncompress(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -7796,7 +8076,7 @@ static PyObject *__pyx_pw_7pykeyvi_24FsaPredictiveCompression_7Uncompress(PyObje
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("Uncompress (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_24FsaPredictiveCompression_6Uncompress(((struct __pyx_obj_7pykeyvi_FsaPredictiveCompression *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -7821,7 +8101,7 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_6Uncompress(struct
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Uncompress", 0);
 
-  /* "pykeyvi.pyx":383
+  /* "pykeyvi.pyx":398
  * 
  *     def Uncompress(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -7833,22 +8113,22 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_6Uncompress(struct
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":385
+  /* "pykeyvi.pyx":400
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  * 
  *         cdef libcpp_string _r = self.inst.get().Uncompress((<libcpp_string>in_0))             # <<<<<<<<<<<<<<
  *         py_result = <libcpp_string>_r
  *         return py_result
  */
-  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_v_in_0); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_v_in_0); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 400; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v__r = __pyx_v_self->inst.get()->Uncompress(((std::string)__pyx_t_2));
 
-  /* "pykeyvi.pyx":386
+  /* "pykeyvi.pyx":401
  * 
  *         cdef libcpp_string _r = self.inst.get().Uncompress((<libcpp_string>in_0))
  *         py_result = <libcpp_string>_r             # <<<<<<<<<<<<<<
@@ -7857,7 +8137,7 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_6Uncompress(struct
  */
   __pyx_v_py_result = ((std::string)__pyx_v__r);
 
-  /* "pykeyvi.pyx":387
+  /* "pykeyvi.pyx":402
  *         cdef libcpp_string _r = self.inst.get().Uncompress((<libcpp_string>in_0))
  *         py_result = <libcpp_string>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -7865,13 +8145,13 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_6Uncompress(struct
  * cdef class CompletionDictionaryCompiler:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 387; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 402; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":382
+  /* "pykeyvi.pyx":397
  *         return py_result
  * 
  *     def Uncompress(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -7890,7 +8170,7 @@ static PyObject *__pyx_pf_7pykeyvi_24FsaPredictiveCompression_6Uncompress(struct
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":393
+/* "pykeyvi.pyx":408
  *     cdef shared_ptr[_CompletionDictionaryCompiler] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -7913,7 +8193,7 @@ static void __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler___dealloc__(struct 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":394
+  /* "pykeyvi.pyx":409
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -7922,7 +8202,7 @@ static void __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler___dealloc__(struct 
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":393
+  /* "pykeyvi.pyx":408
  *     cdef shared_ptr[_CompletionDictionaryCompiler] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -7934,7 +8214,7 @@ static void __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler___dealloc__(struct 
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":397
+/* "pykeyvi.pyx":412
  * 
  * 
  *     def __setitem__(self, bytes in_0 ,  in_1 ):             # <<<<<<<<<<<<<<
@@ -7951,7 +8231,7 @@ static int __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_3__setitem__(PyObjec
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setitem__ (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_2__setitem__(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0), ((PyObject *)__pyx_v_in_1));
 
   /* function exit code */
@@ -7977,7 +8257,7 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_2__setitem__(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__setitem__", 0);
 
-  /* "pykeyvi.pyx":398
+  /* "pykeyvi.pyx":413
  * 
  *     def __setitem__(self, bytes in_0 ,  in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -7989,12 +8269,12 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_2__setitem__(struct 
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 413; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":399
+  /* "pykeyvi.pyx":414
  *     def __setitem__(self, bytes in_0 ,  in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
@@ -8016,37 +8296,37 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_2__setitem__(struct 
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 399; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 414; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":400
+  /* "pykeyvi.pyx":415
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  * 
  *         self.inst.get().__setitem__(input_in_0, (<int>in_1))
  */
-  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 400; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_4);
 
-  /* "pykeyvi.pyx":402
+  /* "pykeyvi.pyx":417
  *         cdef const_char * input_in_0 = <const_char *> in_0
  * 
  *         self.inst.get().__setitem__(input_in_0, (<int>in_1))             # <<<<<<<<<<<<<<
  * 
  *     def Add(self, bytes in_0 ,  in_1 ):
  */
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_in_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 402; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_in_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   try {
     __pyx_v_self->inst.get()->__setitem__(__pyx_v_input_in_0, ((int)__pyx_t_5));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 402; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":397
+  /* "pykeyvi.pyx":412
  * 
  * 
  *     def __setitem__(self, bytes in_0 ,  in_1 ):             # <<<<<<<<<<<<<<
@@ -8065,7 +8345,7 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_2__setitem__(struct 
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":404
+/* "pykeyvi.pyx":419
  *         self.inst.get().__setitem__(input_in_0, (<int>in_1))
  * 
  *     def Add(self, bytes in_0 ,  in_1 ):             # <<<<<<<<<<<<<<
@@ -8104,11 +8384,11 @@ static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_5Add(PyObject 
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_in_1)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("Add", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("Add", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 419; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "Add") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "Add") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 419; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -8121,13 +8401,13 @@ static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_5Add(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("Add", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("Add", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 419; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.CompletionDictionaryCompiler.Add", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 419; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_4Add(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), __pyx_v_in_0, __pyx_v_in_1);
 
   /* function exit code */
@@ -8153,7 +8433,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_4Add(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Add", 0);
 
-  /* "pykeyvi.pyx":405
+  /* "pykeyvi.pyx":420
  * 
  *     def Add(self, bytes in_0 ,  in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -8165,12 +8445,12 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_4Add(struct __
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 405; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 420; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":406
+  /* "pykeyvi.pyx":421
  *     def Add(self, bytes in_0 ,  in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
@@ -8192,37 +8472,37 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_4Add(struct __
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 406; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":407
+  /* "pykeyvi.pyx":422
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  * 
  *         self.inst.get().Add(input_in_0, (<int>in_1))
  */
-  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 407; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_4);
 
-  /* "pykeyvi.pyx":409
+  /* "pykeyvi.pyx":424
  *         cdef const_char * input_in_0 = <const_char *> in_0
  * 
  *         self.inst.get().Add(input_in_0, (<int>in_1))             # <<<<<<<<<<<<<<
  * 
- *     def _init_0(self):
+ *     def WriteToFile(self, bytes in_0 ):
  */
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_in_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 409; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_in_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 424; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   try {
     __pyx_v_self->inst.get()->Add(__pyx_v_input_in_0, ((int)__pyx_t_5));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 409; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 424; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":404
+  /* "pykeyvi.pyx":419
  *         self.inst.get().__setitem__(input_in_0, (<int>in_1))
  * 
  *     def Add(self, bytes in_0 ,  in_1 ):             # <<<<<<<<<<<<<<
@@ -8242,8 +8522,104 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_4Add(struct __
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":411
+/* "pykeyvi.pyx":426
  *         self.inst.get().Add(input_in_0, (<int>in_1))
+ * 
+ *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_7WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_7WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("WriteToFile (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 426; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6WriteToFile(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6WriteToFile(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  const char *__pyx_v_input_in_0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("WriteToFile", 0);
+
+  /* "pykeyvi.pyx":427
+ * 
+ *     def WriteToFile(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().WriteToFile(input_in_0)
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":428
+ *     def WriteToFile(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         self.inst.get().WriteToFile(input_in_0)
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 428; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":429
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().WriteToFile(input_in_0)             # <<<<<<<<<<<<<<
+ * 
+ *     def _init_0(self):
+ */
+  __pyx_v_self->inst.get()->WriteToFile(__pyx_v_input_in_0);
+
+  /* "pykeyvi.pyx":426
+ *         self.inst.get().Add(input_in_0, (<int>in_1))
+ * 
+ *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("pykeyvi.CompletionDictionaryCompiler.WriteToFile", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":431
+ *         self.inst.get().WriteToFile(input_in_0)
  * 
  *     def _init_0(self):             # <<<<<<<<<<<<<<
  *         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
@@ -8251,19 +8627,19 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_4Add(struct __
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_7_init_0(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_7_init_0(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_9_init_0(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_9_init_0(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_init_0 (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6_init_0(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_0(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6_init_0(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self) {
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_0(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   keyvi::dictionary::CompletionDictionaryCompiler *__pyx_t_1;
@@ -8272,7 +8648,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6_init_0(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_0", 0);
 
-  /* "pykeyvi.pyx":412
+  /* "pykeyvi.pyx":432
  * 
  *     def _init_0(self):
  *         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())             # <<<<<<<<<<<<<<
@@ -8283,12 +8659,12 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6_init_0(struc
     __pyx_t_1 = new keyvi::dictionary::CompletionDictionaryCompiler();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 412; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 432; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::CompletionDictionaryCompiler> (__pyx_t_1);
 
-  /* "pykeyvi.pyx":411
- *         self.inst.get().Add(input_in_0, (<int>in_1))
+  /* "pykeyvi.pyx":431
+ *         self.inst.get().WriteToFile(input_in_0)
  * 
  *     def _init_0(self):             # <<<<<<<<<<<<<<
  *         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
@@ -8307,7 +8683,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6_init_0(struc
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":414
+/* "pykeyvi.pyx":434
  *         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
  * 
  *     def _init_1(self,  memory_limit ):             # <<<<<<<<<<<<<<
@@ -8316,19 +8692,19 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_6_init_0(struc
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_9_init_1(PyObject *__pyx_v_self, PyObject *__pyx_v_memory_limit); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_9_init_1(PyObject *__pyx_v_self, PyObject *__pyx_v_memory_limit) {
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_11_init_1(PyObject *__pyx_v_self, PyObject *__pyx_v_memory_limit); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_11_init_1(PyObject *__pyx_v_self, PyObject *__pyx_v_memory_limit) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_init_1 (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_1(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), ((PyObject *)__pyx_v_memory_limit));
+  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10_init_1(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), ((PyObject *)__pyx_v_memory_limit));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_1(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_memory_limit) {
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10_init_1(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_memory_limit) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -8341,7 +8717,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_1(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_1", 0);
 
-  /* "pykeyvi.pyx":415
+  /* "pykeyvi.pyx":435
  * 
  *     def _init_1(self,  memory_limit ):
  *         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'             # <<<<<<<<<<<<<<
@@ -8363,28 +8739,28 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_1(struc
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_memory_limit_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 415; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 435; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":417
+  /* "pykeyvi.pyx":437
  *         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
  * 
  *         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit)))             # <<<<<<<<<<<<<<
  * 
  *     def __init__(self, *args):
  */
-  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_memory_limit); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_memory_limit); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 437; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   try {
     __pyx_t_5 = new keyvi::dictionary::CompletionDictionaryCompiler(((size_t)__pyx_t_4));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 417; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 437; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::CompletionDictionaryCompiler> (__pyx_t_5);
 
-  /* "pykeyvi.pyx":414
+  /* "pykeyvi.pyx":434
  *         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
  * 
  *     def _init_1(self,  memory_limit ):             # <<<<<<<<<<<<<<
@@ -8404,7 +8780,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_1(struc
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":419
+/* "pykeyvi.pyx":439
  *         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit)))
  * 
  *     def __init__(self, *args):             # <<<<<<<<<<<<<<
@@ -8413,8 +8789,8 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_8_init_1(struc
  */
 
 /* Python wrapper */
-static int __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_11__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static int __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_11__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static int __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_13__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_13__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
@@ -8422,7 +8798,7 @@ static int __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_11__init__(PyObject 
   if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "__init__", 0))) return -1;
   __Pyx_INCREF(__pyx_args);
   __pyx_v_args = __pyx_args;
-  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
+  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12__init__(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_args);
@@ -8430,7 +8806,7 @@ static int __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_11__init__(PyObject 
   return __pyx_r;
 }
 
-static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
+static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12__init__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
@@ -8446,7 +8822,7 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":420
+  /* "pykeyvi.pyx":440
  * 
  *     def __init__(self, *args):
  *         if not args:             # <<<<<<<<<<<<<<
@@ -8457,18 +8833,18 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(struct __
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":421
+    /* "pykeyvi.pyx":441
  *     def __init__(self, *args):
  *         if not args:
  *              self._init_0(*args)             # <<<<<<<<<<<<<<
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):
  *              self._init_1(*args)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 441; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 441; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 441; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -8476,14 +8852,14 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(struct __
     goto __pyx_L3;
   }
 
-  /* "pykeyvi.pyx":422
+  /* "pykeyvi.pyx":442
  *         if not args:
  *              self._init_0(*args)
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):             # <<<<<<<<<<<<<<
  *              self._init_1(*args)
  *         else:
  */
-  __pyx_t_6 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 422; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = ((__pyx_t_6 == 1) != 0);
   if (__pyx_t_1) {
   } else {
@@ -8512,18 +8888,18 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(struct __
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":423
+    /* "pykeyvi.pyx":443
  *              self._init_0(*args)
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):
  *              self._init_1(*args)             # <<<<<<<<<<<<<<
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 423; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 443; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 423; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 443; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 423; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 443; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -8532,36 +8908,36 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(struct __
   }
   /*else*/ {
 
-    /* "pykeyvi.pyx":425
+    /* "pykeyvi.pyx":445
  *              self._init_1(*args)
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))             # <<<<<<<<<<<<<<
  * 
- *     def WriteToFile(self, bytes in_0 ):
+ *     def SetManifestFromString(self, bytes in_0 ):
  */
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_args);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_args);
     __Pyx_GIVEREF(__pyx_v_args);
-    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 445; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_L3:;
 
-  /* "pykeyvi.pyx":419
+  /* "pykeyvi.pyx":439
  *         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit)))
  * 
  *     def __init__(self, *args):             # <<<<<<<<<<<<<<
@@ -8583,25 +8959,25 @@ static int __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_10__init__(struct __
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":427
+/* "pykeyvi.pyx":447
  *                raise Exception('can not handle type of %s' % (args,))
  * 
- *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *     def SetManifestFromString(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_13WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_13WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_15SetManifestFromString(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_15SetManifestFromString(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
   CYTHON_UNUSED int __pyx_lineno = 0;
   CYTHON_UNUSED const char *__pyx_filename = NULL;
   CYTHON_UNUSED int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("WriteToFile (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 427; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12WriteToFile(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+  __Pyx_RefNannySetupContext("SetManifestFromString (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 447; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14SetManifestFromString(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
   goto __pyx_L0;
@@ -8612,7 +8988,7 @@ static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_13WriteToFile(
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12WriteToFile(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14SetManifestFromString(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
   const char *__pyx_v_input_in_0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -8621,48 +8997,48 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12WriteToFile(
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("WriteToFile", 0);
+  __Pyx_RefNannySetupContext("SetManifestFromString", 0);
 
-  /* "pykeyvi.pyx":428
+  /* "pykeyvi.pyx":448
  * 
- *     def WriteToFile(self, bytes in_0 ):
+ *     def SetManifestFromString(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
  *         cdef const_char * input_in_0 = <const_char *> in_0
- *         self.inst.get().WriteToFile(input_in_0)
+ *         self.inst.get().SetManifestFromString(input_in_0)
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 428; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 448; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":429
- *     def WriteToFile(self, bytes in_0 ):
+  /* "pykeyvi.pyx":449
+ *     def SetManifestFromString(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
- *         self.inst.get().WriteToFile(input_in_0)
+ *         self.inst.get().SetManifestFromString(input_in_0)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 429; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":430
+  /* "pykeyvi.pyx":450
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
- *         self.inst.get().WriteToFile(input_in_0)             # <<<<<<<<<<<<<<
+ *         self.inst.get().SetManifestFromString(input_in_0)             # <<<<<<<<<<<<<<
  * 
  *     def __enter__(self):
  */
-  __pyx_v_self->inst.get()->WriteToFile(__pyx_v_input_in_0);
+  __pyx_v_self->inst.get()->SetManifestFromString(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":427
+  /* "pykeyvi.pyx":447
  *                raise Exception('can not handle type of %s' % (args,))
  * 
- *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *     def SetManifestFromString(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  */
@@ -8671,7 +9047,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12WriteToFile(
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_AddTraceback("pykeyvi.CompletionDictionaryCompiler.WriteToFile", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pykeyvi.CompletionDictionaryCompiler.SetManifestFromString", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -8679,8 +9055,8 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12WriteToFile(
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":432
- *         self.inst.get().WriteToFile(input_in_0)
+/* "pykeyvi.pyx":452
+ *         self.inst.get().SetManifestFromString(input_in_0)
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
  *         return self
@@ -8688,24 +9064,24 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_12WriteToFile(
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_15__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_15__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_17__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_17__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14__enter__(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__enter__(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14__enter__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self) {
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__enter__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__", 0);
 
-  /* "pykeyvi.pyx":433
+  /* "pykeyvi.pyx":453
  * 
  *     def __enter__(self):
  *         return self             # <<<<<<<<<<<<<<
@@ -8717,8 +9093,8 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14__enter__(st
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":432
- *         self.inst.get().WriteToFile(input_in_0)
+  /* "pykeyvi.pyx":452
+ *         self.inst.get().SetManifestFromString(input_in_0)
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
  *         return self
@@ -8732,7 +9108,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14__enter__(st
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":436
+/* "pykeyvi.pyx":456
  * 
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -8741,8 +9117,8 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_14__enter__(st
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_17__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_17__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_19__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_19__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_type = 0;
   CYTHON_UNUSED PyObject *__pyx_v_value = 0;
   CYTHON_UNUSED PyObject *__pyx_v_traceback = 0;
@@ -8773,16 +9149,16 @@ static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_17__exit__(PyO
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 436; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 456; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_traceback)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 436; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 456; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 436; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 456; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -8797,20 +9173,20 @@ static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_17__exit__(PyO
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 436; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 456; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.CompletionDictionaryCompiler.__exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__exit__(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), __pyx_v_type, __pyx_v_value, __pyx_v_traceback);
+  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18__exit__(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), __pyx_v_type, __pyx_v_value, __pyx_v_traceback);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__exit__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback) {
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18__exit__(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -8821,14 +9197,14 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__exit__(str
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__exit__", 0);
 
-  /* "pykeyvi.pyx":437
+  /* "pykeyvi.pyx":457
  * 
  *     def __exit__(self, type, value, traceback):
  *         self.Compile()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_Compile); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 437; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_Compile); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -8841,16 +9217,16 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__exit__(str
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 437; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 437; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":436
+  /* "pykeyvi.pyx":456
  * 
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -8873,7 +9249,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__exit__(str
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":440
+/* "pykeyvi.pyx":460
  * 
  * 
  *     def Compile(self, *args):             # <<<<<<<<<<<<<<
@@ -8882,8 +9258,8 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_16__exit__(str
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_19Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_19Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_21Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_21Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -8891,7 +9267,7 @@ static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_19Compile(PyOb
   if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "Compile", 0))) return NULL;
   __Pyx_INCREF(__pyx_args);
   __pyx_v_args = __pyx_args;
-  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
+  __pyx_r = __pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_20Compile(((struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_args);
@@ -8899,7 +9275,7 @@ static PyObject *__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_19Compile(PyOb
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
+static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_20Compile(struct __pyx_obj_7pykeyvi_CompletionDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
   void *__pyx_v_callback;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -8907,7 +9283,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("Compile", 0);
 
-  /* "pykeyvi.pyx":441
+  /* "pykeyvi.pyx":461
  * 
  *     def Compile(self, *args):
  *         if not args:             # <<<<<<<<<<<<<<
@@ -8918,7 +9294,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":442
+    /* "pykeyvi.pyx":462
  *     def Compile(self, *args):
  *         if not args:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -8932,7 +9308,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
         #endif
         /*try:*/ {
 
-          /* "pykeyvi.pyx":443
+          /* "pykeyvi.pyx":463
  *         if not args:
  *             with nogil:
  *                 self.inst.get().Compile()             # <<<<<<<<<<<<<<
@@ -8942,7 +9318,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
           __pyx_v_self->inst.get()->Compile();
         }
 
-        /* "pykeyvi.pyx":442
+        /* "pykeyvi.pyx":462
  *     def Compile(self, *args):
  *         if not args:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -8960,7 +9336,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
         }
     }
 
-    /* "pykeyvi.pyx":444
+    /* "pykeyvi.pyx":464
  *             with nogil:
  *                 self.inst.get().Compile()
  *             return             # <<<<<<<<<<<<<<
@@ -8972,7 +9348,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
     goto __pyx_L0;
   }
 
-  /* "pykeyvi.pyx":446
+  /* "pykeyvi.pyx":466
  *             return
  * 
  *         cdef void* callback = <void*> args[0]             # <<<<<<<<<<<<<<
@@ -8981,7 +9357,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
  */
   __pyx_v_callback = ((void *)PyTuple_GET_ITEM(__pyx_v_args, 0));
 
-  /* "pykeyvi.pyx":447
+  /* "pykeyvi.pyx":467
  * 
  *         cdef void* callback = <void*> args[0]
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -8995,7 +9371,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
       #endif
       /*try:*/ {
 
-        /* "pykeyvi.pyx":448
+        /* "pykeyvi.pyx":468
  *         cdef void* callback = <void*> args[0]
  *         with nogil:
  *             self.inst.get().Compile(callback_wrapper, callback)             # <<<<<<<<<<<<<<
@@ -9005,7 +9381,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
         __pyx_v_self->inst.get()->Compile(__pyx_f_7pykeyvi_callback_wrapper, __pyx_v_callback);
       }
 
-      /* "pykeyvi.pyx":447
+      /* "pykeyvi.pyx":467
  * 
  *         cdef void* callback = <void*> args[0]
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -9023,7 +9399,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
       }
   }
 
-  /* "pykeyvi.pyx":440
+  /* "pykeyvi.pyx":460
  * 
  * 
  *     def Compile(self, *args):             # <<<<<<<<<<<<<<
@@ -9039,7 +9415,7 @@ static PyObject *__pyx_pf_7pykeyvi_28CompletionDictionaryCompiler_18Compile(stru
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":451
+/* "pykeyvi.pyx":471
  * 
  * # definition for all compilers
  * cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:             # <<<<<<<<<<<<<<
@@ -9064,16 +9440,16 @@ static void __pyx_f_7pykeyvi_callback_wrapper(size_t __pyx_v_a, size_t __pyx_v_b
   #endif
   __Pyx_RefNannySetupContext("callback_wrapper", 0);
 
-  /* "pykeyvi.pyx":452
+  /* "pykeyvi.pyx":472
  * # definition for all compilers
  * cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:
  *     (<object>py_callback)(a, b)             # <<<<<<<<<<<<<<
  * 
  * cdef class MultiWordCompletion:
  */
-  __pyx_t_2 = __Pyx_PyInt_FromSize_t(__pyx_v_a); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_FromSize_t(__pyx_v_a); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_b); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_FromSize_t(__pyx_v_b); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(((PyObject *)__pyx_v_py_callback));
   __pyx_t_4 = ((PyObject *)__pyx_v_py_callback); __pyx_t_5 = NULL;
@@ -9088,7 +9464,7 @@ static void __pyx_f_7pykeyvi_callback_wrapper(size_t __pyx_v_a, size_t __pyx_v_b
       __pyx_t_6 = 1;
     }
   }
-  __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
   if (__pyx_t_5) {
     PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __Pyx_GIVEREF(__pyx_t_5); __pyx_t_5 = NULL;
@@ -9099,13 +9475,13 @@ static void __pyx_f_7pykeyvi_callback_wrapper(size_t __pyx_v_a, size_t __pyx_v_b
   __Pyx_GIVEREF(__pyx_t_3);
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 452; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 472; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":451
+  /* "pykeyvi.pyx":471
  * 
  * # definition for all compilers
  * cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:             # <<<<<<<<<<<<<<
@@ -9130,7 +9506,7 @@ static void __pyx_f_7pykeyvi_callback_wrapper(size_t __pyx_v_a, size_t __pyx_v_b
   #endif
 }
 
-/* "pykeyvi.pyx":458
+/* "pykeyvi.pyx":478
  *     cdef shared_ptr[_MultiWordCompletion] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -9153,7 +9529,7 @@ static void __pyx_pf_7pykeyvi_19MultiWordCompletion___dealloc__(struct __pyx_obj
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":459
+  /* "pykeyvi.pyx":479
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -9162,7 +9538,7 @@ static void __pyx_pf_7pykeyvi_19MultiWordCompletion___dealloc__(struct __pyx_obj
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":458
+  /* "pykeyvi.pyx":478
  *     cdef shared_ptr[_MultiWordCompletion] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -9174,7 +9550,7 @@ static void __pyx_pf_7pykeyvi_19MultiWordCompletion___dealloc__(struct __pyx_obj
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":462
+/* "pykeyvi.pyx":482
  * 
  * 
  *     def __init__(self, Dictionary in_0 ):             # <<<<<<<<<<<<<<
@@ -9210,7 +9586,7 @@ static int __pyx_pw_7pykeyvi_19MultiWordCompletion_3__init__(PyObject *__pyx_v_s
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 462; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
@@ -9221,13 +9597,13 @@ static int __pyx_pw_7pykeyvi_19MultiWordCompletion_3__init__(PyObject *__pyx_v_s
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 462; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.MultiWordCompletion.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 462; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), __pyx_ptype_7pykeyvi_Dictionary, 1, "in_0", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_19MultiWordCompletion_2__init__(((struct __pyx_obj_7pykeyvi_MultiWordCompletion *)__pyx_v_self), __pyx_v_in_0);
 
   /* function exit code */
@@ -9251,7 +9627,7 @@ static int __pyx_pf_7pykeyvi_19MultiWordCompletion_2__init__(struct __pyx_obj_7p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":463
+  /* "pykeyvi.pyx":483
  * 
  *     def __init__(self, Dictionary in_0 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -9263,12 +9639,12 @@ static int __pyx_pf_7pykeyvi_19MultiWordCompletion_2__init__(struct __pyx_obj_7p
     __pyx_t_1 = __Pyx_TypeCheck(((PyObject *)__pyx_v_in_0), ((PyObject*)__pyx_ptype_7pykeyvi_Dictionary)); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 463; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":464
+  /* "pykeyvi.pyx":484
  *     def __init__(self, Dictionary in_0 ):
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst             # <<<<<<<<<<<<<<
@@ -9278,7 +9654,7 @@ static int __pyx_pf_7pykeyvi_19MultiWordCompletion_2__init__(struct __pyx_obj_7p
   __pyx_t_2 = __pyx_v_in_0->inst;
   __pyx_v_input_in_0 = __pyx_t_2;
 
-  /* "pykeyvi.pyx":465
+  /* "pykeyvi.pyx":485
  *         assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
  *         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
  *         self.inst = shared_ptr[_MultiWordCompletion](new _MultiWordCompletion(input_in_0))             # <<<<<<<<<<<<<<
@@ -9289,11 +9665,11 @@ static int __pyx_pf_7pykeyvi_19MultiWordCompletion_2__init__(struct __pyx_obj_7p
     __pyx_t_3 = new keyvi::dictionary::completion::MultiWordCompletion(__pyx_v_input_in_0);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 485; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::completion::MultiWordCompletion> (__pyx_t_3);
 
-  /* "pykeyvi.pyx":462
+  /* "pykeyvi.pyx":482
  * 
  * 
  *     def __init__(self, Dictionary in_0 ):             # <<<<<<<<<<<<<<
@@ -9312,7 +9688,7 @@ static int __pyx_pf_7pykeyvi_19MultiWordCompletion_2__init__(struct __pyx_obj_7p
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":467
+/* "pykeyvi.pyx":487
  *         self.inst = shared_ptr[_MultiWordCompletion](new _MultiWordCompletion(input_in_0))
  * 
  *     def _GetCompletions_0(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -9329,7 +9705,7 @@ static PyObject *__pyx_pw_7pykeyvi_19MultiWordCompletion_5_GetCompletions_0(PyOb
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_GetCompletions_0 (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 487; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(((struct __pyx_obj_7pykeyvi_MultiWordCompletion *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -9355,7 +9731,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(stru
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_GetCompletions_0", 0);
 
-  /* "pykeyvi.pyx":468
+  /* "pykeyvi.pyx":488
  * 
  *     def _GetCompletions_0(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -9367,22 +9743,22 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(stru
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 468; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 488; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":469
+  /* "pykeyvi.pyx":489
  *     def _GetCompletions_0(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 469; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":470
+  /* "pykeyvi.pyx":490
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)             # <<<<<<<<<<<<<<
@@ -9391,20 +9767,20 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(stru
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetCompletions(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":471
+  /* "pykeyvi.pyx":491
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 471; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 471; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_3, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "pykeyvi.pyx":472
+  /* "pykeyvi.pyx":492
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -9413,7 +9789,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(stru
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":473
+  /* "pykeyvi.pyx":493
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -9422,7 +9798,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(stru
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":474
+  /* "pykeyvi.pyx":494
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return py_result             # <<<<<<<<<<<<<<
@@ -9434,7 +9810,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(stru
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":467
+  /* "pykeyvi.pyx":487
  *         self.inst = shared_ptr[_MultiWordCompletion](new _MultiWordCompletion(input_in_0))
  * 
  *     def _GetCompletions_0(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -9454,7 +9830,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_4_GetCompletions_0(stru
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":476
+/* "pykeyvi.pyx":496
  *         return py_result
  * 
  *     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):             # <<<<<<<<<<<<<<
@@ -9493,11 +9869,11 @@ static PyObject *__pyx_pw_7pykeyvi_19MultiWordCompletion_7_GetCompletions_1(PyOb
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_in_1)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_GetCompletions_1", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 476; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_GetCompletions_1", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 496; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_GetCompletions_1") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 476; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_GetCompletions_1") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 496; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -9510,13 +9886,13 @@ static PyObject *__pyx_pw_7pykeyvi_19MultiWordCompletion_7_GetCompletions_1(PyOb
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_GetCompletions_1", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 476; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_GetCompletions_1", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 496; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.MultiWordCompletion._GetCompletions_1", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 476; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 496; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_19MultiWordCompletion_6_GetCompletions_1(((struct __pyx_obj_7pykeyvi_MultiWordCompletion *)__pyx_v_self), __pyx_v_in_0, __pyx_v_in_1);
 
   /* function exit code */
@@ -9545,7 +9921,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_6_GetCompletions_1(stru
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_GetCompletions_1", 0);
 
-  /* "pykeyvi.pyx":477
+  /* "pykeyvi.pyx":497
  * 
  *     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -9557,12 +9933,12 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_6_GetCompletions_1(stru
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 477; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":478
+  /* "pykeyvi.pyx":498
  *     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'             # <<<<<<<<<<<<<<
@@ -9584,45 +9960,45 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_6_GetCompletions_1(stru
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_1_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 478; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 498; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":479
+  /* "pykeyvi.pyx":499
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))
  */
-  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 479; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_4) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_4);
 
-  /* "pykeyvi.pyx":481
+  /* "pykeyvi.pyx":501
  *         cdef const_char * input_in_0 = <const_char *> in_0
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))             # <<<<<<<<<<<<<<
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  */
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_in_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_in_1); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 501; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v__r = __pyx_v_self->inst.get()->GetCompletions(__pyx_v_input_in_0, ((int)__pyx_t_5));
 
-  /* "pykeyvi.pyx":482
+  /* "pykeyvi.pyx":502
  * 
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)             # <<<<<<<<<<<<<<
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_6 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_MatchIterator)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 502; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 502; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_6);
   __pyx_t_6 = 0;
 
-  /* "pykeyvi.pyx":483
+  /* "pykeyvi.pyx":503
  *         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()             # <<<<<<<<<<<<<<
@@ -9631,7 +10007,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_6_GetCompletions_1(stru
  */
   __pyx_v_py_result->it = __pyx_v__r.begin();
 
-  /* "pykeyvi.pyx":484
+  /* "pykeyvi.pyx":504
  *         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()             # <<<<<<<<<<<<<<
@@ -9640,7 +10016,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_6_GetCompletions_1(stru
  */
   __pyx_v_py_result->end = __pyx_v__r.end();
 
-  /* "pykeyvi.pyx":485
+  /* "pykeyvi.pyx":505
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  *         return py_result             # <<<<<<<<<<<<<<
@@ -9652,7 +10028,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_6_GetCompletions_1(stru
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":476
+  /* "pykeyvi.pyx":496
  *         return py_result
  * 
  *     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):             # <<<<<<<<<<<<<<
@@ -9672,7 +10048,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_6_GetCompletions_1(stru
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":487
+/* "pykeyvi.pyx":507
  *         return py_result
  * 
  *     def GetCompletions(self, *args):             # <<<<<<<<<<<<<<
@@ -9714,14 +10090,14 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_8GetCompletions(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetCompletions", 0);
 
-  /* "pykeyvi.pyx":488
+  /* "pykeyvi.pyx":508
  * 
  *     def GetCompletions(self, *args):
  *         if (len(args)==1) and (isinstance(args[0], bytes)):             # <<<<<<<<<<<<<<
  *             return self._GetCompletions_0(*args)
  *         elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
  */
-  __pyx_t_2 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 488; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 508; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_3 = ((__pyx_t_2 == 1) != 0);
   if (__pyx_t_3) {
   } else {
@@ -9737,7 +10113,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_8GetCompletions(struct 
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "pykeyvi.pyx":489
+    /* "pykeyvi.pyx":509
  *     def GetCompletions(self, *args):
  *         if (len(args)==1) and (isinstance(args[0], bytes)):
  *             return self._GetCompletions_0(*args)             # <<<<<<<<<<<<<<
@@ -9745,11 +10121,11 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_8GetCompletions(struct 
  *             return self._GetCompletions_1(*args)
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_GetCompletions_0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_GetCompletions_0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_6, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -9758,14 +10134,14 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_8GetCompletions(struct 
     goto __pyx_L0;
   }
 
-  /* "pykeyvi.pyx":490
+  /* "pykeyvi.pyx":510
  *         if (len(args)==1) and (isinstance(args[0], bytes)):
  *             return self._GetCompletions_0(*args)
  *         elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):             # <<<<<<<<<<<<<<
  *             return self._GetCompletions_1(*args)
  *         else:
  */
-  __pyx_t_2 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 490; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 510; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_5 = ((__pyx_t_2 == 2) != 0);
   if (__pyx_t_5) {
   } else {
@@ -9804,7 +10180,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_8GetCompletions(struct 
   __pyx_L6_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "pykeyvi.pyx":491
+    /* "pykeyvi.pyx":511
  *             return self._GetCompletions_0(*args)
  *         elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
  *             return self._GetCompletions_1(*args)             # <<<<<<<<<<<<<<
@@ -9812,11 +10188,11 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_8GetCompletions(struct 
  *                raise Exception('can not handle type of %s' % (args,))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_GetCompletions_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_GetCompletions_1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -9826,35 +10202,35 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_8GetCompletions(struct 
   }
   /*else*/ {
 
-    /* "pykeyvi.pyx":493
+    /* "pykeyvi.pyx":513
  *             return self._GetCompletions_1(*args)
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))             # <<<<<<<<<<<<<<
  * 
  * cdef class KeyOnlyDictionaryGenerator:
  */
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_args);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_args);
     __Pyx_GIVEREF(__pyx_v_args);
-    __pyx_t_6 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_4); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_4); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_6);
     __Pyx_GIVEREF(__pyx_t_6);
     __pyx_t_6 = 0;
-    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_4, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_4, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_6, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 493; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":487
+  /* "pykeyvi.pyx":507
  *         return py_result
  * 
  *     def GetCompletions(self, *args):             # <<<<<<<<<<<<<<
@@ -9875,7 +10251,7 @@ static PyObject *__pyx_pf_7pykeyvi_19MultiWordCompletion_8GetCompletions(struct 
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":499
+/* "pykeyvi.pyx":519
  *     cdef shared_ptr[_KeyOnlyDictionaryGenerator] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -9898,7 +10274,7 @@ static void __pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator___dealloc__(struct __
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":500
+  /* "pykeyvi.pyx":520
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -9907,7 +10283,7 @@ static void __pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator___dealloc__(struct __
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":499
+  /* "pykeyvi.pyx":519
  *     cdef shared_ptr[_KeyOnlyDictionaryGenerator] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -9919,7 +10295,7 @@ static void __pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator___dealloc__(struct __
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":503
+/* "pykeyvi.pyx":523
  * 
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -9952,7 +10328,7 @@ static int __pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_2__init__(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":504
+  /* "pykeyvi.pyx":524
  * 
  *     def __init__(self):
  *         self.inst = shared_ptr[_KeyOnlyDictionaryGenerator](new _KeyOnlyDictionaryGenerator())             # <<<<<<<<<<<<<<
@@ -9963,11 +10339,11 @@ static int __pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_2__init__(struct __pyx
     __pyx_t_1 = new keyvi::dictionary::KeyOnlyDictionaryGenerator();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 504; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 524; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::KeyOnlyDictionaryGenerator> (__pyx_t_1);
 
-  /* "pykeyvi.pyx":503
+  /* "pykeyvi.pyx":523
  * 
  * 
  *     def __init__(self):             # <<<<<<<<<<<<<<
@@ -9986,7 +10362,7 @@ static int __pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_2__init__(struct __pyx
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":506
+/* "pykeyvi.pyx":526
  *         self.inst = shared_ptr[_KeyOnlyDictionaryGenerator](new _KeyOnlyDictionaryGenerator())
  * 
  *     def Add(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -10003,7 +10379,7 @@ static PyObject *__pyx_pw_7pykeyvi_26KeyOnlyDictionaryGenerator_5Add(PyObject *_
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("Add (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 506; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 526; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_4Add(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryGenerator *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -10026,7 +10402,7 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_4Add(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Add", 0);
 
-  /* "pykeyvi.pyx":507
+  /* "pykeyvi.pyx":527
  * 
  *     def Add(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -10038,22 +10414,22 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_4Add(struct __py
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 507; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 527; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":508
+  /* "pykeyvi.pyx":528
  *     def Add(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         self.inst.get().Add(input_in_0)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 508; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 528; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":509
+  /* "pykeyvi.pyx":529
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         self.inst.get().Add(input_in_0)             # <<<<<<<<<<<<<<
@@ -10064,10 +10440,10 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_4Add(struct __py
     __pyx_v_self->inst.get()->Add(__pyx_v_input_in_0);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 509; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 529; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":506
+  /* "pykeyvi.pyx":526
  *         self.inst = shared_ptr[_KeyOnlyDictionaryGenerator](new _KeyOnlyDictionaryGenerator())
  * 
  *     def Add(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -10087,7 +10463,7 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_4Add(struct __py
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":511
+/* "pykeyvi.pyx":531
  *         self.inst.get().Add(input_in_0)
  * 
  *     def CloseFeeding(self):             # <<<<<<<<<<<<<<
@@ -10113,7 +10489,7 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_6CloseFeeding(st
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("CloseFeeding", 0);
 
-  /* "pykeyvi.pyx":512
+  /* "pykeyvi.pyx":532
  * 
  *     def CloseFeeding(self):
  *         self.inst.get().CloseFeeding()             # <<<<<<<<<<<<<<
@@ -10122,7 +10498,7 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_6CloseFeeding(st
  */
   __pyx_v_self->inst.get()->CloseFeeding();
 
-  /* "pykeyvi.pyx":511
+  /* "pykeyvi.pyx":531
  *         self.inst.get().Add(input_in_0)
  * 
  *     def CloseFeeding(self):             # <<<<<<<<<<<<<<
@@ -10137,7 +10513,7 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_6CloseFeeding(st
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":514
+/* "pykeyvi.pyx":534
  *         self.inst.get().CloseFeeding()
  * 
  *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -10154,7 +10530,7 @@ static PyObject *__pyx_pw_7pykeyvi_26KeyOnlyDictionaryGenerator_9WriteToFile(PyO
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("WriteToFile (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_8WriteToFile(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryGenerator *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -10177,7 +10553,7 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_8WriteToFile(str
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("WriteToFile", 0);
 
-  /* "pykeyvi.pyx":515
+  /* "pykeyvi.pyx":535
  * 
  *     def WriteToFile(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -10189,22 +10565,22 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_8WriteToFile(str
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 515; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 535; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":516
+  /* "pykeyvi.pyx":536
  *     def WriteToFile(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         self.inst.get().WriteToFile(input_in_0)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":517
+  /* "pykeyvi.pyx":537
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         self.inst.get().WriteToFile(input_in_0)             # <<<<<<<<<<<<<<
@@ -10213,7 +10589,7 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_8WriteToFile(str
  */
   __pyx_v_self->inst.get()->WriteToFile(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":514
+  /* "pykeyvi.pyx":534
  *         self.inst.get().CloseFeeding()
  * 
  *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -10233,7 +10609,7 @@ static PyObject *__pyx_pf_7pykeyvi_26KeyOnlyDictionaryGenerator_8WriteToFile(str
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":523
+/* "pykeyvi.pyx":543
  *     cdef shared_ptr[_KeyOnlyDictionaryCompiler] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -10256,7 +10632,7 @@ static void __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler___dealloc__(struct __p
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":524
+  /* "pykeyvi.pyx":544
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -10265,7 +10641,7 @@ static void __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler___dealloc__(struct __p
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":523
+  /* "pykeyvi.pyx":543
  *     cdef shared_ptr[_KeyOnlyDictionaryCompiler] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -10277,7 +10653,7 @@ static void __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler___dealloc__(struct __p
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":527
+/* "pykeyvi.pyx":547
  * 
  * 
  *     def _init_0(self):             # <<<<<<<<<<<<<<
@@ -10307,7 +10683,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_2_init_0(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_0", 0);
 
-  /* "pykeyvi.pyx":528
+  /* "pykeyvi.pyx":548
  * 
  *     def _init_0(self):
  *         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler())             # <<<<<<<<<<<<<<
@@ -10318,11 +10694,11 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_2_init_0(struct _
     __pyx_t_1 = new keyvi::dictionary::KeyOnlyDictionaryCompiler();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 528; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 548; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::KeyOnlyDictionaryCompiler> (__pyx_t_1);
 
-  /* "pykeyvi.pyx":527
+  /* "pykeyvi.pyx":547
  * 
  * 
  *     def _init_0(self):             # <<<<<<<<<<<<<<
@@ -10342,7 +10718,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_2_init_0(struct _
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":530
+/* "pykeyvi.pyx":550
  *         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler())
  * 
  *     def _init_1(self,  memory_limit ):             # <<<<<<<<<<<<<<
@@ -10376,7 +10752,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_4_init_1(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_1", 0);
 
-  /* "pykeyvi.pyx":531
+  /* "pykeyvi.pyx":551
  * 
  *     def _init_1(self,  memory_limit ):
  *         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'             # <<<<<<<<<<<<<<
@@ -10398,28 +10774,28 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_4_init_1(struct _
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_memory_limit_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 531; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 551; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":533
+  /* "pykeyvi.pyx":553
  *         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
  * 
  *         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler((<size_t>memory_limit)))             # <<<<<<<<<<<<<<
  * 
  *     def __init__(self, *args):
  */
-  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_memory_limit); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 533; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_memory_limit); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 553; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   try {
     __pyx_t_5 = new keyvi::dictionary::KeyOnlyDictionaryCompiler(((size_t)__pyx_t_4));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 533; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 553; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::KeyOnlyDictionaryCompiler> (__pyx_t_5);
 
-  /* "pykeyvi.pyx":530
+  /* "pykeyvi.pyx":550
  *         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler())
  * 
  *     def _init_1(self,  memory_limit ):             # <<<<<<<<<<<<<<
@@ -10439,7 +10815,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_4_init_1(struct _
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":535
+/* "pykeyvi.pyx":555
  *         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler((<size_t>memory_limit)))
  * 
  *     def __init__(self, *args):             # <<<<<<<<<<<<<<
@@ -10481,7 +10857,7 @@ static int __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_6__init__(struct __pyx_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":536
+  /* "pykeyvi.pyx":556
  * 
  *     def __init__(self, *args):
  *         if not args:             # <<<<<<<<<<<<<<
@@ -10492,18 +10868,18 @@ static int __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_6__init__(struct __pyx_
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":537
+    /* "pykeyvi.pyx":557
  *     def __init__(self, *args):
  *         if not args:
  *              self._init_0(*args)             # <<<<<<<<<<<<<<
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):
  *              self._init_1(*args)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 537; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 557; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 537; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 557; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 537; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 557; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -10511,14 +10887,14 @@ static int __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_6__init__(struct __pyx_
     goto __pyx_L3;
   }
 
-  /* "pykeyvi.pyx":538
+  /* "pykeyvi.pyx":558
  *         if not args:
  *              self._init_0(*args)
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):             # <<<<<<<<<<<<<<
  *              self._init_1(*args)
  *         else:
  */
-  __pyx_t_6 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 538; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = ((__pyx_t_6 == 1) != 0);
   if (__pyx_t_1) {
   } else {
@@ -10547,18 +10923,18 @@ static int __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_6__init__(struct __pyx_
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":539
+    /* "pykeyvi.pyx":559
  *              self._init_0(*args)
  *         elif (len(args)==1) and (isinstance(args[0], (int, long))):
  *              self._init_1(*args)             # <<<<<<<<<<<<<<
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 559; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -10567,36 +10943,36 @@ static int __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_6__init__(struct __pyx_
   }
   /*else*/ {
 
-    /* "pykeyvi.pyx":541
+    /* "pykeyvi.pyx":561
  *              self._init_1(*args)
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))             # <<<<<<<<<<<<<<
  * 
  *     def Add(self, bytes in_0 ):
  */
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_args);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_args);
     __Pyx_GIVEREF(__pyx_v_args);
-    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 561; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_L3:;
 
-  /* "pykeyvi.pyx":535
+  /* "pykeyvi.pyx":555
  *         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler((<size_t>memory_limit)))
  * 
  *     def __init__(self, *args):             # <<<<<<<<<<<<<<
@@ -10618,7 +10994,7 @@ static int __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_6__init__(struct __pyx_
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":543
+/* "pykeyvi.pyx":563
  *                raise Exception('can not handle type of %s' % (args,))
  * 
  *     def Add(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -10635,7 +11011,7 @@ static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_9Add(PyObject *__
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("Add (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 543; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 563; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_8Add(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
@@ -10658,7 +11034,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_8Add(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("Add", 0);
 
-  /* "pykeyvi.pyx":544
+  /* "pykeyvi.pyx":564
  * 
  *     def Add(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -10670,36 +11046,36 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_8Add(struct __pyx
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 544; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 564; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":545
+  /* "pykeyvi.pyx":565
  *     def Add(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         self.inst.get().Add(input_in_0)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 545; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 565; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":546
+  /* "pykeyvi.pyx":566
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         self.inst.get().Add(input_in_0)             # <<<<<<<<<<<<<<
  * 
- *     def WriteToFile(self, bytes in_0 ):
+ *     def SetManifestFromString(self, bytes in_0 ):
  */
   try {
     __pyx_v_self->inst.get()->Add(__pyx_v_input_in_0);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 546; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 566; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":543
+  /* "pykeyvi.pyx":563
  *                raise Exception('can not handle type of %s' % (args,))
  * 
  *     def Add(self, bytes in_0 ):             # <<<<<<<<<<<<<<
@@ -10719,25 +11095,25 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_8Add(struct __pyx
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":548
+/* "pykeyvi.pyx":568
  *         self.inst.get().Add(input_in_0)
  * 
- *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *     def SetManifestFromString(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_11WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_11WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_11SetManifestFromString(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_11SetManifestFromString(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
   CYTHON_UNUSED int __pyx_lineno = 0;
   CYTHON_UNUSED const char *__pyx_filename = NULL;
   CYTHON_UNUSED int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("WriteToFile (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 548; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10WriteToFile(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+  __Pyx_RefNannySetupContext("SetManifestFromString (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 568; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10SetManifestFromString(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
 
   /* function exit code */
   goto __pyx_L0;
@@ -10748,7 +11124,103 @@ static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_11WriteToFile(PyO
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10WriteToFile(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10SetManifestFromString(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  const char *__pyx_v_input_in_0;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  const char *__pyx_t_2;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("SetManifestFromString", 0);
+
+  /* "pykeyvi.pyx":569
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().SetManifestFromString(input_in_0)
+ */
+  #ifndef CYTHON_WITHOUT_ASSERTIONS
+  if (unlikely(!Py_OptimizeFlag)) {
+    __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
+    if (unlikely(!(__pyx_t_1 != 0))) {
+      PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 569; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    }
+  }
+  #endif
+
+  /* "pykeyvi.pyx":570
+ *     def SetManifestFromString(self, bytes in_0 ):
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
+ *         self.inst.get().SetManifestFromString(input_in_0)
+ * 
+ */
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
+
+  /* "pykeyvi.pyx":571
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ *         self.inst.get().SetManifestFromString(input_in_0)             # <<<<<<<<<<<<<<
+ * 
+ *     def WriteToFile(self, bytes in_0 ):
+ */
+  __pyx_v_self->inst.get()->SetManifestFromString(__pyx_v_input_in_0);
+
+  /* "pykeyvi.pyx":568
+ *         self.inst.get().Add(input_in_0)
+ * 
+ *     def SetManifestFromString(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("pykeyvi.KeyOnlyDictionaryCompiler.SetManifestFromString", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "pykeyvi.pyx":573
+ *         self.inst.get().SetManifestFromString(input_in_0)
+ * 
+ *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
+ *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+ *         cdef const_char * input_in_0 = <const_char *> in_0
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_13WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_13WriteToFile(PyObject *__pyx_v_self, PyObject *__pyx_v_in_0) {
+  CYTHON_UNUSED int __pyx_lineno = 0;
+  CYTHON_UNUSED const char *__pyx_filename = NULL;
+  CYTHON_UNUSED int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("WriteToFile (wrapper)", 0);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_in_0), (&PyBytes_Type), 1, "in_0", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 573; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12WriteToFile(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self), ((PyObject*)__pyx_v_in_0));
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12WriteToFile(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_in_0) {
   const char *__pyx_v_input_in_0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -10759,7 +11231,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10WriteToFile(str
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("WriteToFile", 0);
 
-  /* "pykeyvi.pyx":549
+  /* "pykeyvi.pyx":574
  * 
  *     def WriteToFile(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
@@ -10771,22 +11243,22 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10WriteToFile(str
     __pyx_t_1 = PyBytes_Check(__pyx_v_in_0); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_in_0_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 549; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 574; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":550
+  /* "pykeyvi.pyx":575
  *     def WriteToFile(self, bytes in_0 ):
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0             # <<<<<<<<<<<<<<
  *         self.inst.get().WriteToFile(input_in_0)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 550; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_in_0); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 575; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_input_in_0 = ((const char *)__pyx_t_2);
 
-  /* "pykeyvi.pyx":551
+  /* "pykeyvi.pyx":576
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
  *         cdef const_char * input_in_0 = <const_char *> in_0
  *         self.inst.get().WriteToFile(input_in_0)             # <<<<<<<<<<<<<<
@@ -10795,8 +11267,8 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10WriteToFile(str
  */
   __pyx_v_self->inst.get()->WriteToFile(__pyx_v_input_in_0);
 
-  /* "pykeyvi.pyx":548
- *         self.inst.get().Add(input_in_0)
+  /* "pykeyvi.pyx":573
+ *         self.inst.get().SetManifestFromString(input_in_0)
  * 
  *     def WriteToFile(self, bytes in_0 ):             # <<<<<<<<<<<<<<
  *         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -10815,7 +11287,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10WriteToFile(str
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":553
+/* "pykeyvi.pyx":578
  *         self.inst.get().WriteToFile(input_in_0)
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
@@ -10824,24 +11296,24 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_10WriteToFile(str
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_13__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_13__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_15__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_15__enter__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12__enter__(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self));
+  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__enter__(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12__enter__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self) {
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__enter__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__", 0);
 
-  /* "pykeyvi.pyx":554
+  /* "pykeyvi.pyx":579
  * 
  *     def __enter__(self):
  *         return self             # <<<<<<<<<<<<<<
@@ -10853,7 +11325,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12__enter__(struc
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":553
+  /* "pykeyvi.pyx":578
  *         self.inst.get().WriteToFile(input_in_0)
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
@@ -10868,7 +11340,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12__enter__(struc
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":557
+/* "pykeyvi.pyx":582
  * 
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -10877,8 +11349,8 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_12__enter__(struc
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_15__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_15__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_17__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_17__exit__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   CYTHON_UNUSED PyObject *__pyx_v_type = 0;
   CYTHON_UNUSED PyObject *__pyx_v_value = 0;
   CYTHON_UNUSED PyObject *__pyx_v_traceback = 0;
@@ -10909,16 +11381,16 @@ static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_15__exit__(PyObje
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 557; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 582; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_traceback)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 557; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 582; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 557; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__exit__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 582; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -10933,20 +11405,20 @@ static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_15__exit__(PyObje
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 557; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 582; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.KeyOnlyDictionaryCompiler.__exit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__exit__(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self), __pyx_v_type, __pyx_v_value, __pyx_v_traceback);
+  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16__exit__(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self), __pyx_v_type, __pyx_v_value, __pyx_v_traceback);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__exit__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback) {
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16__exit__(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_type, CYTHON_UNUSED PyObject *__pyx_v_value, CYTHON_UNUSED PyObject *__pyx_v_traceback) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -10957,14 +11429,14 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__exit__(struct
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__exit__", 0);
 
-  /* "pykeyvi.pyx":558
+  /* "pykeyvi.pyx":583
  * 
  *     def __exit__(self, type, value, traceback):
  *         self.Compile()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_Compile); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_Compile); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 583; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -10977,16 +11449,16 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__exit__(struct
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 583; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 583; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":557
+  /* "pykeyvi.pyx":582
  * 
  * 
  *     def __exit__(self, type, value, traceback):             # <<<<<<<<<<<<<<
@@ -11009,7 +11481,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__exit__(struct
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":561
+/* "pykeyvi.pyx":586
  * 
  * 
  *     def Compile(self, *args):             # <<<<<<<<<<<<<<
@@ -11018,8 +11490,8 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_14__exit__(struct
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_17Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_17Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_19Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_19Compile(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_args = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -11027,7 +11499,7 @@ static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_17Compile(PyObjec
   if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "Compile", 0))) return NULL;
   __Pyx_INCREF(__pyx_args);
   __pyx_v_args = __pyx_args;
-  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
+  __pyx_r = __pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_18Compile(((struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *)__pyx_v_self), __pyx_v_args);
 
   /* function exit code */
   __Pyx_XDECREF(__pyx_v_args);
@@ -11035,7 +11507,7 @@ static PyObject *__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_17Compile(PyObjec
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
+static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_18Compile(struct __pyx_obj_7pykeyvi_KeyOnlyDictionaryCompiler *__pyx_v_self, PyObject *__pyx_v_args) {
   void *__pyx_v_callback;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -11043,7 +11515,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("Compile", 0);
 
-  /* "pykeyvi.pyx":562
+  /* "pykeyvi.pyx":587
  * 
  *     def Compile(self, *args):
  *         if not args:             # <<<<<<<<<<<<<<
@@ -11054,7 +11526,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":563
+    /* "pykeyvi.pyx":588
  *     def Compile(self, *args):
  *         if not args:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -11068,7 +11540,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
         #endif
         /*try:*/ {
 
-          /* "pykeyvi.pyx":564
+          /* "pykeyvi.pyx":589
  *         if not args:
  *             with nogil:
  *                 self.inst.get().Compile()             # <<<<<<<<<<<<<<
@@ -11078,7 +11550,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
           __pyx_v_self->inst.get()->Compile();
         }
 
-        /* "pykeyvi.pyx":563
+        /* "pykeyvi.pyx":588
  *     def Compile(self, *args):
  *         if not args:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -11096,7 +11568,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
         }
     }
 
-    /* "pykeyvi.pyx":565
+    /* "pykeyvi.pyx":590
  *             with nogil:
  *                 self.inst.get().Compile()
  *             return             # <<<<<<<<<<<<<<
@@ -11108,7 +11580,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
     goto __pyx_L0;
   }
 
-  /* "pykeyvi.pyx":567
+  /* "pykeyvi.pyx":592
  *             return
  * 
  *         cdef void* callback = <void*> args[0]             # <<<<<<<<<<<<<<
@@ -11117,7 +11589,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
  */
   __pyx_v_callback = ((void *)PyTuple_GET_ITEM(__pyx_v_args, 0));
 
-  /* "pykeyvi.pyx":568
+  /* "pykeyvi.pyx":593
  * 
  *         cdef void* callback = <void*> args[0]
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -11131,7 +11603,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
       #endif
       /*try:*/ {
 
-        /* "pykeyvi.pyx":569
+        /* "pykeyvi.pyx":594
  *         cdef void* callback = <void*> args[0]
  *         with nogil:
  *             self.inst.get().Compile(callback_wrapper, callback)             # <<<<<<<<<<<<<<
@@ -11141,7 +11613,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
         __pyx_v_self->inst.get()->Compile(__pyx_f_7pykeyvi_callback_wrapper, __pyx_v_callback);
       }
 
-      /* "pykeyvi.pyx":568
+      /* "pykeyvi.pyx":593
  * 
  *         cdef void* callback = <void*> args[0]
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -11159,7 +11631,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
       }
   }
 
-  /* "pykeyvi.pyx":561
+  /* "pykeyvi.pyx":586
  * 
  * 
  *     def Compile(self, *args):             # <<<<<<<<<<<<<<
@@ -11175,7 +11647,7 @@ static PyObject *__pyx_pf_7pykeyvi_25KeyOnlyDictionaryCompiler_16Compile(struct 
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":575
+/* "pykeyvi.pyx":600
  *     cdef shared_ptr[_Match] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -11198,7 +11670,7 @@ static void __pyx_pf_7pykeyvi_5Match___dealloc__(struct __pyx_obj_7pykeyvi_Match
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "pykeyvi.pyx":576
+  /* "pykeyvi.pyx":601
  * 
  *     def __dealloc__(self):
  *          self.inst.reset()             # <<<<<<<<<<<<<<
@@ -11207,7 +11679,7 @@ static void __pyx_pf_7pykeyvi_5Match___dealloc__(struct __pyx_obj_7pykeyvi_Match
  */
   __pyx_v_self->inst.reset();
 
-  /* "pykeyvi.pyx":575
+  /* "pykeyvi.pyx":600
  *     cdef shared_ptr[_Match] inst
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -11219,7 +11691,7 @@ static void __pyx_pf_7pykeyvi_5Match___dealloc__(struct __pyx_obj_7pykeyvi_Match
   __Pyx_RefNannyFinishContext();
 }
 
-/* "pykeyvi.pyx":579
+/* "pykeyvi.pyx":604
  * 
  * 
  *     def SetEnd(self,  end ):             # <<<<<<<<<<<<<<
@@ -11252,7 +11724,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_2SetEnd(struct __pyx_obj_7pykeyvi_Matc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("SetEnd", 0);
 
-  /* "pykeyvi.pyx":580
+  /* "pykeyvi.pyx":605
  * 
  *     def SetEnd(self,  end ):
  *         assert isinstance(end, (int, long)), 'arg end wrong type'             # <<<<<<<<<<<<<<
@@ -11274,22 +11746,22 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_2SetEnd(struct __pyx_obj_7pykeyvi_Matc
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_end_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 580; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":582
+  /* "pykeyvi.pyx":607
  *         assert isinstance(end, (int, long)), 'arg end wrong type'
  * 
  *         self.inst.get().SetEnd((<size_t>end))             # <<<<<<<<<<<<<<
  * 
  *     def GetStart(self):
  */
-  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_end); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 582; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_end); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->inst.get()->SetEnd(((size_t)__pyx_t_4));
 
-  /* "pykeyvi.pyx":579
+  /* "pykeyvi.pyx":604
  * 
  * 
  *     def SetEnd(self,  end ):             # <<<<<<<<<<<<<<
@@ -11309,7 +11781,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_2SetEnd(struct __pyx_obj_7pykeyvi_Matc
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":584
+/* "pykeyvi.pyx":609
  *         self.inst.get().SetEnd((<size_t>end))
  * 
  *     def GetStart(self):             # <<<<<<<<<<<<<<
@@ -11341,7 +11813,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_4GetStart(struct __pyx_obj_7pykeyvi_Ma
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetStart", 0);
 
-  /* "pykeyvi.pyx":585
+  /* "pykeyvi.pyx":610
  * 
  *     def GetStart(self):
  *         cdef size_t _r = self.inst.get().GetStart()             # <<<<<<<<<<<<<<
@@ -11350,7 +11822,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_4GetStart(struct __pyx_obj_7pykeyvi_Ma
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetStart();
 
-  /* "pykeyvi.pyx":586
+  /* "pykeyvi.pyx":611
  *     def GetStart(self):
  *         cdef size_t _r = self.inst.get().GetStart()
  *         py_result = <size_t>_r             # <<<<<<<<<<<<<<
@@ -11359,7 +11831,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_4GetStart(struct __pyx_obj_7pykeyvi_Ma
  */
   __pyx_v_py_result = ((size_t)__pyx_v__r);
 
-  /* "pykeyvi.pyx":587
+  /* "pykeyvi.pyx":612
  *         cdef size_t _r = self.inst.get().GetStart()
  *         py_result = <size_t>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -11367,13 +11839,13 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_4GetStart(struct __pyx_obj_7pykeyvi_Ma
  *     def GetScore(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 587; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 612; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":584
+  /* "pykeyvi.pyx":609
  *         self.inst.get().SetEnd((<size_t>end))
  * 
  *     def GetStart(self):             # <<<<<<<<<<<<<<
@@ -11392,7 +11864,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_4GetStart(struct __pyx_obj_7pykeyvi_Ma
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":589
+/* "pykeyvi.pyx":614
  *         return py_result
  * 
  *     def GetScore(self):             # <<<<<<<<<<<<<<
@@ -11424,7 +11896,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_6GetScore(struct __pyx_obj_7pykeyvi_Ma
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetScore", 0);
 
-  /* "pykeyvi.pyx":590
+  /* "pykeyvi.pyx":615
  * 
  *     def GetScore(self):
  *         cdef float _r = self.inst.get().GetScore()             # <<<<<<<<<<<<<<
@@ -11433,19 +11905,19 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_6GetScore(struct __pyx_obj_7pykeyvi_Ma
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetScore();
 
-  /* "pykeyvi.pyx":591
+  /* "pykeyvi.pyx":616
  *     def GetScore(self):
  *         cdef float _r = self.inst.get().GetScore()
  *         py_result = <float>_r             # <<<<<<<<<<<<<<
  *         return py_result
  * 
  */
-  __pyx_t_1 = PyFloat_FromDouble(((float)__pyx_v__r)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 591; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(((float)__pyx_v__r)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 616; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_py_result = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":592
+  /* "pykeyvi.pyx":617
  *         cdef float _r = self.inst.get().GetScore()
  *         py_result = <float>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -11457,7 +11929,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_6GetScore(struct __pyx_obj_7pykeyvi_Ma
   __pyx_r = __pyx_v_py_result;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":589
+  /* "pykeyvi.pyx":614
  *         return py_result
  * 
  *     def GetScore(self):             # <<<<<<<<<<<<<<
@@ -11477,7 +11949,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_6GetScore(struct __pyx_obj_7pykeyvi_Ma
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":594
+/* "pykeyvi.pyx":619
  *         return py_result
  * 
  *     def SetMatchedString(self, bytes matched_string ):             # <<<<<<<<<<<<<<
@@ -11494,7 +11966,7 @@ static PyObject *__pyx_pw_7pykeyvi_5Match_9SetMatchedString(PyObject *__pyx_v_se
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("SetMatchedString (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matched_string), (&PyBytes_Type), 1, "matched_string", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 594; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_matched_string), (&PyBytes_Type), 1, "matched_string", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 619; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_5Match_8SetMatchedString(((struct __pyx_obj_7pykeyvi_Match *)__pyx_v_self), ((PyObject*)__pyx_v_matched_string));
 
   /* function exit code */
@@ -11516,7 +11988,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_8SetMatchedString(struct __pyx_obj_7py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("SetMatchedString", 0);
 
-  /* "pykeyvi.pyx":595
+  /* "pykeyvi.pyx":620
  * 
  *     def SetMatchedString(self, bytes matched_string ):
  *         assert isinstance(matched_string, bytes), 'arg matched_string wrong type'             # <<<<<<<<<<<<<<
@@ -11528,22 +12000,22 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_8SetMatchedString(struct __pyx_obj_7py
     __pyx_t_1 = PyBytes_Check(__pyx_v_matched_string); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_matched_string_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 595; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 620; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":597
+  /* "pykeyvi.pyx":622
  *         assert isinstance(matched_string, bytes), 'arg matched_string wrong type'
  * 
  *         self.inst.get().SetMatchedString((<libcpp_string>matched_string))             # <<<<<<<<<<<<<<
  * 
  *     def GetValueAsString(self):
  */
-  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_v_matched_string); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 597; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_convert_string_from_py_std__in_string(__pyx_v_matched_string); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 622; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->inst.get()->SetMatchedString(((std::string)__pyx_t_2));
 
-  /* "pykeyvi.pyx":594
+  /* "pykeyvi.pyx":619
  *         return py_result
  * 
  *     def SetMatchedString(self, bytes matched_string ):             # <<<<<<<<<<<<<<
@@ -11563,7 +12035,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_8SetMatchedString(struct __pyx_obj_7py
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":599
+/* "pykeyvi.pyx":624
  *         self.inst.get().SetMatchedString((<libcpp_string>matched_string))
  * 
  *     def GetValueAsString(self):             # <<<<<<<<<<<<<<
@@ -11595,7 +12067,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_10GetValueAsString(struct __pyx_obj_7p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetValueAsString", 0);
 
-  /* "pykeyvi.pyx":600
+  /* "pykeyvi.pyx":625
  * 
  *     def GetValueAsString(self):
  *         cdef libcpp_string _r = self.inst.get().GetValueAsString()             # <<<<<<<<<<<<<<
@@ -11604,7 +12076,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_10GetValueAsString(struct __pyx_obj_7p
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetValueAsString();
 
-  /* "pykeyvi.pyx":601
+  /* "pykeyvi.pyx":626
  *     def GetValueAsString(self):
  *         cdef libcpp_string _r = self.inst.get().GetValueAsString()
  *         py_result = <libcpp_string>_r             # <<<<<<<<<<<<<<
@@ -11613,7 +12085,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_10GetValueAsString(struct __pyx_obj_7p
  */
   __pyx_v_py_result = ((std::string)__pyx_v__r);
 
-  /* "pykeyvi.pyx":602
+  /* "pykeyvi.pyx":627
  *         cdef libcpp_string _r = self.inst.get().GetValueAsString()
  *         py_result = <libcpp_string>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -11621,13 +12093,13 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_10GetValueAsString(struct __pyx_obj_7p
  *     def IsEmpty(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 602; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 627; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":599
+  /* "pykeyvi.pyx":624
  *         self.inst.get().SetMatchedString((<libcpp_string>matched_string))
  * 
  *     def GetValueAsString(self):             # <<<<<<<<<<<<<<
@@ -11646,7 +12118,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_10GetValueAsString(struct __pyx_obj_7p
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":604
+/* "pykeyvi.pyx":629
  *         return py_result
  * 
  *     def IsEmpty(self):             # <<<<<<<<<<<<<<
@@ -11678,7 +12150,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_12IsEmpty(struct __pyx_obj_7pykeyvi_Ma
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("IsEmpty", 0);
 
-  /* "pykeyvi.pyx":605
+  /* "pykeyvi.pyx":630
  * 
  *     def IsEmpty(self):
  *         cdef bool _r = self.inst.get().IsEmpty()             # <<<<<<<<<<<<<<
@@ -11687,7 +12159,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_12IsEmpty(struct __pyx_obj_7pykeyvi_Ma
  */
   __pyx_v__r = __pyx_v_self->inst.get()->IsEmpty();
 
-  /* "pykeyvi.pyx":606
+  /* "pykeyvi.pyx":631
  *     def IsEmpty(self):
  *         cdef bool _r = self.inst.get().IsEmpty()
  *         py_result = <bool>_r             # <<<<<<<<<<<<<<
@@ -11696,7 +12168,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_12IsEmpty(struct __pyx_obj_7pykeyvi_Ma
  */
   __pyx_v_py_result = ((bool)__pyx_v__r);
 
-  /* "pykeyvi.pyx":607
+  /* "pykeyvi.pyx":632
  *         cdef bool _r = self.inst.get().IsEmpty()
  *         py_result = <bool>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -11704,13 +12176,13 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_12IsEmpty(struct __pyx_obj_7pykeyvi_Ma
  *     def SetScore(self, float score ):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 632; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":604
+  /* "pykeyvi.pyx":629
  *         return py_result
  * 
  *     def IsEmpty(self):             # <<<<<<<<<<<<<<
@@ -11729,7 +12201,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_12IsEmpty(struct __pyx_obj_7pykeyvi_Ma
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":609
+/* "pykeyvi.pyx":634
  *         return py_result
  * 
  *     def SetScore(self, float score ):             # <<<<<<<<<<<<<<
@@ -11748,7 +12220,7 @@ static PyObject *__pyx_pw_7pykeyvi_5Match_15SetScore(PyObject *__pyx_v_self, PyO
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("SetScore (wrapper)", 0);
   assert(__pyx_arg_score); {
-    __pyx_v_score = __pyx_PyFloat_AsFloat(__pyx_arg_score); if (unlikely((__pyx_v_score == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 609; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_score = __pyx_PyFloat_AsFloat(__pyx_arg_score); if (unlikely((__pyx_v_score == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 634; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11773,7 +12245,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_14SetScore(struct __pyx_obj_7pykeyvi_M
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("SetScore", 0);
 
-  /* "pykeyvi.pyx":610
+  /* "pykeyvi.pyx":635
  * 
  *     def SetScore(self, float score ):
  *         assert isinstance(score, float), 'arg score wrong type'             # <<<<<<<<<<<<<<
@@ -11782,18 +12254,18 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_14SetScore(struct __pyx_obj_7pykeyvi_M
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_score); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 610; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_score); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_2 = PyFloat_Check(__pyx_t_1); 
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(!(__pyx_t_2 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_score_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 610; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":612
+  /* "pykeyvi.pyx":637
  *         assert isinstance(score, float), 'arg score wrong type'
  * 
  *         self.inst.get().SetScore((<float>score))             # <<<<<<<<<<<<<<
@@ -11802,7 +12274,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_14SetScore(struct __pyx_obj_7pykeyvi_M
  */
   __pyx_v_self->inst.get()->SetScore(((float)__pyx_v_score));
 
-  /* "pykeyvi.pyx":609
+  /* "pykeyvi.pyx":634
  *         return py_result
  * 
  *     def SetScore(self, float score ):             # <<<<<<<<<<<<<<
@@ -11823,7 +12295,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_14SetScore(struct __pyx_obj_7pykeyvi_M
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":614
+/* "pykeyvi.pyx":639
  *         self.inst.get().SetScore((<float>score))
  * 
  *     def GetRawValueAsString(self):             # <<<<<<<<<<<<<<
@@ -11855,7 +12327,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_16GetRawValueAsString(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetRawValueAsString", 0);
 
-  /* "pykeyvi.pyx":615
+  /* "pykeyvi.pyx":640
  * 
  *     def GetRawValueAsString(self):
  *         cdef libcpp_string _r = self.inst.get().GetRawValueAsString()             # <<<<<<<<<<<<<<
@@ -11864,7 +12336,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_16GetRawValueAsString(struct __pyx_obj
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetRawValueAsString();
 
-  /* "pykeyvi.pyx":616
+  /* "pykeyvi.pyx":641
  *     def GetRawValueAsString(self):
  *         cdef libcpp_string _r = self.inst.get().GetRawValueAsString()
  *         py_result = <libcpp_string>_r             # <<<<<<<<<<<<<<
@@ -11873,7 +12345,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_16GetRawValueAsString(struct __pyx_obj
  */
   __pyx_v_py_result = ((std::string)__pyx_v__r);
 
-  /* "pykeyvi.pyx":617
+  /* "pykeyvi.pyx":642
  *         cdef libcpp_string _r = self.inst.get().GetRawValueAsString()
  *         py_result = <libcpp_string>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -11881,13 +12353,13 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_16GetRawValueAsString(struct __pyx_obj
  *     def SetStart(self,  start ):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 617; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 642; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":614
+  /* "pykeyvi.pyx":639
  *         self.inst.get().SetScore((<float>score))
  * 
  *     def GetRawValueAsString(self):             # <<<<<<<<<<<<<<
@@ -11906,7 +12378,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_16GetRawValueAsString(struct __pyx_obj
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":619
+/* "pykeyvi.pyx":644
  *         return py_result
  * 
  *     def SetStart(self,  start ):             # <<<<<<<<<<<<<<
@@ -11939,7 +12411,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_18SetStart(struct __pyx_obj_7pykeyvi_M
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("SetStart", 0);
 
-  /* "pykeyvi.pyx":620
+  /* "pykeyvi.pyx":645
  * 
  *     def SetStart(self,  start ):
  *         assert isinstance(start, (int, long)), 'arg start wrong type'             # <<<<<<<<<<<<<<
@@ -11961,22 +12433,22 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_18SetStart(struct __pyx_obj_7pykeyvi_M
     __pyx_L3_bool_binop_done:;
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_start_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 620; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 645; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":622
+  /* "pykeyvi.pyx":647
  *         assert isinstance(start, (int, long)), 'arg start wrong type'
  * 
  *         self.inst.get().SetStart((<size_t>start))             # <<<<<<<<<<<<<<
  * 
  *     def GetEnd(self):
  */
-  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_start); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 622; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_As_size_t(__pyx_v_start); if (unlikely((__pyx_t_4 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 647; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->inst.get()->SetStart(((size_t)__pyx_t_4));
 
-  /* "pykeyvi.pyx":619
+  /* "pykeyvi.pyx":644
  *         return py_result
  * 
  *     def SetStart(self,  start ):             # <<<<<<<<<<<<<<
@@ -11996,7 +12468,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_18SetStart(struct __pyx_obj_7pykeyvi_M
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":624
+/* "pykeyvi.pyx":649
  *         self.inst.get().SetStart((<size_t>start))
  * 
  *     def GetEnd(self):             # <<<<<<<<<<<<<<
@@ -12028,7 +12500,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_20GetEnd(struct __pyx_obj_7pykeyvi_Mat
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetEnd", 0);
 
-  /* "pykeyvi.pyx":625
+  /* "pykeyvi.pyx":650
  * 
  *     def GetEnd(self):
  *         cdef size_t _r = self.inst.get().GetEnd()             # <<<<<<<<<<<<<<
@@ -12037,7 +12509,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_20GetEnd(struct __pyx_obj_7pykeyvi_Mat
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetEnd();
 
-  /* "pykeyvi.pyx":626
+  /* "pykeyvi.pyx":651
  *     def GetEnd(self):
  *         cdef size_t _r = self.inst.get().GetEnd()
  *         py_result = <size_t>_r             # <<<<<<<<<<<<<<
@@ -12046,7 +12518,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_20GetEnd(struct __pyx_obj_7pykeyvi_Mat
  */
   __pyx_v_py_result = ((size_t)__pyx_v__r);
 
-  /* "pykeyvi.pyx":627
+  /* "pykeyvi.pyx":652
  *         cdef size_t _r = self.inst.get().GetEnd()
  *         py_result = <size_t>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -12054,13 +12526,13 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_20GetEnd(struct __pyx_obj_7pykeyvi_Mat
  *     def __copy__(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 627; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_FromSize_t(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 652; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":624
+  /* "pykeyvi.pyx":649
  *         self.inst.get().SetStart((<size_t>start))
  * 
  *     def GetEnd(self):             # <<<<<<<<<<<<<<
@@ -12079,7 +12551,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_20GetEnd(struct __pyx_obj_7pykeyvi_Mat
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":629
+/* "pykeyvi.pyx":654
  *         return py_result
  * 
  *     def __copy__(self):             # <<<<<<<<<<<<<<
@@ -12110,20 +12582,20 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_22__copy__(struct __pyx_obj_7pykeyvi_M
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__copy__", 0);
 
-  /* "pykeyvi.pyx":630
+  /* "pykeyvi.pyx":655
  * 
  *     def __copy__(self):
  *        cdef Match rv = Match.__new__(Match)             # <<<<<<<<<<<<<<
  *        rv.inst = shared_ptr[_Match](new _Match(deref(self.inst.get())))
  *        return rv
  */
-  __pyx_t_1 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 655; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 655; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_rv = ((struct __pyx_obj_7pykeyvi_Match *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":631
+  /* "pykeyvi.pyx":656
  *     def __copy__(self):
  *        cdef Match rv = Match.__new__(Match)
  *        rv.inst = shared_ptr[_Match](new _Match(deref(self.inst.get())))             # <<<<<<<<<<<<<<
@@ -12132,7 +12604,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_22__copy__(struct __pyx_obj_7pykeyvi_M
  */
   __pyx_v_rv->inst = boost::shared_ptr<keyvi::dictionary::Match> (new keyvi::dictionary::Match((*__pyx_v_self->inst.get())));
 
-  /* "pykeyvi.pyx":632
+  /* "pykeyvi.pyx":657
  *        cdef Match rv = Match.__new__(Match)
  *        rv.inst = shared_ptr[_Match](new _Match(deref(self.inst.get())))
  *        return rv             # <<<<<<<<<<<<<<
@@ -12144,7 +12616,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_22__copy__(struct __pyx_obj_7pykeyvi_M
   __pyx_r = ((PyObject *)__pyx_v_rv);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":629
+  /* "pykeyvi.pyx":654
  *         return py_result
  * 
  *     def __copy__(self):             # <<<<<<<<<<<<<<
@@ -12164,7 +12636,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_22__copy__(struct __pyx_obj_7pykeyvi_M
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":634
+/* "pykeyvi.pyx":659
  *        return rv
  * 
  *     def __deepcopy__(self, memo):             # <<<<<<<<<<<<<<
@@ -12195,20 +12667,20 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_24__deepcopy__(struct __pyx_obj_7pykey
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__deepcopy__", 0);
 
-  /* "pykeyvi.pyx":635
+  /* "pykeyvi.pyx":660
  * 
  *     def __deepcopy__(self, memo):
  *        cdef Match rv = Match.__new__(Match)             # <<<<<<<<<<<<<<
  *        rv.inst = shared_ptr[_Match](new _Match(deref(self.inst.get())))
  *        return rv
  */
-  __pyx_t_1 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 635; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 660; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_rv = ((struct __pyx_obj_7pykeyvi_Match *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pykeyvi.pyx":636
+  /* "pykeyvi.pyx":661
  *     def __deepcopy__(self, memo):
  *        cdef Match rv = Match.__new__(Match)
  *        rv.inst = shared_ptr[_Match](new _Match(deref(self.inst.get())))             # <<<<<<<<<<<<<<
@@ -12217,7 +12689,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_24__deepcopy__(struct __pyx_obj_7pykey
  */
   __pyx_v_rv->inst = boost::shared_ptr<keyvi::dictionary::Match> (new keyvi::dictionary::Match((*__pyx_v_self->inst.get())));
 
-  /* "pykeyvi.pyx":637
+  /* "pykeyvi.pyx":662
  *        cdef Match rv = Match.__new__(Match)
  *        rv.inst = shared_ptr[_Match](new _Match(deref(self.inst.get())))
  *        return rv             # <<<<<<<<<<<<<<
@@ -12229,7 +12701,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_24__deepcopy__(struct __pyx_obj_7pykey
   __pyx_r = ((PyObject *)__pyx_v_rv);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":634
+  /* "pykeyvi.pyx":659
  *        return rv
  * 
  *     def __deepcopy__(self, memo):             # <<<<<<<<<<<<<<
@@ -12249,7 +12721,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_24__deepcopy__(struct __pyx_obj_7pykey
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":639
+/* "pykeyvi.pyx":664
  *        return rv
  * 
  *     def _init_0(self):             # <<<<<<<<<<<<<<
@@ -12275,7 +12747,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_26_init_0(struct __pyx_obj_7pykeyvi_Ma
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_init_0", 0);
 
-  /* "pykeyvi.pyx":640
+  /* "pykeyvi.pyx":665
  * 
  *     def _init_0(self):
  *         self.inst = shared_ptr[_Match](new _Match())             # <<<<<<<<<<<<<<
@@ -12284,7 +12756,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_26_init_0(struct __pyx_obj_7pykeyvi_Ma
  */
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::Match> (new keyvi::dictionary::Match());
 
-  /* "pykeyvi.pyx":639
+  /* "pykeyvi.pyx":664
  *        return rv
  * 
  *     def _init_0(self):             # <<<<<<<<<<<<<<
@@ -12299,7 +12771,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_26_init_0(struct __pyx_obj_7pykeyvi_Ma
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":642
+/* "pykeyvi.pyx":667
  *         self.inst = shared_ptr[_Match](new _Match())
  * 
  *     def _init_1(self, Match m ):             # <<<<<<<<<<<<<<
@@ -12316,7 +12788,7 @@ static PyObject *__pyx_pw_7pykeyvi_5Match_29_init_1(PyObject *__pyx_v_self, PyOb
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_init_1 (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_m), __pyx_ptype_7pykeyvi_Match, 1, "m", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 642; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_m), __pyx_ptype_7pykeyvi_Match, 1, "m", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_7pykeyvi_5Match_28_init_1(((struct __pyx_obj_7pykeyvi_Match *)__pyx_v_self), ((struct __pyx_obj_7pykeyvi_Match *)__pyx_v_m));
 
   /* function exit code */
@@ -12337,7 +12809,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_28_init_1(struct __pyx_obj_7pykeyvi_Ma
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_1", 0);
 
-  /* "pykeyvi.pyx":643
+  /* "pykeyvi.pyx":668
  * 
  *     def _init_1(self, Match m ):
  *         assert isinstance(m, Match), 'arg m wrong type'             # <<<<<<<<<<<<<<
@@ -12349,12 +12821,12 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_28_init_1(struct __pyx_obj_7pykeyvi_Ma
     __pyx_t_1 = __Pyx_TypeCheck(((PyObject *)__pyx_v_m), ((PyObject*)__pyx_ptype_7pykeyvi_Match)); 
     if (unlikely(!(__pyx_t_1 != 0))) {
       PyErr_SetObject(PyExc_AssertionError, __pyx_kp_s_arg_m_wrong_type);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 643; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pykeyvi.pyx":645
+  /* "pykeyvi.pyx":670
  *         assert isinstance(m, Match), 'arg m wrong type'
  * 
  *         self.inst = shared_ptr[_Match](new _Match((deref(m.inst.get()))))             # <<<<<<<<<<<<<<
@@ -12363,7 +12835,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_28_init_1(struct __pyx_obj_7pykeyvi_Ma
  */
   __pyx_v_self->inst = boost::shared_ptr<keyvi::dictionary::Match> (new keyvi::dictionary::Match((*__pyx_v_m->inst.get())));
 
-  /* "pykeyvi.pyx":642
+  /* "pykeyvi.pyx":667
  *         self.inst = shared_ptr[_Match](new _Match())
  * 
  *     def _init_1(self, Match m ):             # <<<<<<<<<<<<<<
@@ -12383,7 +12855,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_28_init_1(struct __pyx_obj_7pykeyvi_Ma
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":647
+/* "pykeyvi.pyx":672
  *         self.inst = shared_ptr[_Match](new _Match((deref(m.inst.get()))))
  * 
  *     def __init__(self, *args):             # <<<<<<<<<<<<<<
@@ -12424,7 +12896,7 @@ static int __pyx_pf_7pykeyvi_5Match_30__init__(struct __pyx_obj_7pykeyvi_Match *
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pykeyvi.pyx":648
+  /* "pykeyvi.pyx":673
  * 
  *     def __init__(self, *args):
  *         if not args:             # <<<<<<<<<<<<<<
@@ -12435,18 +12907,18 @@ static int __pyx_pf_7pykeyvi_5Match_30__init__(struct __pyx_obj_7pykeyvi_Match *
   __pyx_t_2 = ((!__pyx_t_1) != 0);
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":649
+    /* "pykeyvi.pyx":674
  *     def __init__(self, *args):
  *         if not args:
  *              self._init_0(*args)             # <<<<<<<<<<<<<<
  *         elif (len(args)==1) and (isinstance(args[0], Match)):
  *              self._init_1(*args)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 649; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 674; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 649; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 674; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 649; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 674; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -12454,14 +12926,14 @@ static int __pyx_pf_7pykeyvi_5Match_30__init__(struct __pyx_obj_7pykeyvi_Match *
     goto __pyx_L3;
   }
 
-  /* "pykeyvi.pyx":650
+  /* "pykeyvi.pyx":675
  *         if not args:
  *              self._init_0(*args)
  *         elif (len(args)==1) and (isinstance(args[0], Match)):             # <<<<<<<<<<<<<<
  *              self._init_1(*args)
  *         else:
  */
-  __pyx_t_6 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 650; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 675; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_1 = ((__pyx_t_6 == 1) != 0);
   if (__pyx_t_1) {
   } else {
@@ -12477,18 +12949,18 @@ static int __pyx_pf_7pykeyvi_5Match_30__init__(struct __pyx_obj_7pykeyvi_Match *
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":651
+    /* "pykeyvi.pyx":676
  *              self._init_0(*args)
  *         elif (len(args)==1) and (isinstance(args[0], Match)):
  *              self._init_1(*args)             # <<<<<<<<<<<<<<
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 651; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init_1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 676; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 651; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 676; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 651; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_4, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 676; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -12497,36 +12969,36 @@ static int __pyx_pf_7pykeyvi_5Match_30__init__(struct __pyx_obj_7pykeyvi_Match *
   }
   /*else*/ {
 
-    /* "pykeyvi.pyx":653
+    /* "pykeyvi.pyx":678
  *              self._init_1(*args)
  *         else:
  *                raise Exception('can not handle type of %s' % (args,))             # <<<<<<<<<<<<<<
  * 
  *     def GetMatchedString(self):
  */
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 653; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_INCREF(__pyx_v_args);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_args);
     __Pyx_GIVEREF(__pyx_v_args);
-    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 653; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyString_Format(__pyx_kp_s_can_not_handle_type_of_s, __pyx_t_3); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 653; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 653; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 653; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 678; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_L3:;
 
-  /* "pykeyvi.pyx":647
+  /* "pykeyvi.pyx":672
  *         self.inst = shared_ptr[_Match](new _Match((deref(m.inst.get()))))
  * 
  *     def __init__(self, *args):             # <<<<<<<<<<<<<<
@@ -12548,7 +13020,7 @@ static int __pyx_pf_7pykeyvi_5Match_30__init__(struct __pyx_obj_7pykeyvi_Match *
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":655
+/* "pykeyvi.pyx":680
  *                raise Exception('can not handle type of %s' % (args,))
  * 
  *     def GetMatchedString(self):             # <<<<<<<<<<<<<<
@@ -12580,7 +13052,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_32GetMatchedString(struct __pyx_obj_7p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetMatchedString", 0);
 
-  /* "pykeyvi.pyx":656
+  /* "pykeyvi.pyx":681
  * 
  *     def GetMatchedString(self):
  *         cdef libcpp_string _r = self.inst.get().GetMatchedString()             # <<<<<<<<<<<<<<
@@ -12589,7 +13061,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_32GetMatchedString(struct __pyx_obj_7p
  */
   __pyx_v__r = __pyx_v_self->inst.get()->GetMatchedString();
 
-  /* "pykeyvi.pyx":657
+  /* "pykeyvi.pyx":682
  *     def GetMatchedString(self):
  *         cdef libcpp_string _r = self.inst.get().GetMatchedString()
  *         py_result = <libcpp_string>_r             # <<<<<<<<<<<<<<
@@ -12598,7 +13070,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_32GetMatchedString(struct __pyx_obj_7p
  */
   __pyx_v_py_result = ((std::string)__pyx_v__r);
 
-  /* "pykeyvi.pyx":658
+  /* "pykeyvi.pyx":683
  *         cdef libcpp_string _r = self.inst.get().GetMatchedString()
  *         py_result = <libcpp_string>_r
  *         return py_result             # <<<<<<<<<<<<<<
@@ -12606,13 +13078,13 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_32GetMatchedString(struct __pyx_obj_7p
  *     def GetAttribute(self, key):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 658; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_py_result); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 683; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":655
+  /* "pykeyvi.pyx":680
  *                raise Exception('can not handle type of %s' % (args,))
  * 
  *     def GetMatchedString(self):             # <<<<<<<<<<<<<<
@@ -12631,7 +13103,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_32GetMatchedString(struct __pyx_obj_7p
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":660
+/* "pykeyvi.pyx":685
  *         return py_result
  * 
  *     def GetAttribute(self, key):             # <<<<<<<<<<<<<<
@@ -12663,23 +13135,23 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_34GetAttribute(struct __pyx_obj_7pykey
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("GetAttribute", 0);
 
-  /* "pykeyvi.pyx":661
+  /* "pykeyvi.pyx":686
  * 
  *     def GetAttribute(self, key):
  *         py_result = self.inst.get().GetAttributePy(<libcpp_string> key)             # <<<<<<<<<<<<<<
  *         return <object>py_result
  * 
  */
-  __pyx_t_1 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 661; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 686; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   try {
     __pyx_t_2 = __pyx_v_self->inst.get()->GetAttributePy(((std::string)__pyx_t_1));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 661; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 686; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_v_py_result = __pyx_t_2;
 
-  /* "pykeyvi.pyx":662
+  /* "pykeyvi.pyx":687
  *     def GetAttribute(self, key):
  *         py_result = self.inst.get().GetAttributePy(<libcpp_string> key)
  *         return <object>py_result             # <<<<<<<<<<<<<<
@@ -12691,7 +13163,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_34GetAttribute(struct __pyx_obj_7pykey
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":660
+  /* "pykeyvi.pyx":685
  *         return py_result
  * 
  *     def GetAttribute(self, key):             # <<<<<<<<<<<<<<
@@ -12709,7 +13181,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_34GetAttribute(struct __pyx_obj_7pykey
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":665
+/* "pykeyvi.pyx":690
  * 
  * 
  *     def SetAttribute(self, key, value):             # <<<<<<<<<<<<<<
@@ -12748,11 +13220,11 @@ static PyObject *__pyx_pw_7pykeyvi_5Match_37SetAttribute(PyObject *__pyx_v_self,
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_value)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("SetAttribute", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 665; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("SetAttribute", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 690; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "SetAttribute") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 665; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "SetAttribute") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 690; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -12765,7 +13237,7 @@ static PyObject *__pyx_pw_7pykeyvi_5Match_37SetAttribute(PyObject *__pyx_v_self,
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("SetAttribute", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 665; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("SetAttribute", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 690; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pykeyvi.Match.SetAttribute", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -12795,7 +13267,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_36SetAttribute(struct __pyx_obj_7pykey
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("SetAttribute", 0);
 
-  /* "pykeyvi.pyx":666
+  /* "pykeyvi.pyx":691
  * 
  *     def SetAttribute(self, key, value):
  *         t = type(value)             # <<<<<<<<<<<<<<
@@ -12805,97 +13277,97 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_36SetAttribute(struct __pyx_obj_7pykey
   __Pyx_INCREF(((PyObject *)Py_TYPE(__pyx_v_value)));
   __pyx_v_t = ((PyObject*)((PyObject *)Py_TYPE(__pyx_v_value)));
 
-  /* "pykeyvi.pyx":667
+  /* "pykeyvi.pyx":692
  *     def SetAttribute(self, key, value):
  *         t = type(value)
  *         if t == str:             # <<<<<<<<<<<<<<
  *             self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value)
  *         elif t == float:
  */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)__pyx_v_t), ((PyObject *)((PyObject*)(&PyString_Type))), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)__pyx_v_t), ((PyObject *)((PyObject*)(&PyString_Type))), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 692; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 692; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":668
+    /* "pykeyvi.pyx":693
  *         t = type(value)
  *         if t == str:
  *             self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value)             # <<<<<<<<<<<<<<
  *         elif t == float:
  *             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)
  */
-    __pyx_t_3 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_value); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 693; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_value); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 693; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     try {
       __pyx_v_self->inst.get()->SetAttribute(((std::string)__pyx_t_3), ((std::string)__pyx_t_4));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 668; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 693; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     goto __pyx_L3;
   }
 
-  /* "pykeyvi.pyx":669
+  /* "pykeyvi.pyx":694
  *         if t == str:
  *             self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value)
  *         elif t == float:             # <<<<<<<<<<<<<<
  *             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)
  *         elif t == int:
  */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)__pyx_v_t), ((PyObject *)((PyObject*)(&PyFloat_Type))), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 669; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 669; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)__pyx_v_t), ((PyObject *)((PyObject*)(&PyFloat_Type))), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 694; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":670
+    /* "pykeyvi.pyx":695
  *             self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value)
  *         elif t == float:
  *             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)             # <<<<<<<<<<<<<<
  *         elif t == int:
  *             self.inst.get().SetAttribute(<libcpp_string> key, <int> value)
  */
-    __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_5 = __pyx_PyFloat_AsFloat(__pyx_v_value); if (unlikely((__pyx_t_5 == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __pyx_PyFloat_AsFloat(__pyx_v_value); if (unlikely((__pyx_t_5 == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     try {
       __pyx_v_self->inst.get()->SetAttribute(((std::string)__pyx_t_4), ((float)__pyx_t_5));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 670; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 695; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     goto __pyx_L3;
   }
 
-  /* "pykeyvi.pyx":671
+  /* "pykeyvi.pyx":696
  *         elif t == float:
  *             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)
  *         elif t == int:             # <<<<<<<<<<<<<<
  *             self.inst.get().SetAttribute(<libcpp_string> key, <int> value)
  *         # special trick as t == bool does not work due to name collision between cython and C
  */
-  __pyx_t_1 = PyObject_RichCompare(((PyObject *)__pyx_v_t), ((PyObject *)((PyObject*)(&PyInt_Type))), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 671; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(((PyObject *)__pyx_v_t), ((PyObject *)((PyObject*)(&PyInt_Type))), Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 696; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 696; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "pykeyvi.pyx":672
+    /* "pykeyvi.pyx":697
  *             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)
  *         elif t == int:
  *             self.inst.get().SetAttribute(<libcpp_string> key, <int> value)             # <<<<<<<<<<<<<<
  *         # special trick as t == bool does not work due to name collision between cython and C
  *         elif isinstance(value, (int)):
  */
-    __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 672; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 672; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 697; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 697; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     try {
       __pyx_v_self->inst.get()->SetAttribute(((std::string)__pyx_t_4), ((int)__pyx_t_6));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 672; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 697; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     goto __pyx_L3;
   }
 
-  /* "pykeyvi.pyx":674
+  /* "pykeyvi.pyx":699
  *             self.inst.get().SetAttribute(<libcpp_string> key, <int> value)
  *         # special trick as t == bool does not work due to name collision between cython and C
  *         elif isinstance(value, (int)):             # <<<<<<<<<<<<<<
@@ -12906,41 +13378,41 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_36SetAttribute(struct __pyx_obj_7pykey
   __pyx_t_7 = (__pyx_t_2 != 0);
   if (__pyx_t_7) {
 
-    /* "pykeyvi.pyx":675
+    /* "pykeyvi.pyx":700
  *         # special trick as t == bool does not work due to name collision between cython and C
  *         elif isinstance(value, (int)):
  *             self.inst.get().SetAttribute(<libcpp_string> key, <bool> value)             # <<<<<<<<<<<<<<
  *         else:
  *             raise Exception("Unsupported Value Type")
  */
-    __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 675; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_8 == (bool)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 675; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_key); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 700; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_8 == (bool)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 700; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     try {
       __pyx_v_self->inst.get()->SetAttribute(((std::string)__pyx_t_4), ((bool)__pyx_t_8));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 675; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 700; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     goto __pyx_L3;
   }
   /*else*/ {
 
-    /* "pykeyvi.pyx":677
+    /* "pykeyvi.pyx":702
  *             self.inst.get().SetAttribute(<libcpp_string> key, <bool> value)
  *         else:
  *             raise Exception("Unsupported Value Type")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_Exception, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 702; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 702; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   __pyx_L3:;
 
-  /* "pykeyvi.pyx":665
+  /* "pykeyvi.pyx":690
  * 
  * 
  *     def SetAttribute(self, key, value):             # <<<<<<<<<<<<<<
@@ -12962,7 +13434,7 @@ static PyObject *__pyx_pf_7pykeyvi_5Match_36SetAttribute(struct __pyx_obj_7pykey
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":700
+/* "pykeyvi.pyx":725
  *     #    self.it = it
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -12988,7 +13460,7 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator___iter__(struct __pyx_obj_7py
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__iter__", 0);
 
-  /* "pykeyvi.pyx":701
+  /* "pykeyvi.pyx":726
  * 
  *     def __iter__(self):
  *         return self             # <<<<<<<<<<<<<<
@@ -13000,7 +13472,7 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator___iter__(struct __pyx_obj_7py
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":700
+  /* "pykeyvi.pyx":725
  *     #    self.it = it
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -13015,7 +13487,7 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator___iter__(struct __pyx_obj_7py
   return __pyx_r;
 }
 
-/* "pykeyvi.pyx":709
+/* "pykeyvi.pyx":734
  *     #    del self.end
  * 
  *     def __next__(self):             # <<<<<<<<<<<<<<
@@ -13048,7 +13520,7 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator_2__next__(struct __pyx_obj_7p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__next__", 0);
 
-  /* "pykeyvi.pyx":712
+  /* "pykeyvi.pyx":737
  *         # This works correctly by using "*it" and "*end" in the code,
  *         #if  co.dereference( self.it ) == co.dereference( self.end ) :
  *         if  self.it == self.end:             # <<<<<<<<<<<<<<
@@ -13058,21 +13530,21 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator_2__next__(struct __pyx_obj_7p
   __pyx_t_1 = ((__pyx_v_self->it == __pyx_v_self->end) != 0);
   if (__pyx_t_1) {
 
-    /* "pykeyvi.pyx":714
+    /* "pykeyvi.pyx":739
  *         if  self.it == self.end:
  * 
  *             raise StopIteration()             # <<<<<<<<<<<<<<
  *         cdef _Match * _r = new _Match(co.dereference( self.it ))
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_builtin_StopIteration); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 714; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_builtin_StopIteration); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 739; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 714; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 739; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pykeyvi.pyx":715
+  /* "pykeyvi.pyx":740
  * 
  *             raise StopIteration()
  *         cdef _Match * _r = new _Match(co.dereference( self.it ))             # <<<<<<<<<<<<<<
@@ -13081,7 +13553,7 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator_2__next__(struct __pyx_obj_7p
  */
   __pyx_v__r = new keyvi::dictionary::Match((*__pyx_v_self->it));
 
-  /* "pykeyvi.pyx":718
+  /* "pykeyvi.pyx":743
  * 
  *         # This also does the expected thing.
  *         co.preincrement( self.it )             # <<<<<<<<<<<<<<
@@ -13090,20 +13562,20 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator_2__next__(struct __pyx_obj_7p
  */
   (++__pyx_v_self->it);
 
-  /* "pykeyvi.pyx":720
+  /* "pykeyvi.pyx":745
  *         co.preincrement( self.it )
  * 
  *         cdef Match py_result = Match.__new__(Match)             # <<<<<<<<<<<<<<
  *         py_result.inst = shared_ptr[_Match](_r)
  * 
  */
-  __pyx_t_2 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)((PyObject*)__pyx_ptype_7pykeyvi_Match)), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 745; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 720; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_7pykeyvi_Match)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 745; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_Match *)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "pykeyvi.pyx":721
+  /* "pykeyvi.pyx":746
  * 
  *         cdef Match py_result = Match.__new__(Match)
  *         py_result.inst = shared_ptr[_Match](_r)             # <<<<<<<<<<<<<<
@@ -13112,7 +13584,7 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator_2__next__(struct __pyx_obj_7p
  */
   __pyx_v_py_result->inst = boost::shared_ptr<keyvi::dictionary::Match> (__pyx_v__r);
 
-  /* "pykeyvi.pyx":723
+  /* "pykeyvi.pyx":748
  *         py_result.inst = shared_ptr[_Match](_r)
  * 
  *         return py_result             # <<<<<<<<<<<<<<
@@ -13124,7 +13596,7 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator_2__next__(struct __pyx_obj_7p
   __pyx_r = ((PyObject *)__pyx_v_py_result);
   goto __pyx_L0;
 
-  /* "pykeyvi.pyx":709
+  /* "pykeyvi.pyx":734
  *     #    del self.end
  * 
  *     def __next__(self):             # <<<<<<<<<<<<<<
@@ -13140,61 +13612,6 @@ static PyObject *__pyx_pf_7pykeyvi_13MatchIterator_2__next__(struct __pyx_obj_7p
   __pyx_L0:;
   __Pyx_XDECREF((PyObject *)__pyx_v_py_result);
   __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "string.from_py":13
- * 
- * @cname("__pyx_convert_string_from_py_std__in_string")
- * cdef string __pyx_convert_string_from_py_std__in_string(object o) except *:             # <<<<<<<<<<<<<<
- *     cdef Py_ssize_t length
- *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)
- */
-
-static std::string __pyx_convert_string_from_py_std__in_string(PyObject *__pyx_v_o) {
-  Py_ssize_t __pyx_v_length;
-  char *__pyx_v_data;
-  std::string __pyx_r;
-  __Pyx_RefNannyDeclarations
-  char *__pyx_t_1;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("__pyx_convert_string_from_py_std__in_string", 0);
-
-  /* "string.from_py":15
- * cdef string __pyx_convert_string_from_py_std__in_string(object o) except *:
- *     cdef Py_ssize_t length
- *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)             # <<<<<<<<<<<<<<
- *     return string(data, length)
- * 
- */
-  __pyx_t_1 = __Pyx_PyObject_AsStringAndSize(__pyx_v_o, (&__pyx_v_length)); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[1]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_data = __pyx_t_1;
-
-  /* "string.from_py":16
- *     cdef Py_ssize_t length
- *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)
- *     return string(data, length)             # <<<<<<<<<<<<<<
- * 
- * 
- */
-  __pyx_r = std::string(__pyx_v_data, __pyx_v_length);
-  goto __pyx_L0;
-
-  /* "string.from_py":13
- * 
- * @cname("__pyx_convert_string_from_py_std__in_string")
- * cdef string __pyx_convert_string_from_py_std__in_string(object o) except *:             # <<<<<<<<<<<<<<
- *     cdef Py_ssize_t length
- *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("string.from_py.__pyx_convert_string_from_py_std__in_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -13448,6 +13865,61 @@ static CYTHON_INLINE PyObject *__pyx_convert_PyByteArray_string_to_py_std__in_st
   return __pyx_r;
 }
 
+/* "string.from_py":13
+ * 
+ * @cname("__pyx_convert_string_from_py_std__in_string")
+ * cdef string __pyx_convert_string_from_py_std__in_string(object o) except *:             # <<<<<<<<<<<<<<
+ *     cdef Py_ssize_t length
+ *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)
+ */
+
+static std::string __pyx_convert_string_from_py_std__in_string(PyObject *__pyx_v_o) {
+  Py_ssize_t __pyx_v_length;
+  char *__pyx_v_data;
+  std::string __pyx_r;
+  __Pyx_RefNannyDeclarations
+  char *__pyx_t_1;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__pyx_convert_string_from_py_std__in_string", 0);
+
+  /* "string.from_py":15
+ * cdef string __pyx_convert_string_from_py_std__in_string(object o) except *:
+ *     cdef Py_ssize_t length
+ *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)             # <<<<<<<<<<<<<<
+ *     return string(data, length)
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_AsStringAndSize(__pyx_v_o, (&__pyx_v_length)); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[1]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_data = __pyx_t_1;
+
+  /* "string.from_py":16
+ *     cdef Py_ssize_t length
+ *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)
+ *     return string(data, length)             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __pyx_r = std::string(__pyx_v_data, __pyx_v_length);
+  goto __pyx_L0;
+
+  /* "string.from_py":13
+ * 
+ * @cname("__pyx_convert_string_from_py_std__in_string")
+ * cdef string __pyx_convert_string_from_py_std__in_string(object o) except *:             # <<<<<<<<<<<<<<
+ *     cdef Py_ssize_t length
+ *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)
+ */
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("string.from_py.__pyx_convert_string_from_py_std__in_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
 static PyObject *__pyx_tp_new_7pykeyvi_StringDictionaryCompiler(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   struct __pyx_obj_7pykeyvi_StringDictionaryCompiler *p;
   PyObject *o;
@@ -13483,7 +13955,7 @@ static void __pyx_tp_dealloc_7pykeyvi_StringDictionaryCompiler(PyObject *o) {
 
 static int __pyx_mp_ass_subscript_7pykeyvi_StringDictionaryCompiler(PyObject *o, PyObject *i, PyObject *v) {
   if (v) {
-    return __pyx_pw_7pykeyvi_24StringDictionaryCompiler_11__setitem__(o, i, v);
+    return __pyx_pw_7pykeyvi_24StringDictionaryCompiler_13__setitem__(o, i, v);
   }
   else {
     PyErr_Format(PyExc_NotImplementedError,
@@ -13496,10 +13968,11 @@ static PyMethodDef __pyx_methods_7pykeyvi_StringDictionaryCompiler[] = {
   {"_init_0", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_3_init_0, METH_NOARGS, 0},
   {"_init_1", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_5_init_1, METH_O, 0},
   {"Add", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_9Add, METH_VARARGS|METH_KEYWORDS, 0},
-  {"WriteToFile", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_13WriteToFile, METH_O, 0},
-  {"__enter__", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_15__enter__, METH_NOARGS, 0},
-  {"__exit__", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_17__exit__, METH_VARARGS|METH_KEYWORDS, 0},
-  {"Compile", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_19Compile, METH_VARARGS|METH_KEYWORDS, 0},
+  {"WriteToFile", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_11WriteToFile, METH_O, 0},
+  {"SetManifestFromString", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_15SetManifestFromString, METH_O, 0},
+  {"__enter__", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_17__enter__, METH_NOARGS, 0},
+  {"__exit__", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_19__exit__, METH_VARARGS|METH_KEYWORDS, 0},
+  {"Compile", (PyCFunction)__pyx_pw_7pykeyvi_24StringDictionaryCompiler_21Compile, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -13601,7 +14074,7 @@ static void __pyx_tp_dealloc_7pykeyvi_JsonDictionaryCompiler(PyObject *o) {
 
 static int __pyx_mp_ass_subscript_7pykeyvi_JsonDictionaryCompiler(PyObject *o, PyObject *i, PyObject *v) {
   if (v) {
-    return __pyx_pw_7pykeyvi_22JsonDictionaryCompiler_11__setitem__(o, i, v);
+    return __pyx_pw_7pykeyvi_22JsonDictionaryCompiler_13__setitem__(o, i, v);
   }
   else {
     PyErr_Format(PyExc_NotImplementedError,
@@ -13614,10 +14087,11 @@ static PyMethodDef __pyx_methods_7pykeyvi_JsonDictionaryCompiler[] = {
   {"Add", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_3Add, METH_VARARGS|METH_KEYWORDS, 0},
   {"_init_0", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_5_init_0, METH_NOARGS, 0},
   {"_init_1", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_7_init_1, METH_O, 0},
-  {"WriteToFile", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_13WriteToFile, METH_O, 0},
-  {"__enter__", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_15__enter__, METH_NOARGS, 0},
-  {"__exit__", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_17__exit__, METH_VARARGS|METH_KEYWORDS, 0},
-  {"Compile", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_19Compile, METH_VARARGS|METH_KEYWORDS, 0},
+  {"WriteToFile", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_11WriteToFile, METH_O, 0},
+  {"SetManifestFromString", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_15SetManifestFromString, METH_O, 0},
+  {"__enter__", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_17__enter__, METH_NOARGS, 0},
+  {"__exit__", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_19__exit__, METH_VARARGS|METH_KEYWORDS, 0},
+  {"Compile", (PyCFunction)__pyx_pw_7pykeyvi_22JsonDictionaryCompiler_21Compile, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -13725,16 +14199,17 @@ static PyObject *__pyx_sq_item_7pykeyvi_Dictionary(PyObject *o, Py_ssize_t i) {
 }
 
 static PyMethodDef __pyx_methods_7pykeyvi_Dictionary[] = {
-  {"Get", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_3Get, METH_O, 0},
-  {"Lookup", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_5Lookup, METH_O, 0},
-  {"LookupText", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_7LookupText, METH_O, 0},
-  {"get", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_13get, METH_VARARGS|METH_KEYWORDS, 0},
-  {"_key_iterator_wrapper", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_17_key_iterator_wrapper, METH_O, 0},
-  {"_value_iterator_wrapper", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_20_value_iterator_wrapper, METH_O, 0},
-  {"_item_iterator_wrapper", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_23_item_iterator_wrapper, METH_O, 0},
-  {"GetAllKeys", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_26GetAllKeys, METH_NOARGS, 0},
-  {"GetAllValues", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_28GetAllValues, METH_NOARGS, 0},
-  {"GetAllItems", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_30GetAllItems, METH_NOARGS, 0},
+  {"GetManifestAsString", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_5GetManifestAsString, METH_NOARGS, 0},
+  {"Get", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_7Get, METH_O, 0},
+  {"LookupText", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_9LookupText, METH_O, 0},
+  {"Lookup", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_13Lookup, METH_O, 0},
+  {"get", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_15get, METH_VARARGS|METH_KEYWORDS, 0},
+  {"_key_iterator_wrapper", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_19_key_iterator_wrapper, METH_O, 0},
+  {"_value_iterator_wrapper", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_22_value_iterator_wrapper, METH_O, 0},
+  {"_item_iterator_wrapper", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_25_item_iterator_wrapper, METH_O, 0},
+  {"GetAllKeys", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_28GetAllKeys, METH_NOARGS, 0},
+  {"GetAllValues", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_30GetAllValues, METH_NOARGS, 0},
+  {"GetAllItems", (PyCFunction)__pyx_pw_7pykeyvi_10Dictionary_32GetAllItems, METH_NOARGS, 0},
   {0, 0, 0, 0}
 };
 
@@ -13753,7 +14228,7 @@ static PySequenceMethods __pyx_tp_as_sequence_Dictionary = {
 
 static PyMappingMethods __pyx_tp_as_mapping_Dictionary = {
   0, /*mp_length*/
-  __pyx_pw_7pykeyvi_10Dictionary_15__getitem__, /*mp_subscript*/
+  __pyx_pw_7pykeyvi_10Dictionary_17__getitem__, /*mp_subscript*/
   0, /*mp_ass_subscript*/
 };
 
@@ -13797,7 +14272,7 @@ static PyTypeObject __pyx_type_7pykeyvi_Dictionary = {
   0, /*tp_descr_get*/
   0, /*tp_descr_set*/
   0, /*tp_dictoffset*/
-  __pyx_pw_7pykeyvi_10Dictionary_9__init__, /*tp_init*/
+  __pyx_pw_7pykeyvi_10Dictionary_3__init__, /*tp_init*/
   0, /*tp_alloc*/
   __pyx_tp_new_7pykeyvi_Dictionary, /*tp_new*/
   0, /*tp_free*/
@@ -14244,12 +14719,13 @@ static int __pyx_mp_ass_subscript_7pykeyvi_CompletionDictionaryCompiler(PyObject
 
 static PyMethodDef __pyx_methods_7pykeyvi_CompletionDictionaryCompiler[] = {
   {"Add", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_5Add, METH_VARARGS|METH_KEYWORDS, 0},
-  {"_init_0", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_7_init_0, METH_NOARGS, 0},
-  {"_init_1", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_9_init_1, METH_O, 0},
-  {"WriteToFile", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_13WriteToFile, METH_O, 0},
-  {"__enter__", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_15__enter__, METH_NOARGS, 0},
-  {"__exit__", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_17__exit__, METH_VARARGS|METH_KEYWORDS, 0},
-  {"Compile", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_19Compile, METH_VARARGS|METH_KEYWORDS, 0},
+  {"WriteToFile", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_7WriteToFile, METH_O, 0},
+  {"_init_0", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_9_init_0, METH_NOARGS, 0},
+  {"_init_1", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_11_init_1, METH_O, 0},
+  {"SetManifestFromString", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_15SetManifestFromString, METH_O, 0},
+  {"__enter__", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_17__enter__, METH_NOARGS, 0},
+  {"__exit__", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_19__exit__, METH_VARARGS|METH_KEYWORDS, 0},
+  {"Compile", (PyCFunction)__pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_21Compile, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -14299,7 +14775,7 @@ static PyTypeObject __pyx_type_7pykeyvi_CompletionDictionaryCompiler = {
   0, /*tp_descr_get*/
   0, /*tp_descr_set*/
   0, /*tp_dictoffset*/
-  __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_11__init__, /*tp_init*/
+  __pyx_pw_7pykeyvi_28CompletionDictionaryCompiler_13__init__, /*tp_init*/
   0, /*tp_alloc*/
   __pyx_tp_new_7pykeyvi_CompletionDictionaryCompiler, /*tp_new*/
   0, /*tp_free*/
@@ -14547,10 +15023,11 @@ static PyMethodDef __pyx_methods_7pykeyvi_KeyOnlyDictionaryCompiler[] = {
   {"_init_0", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_3_init_0, METH_NOARGS, 0},
   {"_init_1", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_5_init_1, METH_O, 0},
   {"Add", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_9Add, METH_O, 0},
-  {"WriteToFile", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_11WriteToFile, METH_O, 0},
-  {"__enter__", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_13__enter__, METH_NOARGS, 0},
-  {"__exit__", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_15__exit__, METH_VARARGS|METH_KEYWORDS, 0},
-  {"Compile", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_17Compile, METH_VARARGS|METH_KEYWORDS, 0},
+  {"SetManifestFromString", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_11SetManifestFromString, METH_O, 0},
+  {"WriteToFile", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_13WriteToFile, METH_O, 0},
+  {"__enter__", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_15__enter__, METH_NOARGS, 0},
+  {"__exit__", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_17__exit__, METH_VARARGS|METH_KEYWORDS, 0},
+  {"Compile", (PyCFunction)__pyx_pw_7pykeyvi_25KeyOnlyDictionaryCompiler_19Compile, METH_VARARGS|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -15259,8 +15736,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
 };
 static int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 63; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_n_s_StopIteration); if (!__pyx_builtin_StopIteration) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 714; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 243; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_StopIteration = __Pyx_GetBuiltinName(__pyx_n_s_StopIteration); if (!__pyx_builtin_StopIteration) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 739; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -15270,14 +15747,14 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "pykeyvi.pyx":677
+  /* "pykeyvi.pyx":702
  *             self.inst.get().SetAttribute(<libcpp_string> key, <bool> value)
  *         else:
  *             raise Exception("Unsupported Value Type")             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Unsupported_Value_Type); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 677; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_s_Unsupported_Value_Type); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 702; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
@@ -15390,61 +15867,61 @@ PyMODINIT_FUNC PyInit_pykeyvi(void)
   __pyx_type_7pykeyvi_StringDictionaryCompiler.tp_print = 0;
   if (PyObject_SetAttrString(__pyx_m, "StringDictionaryCompiler", (PyObject *)&__pyx_type_7pykeyvi_StringDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 41; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_StringDictionaryCompiler = &__pyx_type_7pykeyvi_StringDictionaryCompiler;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_JsonDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 102; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_JsonDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_JsonDictionaryCompiler.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "JsonDictionaryCompiler", (PyObject *)&__pyx_type_7pykeyvi_JsonDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 102; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "JsonDictionaryCompiler", (PyObject *)&__pyx_type_7pykeyvi_JsonDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 107; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_JsonDictionaryCompiler = &__pyx_type_7pykeyvi_JsonDictionaryCompiler;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_Dictionary) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 163; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_Dictionary) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 173; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_Dictionary.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "Dictionary", (PyObject *)&__pyx_type_7pykeyvi_Dictionary) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 163; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "Dictionary", (PyObject *)&__pyx_type_7pykeyvi_Dictionary) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 173; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_Dictionary = &__pyx_type_7pykeyvi_Dictionary;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_FsaTransform) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_FsaTransform) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_FsaTransform.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "FsaTransform", (PyObject *)&__pyx_type_7pykeyvi_FsaTransform) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 266; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "FsaTransform", (PyObject *)&__pyx_type_7pykeyvi_FsaTransform) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_FsaTransform = &__pyx_type_7pykeyvi_FsaTransform;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_PrefixCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_PrefixCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 301; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_PrefixCompletion.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "PrefixCompletion", (PyObject *)&__pyx_type_7pykeyvi_PrefixCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 286; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "PrefixCompletion", (PyObject *)&__pyx_type_7pykeyvi_PrefixCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 301; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_PrefixCompletion = &__pyx_type_7pykeyvi_PrefixCompletion;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_ForwardBackwardCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 319; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_ForwardBackwardCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 334; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_ForwardBackwardCompletion.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "ForwardBackwardCompletion", (PyObject *)&__pyx_type_7pykeyvi_ForwardBackwardCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 319; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "ForwardBackwardCompletion", (PyObject *)&__pyx_type_7pykeyvi_ForwardBackwardCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 334; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_ForwardBackwardCompletion = &__pyx_type_7pykeyvi_ForwardBackwardCompletion;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_FsaPredictiveCompression) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 362; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_FsaPredictiveCompression) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_FsaPredictiveCompression.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "FsaPredictiveCompression", (PyObject *)&__pyx_type_7pykeyvi_FsaPredictiveCompression) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 362; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "FsaPredictiveCompression", (PyObject *)&__pyx_type_7pykeyvi_FsaPredictiveCompression) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_FsaPredictiveCompression = &__pyx_type_7pykeyvi_FsaPredictiveCompression;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_CompletionDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_CompletionDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_CompletionDictionaryCompiler.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "CompletionDictionaryCompiler", (PyObject *)&__pyx_type_7pykeyvi_CompletionDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "CompletionDictionaryCompiler", (PyObject *)&__pyx_type_7pykeyvi_CompletionDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 404; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_CompletionDictionaryCompiler = &__pyx_type_7pykeyvi_CompletionDictionaryCompiler;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_MultiWordCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_MultiWordCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_MultiWordCompletion.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "MultiWordCompletion", (PyObject *)&__pyx_type_7pykeyvi_MultiWordCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "MultiWordCompletion", (PyObject *)&__pyx_type_7pykeyvi_MultiWordCompletion) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 474; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_MultiWordCompletion = &__pyx_type_7pykeyvi_MultiWordCompletion;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_KeyOnlyDictionaryGenerator) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 495; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_KeyOnlyDictionaryGenerator) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 515; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_KeyOnlyDictionaryGenerator.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "KeyOnlyDictionaryGenerator", (PyObject *)&__pyx_type_7pykeyvi_KeyOnlyDictionaryGenerator) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 495; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "KeyOnlyDictionaryGenerator", (PyObject *)&__pyx_type_7pykeyvi_KeyOnlyDictionaryGenerator) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 515; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_KeyOnlyDictionaryGenerator = &__pyx_type_7pykeyvi_KeyOnlyDictionaryGenerator;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_KeyOnlyDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 519; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_KeyOnlyDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_KeyOnlyDictionaryCompiler.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "KeyOnlyDictionaryCompiler", (PyObject *)&__pyx_type_7pykeyvi_KeyOnlyDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 519; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "KeyOnlyDictionaryCompiler", (PyObject *)&__pyx_type_7pykeyvi_KeyOnlyDictionaryCompiler) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_KeyOnlyDictionaryCompiler = &__pyx_type_7pykeyvi_KeyOnlyDictionaryCompiler;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_Match) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 571; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_Match) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 596; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_Match.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "Match", (PyObject *)&__pyx_type_7pykeyvi_Match) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 571; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "Match", (PyObject *)&__pyx_type_7pykeyvi_Match) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 596; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_Match = &__pyx_type_7pykeyvi_Match;
-  if (PyType_Ready(&__pyx_type_7pykeyvi_MatchIterator) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 688; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi_MatchIterator) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 713; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi_MatchIterator.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "MatchIterator", (PyObject *)&__pyx_type_7pykeyvi_MatchIterator) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 688; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "MatchIterator", (PyObject *)&__pyx_type_7pykeyvi_MatchIterator) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 713; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_7pykeyvi_MatchIterator = &__pyx_type_7pykeyvi_MatchIterator;
-  if (PyType_Ready(&__pyx_type_7pykeyvi___pyx_scope_struct___key_iterator_wrapper) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi___pyx_scope_struct___key_iterator_wrapper) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi___pyx_scope_struct___key_iterator_wrapper.tp_print = 0;
   __pyx_ptype_7pykeyvi___pyx_scope_struct___key_iterator_wrapper = &__pyx_type_7pykeyvi___pyx_scope_struct___key_iterator_wrapper;
-  if (PyType_Ready(&__pyx_type_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper.tp_print = 0;
   __pyx_ptype_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper = &__pyx_type_7pykeyvi___pyx_scope_struct_1__value_iterator_wrapper;
-  if (PyType_Ready(&__pyx_type_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 241; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 256; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper.tp_print = 0;
   __pyx_ptype_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper = &__pyx_type_7pykeyvi___pyx_scope_struct_2__item_iterator_wrapper;
   /*--- Type import code ---*/
@@ -15474,12 +15951,12 @@ PyMODINIT_FUNC PyInit_pykeyvi(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "string.to_py":55
+  /* "string.from_py":13
  * 
- * @cname("__pyx_convert_PyByteArray_string_to_py_std__in_string")
- * cdef inline object __pyx_convert_PyByteArray_string_to_py_std__in_string(const string& s):             # <<<<<<<<<<<<<<
- *     return __Pyx_PyByteArray_FromStringAndSize(s.data(), s.size())
- * 
+ * @cname("__pyx_convert_string_from_py_std__in_string")
+ * cdef string __pyx_convert_string_from_py_std__in_string(object o) except *:             # <<<<<<<<<<<<<<
+ *     cdef Py_ssize_t length
+ *     cdef char* data = __Pyx_PyObject_AsStringAndSize(o, &length)
  */
 
   /*--- Wrapped vars code ---*/

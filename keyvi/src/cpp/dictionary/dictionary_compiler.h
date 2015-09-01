@@ -237,6 +237,25 @@ class DictionaryCompiler
       return false;
     }
 
+    /**
+     * Set a custom manifest to be embedded into the index file.
+     *
+     * @param manifest as JSON string
+     */
+    template<typename StringType>
+    void SetManifestFromString(StringType manifest){
+      generator_.SetManifestFromString(manifest);
+    }
+
+    /**
+     * Set a custom manifest to be embedded into the index file.
+     *
+     * @param manifest
+     */
+    void SetManifest(const boost::property_tree::ptree& manifest){
+      generator_.SetManifest(manifest);
+    }
+
     void Write(std::ostream& stream) {
        generator_.Write(stream);
     }
