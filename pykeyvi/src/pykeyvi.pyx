@@ -69,6 +69,11 @@ cdef class StringDictionaryCompiler:
         cdef const_char * input_in_1 = <const_char *> in_1
         self.inst.get().Add(input_in_0, input_in_1)
     
+    def WriteToFile(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        self.inst.get().WriteToFile(input_in_0)
+    
     def __setitem__(self, bytes in_0 , bytes in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
@@ -76,10 +81,10 @@ cdef class StringDictionaryCompiler:
         cdef const_char * input_in_1 = <const_char *> in_1
         self.inst.get().__setitem__(input_in_0, input_in_1)
     
-    def WriteToFile(self, bytes in_0 ):
+    def SetManifestFromString(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
+        self.inst.get().SetManifestFromString(input_in_0)
     
     def __enter__(self):
         return self
@@ -130,6 +135,11 @@ cdef class JsonDictionaryCompiler:
         else:
                raise Exception('can not handle type of %s' % (args,))
     
+    def WriteToFile(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        self.inst.get().WriteToFile(input_in_0)
+    
     def __setitem__(self, bytes in_0 , bytes in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
@@ -137,10 +147,10 @@ cdef class JsonDictionaryCompiler:
         cdef const_char * input_in_1 = <const_char *> in_1
         self.inst.get().__setitem__(input_in_0, input_in_1)
     
-    def WriteToFile(self, bytes in_0 ):
+    def SetManifestFromString(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
+        self.inst.get().SetManifestFromString(input_in_0)
     
     def __enter__(self):
         return self
@@ -168,19 +178,20 @@ cdef class Dictionary:
          self.inst.reset()
 
     
+    def __init__(self, bytes filename ):
+        assert isinstance(filename, bytes), 'arg filename wrong type'
+        cdef const_char * input_filename = <const_char *> filename
+        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
+    
+    def GetManifestAsString(self):
+        cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+        py_result = <libcpp_string>_r
+        return py_result
+    
     def Get(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
         cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
-        cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
-        py_result.it = _r.begin()
-        py_result.end = _r.end()
-        return py_result
-    
-    def Lookup(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -195,16 +206,20 @@ cdef class Dictionary:
         py_result.end = _r.end()
         return py_result
     
-    def __init__(self, bytes filename ):
-        assert isinstance(filename, bytes), 'arg filename wrong type'
-        cdef const_char * input_filename = <const_char *> filename
-        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
-    
     def __contains__(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
         cdef bool _r = self.inst.get().__contains__(input_in_0)
         py_result = <bool>_r
+        return py_result
+    
+    def Lookup(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
+        cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+        py_result.it = _r.begin()
+        py_result.end = _r.end()
         return py_result
     
     def get (self, key, default = None):
@@ -408,6 +423,11 @@ cdef class CompletionDictionaryCompiler:
     
         self.inst.get().Add(input_in_0, (<int>in_1))
     
+    def WriteToFile(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        self.inst.get().WriteToFile(input_in_0)
+    
     def _init_0(self):
         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
     
@@ -424,10 +444,10 @@ cdef class CompletionDictionaryCompiler:
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def WriteToFile(self, bytes in_0 ):
+    def SetManifestFromString(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
+        self.inst.get().SetManifestFromString(input_in_0)
     
     def __enter__(self):
         return self
@@ -544,6 +564,11 @@ cdef class KeyOnlyDictionaryCompiler:
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
         self.inst.get().Add(input_in_0)
+    
+    def SetManifestFromString(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        self.inst.get().SetManifestFromString(input_in_0)
     
     def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
