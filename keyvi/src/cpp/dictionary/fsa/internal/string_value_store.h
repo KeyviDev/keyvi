@@ -234,6 +234,14 @@ final {
           size_t offset = stream.tellg();
           size_t strings_size = properties.get<size_t>("size");
 
+          // check for file truncation
+          if (strings_size > 0) {
+            stream.seekg(strings_size - 1, stream.cur);
+            if (stream.peek() == EOF) {
+              throw std::invalid_argument("file is corrupt(truncated)");
+            }
+          }
+
           strings_region_ = new boost::interprocess::mapped_region(
               *file_mapping, boost::interprocess::read_only, offset,
               strings_size);
