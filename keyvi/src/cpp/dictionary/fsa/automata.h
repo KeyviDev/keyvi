@@ -75,6 +75,13 @@ final {
           filename, boost::interprocess::read_only);
       size_t array_size = sparse_array_properties_.get<size_t>("size");
 
+      in_stream.seekg(offset + array_size + bucket_size * array_size - 1);
+
+      // check for file truncation
+      if (in_stream.peek() == EOF) {
+        throw std::invalid_argument("file is corrupt(truncated)");
+      }
+
       TRACE("labels start offset: %d", offset);
       labels_region_ = new boost::interprocess::mapped_region(
           *file_mapping_, boost::interprocess::read_only, offset, array_size);
@@ -90,8 +97,9 @@ final {
       transitions_ = (uint32_t*) transitions_region_->get_address();
       transitions_compact_ = (uint16_t*) transitions_region_->get_address();
 
-      in_stream.seekg(offset + array_size + bucket_size * array_size);
-      TRACE("after seek %zu", in_stream.tellg());
+      // forward 1 position
+      in_stream.get();
+      TRACE("value store position %zu", in_stream.tellg());
 
       // initialize value store
       internal::value_store_t value_store_type =
