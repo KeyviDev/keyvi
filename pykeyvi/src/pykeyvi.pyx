@@ -178,11 +178,6 @@ cdef class Dictionary:
          self.inst.reset()
 
     
-    def GetManifestAsString(self):
-        cdef libcpp_string _r = self.inst.get().GetManifestAsString()
-        py_result = <libcpp_string>_r
-        return py_result
-    
     def Lookup(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
@@ -277,6 +272,12 @@ cdef class Dictionary:
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return self._item_iterator_wrapper(py_result)
+
+    def GetManifest(self):
+        cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+        py_result = <libcpp_string>_r
+        import json
+        return json.loads(py_result)
 
     def GetStatistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()

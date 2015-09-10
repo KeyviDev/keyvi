@@ -14,6 +14,6 @@ cdef extern from "dictionary/dictionary.h" namespace "keyvi::dictionary":
         _MatchIteratorPair GetAllItems () # wrap-ignore
         _MatchIteratorPair Lookup(const_char*)
         _MatchIteratorPair LookupText(const_char*)
-        libcpp_string GetManifestAsString()
+        libcpp_string GetManifestAsString() # wrap-ignore
         libcpp_string GetStatistics() # wrap-ignore
         uint32_t GetSize() # wrap-ignore

@@ -63,6 +63,12 @@
         py_result.end = _r.end()
         return self._item_iterator_wrapper(py_result)
 
+    def GetManifest(self):
+        cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+        py_result = <libcpp_string>_r
+        import json
+        return json.loads(py_result)
+
     def GetStatistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()
         py_result = <libcpp_string>_r
