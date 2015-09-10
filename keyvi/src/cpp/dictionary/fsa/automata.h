@@ -130,6 +130,10 @@ final {
       return automata_properties_.get<uint32_t>("start_state");
     }
 
+    uint32_t GetNumberOfKeys() const {
+      return automata_properties_.get<uint32_t>("number_of_keys");
+    }
+
     uint32_t TryWalkTransition(uint32_t starting_state, unsigned char c) const {
       if (labels_[starting_state + c] == c) {
         if (!compact_size_) {
