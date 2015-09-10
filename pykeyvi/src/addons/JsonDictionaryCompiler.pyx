@@ -17,3 +17,8 @@
         cdef void* callback = <void*> args[0]
         with nogil:
             self.inst.get().Compile(callback_wrapper, callback)
+
+
+    def SetManifest(self, manifest):
+        import json
+        self.inst.get().SetManifestFromString(json.dumps(manifest))
