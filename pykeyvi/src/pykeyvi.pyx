@@ -178,20 +178,10 @@ cdef class Dictionary:
          self.inst.reset()
 
     
-    def __init__(self, bytes filename ):
-        assert isinstance(filename, bytes), 'arg filename wrong type'
-        cdef const_char * input_filename = <const_char *> filename
-        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
-    
-    def GetManifestAsString(self):
-        cdef libcpp_string _r = self.inst.get().GetManifestAsString()
-        py_result = <libcpp_string>_r
-        return py_result
-    
-    def Get(self, bytes in_0 ):
+    def Lookup(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
+        cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -206,17 +196,15 @@ cdef class Dictionary:
         py_result.end = _r.end()
         return py_result
     
-    def __contains__(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef bool _r = self.inst.get().__contains__(input_in_0)
-        py_result = <bool>_r
-        return py_result
+    def __init__(self, bytes filename ):
+        assert isinstance(filename, bytes), 'arg filename wrong type'
+        cdef const_char * input_filename = <const_char *> filename
+        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
     
-    def Lookup(self, bytes in_0 ):
+    def Get(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
+        cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -233,6 +221,13 @@ cdef class Dictionary:
         py_result.inst = shared_ptr[_Match](_r)
         return py_result
 
+    def __contains__(self, key):
+        assert isinstance(key, bytes), 'arg in_0 wrong type'
+
+        return self.inst.get().Contains(key)
+
+    def __len__(self):
+        return self.inst.get().GetSize()
 
     def __getitem__ (self, key):
         assert isinstance(key, bytes), 'arg in_0 wrong type'
@@ -276,7 +271,20 @@ cdef class Dictionary:
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
-        return self._item_iterator_wrapper(py_result) 
+        return self._item_iterator_wrapper(py_result)
+
+    def GetManifest(self):
+        cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+        py_result = <libcpp_string>_r
+        import json
+        return json.loads(py_result)
+
+    def GetStatistics(self):
+        cdef libcpp_string _r = self.inst.get().GetStatistics()
+        py_result = <libcpp_string>_r
+        import json
+        return {k: json.loads(v) for k, v in filter(
+            lambda kv: kv[1], [s.split("\n") for s in py_result.split("\n\n")])} 
 
 cdef class FsaTransform:
 

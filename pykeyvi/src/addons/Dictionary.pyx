@@ -11,6 +11,13 @@
         py_result.inst = shared_ptr[_Match](_r)
         return py_result
 
+    def __contains__(self, key):
+        assert isinstance(key, bytes), 'arg in_0 wrong type'
+
+        return self.inst.get().Contains(key)
+
+    def __len__(self):
+        return self.inst.get().GetSize()
 
     def __getitem__ (self, key):
         assert isinstance(key, bytes), 'arg in_0 wrong type'
@@ -55,3 +62,16 @@
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return self._item_iterator_wrapper(py_result)
+
+    def GetManifest(self):
+        cdef libcpp_string _r = self.inst.get().GetManifestAsString()
+        py_result = <libcpp_string>_r
+        import json
+        return json.loads(py_result)
+
+    def GetStatistics(self):
+        cdef libcpp_string _r = self.inst.get().GetStatistics()
+        py_result = <libcpp_string>_r
+        import json
+        return {k: json.loads(v) for k, v in filter(
+            lambda kv: kv[1], [s.split("\n") for s in py_result.split("\n\n")])}

@@ -53,6 +53,14 @@ final {
       return fsa_;
     }
 
+    std::string GetStatistics() const {
+      return fsa_->GetStatistics();
+    }
+
+    uint32_t GetSize() const {
+      return fsa_->GetNumberOfKeys();
+    }
+
     /**
      * A simple Contains method to check whether a key is in the dictionary.
      *
@@ -220,13 +228,6 @@ final {
           };
       return MatchIterator::MakeIteratorPair(tfunc, first_match);
     }
-
-    // convenience: pythonic interface
-#ifdef Py_PYTHON_H
-    bool __contains__ (const char* key) const {
-      return Contains(key);
-    }
-#endif
 
     /**
      * A simple leftmostlongest lookup function.
