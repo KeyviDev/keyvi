@@ -7,7 +7,7 @@ minor_version=datetime.datetime.today().strftime('%Y%m%d')
 # Here's the core info for the package
 
 DEBNAME = "keyvi"
-DEBVERSION = "0.1"
+DEBVERSION = "0.1.1"
 DEBMAINT = "hendrik.muhs@gmail.com"
 DEBARCH = "amd64"
 DEBDEPENDS = "" # what are we dependent on?

@@ -52,7 +52,7 @@ PACKAGE_NAME = 'pykeyvi'
 
 setup(
     name = PACKAGE_NAME,
-    version = '0.1',
+    version = '0.1.1',
     description = 'Python bindings for keyvi',
     author = 'Hendrik Muhs',
     author_email = 'hendrik.muhs@gmail.com',
