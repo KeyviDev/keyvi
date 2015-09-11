@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Usage: py.test tests
 
 import contextlib
 import os
@@ -14,14 +15,14 @@ def tmp_dictionary(compiler, file_name):
     del d
     os.remove(file_name)
 
-def size_test():
+def test_size():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
     c.Add("Leela")
     c.Add("Kif")
     with tmp_dictionary(c, 'brannigan_size.kv') as d:
         assert len(d) == 2
 
-def manifest_test():
+def test_manifest():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
     c.Add("Leela")
     c.Add("Kif")
@@ -30,7 +31,7 @@ def manifest_test():
         m = d.GetManifest()
         assert m['author'] == "Zapp Brannigan"
 
-def statistics_test():
+def test_statistics():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
     c.Add("Leela")
     c.Add("Kif")
