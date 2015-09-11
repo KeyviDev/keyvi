@@ -232,7 +232,7 @@ final {
 
     std::string GetStatistics() const {
       std::ostringstream buf;
-      buf << "keyvi General" << std::endl;
+      buf << "General" << std::endl;
       boost::property_tree::write_json (buf, automata_properties_, false);
       buf << std::endl << "Persistence" << std::endl;
       boost::property_tree::write_json (buf, sparse_array_properties_, false);

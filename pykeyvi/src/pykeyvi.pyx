@@ -69,11 +69,6 @@ cdef class StringDictionaryCompiler:
         cdef const_char * input_in_1 = <const_char *> in_1
         self.inst.get().Add(input_in_0, input_in_1)
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
-    
     def __setitem__(self, bytes in_0 , bytes in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
@@ -81,10 +76,10 @@ cdef class StringDictionaryCompiler:
         cdef const_char * input_in_1 = <const_char *> in_1
         self.inst.get().__setitem__(input_in_0, input_in_1)
     
-    def SetManifestFromString(self, bytes in_0 ):
+    def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().SetManifestFromString(input_in_0)
+        self.inst.get().WriteToFile(input_in_0)
     
     def __enter__(self):
         return self
@@ -102,7 +97,12 @@ cdef class StringDictionaryCompiler:
 
         cdef void* callback = <void*> args[0]
         with nogil:
-            self.inst.get().Compile(callback_wrapper, callback) 
+            self.inst.get().Compile(callback_wrapper, callback)
+
+
+    def SetManifest(self, manifest):
+        import json
+        self.inst.get().SetManifestFromString(json.dumps(manifest)) 
 
 cdef class JsonDictionaryCompiler:
 
@@ -135,11 +135,6 @@ cdef class JsonDictionaryCompiler:
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
-    
     def __setitem__(self, bytes in_0 , bytes in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
@@ -147,10 +142,10 @@ cdef class JsonDictionaryCompiler:
         cdef const_char * input_in_1 = <const_char *> in_1
         self.inst.get().__setitem__(input_in_0, input_in_1)
     
-    def SetManifestFromString(self, bytes in_0 ):
+    def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().SetManifestFromString(input_in_0)
+        self.inst.get().WriteToFile(input_in_0)
     
     def __enter__(self):
         return self
@@ -168,7 +163,12 @@ cdef class JsonDictionaryCompiler:
 
         cdef void* callback = <void*> args[0]
         with nogil:
-            self.inst.get().Compile(callback_wrapper, callback) 
+            self.inst.get().Compile(callback_wrapper, callback)
+
+
+    def SetManifest(self, manifest):
+        import json
+        self.inst.get().SetManifestFromString(json.dumps(manifest)) 
 
 cdef class Dictionary:
 
@@ -431,11 +431,6 @@ cdef class CompletionDictionaryCompiler:
     
         self.inst.get().Add(input_in_0, (<int>in_1))
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
-    
     def _init_0(self):
         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
     
@@ -452,10 +447,10 @@ cdef class CompletionDictionaryCompiler:
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def SetManifestFromString(self, bytes in_0 ):
+    def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().SetManifestFromString(input_in_0)
+        self.inst.get().WriteToFile(input_in_0)
     
     def __enter__(self):
         return self
@@ -474,6 +469,12 @@ cdef class CompletionDictionaryCompiler:
         cdef void* callback = <void*> args[0]
         with nogil:
             self.inst.get().Compile(callback_wrapper, callback)
+
+
+    def SetManifest(self, manifest):
+        import json
+        self.inst.get().SetManifestFromString(json.dumps(manifest))
+
 
 # definition for all compilers
 cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:
@@ -573,11 +574,6 @@ cdef class KeyOnlyDictionaryCompiler:
         cdef const_char * input_in_0 = <const_char *> in_0
         self.inst.get().Add(input_in_0)
     
-    def SetManifestFromString(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().SetManifestFromString(input_in_0)
-    
     def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
@@ -599,7 +595,12 @@ cdef class KeyOnlyDictionaryCompiler:
 
         cdef void* callback = <void*> args[0]
         with nogil:
-            self.inst.get().Compile(callback_wrapper, callback) 
+            self.inst.get().Compile(callback_wrapper, callback)
+
+
+    def SetManifest(self, manifest):
+        import json
+        self.inst.get().SetManifestFromString(json.dumps(manifest)) 
 
 cdef class Match:
 

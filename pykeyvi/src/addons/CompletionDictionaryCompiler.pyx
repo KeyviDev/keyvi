@@ -18,6 +18,12 @@
         with nogil:
             self.inst.get().Compile(callback_wrapper, callback)
 
+
+    def SetManifest(self, manifest):
+        import json
+        self.inst.get().SetManifestFromString(json.dumps(manifest))
+
+
 # definition for all compilers
 cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:
     (<object>py_callback)(a, b)

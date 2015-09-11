@@ -11,7 +11,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__ (const_char*, int) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifestFromString(const_char*)
+        void SetManifestFromString(const_char*) # wrap-ignore
         void WriteToFile(const_char*)
         
     cdef cppclass KeyOnlyDictionaryCompiler:
@@ -20,7 +20,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Add(const_char*) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifestFromString(const_char*)
+        void SetManifestFromString(const_char*) # wrap-ignore
         void WriteToFile(const_char*)
         
     cdef cppclass JsonDictionaryCompiler:
@@ -30,7 +30,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__(const_char*, const_char*) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifestFromString(const_char*)
+        void SetManifestFromString(const_char*) # wrap-ignore
         void WriteToFile(const_char*)
     
     cdef cppclass StringDictionaryCompiler:
@@ -40,6 +40,6 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__(const_char*, const_char*) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifestFromString(const_char*)
+        void SetManifestFromString(const_char*) # wrap-ignore
         void WriteToFile(const_char*)
 
