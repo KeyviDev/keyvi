@@ -10,7 +10,7 @@ Precompiled binaries for Ubuntu 14.04LTS are available at the [keyvi PPA](https:
 
     sudo add-apt-repository ppa:hendrik-muhs/keyvi
     sudo apt-get update
-    sudo apt-get install keyvi python-pykeyvi
+    sudo apt-get install keyvi python-keyvi
 
 ### From Source
 
