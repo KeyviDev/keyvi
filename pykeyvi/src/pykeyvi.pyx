@@ -275,16 +275,16 @@ cdef class Dictionary:
 
     def GetManifest(self):
         cdef libcpp_string _r = self.inst.get().GetManifestAsString()
-        py_result = <libcpp_string>_r
+        cdef bytes py_result = _r
         import json
         return json.loads(py_result)
 
     def GetStatistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()
-        py_result = <libcpp_string>_r
+        cdef bytes py_result = _r
         import json
         return {k: json.loads(v) for k, v in filter(
-            lambda kv: len(kv) > 1 and kv[1],
+            lambda kv: kv and isinstance(kv, list) and len(kv) > 1 and kv[1],
             [s.rstrip().split("\n") for s in py_result.split("\n\n")]
         )} 
 
