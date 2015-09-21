@@ -284,8 +284,9 @@ cdef class Dictionary:
         py_result = <libcpp_string>_r
         import json
         return {k: json.loads(v) for k, v in filter(
-            lambda kv: kv[1], [s.rstrip().split("\n")
-                               for s in py_result.split("\n\n")])} 
+            lambda kv: len(kv) > 1 and kv[1],
+            [s.rstrip().split("\n") for s in py_result.split("\n\n")]
+        )} 
 
 cdef class FsaTransform:
 
