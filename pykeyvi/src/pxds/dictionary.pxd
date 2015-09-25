@@ -7,7 +7,7 @@ from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
 
 cdef extern from "dictionary/dictionary.h" namespace "keyvi::dictionary":
     cdef cppclass Dictionary:
-        Dictionary (const_char* filename) except +
+        Dictionary (const_char* filename, bool load_lazy=False) except +
         bool Contains (const_char*) # wrap-ignore
         Match operator[](const_char*) # wrap-ignore
         _MatchIteratorPair Get (const_char*)

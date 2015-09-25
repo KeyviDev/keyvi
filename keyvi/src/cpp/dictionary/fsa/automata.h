@@ -25,6 +25,7 @@
 #ifndef AUTOMATA_H_
 #define AUTOMATA_H_
 
+#include <sys/mman.h>
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -46,7 +47,7 @@ class Automata
 final {
 
    public:
-    Automata(const char * filename) {
+    Automata(const char * filename, bool load_lazy=false) {
       std::ifstream in_stream(filename, std::ios::binary);
 
       if (!in_stream.good()) {
@@ -80,6 +81,12 @@ final {
       // check for file truncation
       if (in_stream.peek() == EOF) {
         throw std::invalid_argument("file is corrupt(truncated)");
+      }
+
+      boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options | MAP_HUGETLB;
+
+      if (!load_lazy) {
+        map_options |= MAP_POPULATE;
       }
 
       TRACE("labels start offset: %d", offset);

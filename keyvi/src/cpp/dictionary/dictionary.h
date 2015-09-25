@@ -39,8 +39,8 @@ namespace dictionary {
 class Dictionary
 final {
    public:
-    Dictionary(const char* filename)
-        : fsa_(new fsa::Automata(filename)) {
+    Dictionary(const char* filename, bool load_lazy = false)
+        : fsa_(new fsa::Automata(filename, load_lazy)) {
       TRACE("Dictionary from file %s", filename);
     }
 
