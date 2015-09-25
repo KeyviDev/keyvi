@@ -185,6 +185,60 @@ final {
       return 0;
     }
 
+    void GetOutGoingTransitions(uint32_t starting_state, std::vector<uint32_t>& outgoing_states,
+                                std::vector<unsigned char>& outgoing_symbols) const {
+      outgoing_states.clear();
+      outgoing_symbols.clear();
+
+      uint64_t* labels_as_ll = (unsigned long int *) (labels_ + starting_state);
+      uint64_t* mask_as_ll = (unsigned long int *) (OUTGOING_TRANSITIONS_MASK);
+      unsigned char symbol = 0;
+
+      // check 8 bytes at a time
+      for (int offset = 0; offset < 32; ++offset) {
+        uint64_t xor_labels_with_mask = *labels_as_ll^*mask_as_ll;
+
+        if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0) && offset > 0){
+          outgoing_symbols.push_back(symbol);
+          outgoing_states.push_back(ResolveCompactPointer(starting_state, symbol));
+        }
+        if ((xor_labels_with_mask & 0x000000000000ff00ULL)== 0){
+          outgoing_symbols.push_back(symbol + 1);
+          outgoing_states.push_back(ResolveCompactPointer(starting_state, symbol + 1 ));
+        }
+        if ((xor_labels_with_mask & 0x0000000000ff0000ULL)== 0){
+          outgoing_symbols.push_back(symbol + 2);
+          outgoing_states.push_back(ResolveCompactPointer(starting_state, symbol + 2 ));
+        }
+        if ((xor_labels_with_mask & 0x00000000ff000000ULL)== 0){
+          outgoing_symbols.push_back(symbol + 3);
+          outgoing_states.push_back(ResolveCompactPointer(starting_state, symbol + 3 ));
+        }
+        if ((xor_labels_with_mask & 0x000000ff00000000ULL)== 0){
+          outgoing_symbols.push_back(symbol + 4);
+          outgoing_states.push_back(ResolveCompactPointer(starting_state, symbol + 4 ));
+        }
+        if ((xor_labels_with_mask & 0x0000ff0000000000ULL)== 0){
+          outgoing_symbols.push_back(symbol + 5);
+          outgoing_states.push_back(ResolveCompactPointer(starting_state, symbol + 5 ));
+        }
+        if ((xor_labels_with_mask & 0x00ff000000000000ULL)== 0){
+          outgoing_symbols.push_back(symbol + 6);
+          outgoing_states.push_back(ResolveCompactPointer(starting_state, symbol + 6 ));
+        }
+        if ((xor_labels_with_mask & 0xff00000000000000ULL)== 0){
+          outgoing_symbols.push_back(symbol + 7);
+          outgoing_states.push_back(ResolveCompactPointer(starting_state, symbol + 7 ));
+        }
+
+        ++labels_as_ll;
+        ++mask_as_ll;
+        symbol +=8;
+      }
+
+      return;
+    }
+
     bool IsFinalState(uint32_t state_to_check) const {
 
       if (labels_[state_to_check + FINAL_OFFSET_TRANSITION] == FINAL_OFFSET_CODE) {
@@ -266,6 +320,47 @@ final {
     uint16_t* transitions_compact_;
     bool compact_size_;
 
+    inline uint32_t ResolveCompactPointer(uint32_t starting_state, unsigned char c) const {
+      uint16_t pt = le16toh(transitions_compact_[starting_state + c]);
+      uint32_t resolved_ptr;
+
+      if ((pt & 0xC000) == 0xC000) {
+        TRACE("Compact Transition uint16 absolute");
+
+        resolved_ptr = pt & 0x3FFF;
+        TRACE("Compact Transition after resolve %d", resolved_ptr);
+        return resolved_ptr;
+      }
+
+      if (pt & 0x8000){
+        TRACE("Compact Transition overflow %d (from %d) starting from %d", pt, starting_state + c, starting_state);
+
+        // clear the first bit
+        pt &= 0x7FFF;
+        size_t overflow_bucket;
+        TRACE("Compact Transition overflow bucket %d", pt);
+
+        overflow_bucket = (pt >> 4) + starting_state + c - 512;
+
+        TRACE("Compact Transition found overflow bucket %d", overflow_bucket);
+
+        resolved_ptr = util::decodeVarshort(transitions_compact_ + overflow_bucket);
+        resolved_ptr = (resolved_ptr << 3) + (pt & 0x7);
+
+        if (pt & 0x8){
+          // relative coding
+          resolved_ptr = (starting_state + c) - resolved_ptr + 512;
+        }
+
+      } else {
+        TRACE("Compact Transition uint16 transition %d", pt);
+          resolved_ptr = (starting_state + c) - pt + 512;
+
+      }
+
+      TRACE("Compact Transition after resolve %d", resolved_ptr);
+      return resolved_ptr;
+    }
   };
 
   // shared pointer

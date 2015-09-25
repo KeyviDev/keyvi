@@ -118,6 +118,30 @@ BOOST_AUTO_TEST_CASE( DictLookup ) {
   }
   BOOST_CHECK(!matched);
 }
+#define haszero(v) (((v) - 0x0101010101010101ULL) & ~(v) & 0x8080808080808080ULL)
+BOOST_AUTO_TEST_CASE( DictTraverse ) {
+
+  unsigned long int magic_bits = -1;
+  magic_bits = magic_bits / 0xff * 0xfe << 1 >> 1 | 1;
+
+  unsigned long int charmask=4702111234474983745;
+
+  std::cout << "foo:" << magic_bits << std::endl;
+  unsigned long int t= charmask + magic_bits;
+  std::cout << "foo2:" << t << std::endl;
+
+  std::string a = "abcdefgh";
+  std::string b = "axydtfgr";
+
+  unsigned long int* ptr1 =  (unsigned long int *) a.c_str();
+  unsigned long int* ptr2 =  (unsigned long int *) b.c_str();
+
+  unsigned long int xoring = *ptr1^*ptr2;
+  std::cout << "foo3:" << xoring << std::endl;
+  std::cout << "foo4:" << haszero(xoring) << std::endl;
+
+
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

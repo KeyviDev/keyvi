@@ -135,6 +135,45 @@ class EntryIterator {
       return;
     }
 
+    int current_depth = vector_offset_traversal_stack_.size() - 1;
+    // check whether the current state has outgoing transitions left
+    if (vector_offset_traversal_stack_[current_depth] < transitions_vector_traversal_stack_[current_depth].size()) {
+      // go further deep down
+
+      // ensure that the traversal stack is large enough
+      if (state_vector_traversal_stack_.size() < current_depth + 1){
+        state_vector_traversal_stack_.resize(state_vector_traversal_stack_.size() + 10);
+        transitions_vector_traversal_stack_.resize(transitions_vector_traversal_stack_.size() + 10);
+      }
+
+      // get the outgoing transitions
+      fsa_->GetOutGoingTransitions(state_vector_traversal_stack_[current_depth][vector_offset_traversal_stack_[current_depth]],
+                                   state_vector_traversal_stack_[current_depth+1], transitions_vector_traversal_stack_[current_depth+1]);
+
+      if (state_vector_traversal_stack_[current_depth+1].size() == 0) {
+        // no outgoing states were found, take the next state
+        vector_offset_traversal_stack_[current_depth]++;
+        continue;
+      }
+
+      vector_offset_traversal_stack_.push_back(0);
+      ++current_depth;
+
+
+      if (fsa_->IsFinalState(state_vector_traversal_stack_[current_depth][0])) {
+        // we found a final state
+
+        current_value_ = fsa_->GetStateValue(state_vector_traversal_stack_[current_depth][0]);
+        return;
+      }
+    } else {
+      // go up
+      vector_offset_traversal_stack_.pop_back();
+      vector_offset_traversal_stack_[current_depth-1]++;
+    }
+
+
+
     uint32_t child_node = 0;
 
     while (1) {
@@ -190,6 +229,9 @@ class EntryIterator {
   uint64_t current_value_;
   std::vector<unsigned char> traversal_stack_;
   std::vector<uint32_t> state_traversal_stack_;
+  std::vector<std::vector<uint32_t>> state_vector_traversal_stack_;
+  std::vector<std::vector<unsigned char>> transitions_vector_traversal_stack_;
+  std::vector<int> vector_offset_traversal_stack_;
 
   char * buffer_for_reuse_ = 0;
   size_t buffer_for_reuse_size_ = 0;
