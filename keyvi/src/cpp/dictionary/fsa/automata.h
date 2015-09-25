@@ -91,12 +91,12 @@ final {
 
       TRACE("labels start offset: %d", offset);
       labels_region_ = new boost::interprocess::mapped_region(
-          *file_mapping_, boost::interprocess::read_only, offset, array_size);
+          *file_mapping_, boost::interprocess::read_only, offset, array_size, 0, map_options);
 
       TRACE("transitions start offset: %d", offset + array_size);
       transitions_region_ = new boost::interprocess::mapped_region(
           *file_mapping_, boost::interprocess::read_only, offset + array_size,
-          bucket_size * array_size);
+          bucket_size * array_size, 0, map_options);
 
       TRACE("full file size %zu", offset + array_size + bucket_size * array_size);
 
