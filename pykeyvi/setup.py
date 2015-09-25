@@ -18,6 +18,8 @@ if (mode == 'debug'):
     additional_compile_flags.append("-O0")
     additional_compile_flags.append("-ggdb3")
     additional_compile_flags.append("-fstack-protector")
+else:
+    additional_compile_flags.append("-O3")
 
 linklibraries = ["tpie",
              "boost_program_options",
