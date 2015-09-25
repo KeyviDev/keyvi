@@ -196,10 +196,25 @@ cdef class Dictionary:
         py_result.end = _r.end()
         return py_result
     
-    def __init__(self, bytes filename ):
+    def _init_0(self, bytes filename ):
         assert isinstance(filename, bytes), 'arg filename wrong type'
         cdef const_char * input_filename = <const_char *> filename
         self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
+    
+    def _init_1(self, bytes filename ,  load_lazy ):
+        assert isinstance(filename, bytes), 'arg filename wrong type'
+        assert isinstance(load_lazy, (int, long)), 'arg load_lazy wrong type'
+        cdef const_char * input_filename = <const_char *> filename
+    
+        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename, (<bool>load_lazy)))
+    
+    def __init__(self, *args):
+        if (len(args)==1) and (isinstance(args[0], bytes)):
+             self._init_0(*args)
+        elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
+             self._init_1(*args)
+        else:
+               raise Exception('can not handle type of %s' % (args,))
     
     def Get(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
