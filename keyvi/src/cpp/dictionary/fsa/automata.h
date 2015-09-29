@@ -190,6 +190,8 @@ final {
       outgoing_states.clear();
       outgoing_symbols.clear();
 
+      // todo: this can probably be further improved by using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
+
       uint64_t* labels_as_ll = (unsigned long int *) (labels_ + starting_state);
       uint64_t* mask_as_ll = (unsigned long int *) (OUTGOING_TRANSITIONS_MASK);
       unsigned char symbol = 0;
