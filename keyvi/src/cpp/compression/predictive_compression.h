@@ -215,8 +215,13 @@ class PredictiveCompression final {
       if (instream.eof()) break;
       uint16_t index = (uint16_t(c) << 8) + (uint16_t)instream.get();
       uint8_t length = instream.get();
-      instream.read(buffer, length);
-      if (instream.fail())
+      if (length > 8) {
+        char error[100];
+        sprintf(error, "Invalid model: too long value (%u) for key %02x:%02x",
+                length, index >> 8, index & 0xFF);
+        throw std::invalid_argument(error);
+      }
+      if (!instream.read(buffer, length))
         throw std::istream::failure("Incomplete model stream.");
       predictor_table_[index] = std::string(buffer, length);
     }
