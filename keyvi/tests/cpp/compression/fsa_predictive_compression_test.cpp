@@ -58,6 +58,22 @@ BOOST_AUTO_TEST_CASE( CompressAndUncompress ) {
   BOOST_CHECK_EQUAL(26, uncompressed.size());
 }
 
+BOOST_AUTO_TEST_CASE( CompressTooLongValue ) {
+  std::istringstream corpus(
+      "ht\x05""tp://" "tt\x05""ps://" "//\x04""www." "th\x14""too_long_value");
+
+  BOOST_CHECK_THROW(PredictiveCompression compressor(corpus),
+                    std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE( CompressIncomplete ) {
+  std::istringstream corpus(
+      "ht\x05""tp://" "tt\x05""ps://" "//\x04""www");
+
+  BOOST_CHECK_THROW(PredictiveCompression compressor(corpus),
+                    std::istream::failure);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 }
