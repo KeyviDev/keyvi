@@ -210,9 +210,14 @@ class PredictiveCompression final {
   void read_stream(std::istream& instream) {
     char buffer[8];
     while (true) {
-      uint16_t index = (instream.get() << 8) + instream.get();
+      char c;
+      instream.get(c);
+      if (instream.eof()) break;
+      uint16_t index = (uint16_t(c) << 8) + (uint16_t)instream.get();
       uint8_t length = instream.get();
       instream.read(buffer, length);
+      if (instream.fail())
+        throw std::istream::failure("Incomplete model stream.");
       predictor_table_[index] = std::string(buffer, length);
     }
   }
