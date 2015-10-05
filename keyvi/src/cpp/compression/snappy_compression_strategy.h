@@ -16,7 +16,7 @@
  */
 
 /*
- * zlib_compression_strategy.h
+ * snappy_compression_strategy.h
  *
  *  Created on: Apr 10, 2015
  *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
