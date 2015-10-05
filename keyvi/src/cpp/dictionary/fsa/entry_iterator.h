@@ -34,7 +34,6 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-// todo: right now hardcoded for int value storage
 class EntryIterator {
 
  public:
@@ -44,68 +43,28 @@ class EntryIterator {
         fsa_(0) {
   }
 
-  EntryIterator(automata_t f)
-      : fsa_(f) {
-    current_state_ = f->GetStartState();
-
-    TRACE("Get Start state %d", current_state_);
-
-
-    state_vector_traversal_stack_.resize(10);
-
-    transitions_vector_traversal_stack_.resize(10);
-
-    fsa_->GetOutGoingTransitions(f->GetStartState(), state_vector_traversal_stack_[0], transitions_vector_traversal_stack_[0]);
-
-
-    vector_offset_traversal_stack_.push_back(0);
-    traversal_stack_.push_back(transitions_vector_traversal_stack_[0][0]);
-
-
-    //traversal_stack_.push_back(0);
-    TraverseToNextFinalState();
-  }
+  EntryIterator(automata_t f) : EntryIterator(f, f->GetStartState()) {}
 
   EntryIterator(automata_t f, int start_state)
       : fsa_(f) {
     current_state_ = start_state;
+    state_vector_traversal_stack_.resize(10);
+    transitions_vector_traversal_stack_.resize(10);
 
-    TRACE("Get Start state %d", current_state_);
+    fsa_->GetOutGoingTransitions(start_state, state_vector_traversal_stack_[0], transitions_vector_traversal_stack_[0]);
 
-    traversal_stack_.push_back(0);
+    vector_offset_traversal_stack_.push_back(0);
+    traversal_stack_.push_back(transitions_vector_traversal_stack_[0][0]);
     TraverseToNextFinalState();
   }
 
-  ~EntryIterator() {
-    if (buffer_for_reuse_) {
-      delete[] buffer_for_reuse_;
-    }
-  }
-
   std::string GetKey() {
-    return std::string(GetKeyNoCopy());
+    TRACE ("depth: %d", current_depth_);
+    return std::string((const char*) traversal_stack_.data(), current_depth_ + 1);
   }
 
   void WriteKey(std::ostream& stream){
     stream.write((const char*) traversal_stack_.data(), current_depth_ + 1);
-  }
-
-  const char* GetKeyNoCopy() {
-    if (buffer_for_reuse_size_< (traversal_stack_.size() + 1)) {
-      if (buffer_for_reuse_) {
-        delete[] buffer_for_reuse_;
-      }
-      // allocate a little more the necessary
-      buffer_for_reuse_ = new char[traversal_stack_.size() + 10];
-      buffer_for_reuse_size_ = traversal_stack_.size() + 10;
-    }
-
-    std::copy(traversal_stack_.begin(), traversal_stack_.end(),
-              buffer_for_reuse_);
-
-    // overwrite the last character with 0
-    buffer_for_reuse_[traversal_stack_.size()] = '\0';
-    return buffer_for_reuse_;
   }
 
   uint64_t GetValueId() const {
@@ -123,11 +82,12 @@ class EntryIterator {
   EntryIterator &operator=(const EntryIterator &other) {
     fsa_ = other.fsa_;
     current_state_ = other.current_state_;
-    //current_key_ = other.current_key_;
     current_value_ = other.current_value_;
     traversal_stack_ = other.traversal_stack_;
-    //state_traversal_stack_ = other.state_traversal_stack_;
-    //current_depth_ = other.current_depth_;
+    state_vector_traversal_stack_ = other.state_vector_traversal_stack_;
+    transitions_vector_traversal_stack_ = other.transitions_vector_traversal_stack_;
+    vector_offset_traversal_stack_ = other.vector_offset_traversal_stack_;
+    current_depth_ = other.current_depth_;
     return *this;
   }
 
@@ -224,16 +184,11 @@ class EntryIterator {
 
   automata_t fsa_;
   uint32_t current_state_;
-  // std::string current_key_;
   uint64_t current_value_;
   std::vector<unsigned char> traversal_stack_;
-  //std::vector<uint32_t> state_traversal_stack_;
   std::vector<std::vector<uint32_t>> state_vector_traversal_stack_;
   std::vector<std::vector<unsigned char>> transitions_vector_traversal_stack_;
   std::vector<int> vector_offset_traversal_stack_;
-
-  char * buffer_for_reuse_ = 0;
-  size_t buffer_for_reuse_size_ = 0;
   size_t current_depth_ = 0;
 };
 

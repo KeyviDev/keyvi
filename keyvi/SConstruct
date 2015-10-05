@@ -51,7 +51,7 @@ env = Environment()
 install_prefix = GetOption('prefix')
 
 launch_dir = env.GetLaunchDir()
-env.Append(CPPFLAGS = ['-std=c++11'])
+env.Append(CPPFLAGS = ['-std=c++11', '-msse4.2'])
 env.Append(CPPPATH=[launch_dir + '/3rdparty/rapidjson/include',
                     launch_dir + '/3rdparty/msgpack-c/include',
                     launch_dir + '/3rdparty/utf8',
