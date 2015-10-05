@@ -58,8 +58,7 @@ namespace internal {
 /**
  * Value store where the value consists of a single integer.
  */
-class JsonValueStore
-final {
+class JsonValueStore final : public IValueStoreWriter {
    public:
 
     struct RawPointer
@@ -166,9 +165,12 @@ final {
         typedef std::string value_t;
         static const uint64_t no_value = 0;
         static const bool inner_weight = false;
-
-        JsonValueStore(boost::filesystem::path temporary_path, size_t memory_limit = 104857600): hash_(memory_limit){
-          temporary_directory_ = temporary_path;
+        
+        // boost::filesystem::path temporary_path,
+        JsonValueStore(const vs_param_t& parameters,
+                       size_t memory_limit = 104857600)
+            : IValueStoreWriter(parameters), hash_(memory_limit) {
+          temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
           temporary_directory_ /= boost::filesystem::unique_path(
               "dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
           boost::filesystem::create_directory(temporary_directory_);

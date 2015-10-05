@@ -37,7 +37,8 @@ BOOST_AUTO_TEST_SUITE( JsonValueTest )
 
 BOOST_AUTO_TEST_CASE( minimization )
 {
-  JsonValueStore strings("/tmp");
+  JsonValueStore strings(
+      IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
   uint32_t v = strings.GetValue("{\"mytestvalue\":25, \"mytestvalue2\":23}", no_minimization);
   BOOST_CHECK_EQUAL(v,0);
@@ -52,7 +53,8 @@ BOOST_AUTO_TEST_CASE( minimization )
 
 BOOST_AUTO_TEST_CASE( minimization2 )
 {
-  JsonValueStore strings("/tmp");
+  JsonValueStore strings(
+      IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
 
   uint64_t v = strings.GetValue("{\"f\": 5571575, \"df\": 1362790, \"uqf\": 2129086, \"tf1df\": 99838, \"tf2df\": 274586, \"tf3df\": 481278, \"tf5df\": 811157}", no_minimization);

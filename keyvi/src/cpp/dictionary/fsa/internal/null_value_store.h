@@ -36,14 +36,13 @@ namespace internal {
  * A value store for key-only dictionaries.
  * Simply return 0 for all values.
  */
-class NullValueStore final{
+class NullValueStore final : public IValueStoreWriter {
  public:
   typedef uint32_t value_t;
   static const uint64_t no_value = 0;
   static const bool inner_weight = false;
 
-  NullValueStore(boost::filesystem::path temporary_path = ""){
-  }
+  using IValueStoreWriter::IValueStoreWriter;
 
   NullValueStore& operator=(NullValueStore const&) = delete;
   NullValueStore(const NullValueStore& that) = delete;

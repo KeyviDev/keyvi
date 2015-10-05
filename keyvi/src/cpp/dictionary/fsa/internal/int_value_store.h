@@ -38,14 +38,13 @@ namespace internal {
 /**
  * Value store where the value consists of a single integer.
  */
-class IntValueStore final{
+class IntValueStore final : public IValueStoreWriter {
  public:
   typedef uint32_t value_t;
   static const uint64_t no_value = 0;
   static const bool inner_weight = false;
 
-  IntValueStore(boost::filesystem::path temporary_path = ""){
-  }
+  using IValueStoreWriter::IValueStoreWriter;
 
   IntValueStore& operator=(IntValueStore const&) = delete;
   IntValueStore(const IntValueStore& that) = delete;
@@ -70,14 +69,13 @@ class IntValueStore final{
 /**
  * An IntValue store which uses the values as inner weights.
  */
-class IntValueStoreWithInnerWeights final{
+class IntValueStoreWithInnerWeights final : public IValueStoreWriter {
  public:
   typedef uint32_t value_t;
   static const uint32_t no_value = 0;
   static const bool inner_weight = true;
 
-  IntValueStoreWithInnerWeights(boost::filesystem::path temporary_path = ""){
-  }
+  using IValueStoreWriter::IValueStoreWriter;
 
   IntValueStoreWithInnerWeights& operator=(IntValueStoreWithInnerWeights const&) = delete;
   IntValueStoreWithInnerWeights(const IntValueStoreWithInnerWeights& that) = delete;

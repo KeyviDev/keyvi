@@ -25,6 +25,9 @@
 #ifndef IVALUE_STORE_H_
 #define IVALUE_STORE_H_
 
+#define TEMPORARY_PATH_KEY "temporary_path"
+
+#include <map>
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -49,6 +52,7 @@ enum value_store_t {
 };
 
 /* Writing value stores is based on template (duck-typing).
+ * Base class / Interface definition for writing to the value store.
  *
  * The following types/constants/methods are required:
  *
@@ -62,6 +66,25 @@ enum value_store_t {
  * void Write(std::ostream& stream)
  */
 class IValueStoreWriter {
+ public:
+  /** Parameter map type. */
+  typedef std::map<std::string, std::string> vs_param_t;
+
+  /**
+   * Default constructor. Override if the value store implementation requires
+   * extra data.
+   *
+   * @param parameters a map of string parameter values. It is up to the
+   *                   value store what parameters it wants to use (if any).
+   */
+  IValueStoreWriter(const vs_param_t& parameters = vs_param_t()) : parameters_(parameters) {}
+  //IValueStoreWriter() : IValueStoreWriter(vs_param_t()) {}
+
+  virtual ~IValueStoreWriter() {
+  }
+ 
+ protected:
+  vs_param_t parameters_;
 };
 
 /**
