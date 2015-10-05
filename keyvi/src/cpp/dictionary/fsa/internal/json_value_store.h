@@ -27,6 +27,7 @@
 
 #include <boost/functional/hash.hpp>
 #include <zlib.h>
+#include <snappy.h>
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -44,6 +45,7 @@
 
 #include "compression/compression_strategy.h"
 #include "compression/zlib_compression_strategy.h"
+#include "compression/snappy_compression_strategy.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -176,7 +178,8 @@ final {
           values_extern_ = new MemoryMapManager(external_memory_chunk_size,
                                                             temporary_directory_,
                                                            "json_values_filebuffer");
-          compressor_ = new compression::ZlibCompressionStrategy();
+          //compressor_ = new compression::ZlibCompressionStrategy();
+          compressor_ = new compression::SnappyCompressionStrategy();
         }
 
         ~JsonValueStore(){
@@ -310,7 +313,8 @@ final {
 
           strings_ = (const char*) strings_region_->get_address();
 
-          decompressor_ = new compression::ZlibCompressionStrategy();
+          //decompressor_ = new compression::ZlibCompressionStrategy();
+          decompressor_ = new compression::SnappyCompressionStrategy();
         }
 
         ~JsonValueStoreReader() {
