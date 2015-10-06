@@ -14,6 +14,7 @@ env:
   matrix:
     - CONF=debug   ARCH=x86_64
     - CONF=release ARCH=x86_64
+    - BOOST_VERSION=55
   global:
     - GITHUB_REPO='cliqz-oss/keyvi'
 
@@ -36,15 +37,15 @@ addons:
     - scons
     - valgrind
     - cmake
-    - libboost-thread-dev
-    - libboost-system-dev
-    - libboost-test-dev
-    - libboost-dev
-    - libboost-date-time-dev
-    - libboost-regex-dev
-    - libboost-filesystem-dev
-    - libboost-program-options-dev
-    - libboost-iostreams-dev
+    - libboost-thread-$BOOST_VERSION-dev
+    - libboost-system-$BOOST_VERSION-dev
+    - libboost-test-$BOOST_VERSION-dev
+    - libboost-$BOOST_VERSION-dev
+    - libboost-date-time-$BOOST_VERSION-dev
+    - libboost-regex-$BOOST_VERSION-dev
+    - libboost-filesystem-$BOOST_VERSION-dev
+    - libboost-program-options-$BOOST_VERSION-dev
+    - libboost-iostreams-$BOOST_VERSION-dev
     - libsnappy-dev
     - zlib1g-dev
     - doxygen
