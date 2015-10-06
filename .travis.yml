@@ -14,9 +14,9 @@ env:
   matrix:
     - CONF=debug   ARCH=x86_64
     - CONF=release ARCH=x86_64
-    - BOOST_VERSION=55
   global:
     - GITHUB_REPO='cliqz-oss/keyvi'
+    - BOOST_VERSION=55
 
 before_install:
   - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
