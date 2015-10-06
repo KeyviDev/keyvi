@@ -21,8 +21,8 @@ before_install:
   - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
 
 install:
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90
+  - if [ "$CC" = "gcc" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90;fi
+  - if [ "$CC" = "gcc" ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90;fi
 
 addons:
   apt:
@@ -55,6 +55,6 @@ script:
   - scons -j 2 mode=$CONF
   - $CONF/dictionaryfsa_unittests/dictionaryfsa_unittests
 
-sudo: true
+sudo: false
 #after_success:
 #  - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
