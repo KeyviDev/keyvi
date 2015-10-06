@@ -33,10 +33,7 @@
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/util/vint.h"
 #include "dictionary/util/endian.h"
-
-#if defined(__SSE4_2__)
-#include <nmmintrin.h>
-#endif
+#include "dictionary/fsa/internal/intrinsics.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -153,29 +150,55 @@ final {
       std::vector<uint32_t> outgoing_states2;
       std::vector<unsigned char> outgoing_symbols2;
 
-      uint64_t* labels_as_ll = (unsigned long int *) (labels_ + starting_state);
-      uint64_t* mask_as_ll = (unsigned long int *) (OUTGOING_TRANSITIONS_MASK);
-      unsigned char symbol = 0;
-
       // todo: this can probably be further improved by using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
       // the following code produces the right bit mask but lacks handling of it
-      /**
-      __m128i* labels_as_ll2 = (__m128i *) (labels_ + starting_state);
-      __m128i* mask_as_ll2 = (__m128i *) (OUTGOING_TRANSITIONS_MASK);
+
+#if defined(KEYVI_SSE42)
+      __m128i* labels_as_m128 = (__m128i *) (labels_ + starting_state);
+      __m128i* mask_as_m128 = (__m128i *) (OUTGOING_TRANSITIONS_MASK);
+      unsigned char symbol = 0;
 
       // check 16 bytes at a time
       for (int offset = 0; offset < 16; ++offset) {
-        //__m128i mask;
-        int mask =  _mm_cmpestri(_mm_loadu_si128(labels_as_ll2), 16,
-                            _mm_loadu_si128(mask_as_ll2), 16,
-                            _SIDD_UBYTE_OPS|_SIDD_CMP_EQUAL_EACH|_SIDD_MASKED_POSITIVE_POLARITY|_SIDD_MOST_SIGNIFICANT);
+        __m128i mask = _mm_cmpestrm(_mm_loadu_si128(labels_as_m128), 16,
+                            _mm_loadu_si128(mask_as_m128), 16,
+                            _SIDD_UBYTE_OPS|_SIDD_CMP_EQUAL_EACH|_SIDD_MASKED_POSITIVE_POLARITY|_SIDD_BIT_MASK);
 
-        TRACE ("Bitmask %d", mask);
-        ++labels_as_ll2;
-        ++labels_as_ll2;
+        uint64_t mask_int = ((uint64_t*)&mask)[0];
+        TRACE ("Bitmask %d", mask_int);
+
+        if (mask_int != 0) {
+          if (offset == 0) {
+            // in this case we have to ignore the first bit, so start counting from 1
+            mask_int = mask_int >> 1;
+            for (auto i=1; i<16; ++i) {
+              if ((mask_int & 1) == 1) {
+                TRACE("push symbol+%d", symbol + i);
+                outgoing_symbols.push_back(symbol + i);
+                outgoing_states.push_back(ResolvePointer(starting_state, symbol + i));
+              }
+              mask_int = mask_int >> 1;
+            }
+          } else {
+            for (auto i=0; i<16; ++i) {
+              if ((mask_int & 1) == 1) {
+                TRACE("push symbol+%d", symbol + i);
+                outgoing_symbols.push_back(symbol + i);
+                outgoing_states.push_back(ResolvePointer(starting_state, symbol + i));
+              }
+              mask_int = mask_int >> 1;
+            }
+          }
+        }
+
+        ++labels_as_m128;
+        ++mask_as_m128;
         symbol +=16;
       }
-      */
+#else
+      uint64_t* labels_as_ll = (unsigned long int *) (labels_ + starting_state);
+      uint64_t* mask_as_ll = (unsigned long int *) (OUTGOING_TRANSITIONS_MASK);
+      unsigned char symbol = 0;
 
       // check 8 bytes at a time
       for (int offset = 0; offset < 32; ++offset) {
@@ -219,6 +242,7 @@ final {
         ++mask_as_ll;
         symbol +=8;
       }
+#endif
 
       return;
     }
