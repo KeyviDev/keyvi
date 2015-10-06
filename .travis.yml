@@ -45,6 +45,7 @@ addons:
     - libboost-iostreams-dev
     - libsnappy-dev
     - zlib1g-dev
+    - doxygen
 
 script:
   - cd keyvi
