@@ -33,7 +33,7 @@ namespace fsa {
 
 BOOST_AUTO_TEST_SUITE( AutomataTests )
 
-BOOST_AUTO_TEST_CASE( GetOutGoingTransitions ) {
+BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
   std::vector<std::string> test_data =
         { "\01cd", "aaaa", "aabb", "agbc", "ajcd", "azcd" };
     testing::TempDictionary dictionary(test_data);
@@ -71,6 +71,3 @@ BOOST_AUTO_TEST_SUITE_END()
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
-
-
-
