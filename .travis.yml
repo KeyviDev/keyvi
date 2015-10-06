@@ -7,7 +7,7 @@
 language: cpp
 
 compiler:
- - clang
+# disable, does not build with current msgpack - clang
  - gcc
 
 env:
