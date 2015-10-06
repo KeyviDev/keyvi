@@ -16,19 +16,19 @@
  */
 
 /*
- * fsa_predictive_compression.h
+ * predictive_compression.h
  *
  *  Created on: Apr 10, 2015
  *      Author: hendrik
  */
 
-#ifndef FSA_PREDICTIVE_COMPRESSION_H_
-#define FSA_PREDICTIVE_COMPRESSION_H_
+#ifndef PREDICTIVE_COMPRESSION_H_
+#define PREDICTIVE_COMPRESSION_H_
 
+#include <inttypes.h>
 #include <bitset>
 #include <sstream>
-#include "dictionary/dictionary.h"
-#include "dictionary/fsa/automata.h"
+#include <iostream>
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -39,38 +39,29 @@ namespace compression {
 /**
  * Short string compression inspired by RFC 1978 (Predictor Compression Protocol)
  */
-class FsaPredictiveCompression final {
+class PredictiveCompression final {
 
  public:
-  FsaPredictiveCompression(dictionary::fsa::automata_t fsa): fsa_(fsa){
+  PredictiveCompression(std::string file_name) {
+    std::fstream infile(file_name, std::fstream::in | std::fstream::binary);
+    if (!infile.is_open()) throw std::invalid_argument("cannot read file");
+    read_stream(infile);
+    infile.close();
   }
 
-  FsaPredictiveCompression(dictionary::dictionary_t d) {
-    fsa_ = d->GetFsa();
+  PredictiveCompression(std::istream& instream) {
+    read_stream(instream);
   }
 
   // highly inefficient for now
   std::string LookupBigram(const unsigned char* bigram){
 
     // skip for null bytes
-    if (bigram[0] == 0 || bigram[1] == 0){
+    if (bigram[0] == 0 || bigram[1] == 0) {
       return "";
+    } else {
+      return predictor_table_[(uint16_t(bigram[0]) << 8) + bigram[1]];
     }
-
-    uint64_t state = fsa_->GetStartState();
-    state = fsa_->TryWalkTransition(state, bigram[0]);
-    if (!state) {
-      TRACE ("LookupBigram: %c%c failed.", bigram[0], bigram[1]);
-
-      return "";
-    }
-    state = fsa_->TryWalkTransition(state, bigram[1]);
-
-    if (!state) {
-      return "";
-    }
-
-    return fsa_->GetValueAsString(fsa_->GetStateValue(state));
   }
 
   std::string Compress(const std::string& input){
@@ -211,8 +202,32 @@ class FsaPredictiveCompression final {
   }
 
  private:
-  dictionary::fsa::automata_t fsa_;
+  /**
+   * Reads the input stream and builds up the prediction table.
+   *
+   * @note @p instream must be a binary stream.
+   */
+  void read_stream(std::istream& instream) {
+    char buffer[8];
+    while (true) {
+      char c;
+      instream.get(c);
+      if (instream.eof()) break;
+      uint16_t index = (uint16_t(c) << 8) + (uint16_t)instream.get();
+      uint8_t length = instream.get();
+      if (length > 8) {
+        char error[100];
+        sprintf(error, "Invalid model: too long value (%u) for key %02x:%02x",
+                length, index >> 8, index & 0xFF);
+        throw std::invalid_argument(error);
+      }
+      if (!instream.read(buffer, length))
+        throw std::istream::failure("Incomplete model stream.");
+      predictor_table_[index] = std::string(buffer, length);
+    }
+  }
 
+  std::string predictor_table_[65536];
 };
 
 
@@ -221,4 +236,4 @@ class FsaPredictiveCompression final {
 
 
 
-#endif /* FSA_PREDICTIVE_COMPRESSION_H_ */
+#endif /* PREDICTIVE_COMPRESSION_H_ */
