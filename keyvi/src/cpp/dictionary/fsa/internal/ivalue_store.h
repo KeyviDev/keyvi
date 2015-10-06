@@ -26,6 +26,8 @@
 #define IVALUE_STORE_H_
 
 #define TEMPORARY_PATH_KEY "temporary_path"
+#define COMPRESSOR_KEY "compressor"
+#define COMPRESSION_THRESHOLD_KEY "compression_threshold"
 
 #include <map>
 #include <boost/filesystem.hpp>

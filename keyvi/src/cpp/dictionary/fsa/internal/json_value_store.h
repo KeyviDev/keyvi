@@ -25,9 +25,10 @@
 #ifndef JSON_VALUE_STORE_H_
 #define JSON_VALUE_STORE_H_
 
-#include <boost/functional/hash.hpp>
 #include <zlib.h>
 #include <snappy.h>
+#include <boost/functional/hash.hpp>
+#include <boost/lexical_cast.hpp>
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -43,9 +44,7 @@
 #include "dictionary/util/json_to_msgpack.h"
 #include "msgpack/zbuffer.hpp"
 
-#include "compression/compression_strategy.h"
-#include "compression/zlib_compression_strategy.h"
-#include "compression/snappy_compression_strategy.h"
+#include "compression/compression_selector.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -175,17 +174,27 @@ class JsonValueStore final : public IValueStoreWriter {
               "dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
           boost::filesystem::create_directory(temporary_directory_);
 
+          if (parameters_.count(COMPRESSION_THRESHOLD_KEY) > 0) {
+            compression_threshold_ = boost::lexical_cast<size_t>(
+                parameters_[COMPRESSION_THRESHOLD_KEY]);
+          } else {
+            compression_threshold_ = 32;
+          }
+
+          std::string compressor;
+          if (parameters_.count(COMPRESSOR_KEY) > 0) {
+            compressor = parameters_[COMPRESSOR_KEY];
+          }
+          compressor_.reset(compression::compression_strategy(compressor));
+
           size_t external_memory_chunk_size = 1073741824;
 
           values_extern_ = new MemoryMapManager(external_memory_chunk_size,
-                                                            temporary_directory_,
-                                                           "json_values_filebuffer");
-          //compressor_ = new compression::ZlibCompressionStrategy();
-          compressor_ = new compression::SnappyCompressionStrategy();
+                                                temporary_directory_,
+                                                "json_values_filebuffer");
         }
 
         ~JsonValueStore(){
-          delete compressor_;
           delete values_extern_;
           boost::filesystem::remove_all(temporary_directory_);
         }
@@ -216,7 +225,7 @@ class JsonValueStore final : public IValueStoreWriter {
           }
 
           // zlib compression
-          if (msgpack_buffer_.size() > 32) {
+          if (msgpack_buffer_.size() > compression_threshold_) {
             packed_value = compressor_->Compress(
                 msgpack_buffer_.data(), msgpack_buffer_.size());
           } else {
@@ -275,7 +284,8 @@ class JsonValueStore final : public IValueStoreWriter {
        private:
         MemoryMapManager* values_extern_;
 
-        compression::CompressionStrategy* compressor_;
+        std::unique_ptr<compression::CompressionStrategy> compressor_;
+        size_t compression_threshold_;
 
         LeastRecentlyUsedGenerationsCache<RawPointer> hash_;
         msgpack::sbuffer msgpack_buffer_;
