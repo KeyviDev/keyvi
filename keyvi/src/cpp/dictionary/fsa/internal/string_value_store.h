@@ -225,7 +225,7 @@ final {
         using IValueStoreReader::IValueStoreReader;
 
         StringValueStoreReader(std::istream& stream,
-                               boost::interprocess::file_mapping* file_mapping)
+                               boost::interprocess::file_mapping* file_mapping, bool load_lazy = false)
             : IValueStoreReader(stream, file_mapping) {
 
           boost::property_tree::ptree properties =
@@ -242,9 +242,15 @@ final {
             }
           }
 
+          boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options | MAP_HUGETLB;
+
+          if (!load_lazy) {
+            map_options |= MAP_POPULATE;
+          }
+
           strings_region_ = new boost::interprocess::mapped_region(
               *file_mapping, boost::interprocess::read_only, offset,
-              strings_size);
+              strings_size, 0, map_options);
 
           strings_ = (const char*) strings_region_->get_address();
         }

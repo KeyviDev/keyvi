@@ -38,16 +38,16 @@ namespace internal {
 class ValueStoreFactory final {
  public:
   static IValueStoreReader* MakeReader(value_store_t type, std::istream& stream,
-                                boost::interprocess::file_mapping* file_mapping){
+                                boost::interprocess::file_mapping* file_mapping, bool load_lazy = false){
     switch (type){
       case NULL_VALUE_STORE:
         return new NullValueStoreReader(stream, file_mapping);
       case INT_VALUE_STORE:
         return new IntValueStoreReader(stream, file_mapping);
       case STRING_VALUE_STORE:
-        return new StringValueStoreReader(stream, file_mapping);
+        return new StringValueStoreReader(stream, file_mapping, load_lazy);
       case JSON_VALUE_STORE:
-        return new JsonValueStoreReader(stream, file_mapping);
+        return new JsonValueStoreReader(stream, file_mapping, load_lazy);
     }
 
     throw std::invalid_argument("Unknown Value Storage type");

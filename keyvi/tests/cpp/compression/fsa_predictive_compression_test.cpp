@@ -24,22 +24,21 @@
  */
 
 
+#include <sstream>
 #include <boost/test/unit_test.hpp>
 #include "dictionary/testing/temp_dictionary.h"
-#include "compression/fsa_predictive_compression.h"
+#include "compression/predictive_compression.h"
 
 namespace keyvi {
 namespace compression {
 
-BOOST_AUTO_TEST_SUITE( FSAPredictiveCompressionTests )
+BOOST_AUTO_TEST_SUITE( PredictiveCompressionTests )
 
 BOOST_AUTO_TEST_CASE( CompressAndUncompress ) {
-  std::vector<std::pair<std::string, std::string>> bigrams = { { "ht", "tp://" }, {
-      "tt", "ps://" }, {"//", "www."}, {"th", "e"}, };
+  std::istringstream corpus(
+      "ht\x05""tp://" "tt\x05""ps://" "//\x04""www." "th\x01""e");
 
-  dictionary::testing::TempDictionary dictionary(bigrams);
-
-  auto compressor = FsaPredictiveCompression(dictionary.GetFsa());
+  auto compressor = PredictiveCompression(corpus);
 
   std::string input = "http://www.the-test.com";
   std::string output = compressor.Compress(input);
@@ -57,6 +56,22 @@ BOOST_AUTO_TEST_CASE( CompressAndUncompress ) {
   BOOST_CHECK_EQUAL(input, uncompressed);
   BOOST_CHECK_EQUAL(26, input.size());
   BOOST_CHECK_EQUAL(26, uncompressed.size());
+}
+
+BOOST_AUTO_TEST_CASE( CompressTooLongValue ) {
+  std::istringstream corpus(
+      "ht\x05""tp://" "tt\x05""ps://" "//\x04""www." "th\x14""too_long_value");
+
+  BOOST_CHECK_THROW(PredictiveCompression compressor(corpus),
+                    std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE( CompressIncomplete ) {
+  std::istringstream corpus(
+      "ht\x05""tp://" "tt\x05""ps://" "//\x04""www");
+
+  BOOST_CHECK_THROW(PredictiveCompression compressor(corpus),
+                    std::istream::failure);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
