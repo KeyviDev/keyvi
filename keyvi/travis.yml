@@ -1,0 +1,36 @@
+##
+#
+# Travis CI script for keyvi
+#
+
+
+language: cpp
+
+compiler:
+ - clang
+ - gcc
+
+env:
+  matrix:
+    - CONF=debug   ARCH=x86_64
+    - CONF=release ARCH=x86_64
+  global:
+    - GITHUB_REPO='cliqz-oss/keyvi'
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq scons valgrind cmake
+  - sudo apt-get install -qq libboost-thread-dev libboost-system-dev libboost-test-dev libboost-dev libboost-date-time-dev libboost-regex-dev libboost-filesystem-dev
+  - sudo apt-get install -qq libboost-program-options-dev libboost-iostreams-dev libsnappy-dev zlib1g-dev
+  - sudo apt-get --no-install-recommends install doxygen # Don't install LaTeX stuffs
+  - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
+
+install: true
+
+script:
+  - cd keyvi
+  - scons mode=$CONF
+  - $CONF/dictionaryfsa_unittests/dictionaryfsa_unittests
+
+#after_success:
+#  - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
