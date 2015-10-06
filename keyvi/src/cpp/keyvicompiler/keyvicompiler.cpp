@@ -36,6 +36,8 @@
 #include "dictionary/fsa/internal/string_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 
+typedef keyvi::dictionary::fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
+
 void callback (size_t added, size_t overall, void*) {
   std::cout << "Processed " << added << "/" << overall << "(" << ((100 * added) / overall) <<  "%)." << std::endl;
 }
@@ -225,6 +227,15 @@ void compile_json(std::vector<std::string>& input, std::string& output, size_t m
   finalize_compile(compiler, output, partition_size, manifest);
 }
 
+vs_param_t extract_value_store_parameters(
+    const boost::program_options::variables_map& vm) {
+  vs_param_t ret;
+  for (auto& kv : vm) {
+    if (kv.first[0] == 'V') ret[kv.first] = kv.second;
+  }
+  return ret;
+}
+
 int main(int argc, char** argv) {
   std::vector<std::string> input_files;
   std::string output_file;
@@ -298,6 +309,8 @@ int main(int argc, char** argv) {
   std::string manifest = vm["manifest"].as<std::string>();
   std::cout << manifest << std::endl;
 
+  vs_param_t value_store_params = extract_value_store_parameters(vm);
+
   if (vm.count("input-file") && vm.count("output-file")) {
     input_files = vm["input-file"].as<std::vector<std::string>>();
     output_file = vm["output-file"].as<std::string>();
@@ -305,27 +318,35 @@ int main(int argc, char** argv) {
     std::string dictionary_type = vm["dictionary-type"].as<std::string>();
     if (dictionary_type == "integer") {
       if (compact){
-        compile_integer<uint16_t>(input_files, output_file, memory_limit, partition_size, manifest);
+        compile_integer<uint16_t>(input_files, output_file, memory_limit,
+                                  partition_size, manifest, value_store_params);
       } else {
-        compile_integer(input_files, output_file, memory_limit, partition_size, manifest);
+        compile_integer(input_files, output_file, memory_limit, partition_size,
+                        manifest, value_store_params);
       }
     } else if (dictionary_type == "string") {
       if (compact){
-        compile_strings<uint16_t>(input_files, output_file, memory_limit, partition_size, manifest);
+        compile_strings<uint16_t>(input_files, output_file, memory_limit,
+                                  partition_size, manifest, value_store_params);
       } else {
-        compile_strings(input_files, output_file, memory_limit, partition_size, manifest);
+        compile_strings(input_files, output_file, memory_limit, partition_size,
+                        manifest, value_store_params);
       }
     } else if (dictionary_type == "key-only") {
       if (compact){
-        compile_key_only<uint16_t>(input_files, output_file, memory_limit, partition_size, manifest);
+        compile_key_only<uint16_t>(input_files, output_file, memory_limit,
+                                   partition_size, manifest, value_store_params);
       } else {
-        compile_key_only(input_files, output_file, memory_limit, partition_size, manifest);
+        compile_key_only(input_files, output_file, memory_limit, partition_size,
+                         manifest, value_store_params);
       }
     } else if (dictionary_type == "json") {
       if (compact){
-        compile_json<uint16_t>(input_files, output_file, memory_limit, partition_size, manifest);
+        compile_json<uint16_t>(input_files, output_file, memory_limit,
+                               partition_size, manifest, value_store_params);
       } else {
-        compile_json(input_files, output_file, memory_limit, partition_size, manifest);
+        compile_json(input_files, output_file, memory_limit, partition_size,
+                     manifest, value_store_params);
       }
     } else {
       std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;
