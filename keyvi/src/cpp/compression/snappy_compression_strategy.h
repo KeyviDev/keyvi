@@ -18,7 +18,7 @@
 /*
  * snappy_compression_strategy.h
  *
- *  Created on: Apr 10, 2015
+ *  Created on: October 2, 2015
  *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
  */
 
