@@ -124,12 +124,14 @@ void finalize_compile(CompilerType& compiler, std::string& output,
 }
 
 template<class BucketT = uint32_t>
-void compile_integer(std::vector<std::string>& input, std::string& output, size_t memory_limit,
-             size_t partition_size = 0, const std::string& manifest = "") {
+void compile_integer(std::vector<std::string>& input, std::string& output,
+                     size_t memory_limit, size_t partition_size = 0,
+                     const std::string& manifest = "",
+                     const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::IntValueStoreWithInnerWeights> compiler(
-      memory_limit);
+      memory_limit, value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
     size_t tab = line.find('\t');
@@ -156,11 +158,13 @@ void compile_integer(std::vector<std::string>& input, std::string& output, size_
 
 template<class BucketT = uint32_t>
 void compile_strings(std::vector<std::string>& input, std::string& output,
-                     size_t memory_limit, size_t partition_size = 0, const std::string& manifest = "") {
+                     size_t memory_limit, size_t partition_size = 0,
+                     const std::string& manifest = "",
+                     const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::StringValueStore> compiler(
-          memory_limit);
+          memory_limit, value_store_params);
 
   std::function<std::pair<std::string, std::string>(std::string)> parser = [] (std::string line) {
     size_t tab = line.find('\t');
@@ -180,10 +184,12 @@ void compile_strings(std::vector<std::string>& input, std::string& output,
 
 template<class BucketT = uint32_t>
 void compile_key_only(std::vector<std::string>& input, std::string& output,
-                      size_t memory_limit, size_t partition_size = 0, const std::string& manifest = "") {
+                      size_t memory_limit, size_t partition_size = 0,
+                      const std::string& manifest = "",
+                      const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>> compiler(
-      memory_limit);
+      memory_limit, value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
 
@@ -203,12 +209,14 @@ void compile_key_only(std::vector<std::string>& input, std::string& output,
 }
 
 template<class BucketT = uint32_t>
-void compile_json(std::vector<std::string>& input, std::string& output, size_t memory_limit,
-                  size_t partition_size = 0, const std::string& manifest = "") {
+void compile_json(std::vector<std::string>& input, std::string& output,
+                  size_t memory_limit, size_t partition_size = 0,
+                  const std::string& manifest = "",
+                  const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::JsonValueStore> compiler(
-          memory_limit);
+          memory_limit, value_store_params);
 
   std::function<std::pair<std::string, std::string>(std::string)> parser = [] (std::string line) {
     size_t tab = line.find('\t');
@@ -231,7 +239,7 @@ vs_param_t extract_value_store_parameters(
     const boost::program_options::variables_map& vm) {
   vs_param_t ret;
   for (auto& kv : vm) {
-    if (kv.first[0] == 'V') ret[kv.first] = kv.second;
+    if (kv.first[0] == 'V') ret[kv.first] = kv.second.as<std::string>();
   }
   return ret;
 }
