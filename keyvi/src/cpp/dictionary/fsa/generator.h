@@ -126,9 +126,11 @@ enum generator_state {
 template<class PersistenceT, class ValueStoreT = internal::NullValueStore>
 class Generator
 final {
+    typedef const internal::IValueStoreWriter::vs_param_t vs_param_t;
+    
    public:
-    Generator(const internal::IValueStoreWriter::vs_param_t& value_store_params,
-              size_t memory_limit = 1073741824)
+    Generator(size_t memory_limit = 1073741824,
+              const vs_param_t& value_store_params = vs_param_t())
         : memory_limit_(memory_limit), value_store_params_(value_store_params_) {
 
       // use 50% or limit minus 200MB for the memory limit of the hashtable
@@ -147,9 +149,6 @@ final {
       builder_ = new internal::SparseArrayBuilder<PersistenceT>(
           memory_limit_minimization, persistence_, ValueStoreT::inner_weight);
     }
-
-    Generator(size_t memory_limit = 1073741824)
-      : Generator(internal::IValueStoreWriter::vs_param_t(), memory_limit) {}
 
     ~Generator() {
       delete persistence_;

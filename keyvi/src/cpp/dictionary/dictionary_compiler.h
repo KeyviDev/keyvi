@@ -80,7 +80,7 @@ void unserialize(Src & s, keyvi::dictionary::key_value_pair<v> & pt) {
 template<class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryCompiler
   final {
-    typedef const std::map<std::string, std::string>& vs_param_t;
+    typedef const fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
     typedef key_value_pair<typename ValueStoreT::value_t> key_value_t;
     typedef std::function<void (size_t , size_t, void*)> callback_t;
 
@@ -93,18 +93,14 @@ class DictionaryCompiler
      *
      * @param memory_limit memory limit for internal memory usage
      */
-    DictionaryCompiler(
-      const fsa::internal::IValueStoreWriter::vs_param_t& value_store_params,
-      size_t memory_limit = 1073741824)
+    DictionaryCompiler(size_t memory_limit = 1073741824,
+                       const vs_param_t& value_store_params = vs_param_t())
         : initializer_(util::TpieIntializer::getInstance()),
           sorter_(),
-          generator_(value_store_params, memory_limit) {
+          generator_(memory_limit, value_store_params) {
       sorter_.set_available_memory(memory_limit);
       sorter_.begin();
     }
-
-    DictionaryCompiler(size_t memory_limit = 1073741824)
-      : DictionaryCompiler(fsa::internal::IValueStoreWriter::vs_param_t(), memory_limit) {}
 
     template<typename StringType>
     void Add(StringType input_key, typename ValueStoreT::value_t value =
