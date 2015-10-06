@@ -18,11 +18,6 @@ env:
     - GITHUB_REPO='cliqz-oss/keyvi'
 
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq scons valgrind cmake
-  - sudo apt-get install -qq libboost-thread-dev libboost-system-dev libboost-test-dev libboost-dev libboost-date-time-dev libboost-regex-dev libboost-filesystem-dev
-  - sudo apt-get install -qq libboost-program-options-dev libboost-iostreams-dev libsnappy-dev zlib1g-dev
-  - sudo apt-get --no-install-recommends install doxygen # Don't install LaTeX stuffs
   - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
 
 install:
@@ -36,6 +31,20 @@ addons:
     - gcc-4.8
     - g++-4.8
     - clang
+    - scons
+    - valgrind
+    - cmake
+    - libboost-thread-dev
+    - libboost-system-dev
+    - libboost-test-dev
+    - libboost-dev
+    - libboost-date-time-dev
+    - libboost-regex-dev
+    - libboost-filesystem-dev
+    - libboost-program-options-dev
+    - libboost-iostreams-dev
+    - libsnappy-dev
+    - zlib1g-dev
 
 script:
   - cd keyvi
