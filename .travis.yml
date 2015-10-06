@@ -16,7 +16,6 @@ env:
     - CONF=release ARCH=x86_64
   global:
     - GITHUB_REPO='cliqz-oss/keyvi'
-    - BOOST_VERSION=55
 
 before_install:
   - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
@@ -37,15 +36,15 @@ addons:
     - scons
     - valgrind
     - cmake
-    - libboost-thread-$BOOST_VERSION-dev
-    - libboost-system-$BOOST_VERSION-dev
-    - libboost-test-$BOOST_VERSION-dev
-    - libboost-$BOOST_VERSION-dev
-    - libboost-date-time-$BOOST_VERSION-dev
-    - libboost-regex-$BOOST_VERSION-dev
-    - libboost-filesystem-$BOOST_VERSION-dev
-    - libboost-program-options-$BOOST_VERSION-dev
-    - libboost-iostreams-$BOOST_VERSION-dev
+    - libboost-thread-55-dev
+    - libboost-system-55-dev
+    - libboost-test-55-dev
+    - libboost-55-dev
+    - libboost-date-time-55-dev
+    - libboost-regex-55-dev
+    - libboost-filesystem-55-dev
+    - libboost-program-options-55-dev
+    - libboost-iostreams-55-dev
     - libsnappy-dev
     - zlib1g-dev
     - doxygen
