@@ -47,6 +47,8 @@ linklibraries =  [ "tpie",
    ]
 
 env = Environment()
+env["CC"] = os.getenv("CC") or env["CC"]
+env["CXX"] = os.getenv("CXX") or env["CXX"]
 
 install_prefix = GetOption('prefix')
 

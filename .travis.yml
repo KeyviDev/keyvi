@@ -17,17 +17,14 @@ env:
   global:
     - GITHUB_REPO='cliqz-oss/keyvi'
 
-before_install:
-  - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
-
 install:
-  - if [ "$CC" = "gcc" ]; then sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 90;fi
-  - if [ "$CC" = "gcc" ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 90;fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
 addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.6
     - boost-latest
     packages:
     - gcc-4.8
@@ -36,6 +33,7 @@ addons:
     - scons
     - valgrind
     - cmake
+    - clang
     - libboost-thread1.55-dev
     - libboost-system1.55-dev
     - libboost-test1.55-dev
@@ -55,6 +53,6 @@ script:
   - scons -j 2 mode=$CONF
   - $CONF/dictionaryfsa_unittests/dictionaryfsa_unittests
 
-sudo: true
+sudo: false
 #after_success:
 #  - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
