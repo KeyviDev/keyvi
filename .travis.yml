@@ -7,7 +7,7 @@
 language: cpp
 
 compiler:
- - clang
+# disable, does not build with current msgpack - clang
  - gcc
 
 env:
@@ -17,9 +17,6 @@ env:
   global:
     - GITHUB_REPO='cliqz-oss/keyvi'
 
-before_install:
-  - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
-
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
@@ -27,6 +24,8 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.6
+    - boost-latest
     packages:
     - gcc-4.8
     - g++-4.8
@@ -34,21 +33,24 @@ addons:
     - scons
     - valgrind
     - cmake
-    - libboost-thread-dev
-    - libboost-system-dev
-    - libboost-test-dev
-    - libboost-dev
-    - libboost-date-time-dev
-    - libboost-regex-dev
-    - libboost-filesystem-dev
-    - libboost-program-options-dev
-    - libboost-iostreams-dev
+    - clang
+    - libboost-thread1.55-dev
+    - libboost-system1.55-dev
+    - libboost-test1.55-dev
+    - libboost1.55-dev
+    - libboost-date-time1.55-dev
+    - libboost-regex1.55-dev
+    - libboost-filesystem1.55-dev
+    - libboost-program-options1.55-dev
+    - libboost-iostreams1.55-dev
     - libsnappy-dev
     - zlib1g-dev
+    - doxygen
+    - libstdc++-4.8-dev
 
 script:
   - cd keyvi
-  - scons mode=$CONF
+  - scons -j 2 mode=$CONF
   - $CONF/dictionaryfsa_unittests/dictionaryfsa_unittests
 
 sudo: false
