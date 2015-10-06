@@ -149,6 +149,13 @@ final {
       return 0;
     }
 
+    /**
+     * Get the outgoing states of state quickly in 1 step.
+     *
+     * @param starting_state The state
+     * @param outgoing_states a vector given by reference to put n the outgoing states
+     * @param outgoing_symbols a vector given by reference to put in the outgoing symbols (labels)
+     */
     void GetOutGoingTransitions(uint32_t starting_state, std::vector<uint32_t>& outgoing_states,
                                 std::vector<unsigned char>& outgoing_symbols) const {
       outgoing_states.clear();
@@ -157,10 +164,9 @@ final {
       std::vector<uint32_t> outgoing_states2;
       std::vector<unsigned char> outgoing_symbols2;
 
-      // todo: this can probably be further improved by using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
-      // the following code produces the right bit mask but lacks handling of it
-
 #if defined(KEYVI_SSE42)
+      // Optimized version using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
+
       __m128i* labels_as_m128 = (__m128i *) (labels_ + starting_state);
       __m128i* mask_as_m128 = (__m128i *) (OUTGOING_TRANSITIONS_MASK);
       unsigned char symbol = 0;
