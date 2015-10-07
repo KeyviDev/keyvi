@@ -44,6 +44,7 @@
 #include "dictionary/util/json_to_msgpack.h"
 #include "msgpack/zbuffer.hpp"
 
+#include "dictionary/fsa/internal/constants.h"
 #include "compression/compression_selector.h"
 
 //#define ENABLE_TRACING

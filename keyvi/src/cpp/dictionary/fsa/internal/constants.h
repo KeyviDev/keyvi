@@ -44,4 +44,10 @@
 // how many buckets to go left doing (brute force) search for free buckets in the sparse array where the new state fits in
 #define SPARSE_ARRAY_SEARCH_OFFSET 151
 
+// Value option key names
+
+#define TEMPORARY_PATH_KEY "temporary_path"
+#define COMPRESSOR_KEY "compressor"
+#define COMPRESSION_THRESHOLD_KEY "compression_threshold"
+
 #endif /* CONSTANTS_H_ */
