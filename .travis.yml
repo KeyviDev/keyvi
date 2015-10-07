@@ -8,7 +8,14 @@ language: cpp
 
 compiler:
 # disable, does not build with current msgpack - clang
- - gcc
+  - gcc
+
+python:
+  - 2.7
+
+cache:
+  directories:
+    - $HOME/.pip-cache
 
 env:
   matrix:
@@ -17,6 +24,9 @@ env:
   global:
     - GITHUB_REPO='cliqz-oss/keyvi'
 
+before_install:
+  - pip install --user --download-cache $HOME/.pip-cache --use-wheel --install-option="--no-cython-compile" cython
+  - pip install --user --download-cache $HOME/.pip-cache --use-wheel pytest
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
@@ -50,8 +60,12 @@ addons:
 
 script:
   - cd keyvi
-  - scons -j 2 mode=$CONF
+  - scons -j 4 mode=$CONF
   - $CONF/dictionaryfsa_unittests/dictionaryfsa_unittests
+  - cd ../pykeyvi
+  - python setup.py build
+  - python setup.py install --user
+  - py.test tests
 
 sudo: false
 #after_success:
