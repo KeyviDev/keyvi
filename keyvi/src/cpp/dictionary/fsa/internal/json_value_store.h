@@ -27,6 +27,8 @@
 
 #include <boost/functional/hash.hpp>
 #include <zlib.h>
+
+#define RAPIDJSON_SSE42
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"

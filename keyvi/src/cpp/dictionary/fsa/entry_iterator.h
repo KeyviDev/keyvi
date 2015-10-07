@@ -34,7 +34,6 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-// todo: right now hardcoded for int value storage
 class EntryIterator {
 
  public:
@@ -44,52 +43,28 @@ class EntryIterator {
         fsa_(0) {
   }
 
-  EntryIterator(automata_t f)
-      : fsa_(f) {
-    current_state_ = f->GetStartState();
-
-    TRACE("Get Start state %d", current_state_);
-
-    traversal_stack_.push_back(0);
-    TraverseToNextFinalState();
-  }
+  EntryIterator(automata_t f) : EntryIterator(f, f->GetStartState()) {}
 
   EntryIterator(automata_t f, int start_state)
       : fsa_(f) {
     current_state_ = start_state;
+    state_vector_traversal_stack_.resize(10);
+    transitions_vector_traversal_stack_.resize(10);
 
-    TRACE("Get Start state %d", current_state_);
+    fsa_->GetOutGoingTransitions(start_state, state_vector_traversal_stack_[0], transitions_vector_traversal_stack_[0]);
 
-    traversal_stack_.push_back(0);
+    vector_offset_traversal_stack_.push_back(0);
+    traversal_stack_.push_back(transitions_vector_traversal_stack_[0][0]);
     TraverseToNextFinalState();
   }
 
-  ~EntryIterator() {
-    if (buffer_for_reuse_) {
-      delete[] buffer_for_reuse_;
-    }
-  }
-
   std::string GetKey() {
-    return std::string(GetKeyNoCopy());
+    TRACE ("depth: %d", current_depth_);
+    return std::string((const char*) traversal_stack_.data(), current_depth_ + 1);
   }
 
-  const char* GetKeyNoCopy() {
-    if (buffer_for_reuse_size_ < traversal_stack_.size()) {
-      if (buffer_for_reuse_) {
-        delete[] buffer_for_reuse_;
-      }
-      // allocate a little more the necessary
-      buffer_for_reuse_ = new char[traversal_stack_.size() + 10];
-      buffer_for_reuse_size_ = traversal_stack_.size() + 10;
-    }
-
-    std::copy(traversal_stack_.begin(), traversal_stack_.end(),
-              buffer_for_reuse_);
-
-    // overwrite the last character (which is a 1) with 0
-    buffer_for_reuse_[traversal_stack_.size() - 1] = '\0';
-    return buffer_for_reuse_;
+  void WriteKey(std::ostream& stream){
+    stream.write((const char*) traversal_stack_.data(), current_depth_ + 1);
   }
 
   uint64_t GetValueId() const {
@@ -107,10 +82,11 @@ class EntryIterator {
   EntryIterator &operator=(const EntryIterator &other) {
     fsa_ = other.fsa_;
     current_state_ = other.current_state_;
-    current_key_ = other.current_key_;
     current_value_ = other.current_value_;
     traversal_stack_ = other.traversal_stack_;
-    state_traversal_stack_ = other.state_traversal_stack_;
+    state_vector_traversal_stack_ = other.state_vector_traversal_stack_;
+    transitions_vector_traversal_stack_ = other.transitions_vector_traversal_stack_;
+    vector_offset_traversal_stack_ = other.vector_offset_traversal_stack_;
     current_depth_ = other.current_depth_;
     return *this;
   }
@@ -135,65 +111,85 @@ class EntryIterator {
       return;
     }
 
-    uint32_t child_node = 0;
+    // clean the current state
+    current_state_ = 0;
+    current_value_ = 0;
 
-    while (1) {
+    for (;;){
 
-      do {
-        ++traversal_stack_[current_depth_];
-        child_node = fsa_->TryWalkTransition(current_state_,
-                                             traversal_stack_[current_depth_]);
+      current_depth_ = vector_offset_traversal_stack_.size() - 1;
+      int current_offset = vector_offset_traversal_stack_[current_depth_];
+      TRACE("current depth %d", current_depth_);
+      // check whether the current state has outgoing transitions left
+      if (current_offset < transitions_vector_traversal_stack_[current_depth_].size()) {
+        traversal_stack_[traversal_stack_.size()-1] = transitions_vector_traversal_stack_[current_depth_][vector_offset_traversal_stack_[current_depth_]];
 
-        if (traversal_stack_[current_depth_] == 255) {
-          break;
+        // go further deep down
+        size_t new_depth = current_depth_ + 1;
+
+        // ensure that the traversal stack is large enough
+        if (state_vector_traversal_stack_.size() < new_depth + 1){
+          TRACE("resize vectors");
+
+          state_vector_traversal_stack_.resize(state_vector_traversal_stack_.size() + 10);
+          transitions_vector_traversal_stack_.resize(transitions_vector_traversal_stack_.size() + 10);
         }
-      } while (!child_node);
 
-      if (child_node) {
-        /* Found a valid childnode
-         * go one level down
-         */
-        ++current_depth_;
-        state_traversal_stack_.push_back(current_state_);
-        current_state_ = child_node;
-        traversal_stack_.push_back(1);
+        // get the outgoing transitions
+        fsa_->GetOutGoingTransitions(state_vector_traversal_stack_[current_depth_][vector_offset_traversal_stack_[current_depth_]],
+                                     state_vector_traversal_stack_[new_depth], transitions_vector_traversal_stack_[current_depth_+1]);
 
-        if (fsa_->IsFinalState(child_node)) {
+        TRACE("number of outgoing states found: %d", state_vector_traversal_stack_[current_depth_+1].size());
+
+        if (fsa_->IsFinalState(state_vector_traversal_stack_[current_depth_][current_offset])) {
           // we found a final state
-          // todo: implement value for other stores
-          current_value_ = fsa_->GetStateValue(child_node);
-          return;
+          TRACE("found final state");
+          current_state_ = state_vector_traversal_stack_[current_depth_][current_offset];
+          current_value_ = fsa_->GetStateValue(current_state_);
         }
-      } else {
-        // did not found any more transitions at this deep
 
-        if (current_depth_) {
-          /* we did not find any path at the current level (deep)
-           * go one level up
-           */
-          traversal_stack_.pop_back();
-          current_state_ = state_traversal_stack_.back();
-          state_traversal_stack_.pop_back();
-          --current_depth_;
+        if (state_vector_traversal_stack_[new_depth].size() > 0) {
+
+          TRACE("going 1 level deeper");
+
+          vector_offset_traversal_stack_.push_back(0);
+          traversal_stack_.push_back(transitions_vector_traversal_stack_[new_depth][0]);
         } else {
-          // we are at the very end
-          current_state_ = 0;
+          TRACE("no more states");
+          vector_offset_traversal_stack_[current_depth_]++;
+        }
+
+      } else {
+        // go up
+        TRACE("going 1 level up");
+
+        vector_offset_traversal_stack_.pop_back();
+
+        if (vector_offset_traversal_stack_.size() == 0) {
           return;
         }
+
+        traversal_stack_.pop_back();
+        --current_depth_;
+
+        vector_offset_traversal_stack_[current_depth_]++;
+      }
+
+      // if current_state is set, we found a final state -> return
+      if (current_state_ != 0){
+        return;
       }
     }
   }
 
   automata_t fsa_;
   uint32_t current_state_;
-  std::string current_key_;
   uint64_t current_value_;
   std::vector<unsigned char> traversal_stack_;
-  std::vector<uint32_t> state_traversal_stack_;
-
-  char * buffer_for_reuse_ = 0;
-  size_t buffer_for_reuse_size_ = 0;
-  unsigned long current_depth_ = 0;
+  std::vector<std::vector<uint32_t>> state_vector_traversal_stack_;
+  std::vector<std::vector<unsigned char>> transitions_vector_traversal_stack_;
+  std::vector<int> vector_offset_traversal_stack_;
+  size_t current_depth_ = 0;
 };
 
 typedef std::shared_ptr<EntryIterator> entry_iterator_t;
