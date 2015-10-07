@@ -1,6 +1,7 @@
 # keyvi
+[![Build Status](https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master)](https://travis-ci.org/cliqz-oss/keyvi)
 
-A key value index based on finite state technology.
+Keyvi - the short form for "Key value index" - defines a special subtype of the popular key value store (KVS) technologies. As you can imagine from the name, keyvi is an immutable key value store, therefore an index not a store. Keyvi's strengths: high compression ratio and extreme scalability. So if you need online read/writes keyvi is not for you, however, if your use case is mostly reads and infrequent writes you might be interested in checking keyvi out.
 
 ## Install
 
@@ -18,6 +19,9 @@ The core part is a C++ header-only library, but the TPIE 3rdparty library needs 
 tools are also part of the C++ code. For instructions check the [Readme](/keyvi/README.md) file.
 
 For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
+
+## Read
+  * [Announcement blog post](https://cliqz.com/blog/keyvi)
 
 ## Usage
 
