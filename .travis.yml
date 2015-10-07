@@ -25,7 +25,7 @@ env:
     - GITHUB_REPO='cliqz-oss/keyvi'
 
 before_install:
-  - pip install --download-cache $HOME/.pip-cache --use-wheel --install-option="--no-cython-compile" cython
+  - pip install --user --download-cache $HOME/.pip-cache --use-wheel --install-option="--no-cython-compile" cython
 
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
