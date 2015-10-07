@@ -28,7 +28,12 @@
 #include <boost/functional/hash.hpp>
 #include <zlib.h>
 
+#include "dictionary/fsa/internal/intrinsics.h"
+
+#if defined(KEYVI_SSE42)
 #define RAPIDJSON_SSE42
+#endif
+
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
