@@ -22,6 +22,7 @@ env:
 
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - travis_retry pip install --install-option="--no-cython-compile" Cython==0.22
 
 addons:
   apt:
