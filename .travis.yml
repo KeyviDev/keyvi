@@ -64,7 +64,8 @@ script:
   - $CONF/dictionaryfsa_unittests/dictionaryfsa_unittests
   - cd ../pykeyvi
   - python setup.py build
-  - python setup.py install
+  - python setup.py install --user
+  - py.test tests
 
 sudo: false
 #after_success:
