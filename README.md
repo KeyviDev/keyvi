@@ -21,7 +21,7 @@ tools are also part of the C++ code. For instructions check the [Readme](/keyvi/
 For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
 
 ## Read
-  * [Announcement blog post](https://cliqz.com/blog/keyvi)
+  * [Announcement blog post](https://cliqz.com/en/blog/keyvi)
 
 ## Usage
 
