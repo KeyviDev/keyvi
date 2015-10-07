@@ -8,7 +8,10 @@ language: cpp
 
 compiler:
 # disable, does not build with current msgpack - clang
- - gcc
+  - gcc
+
+python:
+  - 2.7
 
 env:
   matrix:
@@ -50,8 +53,11 @@ addons:
 
 script:
   - cd keyvi
-  - scons -j 2 mode=$CONF
+  - scons -j 4 mode=$CONF
   - $CONF/dictionaryfsa_unittests/dictionaryfsa_unittests
+  - cd ../pykeyvi
+  - python setup.py build
+  - python setup.py install
 
 sudo: false
 #after_success:
