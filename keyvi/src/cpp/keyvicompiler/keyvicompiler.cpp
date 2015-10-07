@@ -29,6 +29,7 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/range/iterator_range.hpp>
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
@@ -235,11 +236,18 @@ void compile_json(std::vector<std::string>& input, std::string& output,
   finalize_compile(compiler, output, partition_size, manifest);
 }
 
+/** Extracts the value store parameters. */
 vs_param_t extract_value_store_parameters(
     const boost::program_options::variables_map& vm) {
   vs_param_t ret;
-  for (auto& kv : vm) {
-    if (kv.first[0] == 'V') ret[kv.first] = kv.second.as<std::string>();
+  for (auto& v : vm["value-store-parameter"].as<std::vector <std::string> >()) {
+    std::vector<std::string> key_value;
+    boost::split(key_value, v, boost::is_any_of("="));
+    if (key_value.size() == 2) {
+      ret[key_value[0]] = key_value[1];
+    } else {
+      throw std::invalid_argument("Invalid value store parameter format: " + v);
+    }
   }
   return ret;
 }
@@ -271,6 +279,10 @@ int main(int argc, char** argv) {
                             boost::program_options::value<size_t>(),
                             "create partitions with a maximum size");
   description.add_options()("compact,c", "Compact Mode");
+  description.add_options()(
+      "value-store-parameter,V",
+      boost::program_options::value< std::vector<std::string> >()->default_value(std::vector<std::string>(), "EMPTY")->composing(),
+      "A value store option; format is -V xxx=yyy");
 
   description.add_options()(
         "manifest",
