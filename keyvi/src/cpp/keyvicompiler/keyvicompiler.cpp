@@ -242,7 +242,7 @@ vs_param_t extract_value_store_parameters(
   vs_param_t ret;
   for (auto& v : vm["value-store-parameter"].as<std::vector <std::string> >()) {
     std::vector<std::string> key_value;
-    boost::split(key_value, v, boost::is_any_of("="));
+    boost::split(key_value, v, std::bind1st(std::equal_to<char>(), '='));
     if (key_value.size() == 2) {
       ret[key_value[0]] = key_value[1];
     } else {
