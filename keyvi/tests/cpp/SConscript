@@ -1,6 +1,7 @@
 import glob
 import os
 import fnmatch
+from _hotshot import coverage
 
 # recursive globing
 def RecursiveGlob(pathname):
@@ -12,19 +13,12 @@ def RecursiveGlob(pathname):
     return matches
 
 #get all the build variables we need
-Import('env', 'project', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'linklibraries')
+Import('env', 'project', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'coveragecompilerflags', 'linklibraries')
 localenv = env.Clone()
 
 buildroot = '../../' + buildmode  #holds the root of the build directory tree
 builddir = buildroot + '/' + project   #holds the build directory for this project
 targetpath = builddir + '/' + project  #holds the path to the executable in the build directory
-
-#append the user's additional compile flags
-#assume debugcompilerflags and releasecompilerflags are defined
-if buildmode == 'debug':
-   localenv.Append(CPPFLAGS=debugcompilerflags)
-else:
-   localenv.Append(CPPFLAGS=releasecompilerflags)
 
 localenv.Append(CPPPATH = ['../../src/cpp'])
 

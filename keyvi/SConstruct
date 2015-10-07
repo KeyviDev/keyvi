@@ -13,8 +13,8 @@ SetOption('num_jobs', cpus)
 print "running with -j", GetOption('num_jobs')
 
 #check if the user has been naughty: only 'debug' or 'release' allowed
-if not (buildmode in ['debug', 'release']):
-   print "Error: expected 'debug' or 'release', found: " + mymode
+if not (buildmode in ['debug', 'release', 'coverage']):
+   print "Error: expected 'debug', 'coverage' or 'release', found: " + mymode
    Exit(1)
 
 #tell the user what we're doing
@@ -33,6 +33,7 @@ AddOption('--prefix',
 
 
 debugcompilerflags = ['-ggdb3']   #extra compile flags for debug
+coveragecompilerflags = debugcompilerflags + ['-O0' ,'--coverage'] 
 releasecompilerflags = ['-O3']         #extra compile flags for release
 
 linklibraries =  [ "tpie",
@@ -45,6 +46,9 @@ linklibraries =  [ "tpie",
    "z",
    "snappy"
    ]
+
+if buildmode == 'coverage':
+    linklibraries.append('gcov')
 
 env = Environment()
 env["CC"] = os.getenv("CC") or env["CC"]
@@ -69,9 +73,16 @@ if env['PLATFORM'] == 'darwin':
     linklibraries.remove('boost_thread')
     linklibraries.append('boost_thread-mt')
     
+#append the user's additional compile flags
+if buildmode == 'debug':
+   env.Append(CPPFLAGS=debugcompilerflags)
+elif buildmode == 'coverage':
+   env.Append(CPPFLAGS=coveragecompilerflags)
+else:
+   env.Append(CPPFLAGS=releasecompilerflags)
 
 #make sure the sconscripts can get to the variables
-Export('env', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'linklibraries', 'install_prefix')
+Export('env', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'coveragecompilerflags', 'linklibraries', 'install_prefix')
 
 #put all .sconsign files in one place
 env.SConsignFile()
