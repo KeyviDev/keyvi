@@ -73,4 +73,4 @@ script:
 
 sudo: false
 after_success:
-  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then coveralls -r keyvi -b keyvi --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' -e 3rdparty -e tests --repo-token "${COVERALLS_REPO_TOKEN}" ; fi
+  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then coveralls -r keyvi -b keyvi --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' -e 3rdparty --repo-token "${COVERALLS_REPO_TOKEN}" ; fi
