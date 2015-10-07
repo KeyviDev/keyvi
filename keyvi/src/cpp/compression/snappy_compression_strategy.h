@@ -52,6 +52,8 @@ struct SnappyCompressionStrategy final : public CompressionStrategy {
                        &uncompressed);
     return uncompressed;
   }
+
+  std::string name() const { return "snappy"; }
 };
 
 } /* namespace compression */

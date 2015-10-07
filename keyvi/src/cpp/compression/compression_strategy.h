@@ -55,6 +55,9 @@ struct CompressionStrategy {
    * will have been removed.
    */
   virtual std::string Decompress(const std::string& compressed) = 0;
+
+  /** The "name" of the compression strategy. */
+  virtual std::string name() const = 0;
 };
 
 /**
@@ -72,6 +75,8 @@ struct RawCompressionStrategy final : public CompressionStrategy {
   std::string Decompress(const std::string& compressed) {
     return compressed;
   }
+
+  std::string name() const { return "raw"; }
 };
 
 } /* namespace compression */

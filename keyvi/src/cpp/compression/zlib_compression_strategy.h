@@ -118,6 +118,8 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     return outstring;
   }
 
+  std::string name() const { return "zlib"; }
+
  private:
   int compression_level_;
   char zlib_buffer_[32768];
