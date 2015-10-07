@@ -1,7 +1,17 @@
 # keyvi
-[![Build Status](https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master)](https://travis-ci.org/cliqz-oss/keyvi)
 
 Keyvi - the short form for "Key value index" - defines a special subtype of the popular key value store (KVS) technologies. As you can imagine from the name, keyvi is an immutable key value store, therefore an index not a store. Keyvi's strengths: high compression ratio and extreme scalability. So if you need online read/writes keyvi is not for you, however, if your use case is mostly reads and infrequent writes you might be interested in checking keyvi out.
+
+## Build status
+
+| [Linux][lin-link] | [Coveralls][cov-link] |
+| :---------------: | :-------------------: |
+| ![lin-badge]      | ![cov-badge]          |
+
+[lin-badge]: https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master "Travis build status"
+[lin-link]:  https://travis-ci.org/cliqz-oss/keyvi "Travis build status"
+[cov-badge]: https://coveralls.io/repos/cliqz-oss/keyvi/badge.svg?branch=master&service=github
+[cov-link]:  https://coveralls.io/github/cliqz-oss/keyvi?branch=master
 
 ## Install
 
