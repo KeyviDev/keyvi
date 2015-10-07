@@ -13,6 +13,10 @@ compiler:
 python:
   - 2.7
 
+cache:
+  directories:
+    - $HOME/.pip-cache
+
 env:
   matrix:
     - CONF=debug   ARCH=x86_64
@@ -20,9 +24,11 @@ env:
   global:
     - GITHUB_REPO='cliqz-oss/keyvi'
 
+before_install:
+  - pip install --download-cache $HOME/.pip-cache --use-wheel --install-option="--no-cython-compile" cython
+
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-  - travis_retry pip install --install-option="--no-cython-compile" Cython==0.22
 
 addons:
   apt:
