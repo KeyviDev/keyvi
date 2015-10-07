@@ -328,12 +328,12 @@ class JsonValueStore final : public IValueStoreWriter {
 
           strings_ = (const char*) strings_region_->get_address();
 
-          //decompressor_ = new compression::ZlibCompressionStrategy();
-          decompressor_ = new compression::SnappyCompressionStrategy();
+          // The default decompressor is zlib for backwards compatibility
+          decompressor_.reset(compression::compression_strategy(
+              properties_.get(std::string("__") + COMPRESSOR_KEY, "zlib")));
         }
 
         ~JsonValueStoreReader() {
-          delete decompressor_;
           delete strings_region_;
         }
 
@@ -387,7 +387,7 @@ class JsonValueStore final : public IValueStoreWriter {
         boost::interprocess::mapped_region* strings_region_;
         const char* strings_;
         boost::property_tree::ptree properties_;
-        compression::CompressionStrategy* decompressor_;
+        std::unique_ptr<compression::CompressionStrategy> decompressor_;
       };
 
 } /* namespace internal */
