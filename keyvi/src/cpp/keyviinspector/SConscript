@@ -10,14 +10,6 @@ targetpath = builddir + '/' + project  #holds the path to the executable in the 
 
 localenv.Append(LIBPATH = buildroot + "/dictionaryfsa")
 
-
-#append the user's additional compile flags
-#assume debugcompilerflags and releasecompilerflags are defined
-if buildmode == 'debug':
-   localenv.Append(CPPFLAGS=debugcompilerflags)
-else:
-   localenv.Append(CPPFLAGS=releasecompilerflags)
-
 localenv.Append(CPPPATH = ['../'])
 
 #specify the build directory
