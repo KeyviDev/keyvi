@@ -131,7 +131,7 @@ final {
    public:
     Generator(size_t memory_limit = 1073741824,
               const vs_param_t& value_store_params = vs_param_t())
-        : memory_limit_(memory_limit), value_store_params_(value_store_params_) {
+        : memory_limit_(memory_limit), value_store_params_(value_store_params) {
 
       // use 50% or limit minus 200MB for the memory limit of the hashtable
       size_t memory_limit_minimization = std::max(
