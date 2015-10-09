@@ -260,7 +260,7 @@ int main(int argc, char** argv) {
       "keyvi compiler options:");
 
   description.add_options()("help,h", "Display this help message")(
-      "version,v", "Display the version number");
+                            "version,v", "Display the version number");
 
   description.add_options()("input-file,i",
                             boost::program_options::value<std::vector<std::string>>(),
