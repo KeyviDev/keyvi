@@ -1,4 +1,5 @@
-from libcpp.string cimport string
+from libcpp.string cimport string as libcpp_string
+from libcpp.map cimport map as libcpp_map
 from libc.string cimport const_char
 
 ctypedef void (*callback_t)(size_t a, size_t b, void* user_data)
@@ -24,8 +25,9 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void WriteToFile(const_char*)
         
     cdef cppclass JsonDictionaryCompiler:
-        JsonDictionaryCompiler() except +
-        JsonDictionaryCompiler(size_t memory_limit) except +
+        JsonDictionaryCompiler() except + # wrap-ignore
+        JsonDictionaryCompiler(size_t memory_limit) except + # wrap-ignore
+        JsonDictionaryCompiler(size_t memory_limit, libcpp_map[libcpp_string, libcpp_string]& value_store_params) except + # wrap-ignore
         void Add(const_char*, const_char*) except +
         void __setitem__(const_char*, const_char*) except +
         void Compile() nogil # wrap-ignore
