@@ -68,7 +68,7 @@ inline decompress_func_t decompressor_by_code(const std::string& s) {
       return SnappyCompressionStrategy::DoDecompress;
     default:
       throw std::invalid_argument("Invalid compression code " +
-          boost::lexical_cast<std::string>(static_cast<uint8_t>(s[0])));
+          boost::lexical_cast<std::string>(static_cast<int>(s[0])));
   }
 }
 

@@ -187,6 +187,7 @@ class JsonValueStore final : public IValueStoreWriter {
             compressor = parameters_[COMPRESSOR_KEY];
           }
           compressor_.reset(compression::compression_strategy(compressor));
+          raw_compressor_.reset(compression::compression_strategy("raw"));
 
           size_t external_memory_chunk_size = 1073741824;
 
@@ -230,8 +231,10 @@ class JsonValueStore final : public IValueStoreWriter {
             packed_value = compressor_->Compress(
                 msgpack_buffer_.data(), msgpack_buffer_.size());
           } else {
-            util::encodeVarint(msgpack_buffer_.size(), packed_value);
-            packed_value.append(msgpack_buffer_.data(), msgpack_buffer_.size());
+            packed_value = raw_compressor_->Compress(
+                msgpack_buffer_.data(), msgpack_buffer_.size());
+            //util::encodeVarint(msgpack_buffer_.size(), packed_value);
+            //packed_value.append(msgpack_buffer_.data(), msgpack_buffer_.size());
           }
 
           TRACE("Packed value: %s", packed_value.c_str());
@@ -288,6 +291,7 @@ class JsonValueStore final : public IValueStoreWriter {
         MemoryMapManager* values_extern_;
 
         std::unique_ptr<compression::CompressionStrategy> compressor_;
+        std::unique_ptr<compression::CompressionStrategy> raw_compressor_;
         size_t compression_threshold_;
 
         LeastRecentlyUsedGenerationsCache<RawPointer> hash_;

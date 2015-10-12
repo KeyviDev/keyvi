@@ -74,7 +74,7 @@ struct RawCompressionStrategy final : public CompressionStrategy {
   std::string Compress(const char* raw, size_t raw_size) {
     std::string compressed;
     dictionary::util::encodeVarint(raw_size + 1, compressed);
-    compressed.append(static_cast<char>(NO_COMPRESSION));
+    compressed.append(1, static_cast<char>(NO_COMPRESSION));
     compressed.append(std::string(raw, raw_size));
     return compressed;
   }
