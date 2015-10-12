@@ -327,10 +327,6 @@ class JsonValueStore final : public IValueStoreWriter {
               strings_size);
 
           strings_ = (const char*) strings_region_->get_address();
-
-          // The default decompressor is zlib for backwards compatibility
-          decompressor_.reset(compression::compression_strategy(
-              properties_.get(std::string("__") + COMPRESSOR_KEY, "zlib")));
         }
 
         ~JsonValueStoreReader() {
@@ -358,12 +354,10 @@ class JsonValueStore final : public IValueStoreWriter {
           TRACE("JsonValueStoreReader GetValueAsString");
           std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
 
-          if (packed_string[0] == ' '){
-            TRACE("unpack zlib compressed string");
-            packed_string = decompressor_->Decompress(packed_string);
-
-            TRACE("unpacking %s", packed_string.c_str());
-          }
+          compression::decompress_func_t decompressor =
+              compression::decompressor_by_code(packed_string);
+          packed_string = decompressor(packed_string);
+          TRACE("unpacking %s", packed_string.c_str());
 
           msgpack::unpacked doc;
           msgpack::unpack(&doc, packed_string.data(), packed_string.size());
@@ -387,7 +381,6 @@ class JsonValueStore final : public IValueStoreWriter {
         boost::interprocess::mapped_region* strings_region_;
         const char* strings_;
         boost::property_tree::ptree properties_;
-        std::unique_ptr<compression::CompressionStrategy> decompressor_;
       };
 
 } /* namespace internal */

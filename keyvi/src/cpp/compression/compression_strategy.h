@@ -32,6 +32,12 @@
 namespace keyvi {
 namespace compression {
 
+enum CompressionCode {
+  NO_COMPRESSION = 0,
+  ZLIB_COMPRESSION = 1,
+  SNAPPY_COMPRESSION = 2,
+};
+
 /**
  * The base class of every compression strategy.
  *
@@ -67,13 +73,18 @@ struct CompressionStrategy {
 struct RawCompressionStrategy final : public CompressionStrategy {
   std::string Compress(const char* raw, size_t raw_size) {
     std::string compressed;
-    dictionary::util::encodeVarint(raw_size, compressed);
+    dictionary::util::encodeVarint(raw_size + 1, compressed);
+    compressed.append(static_cast<char>(NO_COMPRESSION));
     compressed.append(std::string(raw, raw_size));
     return compressed;
   }
 
-  std::string Decompress(const std::string& compressed) {
-    return compressed;
+  inline std::string Decompress(const std::string& compressed) {
+    return Decompress(compressed);
+  }
+
+  static inline std::string DoDecompress(const std::string& compressed) {
+    return compressed.substr(1);
   }
 
   std::string name() const { return "raw"; }

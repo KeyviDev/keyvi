@@ -43,10 +43,15 @@ struct SnappyCompressionStrategy final : public CompressionStrategy {
     std::string size_prefix;
     dictionary::util::encodeVarint(compressed.size() + 1, size_prefix);
 
-    return size_prefix + " " + compressed;
+    return size_prefix + std::string(1, static_cast<char>(SNAPPY_COMPRESSION))
+                       + compressed;
   }
 
-  std::string Decompress(const std::string& compressed) {
+  inline std::string Decompress(const std::string& compressed) {
+    return DoDecompress(compressed);
+  }
+
+  static std::string DoDecompress(const std::string& compressed) {
     std::string uncompressed;
     snappy::Uncompress(&compressed.data()[1], compressed.size() - 1,
                        &uncompressed);

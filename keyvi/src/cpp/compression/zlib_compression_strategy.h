@@ -50,7 +50,7 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     zs.avail_in = raw_size;           // set the z_stream's input
 
     int ret;
-    std::string outstring = " ";
+    std::string outstring(1, static_cast<char>(ZLIB_COMPRESSION));
 
     // retrieve the compressed bytes blockwise
     do {
@@ -79,7 +79,11 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     return size_prefix + outstring;
   }
 
-  std::string Decompress(const std::string& compressed) {
+  inline std::string Decompress(const std::string& compressed) {
+    return DoDecompress(compressed);
+  }
+
+  static std::string DoDecompress(const std::string& compressed) {
     z_stream zs;                        // z_stream is zlib's control structure
     memset(&zs, 0, sizeof(zs));
 

@@ -53,6 +53,25 @@ inline CompressionStrategy* compression_strategy(const std::string& name = "")
   }
 }
 
+typedef std::string (*decompress_func_t) (const std::string&);
+
+inline decompress_func_t decompressor_by_code(const std::string& s) {
+  switch (s[0]) {
+    case NO_COMPRESSION:
+      TRACE("unpack uncompressed string");
+      return RawCompressionStrategy::DoDecompress;
+    case ZLIB_COMPRESSION:
+      TRACE("unpack zlib compressed string");
+      return ZlibCompressionStrategy::DoDecompress;
+    case SNAPPY_COMPRESSION:
+      TRACE("unpack snappy compressed string");
+      return SnappyCompressionStrategy::DoDecompress;
+    default:
+      throw std::invalid_argument("Invalid compression code " +
+          boost::lexical_cast<std::string>(static_cast<uint8_t>(s[0])));
+  }
+}
+
 } /* namespace compression */
 } /* namespace keyvi */
 
