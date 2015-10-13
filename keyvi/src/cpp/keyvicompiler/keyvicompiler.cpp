@@ -36,6 +36,7 @@
 #include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/json_value_store2.h"
 
 typedef keyvi::dictionary::fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
 
@@ -236,6 +237,33 @@ void compile_json(std::vector<std::string>& input, std::string& output,
   finalize_compile(compiler, output, partition_size, manifest);
 }
 
+template<class BucketT = uint32_t>
+void compile_json2(std::vector<std::string>& input, std::string& output,
+                   size_t memory_limit, size_t partition_size = 0,
+                   const std::string& manifest = "",
+                   const vs_param_t& value_store_params = vs_param_t()) {
+  keyvi::dictionary::DictionaryCompiler<
+      keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
+      keyvi::dictionary::fsa::internal::JsonValueStore2> compiler(
+          memory_limit, value_store_params);
+
+  std::function<std::pair<std::string, std::string>(std::string)> parser = [] (std::string line) {
+    size_t tab = line.find('\t');
+    if (tab == std::string::npos)
+      return std::pair<std::string, std::string>();
+
+    std::string key = line.substr(0, tab);
+    std::string value = line.substr(tab + 1);
+
+    return std::pair<std::string, std::string>(key, value);
+  };
+
+  compile_multiple(compiler, parser, input);
+
+  //input_stream.
+  finalize_compile(compiler, output, partition_size, manifest);
+}
+
 /** Extracts the value store parameters. */
 vs_param_t extract_value_store_parameters(
     const boost::program_options::variables_map& vm) {
@@ -367,6 +395,14 @@ int main(int argc, char** argv) {
       } else {
         compile_json(input_files, output_file, memory_limit, partition_size,
                      manifest, value_store_params);
+      }
+    } else if (dictionary_type == "json2") {
+      if (compact){
+        compile_json2<uint16_t>(input_files, output_file, memory_limit,
+                                partition_size, manifest, value_store_params);
+      } else {
+        compile_json2(input_files, output_file, memory_limit, partition_size,
+                      manifest, value_store_params);
       }
     } else {
       std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;

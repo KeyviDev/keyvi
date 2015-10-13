@@ -42,8 +42,7 @@ namespace internal {
 /**
  * Value store where the value consists of a string.
  */
-class StringValueStore
-final {
+class StringValueStore final : public IValueStoreWriter {
    public:
 
     struct StringPointer

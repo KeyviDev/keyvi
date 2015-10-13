@@ -58,7 +58,7 @@ namespace internal {
 /**
  * Value store where the value consists of a single integer.
  */
-class JsonValueStore final : public IValueStoreWriter {
+class JsonValueStore2 final : public IValueStoreWriter {
    public:
 
     struct RawPointer
@@ -167,8 +167,8 @@ class JsonValueStore final : public IValueStoreWriter {
         static const bool inner_weight = false;
         
         // boost::filesystem::path temporary_path,
-        JsonValueStore(const vs_param_t& parameters,
-                       size_t memory_limit = 104857600)
+        JsonValueStore2(const vs_param_t& parameters,
+                        size_t memory_limit = 104857600)
             : IValueStoreWriter(parameters), hash_(memory_limit) {
           temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
           temporary_directory_ /= boost::filesystem::unique_path(
@@ -196,14 +196,14 @@ class JsonValueStore final : public IValueStoreWriter {
                                                 "json_values_filebuffer");
         }
 
-        ~JsonValueStore(){
+        ~JsonValueStore2(){
           delete values_extern_;
           boost::filesystem::remove_all(temporary_directory_);
         }
 
-        JsonValueStore() = delete;
-        JsonValueStore& operator=(JsonValueStore const&) = delete;
-        JsonValueStore(const JsonValueStore& that) = delete;
+        JsonValueStore2() = delete;
+        JsonValueStore2& operator=(JsonValueStore2 const&) = delete;
+        JsonValueStore2(const JsonValueStore2& that) = delete;
 
         /**
          * Simple implementation of a value store for json values:
@@ -269,7 +269,7 @@ class JsonValueStore final : public IValueStoreWriter {
         }
 
         value_store_t GetValueStoreType() const {
-          return JSON_VALUE_STORE;
+          return JSON_VALUE_STORE2;
         }
 
         void Write(std::ostream& stream) {
@@ -302,15 +302,16 @@ class JsonValueStore final : public IValueStoreWriter {
         boost::filesystem::path temporary_directory_;
       };
 
-      class JsonValueStoreReader final: public IValueStoreReader {
+      class JsonValueStoreReader2 final: public IValueStoreReader {
        public:
         using IValueStoreReader::IValueStoreReader;
 
-        JsonValueStoreReader(std::istream& stream,
-                               boost::interprocess::file_mapping* file_mapping)
+        JsonValueStoreReader2(std::istream& stream,
+                              boost::interprocess::file_mapping* file_mapping,
+                              bool load_lazy = false)
             : IValueStoreReader(stream, file_mapping) {
 
-          TRACE("JsonValueStoreReader construct");
+          TRACE("JsonValueStoreReader2 construct");
 
           properties_ =
               internal::SerializationUtils::ReadJsonRecord(stream);
@@ -333,7 +334,7 @@ class JsonValueStore final : public IValueStoreWriter {
           strings_ = (const char*) strings_region_->get_address();
         }
 
-        ~JsonValueStoreReader() {
+        ~JsonValueStoreReader2() {
           delete strings_region_;
         }
 
@@ -355,7 +356,7 @@ class JsonValueStore final : public IValueStoreWriter {
         }
 
         virtual std::string GetValueAsString(uint64_t fsa_value) override {
-          TRACE("JsonValueStoreReader GetValueAsString");
+          TRACE("JsonValueStoreReader2 GetValueAsString");
           std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
 
           compression::decompress_func_t decompressor =

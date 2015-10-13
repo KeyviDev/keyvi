@@ -26,6 +26,7 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
 namespace dictionary {
