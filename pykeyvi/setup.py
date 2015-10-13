@@ -18,6 +18,8 @@ if (mode == 'debug'):
     additional_compile_flags.append("-O0")
     additional_compile_flags.append("-ggdb3")
     additional_compile_flags.append("-fstack-protector")
+else:
+    additional_compile_flags.append("-O3")
 
 linklibraries = ["tpie",
              "boost_program_options",
@@ -45,7 +47,7 @@ ext_modules = [Extension('pykeyvi',
                                         os.path.join(dictionary_sources, '3rdparty/tpie/build/install/include')],
                         language = 'c++',
                         sources = ['src/pykeyvi.cpp'],
-                        extra_compile_args=['-std=c++11'] + additional_compile_flags,
+                        extra_compile_args=['-std=c++11', '-msse4.2'] + additional_compile_flags,
                         library_dirs = [os.path.join(dictionary_sources, '3rdparty/tpie/build/install/lib')],
                         libraries = linklibraries)]
 PACKAGE_NAME = 'pykeyvi'

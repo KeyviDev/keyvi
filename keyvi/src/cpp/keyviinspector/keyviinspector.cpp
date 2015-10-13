@@ -37,7 +37,7 @@ void dump(std::string& input, std::string& output, bool keys_only = false) {
   std::ofstream out_stream(output);
 
   while (it != end_it){
-    out_stream << it.GetKeyNoCopy();
+    it.WriteKey(out_stream);
 
     if (!keys_only) {
     std::string value = it.GetValueAsString();
@@ -61,7 +61,8 @@ void dump_with_attributes(std::string& input, std::string& output) {
   std::ofstream out_stream(output);
 
   while (it != end_it){
-    out_stream << it.GetKeyNoCopy();
+    it.WriteKey(out_stream);
+
     out_stream << "\t";
 
     out_stream << it.GetValueAsAttributeVector()->at("value");

@@ -13,8 +13,8 @@ SetOption('num_jobs', cpus)
 print "running with -j", GetOption('num_jobs')
 
 #check if the user has been naughty: only 'debug' or 'release' allowed
-if not (buildmode in ['debug', 'release']):
-   print "Error: expected 'debug' or 'release', found: " + mymode
+if not (buildmode in ['debug', 'release', 'coverage']):
+   print "Error: expected 'debug', 'coverage' or 'release', found: " + mymode
    Exit(1)
 
 #tell the user what we're doing
@@ -33,6 +33,7 @@ AddOption('--prefix',
 
 
 debugcompilerflags = ['-ggdb3']   #extra compile flags for debug
+coveragecompilerflags = debugcompilerflags + ['-O0' ,'--coverage'] 
 releasecompilerflags = ['-O3']         #extra compile flags for release
 
 linklibraries =  [ "tpie",
@@ -46,12 +47,17 @@ linklibraries =  [ "tpie",
    "snappy"
    ]
 
+if buildmode == 'coverage':
+    linklibraries.append('gcov')
+
 env = Environment()
+env["CC"] = os.getenv("CC") or env["CC"]
+env["CXX"] = os.getenv("CXX") or env["CXX"]
 
 install_prefix = GetOption('prefix')
 
 launch_dir = env.GetLaunchDir()
-env.Append(CPPFLAGS = ['-std=c++11'])
+env.Append(CPPFLAGS = ['-std=c++11', '-msse4.2'])
 env.Append(CPPPATH=[launch_dir + '/3rdparty/rapidjson/include',
                     launch_dir + '/3rdparty/msgpack-c/include',
                     launch_dir + '/3rdparty/utf8',
@@ -67,17 +73,25 @@ if env['PLATFORM'] == 'darwin':
     linklibraries.remove('boost_thread')
     linklibraries.append('boost_thread-mt')
     
+#append the user's additional compile flags
+if buildmode == 'debug':
+   env.Append(CPPFLAGS=debugcompilerflags)
+elif buildmode == 'coverage':
+   env.Append(CPPFLAGS=coveragecompilerflags)
+else:
+   env.Append(CPPFLAGS=releasecompilerflags)
 
 #make sure the sconscripts can get to the variables
-Export('env', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'linklibraries', 'install_prefix')
+Export('env', 'buildmode', 'debugcompilerflags', 'releasecompilerflags', 'coveragecompilerflags', 'linklibraries', 'install_prefix')
 
 #put all .sconsign files in one place
 env.SConsignFile()
     
 #build tpie dependency
 tpie = env.Command(["3rdparty/tpie/build/install/lib/libtpie.a","3rdparty/tpie/build/install/include/tpie/tpie.h"], "",
-            "cd 3rdparty/tpie && mkdir -p build && cd build && cmake -D CMAKE_BUILD_TYPE:STRING=Release -D CMAKE_INSTALL_PREFIX=install -D TPIE_PARALLEL_SORT=1 -D CMAKE_CXX_FLAGS=\"-fPIC -std=c++11\" .. && " +
-            "make -j " + str(cpus) + " && make install")
+            "cd 3rdparty/tpie && mkdir -p build && cd build && cmake -D CMAKE_CXX_COMPILER=" + env["CXX"] +
+            " -D CMAKE_BUILD_TYPE:STRING=Release -D CMAKE_INSTALL_PREFIX=install -D TPIE_PARALLEL_SORT=1 -D CMAKE_CXX_FLAGS=\"-fPIC -std=c++11\" .. && " +
+            "make -j " + str(GetOption('num_jobs')) + " && make install")
 
 env.Append(LIBPATH=[launch_dir + '/3rdparty/tpie/build/install/lib'])
 env.Clean(tpie, '3rdparty/tpie/build')
