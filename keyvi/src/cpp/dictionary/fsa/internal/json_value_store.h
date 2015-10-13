@@ -183,8 +183,8 @@ class JsonValueStore final : public IValueStoreWriter {
           }
 
           std::string compressor;
-          if (parameters_.count(COMPRESSOR_KEY) > 0) {
-            compressor = parameters_[COMPRESSOR_KEY];
+          if (parameters_.count(COMPRESSION_KEY) > 0) {
+            compressor = parameters_[COMPRESSION_KEY];
           }
           compressor_.reset(compression::compression_strategy(compressor));
           raw_compressor_.reset(compression::compression_strategy("raw"));
@@ -278,7 +278,7 @@ class JsonValueStore final : public IValueStoreWriter {
           pt.put("size", std::to_string(values_buffer_size_));
           pt.put("values", std::to_string(number_of_values_));
           pt.put("unique_values", std::to_string(number_of_unique_values_));
-          pt.put(std::string("__") + COMPRESSOR_KEY, compressor_->name());
+          pt.put(std::string("__") + COMPRESSION_KEY, compressor_->name());
           pt.put(std::string("__") + COMPRESSION_THRESHOLD_KEY, compression_threshold_);
 
           internal::SerializationUtils::WriteJsonRecord(stream, pt);

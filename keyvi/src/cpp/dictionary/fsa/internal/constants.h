@@ -47,7 +47,7 @@
 // Value option key names
 
 #define TEMPORARY_PATH_KEY "temporary_path"
-#define COMPRESSOR_KEY "compressor"
+#define COMPRESSION_KEY "compression"
 #define COMPRESSION_THRESHOLD_KEY "compression_threshold"
 
 #endif /* CONSTANTS_H_ */
