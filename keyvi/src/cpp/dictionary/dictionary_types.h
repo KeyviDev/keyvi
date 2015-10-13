@@ -30,6 +30,7 @@
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/json_value_store2.h"
 #include "dictionary/fsa/internal/string_value_store.h"
 
 namespace keyvi {
@@ -48,6 +49,10 @@ typedef keyvi::dictionary::DictionaryCompiler<
 typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
     keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryCompiler;
+
+typedef keyvi::dictionary::DictionaryCompiler<
+    keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
+    keyvi::dictionary::fsa::internal::JsonValueStore2> JsonDictionaryCompiler2;
 
 typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,

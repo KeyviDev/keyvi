@@ -16,24 +16,19 @@
  */
 
 /*
- * json_value_store.h
+ * json_value_store2.h
  *
- *  Created on: Jul 16, 2014
- *      Author: hendrik
+ *  Created on: October 13, 2015
+ *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
  */
 
-#ifndef JSON_VALUE_STORE_H_
-#define JSON_VALUE_STORE_H_
+#ifndef JSON_VALUE_STORE2_H_
+#define JSON_VALUE_STORE2_H_
 
-#include <boost/functional/hash.hpp>
 #include <zlib.h>
-
-#include "dictionary/fsa/internal/intrinsics.h"
-
-#if defined(KEYVI_SSE42)
-#define RAPIDJSON_SSE42
-#endif
-
+#include <snappy.h>
+#include <boost/functional/hash.hpp>
+#include <boost/lexical_cast.hpp>
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -49,6 +44,9 @@
 #include "dictionary/util/json_to_msgpack.h"
 #include "msgpack/zbuffer.hpp"
 
+#include "dictionary/fsa/internal/constants.h"
+#include "compression/compression_selector.h"
+
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
@@ -60,8 +58,7 @@ namespace internal {
 /**
  * Value store where the value consists of a single integer.
  */
-class JsonValueStore
-final {
+class JsonValueStore final : public IValueStoreWriter {
    public:
 
     struct RawPointer
@@ -168,18 +165,35 @@ final {
         typedef std::string value_t;
         static const uint64_t no_value = 0;
         static const bool inner_weight = false;
-
-        JsonValueStore(boost::filesystem::path temporary_path, size_t memory_limit = 104857600): hash_(memory_limit){
-          temporary_directory_ = temporary_path;
+        
+        // boost::filesystem::path temporary_path,
+        JsonValueStore(const vs_param_t& parameters,
+                       size_t memory_limit = 104857600)
+            : IValueStoreWriter(parameters), hash_(memory_limit) {
+          temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
           temporary_directory_ /= boost::filesystem::unique_path(
               "dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
           boost::filesystem::create_directory(temporary_directory_);
 
+          if (parameters_.count(COMPRESSION_THRESHOLD_KEY) > 0) {
+            compression_threshold_ = boost::lexical_cast<size_t>(
+                parameters_[COMPRESSION_THRESHOLD_KEY]);
+          } else {
+            compression_threshold_ = 32;
+          }
+
+          std::string compressor;
+          if (parameters_.count(COMPRESSION_KEY) > 0) {
+            compressor = parameters_[COMPRESSION_KEY];
+          }
+          compressor_.reset(compression::compression_strategy(compressor));
+          raw_compressor_.reset(compression::compression_strategy("raw"));
+
           size_t external_memory_chunk_size = 1073741824;
 
           values_extern_ = new MemoryMapManager(external_memory_chunk_size,
-                                                            temporary_directory_,
-                                                           "json_values_filebuffer");
+                                                temporary_directory_,
+                                                "json_values_filebuffer");
         }
 
         ~JsonValueStore(){
@@ -213,11 +227,14 @@ final {
           }
 
           // zlib compression
-          if (msgpack_buffer_.size() > 32) {
-            packed_value = compress_string(msgpack_buffer_.data(), msgpack_buffer_.size());
+          if (msgpack_buffer_.size() > compression_threshold_) {
+            packed_value = compressor_->Compress(
+                msgpack_buffer_.data(), msgpack_buffer_.size());
           } else {
-            util::encodeVarint(msgpack_buffer_.size(), packed_value);
-            packed_value.append(msgpack_buffer_.data(), msgpack_buffer_.size());
+            packed_value = raw_compressor_->Compress(
+                msgpack_buffer_.data(), msgpack_buffer_.size());
+            //util::encodeVarint(msgpack_buffer_.size(), packed_value);
+            //packed_value.append(msgpack_buffer_.data(), msgpack_buffer_.size());
           }
 
           TRACE("Packed value: %s", packed_value.c_str());
@@ -261,6 +278,8 @@ final {
           pt.put("size", std::to_string(values_buffer_size_));
           pt.put("values", std::to_string(number_of_values_));
           pt.put("unique_values", std::to_string(number_of_unique_values_));
+          pt.put(std::string("__") + COMPRESSION_KEY, compressor_->name());
+          pt.put(std::string("__") + COMPRESSION_THRESHOLD_KEY, compression_threshold_);
 
           internal::SerializationUtils::WriteJsonRecord(stream, pt);
           TRACE("Wrote JSON header, stream at %d", stream.tellp());
@@ -271,58 +290,16 @@ final {
        private:
         MemoryMapManager* values_extern_;
 
+        std::unique_ptr<compression::CompressionStrategy> compressor_;
+        std::unique_ptr<compression::CompressionStrategy> raw_compressor_;
+        size_t compression_threshold_;
+
         LeastRecentlyUsedGenerationsCache<RawPointer> hash_;
         msgpack::sbuffer msgpack_buffer_;
-        char zlib_buffer_[32768];
         size_t number_of_values_ = 0;
         size_t number_of_unique_values_ = 0;
         size_t values_buffer_size_ = 0;
         boost::filesystem::path temporary_directory_;
-
-        /** Compress a STL string using zlib with given compression level and return
-          * the binary data. */
-        std::string compress_string(const char* data, size_t data_size,
-                                    int compressionlevel = Z_BEST_COMPRESSION)
-        {
-            z_stream zs;                        // z_stream is zlib's control structure
-            memset(&zs, 0, sizeof(zs));
-
-            if (deflateInit(&zs, compressionlevel) != Z_OK)
-                throw(std::runtime_error("deflateInit failed while compressing."));
-
-            zs.next_in = (Bytef*)data;
-            zs.avail_in = data_size;           // set the z_stream's input
-
-            int ret;
-            std::string outstring = " ";
-
-            // retrieve the compressed bytes blockwise
-            do {
-                zs.next_out = reinterpret_cast<Bytef*>(zlib_buffer_);
-                zs.avail_out = sizeof(zlib_buffer_);
-
-                ret = deflate(&zs, Z_FINISH);
-
-                if (outstring.size() - 1  < zs.total_out) {
-                    // append the block to the output string
-                    outstring.append(zlib_buffer_,
-                                     zs.total_out - outstring.size() + 1);
-                }
-            } while (ret == Z_OK);
-
-            deflateEnd(&zs);
-
-            if (ret != Z_STREAM_END) {          // an error occurred that was not EOF
-                std::ostringstream oss;
-                oss << "Exception during zlib compression: (" << ret << ") " << zs.msg;
-                throw(std::runtime_error(oss.str()));
-            }
-
-            std::string size_prefix;
-            util::encodeVarint(outstring.size(), size_prefix);
-
-            return size_prefix + outstring;
-        }
       };
 
       class JsonValueStoreReader final: public IValueStoreReader {
@@ -330,7 +307,7 @@ final {
         using IValueStoreReader::IValueStoreReader;
 
         JsonValueStoreReader(std::istream& stream,
-                               boost::interprocess::file_mapping* file_mapping, bool load_lazy = false)
+                               boost::interprocess::file_mapping* file_mapping)
             : IValueStoreReader(stream, file_mapping) {
 
           TRACE("JsonValueStoreReader construct");
@@ -349,15 +326,9 @@ final {
             }
           }
 
-          boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options | MAP_HUGETLB;
-
-          if (!load_lazy) {
-            map_options |= MAP_POPULATE;
-          }
-
           strings_region_ = new boost::interprocess::mapped_region(
               *file_mapping, boost::interprocess::read_only, offset,
-              strings_size, 0, map_options);
+              strings_size);
 
           strings_ = (const char*) strings_region_->get_address();
         }
@@ -387,12 +358,10 @@ final {
           TRACE("JsonValueStoreReader GetValueAsString");
           std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
 
-          if (packed_string[0] == ' '){
-            TRACE("unpack zlib compressed string");
-            packed_string = decompress_string(packed_string);
-
-            TRACE("unpacking %s", packed_string.c_str());
-          }
+          compression::decompress_func_t decompressor =
+              compression::decompressor_by_code(packed_string);
+          packed_string = decompressor(packed_string);
+          TRACE("unpacking %s", packed_string.c_str());
 
           msgpack::unpacked doc;
           msgpack::unpack(&doc, packed_string.data(), packed_string.size());
@@ -416,48 +385,6 @@ final {
         boost::interprocess::mapped_region* strings_region_;
         const char* strings_;
         boost::property_tree::ptree properties_;
-
-        /** Decompress an STL string using zlib and return the original data. */
-        std::string decompress_string(const std::string& str)
-        {
-            z_stream zs;                        // z_stream is zlib's control structure
-            memset(&zs, 0, sizeof(zs));
-
-            if (inflateInit(&zs) != Z_OK)
-                throw(std::runtime_error("inflateInit failed while decompressing."));
-
-            zs.next_in = (Bytef*)str.data() + 1;
-            zs.avail_in = str.size() - 1;
-
-            int ret;
-            char outbuffer[32768];
-            std::string outstring;
-
-            // get the decompressed bytes blockwise using repeated calls to inflate
-            do {
-                zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
-                zs.avail_out = sizeof(outbuffer);
-
-                ret = inflate(&zs, 0);
-
-                if (outstring.size() < zs.total_out) {
-                    outstring.append(outbuffer,
-                                     zs.total_out - outstring.size());
-                }
-
-            } while (ret == Z_OK);
-
-            inflateEnd(&zs);
-
-            if (ret != Z_STREAM_END) {          // an error occurred that was not EOF
-                std::ostringstream oss;
-                oss << "Exception during zlib decompression: (" << ret << ") "
-                    << zs.msg;
-                throw(std::runtime_error(oss.str()));
-            }
-
-            return outstring;
-        }
       };
 
 } /* namespace internal */
@@ -465,4 +392,4 @@ final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* JSON_VALUE_STORE_H_ */
+#endif /* JSON_VALUE_STORE2_H_ */

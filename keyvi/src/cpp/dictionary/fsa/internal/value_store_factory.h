@@ -29,6 +29,7 @@
 #include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/json_value_store2.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -48,6 +49,8 @@ class ValueStoreFactory final {
         return new StringValueStoreReader(stream, file_mapping);
       case JSON_VALUE_STORE:
         return new JsonValueStoreReader(stream, file_mapping);
+      case JSON_VALUE_STORE2:
+        return new JsonValueStoreReader2(stream, file_mapping);
     }
 
     throw std::invalid_argument("Unknown Value Storage type");
