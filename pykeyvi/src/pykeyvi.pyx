@@ -15,15 +15,16 @@ from cluster cimport JumpConsistentHashString as _JumpConsistentHashString_clust
 from dictionary_compiler cimport CompletionDictionaryCompiler as _CompletionDictionaryCompiler
 from dictionary cimport Dictionary as _Dictionary
 from forward_backward_completion cimport ForwardBackwardCompletion as _ForwardBackwardCompletion
-from predictive_compression cimport FsaPredictiveCompression as _FsaPredictiveCompression
 from normalization cimport FsaTransform as _FsaTransform
 from dictionary_compiler cimport JsonDictionaryCompiler as _JsonDictionaryCompiler
+from dictionary_compiler cimport JsonDictionaryCompiler2 as _JsonDictionaryCompiler2
 from dictionary_compiler cimport KeyOnlyDictionaryCompiler as _KeyOnlyDictionaryCompiler
 from generator cimport KeyOnlyDictionaryGenerator as _KeyOnlyDictionaryGenerator
 from match cimport Match as _Match
 from match_iterator cimport MatchIterator as _MatchIterator
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
 from multi_word_completion cimport MultiWordCompletion as _MultiWordCompletion
+from predictive_compression cimport PredictiveCompression as _PredictiveCompression
 from prefix_completion cimport PrefixCompletion as _PrefixCompletion
 from dictionary_compiler cimport StringDictionaryCompiler as _StringDictionaryCompiler
 cdef extern from "autowrap_tools.hpp":
@@ -54,11 +55,23 @@ cdef class StringDictionaryCompiler:
     
         self.inst = shared_ptr[_StringDictionaryCompiler](new _StringDictionaryCompiler((<size_t>memory_limit)))
     
+    def _init_2(self,  memory_limit , dict value_store_params ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+    
+        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        for key, value in value_store_params.items():
+           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+        self.inst = shared_ptr[_StringDictionaryCompiler](new _StringDictionaryCompiler((<size_t>memory_limit), deref(v1)))
+        del v1
+    
     def __init__(self, *args):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+             self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     
@@ -127,11 +140,23 @@ cdef class JsonDictionaryCompiler:
     
         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler((<size_t>memory_limit)))
     
+    def _init_2(self,  memory_limit , dict value_store_params ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+    
+        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        for key, value in value_store_params.items():
+           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+        self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler((<size_t>memory_limit), deref(v1)))
+        del v1
+    
     def __init__(self, *args):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+             self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     
@@ -399,33 +424,6 @@ cdef class ForwardBackwardCompletion:
         cdef shared_ptr[_Dictionary] input_in_1 = in_1.inst
         self.inst = shared_ptr[_ForwardBackwardCompletion](new _ForwardBackwardCompletion(input_in_0, input_in_1)) 
 
-cdef class FsaPredictiveCompression:
-
-    cdef shared_ptr[_FsaPredictiveCompression] inst
-
-    def __dealloc__(self):
-         self.inst.reset()
-
-    
-    def __init__(self, Dictionary in_0 ):
-        assert isinstance(in_0, Dictionary), 'arg in_0 wrong type'
-        cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
-        self.inst = shared_ptr[_FsaPredictiveCompression](new _FsaPredictiveCompression(input_in_0))
-    
-    def Compress(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
-        cdef libcpp_string _r = self.inst.get().Compress((<libcpp_string>in_0))
-        py_result = <libcpp_string>_r
-        return py_result
-    
-    def Uncompress(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
-        cdef libcpp_string _r = self.inst.get().Uncompress((<libcpp_string>in_0))
-        py_result = <libcpp_string>_r
-        return py_result 
-
 cdef class CompletionDictionaryCompiler:
 
     cdef shared_ptr[_CompletionDictionaryCompiler] inst
@@ -456,11 +454,23 @@ cdef class CompletionDictionaryCompiler:
     
         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit)))
     
+    def _init_2(self,  memory_limit , dict value_store_params ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+    
+        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        for key, value in value_store_params.items():
+           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+        self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit), deref(v1)))
+        del v1
+    
     def __init__(self, *args):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+             self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     
@@ -538,6 +548,33 @@ cdef class MultiWordCompletion:
         else:
                raise Exception('can not handle type of %s' % (args,)) 
 
+cdef class PredictiveCompression:
+
+    cdef shared_ptr[_PredictiveCompression] inst
+
+    def __dealloc__(self):
+         self.inst.reset()
+
+    
+    def Compress(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    
+        cdef libcpp_string _r = self.inst.get().Compress((<libcpp_string>in_0))
+        py_result = <libcpp_string>_r
+        return py_result
+    
+    def __init__(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    
+        self.inst = shared_ptr[_PredictiveCompression](new _PredictiveCompression((<libcpp_string>in_0)))
+    
+    def Uncompress(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    
+        cdef libcpp_string _r = self.inst.get().Uncompress((<libcpp_string>in_0))
+        py_result = <libcpp_string>_r
+        return py_result 
+
 cdef class KeyOnlyDictionaryGenerator:
 
     cdef shared_ptr[_KeyOnlyDictionaryGenerator] inst
@@ -578,11 +615,23 @@ cdef class KeyOnlyDictionaryCompiler:
     
         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler((<size_t>memory_limit)))
     
+    def _init_2(self,  memory_limit , dict value_store_params ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+    
+        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        for key, value in value_store_params.items():
+           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+        self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler((<size_t>memory_limit), deref(v1)))
+        del v1
+    
     def __init__(self, *args):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+             self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     
@@ -604,6 +653,84 @@ cdef class KeyOnlyDictionaryCompiler:
         self.Compile()
 
 
+    def Compile(self, *args):
+        if not args:
+            with nogil:
+                self.inst.get().Compile()
+            return
+
+        cdef void* callback = <void*> args[0]
+        with nogil:
+            self.inst.get().Compile(callback_wrapper, callback)
+
+
+    def SetManifest(self, manifest):
+        import json
+        self.inst.get().SetManifestFromString(json.dumps(manifest)) 
+
+cdef class JsonDictionaryCompiler2:
+
+    cdef shared_ptr[_JsonDictionaryCompiler2] inst
+
+    def __dealloc__(self):
+         self.inst.reset()
+
+    
+    def __setitem__(self, bytes in_0 , bytes in_1 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        cdef const_char * input_in_1 = <const_char *> in_1
+        self.inst.get().__setitem__(input_in_0, input_in_1)
+    
+    def _init_0(self):
+        self.inst = shared_ptr[_JsonDictionaryCompiler2](new _JsonDictionaryCompiler2())
+    
+    def _init_1(self,  memory_limit ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+    
+        self.inst = shared_ptr[_JsonDictionaryCompiler2](new _JsonDictionaryCompiler2((<size_t>memory_limit)))
+    
+    def _init_2(self,  memory_limit , dict value_store_params ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+    
+        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        for key, value in value_store_params.items():
+           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+        self.inst = shared_ptr[_JsonDictionaryCompiler2](new _JsonDictionaryCompiler2((<size_t>memory_limit), deref(v1)))
+        del v1
+    
+    def __init__(self, *args):
+        if not args:
+             self._init_0(*args)
+        elif (len(args)==1) and (isinstance(args[0], (int, long))):
+             self._init_1(*args)
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+             self._init_2(*args)
+        else:
+               raise Exception('can not handle type of %s' % (args,))
+    
+    def Add(self, bytes in_0 , bytes in_1 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        cdef const_char * input_in_1 = <const_char *> in_1
+        self.inst.get().Add(input_in_0, input_in_1)
+    
+    def WriteToFile(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        self.inst.get().WriteToFile(input_in_0)
+    
+    def __enter__(self):
+        return self
+
+    
+    def __exit__(self, type, value, traceback):
+        self.Compile()
+
+        
     def Compile(self, *args):
         if not args:
             with nogil:
@@ -772,5 +899,6 @@ cdef class MatchIterator:
         py_result.inst = shared_ptr[_Match](_r)
 
         return py_result 
+ 
  
  
