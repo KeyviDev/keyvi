@@ -23,3 +23,8 @@ cdef extern from "dictionary/match.h" namespace "keyvi::dictionary":
         void SetAttribute(libcpp_string, int) except + # wrap-ignore
         void SetAttribute(libcpp_string, bool) except + # wrap-ignore
         bool IsEmpty()
+
+cdef extern from "dictionary/fsa/internal/json_value_store.h" namespace "keyvi::dictionary::fsa::internal":
+    cdef cppclass JsonValueStoreReader:
+        @staticmethod
+        libcpp_string DecodeValue(libcpp_string&)

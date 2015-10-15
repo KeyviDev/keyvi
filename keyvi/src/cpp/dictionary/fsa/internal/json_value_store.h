@@ -359,9 +359,13 @@ class JsonValueStore final : public IValueStoreWriter {
           TRACE("JsonValueStoreReader GetValueAsString");
           std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
 
+          return DecodeValue(packed_string);
+        }
+
+        static std::string DecodeValue(const std::string& encoded_value) {
           compression::decompress_func_t decompressor =
-              compression::decompressor_by_code(packed_string);
-          packed_string = decompressor(packed_string);
+              compression::decompressor_by_code(encoded_value);
+          std::string packed_string = decompressor(encoded_value);
           TRACE("unpacking %s", packed_string.c_str());
 
           msgpack::unpacked doc;
