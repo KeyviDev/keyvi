@@ -17,7 +17,7 @@
 //
 
 /*
- * json_value_store2_test.cpp
+ * json_value_store_test.cpp
  *
  *  Created on: October 14, 2015
  *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
-#include "dictionary/fsa/internal/json_value_store2.h"
+#include "dictionary/fsa/internal/json_value_store_deprecated.h"
 #include "dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
@@ -34,11 +34,11 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( JsonValue2Test )
+BOOST_AUTO_TEST_SUITE( JsonValueDeprecatedTest )
 
 BOOST_AUTO_TEST_CASE( minimization )
 {
-  JsonValueStore2 strings(
+  JsonValueStoreDeprecated strings(
       IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
   uint32_t v = strings.GetValue("{\"mytestvalue\":25, \"mytestvalue2\":23}", no_minimization);
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE( minimization )
 
 BOOST_AUTO_TEST_CASE( minimization2 )
 {
-  JsonValueStore2 strings(
+  JsonValueStoreDeprecated strings(
       IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
 

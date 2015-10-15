@@ -46,8 +46,8 @@ enum value_store_t {
   NULL_VALUE_STORE = 1,  //!< NullValueStore
   INT_VALUE_STORE = 2,  //!< IntValueStore
   STRING_VALUE_STORE = 3, //!< StringValueStore
-  JSON_VALUE_STORE = 4, // !< JsonValueStore
-  JSON_VALUE_STORE2 = 5, // !< JsonValueStore2
+  JSON_VALUE_STORE_DEPRECATED = 4, // !< JsonValueStoreDeprecated
+  JSON_VALUE_STORE = 5, // !< JsonValueStore
 };
 
 /* Writing value stores is based on template (duck-typing).
