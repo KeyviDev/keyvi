@@ -55,6 +55,24 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
+inline std::string DecodeValue(const std::string& encoded_value) {
+  compression::decompress_func_t decompressor =
+      compression::decompressor_by_code(encoded_value);
+  std::string packed_string = decompressor(encoded_value);
+  TRACE("unpacking %s", packed_string.c_str());
+
+  msgpack::unpacked doc;
+  msgpack::unpack(&doc, packed_string.data(), packed_string.size());
+  rapidjson::Document json_document;
+
+  doc.get().convert(&json_document);
+
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+  json_document.Accept(writer);
+  return buffer.GetString();
+}
+
 /**
  * Value store where the value consists of a single integer.
  */
@@ -360,24 +378,6 @@ class JsonValueStore final : public IValueStoreWriter {
           std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
 
           return DecodeValue(packed_string);
-        }
-
-        static std::string DecodeValue(const std::string& encoded_value) {
-          compression::decompress_func_t decompressor =
-              compression::decompressor_by_code(encoded_value);
-          std::string packed_string = decompressor(encoded_value);
-          TRACE("unpacking %s", packed_string.c_str());
-
-          msgpack::unpacked doc;
-          msgpack::unpack(&doc, packed_string.data(), packed_string.size());
-          rapidjson::Document json_document;
-
-          doc.get().convert(&json_document);
-
-          rapidjson::StringBuffer buffer;
-          rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-          json_document.Accept(writer);
-          return buffer.GetString();
         }
 
         virtual std::string GetStatistics() const {

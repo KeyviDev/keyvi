@@ -11,13 +11,13 @@ from  libc.string cimport const_char
 from cython.operator cimport dereference as deref, preincrement as inc, address as address
 from cython.operator cimport dereference, preincrement
 cimport cython.operator as co
+from match cimport DecodeValue as _DecodeValue_match
 from cluster cimport JumpConsistentHashString as _JumpConsistentHashString_cluster
 from dictionary_compiler cimport CompletionDictionaryCompiler as _CompletionDictionaryCompiler
 from dictionary cimport Dictionary as _Dictionary
 from forward_backward_completion cimport ForwardBackwardCompletion as _ForwardBackwardCompletion
 from normalization cimport FsaTransform as _FsaTransform
 from dictionary_compiler cimport JsonDictionaryCompiler as _JsonDictionaryCompiler
-from match cimport JsonValueStoreReader as _JsonValueStoreReader
 from dictionary_compiler cimport KeyOnlyDictionaryCompiler as _KeyOnlyDictionaryCompiler
 from generator cimport KeyOnlyDictionaryGenerator as _KeyOnlyDictionaryGenerator
 from match cimport Match as _Match
@@ -29,6 +29,13 @@ from prefix_completion cimport PrefixCompletion as _PrefixCompletion
 from dictionary_compiler cimport StringDictionaryCompiler as _StringDictionaryCompiler
 cdef extern from "autowrap_tools.hpp":
     char * _cast_const_away(char *)
+
+def DecodeValue(bytes in_0 ):
+    assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+
+    cdef libcpp_string _r = _DecodeValue_match((<libcpp_string>in_0))
+    py_result = <libcpp_string>_r
+    return py_result
 
 def JumpConsistentHashString(bytes in_0 ,  in_1 ):
     assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -423,21 +430,6 @@ cdef class ForwardBackwardCompletion:
         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
         cdef shared_ptr[_Dictionary] input_in_1 = in_1.inst
         self.inst = shared_ptr[_ForwardBackwardCompletion](new _ForwardBackwardCompletion(input_in_0, input_in_1)) 
-
-cdef class JsonValueStoreReader:
-
-    cdef shared_ptr[_JsonValueStoreReader] inst
-
-    def __dealloc__(self):
-         self.inst.reset()
-
-    
-    def DecodeValue(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
-        cdef libcpp_string _r = self.inst.get().DecodeValue((<libcpp_string>in_0))
-        py_result = <libcpp_string>_r
-        return py_result 
 
 cdef class CompletionDictionaryCompiler:
 
