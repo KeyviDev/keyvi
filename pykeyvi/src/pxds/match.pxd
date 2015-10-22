@@ -25,4 +25,6 @@ cdef extern from "dictionary/match.h" namespace "keyvi::dictionary":
         bool IsEmpty()
 
 cdef extern from "dictionary/fsa/internal/json_value_store.h" namespace "keyvi::dictionary::fsa::internal":
-    libcpp_string DecodeValue(libcpp_string) except +
+    libcpp_string DecodeJsonValue(libcpp_string) except +
+    libcpp_string EncodeJsonValue(libcpp_string, int) except + # wrap-ignore
+    libcpp_string EncodeJsonValue(libcpp_string) except + # wrap-ignore

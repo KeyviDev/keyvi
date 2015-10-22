@@ -28,7 +28,6 @@
 #include <string>
 #include <zlib.h>
 
-#include "dictionary/util/vint.h"
 #include "compression/compression_strategy.h"
 
 namespace keyvi {
@@ -73,10 +72,7 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
       throw(std::runtime_error(oss.str()));
     }
 
-    std::string size_prefix;
-    dictionary::util::encodeVarint(outstring.size(), size_prefix);
-
-    return size_prefix + outstring;
+    return outstring;
   }
 
   inline std::string Decompress(const std::string& compressed) {

@@ -11,7 +11,9 @@ from  libc.string cimport const_char
 from cython.operator cimport dereference as deref, preincrement as inc, address as address
 from cython.operator cimport dereference, preincrement
 cimport cython.operator as co
-from match cimport DecodeValue as _DecodeValue_match
+from match cimport DecodeJsonValue as _DecodeJsonValue_match
+from match cimport EncodeJsonValue as _EncodeJsonValue_match
+from match cimport EncodeJsonValue as _EncodeJsonValue_match
 from cluster cimport JumpConsistentHashString as _JumpConsistentHashString_cluster
 from dictionary_compiler cimport CompletionDictionaryCompiler as _CompletionDictionaryCompiler
 from dictionary cimport Dictionary as _Dictionary
@@ -30,10 +32,10 @@ from dictionary_compiler cimport StringDictionaryCompiler as _StringDictionaryCo
 cdef extern from "autowrap_tools.hpp":
     char * _cast_const_away(char *)
 
-def DecodeValue(bytes in_0 ):
+def DecodeJsonValue(bytes in_0 ):
     assert isinstance(in_0, bytes), 'arg in_0 wrong type'
 
-    cdef libcpp_string _r = _DecodeValue_match((<libcpp_string>in_0))
+    cdef libcpp_string _r = _DecodeJsonValue_match((<libcpp_string>in_0))
     py_result = <libcpp_string>_r
     return py_result
 
@@ -781,7 +783,17 @@ cdef class Match:
         elif isinstance(value, (int)):
             self.inst.get().SetAttribute(<libcpp_string> key, <bool> value)
         else:
-            raise Exception("Unsupported Value Type") 
+            raise Exception("Unsupported Value Type")
+
+
+from match cimport EncodeJsonValue as _EncodeJsonValue 
+
+
+def EncodeJsonValue(libcpp_string raw_value, compression_threshold=None):
+    if compression_threshold:
+        return _EncodeJsonValue(raw_value, compression_threshold)
+    else:
+        return _EncodeJsonValue(raw_value) 
  
  
  
