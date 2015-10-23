@@ -261,10 +261,10 @@ class JsonValueStore final : public IValueStoreWriter {
           raw_compressor_.reset(compression::compression_strategy("raw"));
           // This is beyond ugly, but needed for EncodeJsonValue :(
           long_compress_ = std::bind(
-              (compression::compress_mem_fn_t) &compression::CompressionStrategy::Compress,
+              static_cast<compression::compress_mem_fn_t> (&compression::CompressionStrategy::Compress),
               compressor_.get(), std::placeholders::_1, std::placeholders::_2);
           short_compress_ = std::bind(
-              (compression::compress_mem_fn_t) &compression::CompressionStrategy::Compress,
+              static_cast<compression::compress_mem_fn_t> (&compression::CompressionStrategy::Compress),
               raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2);
 
           size_t external_memory_chunk_size = 1073741824;
