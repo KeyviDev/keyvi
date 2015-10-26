@@ -34,7 +34,7 @@
 namespace keyvi {
 namespace compression {
 
-/** A compression strategy that does nothing. */
+/** A compression strategy that wraps snappy. */
 struct SnappyCompressionStrategy final : public CompressionStrategy {
   std::string Compress(const char* raw, size_t raw_size) {
     std::string compressed;

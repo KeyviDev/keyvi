@@ -34,7 +34,7 @@
 namespace keyvi {
 namespace compression {
 
-/** A compression strategy that does nothing. */
+/** A compression strategy that wraps zlib. */
 struct ZlibCompressionStrategy final : public CompressionStrategy {
   ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION)
     : compression_level_(compression_level) {}
