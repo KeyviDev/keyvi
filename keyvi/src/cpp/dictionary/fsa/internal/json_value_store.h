@@ -25,6 +25,7 @@
 #ifndef JSON_VALUE_STORE_H_
 #define JSON_VALUE_STORE_H_
 
+#include <functional>
 #include <zlib.h>
 #include <snappy.h>
 #include <boost/functional/hash.hpp>
@@ -55,7 +56,8 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-inline std::string DecodeValue(const std::string& encoded_value) {
+/** Decompresses (if needed) and decodes a json value stored in a JsonValueStore. */
+inline std::string DecodeJsonValue(const std::string& encoded_value) {
   compression::decompress_func_t decompressor =
       compression::decompressor_by_code(encoded_value);
   std::string packed_string = decompressor(encoded_value);
@@ -72,6 +74,57 @@ inline std::string DecodeValue(const std::string& encoded_value) {
   json_document.Accept(writer);
   return buffer.GetString();
 }
+
+/**
+ * Encodes @p raw_value with msgpack and compresses it, if it is longer than
+ * the specified threshold.
+ */
+inline std::string EncodeJsonValue(
+    std::function<std::string(const char*, size_t)> long_compress,
+    std::function<std::string(const char*, size_t)> short_compress,
+    msgpack::sbuffer& msgpack_buffer,
+    const std::string& raw_value, size_t compression_threshold=32) {
+  std::string packed_value;
+  
+  rapidjson::Document json_document;
+  json_document.Parse(raw_value.c_str());
+
+  if (!json_document.HasParseError()) {
+    TRACE("Got json");
+    msgpack::pack(&msgpack_buffer, json_document);
+  } else {
+    TRACE("Got a normal string");
+    msgpack::pack(&msgpack_buffer, raw_value);
+  }
+
+  // compression
+  if (msgpack_buffer.size() > compression_threshold) {
+    packed_value = long_compress(
+        msgpack_buffer.data(), msgpack_buffer.size());
+  } else {
+    packed_value = short_compress(
+        msgpack_buffer.data(), msgpack_buffer.size());
+  }
+
+  TRACE("Packed value: %s", packed_value.c_str());
+  return packed_value;
+}
+
+/**
+ * Encodes @p raw_value with msgpack and compresses it, if it is longer than
+ * the specified threshold.
+ *
+ * @note This is a default implementation that uses snappy for string longer
+ *       than 32 characters.
+ */
+inline std::string EncodeJsonValue(const std::string& raw_value,
+                                   size_t compression_threshold=32) {
+  msgpack::sbuffer msgpack_buffer;
+  return EncodeJsonValue(&compression::SnappyCompressionStrategy::DoCompress,
+                         &compression::RawCompressionStrategy::DoCompress,
+                         msgpack_buffer, raw_value, compression_threshold);
+}
+  
 
 /**
  * Value store where the value consists of a single integer.
@@ -206,6 +259,13 @@ class JsonValueStore final : public IValueStoreWriter {
           }
           compressor_.reset(compression::compression_strategy(compressor));
           raw_compressor_.reset(compression::compression_strategy("raw"));
+          // This is beyond ugly, but needed for EncodeJsonValue :(
+          long_compress_ = std::bind(
+              static_cast<compression::compress_mem_fn_t> (&compression::CompressionStrategy::Compress),
+              compressor_.get(), std::placeholders::_1, std::placeholders::_2);
+          short_compress_ = std::bind(
+              static_cast<compression::compress_mem_fn_t> (&compression::CompressionStrategy::Compress),
+              raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2);
 
           size_t external_memory_chunk_size = 1073741824;
 
@@ -228,37 +288,18 @@ class JsonValueStore final : public IValueStoreWriter {
          * todo: performance improvements?
          */
         uint64_t GetValue(const value_t& value, bool& no_minimization) {
-          std::string packed_value;
           msgpack_buffer_.clear();
+          std::string compressed = EncodeJsonValue(
+              long_compress_, short_compress_, msgpack_buffer_, value,
+              compression_threshold_);
+          std::string packed_value;
+          dictionary::util::encodeVarint(compressed.size() + 1, packed_value);
+          packed_value += compressed;
 
           ++number_of_values_;
 
-          rapidjson::Document json_document;
-          json_document.Parse(value.c_str());
-
-          if (!json_document.HasParseError()) {
-            TRACE("Got json");
-            msgpack::pack(&msgpack_buffer_, json_document);
-          } else {
-            TRACE("Got a normal string");
-            msgpack::pack(&msgpack_buffer_, value);
-          }
-
-          // zlib compression
-          if (msgpack_buffer_.size() > compression_threshold_) {
-            packed_value = compressor_->Compress(
-                msgpack_buffer_.data(), msgpack_buffer_.size());
-          } else {
-            packed_value = raw_compressor_->Compress(
-                msgpack_buffer_.data(), msgpack_buffer_.size());
-            //util::encodeVarint(msgpack_buffer_.size(), packed_value);
-            //packed_value.append(msgpack_buffer_.data(), msgpack_buffer_.size());
-          }
-
-          TRACE("Packed value: %s", packed_value.c_str());
-
           const RawPointerForCompare<MemoryMapManager> stp(packed_value,
-                                                            values_extern_);
+                                                           values_extern_);
           const RawPointer p = hash_.Get(stp);
 
           if (!p.IsEmpty()) {
@@ -308,8 +349,14 @@ class JsonValueStore final : public IValueStoreWriter {
        private:
         MemoryMapManager* values_extern_;
 
+        /*
+         * Compressors & the associated compression functions. Ugly, but
+         * needed for EncodeJsonValue.
+         */
         std::unique_ptr<compression::CompressionStrategy> compressor_;
         std::unique_ptr<compression::CompressionStrategy> raw_compressor_;
+        std::function<std::string(const char*, size_t)> long_compress_;
+        std::function<std::string(const char*, size_t)> short_compress_;
         size_t compression_threshold_;
 
         LeastRecentlyUsedGenerationsCache<RawPointer> hash_;
@@ -377,7 +424,7 @@ class JsonValueStore final : public IValueStoreWriter {
           TRACE("JsonValueStoreReader GetValueAsString");
           std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
 
-          return DecodeValue(packed_string);
+          return DecodeJsonValue(packed_string);
         }
 
         virtual std::string GetStatistics() const {

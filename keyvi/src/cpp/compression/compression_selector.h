@@ -54,6 +54,7 @@ inline CompressionStrategy* compression_strategy(const std::string& name = "")
 }
 
 typedef std::string (*decompress_func_t) (const std::string&);
+typedef std::string (CompressionStrategy::*compress_mem_fn_t) (const char*, size_t);
 
 inline decompress_func_t decompressor_by_code(const std::string& s) {
   switch (s[0]) {

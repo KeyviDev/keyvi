@@ -28,7 +28,6 @@
 #include <string>
 #include <snappy.h>
 
-#include "dictionary/util/vint.h"
 #include "compression/compression_strategy.h"
 
 namespace keyvi {
@@ -36,15 +35,15 @@ namespace compression {
 
 /** A compression strategy that wraps snappy. */
 struct SnappyCompressionStrategy final : public CompressionStrategy {
-  std::string Compress(const char* raw, size_t raw_size) {
+  inline std::string Compress(const char* raw, size_t raw_size) {
+    return DoCompress(raw, raw_size);
+  }
+
+  static std::string DoCompress(const char* raw, size_t raw_size) {
     std::string compressed;
     snappy::Compress(raw, raw_size, &compressed);
 
-    std::string size_prefix;
-    dictionary::util::encodeVarint(compressed.size() + 1, size_prefix);
-
-    return size_prefix + std::string(1, static_cast<char>(SNAPPY_COMPRESSION))
-                       + compressed;
+    return std::string(1, static_cast<char>(SNAPPY_COMPRESSION)) + compressed;
   }
 
   inline std::string Decompress(const std::string& compressed) {

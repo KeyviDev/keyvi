@@ -27,8 +27,6 @@
 
 #include <string>
 
-#include "dictionary/util/vint.h"
-
 namespace keyvi {
 namespace compression {
 
@@ -71,16 +69,17 @@ struct CompressionStrategy {
  * the length field.
  */
 struct RawCompressionStrategy final : public CompressionStrategy {
-  std::string Compress(const char* raw, size_t raw_size) {
-    std::string compressed;
-    dictionary::util::encodeVarint(raw_size + 1, compressed);
-    compressed.append(1, static_cast<char>(NO_COMPRESSION));
-    compressed.append(std::string(raw, raw_size));
-    return compressed;
+  inline std::string Compress(const char* raw, size_t raw_size) {
+    return DoCompress(raw, raw_size);
+  }
+
+  static std::string DoCompress(const char* raw, size_t raw_size) {
+    return std::string(1, static_cast<char>(NO_COMPRESSION)) +
+           std::string(raw, raw_size);
   }
 
   inline std::string Decompress(const std::string& compressed) {
-    return Decompress(compressed);
+    return DoDecompress(compressed);
   }
 
   static inline std::string DoDecompress(const std::string& compressed) {

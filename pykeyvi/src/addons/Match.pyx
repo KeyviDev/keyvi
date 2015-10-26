@@ -18,3 +18,14 @@
             self.inst.get().SetAttribute(<libcpp_string> key, <bool> value)
         else:
             raise Exception("Unsupported Value Type")
+
+
+from match cimport EncodeJsonValue as _EncodeJsonValue 
+
+
+def EncodeJsonValue(libcpp_string raw_value, compression_threshold=None):
+    if compression_threshold:
+        return _EncodeJsonValue(raw_value, compression_threshold)
+    else:
+        return _EncodeJsonValue(raw_value)
+
