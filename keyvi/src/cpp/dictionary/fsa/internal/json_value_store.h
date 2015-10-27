@@ -25,9 +25,12 @@
 #ifndef JSON_VALUE_STORE_H_
 #define JSON_VALUE_STORE_H_
 
+#include "dictionary/fsa/internal/intrinsics.h"
+#if defined(KEYVI_SSE42)
+#define RAPIDJSON_SSE42
+#endif
+
 #include <functional>
-#include <zlib.h>
-#include <snappy.h>
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
 #include "rapidjson/document.h"
@@ -392,9 +395,16 @@ class JsonValueStore final : public IValueStoreWriter {
             }
           }
 
+          boost::interprocess::map_options_t map_options =
+              boost::interprocess::default_map_options | MAP_HUGETLB;
+
+          if (!load_lazy) {
+            map_options |= MAP_POPULATE;
+          }
+
           strings_region_ = new boost::interprocess::mapped_region(
               *file_mapping, boost::interprocess::read_only, offset,
-              strings_size);
+              strings_size, 0, map_options);
 
           strings_ = (const char*) strings_region_->get_address();
         }
