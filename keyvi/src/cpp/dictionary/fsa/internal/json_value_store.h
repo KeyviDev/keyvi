@@ -123,8 +123,8 @@ inline std::string EncodeJsonValue(
 inline std::string EncodeJsonValue(const std::string& raw_value,
                                    size_t compression_threshold=32) {
   msgpack::sbuffer msgpack_buffer;
-  return EncodeJsonValue(&compression::SnappyCompressionStrategy::DoCompress,
-                         &compression::RawCompressionStrategy::DoCompress,
+  return EncodeJsonValue(static_cast<std::string(const char*, size_t)>(&compression::SnappyCompressionStrategy::DoCompress),
+                         static_cast<std::string(const char*, size_t)>(&compression::RawCompressionStrategy::DoCompress),
                          msgpack_buffer, raw_value, compression_threshold);
 }
   

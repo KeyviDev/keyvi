@@ -46,11 +46,22 @@ enum CompressionCode {
 struct CompressionStrategy {
   virtual ~CompressionStrategy() = default;
 
+  virtual std::ostream& Compress(std::ostream& os,
+                                 const char* raw, size_t raw_size) = 0;
+
+  inline std::ostream& Compress(std::ostream& os, const std::string& raw) {
+    return Compress(os, raw.data(), raw.size());
+  }
+
   inline std::string Compress(const std::string& raw) {
     return Compress(raw.data(), raw.size());
   }
 
-  virtual std::string Compress(const char* raw, size_t raw_size) = 0;
+  inline std::string Compress(const char* raw, size_t raw_size) {
+    std::ostringstream ss;
+    Compress(ss, raw, raw_size);
+    return ss.str();
+  }
 
   /**
    * By the time this function is called, the length field added in Compress()
@@ -67,13 +78,21 @@ struct CompressionStrategy {
  * the length field.
  */
 struct RawCompressionStrategy final : public CompressionStrategy {
-  inline std::string Compress(const char* raw, size_t raw_size) {
-    return DoCompress(raw, raw_size);
+  inline std::ostream& Compress(std::ostream& os,
+                                const char* raw, size_t raw_size) {
+    return DoCompress(os, raw, raw_size);
+  }
+
+  static std::ostream& DoCompress(std::ostream& os,
+                                  const char* raw, size_t raw_size) {
+    os << static_cast<char>(NO_COMPRESSION) << std::string(raw, raw_size);
+    return os;
   }
 
   static std::string DoCompress(const char* raw, size_t raw_size) {
-    return std::string(1, static_cast<char>(NO_COMPRESSION)) +
-           std::string(raw, raw_size);
+    std::ostringstream ss;
+    DoCompress(ss, raw, raw_size);
+    return ss.str();
   }
 
   inline std::string Decompress(const std::string& compressed) {
