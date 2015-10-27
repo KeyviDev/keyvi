@@ -41,7 +41,7 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-template<class PersistenceT>
+template<class PersistenceT, class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
 class SparseArrayBuilder final {
  public:
   SparseArrayBuilder(size_t memory_limit, PersistenceT* persistence,
@@ -51,7 +51,7 @@ class SparseArrayBuilder final {
         persistence_(persistence),
         inner_weight_(inner_weight) {
 
-    state_hashtable_ = new LeastRecentlyUsedGenerationsCache<>(memory_limit);
+    state_hashtable_ = new LeastRecentlyUsedGenerationsCache<PackedState<OffsetTypeT, HashCodeTypeT>>(memory_limit);
   }
 
   ~SparseArrayBuilder() {
@@ -62,14 +62,14 @@ class SparseArrayBuilder final {
   SparseArrayBuilder& operator=(SparseArrayBuilder const&) = delete;
   SparseArrayBuilder(const SparseArrayBuilder& that) = delete;
 
-  uint32_t PersistState(UnpackedState<PersistenceT>& unpacked_state) {
+  OffsetTypeT PersistState(UnpackedState<PersistenceT>& unpacked_state) {
     if (unpacked_state.GetNoMinimizationCounter() == 0) {
       // try to find a match of two equal states to minimize automata
-      const PackedState existing = state_hashtable_->Get(unpacked_state);
+      const PackedState<OffsetTypeT, HashCodeTypeT> existing = state_hashtable_->Get(unpacked_state);
       if (!existing.IsEmpty()) {
         // if we are hitting this line minimization succeeded
         TRACE("found minimization, equal state: %d this->weight %d", existing.GetOffset(), unpacked_state.GetWeight());
-        uint32_t offset = existing.GetOffset();
+        OffsetTypeT offset = existing.GetOffset();
         if (unpacked_state.GetWeight() > 0) {
           UpdateWeightIfNeeded(offset, unpacked_state.GetWeight());
         }
@@ -80,12 +80,12 @@ class SparseArrayBuilder final {
 
     // minimization failed, all predecessors of this state will not be minimized, so stop trying
     unpacked_state.IncrementNoMinimizationCounter();
-    uint32_t offset = FindFreeBucket(unpacked_state);
+    OffsetTypeT offset = FindFreeBucket(unpacked_state);
     //TRACE("write at %d", offset);
 
     WriteState(offset, unpacked_state);
     ++number_of_states_;
-    const PackedState packed_state(offset, unpacked_state.GetHashcode(),
+    const PackedState<OffsetTypeT, HashCodeTypeT> packed_state(offset, static_cast<HashCodeTypeT>(unpacked_state.GetHashcode()) ,
                                    unpacked_state.size());
 
     // if minimization failed several time in a row while the minimization hash has decent amount of data,
@@ -118,13 +118,13 @@ class SparseArrayBuilder final {
   uint64_t highest_persisted_state_;
   PersistenceT* persistence_;
   bool inner_weight_;
-  LeastRecentlyUsedGenerationsCache<>* state_hashtable_;
+  LeastRecentlyUsedGenerationsCache<PackedState<OffsetTypeT, HashCodeTypeT>>* state_hashtable_;
   SlidingWindowBitArrayPositionTracker state_start_positions_;
   SlidingWindowBitArrayPositionTracker taken_positions_in_sparsearray_;
 
-  uint32_t FindFreeBucket(
+  OffsetTypeT FindFreeBucket(
       const UnpackedState<PersistenceT>& unpacked_state) const {
-    uint32_t start_position =
+    OffsetTypeT start_position =
         highest_persisted_state_ > SPARSE_ARRAY_SEARCH_OFFSET ?
             highest_persisted_state_ - SPARSE_ARRAY_SEARCH_OFFSET : 1;
 
@@ -178,7 +178,7 @@ class SparseArrayBuilder final {
     return -1;
   }
 
-  void WriteState(const uint32_t offset,
+  void WriteState(const OffsetTypeT offset,
                   const UnpackedState<PersistenceT>& unpacked_state) {
     int i;
     int len = unpacked_state.size();
@@ -265,7 +265,7 @@ class SparseArrayBuilder final {
     state_start_positions_.Set(offset);
   }
 
-  inline void UpdateWeightIfNeeded(const uint32_t offset,
+  inline void UpdateWeightIfNeeded(const size_t offset,
                                    const uint32_t weight);
 
   inline void WriteTransition(size_t offset, unsigned char transitionId,
@@ -354,7 +354,7 @@ inline void SparseArrayBuilder<SparseArrayPersistence<uint16_t>>::WriteTransitio
   util::encodeVarshort(transitionPointer_high, vshort_pointer, &vshort_size);
 
   // find free spots in the sparse array where the pointer fits in
-  uint32_t start_position = offset > 512 ? offset - 512 : 0;
+  uint64_t start_position = offset > 512 ? offset - 512 : 0;
 
   for (;;) {
     start_position = taken_positions_in_sparsearray_.NextFreeSlot(
@@ -423,7 +423,7 @@ inline void SparseArrayBuilder<SparseArrayPersistence<uint16_t>>::WriteTransitio
 
 template<>
 inline void SparseArrayBuilder<SparseArrayPersistence<uint32_t>>::UpdateWeightIfNeeded(
-    const uint32_t offset, const uint32_t weight) {
+    const size_t offset, const uint32_t weight) {
   TRACE("Check for Update Weight");
   if (persistence_->ReadTransitionValue(offset + INNER_WEIGHT_TRANSITION)
       < weight) {
@@ -437,7 +437,7 @@ inline void SparseArrayBuilder<SparseArrayPersistence<uint32_t>>::UpdateWeightIf
 
 template<>
 inline void SparseArrayBuilder<SparseArrayPersistence<uint16_t>>::UpdateWeightIfNeeded(
-    const uint32_t offset, const uint32_t weight) {
+    const size_t offset, const uint32_t weight) {
   TRACE("Check for Update Weight");
   auto n_weight =
       (weight < COMPACT_SIZE_INNER_WEIGHT_MAX_VALUE) ?

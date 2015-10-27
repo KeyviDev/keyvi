@@ -123,7 +123,7 @@ enum generator_state {
  * "d", stack 3 with "c", "e" and so on.
  * Note: The input must be sorted according to a user-defined sort order.
  */
-template<class PersistenceT, class ValueStoreT = internal::NullValueStore>
+template<class PersistenceT, class ValueStoreT = internal::NullValueStore, class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
 class Generator
 final {
     typedef const internal::IValueStoreWriter::vs_param_t vs_param_t;
@@ -146,7 +146,7 @@ final {
       value_store_ = new ValueStoreT(value_store_params_);
 
       stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
-      builder_ = new internal::SparseArrayBuilder<PersistenceT>(
+      builder_ = new internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>(
           memory_limit_minimization, persistence_, ValueStoreT::inner_weight);
     }
 
@@ -188,7 +188,7 @@ final {
       value_store_ = new ValueStoreT(value_store_params_);
 
       stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
-      builder_ = new internal::SparseArrayBuilder<PersistenceT>(
+      builder_ = new internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>(
           memory_limit_minimization, persistence_, ValueStoreT::inner_weight);
 
       last_key_ = std::string();
@@ -321,7 +321,7 @@ final {
     internal::IValueStoreWriter::vs_param_t value_store_params_;
     PersistenceT* persistence_;
     ValueStoreT* value_store_;
-    internal::SparseArrayBuilder<PersistenceT>* builder_;
+    internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>* builder_;
     internal::UnpackedStateStack<PersistenceT>* stack_;
     std::string last_key_ = std::string();
     size_t highest_stack_ = 0;

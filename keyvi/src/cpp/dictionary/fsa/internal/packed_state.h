@@ -36,20 +36,24 @@ namespace internal {
 /**
  * Represents a state in the state hashtable. Since we'll need to save millions of these,
  * we aim to make each object very small.
+ *
+ *  @tparam OffsetTypeT
+ *  @tparam HashCodeTypeT
  */
+template<class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
 struct PackedState
 final {
    public:
     PackedState()
         : PackedState(0, 0, 0) {
     }
-    PackedState(uint32_t offset, int hashcode, int num_outgoing)
+    PackedState(OffsetTypeT offset, HashCodeTypeT hashcode, int num_outgoing)
         : offset_(offset),
           hashcode_(hashcode),
-          num_outgoing_and_cookie_((uint) (num_outgoing & 0x1FF)) {
+          num_outgoing_and_cookie_((uint32_t) (num_outgoing & 0x1FF)) {
     }
 
-    int GetHashcode() const {
+    HashCodeTypeT GetHashcode() const {
       return hashcode_;
     }
 
@@ -64,10 +68,10 @@ final {
 
     void SetCookie(int value) {
       this->num_outgoing_and_cookie_ = (this->num_outgoing_and_cookie_
-          & 0x1FF) | (uint) (value << 9);
+          & 0x1FF) | (uint32_t) (value << 9);
     }
 
-    uint32_t GetOffset() const {
+    OffsetTypeT GetOffset() const {
       return offset_;
     }
 
@@ -86,11 +90,13 @@ final {
    private:
     static const size_t MaxCookieSize = 0x7FFFFE;
 
-    uint32_t offset_;
-    int32_t hashcode_;
+    OffsetTypeT offset_;
+    HashCodeTypeT hashcode_;
     uint32_t num_outgoing_and_cookie_;
 
-  };
+  }
+  // this is __very__ size critical, so disable any padding
+  __attribute__ ((packed));
 
   } /* namespace internal */
   } /* namespace fsa */
