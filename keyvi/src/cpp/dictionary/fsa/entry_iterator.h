@@ -40,22 +40,31 @@ class EntryIterator {
   EntryIterator()
       : current_state_(0),
         current_value_(0),
-        fsa_(0) {
+        fsa_(nullptr) {
   }
 
   EntryIterator(automata_t f) : EntryIterator(f, f->GetStartState()) {}
 
   EntryIterator(automata_t f, int start_state)
       : fsa_(f) {
-    current_state_ = start_state;
-    state_vector_traversal_stack_.resize(10);
-    transitions_vector_traversal_stack_.resize(10);
+    if (f && f->GetNumberOfKeys() > 0) {
+      current_state_ = start_state;
+      state_vector_traversal_stack_.resize(10);
+      transitions_vector_traversal_stack_.resize(10);
 
-    fsa_->GetOutGoingTransitions(start_state, state_vector_traversal_stack_[0], transitions_vector_traversal_stack_[0]);
+      fsa_->GetOutGoingTransitions(start_state, state_vector_traversal_stack_[0], transitions_vector_traversal_stack_[0]);
 
-    vector_offset_traversal_stack_.push_back(0);
-    traversal_stack_.push_back(transitions_vector_traversal_stack_[0][0]);
-    TraverseToNextFinalState();
+      vector_offset_traversal_stack_.push_back(0);
+      // If there are no transitions from the start state...
+      if (transitions_vector_traversal_stack_[0].size() > 0) {
+        traversal_stack_.push_back(transitions_vector_traversal_stack_[0][0]);
+        TraverseToNextFinalState();
+      } else {
+        Clear();
+      }
+    } else {
+      Clear();
+    }
   }
 
   std::string GetKey() {
@@ -105,6 +114,13 @@ class EntryIterator {
   }
 
  private:
+  /** Cleares the iterator, i.e. makes it equal to the empty iterator. */
+  void Clear() {
+    fsa_ = nullptr;
+    current_state_ = 0;
+    current_state_ = 0;
+  }
+
   void TraverseToNextFinalState() {
 
     if (current_state_ == 0) {
