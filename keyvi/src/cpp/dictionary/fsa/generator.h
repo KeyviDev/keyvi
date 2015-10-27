@@ -126,18 +126,24 @@ enum generator_state {
 template<class PersistenceT, class ValueStoreT = internal::NullValueStore>
 class Generator
 final {
+    typedef const internal::IValueStoreWriter::vs_param_t vs_param_t;
+    
    public:
-    Generator(size_t memory_limit = 1073741824): memory_limit_(memory_limit) {
+    Generator(size_t memory_limit = 1073741824,
+              const vs_param_t& value_store_params = vs_param_t())
+        : memory_limit_(memory_limit), value_store_params_(value_store_params) {
 
       // use 50% or limit minus 200MB for the memory limit of the hashtable
       size_t memory_limit_minimization = std::max(
           memory_limit / 2, memory_limit - (200 * 1024 * 1024));
 
-      boost::filesystem::path temp_path =
-          boost::filesystem::temp_directory_path();
+      if (value_store_params_.count(TEMPORARY_PATH_KEY) == 0) {
+        value_store_params_[TEMPORARY_PATH_KEY] =
+            boost::filesystem::temp_directory_path().string();
+      }
       persistence_ = new PersistenceT(memory_limit - memory_limit_minimization,
-                                      temp_path);
-      value_store_ = new ValueStoreT(temp_path);
+                                      value_store_params_[TEMPORARY_PATH_KEY]);
+      value_store_ = new ValueStoreT(value_store_params_);
 
       stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
       builder_ = new internal::SparseArrayBuilder<PersistenceT>(
@@ -177,11 +183,9 @@ final {
       size_t memory_limit_minimization = std::max(
           memory_limit_ / 2, memory_limit_ - (200 * 1024 * 1024));
 
-      boost::filesystem::path temp_path =
-          boost::filesystem::temp_directory_path();
       persistence_ = new PersistenceT(memory_limit_ - memory_limit_minimization,
-                                      temp_path);
-      value_store_ = new ValueStoreT(temp_path);
+                                      value_store_params_[TEMPORARY_PATH_KEY]);
+      value_store_ = new ValueStoreT(value_store_params_);
 
       stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
       builder_ = new internal::SparseArrayBuilder<PersistenceT>(
@@ -314,6 +318,7 @@ final {
 
    private:
     size_t memory_limit_;
+    internal::IValueStoreWriter::vs_param_t value_store_params_;
     PersistenceT* persistence_;
     ValueStoreT* value_store_;
     internal::SparseArrayBuilder<PersistenceT>* builder_;

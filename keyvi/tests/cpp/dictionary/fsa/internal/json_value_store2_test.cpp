@@ -19,13 +19,13 @@
 /*
  * json_value_store_test.cpp
  *
- *  Created on: Nov 5, 2014
- *      Author: hendrik
+ *  Created on: October 14, 2015
+ *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
  */
 
 #include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
-#include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/json_value_store_deprecated.h"
 #include "dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
@@ -34,11 +34,11 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( JsonValueTest )
+BOOST_AUTO_TEST_SUITE( JsonValueDeprecatedTest )
 
 BOOST_AUTO_TEST_CASE( minimization )
 {
-  JsonValueStore strings(
+  JsonValueStoreDeprecated strings(
       IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
   uint32_t v = strings.GetValue("{\"mytestvalue\":25, \"mytestvalue2\":23}", no_minimization);
@@ -54,17 +54,14 @@ BOOST_AUTO_TEST_CASE( minimization )
 
 BOOST_AUTO_TEST_CASE( minimization2 )
 {
-  JsonValueStore strings(
+  JsonValueStoreDeprecated strings(
       IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
 
   uint64_t v = strings.GetValue("{\"f\": 5571575, \"df\": 1362790, \"uqf\": 2129086, \"tf1df\": 99838, \"tf2df\": 274586, \"tf3df\": 481278, \"tf5df\": 811157}", no_minimization);
   uint64_t w = strings.GetValue("{\"f\": 3, \"df\": 1, \"uqf\": 1, \"tf1df\": 0, \"tf2df\": 0, \"tf3df\": 0, \"tf5df\": 0}", no_minimization);
   BOOST_CHECK(v != w);
-
 }
-
-
 
 BOOST_AUTO_TEST_SUITE_END()
 

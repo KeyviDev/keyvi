@@ -37,6 +37,8 @@ BOOST_AUTO_TEST_SUITE( StringValueTest )
 
 BOOST_AUTO_TEST_CASE( minimization )
 {
+  IValueStoreWriter ivsw1(IValueStoreWriter::vs_param_t {{"hello", "bello"}});
+  IValueStoreWriter ivsw2;
   StringValueStore strings;
 
   bool no_minimization = false;

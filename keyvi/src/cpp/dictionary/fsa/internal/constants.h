@@ -44,6 +44,12 @@
 // how many buckets to go left doing (brute force) search for free buckets in the sparse array where the new state fits in
 #define SPARSE_ARRAY_SEARCH_OFFSET 151
 
+// Value option key names
+
+#define TEMPORARY_PATH_KEY "temporary_path"
+#define COMPRESSION_KEY "compression"
+#define COMPRESSION_THRESHOLD_KEY "compression_threshold"
+
 /**
  * Lookup table to find outgoing transitions quickly(in parallel) by xor'ing the real buffer with this table.
  * (also used for the intrinsic(SSE 4.2) based implementation)
@@ -66,6 +72,5 @@ static unsigned char OUTGOING_TRANSITIONS_MASK[256] = {
     0xe0, 0xe1, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xeb, 0xec, 0xed, 0xee, 0xef,
     0xf0, 0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff
 };
-
 
 #endif /* CONSTANTS_H_ */
