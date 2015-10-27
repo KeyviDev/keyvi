@@ -39,11 +39,9 @@ enum CompressionCode {
 /**
  * The base class of every compression strategy.
  *
- * All strategies (aside from RawCompressionStrategy) should insert a " "
- * (space) character before the string to mark it compressed, as well as the
- * encoded length of the resulting string (including the space). The space,
- * but not the encoded size, will also have to be taken into account in the
- * decompress method.
+ * All strategies (aside from RawCompressionStrategy) should insert the
+ * comression code (see above) as the first character of the encoded string.
+ * The code will also have to be taken into account in the decompress method.
  */
 struct CompressionStrategy {
   virtual ~CompressionStrategy() = default;
