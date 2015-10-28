@@ -26,6 +26,7 @@
 #define SNAPPY_COMPRESSION_STRATEGY_H_
 
 #include <string>
+#include <sstream>
 #include <snappy.h>
 
 #include "compression/compression_strategy.h"
@@ -38,6 +39,12 @@ struct SnappyCompressionStrategy final : public CompressionStrategy {
   inline std::ostream& Compress(std::ostream& os,
                                 const char* raw, size_t raw_size) {
     return DoCompress(os, raw, raw_size);
+  }
+
+  static inline std::string DoCompress(const char* raw, size_t raw_size) {
+    std::ostringstream ss;
+    DoCompress(ss, raw, raw_size);
+    return ss.str();
   }
 
   static std::ostream& DoCompress(std::ostream& os,

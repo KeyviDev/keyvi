@@ -89,7 +89,7 @@ struct RawCompressionStrategy final : public CompressionStrategy {
     return os;
   }
 
-  static std::string DoCompress(const char* raw, size_t raw_size) {
+  static inline std::string DoCompress(const char* raw, size_t raw_size) {
     std::ostringstream ss;
     DoCompress(ss, raw, raw_size);
     return ss.str();
