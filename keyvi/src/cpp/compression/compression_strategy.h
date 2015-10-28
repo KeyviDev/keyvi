@@ -85,7 +85,8 @@ struct RawCompressionStrategy final : public CompressionStrategy {
 
   static std::ostream& DoCompress(std::ostream& os,
                                   const char* raw, size_t raw_size) {
-    os << static_cast<char>(NO_COMPRESSION) << std::string(raw, raw_size);
+    os << static_cast<char>(NO_COMPRESSION);
+    os.write(raw, raw_size);
     return os;
   }
 

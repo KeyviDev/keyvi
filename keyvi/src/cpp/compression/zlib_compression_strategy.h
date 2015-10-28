@@ -61,7 +61,7 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
       if (written  < zs.total_out) {
         // append the block to the output string
-        os << std::string(zlib_buffer_, zs.total_out - written);
+        os.write(zlib_buffer_, zs.total_out - written);
         written = zs.total_out;
       }
     } while (ret == Z_OK);
