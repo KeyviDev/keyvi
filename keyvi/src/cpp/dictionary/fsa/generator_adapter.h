@@ -16,8 +16,9 @@
  */
 
 /*
- * generator_pimpl.h
+ * generator_adapter.h
  *
+ * Interface to abstract away compile time(template) parameters of the generator.
  *  Created on: Oct 28, 2015
  *      Author: hendrik
  */
@@ -47,15 +48,14 @@ class GeneratorAdapterInterface {
   virtual void SetManifestFromString(const std::string& manifest) {}
 
 
- protected:
-  ~GeneratorAdapterInterface(){}
+  virtual ~GeneratorAdapterInterface(){}
 };
 
 template<class PersistenceT, class ValueStoreT, class OffsetTypeT, class HashCodeTypeT>
 class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, ValueStoreT> {
  public:
   GeneratorAdapter(size_t memory_limit = 1073741824,
-                   const generator_vs_param_t& value_store_params = generator_vs_param_t()):
+                   const vs_param_t& value_store_params = vs_param_t()):
                      generator_(memory_limit, value_store_params)
  {}
 

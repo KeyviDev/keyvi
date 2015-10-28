@@ -123,13 +123,11 @@ enum generator_state {
  * "d", stack 3 with "c", "e" and so on.
  * Note: The input must be sorted according to a user-defined sort order.
  */
-typedef const internal::IValueStoreWriter::vs_param_t generator_vs_param_t;
+typedef const internal::IValueStoreWriter::vs_param_t vs_param_t;
 
 template<class PersistenceT, class ValueStoreT = internal::NullValueStore, class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
 class Generator
 final {
-    typedef const internal::IValueStoreWriter::vs_param_t vs_param_t;
-    
    public:
     Generator(size_t memory_limit = 1073741824,
               const vs_param_t& value_store_params = vs_param_t())

@@ -96,17 +96,29 @@ class DictionaryCompiler
     DictionaryCompiler(size_t memory_limit = 1073741824,
                        const vs_param_t& value_store_params = vs_param_t())
         : initializer_(util::TpieIntializer::getInstance()),
-          sorter_() {
+          sorter_(),
+          memory_limit_(memory_limit),
+          value_store_params_(value_store_params) {
       sorter_.set_available_memory(memory_limit);
       sorter_.begin();
 
       generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit, value_store_params);
     }
 
-    template<typename StringType>
-    void Add(StringType input_key, typename ValueStoreT::value_t value =
+    ~DictionaryCompiler(){
+      if (generator_) {
+        delete generator_;
+      }
+    }
+
+    DictionaryCompiler& operator=(DictionaryCompiler const&) = delete;
+    DictionaryCompiler(const DictionaryCompiler& that) = delete;
+
+    void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                  ValueStoreT::no_value) {
       sorter_.push(key_value_t(input_key, value));
+
+      size_of_keys_ += input_key.size();
     }
 
 #ifdef Py_PYTHON_H
@@ -124,6 +136,8 @@ class DictionaryCompiler
     void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
       sorter_.end();
       sorter_.merge_runs();
+      CreateGenerator();
+
       {
         number_of_items_ = sorter_.item_count();
 
@@ -161,6 +175,8 @@ class DictionaryCompiler
                      callback_t progress_callback = nullptr, void* user_data = nullptr)
     {
       if (!sort_finalized_){
+        CreateGenerator();
+
         sorter_.end();
         sorter_.merge_runs();
         sort_finalized_ = true;
@@ -273,12 +289,46 @@ class DictionaryCompiler
    private:
     util::TpieIntializer& initializer_;
     tpie::serialization_sorter<key_value_t> sorter_;
+    size_t memory_limit_;
+    vs_param_t value_store_params_;
+
     fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>* generator_ = nullptr;
     bool sort_finalized_ = false;
     size_t added_key_values_ = 0;
     size_t number_of_items_ = 0;
     size_t callback_trigger_ = 0;
-  };
+
+    size_t size_of_keys_ = 0;
+
+    void CreateGenerator();
+
+
+};
+
+/**
+ * Initialize generator based on size of keys and configured memory
+ *
+ * todo: expose, so that it can be overriden from outside.
+ */
+template<class PersistenceT, class ValueStoreT>
+inline void DictionaryCompiler<PersistenceT, ValueStoreT>::CreateGenerator()
+{
+  if (size_of_keys_ > (UINT32_MAX/2)){
+    if (memory_limit_ > (10 * 1024 * 1024 * 1024)) {
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(memory_limit_, value_store_params_);
+    } else {
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(memory_limit_, value_store_params_);
+    }
+  } else {
+    if (memory_limit_ > (5 * 1024 * 1024 * 1024)) {
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(memory_limit_, value_store_params_);
+    } else {
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit_, value_store_params_);
+    }
+  }
+}
+
+
 
 } /* namespace dictionary */
 } /* namespace keyvi */
