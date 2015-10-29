@@ -35,3 +35,14 @@ def test_simple_zlib():
         assert m['__compression'] == "zlib"
         assert m['__compression_threshold'] == "0"
 
+def test_simple_snappy():
+    c = pykeyvi.JsonDictionaryCompiler(50000000, {'compression': 'snappy', 'compression_threshold': '0'})
+    c.Add("abc", '{"a" : 2}')
+    c.Add("abd", '{"a" : 3}')
+    with tmp_dictionary(c, 'simple_json_snappy.kv') as d:
+        assert len(d) == 2
+        assert d["abc"].GetValueAsString() == '{"a":2}'
+        assert d["abd"].GetValueAsString() == '{"a":3}'
+        m = d.GetStatistics()['Value Store']
+        assert m['__compression'] == "snappy"
+        assert m['__compression_threshold'] == "0"
