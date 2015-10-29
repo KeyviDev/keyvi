@@ -70,7 +70,7 @@ script:
   - python setup.py install --user
   - py.test tests
   - cd ..
-  - for file in `find pykeyvi -name *.gcda`; do cp $file keyvi/tests/; done
+  - for file in `find pykeyvi -name pykeyvi.gc*`; do cp $file keyvi/tests/; done
 
 sudo: false
 after_success:
