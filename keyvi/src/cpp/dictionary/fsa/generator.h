@@ -291,20 +291,8 @@ final {
      *
      * @param manifest as JSON string
      */
-    template<typename StringType>
-    inline void SetManifestFromString(StringType manifest){
-
-      std::string mf_string(c_stringify(manifest));
-
-      // sending an empty string clears the manifest
-      if (mf_string.empty()) {
-        manifest_.clear();
-
-        return;
-      }
-
-      std::istringstream string_stream(mf_string);
-      boost::property_tree::read_json(string_stream, manifest_);
+    inline void SetManifestFromString(const std::string& manifest){
+      SetManifest(internal::SerializationUtils::ReadJsonRecord(manifest));
     }
 
     /**

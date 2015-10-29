@@ -46,7 +46,7 @@ class GeneratorAdapterInterface {
   virtual void Write(std::ostream& stream) {}
   virtual void WriteToFile(const std::string& filename) {}
   virtual void SetManifestFromString(const std::string& manifest) {}
-
+  virtual void SetManifest(const boost::property_tree::ptree& manifest) {}
 
   virtual ~GeneratorAdapterInterface(){}
 };
@@ -86,6 +86,10 @@ class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, Val
 
   void SetManifestFromString(const std::string& manifest) {
     generator_.SetManifestFromString(manifest);
+  }
+
+  void SetManifest(const boost::property_tree::ptree& manifest) {
+    generator_.SetManifest(manifest);
   }
 
  private:

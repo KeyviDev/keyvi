@@ -27,10 +27,12 @@
 
 #include <algorithm>
 #include <functional>
+#include <boost/property_tree/ptree.hpp>
 #include "tpie/serialization_sorter.h"
 
 #include "dictionary/util/tpie_initializer.h"
 #include "dictionary/fsa/internal/null_value_store.h"
+#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/generator_adapter.h"
 
 //#define ENABLE_TRACING
@@ -261,9 +263,8 @@ class DictionaryCompiler
      *
      * @param manifest as JSON string
      */
-    template<typename StringType>
-    void SetManifestFromString(StringType manifest){
-      generator_->SetManifestFromString(manifest);
+    void SetManifestFromString(const std::string& manifest){
+      SetManifest(fsa::internal::SerializationUtils::ReadJsonRecord(manifest));
     }
 
     /**
@@ -272,7 +273,12 @@ class DictionaryCompiler
      * @param manifest
      */
     void SetManifest(const boost::property_tree::ptree& manifest){
-      generator_->SetManifest(manifest);
+      manifest_ = manifest;
+
+      // if generator object is already there, set it otherwise cache it until it is created
+      if (generator_) {
+        generator_->SetManifest(manifest);
+      }
     }
 
     void Write(std::ostream& stream) {
@@ -299,6 +305,7 @@ class DictionaryCompiler
     size_t callback_trigger_ = 0;
 
     size_t size_of_keys_ = 0;
+    boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
 
     void CreateGenerator();
 
@@ -327,6 +334,9 @@ inline void DictionaryCompiler<PersistenceT, ValueStoreT>::CreateGenerator()
       generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit_, value_store_params_);
     }
   }
+
+  // set the manifest
+  generator_->SetManifest(manifest_);
 }
 
 
