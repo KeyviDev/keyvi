@@ -70,8 +70,11 @@ script:
   - python setup.py install --user
   - py.test tests
   - cd ..
-  - for file in `find pykeyvi -name pykeyvi.gc*`; do cp $file keyvi/tests/; done
 
 sudo: false
 after_success:
-  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then coveralls -r keyvi -b keyvi --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' -e 3rdparty -E '.*/tests/*.cpp' --repo-token "${COVERALLS_REPO_TOKEN}" ; fi
+  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then coveralls -r keyvi -b keyvi --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' -e 3rdparty -E '.*/tests/*.cpp' --dump keyvi.cov_report"; \
+    coveralls -r pykeyvi -b pykeyvi --gcov-options '\-lp \-s $PWD/keyvi' -E '.*3rdparty' -E '.*/pykeyvi.cpp' -E '.*autowrap.*' --dump pykeyvi.cov_report --follow-symlinks; \
+    export COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN}; \
+    echo "merge and send"'; \
+    fi
