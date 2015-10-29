@@ -1,19 +1,8 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import contextlib
-import os
-
 import pykeyvi
-
-@contextlib.contextmanager
-def tmp_dictionary(compiler, file_name):
-    compiler.Compile()
-    compiler.WriteToFile(file_name)
-    d = pykeyvi.Dictionary(file_name)
-    yield d
-    del d
-    os.remove(file_name)
+from test_tools import tmp_dictionary
 
 def test_size():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
