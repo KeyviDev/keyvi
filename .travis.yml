@@ -30,6 +30,8 @@ before_install:
   - pip install --user --download-cache $HOME/.pip-cache --use-wheel --install-option="--no-cython-compile" cython
   - pip install --user --download-cache $HOME/.pip-cache --use-wheel pytest
   - if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install --user --download-cache $HOME/.pip-cache --use-wheel cpp-coveralls; fi
+  - if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install --user --download-cache $HOME/.pip-cache --use-wheel coveralls-merge; fi
+
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 
@@ -73,8 +75,8 @@ script:
 
 sudo: false
 after_success:
-  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then coveralls -r keyvi -b keyvi --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' -e 3rdparty -E '.*/tests/*.cpp' --dump keyvi.cov_report"; \
+  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then coveralls -r keyvi -b keyvi --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' -e 3rdparty -E '.*/tests/*.cpp' --dump keyvi.cov_report; \
     coveralls -r pykeyvi -b pykeyvi --gcov-options '\-lp \-s $PWD/keyvi' -E '.*3rdparty' -E '.*/pykeyvi.cpp' -E '.*autowrap.*' --dump pykeyvi.cov_report --follow-symlinks; \
     export COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN}; \
-    echo "merge and send"'; \
+    coveralls-merge  keyvi.cov_report pykeyvi.cov_report; \
     fi
