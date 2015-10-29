@@ -46,6 +46,7 @@ class  build(_build.build):
         
     def run(self):
         global additional_compile_flags
+        global linklibraries
         global ext_modules
         print "Building in {} mode".format(self.mode)
         
@@ -58,11 +59,13 @@ class  build(_build.build):
             
         if self.mode == 'coverage':
             additional_compile_flags.append("--coverage")
+            linklibraries.append("gcov")
         
         # patch the compile flags
         for ext_m in ext_modules:
             flags = getattr(ext_m, 'extra_compile_args') + additional_compile_flags
             setattr(ext_m, 'extra_compile_args', flags)
+            setattr(ext_m, 'libraries', linklibraries)
         
         _build.build.run(self)
 
