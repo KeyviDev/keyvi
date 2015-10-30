@@ -38,7 +38,7 @@ namespace internal {
 /**
  * A simple implementation of a lightweight least recently used cache using generations.
  */
-template <class EntryT = PackedState>
+template <class EntryT = PackedState<>>
 class LeastRecentlyUsedGenerationsCache
 final {
 

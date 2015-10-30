@@ -63,6 +63,23 @@ class SerializationUtils {
     boost::property_tree::read_json(string_stream, properties);
     return properties;
   }
+
+  /**
+   * Utility method to return a property tree from a JSON string.
+   * @param record a string containing a JSON
+   * @return the parsed property tree
+   */
+  static boost::property_tree::ptree ReadJsonRecord(const std::string& record){
+    boost::property_tree::ptree properties;
+
+    // sending an empty string clears the manifest
+    if (!record.empty()) {
+      std::istringstream string_stream(record);
+      boost::property_tree::read_json(string_stream, properties);
+    }
+
+    return properties;
+  }
 };
 
 } /* namespace internal */

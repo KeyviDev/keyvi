@@ -153,7 +153,7 @@ final {
         return weight_;
       }
 
-      inline int GetHashcode() {
+      inline int64_t GetHashcode() {
         if (hashcode_ == -1) {
           int64_t b;
           int64_t a = b = 0x9e3779b9;
@@ -200,16 +200,17 @@ final {
             c ^= b >> 15;
           }
 
-          hashcode_ = static_cast<int>(c);
+          hashcode_ = c;
         }
 
         return hashcode_;
       }
 
-      bool operator==(const PackedState& l) {
+      template<class OffsetTypeT, class HashCodeTypeT>
+      bool operator==(const PackedState<OffsetTypeT, HashCodeTypeT>& l) {
 
         // First filter - check if hash code and the number of transitions is the same
-        if (l.GetHashcode() != GetHashcode()
+        if (l.GetHashcode() != static_cast<HashCodeTypeT>(GetHashcode())
             || l.GetNumberOfOutgoingTransitions() != used_) {
           return false;
         }
@@ -263,7 +264,7 @@ final {
       PersistenceT* persistence_;
 
       int used_ = 0;
-      int hashcode_ = -1;
+      int64_t hashcode_ = -1;
       int no_minimization_counter_ = 0;
       uint32_t weight_ = 0;
       bool final_ = false;

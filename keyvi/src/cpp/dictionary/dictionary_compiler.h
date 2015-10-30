@@ -27,11 +27,13 @@
 
 #include <algorithm>
 #include <functional>
+#include <boost/property_tree/ptree.hpp>
 #include "tpie/serialization_sorter.h"
 
 #include "dictionary/util/tpie_initializer.h"
 #include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/fsa/generator.h"
+#include "dictionary/fsa/internal/serialization_utils.h"
+#include "dictionary/fsa/generator_adapter.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -97,15 +99,28 @@ class DictionaryCompiler
                        const vs_param_t& value_store_params = vs_param_t())
         : initializer_(util::TpieIntializer::getInstance()),
           sorter_(),
-          generator_(memory_limit, value_store_params) {
+          memory_limit_(memory_limit),
+          value_store_params_(value_store_params) {
       sorter_.set_available_memory(memory_limit);
       sorter_.begin();
+
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit, value_store_params);
     }
 
-    template<typename StringType>
-    void Add(StringType input_key, typename ValueStoreT::value_t value =
+    ~DictionaryCompiler(){
+      if (generator_) {
+        delete generator_;
+      }
+    }
+
+    DictionaryCompiler& operator=(DictionaryCompiler const&) = delete;
+    DictionaryCompiler(const DictionaryCompiler& that) = delete;
+
+    void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                  ValueStoreT::no_value) {
       sorter_.push(key_value_t(input_key, value));
+
+      size_of_keys_ += input_key.size();
     }
 
 #ifdef Py_PYTHON_H
@@ -123,6 +138,8 @@ class DictionaryCompiler
     void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
       sorter_.end();
       sorter_.merge_runs();
+      CreateGenerator();
+
       {
         number_of_items_ = sorter_.item_count();
 
@@ -137,7 +154,7 @@ class DictionaryCompiler
 
           TRACE("adding to generator: %s", key_value.key.c_str());
 
-          generator_.Add(key_value.key, key_value.value);
+          generator_->Add(key_value.key, key_value.value);
           ++added_key_values_;
           if (progress_callback && (added_key_values_ % callback_trigger_ == 0)){
             progress_callback(added_key_values_, number_of_items_, user_data);
@@ -145,7 +162,7 @@ class DictionaryCompiler
         }
       }
 
-      generator_.CloseFeeding();
+      generator_->CloseFeeding();
     }
 
     /**
@@ -160,6 +177,8 @@ class DictionaryCompiler
                      callback_t progress_callback = nullptr, void* user_data = nullptr)
     {
       if (!sort_finalized_){
+        CreateGenerator();
+
         sorter_.end();
         sorter_.merge_runs();
         sort_finalized_ = true;
@@ -182,7 +201,7 @@ class DictionaryCompiler
         while (sorter_.can_pull()) {
           key_value_t key_value = sorter_.pull();
 
-          generator_.Add(key_value.key, key_value.value);
+          generator_->Add(key_value.key, key_value.value);
           ++i;
           ++added_key_values_;
 
@@ -190,7 +209,7 @@ class DictionaryCompiler
             progress_callback(added_key_values_, number_of_items_, user_data);
           }
 
-          if (i % 1000 == 0 && generator_.GetFsaSize() > partition_conservative_size){
+          if (i % 1000 == 0 && generator_->GetFsaSize() > partition_conservative_size){
             // todo: continue feeding until we found a good point to persist the partition
 
             TRACE("finish partition: find good partition end");
@@ -205,7 +224,7 @@ class DictionaryCompiler
                 break;
               }
 
-              generator_.Add(key_value.key, key_value.value);
+              generator_->Add(key_value.key, key_value.value);
               ++added_key_values_;
 
               if (progress_callback && (added_key_values_ % callback_trigger_ == 0)){
@@ -216,16 +235,16 @@ class DictionaryCompiler
             }
             TRACE("finish partition: finalize partition");
 
-            generator_.CloseFeeding();
-            generator_.Write(stream);
+            generator_->CloseFeeding();
+            generator_->Write(stream);
 
             // handle case where we do not have to start a new partition
             if (!make_new_partition){
               return false;
             }
 
-            generator_.Reset();
-            generator_.Add(key_value.key, key_value.value);
+            generator_->Reset();
+            generator_->Add(key_value.key, key_value.value);
 
             return true;
           }
@@ -233,8 +252,8 @@ class DictionaryCompiler
       }
 
       // finalize the last partition
-      generator_.CloseFeeding();
-      generator_.Write(stream);
+      generator_->CloseFeeding();
+      generator_->Write(stream);
 
       return false;
     }
@@ -244,9 +263,8 @@ class DictionaryCompiler
      *
      * @param manifest as JSON string
      */
-    template<typename StringType>
-    void SetManifestFromString(StringType manifest){
-      generator_.SetManifestFromString(manifest);
+    void SetManifestFromString(const std::string& manifest){
+      SetManifest(fsa::internal::SerializationUtils::ReadJsonRecord(manifest));
     }
 
     /**
@@ -255,29 +273,73 @@ class DictionaryCompiler
      * @param manifest
      */
     void SetManifest(const boost::property_tree::ptree& manifest){
-      generator_.SetManifest(manifest);
+      manifest_ = manifest;
+
+      // if generator object is already there, set it otherwise cache it until it is created
+      if (generator_) {
+        generator_->SetManifest(manifest);
+      }
     }
 
     void Write(std::ostream& stream) {
-       generator_.Write(stream);
+       generator_->Write(stream);
     }
 
     template<typename StringType>
     void WriteToFile(StringType filename) {
       std::ofstream out_stream(filename, std::ios::binary);
-      generator_.Write(out_stream);
+      generator_->Write(out_stream);
       out_stream.close();
     }
 
    private:
     util::TpieIntializer& initializer_;
     tpie::serialization_sorter<key_value_t> sorter_;
-    fsa::Generator<PersistenceT, ValueStoreT> generator_;
+    size_t memory_limit_;
+    vs_param_t value_store_params_;
+
+    fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>* generator_ = nullptr;
     bool sort_finalized_ = false;
     size_t added_key_values_ = 0;
     size_t number_of_items_ = 0;
     size_t callback_trigger_ = 0;
-  };
+
+    size_t size_of_keys_ = 0;
+    boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
+
+    void CreateGenerator();
+
+
+};
+
+/**
+ * Initialize generator based on size of keys and configured memory
+ *
+ * todo: expose, so that it can be overridden from outside.
+ */
+template<class PersistenceT, class ValueStoreT>
+inline void DictionaryCompiler<PersistenceT, ValueStoreT>::CreateGenerator()
+{
+  // todo: find good parameters for auto-guessing this
+  if (size_of_keys_ > UINT32_MAX){
+    if (memory_limit_ > (10 * 1024 * 1024 * 1024)) {
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(memory_limit_, value_store_params_);
+    } else {
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(memory_limit_, value_store_params_);
+    }
+  } else {
+    if (memory_limit_ > (5 * 1024 * 1024 * 1024)) {
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(memory_limit_, value_store_params_);
+    } else {
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit_, value_store_params_);
+    }
+  }
+
+  // set the manifest
+  generator_->SetManifest(manifest_);
+}
+
+
 
 } /* namespace dictionary */
 } /* namespace keyvi */

@@ -37,12 +37,48 @@ BOOST_AUTO_TEST_SUITE( PackedStateTests )
 
 BOOST_AUTO_TEST_CASE( size )
 {
-  BOOST_CHECK(sizeof(PackedState) == 12);
+  BOOST_CHECK_EQUAL(12, sizeof(PackedState<>));
+}
+
+BOOST_AUTO_TEST_CASE( size64 )
+{
+  BOOST_CHECK_EQUAL(16, sizeof(PackedState<uint64_t>));
+}
+
+BOOST_AUTO_TEST_CASE( sizeHash64 )
+{
+  BOOST_CHECK_EQUAL(16, sizeof(PackedState<uint32_t, int64_t>));
+}
+
+BOOST_AUTO_TEST_CASE( size64Hash64 )
+{
+  BOOST_CHECK_EQUAL(20, sizeof(PackedState<uint64_t, int64_t>));
+}
+
+BOOST_AUTO_TEST_CASE( compare64 )
+{
+  PackedState<> p(0, 42, 42);
+  BOOST_CHECK(p.GetHashcode() == 42);
+
+  int64_t hashcode = std::numeric_limits<int64_t>::max();
+  int32_t hashcode_32 = (int32_t) hashcode;
+
+  PackedState<> p2(0, hashcode, 42);
+
+  // as the hashcode is downcasted this should fail
+  BOOST_CHECK(p2.GetHashcode() != hashcode);
+  BOOST_CHECK(p2.GetHashcode() == hashcode_32);
+
+  PackedState<uint32_t, int64_t> p3(0, hashcode, 42);
+  BOOST_CHECK(p3.GetHashcode() == hashcode);
+
+  // downcasting is bad here, so this test should fail
+  BOOST_CHECK(p3.GetHashcode() != hashcode_32);
 }
 
 BOOST_AUTO_TEST_CASE( numOutgoingAndPrivateUse )
 {
-  PackedState p1 {0, 0, 1};
+  PackedState<> p1 {0, 0, 1};
 
   BOOST_CHECK(p1.GetNumberOfOutgoingTransitions() == 1);
   BOOST_CHECK(p1.GetCookie() == 0);
@@ -56,15 +92,15 @@ BOOST_AUTO_TEST_CASE( numOutgoingAndPrivateUse )
   BOOST_CHECK(p1.GetNumberOfOutgoingTransitions() == 1);
   BOOST_CHECK(p1.GetCookie() == 0);
 
-  PackedState p2 = {0, 0, 257};
+  PackedState<> p2 = {0, 0, 257};
   BOOST_CHECK(p2.GetNumberOfOutgoingTransitions() == 257);
   p2.SetCookie(6948);
   BOOST_CHECK(p2.GetNumberOfOutgoingTransitions() == 257);
   BOOST_CHECK(p2.GetCookie() == 6948);
 
-  p2.SetCookie(PackedState::GetMaxCookieSize());
+  p2.SetCookie(PackedState<>::GetMaxCookieSize());
   BOOST_CHECK(p2.GetNumberOfOutgoingTransitions() == 257);
-  BOOST_CHECK(p2.GetCookie() == PackedState::GetMaxCookieSize());
+  BOOST_CHECK(p2.GetCookie() == PackedState<>::GetMaxCookieSize());
 }
 
 
