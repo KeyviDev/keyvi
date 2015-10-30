@@ -71,6 +71,10 @@ script:
   - python setup.py build --mode $CONF
   - python setup.py install --user
   - py.test tests
+# workaround for coverage measurement: symlink cpp source:
+  - cd src
+  - ln -s ../../keyvi/src/cpp/ .
+  - cd ..
   - cd ..
 
 sudo: false
