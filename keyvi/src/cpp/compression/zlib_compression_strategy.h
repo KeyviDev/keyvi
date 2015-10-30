@@ -38,7 +38,7 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
   ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION)
     : compression_level_(compression_level) {}
 
-  std::string Compress(const char* raw, size_t raw_size) {
+  std::ostream& Compress(std::ostream& os, const char* raw, size_t raw_size) {
     z_stream zs;                        // z_stream is zlib's control structure
     memset(&zs, 0, sizeof(zs));
 
@@ -49,7 +49,8 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     zs.avail_in = raw_size;           // set the z_stream's input
 
     int ret;
-    std::string outstring(1, static_cast<char>(ZLIB_COMPRESSION));
+    size_t written = 0;
+    os << static_cast<char>(ZLIB_COMPRESSION);
 
     // retrieve the compressed bytes blockwise
     do {
@@ -58,9 +59,10 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
       ret = deflate(&zs, Z_FINISH);
 
-      if (outstring.size() - 1  < zs.total_out) {
+      if (written  < zs.total_out) {
         // append the block to the output string
-        outstring.append(zlib_buffer_, zs.total_out - outstring.size() + 1);
+        os.write(zlib_buffer_, zs.total_out - written);
+        written = zs.total_out;
       }
     } while (ret == Z_OK);
 
@@ -72,7 +74,7 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
       throw(std::runtime_error(oss.str()));
     }
 
-    return outstring;
+    return os;
   }
 
   inline std::string Decompress(const std::string& compressed) {
