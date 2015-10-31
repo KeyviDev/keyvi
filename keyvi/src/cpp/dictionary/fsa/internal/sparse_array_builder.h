@@ -481,7 +481,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
       if (!existing.IsEmpty()) {
         // if we are hitting this line minimization succeeded
         TRACE("found minimization, equal state: %d this->weight %d", existing.GetOffset(), unpacked_state.GetWeight());
-        uint32_t offset = existing.GetOffset();
+        OffsetTypeT offset = existing.GetOffset();
         if (unpacked_state.GetWeight() > 0) {
           UpdateWeightIfNeeded(offset, unpacked_state.GetWeight());
         }
@@ -492,7 +492,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
 
     // minimization failed, all predecessors of this state will not be minimized, so stop trying
     unpacked_state.IncrementNoMinimizationCounter();
-    uint32_t offset = FindFreeBucket(unpacked_state);
+    OffsetTypeT offset = FindFreeBucket(unpacked_state);
     //TRACE("write at %d", offset);
 
     WriteState(offset, unpacked_state);

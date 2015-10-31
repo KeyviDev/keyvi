@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
         { "\01cd", "aaaa", "aabb", "agbc", "ajcd", "azcd" };
     testing::TempDictionary dictionary(test_data);
     automata_t f = dictionary.GetFsa();
-  std::vector<uint32_t> outgoings;
+  std::vector<uint64_t> outgoings;
   std::vector<unsigned char> symbols;
 
   f->GetOutGoingTransitions(f->GetStartState(), outgoings, symbols);

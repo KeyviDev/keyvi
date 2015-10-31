@@ -53,7 +53,7 @@ final {
     MatchIterator::MatchIteratorPair GetCompletions(
         const char* query, int number_of_results = 10) {
 
-      uint32_t state = fsa_->GetStartState();
+      uint64_t state = fsa_->GetStartState();
       size_t query_length = strlen(query);
       size_t depth = 0;
 
@@ -140,7 +140,7 @@ final {
     MatchIterator::MatchIteratorPair GetFuzzyCompletions(
         const char* query, int max_edit_distance) {
 
-      uint32_t state = fsa_->GetStartState();
+      uint64_t state = fsa_->GetStartState();
       size_t query_length = strlen(query);
       size_t depth = 0;
       const size_t minimum_exact_prefix = 2;

@@ -313,9 +313,9 @@ final {
     internal::UnpackedStateStack<PersistenceT>* stack_;
     std::string last_key_ = std::string();
     size_t highest_stack_ = 0;
-    uint32_t number_of_keys_added_ = 0;
+    uint64_t number_of_keys_added_ = 0;
     generator_state state_ = generator_state::EMPTY;
-    uint32_t start_state_ = 0;
+    OffsetTypeT start_state_ = 0;
     uint64_t number_of_states_ = 0;
     boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
 
@@ -361,7 +361,7 @@ final {
         internal::UnpackedState<PersistenceT>* unpackedState = stack_->Get(
             highest_stack_);
 
-        uint32_t transitionPointer = builder_->PersistState(*unpackedState);
+        OffsetTypeT transitionPointer = builder_->PersistState(*unpackedState);
 
         // Save transition_pointer in previous stack, indicate whether it makes sense continuing minimization
         stack_->PushTransitionPointer(highest_stack_ - 1, transitionPointer,

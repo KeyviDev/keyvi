@@ -184,7 +184,7 @@ final {
       return PersistenceOrderToHostOrder(*ptr);
     }
 
-    uint32_t ResolveTransitionValue(size_t offset, BucketT value) const;
+    uint64_t ResolveTransitionValue(size_t offset, BucketT value) const;
 
     uint64_t ReadFinalValue(size_t offset) const;
 
@@ -333,14 +333,14 @@ final {
 
 
   template<>
-  inline uint32_t SparseArrayPersistence<uint32_t>::ResolveTransitionValue(size_t offset, uint32_t value) const {
+  inline uint64_t SparseArrayPersistence<uint32_t>::ResolveTransitionValue(size_t offset, uint32_t value) const {
     return value;
   }
 
   template<>
-  inline uint32_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t offset, uint16_t value) const {
+  inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t offset, uint16_t value) const {
     uint16_t pt = value;
-    uint32_t resolved_ptr;
+    uint64_t resolved_ptr;
 
     if ((pt & 0xC000) == 0xC000) {
       //TRACE("Compact Transition uint16 absolute");
