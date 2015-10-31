@@ -31,6 +31,9 @@
 #include "compression/zlib_compression_strategy.h"
 #include "compression/snappy_compression_strategy.h"
 
+//#define ENABLE_TRACING
+#include "dictionary/util/trace.h"
+
 namespace keyvi {
 namespace compression {
 

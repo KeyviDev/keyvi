@@ -26,6 +26,7 @@
 #define COMPRESSION_STRATEGY_H_
 
 #include <string>
+#include <cstring>
 
 namespace keyvi {
 namespace compression {
@@ -35,6 +36,9 @@ enum CompressionCode {
   ZLIB_COMPRESSION = 1,
   SNAPPY_COMPRESSION = 2,
 };
+
+// buffer type which is realloc-able
+typedef std::vector<char> buffer_t;
 
 /**
  * The base class of every compression strategy.
@@ -48,6 +52,8 @@ struct CompressionStrategy {
 
   virtual std::ostream& Compress(std::ostream& os,
                                  const char* raw, size_t raw_size) = 0;
+
+  virtual void Compress(buffer_t& buffer, const char* raw, size_t raw_size) = 0;
 
   inline std::ostream& Compress(std::ostream& os, const std::string& raw) {
     return Compress(os, raw.data(), raw.size());
@@ -81,6 +87,16 @@ struct RawCompressionStrategy final : public CompressionStrategy {
   inline std::ostream& Compress(std::ostream& os,
                                 const char* raw, size_t raw_size) {
     return DoCompress(os, raw, raw_size);
+  }
+
+  inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
+      DoCompress(buffer, raw, raw_size);
+    }
+
+
+  static inline void DoCompress(buffer_t& buffer, const char* raw, size_t raw_size) {
+    buffer.resize(raw_size);
+    std::memcpy(buffer.data(), raw, raw_size);
   }
 
   static std::ostream& DoCompress(std::ostream& os,

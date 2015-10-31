@@ -41,6 +41,19 @@ struct SnappyCompressionStrategy final : public CompressionStrategy {
     return DoCompress(os, raw, raw_size);
   }
 
+  inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
+    DoCompress(buffer, raw, raw_size);
+  }
+
+  static inline void DoCompress (buffer_t& buffer, const char* raw, size_t raw_size)
+  {
+      size_t output_length = snappy::MaxCompressedLength(raw_size);
+      buffer.resize(output_length + 1);
+      buffer[0] = static_cast<char>(SNAPPY_COMPRESSION);
+      snappy::RawCompress(raw, raw_size, buffer.data() + 1, &output_length);
+      buffer.resize(output_length + 1);
+  }
+
   static inline std::string DoCompress(const char* raw, size_t raw_size) {
     std::ostringstream ss;
     DoCompress(ss, raw, raw_size);

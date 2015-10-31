@@ -83,9 +83,10 @@ inline std::string DecodeJsonValue(const std::string& encoded_value) {
  * the specified threshold.
  */
 inline std::string EncodeJsonValue(
-    std::function<std::string(const char*, size_t)> long_compress,
-    std::function<std::string(const char*, size_t)> short_compress,
+    std::function<void (compression::buffer_t&, const char*, size_t)> long_compress,
+    std::function<void (compression::buffer_t&, const char*, size_t)> short_compress,
     msgpack::sbuffer& msgpack_buffer,
+    compression::buffer_t& buffer,
     const std::string& raw_value, size_t compression_threshold=32) {
   std::string packed_value;
   
@@ -102,13 +103,13 @@ inline std::string EncodeJsonValue(
 
   // compression
   if (msgpack_buffer.size() > compression_threshold) {
-    packed_value = long_compress(
+    long_compress(buffer,
         msgpack_buffer.data(), msgpack_buffer.size());
   } else {
-    packed_value = short_compress(
+    short_compress(buffer,
         msgpack_buffer.data(), msgpack_buffer.size());
   }
-
+  packed_value = std::string(reinterpret_cast<char*> (buffer.data()), buffer.size());
   TRACE("Packed value: %s", packed_value.c_str());
   return packed_value;
 }
@@ -123,11 +124,15 @@ inline std::string EncodeJsonValue(
 inline std::string EncodeJsonValue(const std::string& raw_value,
                                    size_t compression_threshold=32) {
   msgpack::sbuffer msgpack_buffer;
-  return EncodeJsonValue(static_cast<std::string(*)(const char*, size_t)>(
+  compression::buffer_t buffer;
+
+  //void (*f)(compression::buffer_t&, const char*, size_t) = &compression::SnappyCompressionStrategy::RawCompress;
+
+  return EncodeJsonValue(static_cast<void(*) (compression::buffer_t&, const char*, size_t)>(
                           &compression::SnappyCompressionStrategy::DoCompress),
-                         static_cast<std::string(*)(const char*, size_t)>(
+                          static_cast<void(*) (compression::buffer_t&, const char*, size_t)>(
                            &compression::RawCompressionStrategy::DoCompress),
-                         msgpack_buffer, raw_value, compression_threshold);
+                         msgpack_buffer, buffer, raw_value, compression_threshold);
 }
   
 
@@ -282,12 +287,19 @@ class JsonValueStore final : public IValueStoreWriter {
    */
   uint64_t GetValue(const value_t& value, bool& no_minimization) {
     msgpack_buffer_.clear();
-    std::string compressed = EncodeJsonValue(
-        long_compress_, short_compress_, msgpack_buffer_, value,
+
+    EncodeJsonValue(
+        long_compress_, short_compress_, msgpack_buffer_,
+        string_buffer_, value,
         compression_threshold_);
+
+    std::string compressed = std::string(string_buffer_.data(), string_buffer_.size);
+
+
     std::string packed_value;
-    dictionary::util::encodeVarint(compressed.size() + 1, packed_value);
-    packed_value += compressed;
+    dictionary::util::encodeVarint(compressed.size() + 1, string_buffer_);
+    //packed_value += compressed;
+    string_buffer_ << compressed;
 
     ++number_of_values_;
 
@@ -353,6 +365,7 @@ class JsonValueStore final : public IValueStoreWriter {
   size_t compression_threshold_;
 
   LeastRecentlyUsedGenerationsCache<RawPointer> hash_;
+  compression::buffer_t string_buffer_;
   msgpack::sbuffer msgpack_buffer_;
   size_t number_of_values_ = 0;
   size_t number_of_unique_values_ = 0;

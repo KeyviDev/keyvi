@@ -77,6 +77,50 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     return os;
   }
 
+  inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
+      DoCompress(buffer, raw, raw_size);
+    }
+
+
+  inline void DoCompress(buffer_t& buffer, const char* raw, size_t raw_size) {
+
+    z_stream zs;                        // z_stream is zlib's control structure
+    memset(&zs, 0, sizeof(zs));
+
+    if (deflateInit(&zs, compression_level_) != Z_OK)
+      throw(std::runtime_error("deflateInit failed while compressing."));
+
+    zs.next_in = (Bytef*)raw;
+    zs.avail_in = raw_size;           // set the z_stream's input
+
+    size_t output_length = deflateBound(&zs, raw_size);
+    buffer.resize(output_length + 1);
+
+    buffer[0] = static_cast<char>(ZLIB_COMPRESSION);
+
+
+    int ret;
+    size_t written = 0;
+
+    // compress bytes
+    zs.next_out = reinterpret_cast<Bytef*>(buffer.data() + 1);
+    zs.avail_out = sizeof(buffer.data() + 1);
+
+    ret = deflate(&zs, Z_FINISH);
+
+    output_length = zs.total_out;
+
+    deflateEnd(&zs);
+
+    if (ret != Z_STREAM_END) {          // an error occurred that was not EOF
+      std::ostringstream oss;
+      oss << "Exception during zlib compression: (" << ret << ") " << zs.msg;
+      throw(std::runtime_error(oss.str()));
+    }
+
+    buffer.resize(output_length + 1);
+  }
+
   inline std::string Decompress(const std::string& compressed) {
     return DoDecompress(compressed);
   }
