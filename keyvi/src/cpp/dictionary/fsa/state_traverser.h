@@ -40,7 +40,7 @@ final {
     StateTraverser(automata_t f) :StateTraverser (f, f->GetStartState()) {
     }
 
-    StateTraverser(automata_t f, uint32_t start_state, bool advance = true)
+    StateTraverser(automata_t f, uint64_t start_state, bool advance = true)
         : fsa_(f),
           current_depth_(0),
           current_label_(0) {
@@ -86,7 +86,7 @@ final {
       return fsa_->GetStateValue(current_state_);
     }
 
-    uint32_t GetStateId(){
+    uint64_t GetStateId(){
       return current_state_;
     }
 
@@ -109,7 +109,7 @@ final {
       }
 
       for (;;) {
-        uint32_t child_node = 0;
+        uint64_t child_node = 0;
 
         do {
           ++traversal_stack_[current_depth_];
@@ -163,9 +163,9 @@ final {
     automata_t fsa_;
     size_t current_depth_;
     unsigned char current_label_;
-    uint32_t current_state_;
+    uint64_t current_state_;
     std::vector<unsigned char> traversal_stack_;
-    std::vector<uint32_t> state_traversal_stack_;
+    std::vector<uint64_t> state_traversal_stack_;
   };
 
   } /* namespace fsa */

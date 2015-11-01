@@ -44,7 +44,7 @@ final {
       this->operator ++(0);
     }
 
-    CodePointStateTraverser(automata_t f, uint32_t state)
+    CodePointStateTraverser(automata_t f, uint64_t state)
         : wrapped_state_traverser_(f, state, false) {
       this->operator ++(0);
     }
@@ -120,7 +120,7 @@ final {
       return wrapped_state_traverser_.GetStateValue();
     }
 
-    uint32_t GetStateId() {
+    uint64_t GetStateId() {
       return wrapped_state_traverser_.GetStateId();
     }
 

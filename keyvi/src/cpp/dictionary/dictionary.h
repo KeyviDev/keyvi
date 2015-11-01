@@ -57,7 +57,7 @@ final {
       return fsa_->GetStatistics();
     }
 
-    uint32_t GetSize() const {
+    uint64_t GetSize() const {
       return fsa_->GetNumberOfKeys();
     }
 
@@ -168,7 +168,7 @@ final {
      * @return a match iterator of all the items
      */
     MatchIterator::MatchIteratorPair GetAllItems() const {
-      uint32_t state = fsa_->GetStartState();
+      uint64_t state = fsa_->GetStartState();
       std::vector<unsigned char> traversal_stack;
       traversal_stack.reserve(1024);
 
