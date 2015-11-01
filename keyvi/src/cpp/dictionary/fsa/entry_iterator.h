@@ -34,7 +34,7 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-class EntryIterator {
+class EntryIterator final{
 
  public:
   EntryIterator()
@@ -199,10 +199,10 @@ class EntryIterator {
   }
 
   automata_t fsa_;
-  uint32_t current_state_;
+  uint64_t current_state_;
   uint64_t current_value_;
   std::vector<unsigned char> traversal_stack_;
-  std::vector<std::vector<uint32_t>> state_vector_traversal_stack_;
+  std::vector<std::vector<uint64_t>> state_vector_traversal_stack_;
   std::vector<std::vector<unsigned char>> transitions_vector_traversal_stack_;
   std::vector<int> vector_offset_traversal_stack_;
   size_t current_depth_ = 0;

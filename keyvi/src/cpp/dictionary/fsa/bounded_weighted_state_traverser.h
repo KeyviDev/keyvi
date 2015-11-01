@@ -43,7 +43,7 @@ final {
                                         top_number_of_results) {
     }
 
-    BoundedWeightedStateTraverser(automata_t f, uint32_t start_state,
+    BoundedWeightedStateTraverser(automata_t f, uint64_t start_state,
                                   size_t top_number_of_results, bool advance =
                                       true)
         : fsa_(f),
@@ -96,7 +96,7 @@ final {
       return fsa_->GetWeightValue(current_state_);
     }
 
-    uint32_t GetStateId() {
+    uint64_t GetStateId() {
       return current_state_;
     }
 
@@ -129,7 +129,7 @@ final {
       TRACE("finding next state");
       traversal_entry_t traversal_entry;
       for (;;) {
-        uint32_t child_node = 0;
+        uint64_t child_node = 0;
         uint32_t weight = 0;
         traversal_entry = entry_traversal_stack_.back();
         TRACE("remaining transitions at %d %d", current_depth_, traversal_entry.size());
@@ -209,10 +209,10 @@ final {
     typedef std::deque<std::pair<uint32_t, unsigned char>> traversal_entry_t;
 
     automata_t fsa_;
-    uint32_t current_state_ = 0;
+    uint64_t current_state_ = 0;
     unsigned char current_label_ = 0;
     int current_depth_ = 0;
-    std::vector<uint32_t> state_traversal_stack_;
+    std::vector<uint64_t> state_traversal_stack_;
     std::vector<traversal_entry_t> entry_traversal_stack_;
     util::BoundedPriorityQueue<uint32_t> priority_queue_;
 
@@ -223,7 +223,7 @@ final {
     ;
 
     void GetNextTransitionsInSortedOrder(uint32_t parent_weight) {
-      uint32_t child_node;
+      uint64_t child_node;
       traversal_entry_t outgoing_transitions;
       for (int i = 1; i < 256; ++i) {
         child_node = fsa_->TryWalkTransition(current_state_, i);

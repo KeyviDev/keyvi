@@ -52,7 +52,7 @@ public:
     MatchIterator::MatchIteratorPair GetCompletions(
         const char* query, int number_of_results = 10) {
 
-      uint32_t state = fsa_->GetStartState();
+      uint64_t state = fsa_->GetStartState();
       size_t number_of_tokens;
       std::string query_bow = util::Transform::BagOfWordsPartial(query, number_of_tokens);
 

@@ -134,15 +134,15 @@ final {
      *
      * @return index of root state.
      */
-    uint32_t GetStartState() const {
-      return automata_properties_.get<uint32_t>("start_state");
+    uint64_t GetStartState() const {
+      return automata_properties_.get<uint64_t>("start_state");
     }
 
-    uint32_t GetNumberOfKeys() const {
-      return automata_properties_.get<uint32_t>("number_of_keys");
+    uint64_t GetNumberOfKeys() const {
+      return automata_properties_.get<uint64_t>("number_of_keys");
     }
 
-    uint32_t TryWalkTransition(uint32_t starting_state, unsigned char c) const {
+    uint64_t TryWalkTransition(uint64_t starting_state, unsigned char c) const {
       if (labels_[starting_state + c] == c) {
         return ResolvePointer(starting_state, c);
       }
@@ -156,13 +156,10 @@ final {
      * @param outgoing_states a vector given by reference to put n the outgoing states
      * @param outgoing_symbols a vector given by reference to put in the outgoing symbols (labels)
      */
-    void GetOutGoingTransitions(uint32_t starting_state, std::vector<uint32_t>& outgoing_states,
+    void GetOutGoingTransitions(uint64_t starting_state, std::vector<uint64_t>& outgoing_states,
                                 std::vector<unsigned char>& outgoing_symbols) const {
       outgoing_states.clear();
       outgoing_symbols.clear();
-
-      std::vector<uint32_t> outgoing_states2;
-      std::vector<unsigned char> outgoing_symbols2;
 
 #if defined(KEYVI_SSE42)
       // Optimized version using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
@@ -260,7 +257,7 @@ final {
       return;
     }
 
-    bool IsFinalState(uint32_t state_to_check) const {
+    bool IsFinalState(uint64_t state_to_check) const {
 
       if (labels_[state_to_check + FINAL_OFFSET_TRANSITION] == FINAL_OFFSET_CODE) {
         return true;
@@ -268,7 +265,7 @@ final {
       return false;
     }
 
-    uint64_t GetStateValue(uint32_t state) const {
+    uint64_t GetStateValue(uint64_t state) const {
       if (!compact_size_) {
         return be32toh(transitions_[state + FINAL_OFFSET_TRANSITION]);
       }
@@ -277,7 +274,7 @@ final {
       return util::decodeVarshort(transitions_compact_ + state + FINAL_OFFSET_TRANSITION);
     }
 
-    uint32_t GetWeightValue(uint32_t state) const {
+    uint32_t GetWeightValue(uint64_t state) const {
       if (!compact_size_) {
         if (labels_[state + INNER_WEIGHT_TRANSITION] != 0) {
           return 0;
@@ -341,13 +338,13 @@ final {
     uint16_t* transitions_compact_;
     bool compact_size_;
 
-    inline uint32_t ResolvePointer(uint32_t starting_state, unsigned char c) const {
+    inline uint64_t ResolvePointer(uint64_t starting_state, unsigned char c) const {
       if (!compact_size_) {
         return be32toh(transitions_[starting_state + c]);
       }
 
       uint16_t pt = le16toh(transitions_compact_[starting_state + c]);
-      uint32_t resolved_ptr;
+      uint64_t resolved_ptr;
 
       if ((pt & 0xC000) == 0xC000) {
         TRACE("Compact Transition uint16 absolute");
