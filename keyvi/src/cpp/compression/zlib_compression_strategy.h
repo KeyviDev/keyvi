@@ -128,7 +128,6 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
  private:
   int compression_level_;
-  char zlib_buffer_[32768];
 };
 
 } /* namespace compression */
