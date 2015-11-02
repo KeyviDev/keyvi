@@ -83,9 +83,10 @@ inline std::string DecodeJsonValue(const std::string& encoded_value) {
  * the specified threshold.
  */
 inline std::string EncodeJsonValue(
-    std::function<std::string(const char*, size_t)> long_compress,
-    std::function<std::string(const char*, size_t)> short_compress,
+    std::function<void (compression::buffer_t&, const char*, size_t)> long_compress,
+    std::function<void (compression::buffer_t&, const char*, size_t)> short_compress,
     msgpack::sbuffer& msgpack_buffer,
+    compression::buffer_t& buffer,
     const std::string& raw_value, size_t compression_threshold=32) {
   std::string packed_value;
   
@@ -102,13 +103,13 @@ inline std::string EncodeJsonValue(
 
   // compression
   if (msgpack_buffer.size() > compression_threshold) {
-    packed_value = long_compress(
+    long_compress(buffer,
         msgpack_buffer.data(), msgpack_buffer.size());
   } else {
-    packed_value = short_compress(
+    short_compress(buffer,
         msgpack_buffer.data(), msgpack_buffer.size());
   }
-
+  packed_value = std::string(reinterpret_cast<char*> (buffer.data()), buffer.size());
   TRACE("Packed value: %s", packed_value.c_str());
   return packed_value;
 }
@@ -123,11 +124,13 @@ inline std::string EncodeJsonValue(
 inline std::string EncodeJsonValue(const std::string& raw_value,
                                    size_t compression_threshold=32) {
   msgpack::sbuffer msgpack_buffer;
-  return EncodeJsonValue(static_cast<std::string(*)(const char*, size_t)>(
+  compression::buffer_t buffer;
+
+  return EncodeJsonValue(static_cast<void(*) (compression::buffer_t&, const char*, size_t)>(
                           &compression::SnappyCompressionStrategy::DoCompress),
-                         static_cast<std::string(*)(const char*, size_t)>(
+                          static_cast<void(*) (compression::buffer_t&, const char*, size_t)>(
                            &compression::RawCompressionStrategy::DoCompress),
-                         msgpack_buffer, raw_value, compression_threshold);
+                         msgpack_buffer, buffer, raw_value, compression_threshold);
 }
   
 
@@ -193,10 +196,19 @@ class JsonValueStore final : public IValueStoreWriter {
   template<class PersistenceT>
   struct RawPointerForCompare final {
    public:
-    RawPointerForCompare(const std::string& value, PersistenceT* persistence)
-        : value_(value), persistence_(persistence) {
-      hashcode_ = std::hash<value_t>()(value);
-      length_ = value.size();
+    RawPointerForCompare(const char* value, size_t value_size, PersistenceT* persistence)
+        : value_(value), value_size_(value_size), persistence_(persistence) {
+
+      // calculate a hashcode
+      int32_t h = 31;
+
+      for(size_t i = 0; i < value_size_; ++i) {
+        h = (h * 54059) ^ (value[i] * 76963);
+      }
+
+      TRACE("hashcode %d", h);
+
+      hashcode_ = h;
     }
 
     int GetHashcode() const {
@@ -204,27 +216,41 @@ class JsonValueStore final : public IValueStoreWriter {
     }
 
     bool operator==(const RawPointer& l) const {
+      TRACE("check equality, 1st hashcode");
+
       // First filter - check if hash code  is the same
       if (l.GetHashcode() != hashcode_) {
         return false;
       }
 
-      TRACE("check");
+      TRACE("check equality, 2nd length");
       size_t length_l = l.GetLength();
 
-      if (length_l < USHRT_MAX && length_l != length_) {
-        return false;
+      if (length_l < USHRT_MAX) {
+        if (length_l != value_size_) {
+          return false;
+        }
+
+        TRACE("check equality, 3rd buffer %d %d %d", l.GetOffset(), value_size_, util::getVarintLength(length_l));
+        // we know the length, skip the length byte and compare the value
+        return persistence_->Compare(l.GetOffset() + util::getVarintLength(length_l), (void*) value_, value_size_);
       }
 
-      TRACE("Compare values at data level length: %d %d", l.GetOffset(), value_.size());
-      return persistence_->Compare(l.GetOffset(), (void*) value_.data(), value_.size());
+      // we do not know the length, first get it, then compare
+      char buf[8];
+      persistence_->GetBuffer(l.GetOffset(), buf, 8);
+
+      length_l = util::decodeVarint((uint8_t*)buf);
+
+      TRACE("check equality, 3rd buffer %d %d", l.GetOffset(), value_size_);
+      return persistence_->Compare(l.GetOffset() + util::getVarintLength(length_l), (void*) value_, value_size_);
     }
 
    private:
-    std::string value_;
+    const char* value_;
+    size_t value_size_;
     PersistenceT* persistence_;
     int32_t hashcode_;
-    size_t length_;
   };
 
   typedef std::string value_t;
@@ -255,10 +281,10 @@ class JsonValueStore final : public IValueStoreWriter {
     // This is beyond ugly, but needed for EncodeJsonValue :(
     long_compress_ = std::bind(static_cast<compression::compress_mem_fn_t>
         (&compression::CompressionStrategy::Compress),
-        compressor_.get(), std::placeholders::_1, std::placeholders::_2);
+        compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     short_compress_ = std::bind(static_cast<compression::compress_mem_fn_t>
         (&compression::CompressionStrategy::Compress),
-        raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2);
+        raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
     size_t external_memory_chunk_size = 1073741824;
 
@@ -282,16 +308,15 @@ class JsonValueStore final : public IValueStoreWriter {
    */
   uint64_t GetValue(const value_t& value, bool& no_minimization) {
     msgpack_buffer_.clear();
-    std::string compressed = EncodeJsonValue(
-        long_compress_, short_compress_, msgpack_buffer_, value,
+
+    EncodeJsonValue(
+        long_compress_, short_compress_, msgpack_buffer_,
+        string_buffer_, value,
         compression_threshold_);
-    std::string packed_value;
-    dictionary::util::encodeVarint(compressed.size() + 1, packed_value);
-    packed_value += compressed;
 
     ++number_of_values_;
 
-    const RawPointerForCompare<MemoryMapManager> stp(packed_value,
+    const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(),
                                                      values_extern_);
     const RawPointer p = hash_.Get(stp);
 
@@ -307,12 +332,15 @@ class JsonValueStore final : public IValueStoreWriter {
 
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
 
-    values_extern_->Append(values_buffer_size_, (void*)packed_value.data(),
-                           packed_value.size());
-    values_buffer_size_ += packed_value.size();
+    dictionary::util::encodeVarint(string_buffer_.size(), *values_extern_);
+    values_buffer_size_ += util::getVarintLength(string_buffer_.size());
 
-    TRACE("add value to hash at %d, length %d", pt, packed_value.size());
-    hash_.Add(RawPointer(pt, stp.GetHashcode(), packed_value.size()));
+    values_extern_->Append((void*)string_buffer_.data(),
+                           string_buffer_.size());
+    values_buffer_size_ += string_buffer_.size();
+
+    TRACE("add value to hash at %d, length %d", pt, string_buffer_.size());
+    hash_.Add(RawPointer(pt, stp.GetHashcode(), string_buffer_.size()));
 
     return pt;
   }
@@ -348,11 +376,12 @@ class JsonValueStore final : public IValueStoreWriter {
    */
   std::unique_ptr<compression::CompressionStrategy> compressor_;
   std::unique_ptr<compression::CompressionStrategy> raw_compressor_;
-  std::function<std::string(const char*, size_t)> long_compress_;
-  std::function<std::string(const char*, size_t)> short_compress_;
+  std::function<void (compression::buffer_t&, const char*, size_t)> long_compress_;
+  std::function<void (compression::buffer_t&, const char*, size_t)> short_compress_;
   size_t compression_threshold_;
 
   LeastRecentlyUsedGenerationsCache<RawPointer> hash_;
+  compression::buffer_t string_buffer_;
   msgpack::sbuffer msgpack_buffer_;
   size_t number_of_values_ = 0;
   size_t number_of_unique_values_ = 0;

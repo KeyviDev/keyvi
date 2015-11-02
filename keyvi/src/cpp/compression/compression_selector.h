@@ -28,8 +28,12 @@
 #include <string>
 #include <boost/algorithm/string.hpp>
 
+#include "compression/compression_strategy.h"
 #include "compression/zlib_compression_strategy.h"
 #include "compression/snappy_compression_strategy.h"
+
+//#define ENABLE_TRACING
+#include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace compression {
@@ -54,7 +58,8 @@ inline CompressionStrategy* compression_strategy(const std::string& name = "")
 }
 
 typedef std::string (*decompress_func_t) (const std::string&);
-typedef std::string (CompressionStrategy::*compress_mem_fn_t) (const char*, size_t);
+typedef void (CompressionStrategy::*compress_mem_fn_t) (buffer_t&, const char*, size_t);
+
 
 inline decompress_func_t decompressor_by_code(const std::string& s) {
   switch (s[0]) {
