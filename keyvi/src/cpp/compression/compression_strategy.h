@@ -50,23 +50,16 @@ typedef std::vector<char> buffer_t;
 struct CompressionStrategy {
   virtual ~CompressionStrategy() = default;
 
-  virtual std::ostream& Compress(std::ostream& os,
-                                 const char* raw, size_t raw_size) = 0;
-
   virtual void Compress(buffer_t& buffer, const char* raw, size_t raw_size) = 0;
-
-  inline std::ostream& Compress(std::ostream& os, const std::string& raw) {
-    return Compress(os, raw.data(), raw.size());
-  }
 
   inline std::string Compress(const std::string& raw) {
     return Compress(raw.data(), raw.size());
   }
 
   inline std::string Compress(const char* raw, size_t raw_size) {
-    std::ostringstream ss;
-    Compress(ss, raw, raw_size);
-    return ss.str();
+    buffer_t buf;
+    Compress(buf, raw, raw_size);
+    return std::string(buf.data(), buf.size());
   }
 
   /**
@@ -84,11 +77,6 @@ struct CompressionStrategy {
  * the length field.
  */
 struct RawCompressionStrategy final : public CompressionStrategy {
-  inline std::ostream& Compress(std::ostream& os,
-                                const char* raw, size_t raw_size) {
-    return DoCompress(os, raw, raw_size);
-  }
-
   inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
       DoCompress(buffer, raw, raw_size);
     }
@@ -100,17 +88,10 @@ struct RawCompressionStrategy final : public CompressionStrategy {
     std::memcpy(buffer.data() + 1, raw, raw_size);
   }
 
-  static std::ostream& DoCompress(std::ostream& os,
-                                  const char* raw, size_t raw_size) {
-    os << static_cast<char>(NO_COMPRESSION);
-    os.write(raw, raw_size);
-    return os;
-  }
-
   static inline std::string DoCompress(const char* raw, size_t raw_size) {
-    std::ostringstream ss;
-    DoCompress(ss, raw, raw_size);
-    return ss.str();
+    buffer_t buf;
+    DoCompress(buf, raw, raw_size);
+    return std::string(buf.data(), buf.size());
   }
 
   inline std::string Decompress(const std::string& compressed) {

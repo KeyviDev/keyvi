@@ -36,11 +36,6 @@ namespace compression {
 
 /** A compression strategy that wraps snappy. */
 struct SnappyCompressionStrategy final : public CompressionStrategy {
-  inline std::ostream& Compress(std::ostream& os,
-                                const char* raw, size_t raw_size) {
-    return DoCompress(os, raw, raw_size);
-  }
-
   inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
     DoCompress(buffer, raw, raw_size);
   }
@@ -55,18 +50,9 @@ struct SnappyCompressionStrategy final : public CompressionStrategy {
   }
 
   static inline std::string DoCompress(const char* raw, size_t raw_size) {
-    std::ostringstream ss;
-    DoCompress(ss, raw, raw_size);
-    return ss.str();
-  }
-
-  static std::ostream& DoCompress(std::ostream& os,
-                                  const char* raw, size_t raw_size) {
-    os << static_cast<char>(SNAPPY_COMPRESSION);
-    std::string compressed;
-    snappy::Compress(raw, raw_size, &compressed);
-    os << compressed;
-    return os;
+    buffer_t buf;
+    DoCompress(buf, raw, raw_size);
+    return std::string(buf.data(), buf.size());
   }
 
   inline std::string Decompress(const std::string& compressed) {
