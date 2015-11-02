@@ -45,7 +45,7 @@ class EntryIterator final{
 
   EntryIterator(automata_t f) : EntryIterator(f, f->GetStartState()) {}
 
-  EntryIterator(automata_t f, int start_state)
+  EntryIterator(automata_t f, uint64_t start_state)
       : fsa_(f) {
     if (f && f->GetNumberOfKeys() > 0) {
       current_state_ = start_state;
