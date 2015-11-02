@@ -104,7 +104,7 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
     // compress bytes
     zs.next_out = reinterpret_cast<Bytef*>(buffer.data() + 1);
-    zs.avail_out = sizeof(buffer.data() + 1);
+    zs.avail_out = buffer.size() - 1;
 
     ret = deflate(&zs, Z_FINISH);
 

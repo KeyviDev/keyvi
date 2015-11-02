@@ -80,6 +80,23 @@ void encodeVarshort(int_t value, uint16_t* output, uint8_t* outputSizePtr) {
 }
 
 /**
+ * Get required length of variable int.
+ * @param value
+ * @return required size
+ */
+template<typename int_t = uint64_t>
+size_t getVarintLength(int_t value){
+  size_t length = 1;
+  while (value > 127) {
+    ++length;
+    //Remove the seven bits we just checked
+    value >>= 7;
+  }
+
+  return length;
+}
+
+/**
  * Get required length of variable short.
  * @param value
  * @return required size

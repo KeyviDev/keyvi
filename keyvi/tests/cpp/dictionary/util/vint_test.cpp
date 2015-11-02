@@ -104,6 +104,32 @@ BOOST_AUTO_TEST_CASE( VShortSimple2) {
   BOOST_CHECK_EQUAL(pointer, resolved_ptr);
 }
 
+BOOST_AUTO_TEST_CASE( VIntLength) {
+  uint8_t buffer[32];
+  uint8_t size;
+
+  encodeVarint(77777, buffer, &size);
+  BOOST_CHECK_EQUAL(util::getVarintLength(77777), size);
+  BOOST_CHECK_EQUAL(77777, decodeVarint(buffer));
+
+  encodeVarint(127, buffer, &size);
+  BOOST_CHECK_EQUAL(util::getVarintLength(1), size);
+  BOOST_CHECK_EQUAL(127, decodeVarint(buffer));
+
+  encodeVarint(0x40000000, buffer, &size);
+  BOOST_CHECK_EQUAL(util::getVarintLength(0x40000000), size);
+  BOOST_CHECK_EQUAL(0x40000000, decodeVarint(buffer));
+
+  encodeVarint(0x200000000000, buffer, &size);
+
+  BOOST_CHECK_EQUAL(util::getVarintLength(0x200000000000), size);
+  BOOST_CHECK_EQUAL(0x200000000000, decodeVarint<uint64_t>(buffer));
+
+  uint64_t x = 11687;
+  BOOST_CHECK_EQUAL(2, util::getVarintLength(x));
+  encodeVarint(x, buffer, &size);
+  BOOST_CHECK_EQUAL(2, size);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

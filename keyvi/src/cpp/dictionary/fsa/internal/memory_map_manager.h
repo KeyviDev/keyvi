@@ -97,6 +97,14 @@ final {
       std::memcpy((char*) buffer + first_chunk_size, (char*) chunk_address_part2, second_chunk_size);
     }
 
+    /**
+     * DEPRECATED: Append to the buffer starting from the given offset.
+     * Note: Append(buffer, buffer_length) shall be used instead.
+     *
+     * @param offset offset at where to append.
+     * @param buffer the buffer to append.
+     * @param buffer_length the buffer length to append.
+     */
     void Append(size_t offset, void* buffer, size_t buffer_length){
       size_t chunk_number = offset / chunk_size_;
       size_t chunk_offset = offset % chunk_size_;
@@ -110,6 +118,40 @@ final {
         void* chunk_address_part2 = GetChunk(chunk_number + 1);
         std::memcpy((char*)chunk_address_part2, (char*)buffer + first_chunk_size, buffer_length - first_chunk_size);
       }
+
+      tail_ = offset + buffer_length;
+    }
+
+    /**
+     * Append to the buffer at the current tail.
+     *
+     * @param buffer the buffer to append
+     * @param buffer_length the buffer length to append
+     */
+    void Append(void* buffer, size_t buffer_length){
+      size_t chunk_number = tail_ / chunk_size_;
+      size_t chunk_offset = tail_ % chunk_size_;
+
+      void* chunk_address = GetChunk(chunk_number);
+      size_t first_chunk_size = std::min(buffer_length, chunk_size_ - chunk_offset);
+      std::memcpy((char*)chunk_address + chunk_offset, buffer, first_chunk_size);
+
+      // handle overflow
+      if (buffer_length != first_chunk_size) {
+        void* chunk_address_part2 = GetChunk(chunk_number + 1);
+        std::memcpy((char*)chunk_address_part2, (char*)buffer + first_chunk_size, buffer_length - first_chunk_size);
+      }
+
+      tail_ += buffer_length;
+    }
+
+    void push_back(const char c){
+      size_t chunk_number = tail_ / chunk_size_;
+      size_t chunk_offset = tail_ % chunk_size_;
+
+      char* chunk_address = static_cast<char*> (GetChunk(chunk_number));
+      chunk_address[chunk_offset] = c;
+      ++tail_;
     }
 
     bool Compare(size_t offset, void* buffer, size_t buffer_length){
@@ -148,6 +190,10 @@ final {
         stream.write (ptr, end - ((number_of_chunks - 1) * chunk_size_));
     }
 
+   size_t GetSize() const {
+     return tail_;
+   }
+
    private:
     struct mapping {
       boost::interprocess::file_mapping* mapping_;
@@ -158,6 +204,7 @@ final {
     std::vector<mapping> mappings_;
     boost::filesystem::path directory_;
     boost::filesystem::path filename_pattern_;
+    size_t tail_ = 0;
 
     void* GetChunk(size_t chunk_number) {
       while (chunk_number >= mappings_.size()) {

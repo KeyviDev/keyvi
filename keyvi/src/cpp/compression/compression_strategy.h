@@ -44,7 +44,7 @@ typedef std::vector<char> buffer_t;
  * The base class of every compression strategy.
  *
  * All strategies (aside from RawCompressionStrategy) should insert the
- * comression code (see above) as the first character of the encoded string.
+ * compression code (see above) as the first character of the encoded string.
  * The code will also have to be taken into account in the decompress method.
  */
 struct CompressionStrategy {
