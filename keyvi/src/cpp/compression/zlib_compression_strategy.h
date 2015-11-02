@@ -98,7 +98,6 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
     buffer[0] = static_cast<char>(ZLIB_COMPRESSION);
 
-
     int ret;
     size_t written = 0;
 

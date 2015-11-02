@@ -95,8 +95,9 @@ struct RawCompressionStrategy final : public CompressionStrategy {
 
 
   static inline void DoCompress(buffer_t& buffer, const char* raw, size_t raw_size) {
-    buffer.resize(raw_size);
-    std::memcpy(buffer.data(), raw, raw_size);
+    buffer.resize(raw_size + 1);
+    buffer[0] = static_cast<char>(NO_COMPRESSION);
+    std::memcpy(buffer.data() + 1, raw, raw_size);
   }
 
   static std::ostream& DoCompress(std::ostream& os,
