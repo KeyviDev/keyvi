@@ -210,9 +210,7 @@ final {
 
       size_t commonPrefixLength = get_common_prefix_length(last_key_.c_str(), key);
 
-      size_t key_length = input_key.size();
-
-      if (commonPrefixLength == input_key.size() && last_key_.size() == key_length) {
+      if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {
         last_key_ = key;
         return;
       }
@@ -221,12 +219,12 @@ final {
       ConsumeStack(commonPrefixLength);
 
       // put everything that is not common between the two strings (the suffix) into the stack
-      FeedStack(commonPrefixLength, key_length, key, value);
+      FeedStack(commonPrefixLength, input_key.size(), key, value);
 
       // if inner weights are used update them
       uint32_t weight = value_store_->GetWeightValue(value);
       if (weight > 0){
-        stack_->UpdateWeights(0, key_length + 1, weight);
+        stack_->UpdateWeights(0, input_key.size() + 1, weight);
       }
 
       last_key_ = key;
