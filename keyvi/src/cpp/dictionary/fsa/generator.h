@@ -203,17 +203,16 @@ final {
      * @param input_key The input key.
      * @param value A value (depending on the Valuestore implementation).
      */
-    template<typename StringType>
-    void Add(StringType input_key, typename ValueStoreT::value_t value =
+    void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                  ValueStoreT::no_value) {
 
-      const char* key = c_stringify(input_key);
+      const char* key = input_key.c_str();
 
       size_t commonPrefixLength = get_common_prefix_length(last_key_.c_str(), key);
 
-      size_t key_length = strlen(key);
+      size_t key_length = input_key.size();
 
-      if (commonPrefixLength == key_length && last_key_.size() == key_length) {
+      if (commonPrefixLength == input_key.size() && last_key_.size() == key_length) {
         last_key_ = key;
         return;
       }
