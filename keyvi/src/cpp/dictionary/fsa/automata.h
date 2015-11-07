@@ -32,6 +32,7 @@
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/value_store_factory.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
+#include "dictionary/fsa/internal/traversal_helpers.h"
 #include "dictionary/util/vint.h"
 #include "dictionary/util/endian.h"
 #include "dictionary/fsa/internal/intrinsics.h"
@@ -255,6 +256,19 @@ final {
 #endif
 
       return;
+    }
+
+    /**
+     * Get the outgoing states of state quickly in 1 step.
+     *
+     * @param starting_state The state
+     * @param outgoing_states a vector given by reference to put n the outgoing states
+     * @param outgoing_symbols a vector given by reference to put in the outgoing symbols (labels)
+     */
+    void GetOutGoingTransitions(uint64_t starting_state, internal::TraversalState& traversal_state) const {
+      // reset the state
+      traversal_state.position = 0;
+      return GetOutGoingTransitions(starting_state, traversal_state.states, traversal_state.transitions);
     }
 
     bool IsFinalState(uint64_t state_to_check) const {
