@@ -16,3 +16,18 @@ To create a dpkg (debian/ubuntu package) run:
 
     scons mode=release debian
 
+
+### Pre-Requisites
+
+#### Manually Installing on MAC
+
+    brew install boost --c++11
+    brew install scons
+    brew install snappy
+    brew install lzlib
+    brew install cmake
+    
+For python-keyvi:
+    
+    pip install cython
+
