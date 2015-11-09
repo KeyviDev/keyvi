@@ -73,24 +73,24 @@ final {
       return fsa_;
     }
 
-    bool IsFinalState() {
+    bool IsFinalState() const {
       return fsa_->IsFinalState(current_state_);
     }
 
-    size_t GetDepth() {
+    size_t GetDepth() const {
       return stack_.GetDepth();
     }
 
-    uint64_t GetStateValue() {
+    uint64_t GetStateValue() const {
       return fsa_->GetStateValue(current_state_);
     }
 
-    uint64_t GetStateId(){
+    uint64_t GetStateId() const {
       return current_state_;
     }
 
-    internal::IValueStoreReader::attributes_t GetValueAsAttributeVector(){
-          return fsa_->GetValueAsAttributeVector(GetStateValue());
+    internal::IValueStoreReader::attributes_t GetValueAsAttributeVector() const {
+      return fsa_->GetValueAsAttributeVector(GetStateValue());
     }
 
     void Prune() {
@@ -132,7 +132,7 @@ final {
 
     }
 
-    unsigned char GetStateLabel() {
+    unsigned char GetStateLabel() const {
       return current_label_;
     }
 
