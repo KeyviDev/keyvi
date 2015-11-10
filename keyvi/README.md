@@ -19,7 +19,13 @@ To create a dpkg (debian/ubuntu package) run:
 
 ### Pre-Requisites
 
-#### Manually Installing on MAC
+#### Linux
+
+In addition to a working gcc build environment, install the following libraries, e.g. using apt: boost (dev packages), scons, snappy, zlib, cmake.
+
+#### MAC
+
+In addtion to a working build setup (Xcode) install the following libraries using homebrew:
 
     brew install boost --c++11
     brew install scons
@@ -27,7 +33,9 @@ To create a dpkg (debian/ubuntu package) run:
     brew install lzlib
     brew install cmake
     
-For python-keyvi:
+Now you should be able to compile as explained above.
+    
+For python-keyvi you need cython:
     
     pip install cython
 
