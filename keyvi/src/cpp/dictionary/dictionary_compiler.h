@@ -322,13 +322,13 @@ inline void DictionaryCompiler<PersistenceT, ValueStoreT>::CreateGenerator()
 {
   // todo: find good parameters for auto-guessing this
   if (size_of_keys_ > UINT32_MAX){
-    if (memory_limit_ > (10 * 1024 * 1024 * 1024)) {
+    if (memory_limit_ > 0x280000000UL /* 10 GB */)  {
       generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(memory_limit_, value_store_params_);
     } else {
       generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(memory_limit_, value_store_params_);
     }
   } else {
-    if (memory_limit_ > (5 * 1024 * 1024 * 1024)) {
+    if (memory_limit_ > 0x140000000UL) /* 5GB */ {
       generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(memory_limit_, value_store_params_);
     } else {
       generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit_, value_store_params_);
