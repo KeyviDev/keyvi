@@ -491,6 +491,110 @@ final {
     }
   };
 
+/**
+ * Get the outgoing states of state quickly in 1 step.
+ *
+ * @param starting_state The state
+ * @param outgoing_states a vector given by reference to put n the outgoing states
+ * @param outgoing_symbols a vector given by reference to put in the outgoing symbols (labels)
+ *
+ * todo: rewrite to avoid push_back on vectors, see: http://lemire.me/blog/2012/06/20/do-not-waste-time-with-stl-vectors/
+ */
+template<>
+inline void Automata::GetOutGoingTransitions(uint64_t starting_state, internal::TraversalState<internal::WeightedTransition>& traversal_state) const {
+  // reset the state
+  traversal_state.position = 0;
+  traversal_state.transitions_.clear();
+
+#if defined(KEYVI_SSE42)
+  // Optimized version using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
+
+  __m128i* labels_as_m128 = (__m128i *) (labels_ + starting_state);
+  __m128i* mask_as_m128 = (__m128i *) (OUTGOING_TRANSITIONS_MASK);
+  unsigned char symbol = 0;
+
+  // check 16 bytes at a time
+  for (int offset = 0; offset < 16; ++offset) {
+    __m128i mask = _mm_cmpestrm(_mm_loadu_si128(labels_as_m128), 16,
+                        _mm_loadu_si128(mask_as_m128), 16,
+                        _SIDD_UBYTE_OPS|_SIDD_CMP_EQUAL_EACH|_SIDD_MASKED_POSITIVE_POLARITY|_SIDD_BIT_MASK);
+
+    uint64_t mask_int = ((uint64_t*)&mask)[0];
+    TRACE ("Bitmask %d", mask_int);
+
+    if (mask_int != 0) {
+      if (offset == 0) {
+        // in this case we have to ignore the first bit, so start counting from 1
+        mask_int = mask_int >> 1;
+        for (auto i=1; i<16; ++i) {
+          if ((mask_int & 1) == 1) {
+            TRACE("push symbol+%d", symbol + i);
+            uint64_t child_state = ResolvePointer(starting_state, symbol + i);
+            traversal_state.Add(child_state, GetWeightValue(child_state), symbol + i);
+          }
+          mask_int = mask_int >> 1;
+        }
+      } else {
+        for (auto i=0; i<16; ++i) {
+          if ((mask_int & 1) == 1) {
+            TRACE("push symbol+%d", symbol + i);
+            uint64_t child_state = ResolvePointer(starting_state, symbol + i);
+            traversal_state.Add(child_state, GetWeightValue(child_state), symbol + i);
+          }
+          mask_int = mask_int >> 1;
+        }
+      }
+    }
+
+    ++labels_as_m128;
+    ++mask_as_m128;
+    symbol +=16;
+  }
+#else
+  uint64_t* labels_as_ll = (unsigned long int *) (labels_ + starting_state);
+  uint64_t* mask_as_ll = (unsigned long int *) (OUTGOING_TRANSITIONS_MASK);
+  unsigned char symbol = 0;
+
+  // check 8 bytes at a time
+  for (int offset = 0; offset < 32; ++offset) {
+
+    uint64_t xor_labels_with_mask = *labels_as_ll^*mask_as_ll;
+
+    if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0) && offset > 0){
+      traversal_state.Add(ResolvePointer(starting_state, symbol), symbol);
+    }
+    if ((xor_labels_with_mask & 0x000000000000ff00ULL)== 0){
+      traversal_state.Add(ResolvePointer(starting_state, symbol + 1), symbol + 1);
+    }
+    if ((xor_labels_with_mask & 0x0000000000ff0000ULL)== 0){
+      traversal_state.Add(ResolvePointer(starting_state, symbol + 2), symbol + 2);
+    }
+    if ((xor_labels_with_mask & 0x00000000ff000000ULL)== 0){
+      traversal_state.Add(ResolvePointer(starting_state, symbol + 3), symbol + 3);
+    }
+    if ((xor_labels_with_mask & 0x000000ff00000000ULL)== 0){
+      traversal_state.Add(ResolvePointer(starting_state, symbol + 4), symbol + 4);
+    }
+    if ((xor_labels_with_mask & 0x0000ff0000000000ULL)== 0){
+      traversal_state.Add(ResolvePointer(starting_state, symbol + 5), symbol + 5);
+    }
+    if ((xor_labels_with_mask & 0x00ff000000000000ULL)== 0){
+      traversal_state.Add(ResolvePointer(starting_state, symbol + 6), symbol + 6);
+    }
+    if ((xor_labels_with_mask & 0xff00000000000000ULL)== 0){
+      traversal_state.Add(ResolvePointer(starting_state, symbol + 7), symbol + 7);
+    }
+
+    ++labels_as_ll;
+    ++mask_as_ll;
+    symbol +=8;
+  }
+#endif
+
+  return;
+}
+
+
   // shared pointer
   typedef std::shared_ptr<Automata> automata_t;
 

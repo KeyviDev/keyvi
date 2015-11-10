@@ -38,6 +38,8 @@ struct Transition {
 };
 
 struct WeightedTransition {
+  WeightedTransition(uint64_t s, uint32_t w, unsigned char l): state(s), weight(w), label(l) {}
+
   uint64_t state;
   uint32_t weight;
   unsigned char label;
@@ -53,6 +55,10 @@ struct TraversalState {
     transitions_.push_back(TransitionT(s, l));
   }
 
+  void Add(uint64_t s, uint32_t w, unsigned char l) {
+    transitions_.push_back(TransitionT(s, w, l));
+  }
+
   uint64_t GetNextState() const {
     if (position < transitions_.size()) {
       return transitions_[position].state;
@@ -63,7 +69,6 @@ struct TraversalState {
   }
 
   unsigned char GetNextTransition() const {
-    //return transitions[position];
     return transitions_[position].label;
   }
 
@@ -86,12 +91,13 @@ struct TraversalState {
 /**
  * A helper data structure memorize the path of a graph traversal.
  */
+template<class TransitionT = Transition>
 struct TraversalStack {
   TraversalStack():traversal_states(), current_depth(0) {
     traversal_states.resize(20);
   }
 
-  TraversalState<>& GetStates() {
+  TraversalState<TransitionT>& GetStates() {
     return traversal_states[current_depth];
   }
 
@@ -125,7 +131,7 @@ struct TraversalStack {
     return current_depth--;
   }
 
-  std::vector<TraversalState<>> traversal_states;
+  std::vector<TraversalState<TransitionT>> traversal_states;
   size_t current_depth;
 };
 

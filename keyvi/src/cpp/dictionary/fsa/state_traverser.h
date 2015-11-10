@@ -129,7 +129,6 @@ final {
       stack_++;
       fsa_->GetOutGoingTransitions(current_state_, stack_.GetStates());
       TRACE("found %ld outgoing states", stack_.GetStates().size());
-
     }
 
     unsigned char GetStateLabel() const {
@@ -140,7 +139,7 @@ final {
     automata_t fsa_;
     unsigned char current_label_;
     uint64_t current_state_;
-    internal::TraversalStack stack_;
+    internal::TraversalStack<> stack_;
   };
 
   } /* namespace fsa */

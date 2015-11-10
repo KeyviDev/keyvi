@@ -47,7 +47,10 @@ final {
       current_state_ = start_state;
 
       TRACE("WeightedStateTraverser starting with Start state %d", current_state_);
-      GetNextTransitionsInSortedOrder();
+      f->GetOutGoingTransitions(start_state, stack_.GetStates());
+      // todo: sort
+
+
       if (advance) {
         this->operator ++(0);
       }
@@ -107,6 +110,41 @@ final {
     }
 
     void operator++(int) {
+      TRACE("weightedstatetraverser++");
+      // ignore cases where we are already at the end
+      if (current_state_ == 0) {
+        TRACE("at the end");
+        return;
+      }
+
+      current_state_ = stack_.GetStates().GetNextState();
+      TRACE ("next state: %ld depth: %ld", current_state_, stack_.GetDepth());
+
+      while (current_state_ == 0) {
+        if (stack_.GetDepth() == 0) {
+          TRACE("traverser exhausted.");
+          current_label_ = 0;
+          return;
+        }
+
+        TRACE ("state is 0, go up");
+        --stack_;
+        stack_.GetStates()++;
+        current_state_ = stack_.GetStates().GetNextState();
+        TRACE ("next state %ld depth %ld", current_state_, stack_.GetDepth());
+      }
+
+      current_label_ = stack_.GetStates().GetNextTransition();
+      TRACE ("Label: %c", current_label_);
+      stack_++;
+      fsa_->GetOutGoingTransitions(current_state_, stack_.GetStates());
+
+      std::sort(stack_.GetStates().transitions_.begin(), stack_.GetStates().transitions_.end(), compare);
+
+      TRACE("found %ld outgoing states", stack_.GetStates().size());
+/*
+
+
 
       // ignore cases where we are already at the end
       if (current_state_ == 0) {
@@ -134,7 +172,7 @@ final {
         if (child_node) {
           /* Found a valid child node
            * go one level down
-           */
+           *//*
           TRACE("found child node");
 
           //current_label_ = traversal_stack_[current_depth_];
@@ -153,7 +191,7 @@ final {
           if (current_depth_) {
             /* we did not find any path at the current level (deep)
              * go one level up
-             */
+             *//*
             TRACE("current path exhausted going up");
 
             //traversal_stack_.pop_back();
@@ -170,8 +208,9 @@ final {
             current_label_ = 0;
             return;
           }
+
         }
-      }
+      }*/
     }
 
     bool operator==(const WeightedStateTraverser &other) const {
@@ -193,14 +232,17 @@ final {
     uint32_t current_state_ = 0;
     unsigned char current_label_ = 0;
     size_t current_depth_ = 0;
+
+    internal::TraversalStack<internal::WeightedTransition> stack_;
+
     std::vector<uint32_t> state_traversal_stack_;
     std::vector<traversal_entry_t> entry_traversal_stack_;
 
-    static bool compare(std::pair<uint32_t, unsigned char> i, std::pair<uint32_t, unsigned char> j){
-      return i.first > j.first;
+    static bool compare(const internal::WeightedTransition& a, const internal::WeightedTransition& b) {
+      return a.weight < b.weight;
     };
 
-    void GetNextTransitionsInSortedOrder() {
+    /*void GetNextTransitionsInSortedOrder() {
       uint32_t child_node;
       traversal_entry_t outgoing_transitions;
       for (int i = 1; i < 256; ++i) {
@@ -216,7 +258,7 @@ final {
       std::sort(outgoing_transitions.begin(), outgoing_transitions.end(), compare);
       TRACE("number of transitions found: %d", outgoing_transitions.size());
       entry_traversal_stack_.push_back(outgoing_transitions);
-    }
+    }*/
 
   };
 
