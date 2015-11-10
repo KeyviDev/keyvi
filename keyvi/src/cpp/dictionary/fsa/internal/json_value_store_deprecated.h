@@ -416,7 +416,7 @@ class JsonValueStoreDeprecated final : public IValueStoreWriter {
           return buffer.GetString();
         }
 
-        virtual std::string GetStatistics() const {
+        virtual std::string GetStatistics() const override {
           std::ostringstream buf;
           boost::property_tree::write_json (buf, properties_, false);
           return buf.str();
