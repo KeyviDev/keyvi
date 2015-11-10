@@ -410,11 +410,16 @@ class JsonValueStoreReader final: public IValueStoreReader {
       }
     }
 
-    boost::interprocess::map_options_t map_options =
-        boost::interprocess::default_map_options | MAP_HUGETLB;
+    boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options;
+
+#ifdef MAP_HUGETLB
+    map_options |= MAP_HUGETLB;
+#endif
 
     if (!load_lazy) {
+#ifdef MAP_POPULATE
       map_options |= MAP_POPULATE;
+#endif
     }
 
     strings_region_ = new boost::interprocess::mapped_region(
