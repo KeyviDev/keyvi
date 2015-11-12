@@ -25,6 +25,9 @@
 #ifndef TRAVERSAL_HELPERS_H_
 #define TRAVERSAL_HELPERS_H_
 
+//#define ENABLE_TRACING
+#include "dictionary/util/trace.h"
+
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
@@ -43,6 +46,12 @@ struct WeightedTransition {
   uint64_t state;
   uint32_t weight;
   unsigned char label;
+};
+
+static bool WeightedTransitionCompare(const internal::WeightedTransition& a, const internal::WeightedTransition& b) {
+  TRACE("compare %d %d", a.weight, b.weight);
+
+  return a.weight > b.weight;
 };
 
 /**

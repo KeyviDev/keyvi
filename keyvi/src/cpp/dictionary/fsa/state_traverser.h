@@ -35,6 +35,7 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+template<class TransitionT = internal::Transition>
 class StateTraverser
 final {
    public:
@@ -83,6 +84,10 @@ final {
 
     uint64_t GetStateValue() const {
       return fsa_->GetStateValue(current_state_);
+    }
+
+    uint32_t GetInnerWeight() {
+      return fsa_->GetWeightValue(current_state_);
     }
 
     uint64_t GetStateId() const {
@@ -139,11 +144,14 @@ final {
     automata_t fsa_;
     unsigned char current_label_;
     uint64_t current_state_;
-    internal::TraversalStack<> stack_;
+    internal::TraversalStack<TransitionT> stack_;
   };
 
-  } /* namespace fsa */
-  } /* namespace dictionary */
-  } /* namespace keyvi */
+  // weighted state traverser
+  typedef  StateTraverser<internal::WeightedTransition> WeightedStateTraverser;
+
+} /* namespace fsa */
+} /* namespace dictionary */
+} /* namespace keyvi */
 
 #endif /* STATE_TRAVERSER_H_ */

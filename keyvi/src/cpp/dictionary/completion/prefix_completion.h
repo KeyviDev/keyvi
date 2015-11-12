@@ -31,7 +31,6 @@
 #include "dictionary/fsa/automata.h"
 #include "dictionary/match_iterator.h"
 #include "dictionary/fsa/state_traverser.h"
-#include "dictionary/fsa/weighted_state_traverser.h"
 #include "dictionary/fsa/bounded_weighted_state_traverser.h"
 #include "dictionary/fsa/codepoint_state_traverser.h"
 #include "dictionary/util/trace.h"

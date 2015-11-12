@@ -176,19 +176,19 @@ final {
 
       // data which is required for the callback as well
       struct delegate_payload {
-        delegate_payload(fsa::StateTraverser&& t,
+        delegate_payload(fsa::StateTraverser<>&& t,
                          std::vector<unsigned char>& stack)
             : traverser(std::move(t)),
               traversal_stack(std::move(stack)) {
         }
 
-        fsa::StateTraverser traverser;
+        fsa::StateTraverser<> traverser;
         std::vector<unsigned char> traversal_stack;
       };
 
       std::shared_ptr<delegate_payload> data(
           new delegate_payload(
-              fsa::StateTraverser(fsa_, state),
+              fsa::StateTraverser<>(fsa_, state),
               traversal_stack));
 
       std::function<Match()> tfunc =

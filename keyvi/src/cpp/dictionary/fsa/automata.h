@@ -567,28 +567,36 @@ inline void Automata::GetOutGoingTransitions(uint64_t starting_state, internal::
     uint64_t xor_labels_with_mask = *labels_as_ll^*mask_as_ll;
 
     if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0) && offset > 0){
-      traversal_state.Add(ResolvePointer(starting_state, symbol), symbol);
+      uint64_t child_state = ResolvePointer(starting_state, symbol);
+      traversal_state.Add(child_state, GetWeightValue(child_state), symbol);
     }
     if ((xor_labels_with_mask & 0x000000000000ff00ULL)== 0){
-      traversal_state.Add(ResolvePointer(starting_state, symbol + 1), symbol + 1);
+      uint64_t child_state = ResolvePointer(starting_state, symbol + 1);
+      traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 1);
     }
     if ((xor_labels_with_mask & 0x0000000000ff0000ULL)== 0){
-      traversal_state.Add(ResolvePointer(starting_state, symbol + 2), symbol + 2);
+      uint64_t child_state = ResolvePointer(starting_state, symbol + 2);
+      traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 2);
     }
     if ((xor_labels_with_mask & 0x00000000ff000000ULL)== 0){
-      traversal_state.Add(ResolvePointer(starting_state, symbol + 3), symbol + 3);
+      uint64_t child_state = ResolvePointer(starting_state, symbol + 3);
+      traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 3);
     }
     if ((xor_labels_with_mask & 0x000000ff00000000ULL)== 0){
-      traversal_state.Add(ResolvePointer(starting_state, symbol + 4), symbol + 4);
+      uint64_t child_state = ResolvePointer(starting_state, symbol + 4);
+      traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 4);
     }
     if ((xor_labels_with_mask & 0x0000ff0000000000ULL)== 0){
-      traversal_state.Add(ResolvePointer(starting_state, symbol + 5), symbol + 5);
+      uint64_t child_state = ResolvePointer(starting_state, symbol + 5);
+      traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 5);
     }
     if ((xor_labels_with_mask & 0x00ff000000000000ULL)== 0){
-      traversal_state.Add(ResolvePointer(starting_state, symbol + 6), symbol + 6);
+      uint64_t child_state = ResolvePointer(starting_state, symbol + 6);
+      traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 6);
     }
     if ((xor_labels_with_mask & 0xff00000000000000ULL)== 0){
-      traversal_state.Add(ResolvePointer(starting_state, symbol + 7), symbol + 7);
+      uint64_t child_state = ResolvePointer(starting_state, symbol + 7);
+      traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 7);
     }
 
     ++labels_as_ll;
@@ -596,6 +604,13 @@ inline void Automata::GetOutGoingTransitions(uint64_t starting_state, internal::
     symbol +=8;
   }
 #endif
+
+  //sort transitions
+  TRACE("sort transitions");
+  if (traversal_state.size() != 0){
+    std::sort(traversal_state.transitions_.begin(), traversal_state.transitions_.end(), internal::WeightedTransitionCompare);
+    TRACE("first transition after sort: %c %d", traversal_state.transitions_[0].label, traversal_state.transitions_[0].weight);
+  }
 
   return;
 }

@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
   testing::TempDictionary dictionary (test_data);
   automata_t f = dictionary.GetFsa();
 
-  StateTraverser s(f);
+  StateTraverser<> s(f);
 
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( someTraversalWithPrune ) {
   testing::TempDictionary dictionary (test_data);
   automata_t f = dictionary.GetFsa();
 
-  StateTraverser s(f);
+  StateTraverser<> s(f);
 
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE( longkeys ) {
   testing::TempDictionary dictionary (test_data);
   automata_t f = dictionary.GetFsa();
 
-  StateTraverser s(f);
+  StateTraverser<> s(f);
 
   for (int i = 1; i<=1000; ++ i){
     BOOST_CHECK_EQUAL('a', s.GetStateLabel());

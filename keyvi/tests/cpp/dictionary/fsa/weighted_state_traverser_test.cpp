@@ -26,7 +26,7 @@
 #include <boost/test/unit_test.hpp>
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/weighted_state_traverser.h"
+#include "dictionary/fsa/state_traverser.h"
 #include "dictionary/testing/temp_dictionary.h"
 
 #define ENABLE_TRACING
