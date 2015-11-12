@@ -36,7 +36,7 @@ class Utf8Utils final{
     int intValue = utf8_byte & 0xFF;
 
     if (intValue >= 0xF8) {
-      throw std::invalid_argument("Illegal UTF-8 byte: " + intValue);
+      throw std::invalid_argument("Illegal UTF-8 byte: " + std::to_string(intValue));
     }
 
     return (intValue < 0x80) || (intValue >= 0xC0);
@@ -52,7 +52,7 @@ class Utf8Utils final{
      }
      else if (intValue < 0xc0)
      {
-       std::invalid_argument("Illegal UTF-8 lead byte: " + intValue);
+       std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(intValue));
      }
      else if (intValue < 0xe0)
      {
@@ -67,7 +67,7 @@ class Utf8Utils final{
          return 4;
      }
 
-     throw std::invalid_argument("Illegal UTF-8 lead byte: " + intValue);
+     throw std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(intValue));
   }
 };
 

@@ -85,10 +85,16 @@ final {
         throw std::invalid_argument("file is corrupt(truncated)");
       }
 
-      boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options | MAP_HUGETLB;
+      boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options;
+
+#ifdef MAP_HUGETLB
+      map_options |= MAP_HUGETLB;
+#endif
 
       if (!load_lazy) {
+#ifdef MAP_POPULATE
         map_options |= MAP_POPULATE;
+#endif
       }
 
       TRACE("labels start offset: %d", offset);
