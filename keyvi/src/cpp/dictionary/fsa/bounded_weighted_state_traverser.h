@@ -252,6 +252,8 @@ final {
 
       std::sort(outgoing_transitions.begin(), outgoing_transitions.end(),
                 compare);
+      TRACE("first transition after sort: %c %d", outgoing_transitions[0].second, outgoing_transitions[0].first);
+
       TRACE("number of transitions found: %d", outgoing_transitions.size());
       entry_traversal_stack_.push_back(outgoing_transitions);
     }
