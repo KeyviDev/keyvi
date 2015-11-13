@@ -25,6 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "dictionary/fsa/automata.h"
+#include "dictionary/fsa/internal/traversal_helpers.h"
 #include "dictionary/testing/temp_dictionary.h"
 
 namespace keyvi {
@@ -36,34 +37,34 @@ BOOST_AUTO_TEST_SUITE( AutomataTests )
 BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
   std::vector<std::string> test_data =
         { "\01cd", "aaaa", "aabb", "agbc", "ajcd", "azcd" };
-    testing::TempDictionary dictionary(test_data);
-    automata_t f = dictionary.GetFsa();
-  std::vector<uint64_t> outgoings;
-  std::vector<unsigned char> symbols;
+  testing::TempDictionary dictionary(test_data);
+  automata_t f = dictionary.GetFsa();
 
-  f->GetOutGoingTransitions(f->GetStartState(), outgoings, symbols);
+  internal::TraversalStack<> stack;
 
-  BOOST_CHECK_EQUAL(2, outgoings.size());
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), '\01'), outgoings[0]);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), 'a'), outgoings[1]);
-  BOOST_CHECK_EQUAL('\01', symbols[0]);
-  BOOST_CHECK_EQUAL('a', symbols[1]);
+  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates());
+
+  BOOST_CHECK_EQUAL(2, stack.GetStates().transitions_.size());
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), '\01'), stack.GetStates().transitions_[0].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), 'a'), stack.GetStates().transitions_[1].state);
+  BOOST_CHECK_EQUAL('\01', stack.GetStates().transitions_[0].label);
+  BOOST_CHECK_EQUAL('a', stack.GetStates().transitions_[1].label);
 
   // check all outgoings for 'a'
   uint32_t state_a = f->TryWalkTransition(f->GetStartState(), 'a');
 
-  f->GetOutGoingTransitions(state_a, outgoings, symbols);
+  f->GetOutGoingTransitions(state_a, stack.GetStates());
 
-  BOOST_CHECK_EQUAL(4, outgoings.size());
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'a'), outgoings[0]);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'g'), outgoings[1]);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'j'), outgoings[2]);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'z'), outgoings[3]);
+  BOOST_CHECK_EQUAL(4, stack.GetStates().transitions_.size());
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'a'), stack.GetStates().transitions_[0].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'g'), stack.GetStates().transitions_[1].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'j'), stack.GetStates().transitions_[2].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'z'), stack.GetStates().transitions_[3].state);
 
-  BOOST_CHECK_EQUAL('a', symbols[0]);
-  BOOST_CHECK_EQUAL('g', symbols[1]);
-  BOOST_CHECK_EQUAL('j', symbols[2]);
-  BOOST_CHECK_EQUAL('z', symbols[3]);
+  BOOST_CHECK_EQUAL('a', stack.GetStates().transitions_[0].label);
+  BOOST_CHECK_EQUAL('g', stack.GetStates().transitions_[1].label);
+  BOOST_CHECK_EQUAL('j', stack.GetStates().transitions_[2].label);
+  BOOST_CHECK_EQUAL('z', stack.GetStates().transitions_[3].label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

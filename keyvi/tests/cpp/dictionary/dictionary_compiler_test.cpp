@@ -160,17 +160,48 @@ BOOST_AUTO_TEST_CASE( sortOrder ) {
   fsa::EntryIterator it(f);
   fsa::EntryIterator end_it;
 
+  std::stringstream ss;
+
   BOOST_CHECK_EQUAL("arbeit", it.GetKey());
+  it.WriteKey(ss);
+  BOOST_CHECK_EQUAL("arbeit", ss.str());
+  ss.str("");
+  ss.clear();
   ++it;
   BOOST_CHECK_EQUAL("uboot", it.GetKey());
+  it.WriteKey(ss);
+  BOOST_CHECK_EQUAL("uboot", ss.str());
+  ss.str("");
+  ss.clear();
+
   ++it;
   BOOST_CHECK_EQUAL("vielleicht", it.GetKey());
+  it.WriteKey(ss);
+  BOOST_CHECK_EQUAL("vielleicht", ss.str());
+  ss.str("");
+  ss.clear();
+
   ++it;
   BOOST_CHECK_EQUAL("zoo", it.GetKey());
+  it.WriteKey(ss);
+  BOOST_CHECK_EQUAL("zoo", ss.str());
+  ss.str("");
+  ss.clear();
+
   ++it;
   BOOST_CHECK_EQUAL("ändern", it.GetKey());
+  it.WriteKey(ss);
+  BOOST_CHECK_EQUAL("ändern", ss.str());
+  ss.str("");
+  ss.clear();
+
   ++it;
   BOOST_CHECK_EQUAL("überfall", it.GetKey());
+  it.WriteKey(ss);
+  BOOST_CHECK_EQUAL("überfall", ss.str());
+  ss.str("");
+  ss.clear();
+
   ++it;
   BOOST_CHECK(it == end_it);
 
