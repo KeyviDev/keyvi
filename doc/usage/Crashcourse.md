@@ -55,9 +55,13 @@ Compile cities.tsv and run the tester:
 
 Try queries like: "Fahrradwerkstatt München", "Berlin Alexanderplatz", "San Francisco Coffee Bar"
 
-#### BYO
+#### Build your own index
 
-Try pykeyvi/scripts/compile_json.py and compile your own JSON
+Try pykeyvi/scripts/compile_json.py and compile your own JSON. The format should be:
+
+    key {"city": "Munich", "state": "Germany"}
+
+(put a tab ('\t') between key and value, you can also use keyvicompiler instead, but the idea of this excercise is to use the compiler from the python bindings.)
 
 Check statistics:
 
