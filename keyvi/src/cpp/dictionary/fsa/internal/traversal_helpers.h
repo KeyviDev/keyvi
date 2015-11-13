@@ -48,6 +48,10 @@ struct WeightedTransition {
   unsigned char label;
 };
 
+struct BoundedWeightedTransition: public WeightedTransition {
+  using WeightedTransition::WeightedTransition;
+};
+
 static bool WeightedTransitionCompare(const internal::WeightedTransition& a, const internal::WeightedTransition& b) {
   TRACE("compare %d %d", a.weight, b.weight);
 
@@ -93,20 +97,30 @@ struct TraversalState {
     return position++;
   }
 
+  void PostProcess(){
+  }
+
   std::vector<TransitionT> transitions_;
   size_t position;
 };
 
+template<>
+inline void TraversalState<WeightedTransition>::PostProcess() {
+  if (transitions_.size() > 0) {
+    std::sort(transitions_.begin(), transitions_.end(), WeightedTransitionCompare);
+  }
+}
+
 /**
  * A helper data structure memorize the path of a graph traversal.
  */
-template<class TransitionT = Transition>
+template<class TransitionT = Transition, class TraversalStateT = TraversalState<TransitionT>>
 struct TraversalStack {
   TraversalStack():traversal_states(), current_depth(0) {
     traversal_states.resize(20);
   }
 
-  TraversalState<TransitionT>& GetStates() {
+  TraversalStateT& GetStates() {
     return traversal_states[current_depth];
   }
 
@@ -140,7 +154,7 @@ struct TraversalStack {
     return current_depth--;
   }
 
-  std::vector<TraversalState<TransitionT>> traversal_states;
+  std::vector<TraversalStateT> traversal_states;
   size_t current_depth;
 };
 
