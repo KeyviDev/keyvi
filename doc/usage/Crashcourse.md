@@ -29,7 +29,11 @@ Compile:
 Dump:
     
     keyviinspector -i compiled.keyvi -o compiled.out
-    
+
+After dumping, open the file compiled.out in a text editor, it should contain your data. 
+
+Check questions:
+ * What is the difference to your input file?
  
 #### Open the file in ipython
 
@@ -38,12 +42,28 @@ Do:
     import pykeyvi
     d = pykeyvi.Dictionary("compiled.keyvi")
     "keyvi" in d
+    
+should return True
+    
+    match = d['keyvi']
+
+gives you a so called match object
+    
+    dir(match)
+ 
+shows all methods you can call on that object, e.g.
+
+    match.GetMatchedString()
+ 
+should return "keyvi"
+
+Match objects are the common return structure in keyvi. For this very simple example, the other methods are not useful. But with going deeper into more elaborated examples below, you will find how they can be used.
  
 Check questions:
 
- * How does loading works?
+ * How fast does it load? Do you have an idea how loading works internally?
  * What happens if you load multiple times (using different processes)?
- 
+
 ### Lookup and Extraction
 
 Go to [lookup examples](/pykeyvi/examples/lookup)
