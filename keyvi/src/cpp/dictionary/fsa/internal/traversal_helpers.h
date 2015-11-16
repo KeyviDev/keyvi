@@ -111,6 +111,13 @@ inline void TraversalState<WeightedTransition>::PostProcess() {
   }
 }
 
+template<>
+inline void TraversalState<BoundedWeightedTransition>::PostProcess() {
+  if (transitions_.size() > 0) {
+    std::sort(transitions_.begin(), transitions_.end(), WeightedTransitionCompare);
+  }
+}
+
 /**
  * A helper data structure memorize the path of a graph traversal.
  */

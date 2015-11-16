@@ -149,7 +149,7 @@ final {
 
   // weighted state traverser
   typedef  StateTraverser<internal::WeightedTransition> WeightedStateTraverser;
-  typedef  StateTraverser<internal::BoundedWeightedTransition> BoundedWeightedStateTraverser;
+  typedef  StateTraverser<internal::BoundedWeightedTransition> BoundedWeightedStateTraverser2;
 
 } /* namespace fsa */
 } /* namespace dictionary */
