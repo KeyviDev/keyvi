@@ -41,6 +41,12 @@ struct Transition {
   unsigned char label;
 };
 
+template<class TransitionT = Transition>
+struct TraversalStatePayload {
+  std::vector<TransitionT> transitions_;
+  size_t position;
+};
+
 /**
  * A helper data structure to hold a state in graph traversal
  */
@@ -48,16 +54,16 @@ template<class TransitionT = Transition>
 struct TraversalState {
 
   void Add(uint64_t s, unsigned char l) {
-    transitions_.push_back(TransitionT(s, l));
+    payload_.transitions_.push_back(TransitionT(s, l));
   }
 
   void Add(uint64_t s, uint32_t w, unsigned char l) {
-    transitions_.push_back(TransitionT(s, w, l));
+    payload_.transitions_.push_back(TransitionT(s, w, l));
   }
 
   uint64_t GetNextState() const {
-    if (position < transitions_.size()) {
-      return transitions_[position].state;
+    if (payload_.position < payload_.transitions_.size()) {
+      return payload_.transitions_[payload_.position].state;
     }
 
     // else
@@ -65,26 +71,30 @@ struct TraversalState {
   }
 
   unsigned char GetNextTransition() const {
-    return transitions_[position].label;
+    return payload_.transitions_[payload_.position].label;
   }
 
   size_t size() const {
-    return transitions_.size();
+    return payload_.transitions_.size();
   }
 
   size_t& operator++ (){
-    return ++position;
+    return ++payload_.position;
   }
 
   size_t operator++ (int){
-    return position++;
+    return payload_.position++;
+  }
+
+  void Clear(){
+    payload_.position = 0;
+    payload_.transitions_.clear();
   }
 
   void PostProcess(){
   }
 
-  std::vector<TransitionT> transitions_;
-  size_t position;
+  TraversalStatePayload<TransitionT> payload_;
 };
 
 /**

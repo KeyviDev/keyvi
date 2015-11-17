@@ -42,11 +42,21 @@ struct BoundedWeightedTransition: public WeightedTransition {
 //struct BTraversalState: public TraversalState<BoundedWeightedTransition> {
 //};
 
+//template<>
+//struct TraversalState<BoundedWeightedTransition> {
+
+//}
+template<>
+struct TraversalStatePayload<BoundedWeightedTransition> {
+  std::vector<BoundedWeightedTransition> transitions_;
+  size_t position;
+  uint32_t min_weight_;
+};
 
 template<>
 inline void TraversalState<BoundedWeightedTransition>::PostProcess() {
-  if (transitions_.size() > 0) {
-    std::sort(transitions_.begin(), transitions_.end(), WeightedTransitionCompare);
+  if (payload_.transitions_.size() > 0) {
+    std::sort(payload_.transitions_.begin(), payload_.transitions_.end(), WeightedTransitionCompare);
   }
 }
 

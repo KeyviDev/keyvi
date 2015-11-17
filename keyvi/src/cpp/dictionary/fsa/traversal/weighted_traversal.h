@@ -51,8 +51,8 @@ static bool WeightedTransitionCompare(const WeightedTransition& a, const Weighte
 
 template<>
 inline void TraversalState<WeightedTransition>::PostProcess() {
-  if (transitions_.size() > 0) {
-    std::sort(transitions_.begin(), transitions_.end(), WeightedTransitionCompare);
+  if (payload_.transitions_.size() > 0) {
+    std::sort(payload_.transitions_.begin(), payload_.transitions_.end(), WeightedTransitionCompare);
   }
 }
 

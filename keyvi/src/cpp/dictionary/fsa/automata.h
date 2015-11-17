@@ -170,8 +170,7 @@ final {
     std::enable_if< std::is_base_of< traversal::Transition, TransitionT >::value, traversal::Transition>::type* = nullptr>
     void GetOutGoingTransitions(uint64_t starting_state, traversal::TraversalState<TransitionT>& traversal_state) const {
       // reset the state
-      traversal_state.position = 0;
-      traversal_state.transitions_.clear();
+      traversal_state.Clear();
 
 #if defined(KEYVI_SSE42)
       // Optimized version using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
@@ -263,8 +262,7 @@ final {
     std::enable_if< std::is_base_of< traversal::WeightedTransition, TransitionT >::value, traversal::WeightedTransition>::type* = nullptr>
     inline void GetOutGoingTransitions(uint64_t starting_state, traversal::TraversalState<TransitionT>& traversal_state) const {
       // reset the state
-      traversal_state.position = 0;
-      traversal_state.transitions_.clear();
+      traversal_state.Clear();
 
     #if defined(KEYVI_SSE42)
       // Optimized version using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
