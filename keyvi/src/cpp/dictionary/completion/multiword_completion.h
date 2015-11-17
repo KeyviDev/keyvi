@@ -30,7 +30,7 @@
 #include "dictionary/dictionary.h"
 #include "dictionary/fsa/automata.h"
 #include "dictionary/match_iterator.h"
-#include "dictionary/fsa/state_traverser.h"
+#include "dictionary/fsa/traverser_types.h"
 #include "dictionary/fsa/bounded_weighted_state_traverser.h"
 #include "dictionary/fsa/codepoint_state_traverser.h"
 #include "dictionary/util/transform.h"

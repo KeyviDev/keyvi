@@ -30,7 +30,7 @@
 #include "dictionary/dictionary.h"
 #include "dictionary/fsa/automata.h"
 #include "dictionary/match_iterator.h"
-#include "dictionary/fsa/state_traverser.h"
+#include "dictionary/fsa/traverser_types.h"
 #include "dictionary/fsa/bounded_weighted_state_traverser.h"
 #include "dictionary/fsa/codepoint_state_traverser.h"
 #include "dictionary/util/trace.h"
@@ -74,19 +74,19 @@ final {
 
         // data which is required for the callback as well
         struct delegate_payload {
-          delegate_payload(fsa::BoundedWeightedStateTraverser&& t,
+          delegate_payload(fsa::BoundedWeightedStateTraverser2&& t,
                            std::vector<unsigned char>& stack)
               : traverser(std::move(t)),
                 traversal_stack(std::move(stack)) {
           }
 
-          fsa::BoundedWeightedStateTraverser traverser;
+          fsa::BoundedWeightedStateTraverser2 traverser;
           std::vector<unsigned char> traversal_stack;
         };
 
         std::shared_ptr<delegate_payload> data(
             new delegate_payload(
-                fsa::BoundedWeightedStateTraverser(fsa_, state,
+                fsa::BoundedWeightedStateTraverser2(fsa_, state,
                                                    number_of_results),
                 traversal_stack));
 
@@ -119,7 +119,7 @@ final {
                         data->traverser.GetStateValue());
 
                     data->traverser++;
-                    data->traverser.TryReduceResultQueue();
+                    //data->traverser.TryReduceResultQueue();
                     return m;
                   }
                   data->traverser++;

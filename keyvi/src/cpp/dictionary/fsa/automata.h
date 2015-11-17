@@ -33,6 +33,7 @@
 #include "dictionary/fsa/internal/value_store_factory.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/traversal/traversal_base.h"
+#include "dictionary/fsa/traversal/weighted_traversal.h"
 #include "dictionary/util/vint.h"
 #include "dictionary/util/endian.h"
 #include "dictionary/fsa/internal/intrinsics.h"

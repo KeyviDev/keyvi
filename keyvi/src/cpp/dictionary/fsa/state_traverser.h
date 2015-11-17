@@ -147,10 +147,6 @@ final {
     traversal::TraversalStack<TransitionT> stack_;
   };
 
-  // weighted state traverser
-  typedef  StateTraverser<traversal::WeightedTransition> WeightedStateTraverser;
-  typedef  StateTraverser<traversal::BoundedWeightedTransition> BoundedWeightedStateTraverser2;
-
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
