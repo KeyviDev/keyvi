@@ -26,7 +26,7 @@
 #define ENTRY_ITERATOR_H_
 
 #include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/internal/traversal_helpers.h"
+#include "dictionary/fsa/traversal/traversal_base.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -160,7 +160,7 @@ class EntryIterator final{
   uint64_t current_value_;
   std::vector<unsigned char> traversal_stack_;
 
-  internal::TraversalStack<> stack_;
+  traversal::TraversalStack<> stack_;
 };
 
 typedef std::shared_ptr<EntryIterator> entry_iterator_t;

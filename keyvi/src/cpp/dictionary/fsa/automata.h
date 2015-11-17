@@ -32,7 +32,7 @@
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/value_store_factory.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
-#include "dictionary/fsa/internal/traversal_helpers.h"
+#include "dictionary/fsa/traversal/traversal_base.h"
 #include "dictionary/util/vint.h"
 #include "dictionary/util/endian.h"
 #include "dictionary/fsa/internal/intrinsics.h"
@@ -166,8 +166,8 @@ final {
      * todo: rewrite to avoid push_back on vectors, see: http://lemire.me/blog/2012/06/20/do-not-waste-time-with-stl-vectors/
      */
     template<class TransitionT, typename
-    std::enable_if< std::is_base_of< internal::Transition, TransitionT >::value, internal::Transition>::type* = nullptr>
-    void GetOutGoingTransitions(uint64_t starting_state, internal::TraversalState<TransitionT>& traversal_state) const {
+    std::enable_if< std::is_base_of< traversal::Transition, TransitionT >::value, traversal::Transition>::type* = nullptr>
+    void GetOutGoingTransitions(uint64_t starting_state, traversal::TraversalState<TransitionT>& traversal_state) const {
       // reset the state
       traversal_state.position = 0;
       traversal_state.transitions_.clear();
@@ -259,8 +259,8 @@ final {
     }
 
     template<class TransitionT, typename
-    std::enable_if< std::is_base_of< internal::WeightedTransition, TransitionT >::value, internal::WeightedTransition>::type* = nullptr>
-    inline void GetOutGoingTransitions(uint64_t starting_state, internal::TraversalState<TransitionT>& traversal_state) const {
+    std::enable_if< std::is_base_of< traversal::WeightedTransition, TransitionT >::value, traversal::WeightedTransition>::type* = nullptr>
+    inline void GetOutGoingTransitions(uint64_t starting_state, traversal::TraversalState<TransitionT>& traversal_state) const {
       // reset the state
       traversal_state.position = 0;
       traversal_state.transitions_.clear();

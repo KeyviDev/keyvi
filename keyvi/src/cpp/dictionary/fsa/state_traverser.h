@@ -26,7 +26,7 @@
 #define STATE_TRAVERSER_H_
 
 #include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/internal/traversal_helpers.h"
+#include "dictionary/fsa/traversal/traversal_base.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -35,7 +35,7 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-template<class TransitionT = internal::Transition>
+template<class TransitionT = traversal::Transition>
 class StateTraverser
 final {
    public:
@@ -144,12 +144,12 @@ final {
     automata_t fsa_;
     unsigned char current_label_;
     uint64_t current_state_;
-    internal::TraversalStack<TransitionT> stack_;
+    traversal::TraversalStack<TransitionT> stack_;
   };
 
   // weighted state traverser
-  typedef  StateTraverser<internal::WeightedTransition> WeightedStateTraverser;
-  typedef  StateTraverser<internal::BoundedWeightedTransition> BoundedWeightedStateTraverser2;
+  typedef  StateTraverser<traversal::WeightedTransition> WeightedStateTraverser;
+  typedef  StateTraverser<traversal::BoundedWeightedTransition> BoundedWeightedStateTraverser2;
 
 } /* namespace fsa */
 } /* namespace dictionary */

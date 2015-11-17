@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/internal/traversal_helpers.h"
+#include "dictionary/fsa/traversal/traversal_base.h"
 #include "dictionary/testing/temp_dictionary.h"
 
 namespace keyvi {
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
   testing::TempDictionary dictionary(test_data);
   automata_t f = dictionary.GetFsa();
 
-  internal::TraversalStack<> stack;
+  traversal::TraversalStack<> stack;
 
   f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates());
 

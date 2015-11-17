@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
+
 /*
- * traversal_helpers.h
+ * traversal_base.h
  *
- *  Created on: Nov 6, 2015
+ *  Created on: Nov 17, 2015
  *      Author: hendrik
  */
 
-#ifndef TRAVERSAL_HELPERS_H_
-#define TRAVERSAL_HELPERS_H_
+#ifndef TRAVERSAL_BASE_H_
+#define TRAVERSAL_BASE_H_
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -31,7 +32,7 @@
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
-namespace internal {
+namespace traversal {
 
 struct Transition {
   Transition(uint64_t s, unsigned char l): state(s), label(l) {}
@@ -52,7 +53,7 @@ struct BoundedWeightedTransition: public WeightedTransition {
   using WeightedTransition::WeightedTransition;
 };
 
-static bool WeightedTransitionCompare(const internal::WeightedTransition& a, const internal::WeightedTransition& b) {
+static bool WeightedTransitionCompare(const WeightedTransition& a, const WeightedTransition& b) {
   TRACE("compare %d %d", a.weight, b.weight);
 
   return a.weight > b.weight;
@@ -111,6 +112,10 @@ inline void TraversalState<WeightedTransition>::PostProcess() {
   }
 }
 
+struct BTraversalState: public TraversalState<BoundedWeightedTransition> {
+};
+
+
 template<>
 inline void TraversalState<BoundedWeightedTransition>::PostProcess() {
   if (transitions_.size() > 0) {
@@ -121,13 +126,13 @@ inline void TraversalState<BoundedWeightedTransition>::PostProcess() {
 /**
  * A helper data structure memorize the path of a graph traversal.
  */
-template<class TransitionT = Transition, class TraversalStateT = TraversalState<TransitionT>>
+template<class TransitionT = Transition>
 struct TraversalStack {
   TraversalStack():traversal_states(), current_depth(0) {
     traversal_states.resize(20);
   }
 
-  TraversalStateT& GetStates() {
+  TraversalState<TransitionT>& GetStates() {
     return traversal_states[current_depth];
   }
 
@@ -161,13 +166,14 @@ struct TraversalStack {
     return current_depth--;
   }
 
-  std::vector<TraversalStateT> traversal_states;
+  std::vector<TraversalState<TransitionT>> traversal_states;
   size_t current_depth;
 };
 
-} /* namespace internal */
+
+} /* namespace traversal */
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* TRAVERSAL_HELPERS_H_ */
+#endif /* TRAVERSAL_BASE_H_ */
