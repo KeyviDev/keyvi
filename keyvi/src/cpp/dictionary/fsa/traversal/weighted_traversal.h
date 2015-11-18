@@ -56,7 +56,6 @@ inline void TraversalState<WeightedTransition>::PostProcess() {
   }
 }
 
-
 } /* namespace traversal */
 } /* namespace fsa */
 } /* namespace dictionary */

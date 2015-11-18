@@ -45,11 +45,12 @@ final {
     StateTraverser(automata_t f, uint64_t start_state, bool advance = true)
         : fsa_(f),
           current_label_(0),
+          current_weight_(0),
           stack_() {
       current_state_ = start_state;
 
       TRACE("StateTraverser starting with Start state %d", current_state_);
-      f->GetOutGoingTransitions(start_state, stack_.GetStates());
+      f->GetOutGoingTransitions(start_state, stack_.GetStates(), stack_.payload_);
 
       if (advance){
         this->operator ++(0);
@@ -64,9 +65,11 @@ final {
         : fsa_(other.fsa_),
           current_label_(other.current_label_),
           current_state_(other.current_state_),
+          current_weight_(other.current_weight_),
           stack_(std::move(other.stack_)) {
       other.fsa_ = 0;
       other.current_state_ = 0;
+      other.current_weight_ = 0;
       other.current_label_ = 0;
     }
 
@@ -87,7 +90,8 @@ final {
     }
 
     uint32_t GetInnerWeight() {
-      return fsa_->GetWeightValue(current_state_);
+      return current_weight_;
+      //return fsa_->GetWeightValue(current_state_);
     }
 
     uint64_t GetStateId() const {
@@ -130,9 +134,10 @@ final {
       }
 
       current_label_ = stack_.GetStates().GetNextTransition();
+      current_weight_ = stack_.GetStates().GetNextInnerWeight();
       TRACE ("Label: %c", current_label_);
       stack_++;
-      fsa_->GetOutGoingTransitions(current_state_, stack_.GetStates());
+      fsa_->GetOutGoingTransitions(current_state_, stack_.GetStates(), stack_.payload_);
       TRACE("found %ld outgoing states", stack_.GetStates().size());
     }
 
@@ -144,6 +149,7 @@ final {
     automata_t fsa_;
     unsigned char current_label_;
     uint64_t current_state_;
+    uint32_t current_weight_;
     traversal::TraversalStack<TransitionT> stack_;
   };
 

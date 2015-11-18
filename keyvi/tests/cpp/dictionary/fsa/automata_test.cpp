@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/traversal/traversal_base.h"
+#include "dictionary/fsa/traverser_types.h"
 #include "dictionary/testing/temp_dictionary.h"
 
 namespace keyvi {
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
 
   traversal::TraversalStack<> stack;
 
-  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates());
+  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates(), stack.payload_);
 
   BOOST_CHECK_EQUAL(2, stack.GetStates().payload_.transitions_.size());
   BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), '\01'), stack.GetStates().payload_.transitions_[0].state);
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
   // check all outgoings for 'a'
   uint32_t state_a = f->TryWalkTransition(f->GetStartState(), 'a');
 
-  f->GetOutGoingTransitions(state_a, stack.GetStates());
+  f->GetOutGoingTransitions(state_a, stack.GetStates(), stack.payload_);
 
   BOOST_CHECK_EQUAL(4, stack.GetStates().payload_.transitions_.size());
   BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'a'), stack.GetStates().payload_.transitions_[0].state);
@@ -65,6 +65,24 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
   BOOST_CHECK_EQUAL('g', stack.GetStates().payload_.transitions_[1].label);
   BOOST_CHECK_EQUAL('j', stack.GetStates().payload_.transitions_[2].label);
   BOOST_CHECK_EQUAL('z', stack.GetStates().payload_.transitions_[3].label);
+}
+
+BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsWeightTest ) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+            { "the fox jumped over the fence and broke his nose", 22 },
+            { "the fox jumped over the fence and broke his feet", 24 },
+            { "the fox jumped over the fence and broke his tongue", 444 },
+            { "the fox jumped over the fence and broke his arm", 2 },
+        };
+  testing::TempDictionary dictionary(test_data);
+  automata_t f = dictionary.GetFsa();
+
+  traversal::TraversalStack<traversal::WeightedTransition> stack;
+
+  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates(), stack.payload_);
+
+  BOOST_CHECK_EQUAL(1, stack.GetStates().payload_.transitions_.size());
+  BOOST_CHECK_EQUAL(444, stack.GetStates().payload_.transitions_[0].weight);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

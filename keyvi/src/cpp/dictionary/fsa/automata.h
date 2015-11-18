@@ -168,7 +168,7 @@ final {
      */
     template<class TransitionT, typename
     std::enable_if< std::is_base_of< traversal::Transition, TransitionT >::value, traversal::Transition>::type* = nullptr>
-    void GetOutGoingTransitions(uint64_t starting_state, traversal::TraversalState<TransitionT>& traversal_state) const {
+    void GetOutGoingTransitions(uint64_t starting_state, traversal::TraversalState<TransitionT>& traversal_state, traversal::TraversalPayload<TransitionT>& payload) const {
       // reset the state
       traversal_state.Clear();
 
@@ -260,9 +260,10 @@ final {
 
     template<class TransitionT, typename
     std::enable_if< std::is_base_of< traversal::WeightedTransition, TransitionT >::value, traversal::WeightedTransition>::type* = nullptr>
-    inline void GetOutGoingTransitions(uint64_t starting_state, traversal::TraversalState<TransitionT>& traversal_state) const {
+    inline void GetOutGoingTransitions(uint64_t starting_state, traversal::TraversalState<TransitionT>& traversal_state, traversal::TraversalPayload<TransitionT>& payload) const {
       // reset the state
       traversal_state.Clear();
+      uint32_t parent_weight = GetWeightValue(starting_state);
 
     #if defined(KEYVI_SSE42)
       // Optimized version using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
@@ -288,7 +289,9 @@ final {
               if ((mask_int & 1) == 1) {
                 TRACE("push symbol+%d", symbol + i);
                 uint64_t child_state = ResolvePointer(starting_state, symbol + i);
-                traversal_state.Add(child_state, GetWeightValue(child_state), symbol + i);
+                uint32_t weight = GetWeightValue(child_state);
+                weight = weight != 0 ? weight : parent_weight;
+                traversal_state.Add(child_state, weight, symbol + i, payload);
               }
               mask_int = mask_int >> 1;
             }
@@ -297,7 +300,9 @@ final {
               if ((mask_int & 1) == 1) {
                 TRACE("push symbol+%d", symbol + i);
                 uint64_t child_state = ResolvePointer(starting_state, symbol + i);
-                traversal_state.Add(child_state, GetWeightValue(child_state), symbol + i);
+                uint32_t weight = GetWeightValue(child_state);
+                weight = weight != 0 ? weight : parent_weight;
+                traversal_state.Add(child_state, weight, symbol + i, payload);
               }
               mask_int = mask_int >> 1;
             }
@@ -320,35 +325,51 @@ final {
 
         if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0) && offset > 0){
           uint64_t child_state = ResolvePointer(starting_state, symbol);
-          traversal_state.Add(child_state, GetWeightValue(child_state), symbol);
+          uint32_t weight = GetWeightValue(child_state);
+          weight = weight != 0 ? weight : parent_weight;
+          traversal_state.Add(child_state, weight, symbol, payload);
         }
         if ((xor_labels_with_mask & 0x000000000000ff00ULL)== 0){
           uint64_t child_state = ResolvePointer(starting_state, symbol + 1);
-          traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 1);
+          uint32_t weight = GetWeightValue(child_state);
+          weight = weight != 0 ? weight : parent_weight;
+          traversal_state.Add(child_state, weight, symbol + 1, payload);
         }
         if ((xor_labels_with_mask & 0x0000000000ff0000ULL)== 0){
           uint64_t child_state = ResolvePointer(starting_state, symbol + 2);
-          traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 2);
+          uint32_t weight = GetWeightValue(child_state);
+          weight = weight != 0 ? weight : parent_weight;
+          traversal_state.Add(child_state, weight, symbol + 2, payload);
         }
         if ((xor_labels_with_mask & 0x00000000ff000000ULL)== 0){
           uint64_t child_state = ResolvePointer(starting_state, symbol + 3);
-          traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 3);
+          uint32_t weight = GetWeightValue(child_state);
+          weight = weight != 0 ? weight : parent_weight;
+          traversal_state.Add(child_state, weight, symbol + 3, payload);
         }
         if ((xor_labels_with_mask & 0x000000ff00000000ULL)== 0){
           uint64_t child_state = ResolvePointer(starting_state, symbol + 4);
-          traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 4);
+          uint32_t weight = GetWeightValue(child_state);
+          weight = weight != 0 ? weight : parent_weight;
+          traversal_state.Add(child_state, weight, symbol + 4, payload);
         }
         if ((xor_labels_with_mask & 0x0000ff0000000000ULL)== 0){
           uint64_t child_state = ResolvePointer(starting_state, symbol + 5);
-          traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 5);
+          uint32_t weight = GetWeightValue(child_state);
+          weight = weight != 0 ? weight : parent_weight;
+          traversal_state.Add(child_state, weight, symbol + 5, payload);
         }
         if ((xor_labels_with_mask & 0x00ff000000000000ULL)== 0){
           uint64_t child_state = ResolvePointer(starting_state, symbol + 6);
-          traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 6);
+          uint32_t weight = GetWeightValue(child_state);
+          weight = weight != 0 ? weight : parent_weight;
+          traversal_state.Add(child_state, weight, symbol + 6, payload);
         }
         if ((xor_labels_with_mask & 0xff00000000000000ULL)== 0){
           uint64_t child_state = ResolvePointer(starting_state, symbol + 7);
-          traversal_state.Add(child_state, GetWeightValue(child_state), symbol + 7);
+          uint32_t weight = GetWeightValue(child_state);
+          weight = weight != 0 ? weight : parent_weight;
+          traversal_state.Add(child_state, weight, symbol + 7, payload);
         }
 
         ++labels_as_ll;
