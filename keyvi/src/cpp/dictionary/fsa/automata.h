@@ -195,7 +195,7 @@ final {
             for (auto i=1; i<16; ++i) {
               if ((mask_int & 1) == 1) {
                 TRACE("push symbol+%d", symbol + i);
-                traversal_state.Add(ResolvePointer(starting_state, symbol + i), symbol + i);
+                traversal_state.Add(ResolvePointer(starting_state, symbol + i), symbol + i, payload);
               }
               mask_int = mask_int >> 1;
             }
@@ -203,7 +203,7 @@ final {
             for (auto i=0; i<16; ++i) {
               if ((mask_int & 1) == 1) {
                 TRACE("push symbol+%d", symbol + i);
-                traversal_state.Add(ResolvePointer(starting_state, symbol + i), symbol + i);
+                traversal_state.Add(ResolvePointer(starting_state, symbol + i), symbol + i, payload);
               }
               mask_int = mask_int >> 1;
             }
@@ -225,28 +225,28 @@ final {
         uint64_t xor_labels_with_mask = *labels_as_ll^*mask_as_ll;
 
         if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0) && offset > 0){
-          traversal_state.Add(ResolvePointer(starting_state, symbol), symbol);
+          traversal_state.Add(ResolvePointer(starting_state, symbol), symbol, payload);
         }
         if ((xor_labels_with_mask & 0x000000000000ff00ULL)== 0){
-          traversal_state.Add(ResolvePointer(starting_state, symbol + 1), symbol + 1);
+          traversal_state.Add(ResolvePointer(starting_state, symbol + 1), symbol + 1, payload);
         }
         if ((xor_labels_with_mask & 0x0000000000ff0000ULL)== 0){
-          traversal_state.Add(ResolvePointer(starting_state, symbol + 2), symbol + 2);
+          traversal_state.Add(ResolvePointer(starting_state, symbol + 2), symbol + 2, payload);
         }
         if ((xor_labels_with_mask & 0x00000000ff000000ULL)== 0){
-          traversal_state.Add(ResolvePointer(starting_state, symbol + 3), symbol + 3);
+          traversal_state.Add(ResolvePointer(starting_state, symbol + 3), symbol + 3, payload);
         }
         if ((xor_labels_with_mask & 0x000000ff00000000ULL)== 0){
-          traversal_state.Add(ResolvePointer(starting_state, symbol + 4), symbol + 4);
+          traversal_state.Add(ResolvePointer(starting_state, symbol + 4), symbol + 4, payload);
         }
         if ((xor_labels_with_mask & 0x0000ff0000000000ULL)== 0){
-          traversal_state.Add(ResolvePointer(starting_state, symbol + 5), symbol + 5);
+          traversal_state.Add(ResolvePointer(starting_state, symbol + 5), symbol + 5, payload);
         }
         if ((xor_labels_with_mask & 0x00ff000000000000ULL)== 0){
-          traversal_state.Add(ResolvePointer(starting_state, symbol + 6), symbol + 6);
+          traversal_state.Add(ResolvePointer(starting_state, symbol + 6), symbol + 6, payload);
         }
         if ((xor_labels_with_mask & 0xff00000000000000ULL)== 0){
-          traversal_state.Add(ResolvePointer(starting_state, symbol + 7), symbol + 7);
+          traversal_state.Add(ResolvePointer(starting_state, symbol + 7), symbol + 7, payload);
         }
 
         ++labels_as_ll;

@@ -42,6 +42,21 @@ final {
     StateTraverser(automata_t f) :StateTraverser (f, f->GetStartState()) {
     }
 
+    StateTraverser(automata_t f, uint64_t start_state, traversal::TraversalPayload<TransitionT>& payload, bool advance = true)
+    : fsa_(f),
+          current_label_(0),
+          current_weight_(0),
+          stack_(payload) {
+      current_state_ = start_state;
+
+      TRACE("StateTraverser starting with Start state %d", current_state_);
+      f->GetOutGoingTransitions(start_state, stack_.GetStates(), stack_.traversal_stack_payload);
+
+      if (advance){
+        this->operator ++(0);
+      }
+    }
+
     StateTraverser(automata_t f, uint64_t start_state, bool advance = true)
         : fsa_(f),
           current_label_(0),
@@ -50,7 +65,7 @@ final {
       current_state_ = start_state;
 
       TRACE("StateTraverser starting with Start state %d", current_state_);
-      f->GetOutGoingTransitions(start_state, stack_.GetStates(), stack_.payload_);
+      f->GetOutGoingTransitions(start_state, stack_.GetStates(), stack_.traversal_stack_payload);
 
       if (advance){
         this->operator ++(0);
@@ -137,7 +152,7 @@ final {
       current_weight_ = stack_.GetStates().GetNextInnerWeight();
       TRACE ("Label: %c", current_label_);
       stack_++;
-      fsa_->GetOutGoingTransitions(current_state_, stack_.GetStates(), stack_.payload_);
+      fsa_->GetOutGoingTransitions(current_state_, stack_.GetStates(), stack_.traversal_stack_payload);
       TRACE("found %ld outgoing states", stack_.GetStates().size());
     }
 

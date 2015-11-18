@@ -42,29 +42,29 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
 
   traversal::TraversalStack<> stack;
 
-  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates(), stack.payload_);
+  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates(), stack.traversal_stack_payload);
 
-  BOOST_CHECK_EQUAL(2, stack.GetStates().payload_.transitions_.size());
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), '\01'), stack.GetStates().payload_.transitions_[0].state);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), 'a'), stack.GetStates().payload_.transitions_[1].state);
-  BOOST_CHECK_EQUAL('\01', stack.GetStates().payload_.transitions_[0].label);
-  BOOST_CHECK_EQUAL('a', stack.GetStates().payload_.transitions_[1].label);
+  BOOST_CHECK_EQUAL(2, stack.GetStates().traversal_state_payload.transitions.size());
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), '\01'), stack.GetStates().traversal_state_payload.transitions[0].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), 'a'), stack.GetStates().traversal_state_payload.transitions[1].state);
+  BOOST_CHECK_EQUAL('\01', stack.GetStates().traversal_state_payload.transitions[0].label);
+  BOOST_CHECK_EQUAL('a', stack.GetStates().traversal_state_payload.transitions[1].label);
 
   // check all outgoings for 'a'
   uint32_t state_a = f->TryWalkTransition(f->GetStartState(), 'a');
 
-  f->GetOutGoingTransitions(state_a, stack.GetStates(), stack.payload_);
+  f->GetOutGoingTransitions(state_a, stack.GetStates(), stack.traversal_stack_payload);
 
-  BOOST_CHECK_EQUAL(4, stack.GetStates().payload_.transitions_.size());
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'a'), stack.GetStates().payload_.transitions_[0].state);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'g'), stack.GetStates().payload_.transitions_[1].state);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'j'), stack.GetStates().payload_.transitions_[2].state);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'z'), stack.GetStates().payload_.transitions_[3].state);
+  BOOST_CHECK_EQUAL(4, stack.GetStates().traversal_state_payload.transitions.size());
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'a'), stack.GetStates().traversal_state_payload.transitions[0].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'g'), stack.GetStates().traversal_state_payload.transitions[1].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'j'), stack.GetStates().traversal_state_payload.transitions[2].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'z'), stack.GetStates().traversal_state_payload.transitions[3].state);
 
-  BOOST_CHECK_EQUAL('a', stack.GetStates().payload_.transitions_[0].label);
-  BOOST_CHECK_EQUAL('g', stack.GetStates().payload_.transitions_[1].label);
-  BOOST_CHECK_EQUAL('j', stack.GetStates().payload_.transitions_[2].label);
-  BOOST_CHECK_EQUAL('z', stack.GetStates().payload_.transitions_[3].label);
+  BOOST_CHECK_EQUAL('a', stack.GetStates().traversal_state_payload.transitions[0].label);
+  BOOST_CHECK_EQUAL('g', stack.GetStates().traversal_state_payload.transitions[1].label);
+  BOOST_CHECK_EQUAL('j', stack.GetStates().traversal_state_payload.transitions[2].label);
+  BOOST_CHECK_EQUAL('z', stack.GetStates().traversal_state_payload.transitions[3].label);
 }
 
 BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsWeightTest ) {
@@ -79,10 +79,10 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsWeightTest ) {
 
   traversal::TraversalStack<traversal::WeightedTransition> stack;
 
-  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates(), stack.payload_);
+  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates(), stack.traversal_stack_payload);
 
-  BOOST_CHECK_EQUAL(1, stack.GetStates().payload_.transitions_.size());
-  BOOST_CHECK_EQUAL(444, stack.GetStates().payload_.transitions_[0].weight);
+  BOOST_CHECK_EQUAL(1, stack.GetStates().traversal_state_payload.transitions.size());
+  BOOST_CHECK_EQUAL(444, stack.GetStates().traversal_state_payload.transitions[0].weight);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

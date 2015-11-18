@@ -50,8 +50,8 @@ struct TraversalPayload {
 
 template<class TransitionT = Transition>
 struct TraversalStatePayload {
-  std::vector<TransitionT> transitions_;
-  size_t position;
+  std::vector<TransitionT> transitions;
+  size_t position = 0;
 };
 
 /**
@@ -60,17 +60,17 @@ struct TraversalStatePayload {
 template<class TransitionT = Transition>
 struct TraversalState {
 
-  void Add(uint64_t s, unsigned char l) {
-    payload_.transitions_.push_back(TransitionT(s, l));
+  void Add(uint64_t s, unsigned char l, TraversalPayload<TransitionT>& payload) {
+    traversal_state_payload.transitions.push_back(TransitionT(s, l));
   }
 
   void Add(uint64_t s, uint32_t weight, unsigned char l, TraversalPayload<TransitionT>& payload) {
-    payload_.transitions_.push_back(TransitionT(s, weight, l));
+    traversal_state_payload.transitions.push_back(TransitionT(s, weight, l));
   }
 
   uint64_t GetNextState() const {
-    if (payload_.position < payload_.transitions_.size()) {
-      return payload_.transitions_[payload_.position].state;
+    if (traversal_state_payload.position < traversal_state_payload.transitions.size()) {
+      return traversal_state_payload.transitions[traversal_state_payload.position].state;
     }
 
     // else
@@ -78,7 +78,7 @@ struct TraversalState {
   }
 
   unsigned char GetNextTransition() const {
-    return payload_.transitions_[payload_.position].label;
+    return traversal_state_payload.transitions[traversal_state_payload.position].label;
   }
 
   uint32_t GetNextInnerWeight() const {
@@ -86,26 +86,26 @@ struct TraversalState {
   }
 
   size_t size() const {
-    return payload_.transitions_.size();
+    return traversal_state_payload.transitions.size();
   }
 
   size_t& operator++ (){
-    return ++payload_.position;
+    return ++traversal_state_payload.position;
   }
 
   size_t operator++ (int){
-    return payload_.position++;
+    return traversal_state_payload.position++;
   }
 
   void Clear(){
-    payload_.position = 0;
-    payload_.transitions_.clear();
+    traversal_state_payload.position = 0;
+    traversal_state_payload.transitions.clear();
   }
 
   void PostProcess(){
   }
 
-  TraversalStatePayload<TransitionT> payload_;
+  TraversalStatePayload<TransitionT> traversal_state_payload;
 };
 
 /**
@@ -113,46 +113,50 @@ struct TraversalState {
  */
 template<class TransitionT = Transition>
 struct TraversalStack {
-  TraversalStack():traversal_states(), payload_() {
+  TraversalStack():traversal_states(), traversal_stack_payload() {
+    traversal_states.resize(20);
+  }
+
+  TraversalStack(TraversalPayload<TransitionT>& payload):traversal_states(), traversal_stack_payload(payload) {
     traversal_states.resize(20);
   }
 
   TraversalState<TransitionT>& GetStates() {
-    return traversal_states[payload_.current_depth];
+    return traversal_states[traversal_stack_payload.current_depth];
   }
 
   size_t GetDepth() const {
-    return payload_.current_depth;
+    return traversal_stack_payload.current_depth;
   }
 
   size_t& operator++ (){
     // resize if needed
-    if (traversal_states.size() < payload_.current_depth + 2) {
-      traversal_states.resize(payload_.current_depth + 10);
+    if (traversal_states.size() < traversal_stack_payload.current_depth + 2) {
+      traversal_states.resize(traversal_stack_payload.current_depth + 10);
     }
-    return ++payload_.current_depth;
+    return ++traversal_stack_payload.current_depth;
   }
 
   size_t operator++ (int){
-    payload_.current_depth++;
+    traversal_stack_payload.current_depth++;
     // resize if needed
-    if (traversal_states.size() < payload_.current_depth + 1) {
-      traversal_states.resize(payload_.current_depth + 10);
+    if (traversal_states.size() < traversal_stack_payload.current_depth + 1) {
+      traversal_states.resize(traversal_stack_payload.current_depth + 10);
     }
 
-    return payload_.current_depth;
+    return traversal_stack_payload.current_depth;
   }
 
   size_t& operator-- (){
-    return --payload_.current_depth;
+    return --traversal_stack_payload.current_depth;
   }
 
   size_t operator-- (int){
-    return payload_.current_depth--;
+    return traversal_stack_payload.current_depth--;
   }
 
   std::vector<TraversalState<TransitionT>> traversal_states;
-  TraversalPayload<TransitionT> payload_;
+  TraversalPayload<TransitionT> traversal_stack_payload;
 };
 
 

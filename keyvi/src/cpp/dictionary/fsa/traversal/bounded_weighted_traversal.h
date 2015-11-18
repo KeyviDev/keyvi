@@ -42,16 +42,16 @@ struct BoundedWeightedTransition: public WeightedTransition {
 
 template<>
 struct TraversalPayload<BoundedWeightedTransition> {
-  TraversalPayload(): current_depth(0), priority_queue_(10){}
+  TraversalPayload(): current_depth(0), priority_queue(10){}
 
   size_t current_depth;
-  util::BoundedPriorityQueue<uint32_t> priority_queue_;
+  util::BoundedPriorityQueue<uint32_t> priority_queue;
 };
 
 template<>
 inline void TraversalState<BoundedWeightedTransition>::PostProcess() {
-  if (payload_.transitions_.size() > 0) {
-    std::sort(payload_.transitions_.begin(), payload_.transitions_.end(), WeightedTransitionCompare);
+  if (traversal_state_payload.transitions.size() > 0) {
+    std::sort(traversal_state_payload.transitions.begin(), traversal_state_payload.transitions.end(), WeightedTransitionCompare);
   }
 }
 
