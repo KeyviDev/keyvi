@@ -29,6 +29,7 @@
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 #include "dictionary/fsa/traversal/weighted_traversal.h"
+#include "dictionary/util/bounded_priority_queue.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -39,18 +40,12 @@ struct BoundedWeightedTransition: public WeightedTransition {
   using WeightedTransition::WeightedTransition;
 };
 
-//struct BTraversalState: public TraversalState<BoundedWeightedTransition> {
-//};
-
-//template<>
-//struct TraversalState<BoundedWeightedTransition> {
-
-//}
 template<>
-struct TraversalStatePayload<BoundedWeightedTransition> {
-  std::vector<BoundedWeightedTransition> transitions_;
-  size_t position;
-  uint32_t min_weight_;
+struct TraversalPayload<BoundedWeightedTransition> {
+  TraversalPayload(): current_depth(0), priority_queue_(10){}
+
+  size_t current_depth;
+  util::BoundedPriorityQueue<uint32_t> priority_queue_;
 };
 
 template<>
