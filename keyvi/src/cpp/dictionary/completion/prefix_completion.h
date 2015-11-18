@@ -74,19 +74,19 @@ final {
 
         // data which is required for the callback as well
         struct delegate_payload {
-          delegate_payload(fsa::BoundedWeightedStateTraverser2&& t,
+          delegate_payload(fsa::BoundedWeightedStateTraverser&& t,
                            std::vector<unsigned char>& stack)
               : traverser(std::move(t)),
                 traversal_stack(std::move(stack)) {
           }
 
-          fsa::BoundedWeightedStateTraverser2 traverser;
+          fsa::BoundedWeightedStateTraverser traverser;
           std::vector<unsigned char> traversal_stack;
         };
 
         std::shared_ptr<delegate_payload> data(
             new delegate_payload(
-                fsa::BoundedWeightedStateTraverser2(fsa_, state,
+                fsa::BoundedWeightedStateTraverser(fsa_, state,
                                                    number_of_results),
                 traversal_stack));
 
