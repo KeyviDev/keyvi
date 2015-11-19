@@ -12,6 +12,7 @@ cdef extern from "dictionary/dictionary.h" namespace "keyvi::dictionary":
         bool Contains (const_char*) # wrap-ignore
         Match operator[](const_char*) # wrap-ignore
         _MatchIteratorPair Get (const_char*)
+        _MatchIteratorPair GetNear (libcpp_string, size_t minimum_prefix_length)
         _MatchIteratorPair GetAllItems () # wrap-ignore
         _MatchIteratorPair Lookup(const_char*)
         _MatchIteratorPair LookupText(const_char*)
