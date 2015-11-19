@@ -102,7 +102,7 @@ struct TraversalState {
     traversal_state_payload.transitions.clear();
   }
 
-  void PostProcess(){
+  void PostProcess(TraversalPayload<TransitionT>& payload){
   }
 
   TraversalStatePayload<TransitionT> traversal_state_payload;

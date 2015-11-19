@@ -365,6 +365,7 @@ final {
 
        fsa::NearStateTraverser traverser;
        std::vector<unsigned char> traversal_stack;
+       size_t matched_depth = 0;
      };
 
      auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(key.substr(minimum_prefix_length));
@@ -377,11 +378,12 @@ final {
        [data, key, minimum_prefix_length] () {
          TRACE("prefix completion callback called");
 
+
          for (;;) {
            unsigned char label = data->traverser.GetStateLabel();
 
            // todo: check minimum depth
-           if (label) {
+           if (label  && data->traverser.GetDepth() > data->matched_depth) {
 
              data->traversal_stack.resize(data->traverser.GetDepth()-1);
              data->traversal_stack.push_back(label);
@@ -399,8 +401,9 @@ final {
 
                data->traverser++;
 
-               // todo: remember the depth
-
+               // remember the depth
+               TRACE("found a match, remember depth, only allow matches with same depth %ld", data->traverser.GetTraversalPayload().exact_depth);
+               data->matched_depth = data->traverser.GetTraversalPayload().exact_depth;
                return m;
              }
              data->traverser++;

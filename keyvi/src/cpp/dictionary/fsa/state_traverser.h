@@ -160,6 +160,10 @@ final {
       return current_label_;
     }
 
+    traversal::TraversalPayload<TransitionT>& GetTraversalPayload() {
+      return stack_.traversal_stack_payload;
+    }
+
    private:
     automata_t fsa_;
     unsigned char current_label_;

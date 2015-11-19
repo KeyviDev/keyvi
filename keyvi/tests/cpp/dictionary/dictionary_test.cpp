@@ -128,14 +128,29 @@ BOOST_AUTO_TEST_CASE( DictGetNear ) {
   testing::TempDictionary dictionary(test_data);
   dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  std::vector<std::string> expected_matches = { "pizzeria:u281wu8bmmzq", "pizzeria:u2817uqfyqkg",
-      "pizzeria:u281z7hfvzq9", "pizzeria:u28db8mmzj1t"};
+  std::vector<std::string> expected_matches = { "pizzeria:u281wu8bmmzq" };
 
   int i = 0;
 
-  // check near match for pizzeria:u28
+  // check near match for pizzeria:u28, it should only return 1 match "281wu" is the closest
   for (auto m : d->GetNear("pizzeria:u281wu88kekq", 12)){
-    BOOST_CHECK(i<expected_matches.size());
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
+    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+  }
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
+
+  expected_matches = { "pizzeria:u2817uqfyqkg", "pizzeria:u281wu8bmmzq", "pizzeria:u281z7hfvzq9" };
+
+  i = 0;
+
+  // check near match for pizzeria:u28, it should only return 2 matches u2817 and u281w are equally good
+  for (auto m : d->GetNear("pizzeria:u2815u88kekq", 12)){
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
     BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
   }
 

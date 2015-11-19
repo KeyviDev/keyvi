@@ -50,7 +50,7 @@ struct TraversalPayload<BoundedWeightedTransition> {
 };
 
 template<>
-inline void TraversalState<BoundedWeightedTransition>::PostProcess() {
+inline void TraversalState<BoundedWeightedTransition>::PostProcess(TraversalPayload<BoundedWeightedTransition>& payload) {
   if (traversal_state_payload.transitions.size() > 0) {
     std::sort(traversal_state_payload.transitions.begin(), traversal_state_payload.transitions.end(), WeightedTransitionCompare);
   }

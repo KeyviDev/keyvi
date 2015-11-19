@@ -255,6 +255,10 @@ final {
       }
 #endif
 
+      //post, e.g. sort transitions
+      TRACE("postprocess transitions");
+      traversal_state.PostProcess(payload);
+
       return;
     }
 
@@ -378,9 +382,9 @@ final {
       }
     #endif
 
-      //sort transitions
+      //post, e.g. sort transitions
       TRACE("postprocess transitions");
-      traversal_state.PostProcess();
+      traversal_state.PostProcess(payload);
 
       return;
     }

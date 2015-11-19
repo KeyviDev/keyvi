@@ -49,6 +49,9 @@ struct TraversalPayload<NearTransition> {
 
   size_t current_depth;
   std::string lookup_key;
+  size_t exact_depth = 0;
+  bool exact = true;
+
 };
 
 template<>
@@ -59,7 +62,18 @@ struct TraversalStatePayload<NearTransition> {
 
 
 template<>
-inline void TraversalState<NearTransition>::PostProcess() {
+inline void TraversalState<NearTransition>::PostProcess(TraversalPayload<NearTransition>& payload) {
+  // check if we are still matching exact, if not mark it
+  if (payload.exact) {
+    TRACE("exact match at %d", payload.current_depth);
+
+    payload.exact_depth = payload.current_depth;
+
+    if (traversal_state_payload.position != 0) {
+      TRACE("Stop exact match at %d", payload.current_depth);
+      payload.exact = false;
+    }
+  }
 }
 
 
@@ -68,7 +82,7 @@ inline void TraversalState<NearTransition>::Add(uint64_t s, unsigned char l, Tra
   // check exact match
   TRACE("Add %c depth %d, exact %c", l, payload.current_depth, payload.lookup_key[payload.current_depth]);
 
-  if (payload.current_depth < payload.lookup_key.size() && payload.lookup_key[payload.current_depth] == l) {
+  if (payload.exact && payload.current_depth < payload.lookup_key.size() && payload.lookup_key[payload.current_depth] == l) {
     // fill in and set position 0, so that we start traversal there
     TRACE("Found exact match");
     traversal_state_payload.position = 0;
