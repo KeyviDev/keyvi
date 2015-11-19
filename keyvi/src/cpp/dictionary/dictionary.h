@@ -27,6 +27,7 @@
 #include <queue>
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/state_traverser.h"
+#include "dictionary/fsa/traverser_types.h"
 #include "dictionary/match.h"
 #include "dictionary/match_iterator.h"
 
@@ -205,7 +206,7 @@ final {
 
                 if (data->traverser.IsFinalState()) {
                   std::string match_str = std::string(reinterpret_cast<char*> (&data->traversal_stack[0]),
-                                                      data->traverser.GetDepth())
+                                                      data->traverser.GetDepth());
                   TRACE("found final state at depth %d %s",
                         data->traverser.GetDepth(),
                         match_str.c_str());
@@ -329,6 +330,91 @@ final {
 
       return MatchIterator::MakeIteratorPair(func);
     }
+
+   /**
+    * Match a key near
+    *
+    * @param key
+    * @param minimum_prefix_length
+    * @return
+    */
+   MatchIterator::MatchIteratorPair GetNear(const std::string& key, size_t minimum_prefix_length) {
+     uint64_t state = fsa_->GetStartState();
+
+     TRACE("GetNear %s, matching prefix first", key.substr(0, minimum_prefix_length).c_str());
+     for (size_t i = 0; i < minimum_prefix_length; ++i) {
+       state = fsa_->TryWalkTransition(state, key[i]);
+
+       if (!state) {
+         return MatchIterator::EmptyIteratorPair();
+       }
+     }
+
+     std::vector<unsigned char> traversal_stack;
+     traversal_stack.reserve(20);
+
+     TRACE("Match prefix, doing near traversal now start state: %ld, remaining key: %s", state, key.substr(minimum_prefix_length).c_str());
+
+     // data which is required for the callback as well
+     struct delegate_payload {
+       delegate_payload(fsa::NearStateTraverser&& t,
+                        std::vector<unsigned char>& stack)
+           : traverser(std::move(t)),
+             traversal_stack(std::move(stack)) {
+       }
+
+       fsa::NearStateTraverser traverser;
+       std::vector<unsigned char> traversal_stack;
+     };
+
+     auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(key.substr(minimum_prefix_length));
+     std::shared_ptr<delegate_payload> data(
+                 new delegate_payload(
+                     fsa::NearStateTraverser(fsa_, state, payload),
+                     traversal_stack));
+
+     auto tfunc =
+       [data, key, minimum_prefix_length] () {
+         TRACE("prefix completion callback called");
+
+         for (;;) {
+           unsigned char label = data->traverser.GetStateLabel();
+
+           // todo: check minimum depth
+           if (label) {
+
+             data->traversal_stack.resize(data->traverser.GetDepth()-1);
+             data->traversal_stack.push_back(label);
+             TRACE("Current depth %d (%d)", minimum_prefix_length + data->traverser.GetDepth() -1, data->traversal_stack.size());
+             if (data->traverser.IsFinalState()) {
+               // todo: refactor, fill vector upfront
+               std::string match_str = key.substr(0, minimum_prefix_length) + std::string(reinterpret_cast<char*> (&data->traversal_stack[0]), data->traverser.GetDepth());
+               TRACE("found final state at depth %d %s", minimum_prefix_length + data->traverser.GetDepth(), match_str.c_str());
+               Match m(0,
+                   data->traverser.GetDepth() + key.size(),
+                   match_str,
+                   0,
+                   data->traverser.GetFsa(),
+                   data->traverser.GetStateValue());
+
+               data->traverser++;
+
+               // todo: remember the depth
+
+               return m;
+             }
+             data->traverser++;
+           } else {
+             TRACE("StateTraverser exhausted.");
+             return Match();
+           }
+         }
+       };
+
+     return MatchIterator::MakeIteratorPair(tfunc);
+   }
+
+
 
    std::string GetManifestAsString() const {
      return fsa_->GetManifestAsString();

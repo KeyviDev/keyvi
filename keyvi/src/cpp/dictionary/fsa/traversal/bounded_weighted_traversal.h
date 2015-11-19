@@ -26,10 +26,11 @@
 #ifndef BOUNDED_WEIGHTED_TRAVERSAL_H_
 #define BOUNDED_WEIGHTED_TRAVERSAL_H_
 
-//#define ENABLE_TRACING
-#include "dictionary/util/trace.h"
 #include "dictionary/fsa/traversal/weighted_traversal.h"
 #include "dictionary/util/bounded_priority_queue.h"
+
+//#define ENABLE_TRACING
+#include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

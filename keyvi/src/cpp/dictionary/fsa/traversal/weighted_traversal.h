@@ -26,9 +26,10 @@
 #ifndef WEIGHTED_TRAVERSAL_H_
 #define WEIGHTED_TRAVERSAL_H_
 
+#include "dictionary/fsa/traversal/traversal_base.h"
+
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
-#include "dictionary/fsa/traversal/traversal_base.h"
 
 namespace keyvi {
 namespace dictionary {
