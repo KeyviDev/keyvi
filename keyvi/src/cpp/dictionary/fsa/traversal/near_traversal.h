@@ -67,7 +67,7 @@ inline void TraversalState<NearTransition>::Add(uint64_t s, unsigned char l, Tra
   // check exact match
   TRACE("Add %c depth %d, exact %c", l, payload.current_depth, payload.lookup_key[payload.current_depth]);
 
-  if (payload.lookup_key[payload.current_depth] == l) {
+  if (payload.current_depth < payload.lookup_key.size() && payload.lookup_key[payload.current_depth] == l) {
     // fill in and set position 0, so that we start traversal there
     traversal_state_payload.position = 0;
     traversal_state_payload.transitions[0] = NearTransition(s, l);

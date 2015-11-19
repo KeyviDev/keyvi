@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE( NearTraversalTests )
 
 BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
 
-  std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
+  std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
   testing::TempDictionary dictionary (test_data);
   automata_t f = dictionary.GetFsa();
 
@@ -56,7 +56,14 @@ BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
   BOOST_CHECK_EQUAL('c', s.GetStateLabel());
   BOOST_CHECK_EQUAL(3, s.GetDepth());
   BOOST_CHECK(!s.IsFinalState());
-
+  s++;
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('h', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
   s++;
   BOOST_CHECK_EQUAL('d', s.GetStateLabel());
   BOOST_CHECK_EQUAL(4, s.GetDepth());
@@ -91,7 +98,6 @@ BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
   BOOST_CHECK_EQUAL('b', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
   BOOST_CHECK(!s.IsFinalState());
-
   s++;
   BOOST_CHECK_EQUAL('b', s.GetStateLabel());
   BOOST_CHECK_EQUAL(2, s.GetDepth());
@@ -101,6 +107,29 @@ BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
   s++;
   BOOST_CHECK_EQUAL('d', s.GetStateLabel());
   BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('g', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('h', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(6, s.GetDepth());
   BOOST_CHECK(s.IsFinalState());
 
   // traverser shall be exhausted
