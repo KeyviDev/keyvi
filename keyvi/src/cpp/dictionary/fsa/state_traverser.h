@@ -106,7 +106,6 @@ final {
 
     uint32_t GetInnerWeight() {
       return current_weight_;
-      //return fsa_->GetWeightValue(current_state_);
     }
 
     uint64_t GetStateId() const {

@@ -382,14 +382,14 @@ final {
          for (;;) {
            unsigned char label = data->traverser.GetStateLabel();
 
-           // todo: check minimum depth
+           // check minimum depth
            if (label  && data->traverser.GetDepth() > data->matched_depth) {
 
              data->traversal_stack.resize(data->traverser.GetDepth()-1);
              data->traversal_stack.push_back(label);
              TRACE("Current depth %d (%d)", minimum_prefix_length + data->traverser.GetDepth() -1, data->traversal_stack.size());
              if (data->traverser.IsFinalState()) {
-               // todo: refactor, fill vector upfront
+               // optimize? fill vector upfront?
                std::string match_str = key.substr(0, minimum_prefix_length) + std::string(reinterpret_cast<char*> (&data->traversal_stack[0]), data->traverser.GetDepth());
                TRACE("found final state at depth %d %s", minimum_prefix_length + data->traverser.GetDepth(), match_str.c_str());
                Match m(0,
