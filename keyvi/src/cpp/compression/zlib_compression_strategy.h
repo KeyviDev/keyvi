@@ -60,7 +60,6 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     buffer[0] = static_cast<char>(ZLIB_COMPRESSION);
 
     int ret;
-    size_t written = 0;
 
     // compress bytes
     zs.next_out = reinterpret_cast<Bytef*>(buffer.data() + 1);

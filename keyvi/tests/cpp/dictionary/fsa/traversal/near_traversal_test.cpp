@@ -16,10 +16,11 @@
 // limitations under the License.
 //
 
+
 /*
- * state_traverser_test.cpp
+ * near_traversal.cpp
  *
- *  Created on: Jun 3, 2014
+ *  Created on: Nov 18, 2015
  *      Author: hendrik
  */
 
@@ -27,21 +28,24 @@
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/state_traverser.h"
+#include "dictionary/fsa/traversal/near_traversal.h"
 #include "dictionary/testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-BOOST_AUTO_TEST_SUITE( StateTraverserTests )
+BOOST_AUTO_TEST_SUITE( NearTraversalTests )
 
 BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
 
-  std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
+  std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
   testing::TempDictionary dictionary (test_data);
   automata_t f = dictionary.GetFsa();
 
-  StateTraverser<> s(f);
+  auto payload = traversal::TraversalPayload<traversal::NearTransition>("aace");
+
+  StateTraverser<traversal::NearTransition> s(f, f->GetStartState(), payload);
 
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
@@ -49,45 +53,51 @@ BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(2, s.GetDepth());
   s++;
-  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(3, s.GetDepth());
-  BOOST_CHECK(!s.IsFinalState());
-
-  s++;
-  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(4, s.GetDepth());
-  BOOST_CHECK(s.IsFinalState());
-
-  s++;
-  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(3, s.GetDepth());
-  BOOST_CHECK(!s.IsFinalState());
-
-  s++;
-  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(4, s.GetDepth());
-  BOOST_CHECK(s.IsFinalState());
-
-  s++;
-  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(4, s.GetDepth());
-  BOOST_CHECK(s.IsFinalState());
-
-  s++;
   BOOST_CHECK_EQUAL('c', s.GetStateLabel());
   BOOST_CHECK_EQUAL(3, s.GetDepth());
   BOOST_CHECK(!s.IsFinalState());
-
+  s++;
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('h', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
   s++;
   BOOST_CHECK_EQUAL('d', s.GetStateLabel());
   BOOST_CHECK_EQUAL(4, s.GetDepth());
   BOOST_CHECK(s.IsFinalState());
 
   s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
   BOOST_CHECK_EQUAL('b', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
   BOOST_CHECK(!s.IsFinalState());
-
   s++;
   BOOST_CHECK_EQUAL('b', s.GetStateLabel());
   BOOST_CHECK_EQUAL(2, s.GetDepth());
@@ -99,89 +109,28 @@ BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
   BOOST_CHECK_EQUAL(4, s.GetDepth());
   BOOST_CHECK(s.IsFinalState());
 
-  // traverser shall be exhausted
   s++;
-  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK_EQUAL(0, s.GetDepth());
-  s++;
-  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK_EQUAL(0, s.GetDepth());
-}
-
-BOOST_AUTO_TEST_CASE( someTraversalWithPrune ) {
-
-  std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary (test_data);
-  automata_t f = dictionary.GetFsa();
-
-  StateTraverser<> s(f);
-
-  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(1, s.GetDepth());
-  s++;
-  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(2, s.GetDepth());
-  s++;
-  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(3, s.GetDepth());
-
-  s.Prune();
-  s++;
-
-  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(3, s.GetDepth());
-
-  s.Prune();
-  s++;
-
   BOOST_CHECK_EQUAL('c', s.GetStateLabel());
-  BOOST_CHECK_EQUAL(3, s.GetDepth());
-
-  s.Prune();
-  s++;
-
-  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
   s++;
-  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
   BOOST_CHECK_EQUAL(2, s.GetDepth());
   s++;
-
-  s.Prune();
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
   s++;
-
-  // traverser shall be exhausted
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
   s++;
-  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK_EQUAL(0, s.GetDepth());
+  BOOST_CHECK_EQUAL('g', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
   s++;
-  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK_EQUAL(0, s.GetDepth());
-}
-
-BOOST_AUTO_TEST_CASE( longkeys ) {
-
-  std::string a(1000, 'a');
-  std::string b(1000, 'b');
-
-  std::vector<std::string> test_data = {a, b};
-  testing::TempDictionary dictionary (test_data);
-  automata_t f = dictionary.GetFsa();
-
-  StateTraverser<> s(f);
-
-  for (int i = 1; i<=1000; ++ i){
-    BOOST_CHECK_EQUAL('a', s.GetStateLabel());
-    BOOST_CHECK_EQUAL(i, s.GetDepth());
-    s++;
-  }
-
-
-  for (int i = 1; i<=1000; ++ i){
-    BOOST_CHECK_EQUAL('b', s.GetStateLabel());
-    BOOST_CHECK_EQUAL(i, s.GetDepth());
-    s++;
-  }
+  BOOST_CHECK_EQUAL('h', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(6, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
 
   // traverser shall be exhausted
   s++;

@@ -26,6 +26,7 @@
 #define STATE_TRAVERSER_H_
 
 #include "dictionary/fsa/automata.h"
+#include "dictionary/fsa/traversal/traversal_base.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -34,20 +35,38 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+template<class TransitionT = traversal::Transition>
 class StateTraverser
 final {
    public:
     StateTraverser(automata_t f) :StateTraverser (f, f->GetStartState()) {
     }
 
-    StateTraverser(automata_t f, uint64_t start_state, bool advance = true)
-        : fsa_(f),
-          current_depth_(0),
-          current_label_(0) {
+    StateTraverser(automata_t f, uint64_t start_state, traversal::TraversalPayload<TransitionT>& payload, bool advance = true)
+    : fsa_(f),
+          current_label_(0),
+          current_weight_(0),
+          stack_(payload) {
       current_state_ = start_state;
 
       TRACE("StateTraverser starting with Start state %d", current_state_);
-      traversal_stack_.push_back(0);
+      f->GetOutGoingTransitions(start_state, stack_.GetStates(), stack_.traversal_stack_payload);
+
+      if (advance){
+        this->operator ++(0);
+      }
+    }
+
+    StateTraverser(automata_t f, uint64_t start_state, bool advance = true)
+        : fsa_(f),
+          current_label_(0),
+          current_weight_(0),
+          stack_() {
+      current_state_ = start_state;
+
+      TRACE("StateTraverser starting with Start state %d", current_state_);
+      f->GetOutGoingTransitions(start_state, stack_.GetStates(), stack_.traversal_stack_payload);
+
       if (advance){
         this->operator ++(0);
       }
@@ -59,117 +78,101 @@ final {
 
     StateTraverser(StateTraverser&& other)
         : fsa_(other.fsa_),
-          current_depth_(other.current_depth_),
           current_label_(other.current_label_),
           current_state_(other.current_state_),
-          traversal_stack_(std::move(other.traversal_stack_)),
-          state_traversal_stack_(std::move(other.state_traversal_stack_)) {
+          current_weight_(other.current_weight_),
+          stack_(std::move(other.stack_)) {
       other.fsa_ = 0;
       other.current_state_ = 0;
+      other.current_weight_ = 0;
       other.current_label_ = 0;
-      other.current_depth_ = 0;
     }
 
     automata_t GetFsa() const {
       return fsa_;
     }
 
-    bool IsFinalState() {
+    bool IsFinalState() const {
       return fsa_->IsFinalState(current_state_);
     }
 
-    size_t GetDepth() {
-      return current_depth_;
+    size_t GetDepth() const {
+      return stack_.GetDepth();
     }
 
-    uint64_t GetStateValue() {
+    uint64_t GetStateValue() const {
       return fsa_->GetStateValue(current_state_);
     }
 
-    uint64_t GetStateId(){
+    uint32_t GetInnerWeight() {
+      return current_weight_;
+    }
+
+    uint64_t GetStateId() const {
       return current_state_;
     }
 
-    internal::IValueStoreReader::attributes_t GetValueAsAttributeVector(){
-          return fsa_->GetValueAsAttributeVector(GetStateValue());
+    internal::IValueStoreReader::attributes_t GetValueAsAttributeVector() const {
+      return fsa_->GetValueAsAttributeVector(GetStateValue());
     }
 
     void Prune() {
-      traversal_stack_.pop_back();
-      current_state_ = state_traversal_stack_.back();
-      state_traversal_stack_.pop_back();
-      --current_depth_;
+      TRACE("statetraverser Prune.");
+      --stack_;
+      stack_.GetStates()++;
     }
 
     void operator++(int) {
-
+      TRACE("statetraverser++");
       // ignore cases where we are already at the end
       if (current_state_ == 0) {
+        TRACE("at the end");
         return;
       }
 
-      for (;;) {
-        uint64_t child_node = 0;
+      current_state_ = stack_.GetStates().GetNextState();
+      TRACE ("next state: %ld depth: %ld", current_state_, stack_.GetDepth());
 
-        do {
-          ++traversal_stack_[current_depth_];
-          child_node = fsa_->TryWalkTransition(
-              current_state_, traversal_stack_[current_depth_]);
-
-          if (traversal_stack_[current_depth_] == 255) {
-            break;
-          }
-        } while (!child_node);
-
-        if (child_node) {
-          /* Found a valid child node
-           * go one level down
-           */
-          current_label_ = traversal_stack_[current_depth_];
-          ++current_depth_;
-          state_traversal_stack_.push_back(current_state_);
-          current_state_ = child_node;
-          traversal_stack_.push_back(1);
-
+      while (current_state_ == 0) {
+        if (stack_.GetDepth() == 0) {
+          TRACE("traverser exhausted.");
+          current_label_ = 0;
           return;
-
-        } else {
-          // did not found any more transitions at this deep
-
-          if (current_depth_) {
-            /* we did not find any path at the current level (deep)
-             * go one level up
-             */
-            traversal_stack_.pop_back();
-            current_state_ = state_traversal_stack_.back();
-            state_traversal_stack_.pop_back();
-            --current_depth_;
-          } else {
-            // we are at the very end
-            current_state_ = 0;
-            current_depth_ = 0;
-            current_label_ = 0;
-            return;
-          }
         }
+
+        TRACE ("state is 0, go up");
+        --stack_;
+        stack_.GetStates()++;
+        current_state_ = stack_.GetStates().GetNextState();
+        TRACE ("next state %ld depth %ld", current_state_, stack_.GetDepth());
       }
+
+      current_label_ = stack_.GetStates().GetNextTransition();
+      current_weight_ = stack_.GetStates().GetNextInnerWeight();
+      TRACE ("Label: %c", current_label_);
+      stack_++;
+      fsa_->GetOutGoingTransitions(current_state_, stack_.GetStates(), stack_.traversal_stack_payload);
+      TRACE("found %ld outgoing states", stack_.GetStates().size());
     }
 
-    unsigned char GetStateLabel() {
+    unsigned char GetStateLabel() const {
       return current_label_;
+    }
+
+    traversal::TraversalPayload<TransitionT>& GetTraversalPayload() {
+      return stack_.traversal_stack_payload;
     }
 
    private:
     automata_t fsa_;
-    size_t current_depth_;
     unsigned char current_label_;
     uint64_t current_state_;
-    std::vector<unsigned char> traversal_stack_;
-    std::vector<uint64_t> state_traversal_stack_;
+    uint32_t current_weight_;
+    traversal::TraversalStack<TransitionT> stack_;
   };
 
-  } /* namespace fsa */
-  } /* namespace dictionary */
-  } /* namespace keyvi */
+} /* namespace fsa */
+} /* namespace dictionary */
+} /* namespace keyvi */
 
 #endif /* STATE_TRAVERSER_H_ */

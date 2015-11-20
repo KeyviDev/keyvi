@@ -26,6 +26,7 @@
 #define ENTRY_ITERATOR_H_
 
 #include "dictionary/fsa/automata.h"
+#include "dictionary/fsa/traversal/traversal_base.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -46,38 +47,33 @@ class EntryIterator final{
   EntryIterator(automata_t f) : EntryIterator(f, f->GetStartState()) {}
 
   EntryIterator(automata_t f, uint64_t start_state)
-      : fsa_(f) {
+      : fsa_(f),stack_() {
     if (f && f->GetNumberOfKeys() > 0) {
       current_state_ = start_state;
-      state_vector_traversal_stack_.resize(10);
-      transitions_vector_traversal_stack_.resize(10);
+      traversal_stack_.reserve(50);
+      f->GetOutGoingTransitions(start_state, stack_.GetStates(), stack_.traversal_stack_payload);
 
-      fsa_->GetOutGoingTransitions(start_state, state_vector_traversal_stack_[0], transitions_vector_traversal_stack_[0]);
-
-      vector_offset_traversal_stack_.push_back(0);
-      // If there are no transitions from the start state...
-      if (transitions_vector_traversal_stack_[0].size() > 0) {
-        traversal_stack_.push_back(transitions_vector_traversal_stack_[0][0]);
-        TraverseToNextFinalState();
-      } else {
-        Clear();
-      }
+      TraverseToNextFinalState();
     } else {
       Clear();
     }
   }
 
   std::string GetKey() {
-    TRACE ("depth: %d", current_depth_);
-    return std::string((const char*) traversal_stack_.data(), current_depth_ + 1);
+    TRACE ("depth: %d", GetDepth());
+    return std::string((const char*) traversal_stack_.data(), GetDepth());
   }
 
   void WriteKey(std::ostream& stream){
-    stream.write((const char*) traversal_stack_.data(), current_depth_ + 1);
+    stream.write((const char*) traversal_stack_.data(), GetDepth());
   }
 
   uint64_t GetValueId() const {
     return current_value_;
+  }
+
+  size_t GetDepth() const {
+    return stack_.GetDepth();
   }
 
   internal::IValueStoreReader::attributes_t GetValueAsAttributeVector() const {
@@ -93,10 +89,7 @@ class EntryIterator final{
     current_state_ = other.current_state_;
     current_value_ = other.current_value_;
     traversal_stack_ = other.traversal_stack_;
-    state_vector_traversal_stack_ = other.state_vector_traversal_stack_;
-    transitions_vector_traversal_stack_ = other.transitions_vector_traversal_stack_;
-    vector_offset_traversal_stack_ = other.vector_offset_traversal_stack_;
-    current_depth_ = other.current_depth_;
+    stack_ = other.stack_;
     return *this;
   }
 
@@ -127,74 +120,38 @@ class EntryIterator final{
       return;
     }
 
-    // clean the current state
-    current_state_ = 0;
-    current_value_ = 0;
-
     for (;;){
+      current_state_ = stack_.GetStates().GetNextState();
+      TRACE ("next state: %ld depth: %ld", current_state_, stack_.GetDepth());
 
-      current_depth_ = vector_offset_traversal_stack_.size() - 1;
-      int current_offset = vector_offset_traversal_stack_[current_depth_];
-      TRACE("current depth %d", current_depth_);
-      // check whether the current state has outgoing transitions left
-      if (current_offset < transitions_vector_traversal_stack_[current_depth_].size()) {
-        traversal_stack_[traversal_stack_.size()-1] = transitions_vector_traversal_stack_[current_depth_][vector_offset_traversal_stack_[current_depth_]];
-
-        // go further deep down
-        size_t new_depth = current_depth_ + 1;
-
-        // ensure that the traversal stack is large enough
-        if (state_vector_traversal_stack_.size() < new_depth + 1){
-          TRACE("resize vectors");
-
-          state_vector_traversal_stack_.resize(state_vector_traversal_stack_.size() + 10);
-          transitions_vector_traversal_stack_.resize(transitions_vector_traversal_stack_.size() + 10);
-        }
-
-        // get the outgoing transitions
-        fsa_->GetOutGoingTransitions(state_vector_traversal_stack_[current_depth_][vector_offset_traversal_stack_[current_depth_]],
-                                     state_vector_traversal_stack_[new_depth], transitions_vector_traversal_stack_[current_depth_+1]);
-
-        TRACE("number of outgoing states found: %d", state_vector_traversal_stack_[current_depth_+1].size());
-
-        if (fsa_->IsFinalState(state_vector_traversal_stack_[current_depth_][current_offset])) {
-          // we found a final state
-          TRACE("found final state");
-          current_state_ = state_vector_traversal_stack_[current_depth_][current_offset];
-          current_value_ = fsa_->GetStateValue(current_state_);
-        }
-
-        if (state_vector_traversal_stack_[new_depth].size() > 0) {
-
-          TRACE("going 1 level deeper");
-
-          vector_offset_traversal_stack_.push_back(0);
-          traversal_stack_.push_back(transitions_vector_traversal_stack_[new_depth][0]);
-        } else {
-          TRACE("no more states");
-          vector_offset_traversal_stack_[current_depth_]++;
-        }
-
-      } else {
-        // go up
-        TRACE("going 1 level up");
-
-        vector_offset_traversal_stack_.pop_back();
-
-        if (vector_offset_traversal_stack_.size() == 0) {
+      while (current_state_ == 0) {
+        if (stack_.GetDepth() == 0) {
+          TRACE("traverser exhausted.");
+          Clear();
           return;
         }
 
+        TRACE ("state is 0, go up");
+        --stack_;
         traversal_stack_.pop_back();
-        --current_depth_;
-
-        vector_offset_traversal_stack_[current_depth_]++;
+        stack_.GetStates()++;
+        current_state_ = stack_.GetStates().GetNextState();
+        TRACE ("next state %ld depth %ld", current_state_, stack_.GetDepth());
       }
 
-      // if current_state is set, we found a final state -> return
-      if (current_state_ != 0){
+      traversal_stack_.push_back(stack_.GetStates().GetNextTransition());
+      stack_++;
+      fsa_->GetOutGoingTransitions(current_state_, stack_.GetStates(), stack_.traversal_stack_payload);
+
+      TRACE("found %ld outgoing states", stack_.GetStates().size());
+
+      if (fsa_->IsFinalState(current_state_)) {
+        // we found a final state
+        TRACE("found final state");
+        current_value_ = fsa_->GetStateValue(current_state_);
         return;
       }
+
     }
   }
 
@@ -202,10 +159,8 @@ class EntryIterator final{
   uint64_t current_state_;
   uint64_t current_value_;
   std::vector<unsigned char> traversal_stack_;
-  std::vector<std::vector<uint64_t>> state_vector_traversal_stack_;
-  std::vector<std::vector<unsigned char>> transitions_vector_traversal_stack_;
-  std::vector<int> vector_offset_traversal_stack_;
-  size_t current_depth_ = 0;
+
+  traversal::TraversalStack<> stack_;
 };
 
 typedef std::shared_ptr<EntryIterator> entry_iterator_t;

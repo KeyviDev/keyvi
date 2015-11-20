@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE( someASCIITraversalNoPrune ) {
   testing::TempDictionary dictionary(test_data);
   automata_t f = dictionary.GetFsa();
 
-  CodePointStateTraverser<StateTraverser> c(f);
+  CodePointStateTraverser<StateTraverser<>> c(f);
 
   BOOST_CHECK_EQUAL('a', c.GetStateLabel());
   BOOST_CHECK_EQUAL(1, c.GetDepth());
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE( someNonASCIITraversalNoPrune ) {
   testing::TempDictionary dictionary(test_data);
   automata_t f = dictionary.GetFsa();
 
-  CodePointStateTraverser<StateTraverser> c(f);
+  CodePointStateTraverser<StateTraverser<>> c(f);
 
   BOOST_CHECK_EQUAL('a', c.GetStateLabel());
   BOOST_CHECK_EQUAL(1, c.GetDepth());

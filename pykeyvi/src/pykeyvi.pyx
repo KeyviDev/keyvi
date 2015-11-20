@@ -212,6 +212,15 @@ cdef class Dictionary:
          self.inst.reset()
 
     
+    def LookupText(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        cdef const_char * input_in_0 = <const_char *> in_0
+        cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
+        cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+        py_result.it = _r.begin()
+        py_result.end = _r.end()
+        return py_result
+    
     def Lookup(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         cdef const_char * input_in_0 = <const_char *> in_0
@@ -221,10 +230,12 @@ cdef class Dictionary:
         py_result.end = _r.end()
         return py_result
     
-    def LookupText(self, bytes in_0 ):
+    def GetNear(self, bytes in_0 ,  minimum_prefix_length ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
+        assert isinstance(minimum_prefix_length, (int, long)), 'arg minimum_prefix_length wrong type'
+    
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetNear((<libcpp_string>in_0), (<size_t>minimum_prefix_length))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
