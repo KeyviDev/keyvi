@@ -31,4 +31,12 @@ def test_near():
         assert(len(list(d.GetNear("zahnarzt:u1h0gkqsenhf", 12))) == 3)
         assert(len(list(d.GetNear("zahnarzt:u1h0gkqsenhf", 13))) == 0)
         assert(len(list(d.GetNear("zahnarzt:u0h0gkqsenhf", 10))) == 4)
-        
+
+def test_near_less_precission():
+    c=pykeyvi.JsonDictionaryCompiler()
+    c.Add("zahnarzt:u0we9", '["a" : 2]')
+    c.Add("zahnarzt:u1h2f", '["a" : 3]')
+    c.Add("zahnarzt:u1huf", '["a" : 4]')
+    with tmp_dictionary(c, 'near_simple.kv') as d:
+        assert(len(list(d.GetNear("zahnarzt:u1h0gkqsenhf", 12))) == 2)
+        assert(len(list(d.GetNear("zahnarzt:u1h0gkqsenhf", 13))) == 0)
