@@ -13,16 +13,21 @@ dictionary_sources = os.path.abspath('../keyvi')
 
 additional_compile_flags = []
 
-linklibraries = ["tpie",
+linklibraries_static_or_dynamic = [
              "boost_program_options",
              "boost_iostreams",
              "boost_filesystem",
              "boost_system",
              "boost_regex",
              "boost_thread",
-             "z",
              "snappy"
              ]
+
+linklibraries = ["tpie",
+             "z"
+             ]
+
+extra_link_arguments = []
 
 if (sys.platform == 'darwin'):
     additional_compile_flags.append("-DOS_MACOSX")
@@ -39,14 +44,20 @@ class  build(_build.build):
         [('mode=',
           None,
           "build mode."),
+         ('staticlinkboost',
+          None,
+          "special mode to statically link boost."),
         ]
     def initialize_options(self):
         _build.build.initialize_options(self)
         self.mode = 'release'
+        self.staticlinkboost = False
         
     def run(self):
         global additional_compile_flags
         global linklibraries
+        global linklibraries_static_or_dynamic
+        global extra_link_arguments
         global ext_modules
         print "Building in {} mode".format(self.mode)
         
@@ -60,13 +71,29 @@ class  build(_build.build):
         if self.mode == 'coverage':
             additional_compile_flags.append("--coverage")
             linklibraries.append("gcov")
-        
+
+        # check linking
+        if self.staticlinkboost:
+            # set static
+            extra_link_arguments = ['-Wl,-Bstatic']
+            for lib in linklibraries_static_or_dynamic:
+                extra_link_arguments.append("-l{}".format(lib))
+            # reset to dynamic
+            extra_link_arguments.append('-Wl,-Bdynamic')
+            extra_link_arguments.append('-static-libstdc++')
+            extra_link_arguments.append('-static-libgcc')
+        else:
+            # no static linking, add the libs to dynamic linker
+            linklibraries += linklibraries_static_or_dynamic
+
         # patch the compile flags
         for ext_m in ext_modules:
             flags = getattr(ext_m, 'extra_compile_args') + additional_compile_flags
             setattr(ext_m, 'extra_compile_args', flags)
             setattr(ext_m, 'libraries', linklibraries)
-        
+            args = getattr(ext_m, 'extra_link_args') + extra_link_arguments
+            setattr(ext_m, 'extra_link_args', args)
+
         _build.build.run(self)
 
 ext_modules = [Extension('pykeyvi',
@@ -80,8 +107,12 @@ ext_modules = [Extension('pykeyvi',
                         language = 'c++',
                         sources = ['src/pykeyvi.cpp'],
                         extra_compile_args=['-std=c++11', '-msse4.2'] + additional_compile_flags,
+                        extra_link_args=[],
                         library_dirs = [os.path.join(dictionary_sources, '3rdparty/tpie/build/install/lib')],
                         libraries = linklibraries)]
+
+
+
 PACKAGE_NAME = 'pykeyvi'
 
 setup(
