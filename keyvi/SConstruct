@@ -62,6 +62,7 @@ env["CC"] = os.getenv("CC") or env["CC"]
 env["CXX"] = os.getenv("CXX") or env["CXX"]
 
 install_prefix = GetOption('prefix')
+custom_boost = GetOption('boost_dir')
 
 launch_dir = env.GetLaunchDir()
 env.Append(CPPFLAGS = ['-std=c++11', '-msse4.2'])
@@ -98,8 +99,8 @@ env.SConsignFile()
 
 tpie_build_cmd = "cd 3rdparty/tpie && mkdir -p build && cd build && cmake -D CMAKE_CXX_COMPILER=" + env["CXX"]
 
-if boost_dir:
-    tpie_build_cmd += "export BOOST_ROOT={} && ".format(boost_dir)
+if custom_boost:
+    tpie_build_cmd += "export BOOST_ROOT={} && ".format(custom_boost)
 
 tpie_build_cmd += " -D CMAKE_BUILD_TYPE:STRING=Release -D CMAKE_INSTALL_PREFIX=install -D TPIE_PARALLEL_SORT=1 -D CMAKE_CXX_FLAGS=\"-fPIC -std=c++11\" .. && "
 tpie_build_cmd += "make -j " + str(GetOption('num_jobs')) + " && make install"
