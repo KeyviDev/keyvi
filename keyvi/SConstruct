@@ -102,7 +102,7 @@ if boost_dir:
     tpie_build_cmd += "export BOOST_ROOT={} && ".format(boost_dir)
 
 tpie_build_cmd += " -D CMAKE_BUILD_TYPE:STRING=Release -D CMAKE_INSTALL_PREFIX=install -D TPIE_PARALLEL_SORT=1 -D CMAKE_CXX_FLAGS=\"-fPIC -std=c++11\" .. && "
-tpie_build_cmd += "make -j " + str(GetOption('num_jobs')) + " && make install")
+tpie_build_cmd += "make -j " + str(GetOption('num_jobs')) + " && make install"
 
 
 tpie = env.Command(["3rdparty/tpie/build/install/lib/libtpie.a","3rdparty/tpie/build/install/include/tpie/tpie.h"], "", tpie_buld_cmd)
