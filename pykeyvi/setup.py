@@ -34,7 +34,6 @@ if (sys.platform == 'darwin'):
     linklibraries.remove('boost_thread')
     linklibraries.append('boost_thread-mt')
 
-
 #########################
 # Custom 'build' command
 #########################
@@ -82,6 +81,8 @@ class  build(_build.build):
             extra_link_arguments.append('-Wl,-Bdynamic')
             extra_link_arguments.append('-static-libstdc++')
             extra_link_arguments.append('-static-libgcc')
+            # workaround: link librt explicitly
+            linklibraries.append("rt")
         else:
             # no static linking, add the libs to dynamic linker
             linklibraries += linklibraries_static_or_dynamic
@@ -110,8 +111,6 @@ ext_modules = [Extension('pykeyvi',
                         extra_link_args=[],
                         library_dirs = [os.path.join(dictionary_sources, '3rdparty/tpie/build/install/lib')],
                         libraries = linklibraries)]
-
-
 
 PACKAGE_NAME = 'pykeyvi'
 
