@@ -769,14 +769,23 @@ cdef class Match:
         return py_result
     
     def GetAttribute(self, key):
+        if isinstance(key, unicode):
+            key = key.encode("utf-8")
+    
         py_result = self.inst.get().GetAttributePy(<libcpp_string> key)
         return <object>py_result
         
         
     def SetAttribute(self, key, value):
+        if isinstance(key, unicode):
+            key = key.encode("utf-8")
+
         t = type(value)
         if t == str:
             self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value)
+        elif t == unicode:
+            value_utf8 = value.encode("utf-8")
+            self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value_utf8)
         elif t == float:
             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)
         elif t == int:
