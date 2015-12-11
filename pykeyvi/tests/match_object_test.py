@@ -4,7 +4,7 @@
 import pykeyvi
 from test_tools import tmp_dictionary
 
-'''
+
 def test_serialization():
     m = pykeyvi.Match()
     m.SetStart(22)
@@ -33,5 +33,3 @@ def test_unicode_attributes():
     assert m.GetAttribute("küy") == 22
     m.SetAttribute("k2", " 吃饭了吗".decode("utf-8"))
     assert m.GetAttribute("k2") == " 吃饭了吗"
-
-'''
