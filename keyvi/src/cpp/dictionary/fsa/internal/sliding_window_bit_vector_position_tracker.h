@@ -42,9 +42,22 @@ namespace internal {
  */
 class SlidingWindowBitArrayPositionTracker final {
  public:
-  SlidingWindowBitArrayPositionTracker() {
-    window_start_position_ = 0;
+  SlidingWindowBitArrayPositionTracker(): window_start_position_(0), current_vector_(), previous_vector_() {}
+
+  SlidingWindowBitArrayPositionTracker(SlidingWindowBitArrayPositionTracker&& other):
+    current_vector_(std::move(other.current_vector_)),
+    previous_vector_(std::move(other.previous_vector_))
+  {
+    window_start_position_ = other.window_start_position_;
   }
+
+  SlidingWindowBitArrayPositionTracker& operator=(const SlidingWindowBitArrayPositionTracker&& other) {
+    current_vector_ = std::move(other.current_vector_);
+    previous_vector_ = std::move(other.previous_vector_);
+    window_start_position_ = other.window_start_position_;
+    return *this;
+  }
+
 
   inline bool IsSet(size_t position) const {
     // divide by 1024
@@ -171,7 +184,7 @@ class SlidingWindowBitArrayPositionTracker final {
   }
 
  private:
-  size_t window_start_position_;
+  size_t window_start_position_ = 0;
 
   BitVector<1024> current_vector_;
   BitVector<1024> previous_vector_;
