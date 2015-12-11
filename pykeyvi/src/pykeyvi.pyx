@@ -771,7 +771,7 @@ cdef class Match:
     def GetAttribute(self, key):
         if isinstance(key, unicode):
             key = key.encode("utf-8")
-    
+
         py_result = self.inst.get().GetAttributePy(<libcpp_string> key)
         return <object>py_result
         
