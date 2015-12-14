@@ -34,7 +34,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__(const_char*, const_char*) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifestFromString(const_char*) # wrap-ignore
+        void SetManifestFromString(const_char*) except + # wrap-ignore
         void WriteToFile(const_char*)
         
     cdef cppclass StringDictionaryCompiler:
