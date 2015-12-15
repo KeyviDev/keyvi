@@ -16,15 +16,12 @@ cdef extern from "dictionary/match.h" namespace "keyvi::dictionary":
         libcpp_string GetMatchedString()
         void SetMatchedString (libcpp_string matched_string)
         PyObject* GetAttributePy(libcpp_string) nogil except + # wrap-ignore
-        libcpp_string GetValueAsString()
-        libcpp_string GetRawValueAsString()
+        libcpp_string GetValueAsString() except +
+        libcpp_string GetRawValueAsString() except +
+        void SetRawValue(libcpp_string) except + # wrap-ignore
         void SetAttribute(libcpp_string, libcpp_string) except + # wrap-ignore
         void SetAttribute(libcpp_string, float) except + # wrap-ignore
         void SetAttribute(libcpp_string, int) except + # wrap-ignore
         void SetAttribute(libcpp_string, bool) except + # wrap-ignore
         bool IsEmpty()
 
-cdef extern from "dictionary/fsa/internal/json_value_store.h" namespace "keyvi::dictionary::fsa::internal":
-    libcpp_string DecodeJsonValue(libcpp_string) except +
-    libcpp_string EncodeJsonValue(libcpp_string, int) except + # wrap-ignore
-    libcpp_string EncodeJsonValue(libcpp_string) except + # wrap-ignore

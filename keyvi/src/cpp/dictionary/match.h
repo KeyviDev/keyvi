@@ -29,6 +29,7 @@
 #include <boost/variant.hpp>
 
 #include "dictionary/fsa/automata.h"
+#include "dictionary/util/json_value.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -69,6 +70,7 @@ struct Match {
       : start_(a),
         end_(b),
         matched_item_(matched_item),
+        raw_value_(),
         score_(score)
   {
     TRACE("initialized Match %d->%d %s", a, b, matched_item.c_str());
@@ -79,6 +81,7 @@ struct Match {
       : start_(a),
         end_(b),
         matched_item_(matched_item),
+        raw_value_(),
         score_(score),
         fsa_(fsa),
         state_(state)
@@ -86,7 +89,7 @@ struct Match {
     TRACE("initialized Match %d->%d %s", a, b, matched_item.c_str());
   }
 
-  Match()
+  Match():matched_item_(), raw_value_()
   {
   }
 
@@ -166,7 +169,11 @@ struct Match {
   std::string GetValueAsString() const {
 
     if (!fsa_){
+      if (raw_value_.size() != 0) {
+        return util::DecodeJsonValue(raw_value_);
+      } else {
         return "";
+      }
     }
 
     return fsa_->GetValueAsString(state_);
@@ -175,16 +182,26 @@ struct Match {
   std::string GetRawValueAsString() const {
 
     if (!fsa_){
-        return "";
+        return raw_value_;
     }
 
     return fsa_->GetRawValueAsString(state_);
+  }
+
+  /**
+   * being able to set the value, e.g. when keyvi is used over network boundaries
+   *
+   * @param value
+   */
+  void SetRawValue(const std::string& value) {
+    raw_value_ = value;
   }
 
  private:
   size_t start_ = 0;
   size_t end_ = 0;
   std::string matched_item_;
+  std::string raw_value_;
   double score_ = 0;
   fsa::automata_t fsa_ = 0;
   uint64_t state_ = 0;

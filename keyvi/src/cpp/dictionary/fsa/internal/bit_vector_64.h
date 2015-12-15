@@ -45,7 +45,7 @@ final {
    public:
     template<std::size_t TsizeOther> friend class BitVector;
 
-    BitVector() {
+    BitVector():bits_() {
       Clear();
     }
 

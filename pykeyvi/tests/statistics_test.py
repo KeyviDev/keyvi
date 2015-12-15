@@ -4,12 +4,14 @@
 import pykeyvi
 from test_tools import tmp_dictionary
 
+
 def test_size():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
     c.Add("Leela")
     c.Add("Kif")
     with tmp_dictionary(c, 'brannigan_size.kv') as d:
         assert len(d) == 2
+
 
 def test_manifest():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
@@ -19,6 +21,7 @@ def test_manifest():
     with tmp_dictionary(c, 'brannigan_manifest.kv') as d:
         m = d.GetManifest()
         assert m['author'] == "Zapp Brannigan"
+
 
 def test_statistics():
     c = pykeyvi.KeyOnlyDictionaryCompiler()

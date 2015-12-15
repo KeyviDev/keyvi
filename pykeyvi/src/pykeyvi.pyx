@@ -9,11 +9,9 @@ from  AutowrapRefHolder cimport AutowrapRefHolder
 from  libcpp cimport bool
 from  libc.string cimport const_char
 from cython.operator cimport dereference as deref, preincrement as inc, address as address
+import msgpack
 from cython.operator cimport dereference, preincrement
 cimport cython.operator as co
-from match cimport DecodeJsonValue as _DecodeJsonValue_match
-from match cimport EncodeJsonValue as _EncodeJsonValue_match
-from match cimport EncodeJsonValue as _EncodeJsonValue_match
 from cluster cimport JumpConsistentHashString as _JumpConsistentHashString_cluster
 from dictionary_compiler cimport CompletionDictionaryCompiler as _CompletionDictionaryCompiler
 from dictionary cimport Dictionary as _Dictionary
@@ -31,13 +29,6 @@ from prefix_completion cimport PrefixCompletion as _PrefixCompletion
 from dictionary_compiler cimport StringDictionaryCompiler as _StringDictionaryCompiler
 cdef extern from "autowrap_tools.hpp":
     char * _cast_const_away(char *)
-
-def DecodeJsonValue(bytes in_0 ):
-    assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-
-    cdef libcpp_string _r = _DecodeJsonValue_match((<libcpp_string>in_0))
-    py_result = <libcpp_string>_r
-    return py_result
 
 def JumpConsistentHashString(bytes in_0 ,  in_1 ):
     assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -778,14 +769,23 @@ cdef class Match:
         return py_result
     
     def GetAttribute(self, key):
+        if isinstance(key, unicode):
+            key = key.encode("utf-8")
+
         py_result = self.inst.get().GetAttributePy(<libcpp_string> key)
         return <object>py_result
         
         
     def SetAttribute(self, key, value):
+        if isinstance(key, unicode):
+            key = key.encode("utf-8")
+
         t = type(value)
         if t == str:
             self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value)
+        elif t == unicode:
+            value_utf8 = value.encode("utf-8")
+            self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value_utf8)
         elif t == float:
             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)
         elif t == int:
@@ -796,15 +796,51 @@ cdef class Match:
         else:
             raise Exception("Unsupported Value Type")
 
+    def dumps(self):
+        m=[]
+        do_pack_rest = False
+        score = self.inst.get().GetScore()
+        if score != 0:
+            m.append(score)
+            do_pack_rest = True
+        end = self.inst.get().GetEnd()
+        if end != 0 or do_pack_rest:
+            m.append(end)
+            do_pack_rest = True
+        start = self.inst.get().GetStart()
+        if start != 0 or do_pack_rest:
+            m.append(start)
+            do_pack_rest = True
+        matchedstring = self.inst.get().GetMatchedString()
+        if len(matchedstring) != 0 or do_pack_rest:
+            m.append(matchedstring)
+            do_pack_rest = True
+        rawvalue = self.inst.get().GetRawValueAsString()
+        if len(rawvalue) != 0 or do_pack_rest:
+            m.append(rawvalue)
+        m.reverse()
+        return msgpack.dumps(m)
 
-from match cimport EncodeJsonValue as _EncodeJsonValue 
+    def __SetRawValue(self, str):
+         self.inst.get().SetRawValue(<libcpp_string> str)
 
+    @staticmethod
+    def loads(serialized_match):
+        m=Match()
+        unserialized = msgpack.loads(serialized_match)
+        number_of_fields = len(unserialized)
+        if number_of_fields > 0:
+            m.__SetRawValue(unserialized[0])
+            if number_of_fields > 1:
+                m.SetMatchedString(unserialized[1])
+                if number_of_fields > 2:
+                    m.SetStart(unserialized[2])
+                    if number_of_fields > 3:
+                         m.SetEnd(unserialized[3])
+                         if number_of_fields > 4:
+                             m.SetScore(unserialized[4])
 
-def EncodeJsonValue(libcpp_string raw_value, compression_threshold=None):
-    if compression_threshold:
-        return _EncodeJsonValue(raw_value, compression_threshold)
-    else:
-        return _EncodeJsonValue(raw_value) 
+        return m 
  
  
  
