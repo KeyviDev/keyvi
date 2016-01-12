@@ -82,7 +82,7 @@ void unserialize(Src & s, keyvi::dictionary::key_value_pair<v> & pt) {
 template<class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryCompiler
   final {
-    typedef const fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
+    typedef const fsa::internal::IValueStoreWriter::vs_param_t compiler_param_t;
     typedef key_value_pair<typename ValueStoreT::value_t> key_value_t;
     typedef std::function<void (size_t , size_t, void*)> callback_t;
 
@@ -96,15 +96,15 @@ class DictionaryCompiler
      * @param memory_limit memory limit for internal memory usage
      */
     DictionaryCompiler(size_t memory_limit = 1073741824,
-                       const vs_param_t& value_store_params = vs_param_t())
+                       const compiler_param_t& params = compiler_param_t())
         : initializer_(util::TpieIntializer::getInstance()),
           sorter_(),
           memory_limit_(memory_limit),
-          value_store_params_(value_store_params) {
+          params_(params) {
       sorter_.set_available_memory(memory_limit);
       sorter_.begin();
 
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit, value_store_params);
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit, params);
     }
 
     ~DictionaryCompiler(){
@@ -296,7 +296,7 @@ class DictionaryCompiler
     util::TpieIntializer& initializer_;
     tpie::serialization_sorter<key_value_t> sorter_;
     size_t memory_limit_;
-    vs_param_t value_store_params_;
+    compiler_param_t params_;
 
     fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>* generator_ = nullptr;
     bool sort_finalized_ = false;
@@ -323,15 +323,15 @@ inline void DictionaryCompiler<PersistenceT, ValueStoreT>::CreateGenerator()
   // todo: find good parameters for auto-guessing this
   if (size_of_keys_ > UINT32_MAX){
     if (memory_limit_ > 0x280000000UL /* 10 GB */)  {
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(memory_limit_, value_store_params_);
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(memory_limit_, params_);
     } else {
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(memory_limit_, value_store_params_);
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(memory_limit_, params_);
     }
   } else {
     if (memory_limit_ > 0x140000000UL) /* 5GB */ {
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(memory_limit_, value_store_params_);
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(memory_limit_, params_);
     } else {
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit_, value_store_params_);
+      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit_, params_);
     }
   }
 

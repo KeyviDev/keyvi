@@ -45,7 +45,7 @@ template<class PersistenceT, class OffsetTypeT = uint32_t, class HashCodeTypeT =
 class SparseArrayBuilder final {
  public:
   SparseArrayBuilder(size_t memory_limit, PersistenceT* persistence,
-                     bool inner_weight){
+                     bool inner_weight, bool minimize = true){
     throw std::invalid_argument("unsupported");
   }
 };
@@ -54,11 +54,13 @@ template<class OffsetTypeT, class HashCodeTypeT>
 class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCodeTypeT> final {
  public:
   SparseArrayBuilder(size_t memory_limit, SparseArrayPersistence<uint16_t>* persistence,
-                     bool inner_weight)
+                     bool inner_weight, bool minimize = true)
       : number_of_states_(0),
         highest_persisted_state_(0),
         persistence_(persistence),
-        inner_weight_(inner_weight) {
+        inner_weight_(inner_weight),
+        minimize_(minimize)
+ {
 
     state_hashtable_ = new LeastRecentlyUsedGenerationsCache<PackedState<OffsetTypeT, HashCodeTypeT>>(memory_limit);
   }
@@ -99,8 +101,8 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
     // if minimization failed several time in a row while the minimization hash has decent amount of data,
     // do not push the state to the minimization hash to avoid unnecessary overhead
-    if (number_of_states_ < 1000000
-        || unpacked_state.GetNoMinimizationCounter() < 8) {
+    if (minimize_ && (number_of_states_ < 1000000
+        || unpacked_state.GetNoMinimizationCounter() < 8)) {
       state_hashtable_->Add(packed_state);
     }
 
@@ -127,6 +129,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
   uint64_t highest_persisted_state_;
   SparseArrayPersistence<uint16_t>* persistence_;
   bool inner_weight_;
+  bool minimize_;
   LeastRecentlyUsedGenerationsCache<PackedState<OffsetTypeT, HashCodeTypeT>>* state_hashtable_;
   SlidingWindowBitArrayPositionTracker state_start_positions_;
   SlidingWindowBitArrayPositionTracker taken_positions_in_sparsearray_;
@@ -457,11 +460,12 @@ template<class OffsetTypeT, class HashCodeTypeT>
 class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCodeTypeT> final {
  public:
   SparseArrayBuilder(size_t memory_limit, SparseArrayPersistence<uint32_t>* persistence,
-                     bool inner_weight)
+                     bool inner_weight, bool minimize = true)
       : number_of_states_(0),
         highest_persisted_state_(0),
         persistence_(persistence),
-        inner_weight_(inner_weight) {
+        inner_weight_(inner_weight),
+        minimize_(minimize){
 
     state_hashtable_ = new LeastRecentlyUsedGenerationsCache<PackedState<OffsetTypeT, HashCodeTypeT>>(memory_limit);
   }
@@ -502,8 +506,8 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
 
     // if minimization failed several time in a row while the minimization hash has decent amount of data,
     // do not push the state to the minimization hash to avoid unnecessary overhead
-    if (number_of_states_ < 1000000
-        || unpacked_state.GetNoMinimizationCounter() < 8) {
+    if (minimize_ && (number_of_states_ < 1000000
+        || unpacked_state.GetNoMinimizationCounter() < 8)) {
       state_hashtable_->Add(packed_state);
     }
 
@@ -530,6 +534,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
   uint64_t highest_persisted_state_;
   SparseArrayPersistence<uint32_t>* persistence_;
   bool inner_weight_;
+  bool minimize_;
   LeastRecentlyUsedGenerationsCache<PackedState<OffsetTypeT, HashCodeTypeT>>* state_hashtable_;
   SlidingWindowBitArrayPositionTracker state_start_positions_;
   SlidingWindowBitArrayPositionTracker taken_positions_in_sparsearray_;

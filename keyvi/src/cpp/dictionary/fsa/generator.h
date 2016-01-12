@@ -123,31 +123,36 @@ enum generator_state {
  * "d", stack 3 with "c", "e" and so on.
  * Note: The input must be sorted according to a user-defined sort order.
  */
-typedef const internal::IValueStoreWriter::vs_param_t vs_param_t;
+typedef const internal::IValueStoreWriter::vs_param_t generator_param_t;
 
 template<class PersistenceT, class ValueStoreT = internal::NullValueStore, class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
 class Generator
 final {
    public:
     Generator(size_t memory_limit = 1073741824,
-              const vs_param_t& value_store_params = vs_param_t())
-        : memory_limit_(memory_limit), value_store_params_(value_store_params) {
+              const generator_param_t& params = generator_param_t())
+        : memory_limit_(memory_limit), params_(params) {
 
       // use 50% or limit minus 200MB for the memory limit of the hashtable
       size_t memory_limit_minimization = std::max(
           memory_limit / 2, memory_limit - (200 * 1024 * 1024));
 
-      if (value_store_params_.count(TEMPORARY_PATH_KEY) == 0) {
-        value_store_params_[TEMPORARY_PATH_KEY] =
+      if (params_.count(TEMPORARY_PATH_KEY) == 0) {
+        params_[TEMPORARY_PATH_KEY] =
             boost::filesystem::temp_directory_path().string();
       }
+
+      if (params_.count(MINIMIZATION_KEY) > 0 && params_[MINIMIZATION_KEY] == "off") {
+        minimize_ = false;
+      }
+
       persistence_ = new PersistenceT(memory_limit - memory_limit_minimization,
-                                      value_store_params_[TEMPORARY_PATH_KEY]);
-      value_store_ = new ValueStoreT(value_store_params_);
+                                      params_[TEMPORARY_PATH_KEY]);
+      value_store_ = new ValueStoreT(params_);
 
       stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
       builder_ = new internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>(
-          memory_limit_minimization, persistence_, ValueStoreT::inner_weight);
+          memory_limit_minimization, persistence_, ValueStoreT::inner_weight, minimize_);
     }
 
     ~Generator() {
@@ -184,12 +189,12 @@ final {
           memory_limit_ / 2, memory_limit_ - (200 * 1024 * 1024));
 
       persistence_ = new PersistenceT(memory_limit_ - memory_limit_minimization,
-                                      value_store_params_[TEMPORARY_PATH_KEY]);
-      value_store_ = new ValueStoreT(value_store_params_);
+                                      params_[TEMPORARY_PATH_KEY]);
+      value_store_ = new ValueStoreT(params_);
 
       stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
       builder_ = new internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>(
-          memory_limit_minimization, persistence_, ValueStoreT::inner_weight);
+          memory_limit_minimization, persistence_, ValueStoreT::inner_weight, minimize_);
 
       last_key_ = std::string();
       highest_stack_ = 0;
@@ -303,7 +308,7 @@ final {
 
    private:
     size_t memory_limit_;
-    internal::IValueStoreWriter::vs_param_t value_store_params_;
+    internal::IValueStoreWriter::vs_param_t params_;
     PersistenceT* persistence_;
     ValueStoreT* value_store_;
     internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>* builder_;
@@ -315,6 +320,7 @@ final {
     OffsetTypeT start_state_ = 0;
     uint64_t number_of_states_ = 0;
     boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
+    bool minimize_ = true;
 
     void WriteHeader(std::ostream& stream) {
       boost::property_tree::ptree pt;

@@ -49,6 +49,8 @@
 #define TEMPORARY_PATH_KEY "temporary_path"
 #define COMPRESSION_KEY "compression"
 #define COMPRESSION_THRESHOLD_KEY "compression_threshold"
+#define MINIMIZATION_KEY "minimization"
+
 
 /**
  * Lookup table to find outgoing transitions quickly(in parallel) by xor'ing the real buffer with this table.

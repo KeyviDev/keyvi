@@ -202,6 +202,11 @@ class JsonValueStore final : public IValueStoreWriter {
     if (parameters_.count(COMPRESSION_KEY) > 0) {
       compressor = parameters_[COMPRESSION_KEY];
     }
+
+    if (parameters_.count(MINIMIZATION_KEY) > 0 && parameters_[MINIMIZATION_KEY] == "off") {
+      minimize_ = false;
+    }
+
     compressor_.reset(compression::compression_strategy(compressor));
     raw_compressor_.reset(compression::compression_strategy("raw"));
     // This is beyond ugly, but needed for EncodeJsonValue :(
@@ -242,6 +247,12 @@ class JsonValueStore final : public IValueStoreWriter {
 
     ++number_of_values_;
 
+    if (!minimize_){
+      TRACE("Minimization is turned off.");
+      no_minimization = true;
+      return AddValue();
+    }
+
     const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(),
                                                      values_extern_);
     const RawPointer p = hash_.Get(stp);
@@ -256,14 +267,7 @@ class JsonValueStore final : public IValueStoreWriter {
     TRACE("New unique value");
     ++number_of_unique_values_;
 
-    uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
-
-    dictionary::util::encodeVarint(string_buffer_.size(), *values_extern_);
-    values_buffer_size_ += util::getVarintLength(string_buffer_.size());
-
-    values_extern_->Append((void*)string_buffer_.data(),
-                           string_buffer_.size());
-    values_buffer_size_ += string_buffer_.size();
+    uint64_t pt = AddValue();
 
     TRACE("add value to hash at %d, length %d", pt, string_buffer_.size());
     hash_.Add(RawPointer(pt, stp.GetHashcode(), string_buffer_.size()));
@@ -305,6 +309,7 @@ class JsonValueStore final : public IValueStoreWriter {
   std::function<void (compression::buffer_t&, const char*, size_t)> long_compress_;
   std::function<void (compression::buffer_t&, const char*, size_t)> short_compress_;
   size_t compression_threshold_;
+  bool minimize_ = true;
 
   LeastRecentlyUsedGenerationsCache<RawPointer> hash_;
   compression::buffer_t string_buffer_;
@@ -313,6 +318,21 @@ class JsonValueStore final : public IValueStoreWriter {
   size_t number_of_unique_values_ = 0;
   size_t values_buffer_size_ = 0;
   boost::filesystem::path temporary_directory_;
+
+  uint64_t AddValue(){
+    uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
+
+    dictionary::util::encodeVarint(string_buffer_.size(), *values_extern_);
+    values_buffer_size_ += util::getVarintLength(string_buffer_.size());
+
+    values_extern_->Append((void*)string_buffer_.data(),
+                           string_buffer_.size());
+    values_buffer_size_ += string_buffer_.size();
+
+    TRACE("add value to hash at %d, length %d", pt, string_buffer_.size());
+    return pt;
+  }
+
 };
 
 

@@ -55,7 +55,7 @@ template<class PersistenceT, class ValueStoreT, class OffsetTypeT, class HashCod
 class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, ValueStoreT> {
  public:
   GeneratorAdapter(size_t memory_limit = 1073741824,
-                   const vs_param_t& value_store_params = vs_param_t()):
+                   const generator_param_t& value_store_params = generator_param_t()):
                      generator_(memory_limit, value_store_params)
  {}
 
