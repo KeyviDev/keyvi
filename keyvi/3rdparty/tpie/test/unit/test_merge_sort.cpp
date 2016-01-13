@@ -21,7 +21,7 @@
 #include <tpie/pipelining/merge_sorter.h>
 #include <tpie/parallel_sort.h>
 #include <tpie/sysinfo.h>
-#include <boost/random.hpp>
+#include <random>
 
 using namespace tpie;
 
@@ -35,7 +35,7 @@ public:
 	class item_generator {
 	private:
 		stream_size_type m_items;
-		boost::rand48 m_rng;
+		std::mt19937 m_rng;
 
 	public:
 		item_generator(stream_size_type bytes)

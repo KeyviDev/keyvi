@@ -4,7 +4,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/sysinfo.cpp.in" "${CMAKE_CURRENT_BIN
 
 set (HEADERS
 		access_type.h
-		atomic.h
 		backtrace.h
 		blocks/block.h
 		blocks/block_collection.h
@@ -16,6 +15,7 @@ set (HEADERS
 		btree/external_store_base.h
 		btree/node.h
 		btree/btree.h
+        btree/btree_builder.h
 		cache_hint.h
 		comparator.h
 		compressed/buffer.h
@@ -54,9 +54,9 @@ set (HEADERS
 		mergeheap.h
 		merge_sorted_runs.h
 		memory.h
-		memory.inl
 		persist.h
 		pipelining/buffer.h
+		pipelining/container.h
 		pipelining/exception.h
 		pipelining/factory_base.h
 		pipelining/factory_helpers.h
@@ -140,14 +140,11 @@ set (HEADERS
 		concept_doc.h
 		tpie.h
 		unittest.h
+		maybe.h
+		tiny.h
 		)
 
-if(TPIE_CPP_RANDOM AND TPIE_CPP_AUTO_KEYWORD)
-	set (HEADERS ${HEADERS} tiny.h)
-endif(TPIE_CPP_RANDOM AND TPIE_CPP_AUTO_KEYWORD)
-
 set (SOURCES
-	atomic.cpp
 	backtrace.cpp
 	blocks/block_collection.cpp
 	blocks/block_collection_cache.cpp
@@ -195,7 +192,7 @@ set (HEADERS ${HEADERS} file_accessor/posix.h file_accessor/posix.inl)
 endif(WIN32)
 
 add_library(tpie ${HEADERS} ${SOURCES})
-target_link_libraries(tpie ${Boost_LIBRARIES})
+target_link_libraries(tpie ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 set_target_properties(tpie PROPERTIES FOLDER tpie)
 
 if(TPIE_HAS_SNAPPY)

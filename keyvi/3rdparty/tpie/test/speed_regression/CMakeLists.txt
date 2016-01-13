@@ -65,3 +65,7 @@ set_target_properties(fractile_tpie PROPERTIES FOLDER tpie/test)
 add_executable(fractile_serialization fractile_serialization.cpp ${SPEED_DEPS})
 target_link_libraries(fractile_serialization tpie)
 set_target_properties(fractile_serialization PROPERTIES FOLDER tpie/test)
+
+add_executable(btree_builder btree_builder.cpp ${SPEED_DEPS})
+target_link_libraries(btree_builder tpie)
+set_target_properties(btree_builder PROPERTIES FOLDER tpie/test)

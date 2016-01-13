@@ -25,7 +25,8 @@
 #include <tpie/array.h>
 #include <tpie/internal_queue.h>
 #include <tpie/exception.h>
-
+#include <functional>
+#include <thread>
 namespace tpie {
  
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,8 +49,8 @@ public:
 	void init_pool(size_t threads) {
 		m_thread_pool.resize(threads);
 		for (size_t i = 0; i < threads; ++i) {
-			boost::function<void()> f(worker);
-			boost::thread t(f);
+			std::function<void()> f(worker);
+			std::thread t(f);
 			// thread is move-constructible
 			m_thread_pool[i].swap(t);
 		}
@@ -59,7 +60,7 @@ public:
 	/// \brief Notify all waiting workers, wait for them to quit.
 	///////////////////////////////////////////////////////////////////////////
 	void shutdown_pool() {
-		boost::mutex::scoped_lock lock(jobs_mutex);
+		std::unique_lock<std::mutex> lock(jobs_mutex);
 		m_kill_job_pool = true;
 		m_has_data.notify_all();
 		lock.unlock();
@@ -71,17 +72,17 @@ public:
 private:
 
 	tpie::internal_queue<tpie::job *> m_jobs;
-	tpie::array<boost::thread> m_thread_pool;
+	tpie::array<std::thread> m_thread_pool;
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief The only mutex we will ever need.
 	///////////////////////////////////////////////////////////////////////////
-	boost::mutex jobs_mutex;
+	std::mutex jobs_mutex;
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Notified when a job is added to the queue.
 	///////////////////////////////////////////////////////////////////////////
-	boost::condition_variable m_has_data;
+	std::condition_variable m_has_data;
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief True when the workers should quit ASAP.
@@ -93,7 +94,7 @@ private:
 	///////////////////////////////////////////////////////////////////////////
 	static void worker() {
 		for (;;) {
-			boost::mutex::scoped_lock lock(the_job_manager->jobs_mutex);
+			std::unique_lock<std::mutex> lock(the_job_manager->jobs_mutex);
 			while (the_job_manager->m_jobs.empty() && !the_job_manager->m_kill_job_pool) the_job_manager->m_has_data.wait(lock);
 			if (the_job_manager->m_kill_job_pool) break;
 			tpie::job * j = the_job_manager->m_jobs.front();
@@ -107,7 +108,7 @@ private:
 };
 
 memory_size_type default_worker_count() {
-	memory_size_type workers = boost::thread::hardware_concurrency();
+	memory_size_type workers = std::thread::hardware_concurrency();
 	if (workers > 3) --workers; // spare a CPU for the UI
 	return workers;
 }
@@ -132,14 +133,14 @@ job::job()
 }
 
 void job::join() {
-	boost::mutex::scoped_lock lock(the_job_manager->jobs_mutex);
+	std::unique_lock<std::mutex> lock(the_job_manager->jobs_mutex);
 	while (m_dependencies) {
 		m_done.wait(lock);
 	}
 }
 
 bool job::is_done() {
-	boost::mutex::scoped_lock lock(the_job_manager->jobs_mutex);
+	std::lock_guard<std::mutex> lock(the_job_manager->jobs_mutex);
 	return !m_dependencies;
 }
 
@@ -149,7 +150,7 @@ void job::enqueue(job * parent) {
 
 	m_state = job_enqueued;
 
-	boost::mutex::scoped_lock lock(the_job_manager->jobs_mutex);
+	std::unique_lock<std::mutex> lock(the_job_manager->jobs_mutex);
 	if (the_job_manager->m_kill_job_pool) throw job_manager_exception();
 	m_parent = parent;
 	m_dependencies = 1;
@@ -170,7 +171,7 @@ void job::run() {
 	m_state = job_running;
 
 	(*this)();
-	boost::mutex::scoped_lock lock(the_job_manager->jobs_mutex);
+	std::lock_guard<std::mutex> lock(the_job_manager->jobs_mutex);
 	done();
 }
 

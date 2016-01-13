@@ -39,6 +39,7 @@ class factory : public factory_base {
 	fact_t fact;
 	const options opts;
 public:
+
 	template <typename dest_t>
 	struct constructed {
 		typedef typename push_type<dest_t>::type T2;
@@ -50,15 +51,15 @@ public:
 		typedef producer<T1, T2> type;
 	};
 
-	factory(const fact_t & fact, const options opts)
-		: fact(fact)
-		, opts(opts)
+	factory(fact_t && fact, options && opts)
+		: fact(std::move(fact))
+		, opts(std::move(opts))
 	{
 	}
 
 	template <typename dest_t>
 	typename constructed<dest_t>::type
-	construct(const dest_t & dest) const {
+	construct(dest_t && dest) {
 		typedef constructed<dest_t> gen_t;
 
 		typedef typename gen_t::T1 input_type;
@@ -69,14 +70,22 @@ public:
 
 		typedef typename gen_t::type producer_t;
 
-		typename state_t::ptr st(new state_t(opts, fact));
+		typename state_t::ptr st(new state_t(opts, std::move(fact)));
 
-		consumer_t consumer(dest, st);
+		consumer_t consumer(std::move(dest), st);
 		this->init_node(consumer);
-		producer_t producer(st, consumer);
+		producer_t producer(st, std::move(consumer));
 		this->init_node(producer);
 		return producer;
 	}
+
+	template <typename dest_t>
+	typename constructed<dest_t>::type
+	construct_copy(dest_t && dest) {
+		return construct(std::forward(dest));
+	}
+
+
 };
 
 } // namespace parallel_bits

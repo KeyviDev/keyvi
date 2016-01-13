@@ -78,6 +78,11 @@ public:
 	factory_base() : m_amount(0), m_set(false), m_destinationKind(destination_kind::none) {
 	}
 
+	factory_base(const factory_base & other) = delete;
+	factory_base(factory_base &&) = default;
+	factory_base & operator=(const factory_base & other) = delete;
+	factory_base & operator=(factory_base &&) = default;
+
 	///////////////////////////////////////////////////////////////////////////
 	/// \copybrief bits::pipe_base::memory(double)
 	/// \copydetails bits::pipe_base::memory(double)
@@ -141,6 +146,9 @@ public:
 	inline void init_node(node & r) const {
 		if (!m_name.empty()) {
 			r.set_name(m_name, m_namePriority);
+		}
+		if (!m_phaseName.empty()) {
+			r.set_phase_name(m_phaseName, m_phaseNamePriority);
 		}
 		if (!m_breadcrumbs.empty()) {
 			r.set_breadcrumb(m_breadcrumbs);
@@ -248,6 +256,18 @@ public:
 	}
 
 	///////////////////////////////////////////////////////////////////////////
+	/// \copybrief bits::pipe_base::phase_name
+	/// \copydetails bits::pipe_base::phase_name
+	///
+	/// \sa bits::pipe_base::phase_name
+	///////////////////////////////////////////////////////////////////////////
+	inline void phase_name(const std::string & n, priority_type p) {
+		m_phaseName = n;
+		m_phaseNamePriority = p;
+	}
+
+	
+	///////////////////////////////////////////////////////////////////////////
 	/// \copybrief bits::pipe_base::breadcrumb
 	/// \copydetails bits::pipe_base::breadcrumb
 	///
@@ -275,15 +295,18 @@ public:
 	}
 
 	void add_to_set(node_set s) {
-		m_add_to_set.push_back(s);
+		if (s)
+			m_add_to_set.push_back(s);
 	}
 
 	void add_dependencies(node_set s) {
-		m_add_relations.push_back(std::make_pair(s,bits::no_forward_depends));
+		if (s)
+			m_add_relations.push_back(std::make_pair(s,bits::no_forward_depends));
 	}
 
 	void add_forwarding_dependencies(node_set s) {
-		m_add_relations.push_back(std::make_pair(s,bits::depends));
+		if (s)
+			m_add_relations.push_back(std::make_pair(s,bits::depends));
 	}
 
 private:
@@ -298,9 +321,9 @@ private:
 	double m_amount;
 	bool m_set;
 	destination_kind::type m_destinationKind;
-	std::string m_name;
+	std::string m_name, m_phaseName;
 	std::string m_breadcrumbs;
-	priority_type m_namePriority;
+	priority_type m_namePriority, m_phaseNamePriority;
 	std::vector<factory_init_hook *> m_hooks;
 	std::vector<node_set> m_add_to_set;
 	std::vector<std::pair<node_set, bits::node_relation> > m_add_relations;

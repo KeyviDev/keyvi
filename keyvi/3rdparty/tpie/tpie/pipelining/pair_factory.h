@@ -41,12 +41,18 @@ public:
 	{
 	}
 
-	pair_factory_base(const pair_factory_base & other)
-		: m_maps(new node_map::ptr[2])
-		, m_final(other.m_final)
-	{
-		m_maps[0] = other.m_maps[0];
-		m_maps[1] = other.m_maps[1];
+	pair_factory_base(const pair_factory_base & other)= delete;
+	pair_factory_base(pair_factory_base && other) {
+		using std::swap;
+		m_final = other.m_final;
+		swap(m_maps, other.m_maps);
+	}
+
+	pair_factory_base & operator=(const pair_factory_base & other) = delete;
+	pair_factory_base & operator=(pair_factory_base && other) {
+		using std::swap;
+		m_final = other.m_final;
+		swap(m_maps, other.m_maps);
 	}
 
 	inline double memory() const {
@@ -74,7 +80,7 @@ public:
 	/// node_maps for a later connectivity check.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename pipe_t>
-	pipe_t record(size_t idx, const pipe_t & pipe) const {
+	pipe_t record(size_t idx, pipe_t && pipe) const {
 		m_maps[idx] = pipe.get_node_map();
 		if (idx == 0 && m_final) {
 			// Now is the opportunity to check that the constructed pipeline is
@@ -82,7 +88,7 @@ public:
 			assert_connected();
 			self().recursive_connected_check();
 		}
-		return pipe;
+		return std::move(pipe);
 	}
 
 	void assert_connected() const {
@@ -149,23 +155,26 @@ public:
 		typedef typename fact1_t::template constructed<typename fact2_t::template constructed<dest_t>::type>::type type;
 	};
 
-	inline pair_factory(const fact1_t & fact1, const fact2_t & fact2)
-		: fact1(fact1), fact2(fact2) {
+	pair_factory(const pair_factory &) = delete;
+	pair_factory(pair_factory &&) = default;
+	pair_factory & operator=(const pair_factory &) = delete;
+	pair_factory & operator=(pair_factory &&) = default;
+
+	pair_factory(fact1_t && fact1, fact2_t && fact2)
+		: fact1(std::move(fact1)), fact2(std::move(fact2)) {
 	}
 
-#ifndef TPIE_CPP_RVALUE_REFERENCE
 	template <typename dest_t>
 	typename constructed<dest_t>::type
-	construct(const dest_t & dest) const {
-		return this->record(0, fact1.construct(this->record(1, fact2.construct(dest))));
-	}
-#else // TPIE_CPP_RVALUE_REFERENCE
-	template <typename dest_t>
-	typename constructed<dest_t>::type
-	construct(dest_t && dest) const {
+	construct(dest_t && dest) {
 		return this->record(0, fact1.construct(this->record(1, fact2.construct(std::forward<dest_t>(dest)))));
 	}
-#endif // TPIE_CPP_RVALUE_REFERENCE
+
+	template <typename dest_t>
+	typename constructed<dest_t>::type
+	construct_copy(dest_t && dest) {
+		return this->record(0, fact1.construct_copy(this->record(1, fact2.construct_copy(std::forward<dest_t>(dest)))));
+	}
 
 	void recursive_connected_check() const {
 		maybe_check_connected<fact1_t>::check(fact1);
@@ -186,17 +195,28 @@ class termpair_factory : public pair_factory_base<termpair_factory<fact1_t, term
 public:
 	typedef typename fact1_t::template constructed<typename termfact2_t::constructed_type>::type constructed_type;
 
-	inline termpair_factory(const fact1_t & fact1, const termfact2_t & fact2)
-		: fact1(fact1)
-		, fact2(fact2)
+
+
+	termpair_factory(const termpair_factory &) = delete;
+	termpair_factory(termpair_factory &&) = default;
+	termpair_factory & operator=(const termpair_factory &) = delete;
+	termpair_factory & operator=(termpair_factory &&) = default;
+
+	termpair_factory(fact1_t && fact1, termfact2_t && fact2)
+		: fact1(std::move(fact1))
+		, fact2(std::move(fact2))
 	{
 	}
 
 	fact1_t fact1;
 	termfact2_t fact2;
 
-	constructed_type construct() const {
+	constructed_type construct() {
 		return this->record(0, fact1.construct(this->record(1, fact2.construct())));
+	}
+
+	constructed_type construct_copy() {
+		return this->record(0, fact1.construct_copy(this->record(1, fact2.construct_copy())));
 	}
 
 	void recursive_connected_check() const {

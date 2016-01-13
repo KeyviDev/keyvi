@@ -20,20 +20,19 @@
 #define __TPIE_TEST_UNIT_PRIORITY_QUEUE_H__
 
 #include <tpie/progress_indicator_arrow.h>
-#include <boost/random/uniform_01.hpp>
-#include <boost/random/linear_congruential.hpp>
+#include <random>
 #include "common.h"
 #include <vector>
 #include <queue>
 
 template <typename T>
-bool cyclic_pq_test(T & pq, boost::uint64_t size, boost::uint64_t iterations) {
+bool cyclic_pq_test(T & pq, uint64_t size, uint64_t iterations) {
 	tpie::progress_indicator_arrow progress("Running test", iterations, tpie::log_info());
-	std::priority_queue<boost::uint64_t, std::vector<boost::uint64_t>, bit_pertume_compare<std::less<boost::uint64_t> > > pq2;
-	boost::rand48 rnd;
-	boost::uniform_01<double> urnd;
+	std::priority_queue<uint64_t, std::vector<uint64_t>, bit_pertume_compare<std::less<uint64_t> > > pq2;
+	std::default_random_engine rnd;
+	std::uniform_real_distribution<> urnd;
 
-	for (boost::uint64_t i=0;i<iterations;i++){
+	for (uint64_t i=0;i<iterations;i++){
 		progress.step();
 		if (pq.size() != pq2.size()) {
 			tpie::log_error() << "Size differs " << pq.size() << " " << pq2.size() << std::endl;
@@ -45,7 +44,7 @@ bool cyclic_pq_test(T & pq, boost::uint64_t size, boost::uint64_t iterations) {
 		}
 		if ((size_t)pq.size() == (size_t)0 ||
 			((size_t)pq.size() < (size_t)size && urnd(rnd) <= (cos(static_cast<double>(i) * 60.0 / static_cast<double>(size))+1.0)/2.0)) {
-			boost::uint64_t r = rnd();
+			uint64_t r = rnd();
 			pq.push(r);
 			pq2.push(r);
 		} else {
@@ -57,27 +56,27 @@ bool cyclic_pq_test(T & pq, boost::uint64_t size, boost::uint64_t iterations) {
 }
 
 template <typename T>
-bool basic_pq_test(T & pq, boost::uint64_t size) {
-	boost::rand48 rnd;
-	// for(boost::uint64_t i=0; i < size; ++i)
+bool basic_pq_test(T & pq, uint64_t size) {
+	std::default_random_engine rnd;
+	// for(uint64_t i=0; i < size; ++i)
 	// 	pq.push( (i*40849+37159)%size );
-    // for(boost::uint64_t i=0; i < 2473; ++i) {
+    // for(uint64_t i=0; i < 2473; ++i) {
 	// 	if (pq.empty()) return false;
 	// 	if (pq.top() != i) return false;
 	// 	pq.pop();
     // }
-    // for(boost::uint64_t i=0; i < 2473; ++i)
+    // for(uint64_t i=0; i < 2473; ++i)
 	// 	pq.push((i*40849+37159)%2473);
-	// for(boost::uint64_t i=0; i < size; ++i) {
+	// for(uint64_t i=0; i < size; ++i) {
 	// 	if (pq.empty()) return false;
 	// 	if (pq.top() != i) return false;
 	// 	pq.pop();
 	// }
 	// if (!pq.empty()) return false; 
 
-	std::priority_queue<boost::uint64_t, std::vector<boost::uint64_t>, bit_pertume_compare<std::less<boost::uint64_t> > > pq2;
-	for (boost::uint64_t i=0;i<size;i++){
-		boost::uint64_t r = rnd();
+	std::priority_queue<uint64_t, std::vector<uint64_t>, bit_pertume_compare<std::less<uint64_t> > > pq2;
+	for (uint64_t i=0;i<size;i++){
+		uint64_t r = rnd();
 		pq.push(r);
 		pq2.push(r);
 	}

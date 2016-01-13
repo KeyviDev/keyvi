@@ -39,9 +39,9 @@ private:
 	vector_type items;
 	dest_t dest;
 public:
-	chunker_t(TPIE_TRANSFERABLE(dest_t) dest, size_t maxSize)
+	chunker_t(dest_t dest, size_t maxSize)
 		: maxSize(maxSize)
-		, dest(TPIE_MOVE(dest))
+		, dest(std::move(dest))
 	{
 			set_minimum_memory(sizeof(item_type) * maxSize);
 			set_name("Chunker", PRIORITY_INSIGNIFICANT);
@@ -73,7 +73,7 @@ public:
 /// \brief A pipelining node that gathers elements into a vector of some size.
 /// \param maxSize the maximum size of the vector
 ///////////////////////////////////////////////////////////////////////////////
-typedef pipe_middle<factory_1<bits::chunker_t, size_t> > chunker;
+typedef pipe_middle<factory<bits::chunker_t, size_t> > chunker;
 
 } //namespace pipelining
 } //namespace terrastream

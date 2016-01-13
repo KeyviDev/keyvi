@@ -38,7 +38,7 @@ class ostream_logger_t : public node {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	inline ostream_logger_t(TPIE_TRANSFERABLE(dest_t) dest, std::ostream & log) : dest(TPIE_MOVE(dest)), log(log), begun(false), ended(false) {
+	inline ostream_logger_t(dest_t dest, std::ostream & log) : dest(std::move(dest)), log(log), begun(false), ended(false) {
 		add_push_destination(this->dest);
 		set_name("Log", PRIORITY_INSIGNIFICANT);
 	}
@@ -69,50 +69,12 @@ private:
 	bool ended;
 };
 
-template <typename dest_t>
-class identity_t : public node {
-public:
-	typedef typename push_type<dest_t>::type item_type;
-
-	inline identity_t(TPIE_TRANSFERABLE(dest_t) dest) : dest(TPIE_MOVE(dest)) {
-		add_push_destination(this->dest);
-	}
-
-	inline void push(const item_type & item) {
-		dest.push(item);
-	}
-private:
-	dest_t dest;
-};
-
-template <typename source_t>
-class pull_identity_t : public node {
-public:
-	typedef typename pull_type<source_t>::type item_type;
-
-	inline pull_identity_t(TPIE_TRANSFERABLE(source_t) source) : source(TPIE_MOVE(source)) {
-		add_pull_source(this->source);
-		set_name("Identity", PRIORITY_INSIGNIFICANT);
-	}
-
-	inline item_type pull() {
-		return source.pull();
-	}
-
-	inline bool can_pull() {
-		return source.can_pull();
-	}
-
-private:
-	source_t source;
-};
-
 template <typename source_t>
 class pull_peek_t : public node {
 public:
 	typedef typename pull_type<source_t>::type item_type;
 
-	pull_peek_t(TPIE_TRANSFERABLE(source_t) source) : source(TPIE_MOVE(source)) {
+	pull_peek_t(source_t source) : source(std::move(source)) {
 		add_pull_source(this->source);
 		set_plot_options(PLOT_SIMPLIFIED_HIDE);
 	}
@@ -146,10 +108,10 @@ private:
 template <typename T>
 class dummydest_t : public node {
 public:
-	dummydest_t() : buffer(new T()) {}
+	dummydest_t() : buffer(std::make_shared<T>()) {}
 
 	typedef T item_type;
-	boost::shared_ptr<T> buffer;
+	std::shared_ptr<T> buffer;
 	inline void push(const T & el) {
 		*buffer = el;
 	}
@@ -157,72 +119,6 @@ public:
 		return *buffer;
 	}
 };
-
-template <typename pushfact_t>
-class push_to_pull {
-public:
-
-	template <typename source_t>
-	class puller_t : public node {
-	public:
-
-		typedef typename pull_type<source_t>::type item_type;
-		typedef typename pushfact_t::template constructed<dummydest_t<item_type> >::type pusher_t;
-
-		source_t source;
-		dummydest_t<item_type> dummydest;
-		pusher_t pusher;
-
-		inline puller_t(TPIE_TRANSFERABLE(source_t) source, const pushfact_t & pushfact)
-			: source(TPIE_MOVE(source))
-			, pusher(pushfact.construct(dummydest_t<item_type>(dummydest)))
-		{
-			add_pull_source(this->source);
-			add_push_destination(pusher);
-		}
-
-		inline item_type pull() {
-			pusher.push(source.pull());
-			return dummydest.pull();
-		}
-
-		inline bool can_pull() {
-			return source.can_pull();
-		}
-
-	};
-};
-
-template <typename pullfact_t>
-class pull_to_push {
-public:
-
-	template <typename dest_t>
-	class pusher_t : public node {
-	public:
-		typedef typename push_type<dest_t>::type item_type;
-		typedef typename pullfact_t::template constructed<dummydest_t<item_type> >::type puller_t;
-
-		dest_t dest;
-		dummydest_t<item_type> dummydest;
-		puller_t puller;
-
-		inline pusher_t(TPIE_TRANSFERABLE(dest_t) dest, const pullfact_t & pullfact)
-			: dest(TPIE_MOVE(dest))
-			, puller(pullfact.construct(dummydest_t<item_type>(dummydest)))
-		{
-			add_push_destination(this->dest);
-			add_pull_source(puller);
-		}
-
-		inline void push(const item_type & item) {
-			dummydest.push(item);
-			dest.push(puller.pull());
-		}
-
-	};
-};
-
 
 template <typename fact2_t>
 class fork_t {
@@ -234,7 +130,7 @@ public:
 	public:
 		typedef typename push_type<dest_t>::type item_type;
 
-		inline type(TPIE_TRANSFERABLE(dest_t) dest, const fact2_t & fact2) : dest(TPIE_MOVE(dest)), dest2(fact2.construct()) {
+		type(dest_t dest, fact2_t && fact2) : dest(std::move(dest)), dest2(std::move(fact2.construct())) {
 			add_push_destination(this->dest);
 			add_push_destination(dest2);
 		}
@@ -302,7 +198,7 @@ public:
 		type(dest_t dest, IT from, IT to)
 			: i(from)
 			, till(to)
-			, dest(dest)
+			, dest(std::move(dest))
 		{
 			add_push_destination(dest);
 		}
@@ -361,7 +257,7 @@ public:
 	public:
 		type(dest_t dest, IT to)
 			: i(to)
-			, dest(dest)
+			, dest(std::move(dest))
 		{
 			add_pull_source(dest);
 		}
@@ -385,7 +281,7 @@ public:
 		dest_t dest;
 	public:
 		typedef typename push_type<dest_t>::type item_type;
-		type(TPIE_TRANSFERABLE(dest_t) dest, const F & functor): functor(functor), dest(TPIE_MOVE(dest)) {
+		type(dest_t dest, const F & functor): functor(functor), dest(std::move(dest)) {
 			add_push_destination(this->dest);
 		}
 
@@ -408,7 +304,7 @@ public:
 		dest_t dest;
 	public:
 		typedef typename push_type<dest_t>::type item_type;
-		type(TPIE_TRANSFERABLE(dest_t) dest, const F & functor): functor(functor), dest(TPIE_MOVE(dest)) {
+		type(dest_t dest, const F & functor): functor(functor), dest(std::move(dest)) {
 			add_push_destination(this->dest);
 		}
 
@@ -428,8 +324,8 @@ struct zip_t {
 	public:
 		typedef typename push_type<dest_t>::type::first_type item_type;
 		
-		type(TPIE_TRANSFERABLE(dest_t) dest, const src_fact_t & src_fact)
-			: src(src_fact.construct()), dest(TPIE_MOVE(dest)) {
+		type(dest_t dest, src_fact_t src_fact)
+			: src(src_fact.construct()), dest(std::move(dest)) {
 			add_push_destination(this->dest);
 			add_pull_source(src);
 		}
@@ -455,7 +351,7 @@ struct unzip_t {
 		typedef typename push_type<dest2_t>::type second_type;
 		typedef std::pair<first_type, second_type> item_type;
 		
-		type(TPIE_TRANSFERABLE(dest1_t) dest1, const fact2_t & fact2) : dest1(TPIE_MOVE(dest1)), dest2(fact2.construct()) {
+		type(dest1_t dest1, fact2_t && fact2) : dest1(std::move(dest1)), dest2(fact2.construct()) {
 			add_push_destination(this->dest1);
 			add_push_destination(dest2);
 		}
@@ -479,8 +375,41 @@ public:
 		dest_t dest;
 	public:
 		typedef T item_type;
-		type(TPIE_TRANSFERABLE(dest_t) dest): dest(TPIE_MOVE(dest)) {}
+		type(dest_t dest): dest(std::move(dest)) {}
 		void push(const item_type & item) {dest.push(item);}
+	};
+};
+
+template <typename fact_t>
+class pull_source_t {
+public:
+	template <typename dest_t>
+	class type: public node {
+	public:
+		typedef typename fact_t::constructed_type source_t;
+		typedef typename push_type<dest_t>::type item_type;
+
+		type(dest_t && dest, fact_t && fact) 
+			: dest(std::move(dest)), src(std::move(fact.construct())) {
+			add_push_destination(dest);
+			add_pull_source(src);
+		}
+
+		void propagate() override {
+			size_t size = fetch<stream_size_type>("items");
+			set_steps(size);
+		}
+
+		void go() override {
+			while (src.can_pull()) {
+				dest.push(src.pull());
+				step();
+			}
+		}
+
+	private:
+		dest_t dest;
+		source_t src;
 	};
 };
 
@@ -490,39 +419,16 @@ public:
 /// \brief A pipelining node that writes items to standard out and then pushes
 /// them to the next node.
 ///////////////////////////////////////////////////////////////////////////////
-inline pipe_middle<factory_1<bits::ostream_logger_t, std::ostream &> >
+inline pipe_middle<factory<bits::ostream_logger_t, std::ostream &> >
 cout_logger() {
-	return factory_1<bits::ostream_logger_t, std::ostream &>(std::cout);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-/// \brief The identity node does nothing but push the items to the next node
-///////////////////////////////////////////////////////////////////////////////
-typedef pipe_middle<factory_0<bits::identity_t> > identity;
-
-///////////////////////////////////////////////////////////////////////////////
-/// \brief A pull-pipe node that does nothing to its items
-///////////////////////////////////////////////////////////////////////////////
-inline pullpipe_middle<factory_1<bits::push_to_pull<factory_0<bits::identity_t> >::puller_t, factory_0<bits::identity_t> > > pull_identity() {
-	return factory_1<bits::push_to_pull<factory_0<bits::identity_t> >::puller_t, factory_0<bits::identity_t> >(factory_0<bits::identity_t>());
+	return {std::cout};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief A node that allows peeking at the next item in the pipeline
 ///////////////////////////////////////////////////////////////////////////////
-typedef pullpipe_middle<factory_0<bits::pull_peek_t> > pull_peek;
+typedef pullpipe_middle<factory<bits::pull_peek_t> > pull_peek;
 
-inline
-pipe_middle<factory_1<
-	bits::pull_to_push<factory_0<bits::pull_identity_t> >::pusher_t,
-	factory_0<bits::pull_identity_t>
-> >
-alt_identity() {
-	return factory_1<
-		bits::pull_to_push<factory_0<bits::pull_identity_t> >::pusher_t,
-		factory_0<bits::pull_identity_t>
-	>(factory_0<bits::pull_identity_t>());
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Create a fork pipe node.
@@ -531,9 +437,9 @@ alt_identity() {
 /// to the destination and then to "to"
 ///////////////////////////////////////////////////////////////////////////////
 template <typename fact_t>
-inline pipe_middle<tempfactory_1<bits::fork_t<fact_t>, const fact_t &> >
-fork(const pipe_end<fact_t> & to) {
-	return tempfactory_1<bits::fork_t<fact_t>, const fact_t &>(to.factory);
+pipe_middle<tempfactory<bits::fork_t<fact_t>, fact_t &&> >
+fork(pipe_end<fact_t> && to) {
+	return tempfactory<bits::fork_t<fact_t>, fact_t &&>(std::move(to.factory));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -543,9 +449,9 @@ fork(const pipe_end<fact_t> & to) {
 /// a is pushed to its destination, and then b is pushed to "to"
 ///////////////////////////////////////////////////////////////////////////////
 template <typename fact_t>
-inline pipe_middle<tempfactory_1<bits::unzip_t<fact_t>, const fact_t &> >
-unzip(const pipe_end<fact_t> & to) {
-	return tempfactory_1<bits::unzip_t<fact_t>, const fact_t &>(to.factory);
+pipe_middle<tempfactory<bits::unzip_t<fact_t>, fact_t &&> >
+unzip(pipe_end<fact_t> && to) {
+	return tempfactory<bits::unzip_t<fact_t>, fact_t &&>(std::move(to.factory));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -556,9 +462,9 @@ unzip(const pipe_end<fact_t> & to) {
 /// and std::make_pair(a,b) is pushed to the destination
 ///////////////////////////////////////////////////////////////////////////////
 template <typename fact_t>
-inline pipe_middle<tempfactory_1<bits::zip_t<fact_t>, const fact_t &> >
-zip(const pullpipe_begin<fact_t> & from) {
-	return tempfactory_1<bits::zip_t<fact_t>, const fact_t &>(from.factory);
+pipe_middle<tempfactory<bits::zip_t<fact_t>, fact_t &&> >
+zip(pullpipe_begin<fact_t> && from) {
+	return tempfactory<bits::zip_t<fact_t>, fact_t &&>(std::move(from.factory));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -567,8 +473,8 @@ zip(const pullpipe_begin<fact_t> & from) {
 /// Whenever an element of type T is pushed to the null_sink it is disregarded
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-inline pipe_end<termfactory_0<bits::null_sink_t<T> > >
-null_sink() {return termfactory_0<bits::null_sink_t<T> >();}
+inline pipe_end<termfactory<bits::null_sink_t<T> > >
+null_sink() {return termfactory<bits::null_sink_t<T> >();}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Create a dummy pull begin pipe node
@@ -576,63 +482,23 @@ null_sink() {return termfactory_0<bits::null_sink_t<T> >();}
 /// Whenever an element of type T is pushed to the null_sink it is disregarded
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-inline pullpipe_begin<termfactory_0<bits::zero_source_t<T> > >
-zero_source() {return termfactory_0<bits::zero_source_t<T> >();}
+inline pullpipe_begin<termfactory<bits::zero_source_t<T> > >
+zero_source() {return termfactory<bits::zero_source_t<T> >();}
 
-///////////////////////////////////////////////////////////////////////////////
-/// \brief Create a dummy end pipe node
-///
-/// \deprecated{Use null_sink}
-///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-inline pipe_end<termfactory_0<bits::null_sink_t<T> > >
-bitbucket(T) {
-	return termfactory_0<bits::null_sink_t<T> >();
+
+template <template <typename dest_t> class Fact, typename... T>
+pipe_begin<factory<Fact, T...> > make_pipe_begin(T... t) {
+	return {t...};
 }
 
-template <template <typename dest_t> class Fact>
-pipe_begin<factory_0<Fact> > make_pipe_begin_0() {
-	return pipe_begin<factory_0<Fact> >(factory_0<Fact>());
+template <template <typename dest_t> class Fact, typename... T>
+pipe_middle<factory<Fact, T...> > make_pipe_middle(T... t) {
+	return {t...};
 }
 
-template <template <typename dest_t> class Fact>
-pipe_middle<factory_0<Fact> > make_pipe_middle_0() {
-	return pipe_middle<factory_0<Fact> >(factory_0<Fact>());
-}
-
-template <typename Fact>
-pipe_end<termfactory_0<Fact> > make_pipe_end_0() {
-	return pipe_end<termfactory_0<Fact> >(termfactory_0<Fact>());
-}
-
-template <template <typename dest_t> class Fact, typename T1>
-pipe_begin<factory_1<Fact, T1> > make_pipe_begin_1(T1 e1) {
-	return pipe_begin<factory_1<Fact, T1> >(factory_1<Fact, T1>(e1));
-}
-
-template <template <typename dest_t> class Fact, typename T1>
-pipe_middle<factory_1<Fact, T1> > make_pipe_middle_1(T1 e1) {
-	return pipe_middle<factory_1<Fact, T1> >(factory_1<Fact, T1>(e1));
-}
-
-template <typename Fact, typename T1>
-pipe_end<termfactory_1<Fact, T1> > make_pipe_end_1(T1 e1) {
-	return pipe_end<termfactory_1<Fact, T1> >(termfactory_1<Fact, T1>(e1));
-}
-
-template <template <typename dest_t> class Fact, typename T1, typename T2>
-pipe_begin<factory_2<Fact, T1, T2> > make_pipe_begin_2(T1 e1, T2 e2) {
-	return pipe_begin<factory_2<Fact, T1, T2> >(factory_2<Fact, T1, T2>(e1, e2));
-}
-
-template <template <typename dest_t> class Fact, typename T1, typename T2>
-pipe_middle<factory_2<Fact, T1, T2> > make_pipe_middle_2(T1 e1, T2 e2) {
-	return pipe_middle<factory_2<Fact, T1, T2> >(factory_2<Fact, T1, T2>(e1, e2));
-}
-
-template <typename Fact, typename T1, typename T2>
-pipe_end<termfactory_2<Fact, T1, T2> > make_pipe_end_2(T1 e1, T2 e2) {
-	return pipe_end<termfactory_2<Fact, T1, T2> >(termfactory_2<Fact, T1, T2>(e1, e2));
+template <typename Fact, typename... T>
+pipe_end<termfactory<Fact, T...> > make_pipe_end(T ... t) {
+	return {t...};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -641,8 +507,8 @@ pipe_end<termfactory_2<Fact, T1, T2> > make_pipe_end_2(T1 e1, T2 e2) {
 /// \param end The iterator pointing to the end of the range
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IT>
-pullpipe_begin<termfactory_2<bits::pull_input_iterator_t<IT>, IT, IT> > pull_input_iterator(IT begin, IT end) {
-	return termfactory_2<bits::pull_input_iterator_t<IT>, IT, IT>(begin, end);
+pullpipe_begin<termfactory<bits::pull_input_iterator_t<IT>, IT, IT> > pull_input_iterator(IT begin, IT end) {
+	return termfactory<bits::pull_input_iterator_t<IT>, IT, IT>(begin, end);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -652,8 +518,8 @@ pullpipe_begin<termfactory_2<bits::pull_input_iterator_t<IT>, IT, IT> > pull_inp
 /// \param end The iterator pointing to the end of the range
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IT>
-pipe_begin<tempfactory_2<bits::push_input_iterator_t<IT>, IT, IT> > push_input_iterator(IT begin, IT end) {
-	return tempfactory_2<bits::push_input_iterator_t<IT>, IT, IT>(begin, end);
+pipe_begin<tempfactory<bits::push_input_iterator_t<IT>, IT, IT> > push_input_iterator(IT begin, IT end) {
+	return tempfactory<bits::push_input_iterator_t<IT>, IT, IT>(begin, end);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -663,8 +529,8 @@ pipe_begin<tempfactory_2<bits::push_input_iterator_t<IT>, IT, IT> > push_input_i
 /// written to
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IT>
-pipe_end<termfactory_1<bits::push_output_iterator_t<IT>, IT> > push_output_iterator(IT to) {
-	return termfactory_1<bits::push_output_iterator_t<IT>, IT>(to);
+pipe_end<termfactory<bits::push_output_iterator_t<IT>, IT> > push_output_iterator(IT to) {
+	return termfactory<bits::push_output_iterator_t<IT>, IT>(to);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -675,8 +541,8 @@ pipe_end<termfactory_1<bits::push_output_iterator_t<IT>, IT> > push_output_itera
 /// \tparam Item The type of the pushed items
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Item, typename IT>
-pipe_end<termfactory_1<bits::push_output_iterator_t<IT, Item>, IT> > typed_push_output_iterator(IT to) {
-	return termfactory_1<bits::push_output_iterator_t<IT, Item>, IT>(to);
+pipe_end<termfactory<bits::push_output_iterator_t<IT, Item>, IT> > typed_push_output_iterator(IT to) {
+	return termfactory<bits::push_output_iterator_t<IT, Item>, IT>(to);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -686,8 +552,8 @@ pipe_end<termfactory_1<bits::push_output_iterator_t<IT, Item>, IT> > typed_push_
 /// written to
 ///////////////////////////////////////////////////////////////////////////////
 template <typename IT>
-pullpipe_end<tempfactory_1<bits::pull_output_iterator_t<IT>, IT> > pull_output_iterator(IT to) {
-	return tempfactory_1<bits::pull_output_iterator_t<IT>, IT>(to);
+pullpipe_end<tempfactory<bits::pull_output_iterator_t<IT>, IT> > pull_output_iterator(IT to) {
+	return tempfactory<bits::pull_output_iterator_t<IT>, IT>(to);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -697,8 +563,8 @@ pullpipe_end<tempfactory_1<bits::pull_output_iterator_t<IT>, IT> > pull_output_i
 /// Whenever an element is pushed, it is immidiately pushed to the destination
 ///////////////////////////////////////////////////////////////////////////////
 template <typename F>
-pipe_middle<tempfactory_1<bits::preparer_t<F>, F> > preparer(const F & functor) {
-	return tempfactory_1<bits::preparer_t<F>, F>(functor);
+pipe_middle<tempfactory<bits::preparer_t<F>, F> > preparer(const F & functor) {
+	return tempfactory<bits::preparer_t<F>, F>(functor);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -708,8 +574,8 @@ pipe_middle<tempfactory_1<bits::preparer_t<F>, F> > preparer(const F & functor) 
 /// Whenever an element is pushed, it is immidiately pushed to the destination
 ///////////////////////////////////////////////////////////////////////////////
 template <typename F>
-pipe_middle<tempfactory_1<bits::propagater_t<F>, F> > propagater(const F & functor) {
-	return tempfactory_1<bits::propagater_t<F>, F>(functor);
+pipe_middle<tempfactory<bits::propagater_t<F>, F> > propagater(const F & functor) {
+	return tempfactory<bits::propagater_t<F>, F>(functor);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -719,10 +585,20 @@ pipe_middle<tempfactory_1<bits::propagater_t<F>, F> > propagater(const F & funct
 /// Whenever an element is push, it is immidiately pushed to the destination
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-pipe_middle<tempfactory_0<bits::item_type_t<T> > > item_type() {
-	return tempfactory_0<bits::item_type_t<T> >();
+pipe_middle<tempfactory<bits::item_type_t<T> > > item_type() {
+	return tempfactory<bits::item_type_t<T> >();
 }
 
+///////////////////////////////////////////////////////////////////////////////
+/// \brief A node that pulls items from source and push them into dest
+///
+/// \param The pull source, and the source forwards the number of items, "items"
+///////////////////////////////////////////////////////////////////////////////
+template <typename fact_t>
+pipe_begin<tempfactory<bits::pull_source_t<fact_t>, fact_t &&> > 
+pull_source(pullpipe_begin<fact_t> && from) {
+	return tempfactory<bits::pull_source_t<fact_t>, fact_t &&>(std::move(from.factory));
+}
 
 }
 

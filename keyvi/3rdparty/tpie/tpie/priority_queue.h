@@ -165,7 +165,7 @@ private:
     bool min_in_buffer;
 
 	/** Overflow priority queue (for buffering inserted elements). Capacity m. */
-	tpie::auto_ptr<OPQType> opq;
+	tpie::unique_ptr<OPQType> opq;
 
 	/** Deletion buffer containing the m' top elements in the entire structure. */
 	tpie::array<T> buffer;

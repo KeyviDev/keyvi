@@ -22,7 +22,7 @@
 #include <vector>
 #include <tpie/internal_queue.h>
 #include <tpie/internal_vector.h>
-#include <boost/random.hpp>
+#include <random>
 #include <tpie/job.h>
 #include <tpie/cpu_timer.h>
 
@@ -93,11 +93,11 @@ bool basic_test() {
 	}
 
 	{
-		//Test auto ptr
+		//Test unique ptr
 		size_t a1 = tpie::get_memory_manager().used();
 		{
-			tpie::auto_ptr<size_t> x(tpie::tpie_new<size_t>(32));
-			tpie::auto_ptr<size_t> y = x;
+			tpie::unique_ptr<size_t> x(tpie::tpie_new<size_t>(32));
+			tpie::unique_ptr<size_t> y = std::move(x);
 			y.reset(tpie::tpie_new<size_t>(54));
 		}
 		size_t a2 = tpie::get_memory_manager().used();
@@ -162,8 +162,8 @@ class memory_user : public tpie::job {
 	typedef int test_t;
 	size_t times;
 	tpie::internal_queue<test_t *> pointers;
-	boost::rand48 rnd;
-	boost::uniform_01<double> urnd;
+	std::default_random_engine rnd;
+	std::uniform_real_distribution<double> urnd;
 
 public:
 	memory_user(size_t times, size_t capacity) : times(times), pointers(capacity) {}

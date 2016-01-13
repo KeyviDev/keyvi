@@ -36,6 +36,9 @@ namespace tpie {
 template <typename S>
 class btree_node {
 public:
+	typedef S state_type;
+
+	
 	/**
 	 * \brief Type of the key of a value
 	 */
@@ -51,6 +54,9 @@ public:
 	 */
 	typedef typename S::value_type value_type;
 
+
+	typedef typename S::store_type store_type;
+	
 	/**
 	 * \brief Check if this node has a parent
 	 *
@@ -83,11 +89,11 @@ public:
 	void child(size_t i) {
 		tp_assert(!m_is_leaf, "Is leaf");
 		tp_assert(i < count(), "Invalid i");
-		if (m_path.size() + 1 == m_store->height()) {
+		if (m_path.size() + 1 == m_state->store().height()) {
 			m_is_leaf = true;
-			m_leaf = m_store->get_child_leaf(m_path.back(), i);
+			m_leaf = m_state->store().get_child_leaf(m_path.back(), i);
 		} else
-			m_path.push_back(m_store->get_child_internal(m_path.back(), i));
+			m_path.push_back(m_state->store().get_child_internal(m_path.back(), i));
 	}
 	
 	/**
@@ -125,7 +131,7 @@ public:
 	 * Requires !is_leaf()
 	 */
 	const augment_type & get_augmentation(size_t i) const {
-		return m_store->augment(m_path.back(), i);
+		return state_type::user_augment(m_state->store().augment(m_path.back(), i));
 	}
 	
 	/**
@@ -133,9 +139,9 @@ public:
 	 */
 	key_type min_key(size_t i) const {
 		if (m_is_leaf)
-			return m_store->min_key(m_leaf, i);
+			return m_state->min_key(m_leaf, i);
 		else
-			return m_store->min_key(m_path.back(), i);
+			return m_state->min_key(m_path.back(), i);
 	}
 	
 	/**
@@ -145,7 +151,7 @@ public:
 	 */
 	value_type value(size_t i) const {
 		tp_assert(m_is_leaf, "Not leaf");
-		return m_store->get(m_leaf, i);
+		return m_state->store().get(m_leaf, i);
 	}
 	
 	/**
@@ -153,9 +159,9 @@ public:
 	 */
 	size_t count() const {
 		if (m_is_leaf)
-			return m_store->count(m_leaf);
+			return m_state->store().count(m_leaf);
 		else
-			return m_store->count(m_path.back());
+			return m_state->store().count(m_path.back());
 	}
 
 	/**
@@ -165,35 +171,47 @@ public:
 	 */
 	size_t index() const {
 		if (m_is_leaf)
-			return m_store->index(m_leaf, m_path.back());
-		return m_store->index(m_path.back(), m_path[m_path.size()-2]);
+			return m_state->store().index(m_leaf, m_path.back());
+		return m_state->store().index(m_path.back(), m_path[m_path.size()-2]);
 	}
 	
-	btree_node(): m_store(NULL) {}
+	btree_node(): m_state(nullptr) {}
 private:
-	typedef typename S::leaf_type leaf_type;
-	typedef typename S::internal_type internal_type;
 
-	btree_node(const S * store, leaf_type root)
-		: m_store(store), m_leaf(root), m_is_leaf(true) {
+	const typename state_type::combined_augment & get_combined_augmentation(size_t i) const {
+		return m_state->store().augment(m_path.back(), i);
 	}
 
-	btree_node(const S * store, internal_type root)
-		: m_store(store), m_is_leaf(false) {
+	
+	typedef typename store_type::leaf_type leaf_type;
+	typedef typename store_type::internal_type internal_type;
+
+	btree_node(const state_type * state, leaf_type root)
+		: m_state(state), m_leaf(root), m_is_leaf(true) {
+	}
+
+	btree_node(const state_type * state, internal_type root)
+		: m_state(state), m_is_leaf(false) {
 		m_path.push_back(root);
 	}
 
-	btree_node(const S * store, std::vector<internal_type> path, leaf_type leaf)
-		: m_store(store), m_path(path), m_leaf(leaf), m_is_leaf(true) {
+	btree_node(const state_type * state, std::vector<internal_type> path, leaf_type leaf)
+		: m_state(state), m_path(path), m_leaf(leaf), m_is_leaf(true) {
 	}
 
-	const S * m_store;
+	const state_type * m_state;
 	std::vector<internal_type> m_path;
 	leaf_type m_leaf;
 	bool m_is_leaf;
 
-	template <typename, typename, typename>
-	friend class btree;
+	template <typename, typename>
+	friend class bbits::tree_state;
+
+	template <typename, typename>
+	friend class bbits::tree;
+
+	template <typename, typename>
+	friend class bbits::builder;
 
 	template <typename>
 	friend class btree_iterator;
@@ -203,23 +221,24 @@ template <typename S>
 class btree_iterator: public boost::iterator_facade<
 	btree_iterator<S>,
 	typename S::value_type const,
-	boost::bidirectional_traversal_tag,
-	typename S::value_type> {
+	boost::bidirectional_traversal_tag> {
 private:
-	typedef typename S::internal_type internal_type;
-	typedef typename S::leaf_type leaf_type;
+	typedef S state_type;
+	typedef typename S::store_type store_type;
+	typedef typename store_type::internal_type internal_type;
+	typedef typename store_type::leaf_type leaf_type;
 	typedef typename S::value_type value_type;
 	typedef typename S::key_type key_type;
 
-	const S * m_store;
+	const state_type * m_state;
 	std::vector<internal_type> m_path;
 	size_t m_index;
 	leaf_type m_leaf;
 
-	template <typename, typename, typename>
-	friend class btree;
+	template <typename, typename>
+	friend class bbits::tree;
 
-	btree_iterator(const S * store): m_store(store) {}
+	btree_iterator(const state_type * state): m_state(state) {}
 
 	void goto_item(const std::vector<internal_type> & p, leaf_type l, size_t i) {
 		m_path = p;
@@ -230,46 +249,46 @@ private:
 
 	void goto_begin() {
 		m_path.clear();
-		if (m_store->height() == 1) {
-			m_leaf = m_store->get_root_leaf();
+		if (m_state->store().height() < 2) {
+			m_leaf = m_state->store().get_root_leaf();
 			m_index = 0;
 			return;
 		}
-		internal_type n = m_store->get_root_internal();
+		internal_type n = m_state->store().get_root_internal();
 		for (size_t i=2;; ++i) {
 			m_path.push_back(n);
-			if (i == m_store->height()) {
-				m_leaf = m_store->get_child_leaf(n, 0);
+			if (i == m_state->store().height()) {
+				m_leaf = m_state->store().get_child_leaf(n, 0);
 				m_index = 0;
 				return;
 			}
-			n = m_store->get_child_internal(n, 0);
+			n = m_state->store().get_child_internal(n, 0);
 		}		
 	}
 
 	void goto_end() {
 		m_path.clear();
 
-		if(m_store->height() == 0) {
-			m_leaf = m_store->get_root_leaf();
+		if(m_state->store().height() == 0) {
+			m_leaf = m_state->store().get_root_leaf();
 			m_index = 0;
 			return;
 		}
 
-		if (m_store->height() == 1) {
-			m_leaf = m_store->get_root_leaf();
-			m_index = m_store->count(m_leaf);
+		if (m_state->store().height() == 1) {
+			m_leaf = m_state->store().get_root_leaf();
+			m_index = m_state->store().count(m_leaf);
 			return;
 		}
-		internal_type n = m_store->get_root_internal();
+		internal_type n = m_state->store().get_root_internal();
 		for (size_t i=2;; ++i) {
 			m_path.push_back(n);
-			if (i == m_store->height()) {
-				m_leaf = m_store->get_child_leaf(n, m_store->count(n)-1);
-				m_index = m_store->count(m_leaf);
+			if (i == m_state->store().height()) {
+				m_leaf = m_state->store().get_child_leaf(n, m_state->store().count(n)-1);
+				m_index = m_state->store().count(m_leaf);
 				return;
 			}
-			n = m_store->get_child_internal(n, m_store->count(n)-1);
+			n = m_state->store().get_child_internal(n, m_state->store().count(n)-1);
 		}		
 	}
 
@@ -277,8 +296,8 @@ private:
 public:
 	btree_iterator(): m_index(0), m_leaf() {}
 
-	value_type dereference() const {
-		return m_store->get(m_leaf, m_index);
+	const value_type & dereference() const {
+		return m_state->store().get(m_leaf, m_index);
 	}
 
 	bool equal(const btree_iterator & o) const {
@@ -288,7 +307,7 @@ public:
 	size_t index() const {return m_index;}
 
 	btree_node<S> is_leaf() const {
-		return btree_node<S>(m_store, m_path, m_leaf);
+		return btree_node<S>(m_state, m_path, m_leaf);
 	}
 	
 	void decrement() {
@@ -297,50 +316,50 @@ public:
 			return;
 		}
 		
-		size_t i=m_store->index(m_leaf, m_path.back());
+		size_t i=m_state->store().index(m_leaf, m_path.back());
 		size_t x=0;
 		while (i == 0) {
 			internal_type n = m_path.back();
 			m_path.pop_back();
-			i = m_store->index(n, m_path.back());
+			i = m_state->store().index(n, m_path.back());
 			++x;
 		}
 		--i;
 
 		while (x != 0) {
-			m_path.push_back(m_store->get_child_internal(m_path.back(), i));
-			i = m_store->count(m_path.back())-1;							 
+			m_path.push_back(m_state->store().get_child_internal(m_path.back(), i));
+			i = m_state->store().count(m_path.back())-1;							 
 			--x;
 		}
 		
-		m_leaf = m_store->get_child_leaf(m_path.back(), i);
-		m_index = m_store->count(m_leaf)-1;
+		m_leaf = m_state->store().get_child_leaf(m_path.back(), i);
+		m_index = m_state->store().count(m_leaf)-1;
 	}
 
 	void increment() {
 		m_index++;
-		if (m_index < m_store->count(m_leaf)) return;
+		if (m_index < m_state->store().count(m_leaf)) return;
 		if (m_path.empty()) return; //We are at the end
 
-		size_t i=m_store->index(m_leaf, m_path.back());
+		size_t i=m_state->store().index(m_leaf, m_path.back());
 		size_t x=0;
-		while (i +1 == m_store->count(m_path.back())) {
+		while (i +1 == m_state->store().count(m_path.back())) {
 			internal_type n = m_path.back();
 			m_path.pop_back();
 			if (m_path.empty()) {
 				goto_end();
 				return;
 			}
-			i = m_store->index(n, m_path.back());
+			i = m_state->store().index(n, m_path.back());
 			++x;
 		}
 		++i;
 		while (x != 0) {
-			m_path.push_back(m_store->get_child_internal(m_path.back(), i));
+			m_path.push_back(m_state->store().get_child_internal(m_path.back(), i));
 			i = 0;
 			--x;
 		}
-		m_leaf = m_store->get_child_leaf(m_path.back(), i);
+		m_leaf = m_state->store().get_child_leaf(m_path.back(), i);
 		m_index = 0;
 	}
 

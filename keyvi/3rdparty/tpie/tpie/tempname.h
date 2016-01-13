@@ -28,9 +28,9 @@
 #include <tpie/portability.h>
 #include <tpie/stats.h>
 #include <stdexcept>
-#include <boost/utility.hpp>
-#include <boost/smart_ptr.hpp>
-// The name of the environment variable pointing to a tmp directory.
+#include <boost/intrusive_ptr.hpp>
+#include <string>
+ // The name of the environment variable pointing to a tmp directory.
 #define TMPDIR_ENV "TMPDIR"
 
 // The name of the environment variable to consult for default device
@@ -157,9 +157,14 @@ namespace tpie {
 
 	namespace bits {
 	
-	class temp_file_inner : public boost::noncopyable {
+	class temp_file_inner {
 	public:
 		temp_file_inner();
+		temp_file_inner(const temp_file_inner & o) = delete;
+		temp_file_inner(temp_file_inner && o) = delete;
+		temp_file_inner & operator=(const temp_file_inner & o) = delete;
+		temp_file_inner & operator=(temp_file_inner && o) = delete;
+		
 		temp_file_inner(const std::string & path, bool persist);
 		~temp_file_inner();
 

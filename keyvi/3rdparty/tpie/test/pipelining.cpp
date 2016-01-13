@@ -19,7 +19,7 @@
 
 #include <tpie/tpie.h>
 #include <tpie/pipelining.h>
-#include <boost/random.hpp>
+#include <random>
 #include <tpie/file_stream.h>
 #include <iostream>
 #include <sstream>
@@ -84,16 +84,16 @@ class input_nodes_t : public P::node {
 public:
 	typedef node item_type;
 
-	inline input_nodes_t(const dest_t & dest, size_t nodes)
-		: dest(dest)
+	inline input_nodes_t(dest_t dest, size_t nodes)
+		: dest(std::move(dest))
 		, nodes(nodes)
 	{
 		set_steps(nodes);
 	}
 
 	virtual void go() override {
-		static boost::mt19937 mt;
-		static boost::uniform_int<> dist(0, nodes-1);
+		static std::mt19937 mt;
+		static std::uniform_int_distribution<> dist(0, nodes-1);
 		dest.begin();
 		for (size_t i = 0; i < nodes; ++i) {
 			dest.push(make_node(i, dist(mt)));
@@ -107,10 +107,7 @@ private:
 	size_t nodes;
 };
 
-inline P::pipe_begin<P::factory_1<input_nodes_t, size_t> >
-input_nodes(size_t nodes) {
-	return P::factory_1<input_nodes_t, size_t>(nodes);
-}
+typedef  P::pipe_begin<P::factory<input_nodes_t, size_t> > input_nodes;
 
 template <typename dest_t, typename byid_t, typename byparent_t>
 class count_t : public P::node {
@@ -119,8 +116,8 @@ class count_t : public P::node {
 	byparent_t byparent;
 
 public:
-	count_t(const dest_t & dest, const byid_t & byid, const byparent_t & byparent)
-		: dest(dest), byid(byid), byparent(byparent)
+	count_t(dest_t dest, byid_t byid, byparent_t byparent)
+		: dest(std::move(dest)), byid(std::move(byid)), byparent(std::move(byparent))
 	{
 		add_push_destination(dest);
 		add_pull_source(byid);
@@ -128,7 +125,7 @@ public:
 	}
 
 	virtual void go() override {
-		tpie::auto_ptr< ::node> buf(0);
+		tpie::unique_ptr<::node> buf(nullptr);
 		while (byid.can_pull()) {
 			node_output cur = byid.pull();
 			if (buf.get()) {
@@ -170,17 +167,17 @@ public:
 		typedef count_t<dest_t, byid_gen_t, byparent_gen_t> type;
 	};
 
-	count_factory(byid_t byid, byparent_t byparent)
-		: m_byid(byid.factory)
-		, m_byparent(byparent.factory)
+	count_factory(byid_t && byid, byparent_t && byparent)
+		: m_byid(std::move(byid.factory))
+		, m_byparent(std::move(byparent.factory))
 	{
 	}
 
 	template <typename dest_t>
 	count_t<dest_t, byid_gen_t, byparent_gen_t>
-	construct(const dest_t & dest) const {
+	construct(dest_t dest) {
 		return count_t<dest_t, byid_gen_t, byparent_gen_t>
-			(dest, m_byid.construct(), m_byparent.construct());
+			(std::move(dest), m_byid.construct(), m_byparent.construct());
 	}
 
 private:
@@ -189,9 +186,9 @@ private:
 };
 
 template <typename byid_t, typename byparent_t>
-inline P::pipe_begin<count_factory<byid_t, byparent_t> >
-count(const byid_t & byid, const byparent_t & byparent) {
-	return count_factory<byid_t, byparent_t>(byid, byparent);
+P::pipe_begin<count_factory<byid_t, byparent_t> >
+count(byid_t && byid, byparent_t && byparent) {
+	return count_factory<byid_t, byparent_t>(std::forward<byid_t>(byid), std::forward<byparent_t>(byparent));
 }
 
 class output_count_t : public P::node {
@@ -222,10 +219,7 @@ public:
 	}
 };
 
-inline P::pipe_end<P::termfactory_0<output_count_t> >
-output_count() {
-	return P::termfactory_0<output_count_t>();
-}
+typedef P::pipe_end<P::termfactory<output_count_t> > output_count;
 
 int main(int argc, char ** argv) {
 	TP::tpie_init(TP::ALL & ~TP::DEFAULT_LOGGING);
@@ -253,7 +247,7 @@ int main(int argc, char ** argv) {
 		p1.plot();
 		if (progress) {
 			TP::progress_indicator_arrow pi("Test", nodes);
-			p1(nodes, pi);
+			p1(nodes, pi, TPIE_FSI);
 		} else {
 			p1();
 		}

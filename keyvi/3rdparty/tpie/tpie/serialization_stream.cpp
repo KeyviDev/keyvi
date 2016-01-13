@@ -19,6 +19,7 @@
 
 #include <tpie/serialization_stream.h>
 #include <tpie/array.h>
+#include <algorithm>
 
 ///////////////////////////////////////////////////////////////////////////////
 // serialization_header {{{
@@ -119,7 +120,7 @@ private:
 	};
 #pragma pack(pop)
 
-	std::auto_ptr<stream_header_t> m_headerPtr;
+	std::unique_ptr<stream_header_t> m_headerPtr;
 	stream_header_t & m_header;
 
 	file_accessor::raw_file_accessor & m_fileAccessor;

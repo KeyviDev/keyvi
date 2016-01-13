@@ -128,7 +128,7 @@ namespace log_bits {
 bool log_selector::s_init;
 log_level log_selector::s_level;
 
-std::vector<boost::shared_ptr<logstream> > log_instances;
+std::vector<std::shared_ptr<logstream> > log_instances;
 
 } // namespace log_bits
 
@@ -158,8 +158,8 @@ namespace log_bits {
 
 void initiate_log_level(log_level level) {
 	while (log_instances.size() <= level)
-		log_instances.push_back(boost::shared_ptr<logstream>());
-	log_instances[level].reset(new logstream(level));
+		log_instances.push_back(std::shared_ptr<logstream>());
+	log_instances[level] = std::make_shared<logstream>(level);
 }
 
 void flush_logs() {

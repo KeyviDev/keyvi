@@ -36,7 +36,7 @@ class scanf_ints_t : public node {
 public:
 	typedef int item_type;
 
-	inline scanf_ints_t(TPIE_TRANSFERABLE(dest_t) dest) : dest(TPIE_MOVE(dest)) {
+	inline scanf_ints_t(dest_t dest) : dest(std::move(dest)) {
 		add_push_destination(this->dest);
 	}
 
@@ -68,12 +68,12 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief A pipelining node that pushes the integers it reads using scanf
 ///////////////////////////////////////////////////////////////////////////////
-typedef pipe_begin<factory_0<bits::scanf_ints_t> > scanf_ints;
+typedef pipe_begin<factory<bits::scanf_ints_t> > scanf_ints;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief A pipelining node that prints the items that are pushed to it.
 ///////////////////////////////////////////////////////////////////////////////
-typedef pipe_end<termfactory_0<bits::printf_ints_t> > printf_ints;
+typedef pipe_end<termfactory<bits::printf_ints_t> > printf_ints;
 
 } // namespace pipelining
 

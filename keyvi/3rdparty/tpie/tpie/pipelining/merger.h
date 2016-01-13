@@ -35,8 +35,12 @@ private:
 
 	typedef bits::store_pred<pred_t, specific_store_t> store_pred_t;
 public:
-	inline merger(pred_t pred, specific_store_t store)
-		: pq(0, predwrap(store_pred_t(pred))), m_store(store) {
+	inline merger(pred_t pred, specific_store_t store,
+				  memory_bucket_ref bucket = memory_bucket_ref())
+		: pq(0, predwrap(store_pred_t(pred)), bucket)
+		, in(bucket)
+		, itemsRead(bucket)
+		, m_store(store) {
 	}
 
 	inline bool can_pull() {
@@ -45,7 +49,7 @@ public:
 
  	inline store_type pull() {
 		tp_assert(can_pull(), "pull() while !can_pull()");
-		store_type el = TPIE_MOVE(pq.top().first);
+		store_type el = std::move(pq.top().first);
 		size_t i = pq.top().second;
 		if (in[i].can_read() && itemsRead[i] < runLength) {
 			pq.pop_and_push(
@@ -57,7 +61,7 @@ public:
 		if (!can_pull()) {
 			reset();
 		}
-		return TPIE_MOVE(el);
+		return std::move(el);
 	}
 
 	inline void reset() {

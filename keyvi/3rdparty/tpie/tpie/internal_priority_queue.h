@@ -42,14 +42,18 @@ public:
     /// \brief Construct a priority queue.
     /// \param max_size Maximum size of queue.
 	///////////////////////////////////////////////////////////////////////////
-    internal_priority_queue(size_type max_size, comp_t c=comp_t()): pq(max_size), sz(0), comp(c) {}
+    internal_priority_queue(size_type max_size, comp_t c=comp_t(),
+							memory_bucket_ref bucket = memory_bucket_ref())
+		: pq(max_size, bucket), sz(0), comp(c) {}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Construct a priority queue with given elements.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename IT>
 	internal_priority_queue(size_type max_size, const IT & start, const IT & end,
-							comp_t c=comp_t()): pq(max_size), sz(0), comp(c) {
+							comp_t c=comp_t(),
+							memory_bucket_ref bucket = memory_bucket_ref())
+		: pq(max_size, bucket), sz(0), comp(c) {
 		insert(start, end);
 	}
 
@@ -73,11 +77,9 @@ public:
 		pq[sz++] = v;
 	}
 
-#ifdef TPIE_CPP_RVALUE_REFERENCE
 	void unsafe_push(T && v) {
 		pq[sz++] = std::move(v);
 	}
-#endif
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Make the priority queue safe after a sequence of calls to
@@ -97,31 +99,29 @@ public:
     /// \brief Returns the size of the queue.
     /// \return Queue size.
 	///////////////////////////////////////////////////////////////////////////
-    inline size_type size() const {return sz;}
+    size_type size() const {return sz;}
 
 	///////////////////////////////////////////////////////////////////////////
     /// \brief Insert an element into the priority queue.
     ///
     /// \param v The element that should be inserted.
 	///////////////////////////////////////////////////////////////////////////
-    inline void push(const T & v) { 
+    void push(const T & v) { 
 		assert(size() < pq.size());
 		pq[sz++] = v; 
 		std::push_heap(pq.begin(), pq.find(sz), comp);
     }
 
-#ifdef TPIE_CPP_RVALUE_REFERENCE
 	void push(T && v) {
 		assert(size() < pq.size());
 		pq[sz++] = std::move(v);
 		std::push_heap(pq.begin(), pq.find(sz), comp);
     }
-#endif
 
 	///////////////////////////////////////////////////////////////////////////
     /// \brief Remove the minimum element from heap.
 	///////////////////////////////////////////////////////////////////////////
-    inline void pop() { 
+    void pop() { 
 		assert(!empty());
 		std::pop_heap(pq.begin(), pq.find(sz), comp);
 		--sz;
@@ -130,26 +130,24 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Remove the minimum element and insert a new element.
 	///////////////////////////////////////////////////////////////////////////
-	inline void pop_and_push(const T & v) {
+	void pop_and_push(const T & v) {
 		assert(!empty());
 		pq[0] = v;
 		pop_and_push_heap(pq.begin(), pq.find(sz), comp);
 	}
 
-#ifdef TPIE_CPP_RVALUE_REFERENCE
 	void pop_and_push(T && v) {
 		assert(!empty());
 		pq[0] = std::move(v);
 		pop_and_push_heap(pq.begin(), pq.find(sz), comp);
 	}
-#endif
 
 	///////////////////////////////////////////////////////////////////////////
     /// \brief Return the minimum element.
     ///
     /// \return The minimum element.
 	///////////////////////////////////////////////////////////////////////////
-    inline const T & top() const {return pq[0];}
+    const T & top() const {return pq[0];}
 
 	T & top() {return pq[0];}
 
@@ -157,7 +155,7 @@ public:
 	/// \copybrief linear_memory_structure_doc::memory_coefficient()
 	/// \copydetails linear_memory_structure_doc::memory_coefficient()
 	///////////////////////////////////////////////////////////////////////////
-	inline static double memory_coefficient() {
+	static double memory_coefficient() {
 		return tpie::array<T>::memory_coefficient();
 	}
 
@@ -165,7 +163,7 @@ public:
 	/// \copybrief linear_memory_structure_doc::memory_overhead()
 	/// \copydetails linear_memory_structure_doc::memory_overhead()
 	///////////////////////////////////////////////////////////////////////////
-	inline static double memory_overhead() {
+	static double memory_overhead() {
 		return tpie::array<T>::memory_overhead() - sizeof(tpie::array<T>) + sizeof(internal_priority_queue);
 	}
 
@@ -181,13 +179,13 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Clear the structure of all elements.
 	///////////////////////////////////////////////////////////////////////////
-	inline void clear() {sz=0;}
+	void clear() {sz=0;}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Resize priority queue to given size.
 	/// \param s New size of priority queue.
 	///////////////////////////////////////////////////////////////////////////
-	inline void resize(size_t s) {sz=0; pq.resize(s);}
+	void resize(size_t s) {sz=0; pq.resize(s);}
 private:	
 	tpie::array<T> pq; 
     size_type sz;

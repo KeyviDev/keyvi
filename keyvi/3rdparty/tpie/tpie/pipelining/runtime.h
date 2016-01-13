@@ -73,7 +73,8 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	void go(stream_size_type items,
 			progress_indicator_base & progress,
-			memory_size_type memory);
+			memory_size_type memory,
+			const char * file, const char * function);
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief  Get all sources of the item flow graph.

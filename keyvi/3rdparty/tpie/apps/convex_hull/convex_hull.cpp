@@ -79,8 +79,8 @@ class graham_scan_reconstruct_type : public P::node {
 public:
 	typedef Pt item_type;
 
-	graham_scan_reconstruct_type(const dest_t & dest)
-		: dest(dest)
+	graham_scan_reconstruct_type(dest_t dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 		set_minimum_memory(sizeof(TP::temp_file)
@@ -146,8 +146,8 @@ class graham_scan_type<graham_scan_reconstruct_type<rdest_t> > : public P::node 
 public:
 	typedef Pt item_type;
 
-	graham_scan_type(const dest_t & dest)
-		: dest(dest)
+	graham_scan_type(dest_t dest)
+		: dest(std::move(dest))
 	{
 		this->dest.set_predecessor(*this);
 		set_minimum_memory(sizeof(TP::temp_file)
@@ -218,15 +218,10 @@ private:
 	}
 };
 
-P::pipe_middle<P::factory_0<graham_scan_type> >
-graham_scan_in() {
-	return P::factory_0<graham_scan_type>();
-}
+typedef P::pipe_middle<P::factory<graham_scan_type> > graham_scan_in;
 
-P::pipe_middle<P::factory_0<graham_scan_reconstruct_type> >
-graham_scan_out() {
-	return P::factory_0<graham_scan_reconstruct_type>();
-}
+
+typedef P::pipe_middle<P::factory<graham_scan_reconstruct_type> > graham_scan_out;
 
 // Aggregates two coordinates into one point.
 template <typename dest_t>
@@ -241,7 +236,7 @@ public:
 
 	make_points_type(dest_t dest)
 		: flag(false)
-		, dest(dest)
+		, dest(std::move(dest))
 	{
 		add_push_destination(dest);
 	}
@@ -258,10 +253,7 @@ public:
 	}
 };
 
-P::pipe_middle<P::factory_0<make_points_type> >
-make_points() {
-	return P::factory_0<make_points_type>();
-}
+typedef P::pipe_middle<P::factory<make_points_type> > make_points;
 
 // Print and verify polygon. Weeds out duplicates.
 template <typename T>
@@ -316,9 +308,9 @@ public:
 };
 
 template <typename T>
-P::pipe_end<P::termfactory_0<print_points_type<T> > >
+P::pipe_end<P::termfactory<print_points_type<T> > >
 print_points() {
-	return P::termfactory_0<print_points_type<T> >();
+	return P::termfactory<print_points_type<T> >();
 }
 
 int main() {

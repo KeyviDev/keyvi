@@ -29,6 +29,7 @@ namespace {
 		out << "====================> Backtrace <======================" << std::endl;
 	}
 
+#if defined(WIN32) || defined(__CYGWIN__)
 	void backtrace_item(std::ostream & out, size_t addr, const char * name, const char * file, int line) {
 		if (name[0] != '\0') out << name;
 		else if (addr != 0) out << addr;
@@ -40,6 +41,7 @@ namespace {
 		}
 		out << std::endl;
 	}
+#endif
 
 	void backtrace_end(std::ostream & out) {
 		out << "=======================================================" << std::endl;

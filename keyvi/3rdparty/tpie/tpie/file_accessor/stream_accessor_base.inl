@@ -48,6 +48,7 @@ void stream_accessor_base<file_accessor_t>::read_header() {
 template <typename file_accessor_t>
 void stream_accessor_base<file_accessor_t>::write_header(bool clean) {
 	stream_header_t header;
+	memset(&header, 0, sizeof(header));
 	fill_header(header, clean);
 	m_fileAccessor.seek_i(0);
 	m_fileAccessor.write_i(&header, sizeof(header));

@@ -20,9 +20,7 @@
 #ifndef TPIE_PIPELINING_NODE_TRAITS_H
 #define TPIE_PIPELINING_NODE_TRAITS_H
 
-#ifdef TPIE_CPP_DECLTYPE
 #include <type_traits>
-#endif
 
 namespace tpie {
 
@@ -45,15 +43,10 @@ struct remove<T &> {
 	typedef typename remove<T>::type type;
 };
 
-#ifdef TPIE_CPP_RVALUE_REFERENCE
 template <typename T>
 struct remove<T &&> {
 	typedef typename remove<T>::type type;
 };
-#endif // TPIE_CPP_RVALUE_REFERENCE
-
-
-#ifdef TPIE_CPP_DECLTYPE
 
 template <typename T>
 struct push_traits {};
@@ -106,8 +99,6 @@ struct has_itemtype {
 	//static_assert(sizeof(test<T>(nullptr)) == sizeof(yes), "WTF");
 	static const bool value = sizeof(test<T>(nullptr)) == sizeof(yes);
 };
-#endif //TPIE_CPP_DECLTYPE
-
 
 } // namespace bits
 
@@ -116,7 +107,6 @@ struct has_itemtype {
 /// typedef item_type to T::item_type if that exists
 /// otherwise typedef it to the type of whatever paramater push takes
 ///////////////////////////////////////////////////////////////////////////////
-#ifdef TPIE_CPP_DECLTYPE
 template <typename T>
 struct push_type {
 	typedef typename bits::remove<T>::type node_type;
@@ -128,22 +118,6 @@ struct pull_type {
 	typedef typename bits::remove<T>::type node_type;
 	typedef typename bits::pull_type_help<node_type, bits::has_itemtype<T>::value>::type type;
 };
-
-#else //TPIE_CPP_DECLTYPE
-
-template <typename T>
-struct push_type {
-	typedef typename bits::remove<T>::type node_type;
-	typedef typename node_type::item_type type;
-};
-
-template <typename T>
-struct pull_type {
-	typedef typename bits::remove<T>::type node_type;
-	typedef typename node_type::item_type type;
-};
-
-#endif //TPIE_CPP_DECLTYPE
 
 } // namespace pipelining
 

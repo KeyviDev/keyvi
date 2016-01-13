@@ -24,11 +24,12 @@
 /// Generic internal array with known memory requirements.
 ///////////////////////////////////////////////////////////////////////////
 #include <tpie/util.h>
-#include <boost/type_traits/is_pod.hpp>
 #include <boost/iterator/iterator_facade.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <tpie/memory.h>
 #include <tpie/array_view_base.h>
+#include <type_traits>
+#include <cassert>
+#include <ostream>
 
 namespace tpie {
 
@@ -45,16 +46,15 @@ private:
 	friend class boost::iterator_core_access;
 	template <typename, bool> friend class array_iter_base;
 
-	struct enabler {};
 	explicit array_iter_base(TT * e): elm(e) {}
 
-	inline TT & dereference() const {return * elm;}
+	TT & dereference() const {return * elm;}
 	template <class U>
-	inline bool equal(array_iter_base<U, forward> const& o) const {return elm == o.elm;}
-	inline void increment() {elm += forward?1:-1;}
-	inline void decrement() {elm += forward?-1:1;}
-	inline void advance(size_t n) {if (forward) elm += n; else elm -= n;}
-	inline ptrdiff_t distance_to(array_iter_base const & o) const {return o.elm - elm;}
+	bool equal(array_iter_base<U, forward> const& o) const {return elm == o.elm;}
+	void increment() {elm += forward?1:-1;}
+	void decrement() {elm += forward?-1:1;}
+	void advance(size_t n) {if (forward) elm += n; else elm -= n;}
+	ptrdiff_t distance_to(array_iter_base const & o) const {return o.elm - elm;}
 	TT * elm;
 public:
 	///////////////////////////////////////////////////////////////////////////
@@ -68,8 +68,9 @@ public:
 	/// specific item_type to an iterator with a more general item_type.
 	///////////////////////////////////////////////////////////////////////////
 	template <class U>
-	array_iter_base(array_iter_base<U, forward> const& o, typename boost::enable_if<
-			  boost::is_convertible<U*,TT*>, enabler>::type = enabler())
+	array_iter_base(array_iter_base<U, forward> const& o,
+					typename std::enable_if<
+					std::is_convertible<U*,TT*>::value>::type* = 0)
 			: elm(o.elm) {}
 };
 
@@ -212,6 +213,23 @@ public:
 	}
 
 	///////////////////////////////////////////////////////////////////////////
+	/// \brief Move elements from another array into this.
+	///
+	/// Note: This array is resized to the size of other.
+	///
+	/// \param other The array to copy from.
+	/// \return A reference to this array.
+	///////////////////////////////////////////////////////////////////////////
+	array & operator=(array && other) {
+		resize(0);
+		std::swap(m_allocator, other.m_allocator);
+		std::swap(m_elements, other.m_elements);
+		std::swap(m_size, other.m_size);
+		std::swap(m_tss_used, other.m_tss_used);
+		return *this;
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
 	/// \brief Copy elements from another array with any allocator into this.
 	///
 	/// Note: This array is resized to the size of other.
@@ -232,7 +250,7 @@ public:
 	///
 	/// \return True if and only if size is 0.
 	///////////////////////////////////////////////////////////////////////////
-	inline bool empty() const {return size() == 0;}
+	bool empty() const {return size() == 0;}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return a const reference to an array entry.
@@ -240,7 +258,7 @@ public:
 	/// \param i The index of the entry to return.
 	/// \return Const reference to the entry.
 	///////////////////////////////////////////////////////////////////////////
-	inline const T & operator[](size_t i) const {
+	const T & operator[](size_t i) const {
 		assert(i < size());
 		return at(i);
 	}
@@ -251,7 +269,7 @@ public:
 	/// \param i The index of the entry to return.
 	/// \return Reference to the entry.
 	///////////////////////////////////////////////////////////////////////////
-	inline T & operator[](size_t i) {
+	T & operator[](size_t i) {
 		assert(i < size());
 		return at(i);
 	}
@@ -263,7 +281,7 @@ public:
 	/// \param other The array to compare against.
 	/// \return True if they are equal otherwise false.
 	///////////////////////////////////////////////////////////////////////////
-	inline bool operator==(const array & other) const {
+	bool operator==(const array & other) const {
 		if (size() != other.size()) return false;
 		for (size_t i=0;i<size();++i) if (*get_iter(i) != *other.get_iter(i)) return false;
 		return true;
@@ -275,7 +293,7 @@ public:
 	/// \param other The array to compare against.
 	/// \return False if they are equal; otherwise true.
 	///////////////////////////////////////////////////////////////////////////
-	inline bool operator!=(const array & other) const {
+	bool operator!=(const array & other) const {
 		if (size() != other.size()) return true;
 		for (size_t i=0; i<size(); ++i) if (*get_iter(i) != *other.get_iter(i)) return true;
 		return false;
@@ -286,86 +304,86 @@ public:
 	///
 	/// \return An iterator to the beginning of the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline iterator begin() {return get_iter(0);}
+	iterator begin() {return get_iter(0);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return a const iterator to the beginning of the array.
 	///
 	/// \return A const iterator to the beginning of the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline const_iterator begin() const {return get_iter(0);}
+	const_iterator begin() const {return get_iter(0);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return an iterator to the end of the array.
 	///
 	/// \return An iterator to the end of the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline iterator end() {return get_iter(size());}
+	iterator end() {return get_iter(size());}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return a const iterator to the end of the array.
 	///
 	/// \return A const iterator to the end of the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline const_iterator end() const {return get_iter(size());}
+	const_iterator end() const {return get_iter(size());}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return the first element in the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline const T & front() const {return at(0);}
+	const T & front() const {return at(0);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return the first element in the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline T & front() {return at(0);}
+	T & front() {return at(0);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return the last element in the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline const T & back() const {return at(size()-1);}
+	const T & back() const {return at(size()-1);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return the last element in the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline T & back() {return at(size()-1);}
+	T & back() {return at(size()-1);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Reverse iterator to beginning of reverse sequence.
 	///////////////////////////////////////////////////////////////////////////
-	inline reverse_iterator rbegin() {return get_rev_iter(0);}
+	reverse_iterator rbegin() {return get_rev_iter(0);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Const reverse iterator to beginning of reverse sequence.
 	///////////////////////////////////////////////////////////////////////////
-	inline const_reverse_iterator rbegin() const {return get_rev_iter(0);}
+	const_reverse_iterator rbegin() const {return get_rev_iter(0);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Reverse iterator to end of reverse sequence.
 	///////////////////////////////////////////////////////////////////////////
-	inline reverse_iterator rend() {return get_rev_iter(size());}
+	reverse_iterator rend() {return get_rev_iter(size());}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Const reverse iterator to end of reverse sequence.
 	///////////////////////////////////////////////////////////////////////////
-	inline const_reverse_iterator rend() const {return get_rev_iter(size());}
+	const_reverse_iterator rend() const {return get_rev_iter(size());}
 
 private:
 	T * m_elements;
 	size_t m_size;
 
-	inline iterator get_iter(size_t idx) {
+	iterator get_iter(size_t idx) {
 		return iterator(m_elements+idx);
 	}
 
-	inline const_iterator get_iter(size_t idx) const {
+	const_iterator get_iter(size_t idx) const {
 		return const_iterator(m_elements+idx);
 	}
 
-	inline reverse_iterator get_rev_iter(size_t idx) {
+	reverse_iterator get_rev_iter(size_t idx) {
 		return reverse_iterator(m_elements+m_size-idx-1);
 	}
 
-	inline const_reverse_iterator get_rev_iter(size_t idx) const {
+	const_reverse_iterator get_rev_iter(size_t idx) const {
 		return const_reverse_iterator(m_elements+m_size-idx-1);
 	}
 public:
@@ -392,6 +410,13 @@ public:
 		): m_elements(0), m_size(0), m_tss_used(false), m_allocator(alloc)
 		{resize(s, value);}
 
+	array(size_type s, memory_bucket_ref bucket):
+		m_elements(0), m_size(0), m_tss_used(false), m_allocator(bucket)
+		{resize(s);}
+
+	array(memory_bucket_ref bucket):
+		m_elements(0), m_size(0), m_tss_used(false), m_allocator(bucket) {}
+	
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Construct array of given size.
 	///
@@ -408,6 +433,20 @@ public:
 	array(const array & other): m_elements(0), m_size(other.m_size), m_tss_used(false), m_allocator(other.m_allocator) {
 		if (other.size() == 0) return;
 		alloc_copy(other.m_elements);
+	}
+
+	/////////////////////////////////////////////////////////
+	/// \brief Move construct from another array
+	/// \param other The array to move.
+	/////////////////////////////////////////////////////////
+	array(array && other)
+		: m_elements(other.m_elements)
+		, m_size(other.m_size)
+		, m_tss_used(other.m_tss_used)
+		, m_allocator(other.m_allocator) {
+		other.m_elements = nullptr;
+		other.m_size = 0;
+		other.m_tss_used = false;
 	}
 
 	array(const array_view_base<T> & view)
@@ -484,17 +523,17 @@ public:
 	///
 	/// \return The size of the array.
 	///////////////////////////////////////////////////////////////////////////
-	inline size_type size() const {return m_size;}
+	size_type size() const {return m_size;}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return a raw pointer to the array content.
 	///////////////////////////////////////////////////////////////////////////
-	inline T * get() {return m_elements;}
+	T * get() {return m_elements;}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return a raw pointer to the array content.
 	///////////////////////////////////////////////////////////////////////////
-	inline const T * get() const {return m_elements;}
+	const T * get() const {return m_elements;}
 
 private:
 	friend struct bits::allocator_usage<T, Allocator>;
@@ -506,7 +545,7 @@ private:
 	/// Effect: Allocates the m_elements buffer.
 	/// \param copy_from  Source elements in [copy_from, copy_from+m_size)
 	///////////////////////////////////////////////////////////////////////////
-	inline void alloc_copy(const T * copy_from) { bits::allocator_usage<T, Allocator>::alloc_copy(*this, copy_from); }
+	void alloc_copy(const T * copy_from) { bits::allocator_usage<T, Allocator>::alloc_copy(*this, copy_from); }
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Allocate m_size elements and copy construct contents with
@@ -515,21 +554,21 @@ private:
 	/// Effect: Allocates the m_elements buffer.
 	/// \param elm  Element to pass to the copy constructor
 	///////////////////////////////////////////////////////////////////////////
-	inline void alloc_fill(const T & elm) { bits::allocator_usage<T, Allocator>::alloc_fill(*this, elm); }
+	void alloc_fill(const T & elm) { bits::allocator_usage<T, Allocator>::alloc_fill(*this, elm); }
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Allocate m_size elements and default construct contents.
 	/// Precondition: m_elements == null pointer; m_size == no. of elements;
 	/// Effect: Allocates the m_elements buffer.
 	///////////////////////////////////////////////////////////////////////////
-	inline void alloc_dfl() { bits::allocator_usage<T, Allocator>::alloc_dfl(*this); }
+	void alloc_dfl() { bits::allocator_usage<T, Allocator>::alloc_dfl(*this); }
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Destruct and deallocate elements.
 	/// Precondition: m_elements == pointer to buffer of m_size elements;
 	/// Effect: m_elements == null pointer; does not modify m_size
 	///////////////////////////////////////////////////////////////////////////
-	inline void destruct_and_dealloc() { bits::allocator_usage<T, Allocator>::destruct_and_dealloc(*this); }
+	void destruct_and_dealloc() { bits::allocator_usage<T, Allocator>::destruct_and_dealloc(*this); }
 
 	/** Whether we allocated m_elements as a trivial_same_size<T> *.
 	 * See the implementation note in the source for an explanation. */
@@ -545,6 +584,10 @@ struct allocator_usage<T, allocator<T> > {
 	static void alloc_copy(array<T, allocator<T> > & host, const T * copy_from) {
 		host.m_elements = host.m_size ? reinterpret_cast<T*>(tpie_new_array<trivial_same_size<T> >(host.m_size)) : 0;
 		host.m_tss_used = true;
+
+		if (host.m_allocator.bucket)
+			host.m_allocator.bucket->count += sizeof(T) * host.m_size;
+			
 		std::uninitialized_copy(copy_from+0, copy_from+host.m_size, host.m_elements+0);
 	}
 
@@ -552,6 +595,9 @@ struct allocator_usage<T, allocator<T> > {
 		host.m_elements = host.m_size ? reinterpret_cast<T*>(tpie_new_array<trivial_same_size<T> >(host.m_size)) : 0;
 		host.m_tss_used = true;
 
+		if (host.m_allocator.bucket)
+			host.m_allocator.bucket->count += sizeof(T) * host.m_size;
+		
 		// call copy constructors manually
 		std::uninitialized_fill(host.m_elements+0, host.m_elements+host.m_size, elm);
 	}
@@ -559,9 +605,15 @@ struct allocator_usage<T, allocator<T> > {
 	static void alloc_dfl(array<T, allocator<T> > & host) {
 		host.m_elements = host.m_size ? tpie_new_array<T>(host.m_size) : 0;
 		host.m_tss_used = false;
+		
+		if (host.m_allocator.bucket)
+			host.m_allocator.bucket->count += sizeof(T) * host.m_size;
 	}
 
 	static void destruct_and_dealloc(array<T, allocator<T> > & host) {
+		if (host.m_allocator.bucket)
+			host.m_allocator.bucket->count -= sizeof(T) * host.m_size;
+		
 		if (!host.m_tss_used) {
 			// calls destructors
 			tpie_delete_array(host.m_elements, host.m_size);

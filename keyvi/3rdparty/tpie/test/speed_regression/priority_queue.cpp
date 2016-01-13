@@ -25,11 +25,9 @@
 #include <iostream>
 #include "testtime.h"
 #include "stat.h"
-#include <boost/filesystem/operations.hpp>
 #include <tpie/priority_queue.h>
 #include "testinfo.h"
-#include <boost/random/uniform_01.hpp>
-#include <boost/random/mersenne_twister.hpp>
+#include <random>
 #include <tpie/types.h>
 
 using namespace tpie;
@@ -50,13 +48,13 @@ struct intgenerator {
 	inline void use(item_type & a, item_type & x) { a ^= x; }
 };
 
-boost::mt19937 rng;
-boost::uniform_01<boost::mt19937, double> doublegenerator(rng);
-boost::uniform_01<boost::mt19937, float> floatgenerator(rng);
+std::mt19937 rng;
+std::uniform_real_distribution<double> double_dist;
+std::uniform_real_distribution<float> float_dist;
 
 struct segmentgenerator {
 	typedef std::pair<double, std::pair<double, float> > item_type;
-	inline item_type operator()() { return std::make_pair(doublegenerator(), std::make_pair(doublegenerator(), floatgenerator())); }
+	inline item_type operator()() { return std::make_pair(double_dist(rng), std::make_pair(double_dist(rng), float_dist(rng))); }
 	inline void use(item_type & a, item_type & x) { a.first += x.second.first; }
 };
 

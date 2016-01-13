@@ -58,7 +58,7 @@ public:
 	/// \brief Check the global errno variable and throw an exception that
 	/// matches its value.
 	///////////////////////////////////////////////////////////////////////////
-	static inline void throw_errno();
+	static inline void throw_errno(std::string path = std::string());
 
 	inline void set_cache_hint(cache_hint cacheHint);
 

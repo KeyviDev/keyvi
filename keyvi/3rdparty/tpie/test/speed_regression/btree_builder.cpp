@@ -1,6 +1,6 @@
 // -*- mode: c++; tab-width: 4; indent-tabs-mode: t; c-file-style: "stroustrup"; -*-
 // vi:set ts=4 sts=4 sw=4 noet :
-// Copyright 2009, The TPIE development team
+// Copyright 2015, The TPIE development team
 // 
 // This file is part of TPIE.
 // 
@@ -21,9 +21,12 @@
 #include "blocksize_2MB.h"
 
 #include <tpie/tpie.h>
-#include <tpie/stream.h>
+#include <tpie/btree/btree_builder.h>
+#include <tpie/btree/btree.h>
+#include <tpie/btree/external_store.h>
 #include <tpie/queue.h>
 #include <iostream>
+#include <set>
 #include "testtime.h"
 #include "stat.h"
 #include "testinfo.h"
@@ -38,33 +41,39 @@ typedef tpie::uint64_t count_t; // number of items
 typedef tpie::uint64_t elm_t; // type of element we enqueue
 
 void usage() {
-	std::cout << "Parameters: [times] [mb] [memory] [continous_count] [compressed]" << std::endl;
+	std::cout << "Parameters: [times] [mb]" << std::endl;
 }
 
-void test(size_t mb, size_t times, size_t countinous_count, compression_flags compressionFlags) {
+void test(size_t mb, size_t times) {
 	std::vector<const char *> names;
-	names.resize(1);
-	names[0] = "Push/pop";
+	names.resize(2);
+	names[0] = "Builder";
+	names[1] = "Inserts";
 	tpie::test::stat s(names);
 	count_t count=static_cast<count_t>(mb)*1024*1024/sizeof(elm_t);
+    tpie::get_memory_manager().set_limit(1000 * 1024 * 1024);
 
 	for (size_t i=0; i < times; ++i) {
 		test_realtime_t start;
 		test_realtime_t end;
 
-		tpie::queue<elm_t> q(access_sequential, compressionFlags);
 		getTestRealtime(start);
 		{
-			for(count_t j = 0; j < count; j += countinous_count) {
-				for(count_t l = j; l < j+countinous_count && l < count; ++l) {
-					elm_t x = (l + 91493) * 104729;
-					q.push(x);
-				}
+            temp_file tmp;
+            btree_builder<int, btree_external> builder(tmp.path());
+            for(count_t i = 0; i < count; ++i)
+                builder.push(i);
+            auto tree(builder.build());
+		}
+		getTestRealtime(end);
+		s(testRealtimeDiff(start,end));
 
-				for(count_t l = j; l < j+countinous_count && l < count; ++l) {
-					q.pop();
-				}
-			}
+		getTestRealtime(start);
+		{
+            temp_file tmp;
+			btree<int, btree_external> tree(tmp.path());
+            for(count_t i = 0; i < count; ++i)
+                tree.insert(i);
 		}
 		getTestRealtime(end);
 		s(testRealtimeDiff(start,end));
@@ -74,9 +83,6 @@ void test(size_t mb, size_t times, size_t countinous_count, compression_flags co
 int main(int argc, char **argv) {
 	size_t times = 10;
 	size_t mb = mb_default;
-	size_t memory = 1024;
-	size_t countinous_count = 1; // the number of push and pop operations to appear after eachother
-	compression_flags compressionFlags = compression_none;
 
 	if (argc > 1) {
 		if (std::string(argv[1]) == "0") {
@@ -96,26 +102,11 @@ int main(int argc, char **argv) {
 			return EXIT_FAILURE;
 		}
 	}
-	if (argc > 3) {
-		std::stringstream(argv[3]) >> memory;
-		if (!memory) {
-			usage();
-			return EXIT_FAILURE;
-		}
-	}
-	if (argc > 4) {
-		std::stringstream(argv[4]) >> countinous_count;
-		if (!countinous_count) {
-			usage();
-			return EXIT_FAILURE;
-		}
-	}
-	if (argc > 5) {
-		compressionFlags = compression_normal;
-	}
 
-	testinfo t("Queue speed test", memory, mb, times);
-	sysinfo().printinfo("Compression", (compressionFlags == compression_normal) ? "Enabled" : "Disabled");
-	::test(mb, times, countinous_count, compressionFlags);
+    log_info() << "Repetitions: " << times << std::endl;
+    log_info() << "Test size: " << mb << " MB" << std::endl;
+
+	testinfo t("Btree builder speed regresssion test", mb, times);
+	::test(mb, times);
 	return EXIT_SUCCESS;
 }

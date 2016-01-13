@@ -26,7 +26,7 @@ algorithms will respect the amount of memory your implementation has already
 allocated.
 
 TPIE provides an implementation of the auto pointer paradigm. See
-\ref tpie::auto_ptr.
+\ref tpie::unique_ptr.
 
 \code
 @DOCCODE_MEMORY@

@@ -34,8 +34,8 @@ class Generator : public node {
 public:
 	typedef int item_type;
 
-	Generator(const dest_t & dest, int n)
-		: dest(dest)
+	Generator(dest_t dest, int n)
+		: dest(std::move(dest))
 		, n(n)
 	{
 		add_push_destination(dest);
@@ -53,9 +53,7 @@ private:
 	int n;
 };
 
-inline pipe_begin<factory_1<Generator, int> > generator(int n) {
-	return factory_1<Generator, int>(n);
-}
+typedef pipe_begin<factory<Generator, int> > generator;
 
 // Increases each incoming value by 1.
 template <typename dest_t>
@@ -63,8 +61,8 @@ class AddOne : public node {
 public:
 	typedef int item_type;
 
-	AddOne(const dest_t & dest)
-		: dest(dest)
+	AddOne(dest_t dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 		set_name("AddOne");
@@ -78,9 +76,8 @@ private:
 	dest_t dest;
 };
 
-inline pipe_middle<factory_0<AddOne> > addOne() {
-	return factory_0<AddOne>();
-}
+typedef pipe_middle<factory<AddOne> > addOne;
+
 
 template <typename source_t>
 class AddPairwise {
@@ -90,8 +87,8 @@ public:
 	public:
 		typedef int item_type;
 
-		type(const dest_t & dest, const source_t & src)
-			: dest(dest)
+		type(dest_t dest, source_t src)
+			: dest(std::move(dest))
 			, puller(src.construct())
 		{
 			add_push_destination(dest);
@@ -118,8 +115,8 @@ public:
 };
 
 template <typename source_t>
-inline pipe_begin<tempfactory_1<AddPairwise<source_t>, source_t> > addPairwise(const source_t & source) {
-	return tempfactory_1<AddPairwise<source_t>, source_t >(source);
+inline pipe_begin<tempfactory<AddPairwise<source_t>, source_t> > addPairwise(source_t source) {
+	return {std::move(source)};
 }
 
 void go() {

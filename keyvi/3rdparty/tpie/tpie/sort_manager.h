@@ -89,8 +89,8 @@ private:
 	void merge_to_output(progress_indicator_base* indicator, tpie::array<temp_file> & temporaries); // loop over merge tree, create output stream
 	// Merge a single group mrgArity streams to an output stream
 	void single_merge(
-		typename tpie::array<tpie::auto_ptr<file_stream<T> > >::iterator,
-		typename tpie::array<tpie::auto_ptr<file_stream<T> > >::iterator,
+		typename tpie::array<tpie::unique_ptr<file_stream<T> > >::iterator,
+		typename tpie::array<tpie::unique_ptr<file_stream<T> > >::iterator,
 		file_stream<T>*, TPIE_OS_OFFSET = -1, progress_indicator_base* indicator=0);
 	    
 	// **************
@@ -623,7 +623,7 @@ void sort_manager<T,I,M>::merge_to_output(progress_indicator_base* indicator, tp
 	// The input streams we from which will read sorted runs
 	// This Memory allocation accounted for in phase 2:
 	//   mrgArity*sizeof(stream<T>*) + space_overhead()[fixed cost]
-	tpie::array<tpie::auto_ptr<file_stream<T> > > mergeInputStreams(mrgArity);
+	tpie::array<tpie::unique_ptr<file_stream<T> > > mergeInputStreams(mrgArity);
 
 	TP_LOG_DEBUG_ID("Allocated " << static_cast<TPIE_OS_OUTPUT_SIZE_T>(sizeof(ami::stream<T>*)*mrgArity)
 					<< " bytes for " << static_cast<TPIE_OS_OUTPUT_SIZE_T>(mrgArity) << " merge input stream pointers.\n"
@@ -816,8 +816,8 @@ void sort_manager<T,I,M>::merge_to_output(progress_indicator_base* indicator, tp
 
 template<class T, class I, class M>
 void sort_manager<T,I,M>::single_merge( 
-	typename tpie::array<tpie::auto_ptr<file_stream<T> > >::iterator start,
-	typename tpie::array<tpie::auto_ptr<file_stream<T> > >::iterator end,
+	typename tpie::array<tpie::unique_ptr<file_stream<T> > >::iterator start,
+	typename tpie::array<tpie::unique_ptr<file_stream<T> > >::iterator end,
 	file_stream < T >*outStream, TPIE_OS_OFFSET cutoff, progress_indicator_base* indicator)
 {
 

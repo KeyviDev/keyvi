@@ -32,7 +32,7 @@
 
 namespace tpie {
 
-typedef boost::uint64_t time_type;
+typedef uint64_t time_type;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \internal \brief Used by tpie_init to initialize the execution time

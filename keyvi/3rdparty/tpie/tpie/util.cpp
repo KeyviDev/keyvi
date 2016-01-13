@@ -25,7 +25,10 @@
 #include <tpie/util.h>
 #include <stdexcept>
 #include <cstdio>
-#ifdef WIN32
+#ifndef WIN32
+#include <tpie/tpie_log.h>
+#include <tpie/file_accessor/posix.h>
+#else
 #include <windows.h>
 #endif
 
@@ -35,8 +38,10 @@ void atomic_rename(const std::string & src, const std::string & dst) {
 	//Note according to posix rename is atomic..
 	//On windows it is probably not
 #ifndef _WIN32
-	if (rename(src.c_str(), dst.c_str()) != 0)
-		throw std::runtime_error("Atomic rename failed");
+	if (rename(src.c_str(), dst.c_str()) != 0) {
+		log_debug() << "Atomic rename failed from ``" << src << "'' to ``" << dst << "''." << std::endl;
+		file_accessor::posix::throw_errno();
+	}
 #else
 	//TODO use MoveFileTransacted on vista or newer
 	if (!MoveFileEx(src.c_str(), dst.c_str(), MOVEFILE_COPY_ALLOWED | MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH))

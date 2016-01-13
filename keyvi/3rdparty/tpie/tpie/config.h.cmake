@@ -31,48 +31,6 @@
 #define TPIE_FRACTIONDB_DIR_INL "${TPIE_FRACTIONDB_DIR_INL}"
 #endif
 
-#cmakedefine TPIE_CPP_VARIADIC_TEMPLATES
-#cmakedefine TPIE_CPP_RVALUE_REFERENCE
-#cmakedefine TPIE_CPP_OVERRIDE_KEYWORD
-#cmakedefine TPIE_CPP_NOXECEPT_KEYWORD
-#cmakedefine TPIE_CPP_DECLTYPE
-#cmakedefine TPIE_CPP_TEMPLATE_ALIAS
-#cmakedefine TPIE_CPP_NONE_POD_UNION
-#cmakedefine TPIE_CPP_TYPE_TRAITS
-#cmakedefine TPIE_CPP_INITIALIZER_LIST
-#cmakedefine TPIE_CPP_AUTO_KEYWORD
-
-#ifndef TPIE_CPP_OVERRIDE_KEYWORD
-	#define final
-	#define override
-#endif
-
-#ifndef TPIE_CPP_NOXECEPT_KEYWORD
-	#define TPIE_NOEXCEPT throw()
-#else
-	#define TPIE_NOEXCEPT noexcept
-#endif
-
-
-
-#if defined(TPIE_CPP_VARIADIC_TEMPLATES) && defined(TPIE_CPP_RVALUE_REFERENCE)
-#define TPIE_VARIADIC_FACTORIES
-#endif
-
-#if defined(TPIE_CPP_RVALUE_REFERENCE) && defined(TPIE_CPP_TEMPLATE_ALIAS) && defined(TPIE_CPP_INITIALIZER_LIST)
-#define TPIE_CPP_TINY
-#endif
-
-#ifdef TPIE_CPP_RVALUE_REFERENCE
-#define TPIE_MOVE(X) std::move(X)
-#define TPIE_RREF(T) T &&
-#define TPIE_TRANSFERABLE(T) T
-#else
-#define TPIE_MOVE(X) X
-#define TPIE_RREF(T) const T &
-#define TPIE_TRANSFERABLE(T) const T &
-#endif
-
 #ifdef WIN32
 	//disable windows crt security and deprecation warnings
 	#define _CRT_SECURE_NO_DEPRECATE 

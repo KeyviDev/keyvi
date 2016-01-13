@@ -20,7 +20,6 @@
 #include "common.h"
 #include <tpie/pipelining.h>
 #include <tpie/file_stream.h>
-#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <cmath>
 #include <tpie/sysinfo.h>
@@ -37,8 +36,8 @@ template <typename dest_t>
 struct multiply_t : public node {
 	typedef test_t item_type;
 
-	inline multiply_t(const dest_t & dest, uint64_t factor)
-		: dest(dest)
+	inline multiply_t(dest_t dest, uint64_t factor)
+		: dest(std::move(dest))
 		, factor(factor)
 	{
 		set_minimum_memory(17000000);
@@ -58,7 +57,7 @@ struct multiply_t : public node {
 	uint64_t factor;
 };
 
-typedef pipe_middle<factory_1<multiply_t, uint64_t> > multiply;
+typedef pipe_middle<factory<multiply_t, uint64_t> > multiply;
 
 std::vector<test_t> inputvector;
 std::vector<test_t> expectvector;
@@ -147,7 +146,7 @@ bool file_stream_pull_test() {
 		in.open(input_file.path());
 		file_stream<test_t> out;
 		out.open(output_file.path());
-		pipeline p = (pull_input(in) | pull_identity() | pull_output(out));
+		pipeline p = (pull_input(in) | pull_output(out));
 		p.get_node_map()->dump(log_info());
 		p.plot(log_info());
 		p();
@@ -177,7 +176,7 @@ bool file_stream_alt_push_test() {
 		in.open(input_file.path());
 		file_stream<test_t> out;
 		out.open(output_file.path());
-		pipeline p = (input(in) | alt_identity() | output(out));
+		pipeline p = (input(in) | output(out));
 		p.plot(log_info());
 		p();
 	}
@@ -265,8 +264,8 @@ public:
 		typename factory_type::constructed_type pullSource;
 		typedef uint64_t item_type;
 
-		type(const dest_t & dest, const factory_type & factory)
-		: dest(dest)
+		type(dest_t dest, factory_type && factory)
+		: dest(std::move(dest))
 		, pullSource(factory.construct())
 		{
 			add_push_destination(dest);
@@ -280,9 +279,9 @@ public:
 };
 
 template <typename pipe_type>
-tpie::pipelining::pipe_middle<tpie::pipelining::tempfactory_1<add_pairs_type<typename pipe_type::factory_type>, typename pipe_type::factory_type> >
-add_pairs(const pipe_type &pipe) {
-	return tpie::pipelining::tempfactory_1<add_pairs_type<typename pipe_type::factory_type>, typename pipe_type::factory_type>(pipe.factory);
+tpie::pipelining::pipe_middle<tpie::pipelining::tempfactory<add_pairs_type<typename pipe_type::factory_type>, typename pipe_type::factory_type &&> >
+add_pairs(pipe_type && pipe) {
+	return tpie::pipelining::tempfactory<add_pairs_type<typename pipe_type::factory_type>, typename pipe_type::factory_type &&>(std::move(pipe.factory));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -324,8 +323,8 @@ template <typename dest_t>
 struct sequence_generator_type : public node {
 	typedef size_t item_type;
 
-	sequence_generator_type(const dest_t & dest, size_t elements, bool reverse)
-		: dest(dest)
+	sequence_generator_type(dest_t dest, size_t elements, bool reverse)
+		: dest(std::move(dest))
 		, elements(elements)
 		, reverse(reverse)
 	{
@@ -356,7 +355,7 @@ private:
 	bool reverse;
 };
 
-typedef pipe_begin<factory_2<sequence_generator_type, size_t, bool> >
+typedef pipe_begin<factory<sequence_generator_type, size_t, bool> >
 	sequence_generator;
 
 struct sequence_verifier_type : public node {
@@ -405,7 +404,7 @@ private:
 	bool bad;
 };
 
-typedef pipe_end<termfactory_2<sequence_verifier_type, size_t, bool *> >
+typedef pipe_end<termfactory<sequence_verifier_type, size_t, bool *> >
 	sequence_verifier;
 
 bool sort_test(size_t elements) {
@@ -482,14 +481,14 @@ class memtest_1 : public node {
 	memtest & settings;
 
 public:
-	memtest_1(const dest_t & dest, memtest & settings)
-		: dest(dest)
+	memtest_1(dest_t dest, memtest & settings)
+		: dest(std::move(dest))
 		, settings(settings)
 	{
 		add_push_destination(dest);
 	}
 
-	void prepare() {
+	void prepare() override {
 		set_minimum_memory(settings.minMem1);
 		if (settings.maxMem1 > 0)
 			set_maximum_memory(settings.maxMem1);
@@ -514,7 +513,7 @@ public:
 	{
 	}
 
-	void prepare() {
+	void prepare() override {
 		set_minimum_memory(settings.minMem2);
 		if (settings.maxMem2 > 0)
 			set_maximum_memory(settings.maxMem2);
@@ -538,9 +537,9 @@ bool memory_test(memtest settings) {
 	progress_indicator_null pi;
 
 	pipeline p =
-		make_pipe_begin_1<memtest_1, memtest &>(settings)
-		| make_pipe_end_1<memtest_2, memtest &>(settings);
-	p(0, pi, settings.totalMemory);
+		make_pipe_begin<memtest_1, memtest &>(settings)
+		| make_pipe_end<memtest_2, memtest &>(settings);
+	p(0, pi, settings.totalMemory, TPIE_FSI);
 
 	log_debug() << "totalMemory " << settings.totalMemory << '\n'
 	            << "minMem1     " << settings.minMem1 << '\n'
@@ -620,7 +619,7 @@ void memory_test_multi(teststream & ts) {
 
 bool fork_test() {
 	expectvector = inputvector;
-	pipeline p = input_vector(inputvector).name("Input vector") | fork(output_vector(outputvector)) | bitbucket<test_t>(0);
+	pipeline p = input_vector(inputvector).name("Input vector") | fork(output_vector(outputvector)) | null_sink<test_t>();
 	p();
 	return check_test_vectors();
 }
@@ -629,8 +628,8 @@ template <typename dest_t>
 struct buffer_node_t : public node {
 	typedef typename dest_t::item_type item_type;
 
-	inline buffer_node_t(const dest_t & dest)
-		: dest(dest)
+	inline buffer_node_t(dest_t dest)
+		: dest(std::move(dest))
 	{
 		add_dependency(dest);
 	}
@@ -642,10 +641,7 @@ struct buffer_node_t : public node {
 	dest_t dest;
 };
 
-inline pipe_middle<factory_0<buffer_node_t> >
-buffer_node() {
-	return pipe_middle<factory_0<buffer_node_t> >();
-}
+typedef pipe_middle<factory<buffer_node_t> > buffer_node;
 
 struct merger_memory : public memory_test {
 	typedef int test_t;
@@ -705,7 +701,7 @@ struct my_item {
 template <typename dest_t>
 struct FF1 : public node {
 	dest_t dest;
-	FF1(const dest_t & dest) : dest(dest) {
+	FF1(dest_t dest) : dest(std::move(dest)) {
 		add_push_destination(dest);
 	}
 	virtual void propagate() override {
@@ -720,7 +716,7 @@ struct FF1 : public node {
 template <typename dest_t>
 struct FF2 : public node {
 	dest_t dest;
-	FF2(const dest_t & dest) : dest(dest) {
+	FF2(dest_t dest) : dest(std::move(dest)) {
 		add_push_destination(dest);
 	}
 };
@@ -747,15 +743,78 @@ struct FF3 : public node {
 
 bool fetch_forward_test() {
 	fetch_forward_result = true;
-	pipeline p = make_pipe_begin_0<FF1>()
-		| make_pipe_middle_0<FF2>()
-		| make_pipe_end_0<FF3>()
+	pipeline p = make_pipe_begin<FF1>()
+		| make_pipe_middle<FF2>()
+		| make_pipe_end<FF3>()
 		;
 	p.plot(log_info());
 	p.forward<int>("test", 42);
 	p();
 	if (!fetch_forward_result) return false;
 	if (p.fetch<int>("test") != 42) {
+		log_error() << "Something went wrong" << std::endl;
+		return false;
+	}
+	return true;
+}
+
+template <typename dest_t>
+struct FFB1 : public node {
+	dest_t dest;
+	FFB1(dest_t dest) : dest(std::move(dest)) {}
+
+	virtual void propagate() override {
+		forward("my_item", 42, 2);
+	}
+
+	virtual void go() override {
+	}
+};
+
+bool bound_fetch_forward_result;
+
+template <typename dest_t>
+struct FFB2 : public node {
+	dest_t dest;
+	FFB2(dest_t dest) : dest(std::move(dest)) {}
+
+	virtual void propagate() override {
+		if (!can_fetch("my_item")) {
+			log_error() << "Cannot fetch my_item" << std::endl;
+			bound_fetch_forward_result = false;
+			return;
+		}
+		int i = fetch<int>("my_item");
+		if (i != 42) {
+			log_error() << "Wrong answer" << std::endl;
+			bound_fetch_forward_result = false;
+			return;
+		}
+	}
+};
+
+struct FFB3 : public node {
+	virtual void propagate() override {
+		if (can_fetch("my_item")) {
+			log_error() << "Should not be able to fetch my_item" << std::endl;
+			bound_fetch_forward_result = false;
+			return;
+		}
+	}
+};
+
+bool bound_fetch_forward_test() {
+	bound_fetch_forward_result = true;
+	pipeline p = make_pipe_begin<FFB1>()
+		| make_pipe_middle<FFB2>()
+		| make_pipe_middle<FFB2>()
+		| make_pipe_end<FFB3>()
+		;
+	p.plot(log_info());
+	p.forward<int>("test", 7);
+	p();
+	if (!bound_fetch_forward_result) return false;
+	if (p.fetch<int>("test") != 7) {
 		log_error() << "Something went wrong" << std::endl;
 		return false;
 	}
@@ -771,10 +830,10 @@ public:
 	typedef typename dest_t::item_type item_type;
 private:
 	// Type of pointer to dereference.
-	typedef typename boost::remove_reference<item_type>::type * ptr_type;
+	typedef typename std::remove_reference<item_type>::type * ptr_type;
 public:
-	push_zero_t(const dest_t & dest)
-		: dest(dest)
+	push_zero_t(dest_t dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 	}
@@ -784,10 +843,7 @@ public:
 	}
 };
 
-pipe_begin<factory_0<push_zero_t> >
-push_zero() {
-	return factory_0<push_zero_t>();
-}
+typedef pipe_begin<factory<push_zero_t> > push_zero;
 
 bool virtual_test() {
 	pipeline p = virtual_chunk_begin<test_t>(input_vector(inputvector))
@@ -870,7 +926,7 @@ public:
 	typedef void * item_type;
 
 	prepare_begin_type(dest_t dest, prepare_result & r)
-		: dest(dest)
+		: dest(std::move(dest))
 		, r(r)
 	{
 		add_push_destination(dest);
@@ -909,10 +965,7 @@ public:
 	}
 };
 
-inline pipe_begin<factory_1<prepare_begin_type, prepare_result &> >
-prepare_begin(prepare_result & r) {
-	return factory_1<prepare_begin_type, prepare_result &>(r);
-}
+typedef pipe_begin<factory<prepare_begin_type, prepare_result &> > prepare_begin;
 
 template <typename dest_t>
 class prepare_middle_type : public node {
@@ -922,7 +975,7 @@ public:
 	typedef void * item_type;
 
 	prepare_middle_type(dest_t dest, prepare_result & r)
-		: dest(dest)
+		: dest(std::move(dest))
 		, r(r)
 	{
 		add_push_destination(dest);
@@ -962,10 +1015,7 @@ public:
 	}
 };
 
-inline pipe_middle<factory_1<prepare_middle_type, prepare_result &> >
-prepare_middle(prepare_result & r) {
-	return factory_1<prepare_middle_type, prepare_result &>(r);
-}
+typedef pipe_middle<factory<prepare_middle_type, prepare_result &> > prepare_middle;
 
 class prepare_end_type : public node {
 	prepare_result & r;
@@ -1009,10 +1059,7 @@ public:
 	}
 };
 
-inline pipe_end<termfactory_1<prepare_end_type, prepare_result &> >
-prepare_end(prepare_result & r) {
-	return termfactory_1<prepare_end_type, prepare_result &>(r);
-}
+typedef pipe_end<termfactory<prepare_end_type, prepare_result &> > prepare_end;
 
 bool prepare_test() {
 	prepare_result r;
@@ -1075,10 +1122,7 @@ public:
 	}
 };
 
-pullpipe_begin<termfactory_1<begin_type, result &> >
-inline begin(result & r) {
-	return termfactory_1<begin_type, result &>(r);
-}
+typedef pullpipe_begin<termfactory<begin_type, result &> > begin;
 
 template <typename dest_t>
 class end_type : public node {
@@ -1086,7 +1130,7 @@ class end_type : public node {
 	dest_t dest;
 
 public:
-	end_type(dest_t dest, result & r) : r(r), dest(dest) {
+	end_type(dest_t dest, result & r) : r(r), dest(std::move(dest)) {
 		add_pull_source(dest);
 	}
 
@@ -1098,10 +1142,8 @@ public:
 	}
 };
 
-pullpipe_end<factory_1<end_type, result &> >
-inline end(result & r) {
-	return factory_1<end_type, result &>(r);
-}
+typedef pullpipe_end<factory<end_type, result &> > end;
+
 
 bool test() {
 	result r;
@@ -1148,8 +1190,8 @@ class multiplicative_inverter_type : public node {
 public:
 	typedef size_t item_type;
 
-	multiplicative_inverter_type(const dest_t & dest, size_t p)
-		: dest(dest)
+	multiplicative_inverter_type(dest_t dest, size_t p)
+		: dest(std::move(dest))
 		, p(p)
 	{
 		add_push_destination(dest);
@@ -1164,10 +1206,7 @@ public:
 	}
 };
 
-inline pipe_middle<factory_1<multiplicative_inverter_type, size_t> >
-multiplicative_inverter(size_t p) {
-	return factory_1<multiplicative_inverter_type, size_t>(p);
-}
+typedef pipe_middle<factory<multiplicative_inverter_type, size_t> > multiplicative_inverter;
 
 bool parallel_test(size_t modulo) {
 	bool result = false;
@@ -1177,7 +1216,7 @@ bool parallel_test(size_t modulo) {
 		| sequence_verifier(modulo-1, &result);
 	p.plot(log_info());
 	tpie::progress_indicator_arrow pi("Parallel", 1);
-	p(modulo-1, pi);
+	p(modulo-1, pi, TPIE_FSI);
 	return result;
 }
 
@@ -1188,7 +1227,7 @@ bool parallel_ordered_test(size_t modulo) {
 		| sequence_verifier(modulo-1, &result);
 	p.plot(log_info());
 	tpie::progress_indicator_arrow pi("Parallel", 1);
-	p(modulo-1, pi);
+	p(modulo-1, pi, TPIE_FSI);
 	return result;
 }
 
@@ -1199,8 +1238,8 @@ class Monotonic : public node {
 	test_t chunkSize;
 public:
 	typedef test_t item_type;
-	Monotonic(const dest_t & dest, test_t sum, test_t chunkSize)
-		: dest(dest)
+	Monotonic(dest_t dest, test_t sum, test_t chunkSize)
+		: dest(std::move(dest))
 		, sum(sum)
 		, chunkSize(chunkSize)
 	{
@@ -1219,18 +1258,15 @@ public:
 	}
 };
 
-pipe_begin<factory_2<Monotonic, test_t, test_t> >
-monotonic(test_t sum, test_t chunkSize) {
-	return factory_2<Monotonic, test_t, test_t>(sum, chunkSize);
-}
+typedef pipe_begin<factory<Monotonic, test_t, test_t> > monotonic;
 
 template <typename dest_t>
 class Splitter : public node {
 	dest_t dest;
 public:
 	typedef test_t item_type;
-	Splitter(const dest_t & dest)
-		: dest(dest)
+	Splitter(dest_t dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 	}
@@ -1243,10 +1279,7 @@ public:
 	}
 };
 
-pipe_middle<factory_0<Splitter> >
-splitter() {
-	return factory_0<Splitter>();
-}
+typedef pipe_middle<factory<Splitter> > splitter;
 
 class Summer : public node {
 	test_t & result;
@@ -1262,10 +1295,7 @@ public:
 	}
 };
 
-pipe_end<termfactory_1<Summer, test_t &> >
-summer(test_t & result) {
-	return termfactory_1<Summer, test_t &>(result);
-}
+typedef pipe_end<termfactory<Summer, test_t &> > summer;
 
 bool parallel_multiple_test() {
 	test_t sumInput = 1000;
@@ -1292,7 +1322,7 @@ public:
 	typedef test_t item_type;
 
 	buffering_accumulator_type(dest_t dest)
-		: dest(dest)
+		: dest(std::move(dest))
 		, inputs(0)
 	{
 		add_push_destination(dest);
@@ -1316,10 +1346,7 @@ private:
 	}
 };
 
-pipe_middle<factory_0<buffering_accumulator_type> >
-buffering_accumulator() {
-	return factory_0<buffering_accumulator_type>();
-}
+typedef pipe_middle<factory<buffering_accumulator_type> > buffering_accumulator;
 
 bool parallel_own_buffer_test() {
 	test_t sumInput = 64;
@@ -1342,8 +1369,8 @@ template <typename dest_t>
 class noop_initiator_type : public node {
 	dest_t dest;
 public:
-	noop_initiator_type(const dest_t & dest)
-		: dest(dest)
+	noop_initiator_type(dest_t dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 	}
@@ -1353,10 +1380,7 @@ public:
 	}
 };
 
-pipe_begin<factory_0<noop_initiator_type> >
-noop_initiator() {
-	return factory_0<noop_initiator_type>();
-}
+typedef pipe_begin<factory<noop_initiator_type> > noop_initiator;
 
 template <typename dest_t>
 class push_in_end_type : public node {
@@ -1364,8 +1388,8 @@ class push_in_end_type : public node {
 public:
 	typedef test_t item_type;
 
-	push_in_end_type(const dest_t & dest)
-		: dest(dest)
+	push_in_end_type(dest_t dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 	}
@@ -1380,10 +1404,7 @@ public:
 	}
 };
 
-pipe_middle<factory_0<push_in_end_type> >
-push_in_end() {
-	return factory_0<push_in_end_type>();
-}
+typedef pipe_middle<factory<push_in_end_type> > push_in_end;
 
 bool parallel_push_in_end_test() {
 	test_t sumOutput = 0;
@@ -1409,7 +1430,7 @@ public:
 	typedef typename dest_t::item_type item_type;
 
 	step_begin_type(dest_t dest)
-		: dest(dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 	}
@@ -1425,10 +1446,7 @@ public:
 	}
 };
 
-pipe_begin<factory_0<step_begin_type> >
-step_begin() {
-	return factory_0<step_begin_type>();
-}
+typedef pipe_begin<factory<step_begin_type> > step_begin;
 
 template <typename dest_t>
 class step_middle_type : public node {
@@ -1438,7 +1456,7 @@ public:
 	typedef typename dest_t::item_type item_type;
 
 	step_middle_type(dest_t dest)
-		: dest(dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 	}
@@ -1454,10 +1472,7 @@ public:
 	}
 };
 
-pipe_middle<factory_0<step_middle_type> >
-step_middle() {
-	return factory_0<step_middle_type>();
-}
+typedef pipe_middle<factory<step_middle_type> > step_middle;
 
 class step_end_type : public node {
 public:
@@ -1467,15 +1482,11 @@ public:
 	}
 };
 
-pipe_end<termfactory_0<step_end_type> >
-step_end() {
-	return termfactory_0<step_end_type>();
-}
-
+typedef pipe_end<termfactory<step_end_type> > step_end;
 bool parallel_step_test() {
 	pipeline p = step_begin() | parallel(step_middle()) | step_end();
 	progress_indicator_arrow pi("Test", 0);
-	p(get_memory_manager().available(), pi);
+	p(get_memory_manager().available(), pi, TPIE_FSI);
 	return true;
 }
 
@@ -1485,7 +1496,7 @@ public:
 	class t {
 		typedef typename tpie::pipelining::bits::maybe_add_const_ref<In>::type Out;
 	public:
-		typedef typename boost::enable_if<boost::is_same<Out, Expect>, int>::type u;
+		typedef typename std::enable_if<std::is_same<Out, Expect>::value, int>::type u;
 	};
 };
 
@@ -1499,27 +1510,20 @@ bool virtual_cref_item_type_test() {
 	return t1 + t2 + t3 + t4 + t5 > 0;
 }
 
-enum nocopy_tag { nocopy };
+struct no_move_tag {};
 
 class node_map_tester : public node {
 	friend class node_map_tester_factory;
 
-	std::auto_ptr<node_map_tester> dest;
-
+	std::unique_ptr<node_map_tester> dest;
 public:
+
 	node_map_tester() {
 		set_name("Node map tester leaf");
 	}
 
-	node_map_tester(const node_map_tester & copy)
-		: node(copy)
-	{
-		if (copy.dest.get())
-			dest.reset(new node_map_tester(*copy.dest));
-	}
-
-	node_map_tester(node_map_tester & copy, nocopy_tag)
-		: dest(new node_map_tester(copy))
+	node_map_tester(node_map_tester && copy, no_move_tag)
+		: dest(new node_map_tester(std::move(copy)))
 	{
 		set_name("Node map tester non-leaf");
 	}
@@ -1550,12 +1554,14 @@ public:
 
 	node_map_tester construct() const {
 		std::vector<node_map_tester *> nodes;
-		std::auto_ptr<node_map_tester> node;
-		for (size_t i = 0; i < this->nodes; ++i) {
-			node.reset(node.get() ? new node_map_tester(*node, nocopy) : new node_map_tester());
-			this->init_node(*node);
+		node_map_tester node;
+		this->init_node(node);
+		for (size_t i = 1; i < this->nodes; ++i) {
+			node_map_tester n2(std::move(node), no_move_tag());
+			node = std::move(n2);
+			this->init_node(node);
 		}
-		node->add(nodes);
+		node.add(nodes);
 		for (size_t i = 0, idx = 0; i < this->nodes; ++i) {
 			for (size_t j = 0; j < this->nodes; ++j, ++idx) {
 				switch (edges[idx]) {
@@ -1577,7 +1583,7 @@ public:
 				}
 			}
 		}
-		return *node;
+		return node;
 	}
 };
 
@@ -1690,8 +1696,8 @@ class datastructuretest_1 : public node {
 	datastructuretest & settings;
 
 public:
-	datastructuretest_1(const dest_t & dest, datastructuretest & settings)
-		: dest(dest)
+	datastructuretest_1(dest_t dest, datastructuretest & settings)
+		: dest(std::move(dest))
 		, settings(settings)
 	{
 		add_push_destination(dest);
@@ -1747,9 +1753,9 @@ bool datastructure_test(datastructuretest settings) {
 	progress_indicator_null pi;
 
 	pipeline p =
-		make_pipe_begin_1<datastructuretest_1, datastructuretest &>(settings)
-		| make_pipe_end_1<datastructuretest_2, datastructuretest &>(settings);
-	p(0, pi, settings.totalMemory);
+		make_pipe_begin<datastructuretest_1, datastructuretest &>(settings)
+		| make_pipe_end<datastructuretest_2, datastructuretest &>(settings);
+	p(0, pi, settings.totalMemory, TPIE_FSI);
 
 	log_debug() << "totalMemory " << settings.totalMemory << '\n'
 	            << "minMem1     " << settings.minMem1 << '\n'
@@ -1832,8 +1838,8 @@ class flush_priority_test_node_t : public node {
 public:
 	typedef int item_type;
 
-	flush_priority_test_node_t(const dest_t & dest, size_t flushPriority, size_t & returnedValue)
-		: dest(dest)
+	flush_priority_test_node_t(dest_t dest, size_t flushPriority, size_t & returnedValue)
+		: dest(std::move(dest))
 		, returnedValue(returnedValue)
 	{
 		add_push_destination(dest);
@@ -1853,7 +1859,7 @@ private:
 	size_t & returnedValue;
 };
 
-typedef pipe_begin<factory_2<flush_priority_test_node_t, size_t, size_t &> > flush_priority_test_node;
+typedef pipe_begin<factory<flush_priority_test_node_t, size_t, size_t &> > flush_priority_test_node;
 
 bool set_flush_priority_test() {
 	for(size_t i = 0; i < 100; ++i) {
@@ -1876,8 +1882,8 @@ class reference_incrementer_type : public node {
 public:
 	typedef int item_type;
 
-	reference_incrementer_type(const dest_t & dest, size_t flush_priority, size_t & counter, size_t & incremented_to, std::string name)
-	: dest(dest)
+	reference_incrementer_type(dest_t dest, size_t flush_priority, size_t & counter, size_t & incremented_to, std::string name)
+	: dest(std::move(dest))
 	, counter(counter)
 	, incremented_to(incremented_to)
 	{
@@ -1895,7 +1901,7 @@ public:
 	}
 };
 
-typedef pipe_middle<factory_4<reference_incrementer_type, size_t, size_t &, size_t &, std::string> > reference_incrementer;
+typedef pipe_middle<factory<reference_incrementer_type, size_t, size_t &, size_t &, std::string> > reference_incrementer;
 
 bool phase_priority_test() {
 	size_t branchA;
@@ -1927,7 +1933,7 @@ int main(int argc, char ** argv) {
 	.test(vector_multiply_test, "vector")
 	.test(file_stream_test, "filestream", "n", static_cast<stream_size_type>(3))
 	.test(file_stream_pull_test, "fspull")
-	.test(file_stream_alt_push_test, "fsaltpush")
+		//.test(file_stream_alt_push_test, "fsaltpush")
 	.test(merge_test, "merge")
 	.test(reverse_test, "reverse")
 	.test(internal_reverse_test, "internal_reverse")
@@ -1942,6 +1948,7 @@ int main(int argc, char ** argv) {
 	.test(fork_test, "fork")
 	.test(merger_memory_test, "merger_memory", "n", static_cast<size_t>(10))
 	.test(fetch_forward_test, "fetch_forward")
+	.test(bound_fetch_forward_test, "bound_fetch_forward")
 	.test(virtual_test, "virtual")
 	.test(virtual_fork_test, "virtual_fork")
 	.test(virtual_cref_item_type_test, "virtual_cref_item_type")

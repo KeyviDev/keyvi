@@ -52,8 +52,8 @@ class pair_item_number_augmenter_type : public node {
 public:
 	typedef int item_type; // the type of item that this node accepts.
 
-	pair_item_number_augmenter_type(const dest_t & dest)
-	: dest(dest)
+	pair_item_number_augmenter_type(dest_t dest)
+	: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 		set_name("Pair item number augmenter");
@@ -68,7 +68,7 @@ public:
 	}
 };
 
-typedef pipe_middle<factory_0<pair_item_number_augmenter_type> > pair_item_number_augmenter;
+typedef pipe_middle<factory<pair_item_number_augmenter_type> > pair_item_number_augmenter;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This is an implementation of a node that will remove any consecutive
@@ -81,8 +81,8 @@ class remove_duplicates_type : public node {
 public:
 	typedef std::pair<int, int> item_type;
 
-	remove_duplicates_type(const dest_t & dest)
-	: dest(dest)
+	remove_duplicates_type(dest_t dest)
+	: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 		set_name("Remove duplicates");
@@ -102,7 +102,7 @@ public:
 	}
 };
 
-typedef pipe_middle<factory_0<remove_duplicates_type> > remove_duplicates;
+typedef pipe_middle<factory<remove_duplicates_type> > remove_duplicates;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This node will accepts std::pair<int, int> and will push the first
@@ -114,8 +114,8 @@ class pair_to_int_type : public node {
 public:
 	typedef std::pair<int, int> item_type;
 
-	pair_to_int_type(const dest_t & dest)
-	: dest(dest)
+	pair_to_int_type(dest_t dest)
+	: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 		set_name("Remove line number");
@@ -126,7 +126,7 @@ public:
 	}
 };
 
-typedef pipe_middle<factory_0<pair_to_int_type> > pair_to_int;
+typedef pipe_middle<factory<pair_to_int_type> > pair_to_int;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// A comparator in order to sort std::pair<int, int> by the second component

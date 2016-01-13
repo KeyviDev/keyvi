@@ -20,16 +20,12 @@
 #ifndef __TPIE_PIPELINING_FACTORY_HELPERS_H__
 #define __TPIE_PIPELINING_FACTORY_HELPERS_H__
 
+#include <tpie/pipelining/container.h>
 #include <tpie/pipelining/factory_base.h>
 #include <tpie/pipelining/node.h>
-#ifdef TPIE_VARIADIC_FACTORIES
-#include <tuple>
-#endif // TPIE_VARIADIC_FACTORIES
 
 namespace tpie {
 namespace pipelining {
-
-#ifdef TPIE_VARIADIC_FACTORIES
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \class factory
@@ -38,7 +34,13 @@ namespace pipelining {
 template <template <typename dest_t> class R, typename... T>
 class factory : public factory_base {
 public:
-	factory(T... v) : m_v(v...) {}
+	factory(const factory &) = delete;
+	factory(factory &&) = default;
+	factory & operator=(const factory &) = delete;
+	factory & operator=(factory &&) = default;
+
+	template <typename... Args>
+	factory(Args && ... v) : cont(std::forward<Args>(v)...) {}
 
 	template<typename dest_t>
 	struct constructed {
@@ -46,41 +48,27 @@ public:
 	};
 
 	template <typename dest_t>
-	typename constructed<dest_t>::type construct(dest_t && dest) const {
-		return invoker<sizeof...(T)>::go(std::forward<dest_t>(dest), *this);
+	typename constructed<dest_t>::type construct(dest_t && dest) {
+		node_token tok = dest.get_token();
+		typename constructed<dest_t>::type r = container_construct<typename constructed<dest_t>::type>(cont, std::forward<dest_t>(dest));
+		this->init_node(r);
+		this->add_default_edge(r, tok);
+		this->add_node_set_edges(r);
+		return r;
+	}
+
+	template <typename dest_t>
+	typename constructed<dest_t>::type construct_copy(dest_t && dest) {
+		node_token tok = dest.get_token();
+		typename constructed<dest_t>::type r = container_construct_copy<typename constructed<dest_t>::type>(cont, std::forward<dest_t>(dest));
+		this->init_node(r);
+		this->add_default_edge(r, tok);
+		this->add_node_set_edges(r);
+		return r;
 	}
 
 private:
-	std::tuple<T...> m_v;
-
-	template <size_t N, size_t... S>
-	class invoker {
-	public:
-		template <typename dest_t>
-		static typename constructed<dest_t>::type
-		go(dest_t && dest, const factory & parent) {
-			return invoker<N-1, N-1, S...>::go(std::forward<dest_t>(dest), parent);
-		}
-	};
-
-	template <size_t... S>
-	class invoker<0, S...> {
-	public:
-		template <typename dest_t>
-		static typename constructed<dest_t>::type
-		go(dest_t && dest, const factory & parent) {
-			node_token tok = dest.get_token();
-			typename constructed<dest_t>::type
-				r(std::forward<dest_t>(dest), std::get<S>(parent.m_v)...);
-			parent.init_node(r);
-			parent.add_default_edge(r, tok);
-			parent.add_node_set_edges(r);
-			return r;
-		}
-	};
-
-	template <size_t N, size_t... S>
-	friend class invoker;
+	container<T...> cont;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,7 +78,13 @@ private:
 template <typename Holder, typename... T>
 class tempfactory : public factory_base {
 public:
-	tempfactory(T... v) : m_v(v...) {}
+	tempfactory(const tempfactory & o) = delete;
+	tempfactory(tempfactory && o) = default;
+	tempfactory & operator=(const tempfactory & o) = delete;
+	tempfactory & operator=(tempfactory && o) = default;
+
+	template <typename... Args>
+	tempfactory(Args && ... v) : cont(std::forward<Args>(v)...) {}
 
 	template<typename dest_t>
 	struct constructed {
@@ -98,38 +92,26 @@ public:
 	};
 
 	template <typename dest_t>
-	typename constructed<dest_t>::type construct(dest_t && dest) const {
-		return invoker<sizeof...(T)>::go(std::forward<dest_t>(dest), *this);
+	typename constructed<dest_t>::type construct(dest_t && dest) {
+		node_token tok = dest.get_token();
+		typename constructed<dest_t>::type r = container_construct<typename constructed<dest_t>::type>(cont, std::forward<dest_t>(dest));
+		this->init_node(r);
+		this->add_default_edge(r, tok);
+		this->add_node_set_edges(r);
+		return r;
 	}
 
+	template <typename dest_t>
+	typename constructed<dest_t>::type construct_copy(dest_t && dest) {
+		node_token tok = dest.get_token();
+		typename constructed<dest_t>::type r = container_construct_copy<typename constructed<dest_t>::type>(cont, std::forward<dest_t>(dest));
+		this->init_node(r);
+		this->add_default_edge(r, tok);
+		this->add_node_set_edges(r);
+		return r;
+	}
 private:
-	std::tuple<T...> m_v;
-
-	template <size_t N, size_t... S>
-	class invoker {
-	public:
-		template <typename dest_t>
-		static typename constructed<dest_t>::type go(dest_t && dest, const tempfactory & parent) {
-			return invoker<N-1, N-1, S...>::go(std::forward<dest_t>(dest), parent);
-		}
-	};
-
-	template <size_t... S>
-	class invoker<0, S...> {
-	public:
-		template <typename dest_t>
-		static typename constructed<dest_t>::type go(dest_t && dest, const tempfactory & parent) {
-			node_token tok = dest.get_token();
-			typename constructed<dest_t>::type r(std::forward<dest_t>(dest), std::get<S>(parent.m_v)...);
-			parent.init_node(r);
-			parent.add_default_edge(r, tok);
-			parent.add_node_set_edges(r);
-			return r;
-		}
-	};
-
-	template <size_t N, size_t... S>
-	friend class invoker;
+	container<T...> cont;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -141,43 +123,88 @@ class termfactory : public factory_base {
 public:
 	typedef R constructed_type;
 
-	termfactory(T... v) : m_v(v...) {}
+	termfactory(const termfactory & o) = delete;
+	termfactory(termfactory && o) = default;
+	termfactory & operator=(const termfactory & o) = delete;
+	termfactory & operator=(termfactory && o) = default;
 
-	inline R construct() const {
-		return invoker<sizeof...(T)>::go(*this);
+	template<typename... Args>
+	termfactory(Args && ... v) : cont(std::forward<Args>(v)...) {}
+
+	R construct() {
+		R r = container_construct<R>(cont);
+		this->init_node(r);
+		this->add_node_set_edges(r);
+		return r;
 	}
 
+	R construct_copy() {
+		R r = container_construct_copy<R>(cont);
+		this->init_node(r);
+		this->add_node_set_edges(r);
+		return r;
+	}
 private:
-	std::tuple<T...> m_v;
-
-	template <size_t N, size_t... S>
-	class invoker {
-	public:
-		static R go(const termfactory & parent) {
-			return invoker<N-1, N-1, S...>::go(parent);
-		}
-	};
-
-	template <size_t... S>
-	class invoker<0, S...> {
-	public:
-		static R go(const termfactory & parent) {
-			R r(std::get<S>(parent.m_v)...);
-			parent.init_node(r);
-			parent.add_node_set_edges(r);
-			return r;
-		}
-	};
-
-	template <size_t N, size_t... S>
-	friend class invoker;
+	container<T...> cont;
 };
+
+
+template <typename ...>
+class Args;
+
+///////////////////////////////////////////////////////////////////////////////
+/// \class tfactory
+/// Node factory for variadic argument terminators.
+///////////////////////////////////////////////////////////////////////////////
+template <template <typename dest_t, typename ... X> class R, typename Args, typename... T>
+class tfactory {/*We should never use this*/};
+
+template <template <typename dest_t, typename ... X> class R,
+		  typename ...TT, typename... T>
+class tfactory<R, Args<TT...>, T...> : public factory_base {
+public:
+	tfactory(const tfactory & o) = delete;
+	tfactory(tfactory && o) = default;
+	tfactory & operator=(const tfactory & o) = delete;
+	tfactory & operator=(tfactory && o) = default;
+
+	template<typename... Args>
+	tfactory(Args && ... v) : cont(std::forward<Args>(v)...) {}
+
+	template<typename dest_t>
+	struct constructed {
+		typedef R<typename bits::remove<dest_t>::type, TT...> type;
+	};
+
+	template <typename dest_t>
+	typename constructed<dest_t>::type construct(dest_t && dest) {
+		node_token tok = dest.get_token();
+		typename constructed<dest_t>::type r = container_construct<typename constructed<dest_t>::type>(cont, std::forward<dest_t>(dest));
+		this->init_node(r);
+		this->add_default_edge(r, tok);
+		this->add_node_set_edges(r);
+		return r;
+	}
+
+	template <typename dest_t>
+	typename constructed<dest_t>::type construct_copy(dest_t && dest) {
+		node_token tok = dest.get_token();
+		typename constructed<dest_t>::type r = container_construct_copy<typename constructed<dest_t>::type>(cont, std::forward<dest_t>(dest));
+		this->init_node(r);
+		this->add_default_edge(r, tok);
+		this->add_node_set_edges(r);
+		return r;
+	}
+private:
+	container<T...> cont;
+};
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Node factory for split nodes, typically used for phase boundary nodes.
 /// \tparam I the type of the input node
 /// \tparam item_type the type of item used by both nodes
-/// \tparam OB the base class for both input and output node. Typically 
+/// \tparam OB the base class for both input and output node. Typically
 /// \ref tpie::pipelining::node
 /// \tparam O the type of the output node
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,99 +221,15 @@ public:
 	typename constructed<dest_t>::type construct(dest_t && dest) const {
 		node_token input_token;
 		typedef typename push_type<dest_t>::type item_type;
-		boost::shared_ptr<OB> o(new O<dest_t>(std::forward<dest_t>(dest), input_token));
+		std::shared_ptr<OB> o = std::make_shared<O<dest_t> >(std::forward<dest_t>(dest), input_token);
 		return I<item_type>(input_token, std::move(o));
 	};
-};
-
-#else
-
-///////////////////////////////////////////////////////////////////////////////
-/// Node factory for split nodes, typically used for phase boundary nodes.
-/// \tparam I the type of the input node
-/// \tparam item_type the type of item used by both nodes
-/// \tparam OB the base class for both input and output node. Typically 
-/// \ref tpie::pipelining::node
-/// \tparam O the type of the output node
-///////////////////////////////////////////////////////////////////////////////
-template <template <typename item_type> class I, typename OB, template<typename dest_t> class O>
-class split_factory : public factory_base {
-public:
-	template <typename dest_t>
-	struct constructed {
-		typedef typename push_type<dest_t>::type item_type;
-		typedef I<item_type> type;
-	};
 
 	template <typename dest_t>
-	typename constructed<dest_t>::type construct(TPIE_TRANSFERABLE(dest_t) dest) const {
-		node_token input_token;
-		typedef typename push_type<dest_t>::type item_type;
-		boost::shared_ptr<OB> o(new O<dest_t>(TPIE_MOVE(dest), input_token));
-		return I<item_type>(input_token, o);
+	typename constructed<dest_t>::type construct_copy(dest_t && dest) const {
+		return construct(std::forward<dest_t>(dest));
 	};
 };
-
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
-// Legacy typedefs
-///////////////////////////////////////////////////////////////////////////////
-
-#if defined(TPIE_CPP_TEMPLATE_ALIAS) && defined(TPIE_VARIADIC_FACTORIES)
-
-template <template <typename dest_t> class R>
-using factory_0 = factory<R>;
-template <template <typename dest_t> class R, typename T1>
-using factory_1 = factory<R, T1>;
-template <template <typename dest_t> class R, typename T1, typename T2>
-using factory_2 = factory<R, T1, T2>;
-template <template <typename dest_t> class R, typename T1, typename T2, typename T3>
-using factory_3 = factory<R, T1, T2, T3>;
-template <template <typename dest_t> class R, typename T1, typename T2, typename T3, typename T4>
-using factory_4 = factory<R, T1, T2, T3, T4>;
-template <template <typename dest_t> class R, typename T1, typename T2, typename T3, typename T4, typename T5>
-using factory_5 = factory<R, T1, T2, T3, T4, T5>;
-template <template <typename dest_t> class R, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-using factory_6 = factory<R, T1, T2, T3, T4, T5, T6>;
-
-template <typename Holder>
-using tempfactory_0 = tempfactory<Holder>;
-template <typename Holder, typename T1>
-using tempfactory_1 = tempfactory<Holder, T1>;
-template <typename Holder, typename T1, typename T2>
-using tempfactory_2 = tempfactory<Holder, T1, T2>;
-template <typename Holder, typename T1, typename T2, typename T3>
-using tempfactory_3 = tempfactory<Holder, T1, T2, T3>;
-template <typename Holder, typename T1, typename T2, typename T3, typename T4>
-using tempfactory_4 = tempfactory<Holder, T1, T2, T3, T4>;
-template <typename Holder, typename T1, typename T2, typename T3, typename T4, typename T5>
-using tempfactory_5 = tempfactory<Holder, T1, T2, T3, T4, T5>;
-template <typename Holder, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-using tempfactory_6 = tempfactory<Holder, T1, T2, T3, T4, T5, T6>;
-
-template <typename R>
-using termfactory_0 = termfactory<R>;
-template <typename R, typename T1>
-using termfactory_1 = termfactory<R, T1>;
-template <typename R, typename T1, typename T2>
-using termfactory_2 = termfactory<R, T1, T2>;
-template <typename R, typename T1, typename T2, typename T3>
-using termfactory_3 = termfactory<R, T1, T2, T3>;
-template <typename R, typename T1, typename T2, typename T3, typename T4>
-using termfactory_4 = termfactory<R, T1, T2, T3, T4>;
-template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5>
-using termfactory_5 = termfactory<R, T1, T2, T3, T4, T5>;
-template <typename R, typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-using termfactory_6 = termfactory<R, T1, T2, T3, T4, T5, T6>;
-
-#else
-
-#ifndef DOXYGEN
-#include <tpie/pipelining/factory_helpers.inl>
-#endif
-
-#endif
 
 } // namespace pipelining
 } // namespace tpie

@@ -25,7 +25,7 @@ add_unittest(ami_stream basic truncate)
 add_unittest(array
 	basic
 	iterators
-	auto_ptr
+	unique_ptr
 	memory
 	bit_basic
 	bit_iterators
@@ -38,7 +38,6 @@ add_unittest(array
 	copy
 	from_view
 	)
-add_unittest(atomic basic parallel)
 add_unittest(block_collection basic erase overwrite)
 add_unittest(block_collection_cache basic erase overwrite)
 add_unittest(compressed_stream
@@ -52,10 +51,25 @@ add_unittest(compressed_stream
 	position_3_u position_4_u position_5_u position_6_u position_7_u
 	position_seek_u uncompressed_u uncompressed_new_u
 
-	odd_block_size
+	odd_block_size write_only
 	write_peek
 )
-add_unittest(btree internal_basic internal_iterator internal_key_and_compare internal_augment external_basic external_iterator external_key_and_compare external_augment)
+add_unittest(btree
+	internal_augment
+	internal_basic
+	internal_build
+	internal_static
+	internal_unordered
+	internal_bound
+	internal_iterator
+	internal_key_and_compare
+	external_augment
+	external_basic
+	external_bound
+	external_build
+	external_iterator
+	external_key_and_compare)
+	
 add_unittest(disjoint_set basic memory)
 add_unittest(external_priority_queue basic)
 add_unittest(external_queue basic empty_size sized large)
@@ -123,7 +137,6 @@ add_unittest(pipelining
 	vector
 	filestream
 	fspull
-	fsaltpush
 	merge
 	reverse
 	internal_reverse
@@ -136,6 +149,7 @@ add_unittest(pipelining
 	memory
 	fork
 	merger_memory
+	bound_fetch_forward
 	fetch_forward
 	virtual
 	virtual_cref_item_type
@@ -155,18 +169,16 @@ add_unittest(pipelining
 	datastructures
 	phase_priority_test
 	set_flush_priority_test
+	node_map
 	)
 add_unittest(pipelining_runtime evacuate get_phase_graph)
 add_unittest(pipelining_serialization basic reverse sort)
-add_unittest(maybe basic auto_ptr)
+add_unittest(maybe basic unique_ptr)
 add_unittest(close_file internal serialization_writer_close serialization_writer_dtor serialization_reader_dtor)
 add_unittest(node_name gcc msvc)
 add_unittest(snappy basic)
 
-if (TPIE_CPP_RANDOM AND TPIE_CPP_AUTO_KEYWORD)
-	add_unittest(tiny sort set map multiset multimap)
-endif(TPIE_CPP_RANDOM AND TPIE_CPP_AUTO_KEYWORD)
-
+add_unittest(tiny sort set map multiset multimap)
 
 add_fulltest(ami_stream stress)
 add_fulltest(disjoint_set large large_cycle very_large medium ovelflow)
