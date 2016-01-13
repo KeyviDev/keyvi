@@ -48,7 +48,7 @@
 ///
 /// The TPIE job framework is insufficient for this parallelization code,
 /// since we get deadlocks if some of the workers are allowed to wait for a
-/// ready tpie::job worker. Instead, we use boost::threads directly.
+/// ready tpie::job worker. Instead, we use std::threads directly.
 ///
 /// Parallel worker states. The main thread has a condition variable
 /// (producerCond) which is signalled every time a worker changes its own

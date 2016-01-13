@@ -21,9 +21,8 @@
 #include <tpie/hash_map.h>
 #include <tpie/tpie.h>
 #include <map>
-#include <boost/random/linear_congruential.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <random>
+#include <unordered_map>
 #include "test_timer.h"
 #include <iomanip>
 using namespace tpie;
@@ -33,7 +32,7 @@ template <template <typename value_t, typename hash_t, typename equal_t, typenam
 bool basic_test() {
 	tpie::hash_map<int, char, tpie::hash<int>, std::equal_to<int>, size_t, table_t> q1(200);
 	map<int, char> q2;
-	boost::rand48 prng(42);
+	std::default_random_engine prng(42);
 	for(int i=0; i < 100; ++i) {
 		int k = (prng()*2) % 250;
 		char v = static_cast<char>(prng() % 265);
@@ -68,26 +67,26 @@ bool basic_test() {
 }
 
 struct charm_gen {
-	static inline int key(int i) {
+	static inline size_t key(size_t i) {
 		return (i*21467) % 0x7FFFFFFF;
 	}
-	static inline int value(int i) {
+	static inline size_t value(size_t i) {
 		return (i*41983)%128;
 	}
-	static inline int cnt() {return 1000000;}
+	static inline size_t cnt() {return 1000000;}
 };
 
 struct identity_gen {
-	static inline int key(int i) {
+	static inline size_t key(size_t i) {
 		return i;
 	}
-	static inline int value(int i) {
+	static inline size_t value(size_t i) {
 		return i%128;
 	}
-	static inline int cnt() {return 1000000;}
+	static inline size_t cnt() {return 1000000;}
 };
 
-template <typename gen_t, 
+template <typename gen_t,
 		  template <typename value_t, typename hash_t, typename equal_t, typename index_t> class table_t>
 void test_speed() {
 	test_timer insert_hash_map("insert hash_map");
@@ -98,41 +97,41 @@ void test_speed() {
 
 	test_timer erase_hash_map("erase hash_map");
 	test_timer erase_unordered_map("erase unordered_map");
-	
-	for(int t=0; t < 100; ++t) {
+
+	for(size_t t=0; t < 100; ++t) {
 		insert_hash_map.start();
-		tpie::hash_map<int, char, tpie::hash<size_t>, std::equal_to<size_t>, size_t, table_t> q1(gen_t::cnt());
-		for(int i=0; i < gen_t::cnt();++i) 
+		tpie::hash_map<size_t, char, tpie::hash<size_t>, std::equal_to<size_t>, size_t, table_t> q1(gen_t::cnt());
+		for(size_t i=0; i < gen_t::cnt();++i)
 			q1[gen_t::key(i)] = static_cast<char>(gen_t::value(i));
 		insert_hash_map.stop();
-	
+
 		insert_unordered_map.start();
-		boost::unordered_map<int, char> q2;
-		for(int i=0; i < gen_t::cnt();++i)
+		std::unordered_map<size_t, char> q2;
+		for(size_t i=0; i < gen_t::cnt();++i)
 			q2[gen_t::key(i)] = static_cast<char>(gen_t::value(i));
 		insert_unordered_map.stop();
-		
-		int x=42;
+
+		size_t x=42;
 		find_hash_map.start();
-		for(int i=0; i < gen_t::cnt();++i)
+		for(size_t i=0; i < gen_t::cnt();++i)
 			x ^= q1.find(gen_t::key(i))->second;
 		find_hash_map.stop();
 
 		find_unordered_map.start();
-		for(int i=0; i < gen_t::cnt();++i)
+		for(size_t i=0; i < gen_t::cnt();++i)
 			x ^= q2.find(gen_t::key(i))->second;
 		find_unordered_map.stop();
 
 		erase_hash_map.start();
-		for(int i=0; i < gen_t::cnt();++i)
+		for(size_t i=0; i < gen_t::cnt();++i)
 			q1.erase(gen_t::key(i));
 		erase_hash_map.stop();
-		
+
 		erase_unordered_map.start();
-		for(int i=0; i < gen_t::cnt();++i)
+		for(size_t i=0; i < gen_t::cnt();++i)
 			q2.erase(gen_t::key(i));
 		erase_unordered_map.stop();
-		
+
 		if (x + q1.size() + q2.size() != 42) tpie::log_info() << "Orly" << std::endl;
 		tpie::log_info() << std::setw(3) << t  << "%\r" << std::flush;
 	}
@@ -155,7 +154,7 @@ bool iterator_test() {
 	d.push_back(make_pair(9,'e'));
 	d.push_back(make_pair(10,'x'));
 	for(size_t i=0; i < d.size(); ++i) m.insert(d[i].first, d[i].second);
-	for(tpie::hash_map<int, char>::iterator i=m.begin(); i != m.end(); ++i) 
+	for(tpie::hash_map<int, char>::iterator i=m.begin(); i != m.end(); ++i)
 		r.push_back(*i);
 	sort(d.begin(), d.end());
 	sort(r.begin(), r.end());

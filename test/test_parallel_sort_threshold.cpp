@@ -18,29 +18,27 @@
 // along with TPIE.  If not, see <http://www.gnu.org/licenses/>
 
 #include <tpie/tpie.h>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <tpie/unittest.h>
 #include <tpie/parallel_sort.h>
-#include <boost/random.hpp>
+#include <random>
 #include <tpie/sysinfo.h>
-
-using boost::posix_time::time_duration;
 
 typedef int test_t;
 
 struct sort_timer {
 	virtual ~sort_timer() {}
-	virtual time_duration run(std::vector<test_t> & items) = 0;
+	virtual double run(std::vector<test_t> & items) = 0;
 };
 
 template <size_t stdSortThreshold>
 struct sort_timer_impl : public sort_timer {
 	~sort_timer_impl() {}
-	time_duration run(std::vector<test_t> & items) {
-		boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
+	double run(std::vector<test_t> & items) {
+		tpie::test_time start=tpie::test_now();
 		tpie::parallel_sort_impl<std::vector<test_t>::iterator, std::less<test_t>, false, stdSortThreshold > s(0);
 		s(items.begin(), items.end());
-		boost::posix_time::ptime end=boost::posix_time::microsec_clock::local_time();
-		return end-start;
+		tpie::test_time end=tpie::test_now();
+		return tpie::test_secs(start, end);
 	}
 };
 
@@ -74,7 +72,7 @@ sort_timer * get_sort_timer(size_t stdSortThreshold) {
 
 // fill a vector with random numbers (the same random numbers each time).
 void fill_data(std::vector<test_t> & data) {
-	boost::mt19937 rng; // default seed
+	std::mt19937 rng; // default seed
 	std::generate(data.begin(), data.end(), rng);
 }
 
@@ -87,12 +85,12 @@ size_t find_threshold(size_t center, size_t radius, std::vector<test_t> & data) 
 	size_t hi = lo + 2*radius;
 
 	size_t best = 0;
-	time_duration besttime;
+	double besttime = std::numeric_limits<double>::max();
 	for (size_t attempt = lo; attempt <= hi; attempt += inc) {
 		sort_timer * t = get_sort_timer(attempt);
 		fill_data(data);
 		std::cout << attempt << ' ' << std::flush;
-		time_duration dur = t->run(data);
+		double dur = t->run(data);
 		std::cout << dur << std::endl;
 		if (attempt == lo || dur < besttime) {
 			best = attempt;

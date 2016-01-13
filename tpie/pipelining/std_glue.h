@@ -37,7 +37,7 @@ class input_vector_t : public node {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	inline input_vector_t(TPIE_TRANSFERABLE(dest_t) dest, const std::vector<item_type> & input) : dest(TPIE_MOVE(dest)), input(input) {
+	inline input_vector_t(dest_t dest, const std::vector<item_type> & input) : dest(std::move(dest)), input(input) {
 		add_push_destination(this->dest);
 	}
 
@@ -81,7 +81,7 @@ public:
 	public:
 		typedef typename F::argument_type item_type;
 		
-		type(TPIE_TRANSFERABLE(dest_t) dest, const F & f): f(f), dest(TPIE_MOVE(dest)) {
+		type(dest_t dest, const F & f): f(f), dest(std::move(dest)) {
 		}
 		
 		void push(const item_type & item) {
@@ -101,7 +101,7 @@ public:
 	public:
 		typedef typename F::argument_type item_type;
 		
-		type(TPIE_TRANSFERABLE(dest_t) dest, const F & f): f(f), dest(TPIE_MOVE(dest)) {
+		type(dest_t dest, const F & f): f(f), dest(std::move(dest)) {
 		}
 		
 		void push(const item_type & item) {
@@ -123,8 +123,8 @@ public:
 /// \param input The vector from which it pushes items
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline pipe_begin<factory_1<bits::input_vector_t, const std::vector<T> &> > input_vector(const std::vector<T> & input) {
-	return factory_1<bits::input_vector_t, const std::vector<T> &>(input);
+inline pipe_begin<factory<bits::input_vector_t, const std::vector<T> &> > input_vector(const std::vector<T> & input) {
+	return factory<bits::input_vector_t, const std::vector<T> &>(input);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,8 +132,8 @@ inline pipe_begin<factory_1<bits::input_vector_t, const std::vector<T> &> > inpu
 /// \param output The vector to push items to
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-inline pipe_end<termfactory_1<bits::output_vector_t<T>, std::vector<T> &> > output_vector(std::vector<T> & output) {
-	return termfactory_1<bits::output_vector_t<T>, std::vector<T> &>(output);
+inline pipe_end<termfactory<bits::output_vector_t<T>, std::vector<T> &> > output_vector(std::vector<T> & output) {
+	return termfactory<bits::output_vector_t<T>, std::vector<T> &>(output);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -143,8 +143,8 @@ inline pipe_end<termfactory_1<bits::output_vector_t<T>, std::vector<T> &> > outp
 /// \param f The functor that should be applied to items
 ///////////////////////////////////////////////////////////////////////////////
 template <typename F>
-inline pipe_middle<tempfactory_1<bits::lambda_t<F>, F> > lambda(const F & f) {
-	return tempfactory_1<bits::lambda_t<F>, F>(f);
+inline pipe_middle<tempfactory<bits::lambda_t<F>, F> > lambda(const F & f) {
+	return tempfactory<bits::lambda_t<F>, F>(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -157,8 +157,8 @@ inline pipe_middle<tempfactory_1<bits::lambda_t<F>, F> > lambda(const F & f) {
 /// \param f The functor that should be applied to items
 ///////////////////////////////////////////////////////////////////////////////
 template <typename F>
-inline pipe_middle<tempfactory_1<bits::exclude_lambda_t<F>, F> > exclude_lambda(const F & f) {
-	return tempfactory_1<bits::exclude_lambda_t<F>, F>(f);
+inline pipe_middle<tempfactory<bits::exclude_lambda_t<F>, F> > exclude_lambda(const F & f) {
+	return tempfactory<bits::exclude_lambda_t<F>, F>(f);
 }
 
 

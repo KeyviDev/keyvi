@@ -24,29 +24,32 @@
 #ifndef _TPIE_TYPES_H
 #define _TPIE_TYPES_H
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
+#include <cstddef>
 #ifdef _WIN32
 #include <basetsd.h>
+#else
+#include <sys/types.h>
 #endif
 
 namespace tpie {
 
-using boost::uint8_t;
-using boost::int8_t;
-using boost::uint16_t;
-using boost::int16_t;
-using boost::uint32_t;
-using boost::int32_t;
-using boost::uint64_t;
-using boost::int64_t;
+using std::uint8_t;
+using std::int8_t;
+using std::uint16_t;
+using std::int16_t;
+using std::uint32_t;
+using std::int32_t;
+using std::uint64_t;
+using std::int64_t;
 
-typedef boost::uint64_t stream_size_type;
-typedef boost::int64_t stream_offset_type;
-typedef ::size_t memory_size_type;
+typedef uint64_t stream_size_type;
+typedef int64_t stream_offset_type;
+typedef std::size_t memory_size_type;
 #ifdef _WIN32
 typedef SSIZE_T memory_offset_type;
 #else
-typedef ::ssize_t memory_offset_type;
+typedef ssize_t memory_offset_type;
 #endif
 
 typedef stream_offset_type offset_type;

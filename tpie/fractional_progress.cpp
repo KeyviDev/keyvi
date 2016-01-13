@@ -26,7 +26,7 @@
 #include <sstream>
 #include <locale>
 #include <boost/filesystem.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/lexical_cast.hpp>
 
 namespace {
@@ -56,14 +56,27 @@ public:
 		std::fstream f;
 		f.open(path.c_str(), std::fstream::in | std::fstream::binary);
 		if (f.is_open()) {
+			static const std::string head = "tpie::update_fractions(\"";
+			static const std::string s1 = "\", ";
+			static const std::string s2 = ", ";
+			static const std::string tail = ");";
 			std::string line;
-			boost::regex lineExp("tpie::update_fractions\\([ ]*\"([^\"]+)\"[ ]*,[ ]*([^, ]+)[ ]*,[ ]*([^\\) ]+)[ ]*\\);.*", boost::regex::extended);
-			boost::smatch matches;
 			while (f) {
 				std::getline(f, line);
-				if (boost::regex_match(line, matches, lineExp) && matches.size() == 4) {
-					update(matches.str(1), boost::lexical_cast<float>(matches.str(2)), boost::lexical_cast<stream_size_type>(matches.str(3)));
-				}
+				if (line.substr(0, head.size()) != head) continue;
+				const size_t p1 = line.rfind(s1);
+				const size_t p2 = p1 + s1.size();
+				const size_t p3 = line.find(s2, p2);
+				const size_t p4 = p3 + s2.size();
+				const size_t p5 = line.find(tail, p4);
+				if (p1 == std::string::npos ||
+					p3 == std::string::npos ||
+					p5 == std::string::npos) continue;
+				
+				update(line.substr(head.size(), p1 - head.size()),
+					   boost::lexical_cast<float>(line.substr(p2, p3-p2)),
+					   boost::lexical_cast<stream_size_type>(line.substr(p4, p5-p4)));
+
 			}
 		}
 		dirty=false;

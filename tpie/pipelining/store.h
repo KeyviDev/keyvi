@@ -123,7 +123,6 @@ struct explicit_tpie_pointer_store {
 	specific<element_t> get_specific() {return specific<element_t>();}
 };
 
-#ifdef TPIE_CPP_RVALUE_REFERENCE
 /**
  * \brief Sort elements in tpie unique pointers
  *
@@ -157,7 +156,6 @@ struct explicit_tpie_unique_pointer_store {
 	template <typename element_t>
 	specific<element_t> get_specific() {return specific<element_t>();}
 };
-#endif //TPIE_CPP_RVALUE_REFERENCE
 
 /**
  * \brief Sort elements using pointer indirection.

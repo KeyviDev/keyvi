@@ -56,6 +56,7 @@ public:
 		m_queue = &**m_queue_ptr;
 		m_queue->seek(0);
 		forward("items", m_queue->size());
+		set_steps(m_queue->size());
 	}
 
 	bool can_pull() const {
@@ -63,6 +64,7 @@ public:
 	}
 
 	T pull() {
+		step();
 		return m_queue->read();
 	}
 
@@ -80,7 +82,7 @@ class buffer_input_t: public node {
 public:
 	typedef T item_type;
 
-	buffer_input_t(const node_token & token, boost::shared_ptr<node> output=boost::shared_ptr<node>())
+	buffer_input_t(const node_token & token, std::shared_ptr<node> output=std::shared_ptr<node>())
 		: node(token)
 		, m_output(output)
 	{
@@ -99,12 +101,12 @@ public:
 	}
 
 	void end() override {
-		forward("queue", &m_queue);
+		forward("queue", &m_queue, 1);
 	}
 
 private:
 	tpie::maybe< file_stream<T> > m_queue;
-	boost::shared_ptr<node> m_output;
+	std::shared_ptr<node> m_output;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,8 +117,8 @@ class buffer_output_t: public node {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	buffer_output_t(TPIE_TRANSFERABLE(dest_t) dest, const node_token & input_token)
-		: dest(TPIE_MOVE(dest))
+	buffer_output_t(dest_t dest, const node_token & input_token)
+		: dest(std::move(dest))
 	{
 		add_dependency(input_token);
 		add_push_destination(this->dest);
@@ -163,12 +165,13 @@ public:
 	typedef bits::buffer_input_t<T> input_t;
 	typedef bits::buffer_pull_output_t<T> output_t;
 private:
-	typedef termfactory_1<input_t,  const node_token &> inputfact_t;
-	typedef termfactory_1<output_t, const node_token &> outputfact_t;
+	typedef termfactory<input_t,  const node_token &> inputfact_t;
+	typedef termfactory<output_t, const node_token &> outputfact_t;
+public:
 	typedef pipe_end      <inputfact_t>  inputpipe_t;
 	typedef pullpipe_begin<outputfact_t> outputpipe_t;
 
-public:
+
 	passive_buffer() {}
 
 	inline input_t raw_input() {

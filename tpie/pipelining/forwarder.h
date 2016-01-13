@@ -35,20 +35,16 @@ public:
 	typedef typename push_type<dest_t>::type item_type;
 	typedef std::vector<std::pair<std::string, boost::any> > values_t;
 	
-	Forwarder(TPIE_TRANSFERABLE(dest_t) dest, values_t values)
-		: values(TPIE_MOVE(values)), dest(TPIE_MOVE(dest)) {}
+	Forwarder(dest_t dest, values_t values)
+		: values(std::move(values)), dest(std::move(dest)) {}
 
 	void prepare() override {
 		for (typename values_t::iterator i=values.begin(); i != values.end(); ++i)
 			forward_any(i->first, i->second);
 	}
 
-#ifdef TPIE_CPP_RVALUE_REFERENCE
 	template <typename T>
 	void push(T && t) {dest.push(std::forward<T>(t));}
-#else
-	void push(const item_type & t) {dest.push(t);}
-#endif
 private:
 	std::vector<std::pair<std::string, boost::any> > values;
 	dest_t dest;
@@ -61,7 +57,7 @@ private:
 // pass though items on push
 ///////////////////////////////////////////////////////////////////////////////
 inline pipe_middle<factory<bits::Forwarder, std::vector<std::pair<std::string, boost::any> > > > forwarder(std::vector<std::pair<std::string, boost::any> > items) {
-	return factory<bits::Forwarder, std::vector<std::pair<std::string, boost::any> >  >(TPIE_MOVE(items));
+	return factory<bits::Forwarder, std::vector<std::pair<std::string, boost::any> >  >(std::move(items));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,7 +68,7 @@ template <typename VT>
 pipe_middle<factory<bits::Forwarder, std::vector<std::pair<std::string, boost::any> > > > forwarder(std::string name, VT value) {
 	std::vector<std::pair<std::string, boost::any> > v;
 	v.push_back(std::make_pair(name, boost::any(value)));
-	return forwarder(TPIE_MOVE(v));
+	return forwarder(std::move(v));
 }
 
 } //namespace pipelining

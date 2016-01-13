@@ -65,7 +65,7 @@ int teststream_buf::sync() {
 
 teststream::teststream(bool do_time): std::ostream(&m_buff), failed(0), total(0), do_time(do_time) {
 	if (do_time) 
-		time = boost::posix_time::microsec_clock::local_time();
+		time = test_now();
 };
 bool teststream::success() {return failed ==0;}
 
@@ -78,8 +78,8 @@ void result_manip(teststream & s, bool success) {
 	}
 	s.total++;
 	if (s.do_time) {
-		boost::posix_time::ptime ntime = boost::posix_time::microsec_clock::local_time();
-		s << " " << (ntime - s.time).total_milliseconds() << " ms";
+		test_time ntime = test_now();
+		s << " " << test_millisecs(s.time, ntime) << " ms";
 		s.time = ntime;
 	}
 	s << std::endl;
@@ -296,12 +296,11 @@ namespace bits {
 	{
 		t->start_test(name);
 		if (t->do_time)
-			m_time = boost::posix_time::microsec_clock::local_time();
+			m_time = test_now();
 	}
 
 	test_runner::~test_runner() {
-		t->end_test(result, 
-					t->do_time?(boost::posix_time::microsec_clock::local_time() - m_time).total_milliseconds(): 0);
+		t->end_test(result, t->do_time?test_millisecs(m_time, test_now()): 0);
 	}
 
 	void test_runner::set_result(bool result) {

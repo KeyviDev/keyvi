@@ -40,7 +40,7 @@ class reverser_input_t: public node {
 public:
 	typedef T item_type;
 
-	inline reverser_input_t(const node_token & token, boost::shared_ptr<node> output=boost::shared_ptr<node>())
+	inline reverser_input_t(const node_token & token, std::shared_ptr<node> output=std::shared_ptr<node>())
 		: node(token), m_output(output)
 	{
 		set_name("Store items", PRIORITY_SIGNIFICANT);
@@ -60,11 +60,11 @@ public:
 	}
 
 	void end() override {
-		forward("stack", &m_stack);
+		forward("stack", &m_stack, 1);
 	}
 private:
 	tpie::maybe<stack<item_type> > m_stack;
-	boost::shared_ptr<node> m_output;
+	std::shared_ptr<node> m_output;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ class internal_reverser_input_t: public node {
 public:
 	typedef T item_type;
 
-	inline internal_reverser_input_t(const node_token & token, boost::shared_ptr<node> output=boost::shared_ptr<node>())
+	inline internal_reverser_input_t(const node_token & token, std::shared_ptr<node> output=std::shared_ptr<node>())
 		: node(token), m_output(output)
 	{
 		set_name("Store items", PRIORITY_SIGNIFICANT);
@@ -86,7 +86,7 @@ public:
 
 	virtual void propagate() override {
 		m_stack = tpie_new<std::stack<item_type> >();
-		forward("stack", m_stack);
+		forward("stack", m_stack, 1);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ public:
 	}
 private:
 	std::stack<item_type> * m_stack;
-	boost::shared_ptr<node> m_output;
+	std::shared_ptr<node> m_output;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,8 +108,8 @@ class reverser_output_t: public node {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	reverser_output_t(TPIE_TRANSFERABLE(dest_t) dest, const node_token & input_token)
-		: dest(TPIE_MOVE(dest))
+	reverser_output_t(dest_t dest, const node_token & input_token)
+		: dest(std::move(dest))
 	{
 		add_dependency(input_token);
 		add_push_destination(this->dest);
@@ -149,8 +149,8 @@ class internal_reverser_output_t: public node {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	internal_reverser_output_t(TPIE_TRANSFERABLE(dest_t) dest, const node_token & input_token)
-		: dest(TPIE_MOVE(dest))
+	internal_reverser_output_t(dest_t dest, const node_token & input_token)
+		: dest(std::move(dest))
 	{
 		add_dependency(input_token);
 		add_push_destination(this->dest);
@@ -279,8 +279,8 @@ public:
 	typedef bits::reverser_input_t<T> input_t;
 	typedef bits::reverser_pull_output_t<T> output_t;
 private:
-	typedef termfactory_1<input_t,  const node_token &> inputfact_t;
-	typedef termfactory_1<output_t, const node_token &> outputfact_t;
+	typedef termfactory<input_t,  const node_token &> inputfact_t;
+	typedef termfactory<output_t, const node_token &> outputfact_t;
 	typedef pipe_end<inputfact_t>  inputpipe_t;
 	typedef pullpipe_begin<outputfact_t> outputpipe_t;
 public:
@@ -326,8 +326,8 @@ public:
 	typedef bits::internal_reverser_input_t<T> input_t;
 	typedef bits::internal_reverser_pull_output_t<T> output_t;
 private:
-	typedef termfactory_1<input_t,  const node_token &> inputfact_t;
-	typedef termfactory_1<output_t, const node_token &> outputfact_t;
+	typedef termfactory<input_t,  const node_token &> inputfact_t;
+	typedef termfactory<output_t, const node_token &> outputfact_t;
 	typedef pipe_end<inputfact_t>  inputpipe_t;
 	typedef pullpipe_begin<outputfact_t> outputpipe_t;
 public:

@@ -23,7 +23,7 @@
 #include <tpie/pipelining/node.h>
 #include <tpie/pipelining/factory_base.h>
 #include <tpie/array_view.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <tpie/pipelining/maintain_order_type.h>
 #include <tpie/pipelining/parallel/options.h>
 #include <tpie/pipelining/parallel/worker_state.h>
@@ -131,7 +131,7 @@ private:
 	aligned_before_t m_data;
 
 public:
-	threads_impl(fact_t fact,
+	threads_impl(fact_t && fact,
 						state<T1, T2> & st)
 		: numJobs(st.opts.numJobs)
 	{
@@ -156,9 +156,14 @@ public:
 			hook.index = i;
 			new (this->m_progressIndicators.get(i)) pi_t();
 
+			auto n = fact.construct_copy(after_t(st, i));
+			if (i == 0)
+				n.set_plot_options(node::PLOT_PARALLEL);
+			else
+				n.set_plot_options(node::PLOT_PARALLEL | node::PLOT_SIMPLIFIED_HIDE);
 			this->m_dests[i] =
 				new(m_data.get(i))
-				before_t(st, i, fact.construct(after_t(st, i)));
+				before_t(st, i, std::move(n));
 		}
 	}
 
@@ -197,7 +202,7 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief  Common state in parallel pipelining library.
-/// This class is instantiated once and kept in a boost::shared_ptr, and it is
+/// This class is instantiated once and kept in a std::shared_ptr, and it is
 /// not copy constructible.
 ///
 /// Unless noted otherwise, a thread must own the state mutex to access other
@@ -205,9 +210,9 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 class state_base {
 public:
-	typedef boost::mutex mutex_t;
-	typedef boost::condition_variable cond_t;
-	typedef boost::unique_lock<boost::mutex> lock_t;
+	typedef std::mutex mutex_t;
+	typedef std::condition_variable cond_t;
+	typedef std::unique_lock<std::mutex> lock_t;
 
 	const options opts;
 
@@ -378,7 +383,7 @@ public:
 template <typename T1, typename T2>
 class state : public state_base {
 public:
-	typedef boost::shared_ptr<state> ptr;
+	typedef std::shared_ptr<state> ptr;
 	typedef state_base::mutex_t mutex_t;
 	typedef state_base::cond_t cond_t;
 	typedef state_base::lock_t lock_t;
@@ -388,17 +393,17 @@ public:
 
 	consumer<T2> * m_cons;
 
-	std::auto_ptr<threads<T1, T2> > pipes;
+	std::unique_ptr<threads<T1, T2> > pipes;
 
 	template <typename fact_t>
-	state(const options opts, const fact_t & fact)
+	state(const options opts, fact_t && fact)
 		: state_base(opts)
 		, m_inputBuffers(opts.numJobs)
 		, m_outputBuffers(opts.numJobs)
 		, m_cons(0)
 	{
 		typedef threads_impl<T1, T2, fact_t> pipes_impl_t;
-		pipes.reset(new pipes_impl_t(fact, *this));
+		pipes.reset(new pipes_impl_t(std::move(fact), *this));
 	}
 
 	void set_consumer_ptr(consumer<T2> * cons) {
@@ -418,7 +423,7 @@ class after : public after_base {
 protected:
 	state_base & st;
 	size_t parId;
-	std::auto_ptr<parallel_output_buffer<T> > m_buffer;
+	std::unique_ptr<parallel_output_buffer<T> > m_buffer;
 	array<parallel_output_buffer<T> *> & m_outputBuffers;
 	typedef state_base::lock_t lock_t;
 	consumer<T> * const * m_cons;
@@ -436,6 +441,7 @@ public:
 	{
 		state.set_output_ptr(parId, this);
 		set_name("Parallel after", PRIORITY_INSIGNIFICANT);
+		set_plot_options(PLOT_PARALLEL | PLOT_SIMPLIFIED_HIDE);
 		if (m_cons == 0) throw tpie::exception("Unexpected nullptr");
 		if (*m_cons != 0) throw tpie::exception("Expected nullptr");
 	}
@@ -444,16 +450,15 @@ public:
 		this->add_push_destination(*cons);
 	}
 
-	after(const after & other)
-		: after_base(other)
+	after(after && other)
+		: after_base(std::move(other))
 		, st(other.st)
-		, parId(other.parId)
+		, parId(std::move(other.parId))
 		, m_outputBuffers(other.m_outputBuffers)
-		, m_cons(other.m_cons)
-	{
+		, m_cons(std::move(other.m_cons)) {
 		st.set_output_ptr(parId, this);
-		if (m_cons == 0) throw tpie::exception("Unexpected nullptr in copy");
-		if (*m_cons != 0) throw tpie::exception("Expected nullptr in copy");
+		if (m_cons == 0) throw tpie::exception("Unexpected nullptr in move");
+		if (*m_cons != 0) throw tpie::exception("Expected nullptr in move");
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -557,9 +562,9 @@ class before : public node {
 protected:
 	state_base & st;
 	size_t parId;
-	std::auto_ptr<parallel_input_buffer<T> > m_buffer;
+	std::unique_ptr<parallel_input_buffer<T> > m_buffer;
 	array<parallel_input_buffer<T> *> & m_inputBuffers;
-	boost::thread m_worker;
+	std::thread m_worker;
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Overridden in subclass to push a buffer of items.
@@ -573,6 +578,7 @@ protected:
 		, m_inputBuffers(st.m_inputBuffers)
 	{
 		set_name("Parallel before", PRIORITY_INSIGNIFICANT);
+		set_plot_options(PLOT_PARALLEL | PLOT_SIMPLIFIED_HIDE);
 	}
 	// virtual dtor in node
 
@@ -583,12 +589,16 @@ protected:
 	{
 	}
 
+	~before() {
+		m_worker.join();
+	}
+
 public:
 	typedef T item_type;
 
 	virtual void begin() override {
 		node::begin();
-		boost::thread t(run_worker, this);
+		std::thread t(run_worker, this);
 		m_worker.swap(t);
 	}
 
@@ -687,7 +697,7 @@ public:
 						 size_t parId,
 						 dest_t dest)
 		: before<item_type>(st, parId)
-		, dest(dest)
+		, dest(std::move(dest))
 	{
 		this->add_push_destination(dest);
 		st.set_input_ptr(parId, this);
@@ -721,12 +731,13 @@ class consumer_impl : public consumer<typename push_type<dest_t>::type> {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	consumer_impl(const dest_t & dest, stateptr st)
-		: dest(dest)
+	consumer_impl(dest_t dest, stateptr st)
+		: dest(std::move(dest))
 		, st(st)
 	{
 		this->add_push_destination(dest);
 		this->set_name("Parallel output", PRIORITY_INSIGNIFICANT);
+		this->set_plot_options(node::PLOT_PARALLEL | node::PLOT_SIMPLIFIED_HIDE);
 		for (size_t i = 0; i < st->opts.numJobs; ++i) {
 			st->output(i).set_consumer(this);
 		}
@@ -759,7 +770,7 @@ private:
 	array<T1> inputBuffer;
 	size_t written;
 	size_t readyIdx;
-	boost::shared_ptr<consumer<T2> > cons;
+	std::shared_ptr<consumer<T2> > cons;
 	internal_queue<memory_size_type> m_outputOrder;
 	stream_size_type m_steps;
 
@@ -875,16 +886,18 @@ private:
 
 public:
 	template <typename consumer_t>
-	producer(stateptr st, const consumer_t & cons)
+	producer(stateptr st, consumer_t cons)
 		: st(st)
 		, written(0)
-		, cons(new consumer_t(cons))
+		, cons(new consumer_t(std::move(cons)))
 		, m_steps(0)
 	{
 		for (size_t i = 0; i < st->opts.numJobs; ++i) {
 			this->add_push_destination(st->input(i));
 		}
 		this->set_name("Parallel input", PRIORITY_INSIGNIFICANT);
+		this->set_plot_options(PLOT_PARALLEL | PLOT_SIMPLIFIED_HIDE);
+
 		memory_size_type usage =
 			st->opts.numJobs * st->opts.bufSize * (sizeof(T1) + sizeof(T2)) // workers
 			+ st->opts.bufSize * sizeof(item_type) // our buffer

@@ -28,7 +28,6 @@
 #include <sstream>
 #include <tpie/portability.h>
 #include <boost/filesystem.hpp>
-#include <boost/random.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <stdexcept>
 #include <tpie/util.h>
@@ -43,8 +42,6 @@
 #endif
 
 using namespace tpie;
-
-boost::rand48 prng(42);
 
 namespace {
 

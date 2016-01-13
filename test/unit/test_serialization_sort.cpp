@@ -21,7 +21,7 @@
 #include <tpie/parallel_sort.h>
 #include <tpie/serialization_sorter.h>
 #include <tpie/sysinfo.h>
-#include <boost/random.hpp>
+#include <random>
 
 using namespace tpie;
 
@@ -39,7 +39,7 @@ public:
 	class item_generator {
 	private:
 		stream_size_type m_items;
-		boost::rand48 m_rng;
+		std::mt19937 m_rng;
 		const static size_t expectedSize = 24;
 		const static size_t modulus = 2*expectedSize;
 		stream_size_type m_generated;

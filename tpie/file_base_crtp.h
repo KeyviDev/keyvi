@@ -304,7 +304,7 @@ protected:
 	bool m_open;
 	memory_size_type m_itemSize;
 	file_accessor::file_accessor * m_fileAccessor;
-	tpie::auto_ptr<temp_file> m_ownedTempFile;
+	tpie::unique_ptr<temp_file> m_ownedTempFile;
 	temp_file * m_tempFile;
 	stream_size_type m_size;
 

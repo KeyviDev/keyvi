@@ -25,9 +25,8 @@
 
 #include <iostream>
 #include <vector>
-#include <boost/filesystem/operations.hpp>
-#include <boost/array.hpp>
-#include <boost/random.hpp>
+#include <array>
+#include <random>
 #include <tpie/tpie_log.h>
 #include <tpie/progress_indicator_arrow.h>
 
@@ -47,7 +46,7 @@ static const size_t ARRAYSIZE = 512;
 static const size_t ARRAYS = TESTSIZE/(ARRAYSIZE*sizeof(uint64_t));
 
 struct movable_file_stream {
-	tpie::auto_ptr<tpie::uncompressed_stream<uint64_t> > fs;
+	tpie::unique_ptr<tpie::uncompressed_stream<uint64_t> > fs;
 	movable_file_stream() {fs.reset(tpie::tpie_new<tpie::uncompressed_stream<uint64_t> >());}
 	movable_file_stream(tpie::uncompressed_stream<uint64_t> & with) {
 		fs.reset(tpie::tpie_new<tpie::uncompressed_stream<uint64_t> >());
@@ -68,7 +67,7 @@ bool swap_test();
 template <typename T>
 struct file_colon_colon_stream {
 	tpie::file<T> m_file;
-	tpie::auto_ptr<typename tpie::file<T>::stream> m_stream;
+	tpie::unique_ptr<typename tpie::file<T>::stream> m_stream;
 	typedef typename tpie::file<T>::stream stream_type;
 
 	inline ~file_colon_colon_stream() {
@@ -253,7 +252,7 @@ static bool extend_test() {
 }
 
 static bool odd_block_test() {
-	typedef boost::array<char, 17> test_t;
+	typedef std::array<char, 17> test_t;
 	const size_t items = 500000;
 	test_t initial_item;
 	for (size_t i = 0; i < initial_item.size(); ++i) initial_item[i] = static_cast<char>(i+42);
@@ -321,8 +320,8 @@ struct stress_tester {
 	std::vector<int> itemBuffer;
 	Stream<int> fs;
 	typename Stream<int>::stream_type & stream;
-	boost::mt19937 rng;
-	boost::uniform_int<> ddist;
+	std::mt19937 rng;
+	std::uniform_int_distribution<> ddist;
 	bool result;
 	size_t size;
 	size_t location;
@@ -362,7 +361,7 @@ struct stress_tester {
 	bool go() {
 		tpie::temp_file tmp;
 		fs.open(tmp.path());
-		boost::uniform_int<> todo(0, actionCount - 1);
+		std::uniform_int_distribution<> todo(0, actionCount - 1);
 		const size_t stepEvery = 256;
 		tpie::progress_indicator_arrow pi("Test", actions/stepEvery);
 		pi.init(actions/stepEvery);
@@ -409,7 +408,7 @@ struct stress_tester {
 			return;
 		}
 		size_t maxItems = size - location;
-		boost::uniform_int<> d(1,std::min<size_t>(maxItems, chunkSize));
+		std::uniform_int_distribution<> d(1,std::min<size_t>(maxItems, chunkSize));
 		size_t items = d(rng);
 		tpie::log_debug() << "stream.read() * " << items << '\n';
 		for (size_t i = 0; i < items; ++i) {
@@ -437,7 +436,7 @@ struct stress_tester {
 			return;
 		}
 		size_t maxItems = size - location;
-		boost::uniform_int<> d(1,std::min<size_t>(maxItems, chunkSize));
+		std::uniform_int_distribution<> d(1,std::min<size_t>(maxItems, chunkSize));
 		size_t items = d(rng);
 		stream.read(itemBuffer.begin(), itemBuffer.begin() + items);
 		tpie::log_debug() << "stream.read(itemBuffer.begin(), itemBuffer.begin() + " << items << ");\n";
@@ -460,7 +459,7 @@ struct stress_tester {
 	void write() {
 		if (location == maxSize) return;
 		size_t maxItems = maxSize - location;
-		boost::uniform_int<> d(1,std::min<size_t>(maxItems, chunkSize));
+		std::uniform_int_distribution<> d(1,std::min<size_t>(maxItems, chunkSize));
 		size_t items = d(rng);
 		tpie::log_debug() << "stream.write() * " << items << '\n';
 		for (size_t i = 0; i < items; ++i) {
@@ -478,7 +477,7 @@ struct stress_tester {
 	void write_array() {
 		if (location == maxSize) return;
 		size_t maxItems = maxSize - location;
-		boost::uniform_int<> d(1,std::min<size_t>(maxItems, chunkSize));
+		std::uniform_int_distribution<> d(1,std::min<size_t>(maxItems, chunkSize));
 		size_t items = d(rng);
 		tpie::log_debug() << "stream.write(itemBuffer.begin(), itemBuffer.begin() + " << items << ");\n";
 		for (size_t i = 0; i < items; ++i) {
@@ -502,7 +501,7 @@ struct stress_tester {
 	}
 
 	void seek() {
-		boost::uniform_int<> d(0, size);
+		std::uniform_int_distribution<> d(0, size);
 		size_t loc = d(rng);
 		tpie::log_debug() << "stream.seek(" << loc << "); // end\n";
 		stream.seek(loc);
@@ -510,7 +509,7 @@ struct stress_tester {
 	}
 
 	void truncate() {
-		boost::uniform_int<> d(std::max(0, (int)size-(int)chunkSize), std::min(size+chunkSize, maxSize));
+		std::uniform_int_distribution<> d(std::max(0, (int)size-(int)chunkSize), std::min(size+chunkSize, maxSize));
 		size_t ns=d(rng);
 		tpie::log_debug() << "fs.file().truncate(" << ns << "); // was " << size << '\n';
 		stream.seek(0);

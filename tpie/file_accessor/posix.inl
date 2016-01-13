@@ -31,9 +31,12 @@
 namespace tpie {
 namespace file_accessor {
 
-void posix::throw_errno() {
-	if (errno == ENOSPC) throw out_of_space_exception(strerror(errno));
-	else throw io_exception(strerror(errno));
+void posix::throw_errno(std::string path /*=std::string()*/) {
+	std::string msg = strerror(errno);
+	if (!path.empty())
+		msg += " Path: ``" + path + "''.";
+	if (errno == ENOSPC) throw out_of_space_exception(msg);
+	else throw io_exception(msg);
 }
 
 posix::posix()
@@ -104,20 +107,20 @@ inline stream_size_type posix::file_size_i() {
 
 void posix::open_wo(const std::string & path) {
 	m_fd = ::open(path.c_str(), O_RDWR | O_TRUNC | O_CREAT, 0666);
-	if (m_fd == -1) throw_errno();
+	if (m_fd == -1) throw_errno(path);
 	give_advice();
 }
 
 void posix::open_ro(const std::string & path) {
 	m_fd = ::open(path.c_str(), O_RDONLY);
-	if (m_fd == -1) throw_errno();
+	if (m_fd == -1) throw_errno(path);
 	give_advice();
 }
 
 bool posix::try_open_rw(const std::string & path) {
 	m_fd = ::open(path.c_str(), O_RDWR);
 	if (m_fd == -1) {
-		if (errno != ENOENT) throw_errno();
+		if (errno != ENOENT) throw_errno(path);
 		return false;
 	}
 	give_advice();
@@ -126,7 +129,7 @@ bool posix::try_open_rw(const std::string & path) {
 
 void posix::open_rw_new(const std::string & path) {
 	m_fd = ::open(path.c_str(), O_RDWR | O_CREAT, 0666);
-	if (m_fd == -1) throw_errno();
+	if (m_fd == -1) throw_errno(path);
 	give_advice();
 }
 

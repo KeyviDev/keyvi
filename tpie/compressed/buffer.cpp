@@ -24,19 +24,19 @@ namespace tpie {
 
 class stream_buffer_pool::impl {
 public:
-	typedef boost::shared_ptr<compressor_buffer> buffer_t;
+	typedef std::shared_ptr<compressor_buffer> buffer_t;
 
 	const static memory_size_type EXTRA_BUFFERS = 2;
 
 	impl() {
 		m_extraBuffers.reserve(EXTRA_BUFFERS);
 		for (size_t i = 0; i < EXTRA_BUFFERS; ++i) {
-			m_extraBuffers.push_back(buffer_t(new compressor_buffer(block_size())));
+			m_extraBuffers.push_back(std::make_shared<compressor_buffer>(block_size()));
 		}
 	}
 
 	buffer_t allocate_own_buffer() {
-		return buffer_t(new compressor_buffer(block_size()));
+		return std::make_shared<compressor_buffer>(block_size());
 	}
 
 	void release_own_buffer(buffer_t & b) {

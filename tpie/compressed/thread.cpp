@@ -22,7 +22,7 @@
 #include <tpie/compressed/request.h>
 #include <tpie/compressed/buffer.h>
 #include <tpie/compressed/scheme.h>
-
+#include <condition_variable>
 namespace {
 
 class block_header {
@@ -304,8 +304,8 @@ public:
 private:
 	mutex_t m_mutex;
 	std::queue<compressor_request> m_requests;
-	boost::condition_variable m_newRequest;
-	boost::condition_variable m_requestDone;
+	std::condition_variable m_newRequest;
+	std::condition_variable m_requestDone;
 	bool m_done;
 	compression_scheme::type m_preferredCompression;
 
@@ -318,7 +318,7 @@ private:
 namespace {
 
 tpie::compressor_thread the_compressor_thread;
-boost::thread the_compressor_thread_handle;
+std::thread the_compressor_thread_handle;
 bool compressor_thread_already_finished = false;
 
 void run_the_compressor_thread() {
@@ -334,17 +334,17 @@ compressor_thread & the_compressor_thread() {
 }
 
 void init_compressor() {
-	if (the_compressor_thread_handle.get_id() != boost::thread::id()) {
+	if (the_compressor_thread_handle.get_id() != std::thread::id()) {
 		log_debug() << "Attempted to initiate compressor thread twice" << std::endl;
 		return;
 	}
-	boost::thread t(run_the_compressor_thread);
+	std::thread t(run_the_compressor_thread);
 	the_compressor_thread_handle.swap(t);
 	compressor_thread_already_finished = false;
 }
 
 void finish_compressor() {
-	if (the_compressor_thread_handle.get_id() == boost::thread::id()) {
+	if (the_compressor_thread_handle.get_id() == std::thread::id()) {
 		if (compressor_thread_already_finished) {
 			log_debug() << "Compressor thread already finished" << std::endl;
 		} else {
@@ -357,7 +357,7 @@ void finish_compressor() {
 		the_compressor_thread().stop(lock);
 	}
 	the_compressor_thread_handle.join();
-	boost::thread t;
+	std::thread t;
 	the_compressor_thread_handle.swap(t);
 	compressor_thread_already_finished = true;
 }

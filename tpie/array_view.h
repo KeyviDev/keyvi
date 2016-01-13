@@ -28,7 +28,7 @@
 #include <tpie/array.h>
 #include <tpie/array_view_base.h>
 #include <tpie/internal_vector.h>
-#include <boost/type_traits/remove_pointer.hpp>
+#include <type_traits>
 
 namespace tpie {
 
@@ -139,8 +139,8 @@ public:
 
 
 template <typename T>
-array_view<typename boost::remove_pointer<typename std::iterator_traits<T>::pointer>::type > make_array_view(T start, T end) {
-	return array_view<typename boost::remove_pointer<typename std::iterator_traits<T>::pointer>::type>(&*start, &*end);
+array_view<typename std::remove_pointer<typename std::iterator_traits<T>::pointer>::type > make_array_view(T start, T end) {
+	return array_view<typename std::remove_pointer<typename std::iterator_traits<T>::pointer>::type>(&*start, &*end);
 }
 
 template <typename T>

@@ -32,10 +32,9 @@
 #include <tpie/config.h>
 #include <tpie/portability.h>
 #include <typeinfo>
-#include <boost/type_traits/is_pod.hpp>
-#include <boost/type_traits/is_pointer.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 #include <tpie/is_simple_iterator.h>
+#include <array>
 
 namespace tpie {
 
@@ -85,20 +84,17 @@ void unserialize(S & src, foo & v);
 // Library implementations of tpie::serialize and tpie::unserialize.
 ///////////////////////////////////////////////////////////////////////////////
 
-template <bool> struct is_trivially_serializable_enable_if { };
-template <> struct is_trivially_serializable_enable_if<true> {typedef void type;};
-
 template <typename T>
 struct is_trivially_serializable {
 private:
 	template <typename TT>
-	static char magic(TT *, typename is_simple_iterator_enable_if<TT::is_trivially_serializable>::type *_=0);
+	static char magic(TT *, typename std::enable_if<TT::is_trivially_serializable>::type *_=0);
 
 	template <typename TT>
 	static long magic(...);
 public:
 	static bool const value=
-		boost::is_pod<T>::value || sizeof(magic<T>((T*)0))==sizeof(char);
+		std::is_pod<T>::value || sizeof(magic<T>((T*)0))==sizeof(char);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,8 +102,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 template <typename D, typename T>
 void serialize(D & dst, const T & v,
-			   typename boost::enable_if<is_trivially_serializable<T> >::type * = 0,
-			   typename boost::disable_if<boost::is_pointer<T> >::type * = 0) {
+			   typename std::enable_if<is_trivially_serializable<T>::value
+			   && !std::is_pointer<T>::value >::type * = 0) {
 	dst.write((const char *)&v, sizeof(T));
 }
 
@@ -116,8 +112,8 @@ void serialize(D & dst, const T & v,
 ///////////////////////////////////////////////////////////////////////////////
 template <typename S, typename T>
 void unserialize(S & src, T & v,
-				 typename boost::enable_if<is_trivially_serializable<T> >::type * = 0,
-				 typename boost::disable_if<boost::is_pointer<T> >::type * = 0) {
+				 typename std::enable_if<is_trivially_serializable<T>::value
+				 && !std::is_pointer<T>::value>::type * = 0) {
 	src.read((char *)&v, sizeof(T));
 }
 
@@ -129,8 +125,8 @@ namespace bits {
 ///////////////////////////////////////////////////////////////////////////////
 template <typename D, typename T,
 		  bool is_simple_itr=tpie::is_simple_iterator<T>::value,
-		  bool is_pod=boost::is_pod<typename std::iterator_traits<T>::value_type>::value,
-		  bool is_pointer=boost::is_pointer<typename std::iterator_traits<T>::value_type>::value>
+		  bool is_pod=std::is_pod<typename std::iterator_traits<T>::value_type>::value,
+		  bool is_pointer=std::is_pointer<typename std::iterator_traits<T>::value_type>::value>
 struct array_encode_magic {
 	void operator()(D & dst, T start, T end) {
 		using tpie::serialize;
@@ -157,8 +153,8 @@ struct array_encode_magic<D, T, true, true, false> {
 ///////////////////////////////////////////////////////////////////////////////
 template <typename D, typename T,
 		  bool is_simple_itr=tpie::is_simple_iterator<T>::value,
-		  bool is_pod=boost::is_pod<typename std::iterator_traits<T>::value_type>::value,
-		  bool is_pointer=boost::is_pointer<typename std::iterator_traits<T>::value_type>::value>
+		  bool is_pod=std::is_pod<typename std::iterator_traits<T>::value_type>::value,
+		  bool is_pointer=std::is_pointer<typename std::iterator_traits<T>::value_type>::value>
 struct array_decode_magic {
 	void operator()(D & dst, T start, T end) {
 		using tpie::unserialize;
@@ -212,6 +208,42 @@ template <typename D, typename T>
 void unserialize(D & dst, T start, T end) {
 	bits::array_decode_magic<D, T> magic;
 	magic(dst, start, end);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief tpie::serialize for fixed-length C-style arrays of serializable items.
+///////////////////////////////////////////////////////////////////////////////
+template <typename D, typename T, std::size_t size>
+void serialize(D & dst, const T (&x)[size]) {
+	using tpie::serialize;
+	serialize(dst, x, &x[size]);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief tpie::unserialize for fixed-length C-style arrays unserializable items.
+///////////////////////////////////////////////////////////////////////////////
+template <typename S, typename T, std::size_t size>
+void unserialize(S & src, T (&x)[size]) {
+	using tpie::unserialize;
+	unserialize(src, x, &x[size]);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief tpie::serialize for std::arrays of serializable items.
+///////////////////////////////////////////////////////////////////////////////
+template <typename D, typename T, std::size_t size>
+void serialize(D & dst, const std::array<T, size> & v) {
+	using tpie::serialize;
+	serialize(dst, v.begin(), v.end());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief tpie::unserialize for std::arrays of unserializable items.
+///////////////////////////////////////////////////////////////////////////////
+template <typename S, typename T, std::size_t size>
+void unserialize(S & src, std::array<T, size> & v) {
+	using tpie::unserialize;
+	unserialize(src, v.begin(), v.end());
 }
 
 ///////////////////////////////////////////////////////////////////////////////

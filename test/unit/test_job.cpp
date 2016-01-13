@@ -38,7 +38,7 @@ bool repeat_test() {
 	size_t workers = 10;
 	size_t times = 10;
 	tpie::array<size_t> scratch(workers*64, 0);
-	tpie::array<tpie::auto_ptr<test_job> > jobs(workers);
+	tpie::array<tpie::unique_ptr<test_job> > jobs(workers);
 	for (size_t i = 0; i < workers; ++i) {
 		jobs[i].reset(tpie::tpie_new<test_job>(&scratch[64*i]));
 	}

@@ -24,7 +24,9 @@
 /// \file compressed/thread.h  Interface to the compressor thread.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/thread.hpp>
+#include <thread>
+#include <mutex>
+#include <memory>
 #include <tpie/array.h>
 #include <tpie/file_accessor/file_accessor.h>
 #include <tpie/file_accessor/byte_stream_accessor.h>
@@ -38,9 +40,9 @@ class compressor_thread {
 	impl * pimpl;
 
 public:
-	typedef boost::shared_ptr<compressor_buffer> buffer_t;
+	typedef std::shared_ptr<compressor_buffer> buffer_t;
 	typedef file_accessor::byte_stream_accessor<default_raw_file_accessor> file_accessor_t;
-	typedef boost::mutex mutex_t;
+	typedef std::mutex mutex_t;
 
 	static stream_size_type subtract_block_header(stream_size_type dataOffset);
 
@@ -63,7 +65,7 @@ public:
 
 class compressor_thread_lock {
 public:
-	typedef boost::unique_lock<compressor_thread::mutex_t> lock_t;
+	typedef std::unique_lock<compressor_thread::mutex_t> lock_t;
 
 	compressor_thread_lock(compressor_thread & c)
 		: t1(ptime::now())

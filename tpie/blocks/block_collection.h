@@ -24,7 +24,6 @@
 #ifndef _TPIE_BLOCKS_BLOCK_COLLECTION_H
 #define _TPIE_BLOCKS_BLOCK_COLLECTION_H
 
-#include <boost/utility.hpp>
 #include <tpie/tpie.h>
 #include <tpie/file_accessor/file_accessor.h>
 #include <tpie/blocks/block.h>
@@ -49,11 +48,7 @@ public:
 
 	~block_collection();
 
-	#ifdef TPIE_CPP_RVALUE_REFERENCE
-
 	block_collection(const block_collection &) = delete;
-
-	#endif
 
 	/**
 	 * \brief Allocates a new block

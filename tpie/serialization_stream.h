@@ -30,6 +30,7 @@
 #include <tpie/access_type.h>
 #include <tpie/array.h>
 #include <tpie/tempname.h>
+#include <algorithm>
 
 namespace tpie {
 

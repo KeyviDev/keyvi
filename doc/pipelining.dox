@@ -62,7 +62,7 @@ namespace tp = tpie::pipelining;
 template <typename dest_t>
 class hello_world_type : public tp::node {
 public:
-	hello_world_type(dest_t dest): dest(dest) {}
+	hello_world_type(dest_t dest): dest(std::move(dest)) {}
 
 	void push(const size_t & item) {
 		if ((item % 2) == 0)
@@ -143,7 +143,7 @@ public:
 	typedef size_t item_type;
 
 	hello_world_type(dest_t dest)
-		: dest(dest)
+		: dest(std::move(dest))
 	{
 		// The default name is the class name, capitalized,
 		// with underscores replaced by spaces,
@@ -209,7 +209,7 @@ class pull_hello_world_type : public node {
 public:
 	typedef int item_type;
 
-	pull_hello_world_type(const source_t & source) : source(source) {
+	pull_hello_world_type(source_t source) : source(std::move(source)) {
 		add_pull_source(source);
 	}
 
@@ -290,6 +290,9 @@ The method \c fetch takes a required template parameter which is the type of
 data to fetch. Internally, metadata is stored using \c boost::any,
 and the method \c fetch_any fetches metadata just like \c fetch, except it
 returns the \c boost::any object directly without using \c boost::any_cast.
+An optional third argument \c k may be passed as well. This determines the
+maximum distance that the item should be forwarded. This lets the framework
+avoid doing extra work if the data is only needed in the next few nodes.
 
 Using \c forward, a node may forward metadata to its successors in the item flow graph.
 That is, metadata is sent from item sources to item sinks; this is the actor
@@ -333,8 +336,8 @@ public:
 	public:
 		typedef int item_type;
 
-		type(const dest_t & dest, const source_t & src)
-			: dest(dest)
+		type(dest_t dest, source_t src)
+			: dest(std::move(dest))
 			, puller(src.construct())
 		{
 			add_push_destination(dest);
@@ -422,8 +425,8 @@ class reverser_type : public tpie::pipelining::node {
 public:
 	typedef point3d item_type;
 
-	reverser_type(const dest_t & dest)
-		: dest(dest)
+	reverser_type(dest_t dest)
+		: dest(std::move(dest))
 	{
 		add_push_destination(dest);
 		set_name("Reverser",
@@ -464,7 +467,7 @@ class reverser_input_t: public node {
 public:
 	typedef T item_type;
 
-	inline reverser_input_t(const node_token & token, boost::shared_ptr<node> output=boost::shared_ptr<node>())
+	inline reverser_input_t(const node_token & token, std::shared_ptr<node> output=std::shared_ptr<node>())
 		: node(token), m_output(output)
 	{
 		set_minimum_memory(stack<item_type>::memory_usage());
@@ -481,7 +484,7 @@ public:
 	}
 private:
 	stack<item_type> * m_stack;
-	boost::shared_ptr<node> m_output;
+	std::shared_ptr<node> m_output;
 };
 
 template <typename dest_t>
@@ -489,8 +492,8 @@ class reverser_output_t: public node {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	reverser_output_t(const dest_t & dest, const node_token & input_token)
-		: dest(dest)
+	reverser_output_t(dest_t dest, const node_token & input_token)
+		: dest(std::move(dest))
 	{
 		add_dependency(input_token);
 		add_push_destination(dest);
@@ -684,8 +687,8 @@ public:
 	};
 
 	template <typename dest_t>
-	hello_world_type<dest_t> construct(const dest_t & dest) {
-		hello_world_type<dest_t> hw(dest);
+	hello_world_type<dest_t> construct(dest_t && dest) {
+		hello_world_type<dest_t> hw(std::forward<dest_t>(dest));
 		this->init_node(hw);
 		return hw;
 	}

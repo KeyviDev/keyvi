@@ -1,6 +1,6 @@
-// -*- mode: c++; tab-width: 4; indent-tabs-mode: t; c-file-style: "stroustrup"; -*-
+// -*- mode: c++; tab-width: 4; indent-tabs-mode: t; eval: (progn (c-set-style "stroustrup") (c-set-offset 'innamespace 0)); -*-
 // vi:set ts=4 sts=4 sw=4 noet :
-// Copyright 2013, The TPIE development team
+// Copyright 2011, The TPIE development team
 // 
 // This file is part of TPIE.
 // 
@@ -17,27 +17,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with TPIE.  If not, see <http://www.gnu.org/licenses/>
 
-#include <random>
-#include <tpie/tpie.h>
-#include <tpie/hash.h>
+#ifndef __TPIE_BTREE_H__
+#define __TPIE_BTREE_H__
 
-using namespace tpie::hash_bits;
+#include <tpie/btree/base.h>
+#include <tpie/btree/internal_store.h>
+#include <tpie/btree/external_store.h>
+#include <tpie/btree/btree.h>
+#include <tpie/btree/btree_builder.h>
 
-namespace tpie {
-
-namespace hash_bits {
-
-size_t hash_codes[sizeof(size_t)][256];
-
-} // namespace hash_bits
-
-void init_hash() {
-	std::mt19937 rng(9001);
-	std::uniform_int_distribution<size_t> dist(0, std::numeric_limits<size_t>::max());
-
-	for(size_t i = 0; i < sizeof(size_t); ++i)
-		for(size_t j = 0; j < 256; ++j)
-			hash_codes[i][j] = dist(rng);
-}
-
-} // namespace tpie
+#endif //__TPIE_BTREE_H__

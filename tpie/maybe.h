@@ -43,7 +43,11 @@ public:
 	/// \brief If o is constructed throw an exception otherwise do nothing.
 	///////////////////////////////////////////////////////////////////////////////
 	maybe(const maybe<T> & o) : m_constructed(false) {
-		o.assert_not_constructed(); 
+		o.assert_not_constructed();
+	}
+
+	maybe(maybe<T> && o) : m_constructed(false) {
+		o.assert_not_constructed();
 	}
 
 private:
@@ -57,8 +61,15 @@ public:
 	/// \brief If o is constructed throw an exception otherwise return *this.
 	///////////////////////////////////////////////////////////////////////////////
 	maybe & operator=(const maybe<T> &o) {
-		o.assert_not_constructed(); 
-		assert_not_constructed(); 
+		o.assert_not_constructed();
+		assert_not_constructed();
+
+		return *this;
+	}
+
+	maybe & operator==(maybe<T> &o) {
+		o.assert_not_constructed();
+		assert_not_constructed();
 
 		return *this;
 	}
@@ -67,12 +78,11 @@ public:
 	/// \return Whether the object contained is constructed or not.
 	///////////////////////////////////////////////////////////////////////////////
 	bool is_constructed() const {
-		return m_constructed; 
-	}		
+		return m_constructed;
+	}
 
-	#ifdef DOXYGEN
 	///////////////////////////////////////////////////////////////////////////////
-	/// \brief Contains an element of the type given as template parameter and 
+	/// \brief Contains an element of the type given as template parameter and
 	/// disallows copy constructing of the maybe class when the object is allocated.
 	///
 	///
@@ -84,47 +94,40 @@ public:
 	/// \param args The variadic number of arguments to pass to the constructor of
 	///////////////////////////////////////////////////////////////////////////////
 
-	template <typename Args>
-	void construct(Args args);
-	#elif defined(TPIE_CPP_VARIADIC_TEMPLATES) && defined(TPIE_CPP_RVALUE_REFERENCE) && defined(TPIE_CPP_NONE_POD_UNION)
 	template <typename ... T_ARGS>
 	void construct(T_ARGS && ... t) {
-		assert_not_constructed(); 
+		assert_not_constructed();
 
 		new(&object) T(std::forward<T_ARGS>(t)...);
-		m_constructed = true; 
+		m_constructed = true;
 	}
-	#else
-	#include <tpie/maybe.inl>
-	#endif
 
-	#if defined(TPIE_CPP_VARIADIC_TEMPLATES) && defined(TPIE_CPP_RVALUE_REFERENCE) && defined(TPIE_CPP_NONE_POD_UNION)
 	///////////////////////////////////////////////////////////////////////////////
 	/// \return A reference to the object contained.
 	///////////////////////////////////////////////////////////////////////////////
 	T & operator*() {
-		return object; 
+		return object;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	/// \return A const reference to the object contained.
 	///////////////////////////////////////////////////////////////////////////////
 	const T & operator*() const {
-		return object; 
+		return object;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	/// \return A pointer to the object contained.
 	///////////////////////////////////////////////////////////////////////////////
 	T * operator->() {
-		return &object; 
+		return &object;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
 	/// \return A const pointer to the object contained.
 	///////////////////////////////////////////////////////////////////////////////
 	const T * operator->() const {
-		return &object; 
+		return &object;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -132,48 +135,11 @@ public:
 	///////////////////////////////////////////////////////////////////////////////
 	void destruct() {
 		if(!m_constructed)
-			return; 
+			return;
 
-		object.~T(); 
+		object.~T();
 		m_constructed = false;
 	}
-	#else
-	///////////////////////////////////////////////////////////////////////////////
-	/// \return A reference to the object contained.
-	///////////////////////////////////////////////////////////////////////////////
-	T & operator*() {
-		return *object; 
-	}
-
-	///////////////////////////////////////////////////////////////////////////////
-	/// \return A const reference to the object contained.
-	///////////////////////////////////////////////////////////////////////////////
-	const T & operator*() const {
-		return *object; 
-	}
-
-	///////////////////////////////////////////////////////////////////////////////
-	/// \return A pointer to the object contained.
-	///////////////////////////////////////////////////////////////////////////////
-	T * operator->() {
-		return object; 
-	}
-
-	const T * operator->() const {
-		return object; 
-	}
-
-	///////////////////////////////////////////////////////////////////////////////
-	/// \brief Invokes the deconstructor on the object contained.
-	///////////////////////////////////////////////////////////////////////////////
-	void destruct() {
-		if(!m_constructed)
-			return; 
-
-		object->~T(); 
-		m_constructed = false;
-	}
-	#endif
 
 	///////////////////////////////////////////////////////////////////////////////
 	/// \brief Calls the destruct method and destroys the instance.
@@ -182,12 +148,8 @@ public:
 		destruct();
 	}
 private:
-	#if defined(TPIE_CPP_VARIADIC_TEMPLATES) && defined(TPIE_CPP_RVALUE_REFERENCE) && defined(TPIE_CPP_NONE_POD_UNION)
 	union { T object; };
-	#else
-	T *object; 
-	#endif
-	bool m_constructed; 
+	bool m_constructed;
 };
 } // namespace tpie
 

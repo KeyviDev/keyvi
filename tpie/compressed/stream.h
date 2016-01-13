@@ -38,13 +38,92 @@
 
 namespace tpie {
 
+struct open {
+	enum type {
+		/** Open a file for reading only. */
+		read_only =  00000001,
+		/** Open a file for writing only.
+		 * Content is truncated. */
+		write_only = 00000002,
+		/** Neither sequential access nor random access is intended.
+		 * Corresponds to POSIX_FADV_NORMAL. */
+		access_normal = 00000004,
+		/** Random access is intended.
+		 * Corresponds to POSIX_FADV_RANDOM and FILE_FLAG_RANDOM_ACCESS (Win32). */
+		access_random = 00000010,
+		/** Compress some blocks
+		 * according to available resources (time, memory). */
+		compression_normal = 00000020,
+		/** Compress all blocks according to the preferred compression scheme
+		 * which can be set using
+		 * tpie::the_compressor_thread().set_preferred_compression(). */
+		compression_all = 00000040,
+
+		defaults = 0
+	};
+
+	friend inline open::type operator|(open::type a, open::type b)
+	{ return (open::type) ((int) a | (int) b); }
+	friend inline open::type operator&(open::type a, open::type b)
+	{ return (open::type) ((int) a & (int) b); }
+	friend inline open::type operator^(open::type a, open::type b)
+	{ return (open::type) ((int) a ^ (int) b); }
+	friend inline open::type operator~(open::type a)
+	{ return (open::type) (int) ~a; }
+
+	static type translate(access_type accessType, cache_hint cacheHint, compression_flags compressionFlags) {
+		return (type) ((
+
+			(accessType == access_read) ? read_only :
+			(accessType == access_write) ? write_only :
+			defaults) | (
+
+			(cacheHint == tpie::access_normal) ? access_normal :
+			(cacheHint == tpie::access_random) ? access_random :
+			defaults) | (
+
+			(compressionFlags == tpie::compression_normal) ? compression_normal :
+			(compressionFlags == tpie::compression_all) ? compression_all :
+			defaults));
+	}
+
+	static cache_hint translate_cache(open::type openFlags) {
+		const open::type cacheFlags =
+			openFlags & (open::access_normal | open::access_random);
+
+		if (cacheFlags == open::access_normal)
+			return tpie::access_normal;
+		else if (cacheFlags == open::access_random)
+			return tpie::access_random;
+		else if (!cacheFlags)
+			return tpie::access_sequential;
+		else
+			throw tpie::stream_exception("Invalid cache flags supplied");
+	}
+
+	static compression_flags translate_compression(open::type openFlags) {
+		const open::type compressionFlags =
+			openFlags & (open::compression_normal | open::compression_all);
+
+		if (compressionFlags == open::compression_normal)
+			return tpie::compression_normal;
+		else if (compressionFlags == open::compression_all)
+			return tpie::compression_all;
+		else if (!compressionFlags)
+			return tpie::compression_none;
+		else
+			throw tpie::stream_exception("Invalid compression flags supplied");
+	}
+};
+
+
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief  Base class containing the implementation details that are
 /// independent of the item type.
 ///////////////////////////////////////////////////////////////////////////////
 class compressed_stream_base {
 public:
-	typedef boost::shared_ptr<compressor_buffer> buffer_t;
+	typedef std::shared_ptr<compressor_buffer> buffer_t;
 
 protected:
 	struct seek_state {
@@ -67,10 +146,8 @@ protected:
 	virtual void post_open() = 0;
 
 	void open_inner(const std::string & path,
-					access_type accessType,
-					memory_size_type userDataSize,
-					cache_hint cacheHint,
-					int compressionFlags);
+					open::type openFlags,
+					memory_size_type userDataSize);
 
 	compressor_thread & compressor() { return the_compressor_thread(); }
 
@@ -114,7 +191,7 @@ public:
 	const std::string & path() const;
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief  Open a stream.
+	/// \brief  Deprecated interface for opening a named stream.
 	///
 	/// If compressionFlags is compression_none and the file does not already
 	/// exist, no compression will be used when writing.
@@ -124,55 +201,116 @@ public:
 	/// are used instead.
 	///////////////////////////////////////////////////////////////////////////
 	void open(const std::string & path,
-			  access_type accessType = access_read_write,
+			  access_type accessType,
 			  memory_size_type userDataSize = 0,
 			  cache_hint cacheHint=access_sequential,
-			  compression_flags compressionFlags=compression_none);
-
-	///////////////////////////////////////////////////////////////////////////
-	/// \brief  Open an anonymous temporary file for reading and writing.
-	///////////////////////////////////////////////////////////////////////////
-	void open(memory_size_type userDataSize = 0,
-			  cache_hint cacheHint=access_sequential,
-			  compression_flags compressionFlags=compression_none);
-
-	///////////////////////////////////////////////////////////////////////////
-	/// \brief  Open a specific temporary file.
-	///////////////////////////////////////////////////////////////////////////
-	void open(temp_file & file,
-			  access_type accessType = access_read_write,
-			  memory_size_type userDataSize = 0,
-			  cache_hint cacheHint=access_sequential,
-			  compression_flags compressionFlags=compression_none);
-
-	///////////////////////////////////////////////////////////////////////////
-	/// \brief  open()-overload accepting a file name and compression flags.
-	///////////////////////////////////////////////////////////////////////////
-	void open(const std::string & path, compression_flags compressionFlags) {
-		const access_type accessType = access_read_write;
-		const memory_size_type userDataSize = 0;
-		const cache_hint cacheHint = access_sequential;
-		open(path, accessType, userDataSize, cacheHint, compressionFlags);
+			  compression_flags compressionFlags=compression_none)
+	{
+		open(path, open::translate(accessType, cacheHint, compressionFlags), userDataSize);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief  open()-overload accepting just compression flags.
+	/// \brief  Deprecated interface for opening an unnamed temporary stream.
+	///////////////////////////////////////////////////////////////////////////
+	void open(memory_size_type userDataSize,
+			  cache_hint cacheHint=access_sequential,
+			  compression_flags compressionFlags=compression_none) {
+		open(open::translate(access_read_write, cacheHint, compressionFlags), userDataSize);
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Deprecated interface for opening a temporary stream.
+	///////////////////////////////////////////////////////////////////////////
+	void open(temp_file & file,
+			  access_type accessType,
+			  memory_size_type userDataSize = 0,
+			  cache_hint cacheHint=access_sequential,
+			  compression_flags compressionFlags=compression_none) {
+		open(file, open::translate(accessType, cacheHint, compressionFlags), userDataSize);
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Deprecated interface for opening a named stream.
+	///////////////////////////////////////////////////////////////////////////
+	void open(const std::string & path, compression_flags compressionFlags) {
+		const memory_size_type userDataSize = 0;
+		open(path, open::translate(access_read_write, access_sequential, compressionFlags), userDataSize);
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Deprecated interface for opening an unnamed temporary stream.
 	///////////////////////////////////////////////////////////////////////////
 	void open(compression_flags compressionFlags) {
 		const memory_size_type userDataSize = 0;
-		const cache_hint cacheHint = access_sequential;
-		open(userDataSize, cacheHint, compressionFlags);
+		open(open::translate(access_read_write, access_sequential, compressionFlags), userDataSize);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief  open()-overload accepting a temp file and compression flags.
+	/// \brief  Deprecated interface for opening a temporary stream.
 	///////////////////////////////////////////////////////////////////////////
 	void open(temp_file & file, compression_flags compressionFlags) {
-		const access_type accessType = access_read_write;
 		const memory_size_type userDataSize = 0;
-		const cache_hint cacheHint = access_sequential;
-		open(file, accessType, userDataSize, cacheHint, compressionFlags);
+		open(file, open::translate(access_read_write, access_sequential, compressionFlags), userDataSize);
 	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Open and possibly create a stream.
+	///
+	/// The stream is created if it does not exist and opened for reading
+	/// and writing, but this can be changed with open::read_only or
+	/// open::write_only; see below.
+	///
+	/// The flags supplied to openFlags should be a combination of the
+	/// following from \c open::type, OR'ed together:
+	///
+	/// open::read_only
+	///     Open for reading only, and fail if the stream does not exist.
+	///
+	/// open::write_only
+	///     Open for writing only, and truncate the stream if it exists.
+	///
+	/// open::access_normal
+	///     By default, POSIX_FADV_SEQUENTIAL is passed to the open syscall
+	///     to indicate that the OS should optimize for sequential access;
+	///     this flag disables that flag.
+	///
+	/// open::access_random
+	///	    Pass POSIX_FADV_RANDOM to the open syscall to make the OS optimize
+	///	    for random access.
+	///
+	/// open::compression_normal
+	///     Create the stream in compression mode if it does not already exist,
+	///     and compress written blocks according to available resources (for
+	///     instance CPU time and memory).
+	///
+	/// open::compression_all
+	///     Create the stream in compression mode if it does not already exist,
+	///     and compress all written blocks using the preferred compression
+	///     scheme, which can be set using
+	///     tpie::the_compressor_thread().set_preferred_compression().
+	///
+	/// \param path  The path to the file to open
+	/// \param openFlags  A bit-wise combination of the flags; see above.
+	/// \param userDataSize  Required user data capacity in stream header.
+	///////////////////////////////////////////////////////////////////////////
+	void open(const std::string & path, open::type openFlags=open::defaults, memory_size_type userDataSize=0);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Open and create an unnamed temporary stream.
+	///
+	/// \param openFlags  A bit-wise combination of the flags; see above.
+	/// \param userDataSize  Required user data capacity in stream header.
+	///////////////////////////////////////////////////////////////////////////
+	void open(open::type openFlags=open::defaults, memory_size_type userDataSize=0);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Open and possibly create a temporary stream.
+	///
+	/// \param file  The temporary file to open
+	/// \param openFlags  A bit-wise combination of the flags; see above.
+	/// \param userDataSize  Required user data capacity in stream header.
+	///////////////////////////////////////////////////////////////////////////
+	void open(temp_file & file, open::type openFlags=open::defaults, memory_size_type userDataSize=0);
 
 	void close();
 
@@ -254,7 +392,7 @@ protected:
 	/** Number of cheap, unchecked writes we can do next. */
 	memory_size_type m_cachedWrites;
 	/** The anonymous temporary file we have opened (when appropriate). */
-	tpie::auto_ptr<temp_file> m_ownedTempFile;
+	tpie::unique_ptr<temp_file> m_ownedTempFile;
 	/** The temporary file we have opened (when appropriate).
 	 * When m_ownedTempFile.get() != 0, m_tempFile == m_ownedTempFile.get(). */
 	temp_file * m_tempFile;
@@ -582,6 +720,7 @@ private:
 	void truncate_zero() {
 		// No need to flush block
 		m_buffer.reset();
+		m_response.clear_block_info();
 		compressor_thread_lock l(compressor());
 		finish_requests(l);
 		get_buffer(l, 0);

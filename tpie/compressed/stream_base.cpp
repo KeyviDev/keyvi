@@ -33,7 +33,7 @@ compressed_stream_base::compressed_stream_base(memory_size_type itemSize,
 	, m_itemSize(itemSize)
 	, m_cachedReads(0)
 	, m_cachedWrites(0)
-	, m_ownedTempFile(/* empty auto_ptr */)
+	, m_ownedTempFile(/* empty unique_ptr */)
 	, m_tempFile(0)
 	, m_byteStreamAccessor()
 	, m_size(0)
@@ -62,17 +62,24 @@ compressed_stream_base::~compressed_stream_base() {
 	// m_buffer::~shared_ptr()
 	// m_buffers::~stream_buffers()
 	// m_byteStreamAccessor::~byte_stream_accessor()
-	// m_ownedTempFile::~auto_ptr()
+	// m_ownedTempFile::~unique_ptr()
 }
 
 void compressed_stream_base::open_inner(const std::string & path,
-										access_type accessType,
-										memory_size_type userDataSize,
-										cache_hint cacheHint,
-										int compressionFlags)
+										open::type openFlags,
+										memory_size_type userDataSize)
 {
-	m_canRead = accessType == access_read || accessType == access_read_write;
-	m_canWrite = accessType == access_write || accessType == access_read_write;
+	// Parse openFlags
+	const bool readOnly = openFlags & open::read_only;
+	const bool writeOnly = openFlags & open::write_only;
+	if (readOnly && writeOnly)
+		throw tpie::stream_exception("Invalid read/write only flags");
+	m_canRead = !writeOnly;
+	m_canWrite = !readOnly;
+
+	const cache_hint cacheHint = open::translate_cache(openFlags);
+	const compression_flags compressionFlags = open::translate_compression(openFlags);
+
 	m_byteStreamAccessor.open(path, m_canRead, m_canWrite, m_itemSize,
 							  m_blockSize, userDataSize, cacheHint,
 							  compressionFlags);
@@ -131,37 +138,28 @@ const std::string & compressed_stream_base::path() const {
 	return m_byteStreamAccessor.path();
 }
 
-void compressed_stream_base::open(const std::string & path,
-								  access_type accessType /*= access_read_write*/,
-								  memory_size_type userDataSize /*= 0*/,
-								  cache_hint cacheHint/*=access_sequential*/,
-								  compression_flags compressionFlags/*=compression_normal*/)
+void compressed_stream_base::open(const std::string & path, open::type openFlags,
+								  memory_size_type userDataSize /*= 0*/)
 {
 	close();
-	open_inner(path, accessType, userDataSize, cacheHint, compressionFlags);
+	open_inner(path, openFlags, userDataSize);
 }
 
-void compressed_stream_base::open(memory_size_type userDataSize /*= 0*/,
-								  cache_hint cacheHint/*=access_sequential*/,
-								  compression_flags compressionFlags/*=compression_normal*/)
+void compressed_stream_base::open(open::type openFlags,
+								  memory_size_type userDataSize /*= 0*/)
 {
 	close();
 	m_ownedTempFile.reset(tpie_new<temp_file>());
 	m_tempFile = m_ownedTempFile.get();
-	open_inner(m_tempFile->path(), access_read_write, userDataSize,
-			   cacheHint, compressionFlags);
+	open_inner(m_tempFile->path(), openFlags, userDataSize);
 }
 
-void compressed_stream_base::open(temp_file & file,
-								  access_type accessType /*= access_read_write*/,
-								  memory_size_type userDataSize /*= 0*/,
-								  cache_hint cacheHint/*=access_sequential*/,
-								  compression_flags compressionFlags/*=compression_normal*/)
+void compressed_stream_base::open(temp_file & file, open::type openFlags,
+								  memory_size_type userDataSize /*= 0*/)
 {
 	close();
 	m_tempFile = &file;
-	open_inner(m_tempFile->path(), accessType, userDataSize,
-			   cacheHint, compressionFlags);
+	open_inner(m_tempFile->path(), openFlags, userDataSize);
 }
 
 void compressed_stream_base::close() {

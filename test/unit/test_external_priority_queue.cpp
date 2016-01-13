@@ -28,11 +28,11 @@ using namespace std;
 bool basic_test() {
 	//Lets hope the external pq has a small block factor!
 	get_memory_manager().set_limit(32*1024*1024);
-	ami::priority_queue<boost::uint64_t, bit_pertume_compare< std::greater<boost::uint64_t> > > pq(1.0);
+	ami::priority_queue<uint64_t, bit_pertume_compare< std::greater<uint64_t> > > pq(1.0);
 #ifdef NDEBUG
-	const boost::uint64_t size = 350003;
+	const uint64_t size = 350003;
 #else // DEBUG
-	const boost::uint64_t size = 350;
+	const uint64_t size = 350;
 #endif
 	return basic_pq_test(pq, size);
 }
@@ -91,7 +91,7 @@ bool medium_instance() {
 bool large_cycle(){
 	size_t x = 524*1024*1024;
 	get_memory_manager().set_limit(x);
-	ami::priority_queue<boost::uint64_t, bit_pertume_compare< std::greater<boost::uint64_t> > > pq(0.01);
+	ami::priority_queue<uint64_t, bit_pertume_compare< std::greater<uint64_t> > > pq(0.01);
 	return cyclic_pq_test(pq, x / 10, 20000000);
 }
 
@@ -101,8 +101,8 @@ bool large_instance(){
 	get_memory_manager().set_limit(500*1024*1024);
 	double mem_frac = crash_test ? 1.0 : 0.04;
 
-	ami::priority_queue<boost::uint64_t, std::greater<boost::uint64_t> > pq(mem_frac);
-	std::priority_queue<boost::uint64_t, vector<boost::uint64_t>, std::less<boost::uint64_t> > pq2;
+	ami::priority_queue<uint64_t, std::greater<uint64_t> > pq(mem_frac);
+	std::priority_queue<uint64_t, vector<uint64_t>, std::less<uint64_t> > pq2;
 
 	double cycle = crash_test ? 20000000000.0 : 50000000.0;
 	const TPIE_OS_OFFSET iterations=500000000;
@@ -111,7 +111,7 @@ bool large_instance(){
 		progress.step();
 		double i = static_cast<double>(j);
 		double th = (cos(i*2.0*PI/cycle)+1.0)*(RAND_MAX/2);
-		if (!crash_test && (boost::uint64_t)pq.size() != (boost::uint64_t)pq2.size()) return false;
+		if (!crash_test && (uint64_t)pq.size() != (uint64_t)pq2.size()) return false;
 		if (!crash_test && pq.empty() != pq2.empty()) return false;
 
 		if (!crash_test && !pq.empty() && pq.top()!=pq2.top()) {
@@ -120,7 +120,7 @@ bool large_instance(){
 			return false;
 		}
 		if (rand()<th) {
-			boost::uint64_t r = rand();
+			uint64_t r = rand();
 			pq.push(r);
 			if (!crash_test) pq2.push(r);
 		} else {
@@ -233,7 +233,7 @@ bool very_large_test() {
 		const uint64_t size=base+base+prime;
 		uint64_t nn=0;
 		uint64_t ext=0;
-		ami::priority_queue<boost::uint64_t> pq;
+		ami::priority_queue<uint64_t> pq;
 		tpie::progress_indicator_arrow pi("Test", size+size);
 		pi.init(size+size);
 		for (uint64_t i=0; i < prime; ++i) {
@@ -282,7 +282,7 @@ bool parameter_test(double kb, double blockSizeKB) {
 template <typename T>
 bool remove_group_buffer_test(memory_size_type mmAvail, float blockFact, stream_size_type items, stream_size_type iterations) {
 	log_debug() << "blockFact = " << blockFact << "\nmmAvail = " << mmAvail << endl;
-	ami::priority_queue<boost::uint64_t, bit_pertume_compare< std::greater<boost::uint64_t> > > pq(mmAvail, blockFact);
+	ami::priority_queue<uint64_t, bit_pertume_compare< std::greater<uint64_t> > > pq(mmAvail, blockFact);
 	return cyclic_pq_test(pq, items, iterations);
 }
 

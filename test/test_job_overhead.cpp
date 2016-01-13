@@ -18,10 +18,11 @@
 // along with TPIE.  If not, see <http://www.gnu.org/licenses/>
 
 #include <tpie/tpie.h>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <tpie/unittest.h>
 #include <tpie/job.h>
 #include <tpie/sysinfo.h>
 #include <boost/lexical_cast.hpp>
+using namespace tpie;
 
 struct simple_job : public tpie::job {
 	size_t jobs;
@@ -46,12 +47,12 @@ int main(int argc, char ** argv) {
 		return 1;
 	}
 	size_t jobs = boost::lexical_cast<size_t>(argv[1]);
-	boost::posix_time::ptime start=boost::posix_time::microsec_clock::local_time();
+	test_time start=test_now();
 	simple_job j(jobs);
 	j.enqueue();
 	j.join();
-	boost::posix_time::ptime end=boost::posix_time::microsec_clock::local_time();
-	std::cout << "Running " << jobs << " jobs took " << end-start << std::endl;
+	test_time end=test_now();
+	std::cout << "Running " << jobs << " jobs took " << test_millisecs(start, end) << "ms" << std::endl;
 	tpie::tpie_finish();
 	return 0;
 }

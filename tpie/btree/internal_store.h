@@ -26,6 +26,7 @@
 #include <cstddef>
 
 namespace tpie {
+namespace bbits {
 
 /**
  * \brief Storage used for an internal btree. Note that a user of a btree should
@@ -33,18 +34,19 @@ namespace tpie {
  *
  * \tparam T the type of value stored
  * \tparam A the type of augmentation
- * \tparam K the functor used to extract the key from a given value
  * \tparam a the minimum fanout of a node
  * \tparam b the maximum fanout of a node
  */
 template <typename T,
-		  typename A=empty_augment,
-		  typename K=identity_key<T>,
-		  std::size_t a=2,
-		  std::size_t b=4
+		  typename A,
+		  std::size_t a_,
+		  std::size_t b_
 		  >
-class btree_internal_store {
+class internal_store {
 public:
+	static const size_t a = a_?a_:2;
+	static const size_t b = b_?b_:4;
+	
 	/**
 	 * \brief Type of value of items stored
 	 */
@@ -55,28 +57,37 @@ public:
 	 */
 	typedef A augment_type;
 
-	/**
-	 * \brief Type of functer used to extract a key from a value
-	 */
-	typedef K key_extract_type;
-
-	/**
-	 * \brief Type of key
-	 */
-	typedef typename K::value_type key_type;
 
 	typedef size_t size_type;
+
+
+	internal_store(const internal_store & o) = delete;
+	internal_store & operator=(const internal_store & o) = delete;
+
+	internal_store(internal_store && o)
+		: m_root(o.m_root)
+		, m_height(o.m_height)
+		, m_size(o.m_size) {
+		o.m_root = nullptr;
+		o.m_size = 0;
+		o.m_height = 0;
+	}
+		
+	internal_store & operator=(internal_store && o) {
+		this->~internal_store();
+		new (this) internal_store(o);
+		return this;
+	}
 	
+private:	
 	/**
 	 * \brief Construct a new empty btree storage
 	 */
-	btree_internal_store(K key_extract=K()): 
-		m_root(NULL), key_extract(key_extract),
-		m_height(0), m_size(0) {}
+	explicit internal_store(): 
+		m_root(nullptr), m_height(0), m_size(0) {}
 
-private:
+	
 	struct internal_content {
-		key_type min_key;
 		void * ptr;
 		A augment;
 	};
@@ -93,12 +104,29 @@ private:
 
 	typedef internal * internal_type;
 	typedef leaf * leaf_type;
+	
+	void dispose(void * node, size_t depth) {
+		if (depth + 1 == m_height) {
+			delete static_cast<leaf *>(node);
+			return;
+		}
+		internal * in = static_cast<internal*>(node);
+		for (size_t i=0; i != in->count; ++i)
+			dispose(in->values[i].ptr, depth + 1);
+		delete in;
+	}
+	
+	~internal_store() {
+		if (!m_root || !m_height) return;
+		dispose(m_root, 0);
+		m_root = nullptr;
+	}
+	
+	static constexpr size_t min_internal_size() {return a;}
+	static constexpr size_t max_internal_size() {return b;}
 
-	static size_t min_internal_size() {return a;}
-	static size_t max_internal_size() {return b;}
-
-	static size_t min_leaf_size() {return a;}
-	static size_t max_leaf_size() {return b;}
+	static constexpr size_t min_leaf_size() {return a;}
+	static constexpr size_t max_leaf_size() {return b;}
 	
 	void move(internal_type src, size_t src_i,
 			  internal_type dst, size_t dst_i) {
@@ -122,7 +150,7 @@ private:
 		node->values[i].ptr = c;
 	}
 
-	T & get(leaf_type l, size_t i) const {
+	const T & get(leaf_type l, size_t i) const {
 		return l->values[i];
 	}
 
@@ -148,26 +176,6 @@ private:
 
 	void set_count(leaf_type node, size_t i) {
 		node->count = i;
-	}
-
-	key_type min_key(internal_type node, size_t i) const {
-		return node->values[i].min_key;
-	}
-
-	key_type min_key(leaf_type node, size_t i) const {
-		return key_extract(node->values[i]);
-	}
-
-	key_type min_key(T v) const {
-		return key_extract(v);
-	}
-
-	key_type min_key(internal_type v) const {
-		return min_key(v, 0);
-	}
-
-	key_type min_key(leaf_type v) const {
-		return min_key(v, 0);
 	}
 
 	leaf_type create_leaf() {return new leaf();}
@@ -197,30 +205,15 @@ private:
 		return static_cast<leaf_type>(node->values[i].ptr);
 	}
 
-	size_t index(leaf_type child, internal_type node) const {
+	size_t index(void * child, internal_type node) const {
 		for (size_t i=0; i < node->count; ++i)
 			if (node->values[i].ptr == child) return i;
-		tp_assert(false, "Leaf not found");
+		tp_assert(false, "Not found");
 		tpie_unreachable();
 	}
 
-	size_t index(internal_type child, internal_type node) const {
-		for (size_t i=0; i < node->count; ++i)
-			if (node->values[i].ptr == child) return i;
-		tp_assert(false, "Node nout found");
-		tpie_unreachable();
-	}
-
-	void set_augment(leaf_type l, internal_type p, augment_type ag) {
+	void set_augment(void * l, internal_type p, augment_type ag) {
 		size_t idx=index(l, p);
-		p->values[idx].min_key = min_key(l);
-		p->values[idx].augment = ag;
-		
-	}
-
-	void set_augment(internal_type l, internal_type p, augment_type ag) {
-		size_t idx=index(l, p);
-		p->values[idx].min_key = min_key(l);
 		p->values[idx].augment = ag;
 	}
 
@@ -245,7 +238,6 @@ private:
 	}
 
 	void * m_root;
-	K key_extract;
 	size_t m_height;
 	size_t m_size;
 
@@ -255,9 +247,18 @@ private:
 	template <typename>
 	friend class btree_iterator;
 
-	template <typename, typename, typename>
-	friend class btree;
+	template <typename, typename>
+	friend class bbits::tree;
+
+	template <typename, typename>
+	friend class bbits::tree_state;
+
+    template<typename, typename>
+    friend class bbits::builder;
+
+	
 };
 
+} //namespace bbits
 } //namespace tpie
 #endif /*_TPIE_BTREE_INTERNAL_STORE_H_*/

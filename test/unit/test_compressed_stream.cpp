@@ -869,6 +869,86 @@ static bool write_peek_test(size_t n) {
 	return true;
 }
 
+void create_file(const std::string & path) {
+	tpie::file_stream<int> fs;
+	fs.open(path, tpie::open::write_only);
+	fs.write(42);
+	fs.close();
+}
+
+/* bool read_only_test() {
+	{
+		bool caughtException = false;
+		tpie::temp_file tf;
+		create_file(tf.path()); // temp_file doesn't actually create the file
+
+		tpie::file_stream<int> fs;
+		fs.open(tf.path(), tpie::open::read_only);
+
+		try {
+			fs.write(42);
+			fs.close();
+		} catch (tpie::io_exception e) {
+			caughtException = true;
+		}
+
+		if (!caughtException) {
+			tpie::log_error() << "Didn't throw on write() for named file" << std::endl;
+			return false;
+		}
+	}
+	{
+		tpie::temp_file tf;
+		create_file(tf.path()); // temp_file doesn't actually create the file
+		bool caughtException = false;
+		tpie::file_stream<int> fs;
+		fs.open(tf, tpie::open::read_only);
+		try {
+			fs.write(42);
+		} catch (tpie::io_exception) {
+			caughtException = true;
+		}
+		if (!caughtException) {
+			tpie::log_error() << "Didn't throw on write() for temp file" << std::endl;
+			return false;
+		}
+	}
+	return true;
+} */
+
+bool write_only_test() {
+	bool success = true;
+	{
+		tpie::temp_file tf;
+		{
+			tpie::file_stream<int> fs;
+			fs.open(tf);
+			fs.write(42);
+		}
+		tpie::file_stream<int> fs;
+		fs.open(tf.path(), tpie::open::write_only);
+		if (fs.size() != 0) {
+			tpie::log_error() << "Didn't truncate named file" << std::endl;
+			success = false;
+		}
+	}
+	{
+		tpie::temp_file tf;
+		{
+			tpie::file_stream<int> fs;
+			fs.open(tf);
+			fs.write(42);
+		}
+		tpie::file_stream<int> fs;
+		fs.open(tf, tpie::open::write_only);
+		if (fs.size() != 0) {
+			tpie::log_error() << "Didn't truncate temp file" << std::endl;
+			success = false;
+		}
+	}
+	return success;
+}
+
 template <tpie::compression_flags flags>
 tpie::tests & add_tests(tpie::tests & t, std::string suffix) {
 	typedef tests<flags> T;
@@ -909,5 +989,7 @@ int main(int argc, char ** argv) {
 		.test(backwards_file_stream_test, "backwards_fs", "n", static_cast<size_t>(1 << 23))
 		.test(odd_block_size_test, "odd_block_size")
 		.test(write_peek_test, "write_peek", "n", static_cast<size_t>(1 << 23))
+		/* .test(read_only_test, "read_only") */
+		.test(write_only_test, "write_only")
 		;
 }

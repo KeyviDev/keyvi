@@ -27,6 +27,7 @@
 #include <deque>
 #include <algorithm>
 #include <tpie/file_accessor/file_accessor.h>
+#include <list>
 
 using namespace tpie;
 using namespace tpie::blocks;

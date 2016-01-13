@@ -19,9 +19,8 @@
 
 #include <tpie/pipelining/pipeline.h>
 #include <tpie/pipelining/node.h>
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 #include <iostream>
-#include <boost/unordered_set.hpp>
 #include <tpie/pipelining/runtime.h>
 
 namespace {
@@ -50,7 +49,7 @@ namespace pipelining {
 
 namespace bits {
 
-typedef boost::unordered_map<const node *, size_t> nodes_t;
+typedef std::unordered_map<const node *, size_t> nodes_t;
 
 void pipeline_base::plot_impl(std::ostream & out, bool full) {
 	typedef tpie::pipelining::bits::node_map::id_t id_t;
@@ -58,7 +57,7 @@ void pipeline_base::plot_impl(std::ostream & out, bool full) {
 	node_map::ptr nodeMap = m_nodeMap->find_authority();
 	const node_map::relmap_t & relations = nodeMap->get_relations();
 	
-	boost::unordered_map<id_t, id_t> repr;
+	std::unordered_map<id_t, id_t> repr;
 	if (!full) {
 	 	for (node_map::relmapit i = relations.begin(); i != relations.end(); ++i) {
 			id_t s = i->first;
@@ -74,6 +73,9 @@ void pipeline_base::plot_impl(std::ostream & out, bool full) {
 		if (repr.count(i->first)) continue;
 		if (!full && (nodeMap->get(i->first)->get_plot_options() & node::PLOT_BUFFERED))
 			out << '"' << name(nodeMap, i->first) << "\" [shape=box];\n";
+		
+		if (!full && (nodeMap->get(i->first)->get_plot_options() & node::PLOT_PARALLEL))
+			out << '"' << name(nodeMap, i->first) << "\" [shape=polygon];\n";
 		else
 			out << '"' << name(nodeMap, i->first) << "\";\n";
 	}
@@ -102,10 +104,12 @@ void pipeline_base::plot_impl(std::ostream & out, bool full) {
 	out << '}' << std::endl;
 }
 
-void pipeline_base::operator()(stream_size_type items, progress_indicator_base & pi, const memory_size_type initialMemory) {
+void pipeline_base::operator()(stream_size_type items, progress_indicator_base & pi,
+							   const memory_size_type initialMemory,
+							   const char * file, const char * function) {
 	node_map::ptr map = m_nodeMap->find_authority();
 	runtime rt(map);
-	rt.go(items, pi, initialMemory);
+	rt.go(items, pi, initialMemory, file, function);
 
 	/*
 	typedef std::vector<phase> phases_t;
@@ -201,8 +205,12 @@ void pipeline_base::order_before(pipeline_base & other) {
 	}
 }
 
+
+	
 } // namespace bits
 
+pipeline * pipeline::m_current = NULL;
+	
 void pipeline::output_memory(std::ostream & o) const {
 	bits::node_map::ptr nodeMap = p->get_node_map()->find_authority();
 	for (bits::node_map::mapit i = nodeMap->begin(); i != nodeMap->end(); ++i) {

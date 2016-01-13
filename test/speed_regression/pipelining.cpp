@@ -46,8 +46,8 @@ static inline void usage() {
 template <typename dest_t>
 struct number_generator_t : public node {
 	typedef typename dest_t::item_type item_type;
-	inline number_generator_t(const dest_t & dest, size_t count)
-		: dest(dest)
+	inline number_generator_t(dest_t dest, size_t count)
+		: dest(std::move(dest))
 		, count(count)
 	{
 		add_push_destination(dest);
@@ -79,7 +79,7 @@ private:
 inline static void do_write(size_t count) {
 	file_stream<test_t> s;
 	s.open("tmp");
-	pipeline p = pipe_begin<factory_1<number_generator_t, size_t> >(count) | output(s);
+	pipeline p = pipe_begin<factory<number_generator_t, size_t> >(count) | output(s);
 	p();
 }
 
@@ -87,7 +87,7 @@ inline static test_t do_read() {
 	test_t res = 0;
 	file_stream<test_t> s;
 	s.open("tmp");
-	pipeline p = input(s) | pipe_end<termfactory_1<number_sink_t, test_t &> >(termfactory_1<number_sink_t, test_t &>(res));
+	pipeline p = input(s) | pipe_end<termfactory<number_sink_t, test_t &> >(res);
 	p();
 	return res;
 }

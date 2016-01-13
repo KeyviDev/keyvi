@@ -19,15 +19,17 @@
 
 #include "common.h"
 #include <tpie/tpie.h>
-#include <tpie/btree/internal_store.h>
-#include <tpie/btree/external_store.h>
-#include <tpie/btree/btree.h>
+#include <tpie/btree.h>
 #include <tpie/tempname.h>
 #include <algorithm>
 #include <set>
 #include <map>
+#include <numeric>
 using namespace tpie;
 using namespace std;
+
+template <typename ... TT>
+class TA {};
 
 template <typename node_t, typename iter_t> 
 bool compare(node_t & n, iter_t & i, iter_t end) {
@@ -55,29 +57,26 @@ bool compare(tree_t & t, set_t & s) {
 	return compare(node, iter, s.end()) && iter == s.end();
 }
 
-template<typename store_constructor>
-bool basic_test(store_constructor constructor) {
-	btree<typename store_constructor::build_type> tree(constructor.construct());
+template<typename ... TT, typename ... A>
+bool basic_test(TA<TT...>, A && ... a) {
+	btree<int, TT...> tree(std::forward<A>(a)...);
 	set<int> tree2;
 	
-	std::vector<int> x;
-    for (int i=0; i < 1234; ++i) {
-        x.push_back(i);
-	}
+	std::vector<int> x(12); //34);
+	std::iota(x.begin(), x.end(), 0);
 	std::random_shuffle(x.begin(), x.end());
-	
-	for (size_t i=0; i < x.size(); ++i) {
-		tree.insert(x[i]);
-		tree2.insert(x[i]);
+
+	for (size_t v: x) {
+		tree.insert(v);
+		tree2.insert(v);
 		TEST_ENSURE(compare(tree, tree2), "Compare failed on during insert stage.");
 		TEST_ENSURE_EQUALITY(tree2.size(), tree.size(), "The tree has the wrong size during insert stage.");
 	}
 
 	std::random_shuffle(x.begin(), x.end());
-	
-	for (size_t i=0; i < x.size(); ++i) {
-		tree.erase(x[i]);
-		tree2.erase(x[i]);
+	for (size_t v: x) {
+		tree.erase(v);
+		tree2.erase(v);
 		TEST_ENSURE(compare(tree, tree2), "Compare failed on during erase stage.");
 		TEST_ENSURE_EQUALITY(tree2.size(), tree.size(), "The tree has the wrong size during erase stage.");
 	}
@@ -85,9 +84,9 @@ bool basic_test(store_constructor constructor) {
 	return true;
 }
 
-template<typename store_constructor>
-bool iterator_test(store_constructor constructor) {
-	btree<typename store_constructor::build_type> tree(constructor.construct());
+template<typename ... TT, typename ... A>
+bool iterator_test(TA<TT...>, A && ... a) {
+	btree<int, TT...> tree(std::forward<A>(a)...);
 	set<int> tree2;
 	
 	std::vector<int> x;
@@ -102,11 +101,11 @@ bool iterator_test(store_constructor constructor) {
 		if (tree.size() != tree2.size()) return false;
 	}
 
-	typename btree<typename store_constructor::build_type>::iterator b1 = tree.begin();
+	auto b1 = tree.begin();
 	set<int>::iterator b2 = tree2.begin();
-	typename btree<typename store_constructor::build_type>::iterator e1 = tree.end();
+	auto e1 = tree.end();
 	set<int>::iterator e2 = tree2.end();
-	typename btree<typename store_constructor::build_type>::iterator i1 = b1;
+	auto i1 = b1;
 	set<int>::iterator i2 = b2;
 	
 	while (true) {
@@ -132,6 +131,9 @@ template <typename T>
 class uncomparable {
 public:
 	T value;
+	friend std::ostream & operator<<(std::ostream & o, const uncomparable & u) {
+		return o << u.value;
+	}
 private:
 	bool operator <(const T & other) const;
 	bool operator <=(const T & other) const;
@@ -163,15 +165,18 @@ struct item {
 };
 
 struct key_extract {
-	typedef uncomparable<int> value_type;
-	value_type operator()(const item & i) const {return i.key;}
+	uncomparable<int> operator()(const item & i) const {return i.key;}
 };
 
-template<typename store_constructor>
-bool key_and_comparator_test(store_constructor constructor) {
+template<typename ... TT, typename ... A>
+bool key_and_comparator_test(TA<TT...>, A && ... a) {
 	std::greater<int> c1;
 	comparator<std::greater<int> > comp(c1);
-	btree<typename store_constructor::build_type, comparator<std::greater<int> > > tree(constructor.construct(), comp);
+	btree<
+		item,
+		btree_key<key_extract>,
+		btree_comp<comparator<std::greater<int> > >,
+		TT...> tree(std::forward<A>(a)..., comp);
 	std::map<uncomparable<int>, int, comparator<std::greater<int> > > tree2(comp);
 	
 	std::vector<item> x;
@@ -190,8 +195,8 @@ bool key_and_comparator_test(store_constructor constructor) {
 		tree2[x[i].key] = x[i].value;
 	}
 
-	typename btree<typename store_constructor::build_type>::iterator e1 = tree.end();
-	typename btree<typename store_constructor::build_type>::iterator i1 = tree.begin();
+	auto e1 = tree.end();
+	auto i1 = tree.begin();
 	map<uncomparable<int>, int>::iterator i2 = tree2.begin();
 	while (i1 != e1) {
 		if (i1->key.value != i2->first.value ||
@@ -282,21 +287,21 @@ void print(btree_node<S> & n) {
 	std::cout << ")";
 }
 
-template<typename store_constructor>
-bool augment_test(store_constructor constructor) {
-	std::less<int> c;
-	ss_augmenter a;
-	btree<typename store_constructor::build_type, std::less<int>, ss_augmenter> tree(constructor.construct(), c, a);
+template<typename ... TT, typename ... A>
+bool augment_test(TA<TT...>, A && ... a) {
+	default_comp c;
+	ss_augmenter au;
+	btree<int, btree_augment<ss_augmenter>, TT...> tree(std::forward<A>(a)..., c, au);
 	std::vector<int> x;
     for (int i=0; i < 1234; ++i) x.push_back(i);
 	std::random_shuffle(x.begin(), x.end());
 	for (size_t i=0; i < x.size(); ++i) {
 		tree.insert(x[i]);
-		btree_node<typename store_constructor::build_type> n=tree.root();
+		auto n=tree.root();
 	}
 
 	std::sort(x.begin(), x.end());
-	typename btree<typename store_constructor::build_type>::iterator i1 = tree.begin();
+	auto i1 = tree.begin();
 	size_t sum=0;
 	for (size_t i=0; i < x.size(); ++i) {
 		if (rank_sum(i1) != ss_augment(i, sum)) return false;
@@ -322,63 +327,155 @@ bool augment_test(store_constructor constructor) {
 	return true;
 }
 
-template <typename T>
-struct internal_store_constructor {
-	typedef T build_type;
+template<typename ... TT, typename ... A>
+bool build_test(TA<TT...>, A && ... a) {
+    default_comp c;
+    ss_augmenter au;
+    btree_builder<int, btree_augment<ss_augmenter>, TT...> builder(std::forward<A>(a)..., c, au);
+	set<int> tree2;
 
-	build_type construct() {
-		return build_type();
+	for (size_t i=0; i < 50000; ++i) {
+		builder.push(i);
+		tree2.insert(i);
 	}
-};
+
+	auto tree = builder.build();
+    TEST_ENSURE_EQUALITY(tree2.size(), tree.size(), "The tree has the wrong size");
+    TEST_ENSURE(compare(tree, tree2), "Compare failed");
+
+	return true;
+}
+
+
+template<typename ... TT, typename ... A>
+bool unordered_test(TA<TT...>, A && ... a) {
+	struct item {
+		size_t v;
+		bool operator==(const item & o) const noexcept {return v == o.v;}
+		bool operator!=(const item & o) const noexcept {return v != o.v;}
+	};
+	
+    btree_builder<item, btree_unordered, TT...> builder(std::forward<A>(a)...);
+	std::vector<item> tree2;
+
+	for (size_t i=0; i < 50000; ++i) {
+		builder.push(item{i});
+		tree2.push_back(item{i});
+	}
+
+	auto tree = builder.build();
+    TEST_ENSURE_EQUALITY(tree2.size(), tree.size(), "The tree has the wrong size");
+    TEST_ENSURE(compare(tree, tree2), "Compare failed");
+
+	return true;
+}
+
+template<typename ... TT, typename ... A>
+bool bound_test(TA<TT...>, A && ... a) {
+	btree<int, TT...>  tree(std::forward<A>(a)...);
+	set<int> tree2;
+
+	std::vector<int> x;
+    for (int i=0; i < 1234; ++i) {
+        x.push_back(i);
+	}
+	std::random_shuffle(x.begin(), x.end());
+
+	for (size_t i=0; i < x.size(); ++i) {
+		tree.insert(x[i]);
+		tree2.insert(x[i]);
+
+		int r1 = (x.size() * 23) % x.size();
+		int r2 = (x.size() * 61) % x.size();
+
+		TEST_ENSURE((tree.lower_bound(r1) == tree.end()) == (tree2.lower_bound(r1) == tree2.end()), "Lower bound compare failed during insert stage");
+		TEST_ENSURE(tree.lower_bound(r1) == tree.end() || *tree.lower_bound(r1) ==  *tree2.lower_bound(r1), "Lower bound compare failed during insert stage.");
+
+		TEST_ENSURE((tree.upper_bound(r2) == tree.end()) == (tree2.upper_bound(r2) == tree2.end()), "Upper bound compare failed during insert stage");
+		TEST_ENSURE(tree.upper_bound(r2) == tree.end() || *tree.upper_bound(r2) ==  *tree2.upper_bound(r2), "Upper bound compare failed during insert stage.");
+	}
+
+	std::random_shuffle(x.begin(), x.end());
+
+	for (size_t i=0; i < x.size(); ++i) {
+		tree.erase(x[i]);
+		tree2.erase(x[i]);
+
+		int r1 = (x.size() * 23) % x.size();
+		int r2 = (x.size() * 61) % x.size();
+
+		TEST_ENSURE((tree.lower_bound(r1) == tree.end()) == (tree2.lower_bound(r1) == tree2.end()), "Lower bound compare failed during insert stage");
+		TEST_ENSURE(tree.lower_bound(r1) == tree.end() || *tree.lower_bound(r1) ==  *tree2.lower_bound(r1), "Lower bound compare failed during insert stage.");
+
+		TEST_ENSURE((tree.upper_bound(r2) == tree.end()) == (tree2.upper_bound(r2) == tree2.end()), "Upper bound compare failed during insert stage");
+		TEST_ENSURE(tree.upper_bound(r2) == tree.end() || *tree.upper_bound(r2) ==  *tree2.upper_bound(r2), "Upper bound compare failed during insert stage.");
+	}
+
+	return true;
+}
+
 
 bool internal_basic_test() {
-	return basic_test(internal_store_constructor<btree_internal_store<int> >());
+	return basic_test(TA<btree_internal>());
 }
 
 bool internal_iterator_test() {
-	return iterator_test(internal_store_constructor<btree_internal_store<int> >());
+	return iterator_test(TA<btree_internal>());
 }
 
 bool internal_key_and_comparator_test() {
-	return key_and_comparator_test(internal_store_constructor<btree_internal_store<item, empty_augment, key_extract> >());
+	return key_and_comparator_test(TA<btree_internal>());
 }
 
 bool internal_augment_test() {
-	return augment_test(internal_store_constructor<btree_internal_store<int, ss_augment> >());
+	return augment_test(TA<btree_internal>());
 }
 
-template <typename T>
-struct external_store_constructor {
-	typedef T build_type;
-	std::string path;
+bool internal_build_test() {
+	return build_test(TA<btree_internal>());
+}
 
-	external_store_constructor(std::string path) : path(path) {}
+bool internal_static_test() {
+	return build_test(TA<btree_internal, btree_static>());
+}
 
-	build_type construct() {
-		return build_type(path);
-	}
-};
+bool internal_unordered_test() {
+	return unordered_test(TA<btree_internal>());
+}
+
+bool internal_bound_test() {
+	return bound_test(TA<btree_internal>());
+}
 
 bool external_basic_test() {
 	temp_file tmp;
-	return basic_test(external_store_constructor<btree_external_store<int> >(tmp.path()));
+	return basic_test(TA<btree_external>(), tmp.path());
 }
 
 bool external_iterator_test() {
 	temp_file tmp;
-	return iterator_test(external_store_constructor<btree_external_store<int> >(tmp.path()));
+	return iterator_test(TA<btree_external>(), tmp.path());
 }
 
 bool external_key_and_comparator_test() {
 	temp_file tmp;
-	return key_and_comparator_test(external_store_constructor<btree_external_store<item, empty_augment, key_extract> >(tmp.path()));
+	return key_and_comparator_test(TA<btree_external>(), tmp.path());
 }
 
 bool external_augment_test() {
 	temp_file tmp;
-	return augment_test(external_store_constructor<btree_external_store<int, ss_augment> >(tmp.path()));
+	return augment_test(TA<btree_external>(), tmp.path());
 }
 
+bool external_build_test() {
+    temp_file tmp;
+    return build_test(TA<btree_external>(), tmp.path());
+}
+
+bool external_bound_test() {
+	temp_file tmp;
+	return bound_test(TA<btree_external>(), tmp.path());
+}
 
 int main(int argc, char **argv) {
 	return tpie::tests(argc, argv)
@@ -386,10 +483,16 @@ int main(int argc, char **argv) {
 		.test(internal_iterator_test, "internal_iterator")
 		.test(internal_key_and_comparator_test, "internal_key_and_compare")
 		.test(internal_augment_test, "internal_augment")
+        .test(internal_build_test, "internal_build")
+		.test(internal_static_test, "internal_static")
+		.test(internal_unordered_test, "internal_unordered")
+		.test(internal_bound_test, "internal_bound")
 		.test(external_basic_test, "external_basic")
 		.test(external_iterator_test, "external_iterator")
 		.test(external_key_and_comparator_test, "external_key_and_compare")
-		.test(external_augment_test, "external_augment");
+		.test(external_augment_test, "external_augment")
+        .test(external_build_test, "external_build")
+		.test(external_bound_test, "external_bound");
 }
 
 

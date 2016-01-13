@@ -25,7 +25,7 @@
 
 #include <tpie/tpie.h>
 #include <tpie/pipelining.h>
-#include <boost/random.hpp>
+#include <random>
 #include <tpie/file_stream.h>
 #include <iostream>
 #include <sstream>
@@ -50,7 +50,7 @@ public:
 		typedef int item_type;
 
 		type(dest_t dest, src_pipe_t srcpipe)
-			: dest(dest)
+			: dest(std::move(dest))
 			, src(srcpipe.factory.construct())
 		{
 			add_push_destination(dest);
@@ -64,9 +64,9 @@ public:
 };
 
 template <typename src_pipe_t>
-inline pipe_middle<tempfactory_1<add_t<src_pipe_t>, src_pipe_t> >
-add(src_pipe_t srcpipe) {
-	return tempfactory_1<add_t<src_pipe_t>, src_pipe_t>(srcpipe);
+pipe_middle<tempfactory<add_t<src_pipe_t>, src_pipe_t> >
+add(src_pipe_t && srcpipe) {
+	return tempfactory<add_t<src_pipe_t>, src_pipe_t>(std::forward<src_pipe_t>(srcpipe));
 }
 
 void go() {
