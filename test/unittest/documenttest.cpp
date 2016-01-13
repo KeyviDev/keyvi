@@ -28,6 +28,7 @@ void ParseCheck(DocumentType& doc) {
     typedef typename DocumentType::ValueType ValueType;
 
     EXPECT_FALSE(doc.HasParseError());
+    EXPECT_TRUE(static_cast<ParseResult>(doc));
 
     EXPECT_TRUE(doc.IsObject());
 
@@ -62,8 +63,8 @@ void ParseCheck(DocumentType& doc) {
     const ValueType& a = doc["a"];
     EXPECT_TRUE(a.IsArray());
     EXPECT_EQ(4u, a.Size());
-    for (SizeType i = 0; i < 4; i++)
-        EXPECT_EQ(i + 1, a[i].GetUint());
+    for (SizeType j = 0; j < 4; j++)
+        EXPECT_EQ(j + 1, a[j].GetUint());
 }
 
 template <typename Allocator, typename StackAllocator>
@@ -95,17 +96,37 @@ TEST(Document, Parse) {
     ParseTest<CrtAllocator, CrtAllocator>();
 }
 
+TEST(Document, UnchangedOnParseError) {
+    Document doc;
+    doc.SetArray().PushBack(0, doc.GetAllocator());
+
+    ParseResult err = doc.Parse("{]");
+    EXPECT_TRUE(doc.HasParseError());
+    EXPECT_EQ(err.Code(), doc.GetParseError());
+    EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
+    EXPECT_TRUE(doc.IsArray());
+    EXPECT_EQ(doc.Size(), 1u);
+
+    err = doc.Parse("{}");
+    EXPECT_FALSE(doc.HasParseError());
+    EXPECT_FALSE(err.IsError());
+    EXPECT_EQ(err.Code(), doc.GetParseError());
+    EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
+    EXPECT_TRUE(doc.IsObject());
+    EXPECT_EQ(doc.MemberCount(), 0u);
+}
+
 static FILE* OpenEncodedFile(const char* filename) {
     const char *paths[] = {
-        "encodings/%s",
-        "bin/encodings/%s",
-        "../bin/encodings/%s",
-        "../../bin/encodings/%s",
-        "../../../bin/encodings/%s"
+        "encodings",
+        "bin/encodings",
+        "../bin/encodings",
+        "../../bin/encodings",
+        "../../../bin/encodings"
     };
     char buffer[1024];
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
-        sprintf(buffer, paths[i], filename);
+        sprintf(buffer, "%s/%s", paths[i], filename);
         FILE *fp = fopen(buffer, "rb");
         if (fp)
             return fp;
@@ -136,22 +157,22 @@ TEST(Document, ParseStream_EncodedInputStream) {
     StringBuffer bos;
     typedef EncodedOutputStream<UTF8<>, StringBuffer> OutputStream;
     OutputStream eos(bos, false);   // Not writing BOM
-    Writer<OutputStream, UTF16<>, UTF8<> > writer(eos);
-    d.Accept(writer);
-
     {
-        // Condense the original file and compare.
-        FILE *fp = OpenEncodedFile("utf8.json");
-        FileReadStream is(fp, buffer, sizeof(buffer));
-        Reader reader;
-        StringBuffer bos2;
-        Writer<StringBuffer> writer(bos2);
-        reader.Parse(is, writer);
-        fclose(fp);
-
-        EXPECT_EQ(bos.GetSize(), bos2.GetSize());
-        EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
+        Writer<OutputStream, UTF16<>, UTF8<> > writer(eos);
+        d.Accept(writer);
     }
+
+    // Condense the original file and compare.
+    fp = OpenEncodedFile("utf8.json");
+    FileReadStream is(fp, buffer, sizeof(buffer));
+    Reader reader;
+    StringBuffer bos2;
+    Writer<StringBuffer> writer2(bos2);
+    reader.Parse(is, writer2);
+    fclose(fp);
+
+    EXPECT_EQ(bos.GetSize(), bos2.GetSize());
+    EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
 }
 
 TEST(Document, ParseStream_AutoUTFInputStream) {
@@ -178,19 +199,17 @@ TEST(Document, ParseStream_AutoUTFInputStream) {
     Writer<StringBuffer> writer(bos);
     d.Accept(writer);
 
-    {
-        // Condense the original file and compare.
-        FILE *fp = OpenEncodedFile("utf8.json");
-        FileReadStream is(fp, buffer, sizeof(buffer));
-        Reader reader;
-        StringBuffer bos2;
-        Writer<StringBuffer> writer(bos2);
-        reader.Parse(is, writer);
-        fclose(fp);
+    // Condense the original file and compare.
+    fp = OpenEncodedFile("utf8.json");
+    FileReadStream is(fp, buffer, sizeof(buffer));
+    Reader reader;
+    StringBuffer bos2;
+    Writer<StringBuffer> writer2(bos2);
+    reader.Parse(is, writer2);
+    fclose(fp);
 
-        EXPECT_EQ(bos.GetSize(), bos2.GetSize());
-        EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
-    }
+    EXPECT_EQ(bos.GetSize(), bos2.GetSize());
+    EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
 }
 
 TEST(Document, Swap) {
@@ -242,11 +261,15 @@ TEST(Document, Swap) {
 struct OutputStringStream : public std::ostringstream {
     typedef char Ch;
 
+    virtual ~OutputStringStream();
+
     void Put(char c) {
         put(c);
     }
     void Flush() {}
 };
+
+OutputStringStream::~OutputStringStream() {}
 
 TEST(Document, AcceptWriter) {
     Document doc;
@@ -366,7 +389,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
     EXPECT_EQ(3u, b.Size());
-    EXPECT_EQ(&a.GetAllocator(), (void*)0);
+    EXPECT_THROW(a.GetAllocator(), AssertException);
     EXPECT_EQ(&b.GetAllocator(), &allocator);
 
     b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
@@ -379,7 +402,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
     EXPECT_EQ(2u, c.MemberCount());
-    EXPECT_EQ(&b.GetAllocator(), (void*)0);
+    EXPECT_THROW(b.GetAllocator(), AssertException);
     EXPECT_EQ(&c.GetAllocator(), &allocator);
 }
 
@@ -460,7 +483,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
     EXPECT_EQ(3u, b.Size());
-    EXPECT_EQ(&a.GetAllocator(), (void*)0);
+    EXPECT_THROW(a.GetAllocator(), AssertException);
     EXPECT_EQ(&b.GetAllocator(), &allocator);
 
     b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
@@ -474,7 +497,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
     EXPECT_EQ(2u, c.MemberCount());
-    EXPECT_EQ(&b.GetAllocator(), (void*)0);
+    EXPECT_THROW(b.GetAllocator(), AssertException);
     EXPECT_EQ(&c.GetAllocator(), &allocator);
 }
 
