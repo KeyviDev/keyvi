@@ -2,6 +2,7 @@
 #include <msgpack/fbuffer.hpp>
 #include <msgpack/fbuffer.h>
 #include <msgpack/zbuffer.hpp>
+#include <msgpack/zbuffer.h>
 #include <gtest/gtest.h>
 #include <string.h>
 
@@ -12,7 +13,7 @@ TEST(buffer, sbuffer)
     sbuf.write("a", 1);
     sbuf.write("a", 1);
 
-    EXPECT_EQ(3, sbuf.size());
+    EXPECT_EQ(3ul, sbuf.size());
     EXPECT_TRUE( memcmp(sbuf.data(), "aaa", 3) == 0 );
 
     sbuf.clear();
@@ -20,7 +21,7 @@ TEST(buffer, sbuffer)
     sbuf.write("a", 1);
     sbuf.write("a", 1);
 
-    EXPECT_EQ(3, sbuf.size());
+    EXPECT_EQ(3ul, sbuf.size());
     EXPECT_TRUE( memcmp(sbuf.data(), "aaa", 3) == 0 );
 }
 
@@ -40,7 +41,7 @@ TEST(buffer, vrefbuffer)
         sbuf.write((const char*)vec[i].iov_base, vec[i].iov_len);
     }
 
-    EXPECT_EQ(3, sbuf.size());
+    EXPECT_EQ(3ul, sbuf.size());
     EXPECT_TRUE( memcmp(sbuf.data(), "aaa", 3) == 0 );
 
 
@@ -57,7 +58,7 @@ TEST(buffer, vrefbuffer)
         sbuf.write((const char*)vec[i].iov_base, vec[i].iov_len);
     }
 
-    EXPECT_EQ(3, sbuf.size());
+    EXPECT_EQ(3ul, sbuf.size());
     EXPECT_TRUE( memcmp(sbuf.data(), "aaa", 3) == 0 );
 }
 
@@ -68,14 +69,35 @@ TEST(buffer, zbuffer)
     zbuf.write("a", 1);
     zbuf.write("a", 1);
     zbuf.write("a", 1);
+    zbuf.write("", 0);
 
     zbuf.flush();
 }
 
 
+TEST(buffer, zbuffer_c)
+{
+    msgpack_zbuffer zbuf;
+    EXPECT_TRUE(msgpack_zbuffer_init(&zbuf, 1, MSGPACK_ZBUFFER_INIT_SIZE));
+    EXPECT_EQ(0, msgpack_zbuffer_write(&zbuf, "a", 1));
+    EXPECT_EQ(0, msgpack_zbuffer_write(&zbuf, "a", 1));
+    EXPECT_EQ(0, msgpack_zbuffer_write(&zbuf, "a", 1));
+    EXPECT_EQ(0, msgpack_zbuffer_write(&zbuf, "", 0));
+
+    EXPECT_TRUE(msgpack_zbuffer_flush(&zbuf) != NULL);
+
+    msgpack_zbuffer_destroy(&zbuf);
+}
+
+
 TEST(buffer, fbuffer)
 {
+#if defined(_MSC_VER)
+    FILE* file;
+    tmpfile_s(&file);
+#else  // defined(_MSC_VER)
     FILE* file = tmpfile();
+#endif // defined(_MSC_VER)
     EXPECT_TRUE( file != NULL );
 
     msgpack::fbuffer fbuf(file);
@@ -99,7 +121,13 @@ TEST(buffer, fbuffer)
 
 TEST(buffer, fbuffer_c)
 {
+#if defined(_MSC_VER)
+    FILE* file;
+    tmpfile_s(&file);
+#else  // defined(_MSC_VER)
     FILE* file = tmpfile();
+#endif // defined(_MSC_VER)
+
     void* fbuf = (void*)file;
 
     EXPECT_TRUE( file != NULL );
