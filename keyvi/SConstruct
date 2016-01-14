@@ -70,7 +70,8 @@ env.Append(CPPPATH=[launch_dir + '/3rdparty/rapidjson/include',
                     launch_dir + '/3rdparty/msgpack-c/include',
                     launch_dir + '/3rdparty/utf8',
                     launch_dir + '/3rdparty/misc',
-                    launch_dir + '/3rdparty/tpie/build/install/include'
+                    launch_dir + '/3rdparty/tpie/build/install/include',
+                    launch_dir + '/3rdparty/xchange/src'
                     ])
 
 # Mac buid

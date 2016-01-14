@@ -44,9 +44,9 @@
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/util/vint.h"
 
-#include "dictionary/util/json_to_msgpack_fwd.h"
 #include "msgpack.hpp"
-#include "dictionary/util/json_to_msgpack.h"
+// from 3rdparty/xchange: msgpack <-> rapidjson converter
+#include "msgpack/type/rapidjson.hpp"
 #include "msgpack/zbuffer.hpp"
 
 #include "dictionary/fsa/internal/constants.h"
