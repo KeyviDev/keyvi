@@ -1,4 +1,4 @@
-#include <msgpack_fwd.hpp>
+#include <msgpack.hpp>
 #include <gtest/gtest.h>
 
 class enum_member {
@@ -16,8 +16,6 @@ public:
 };
 
 MSGPACK_ADD_ENUM(enum_member::flags_t);
-
-#include <msgpack.hpp>
 
 class compatibility {
 public:
@@ -73,4 +71,42 @@ TEST(convert, enum_member)
     EXPECT_NO_THROW( obj.convert(&to) );
 
     EXPECT_EQ(enum_member::B, to.flag);
+}
+
+TEST(convert, return_value_ptr)
+{
+    msgpack::zone z;
+    msgpack::object obj(1, z);
+
+    int i;
+    EXPECT_EQ(obj.convert(&i), &i);
+    EXPECT_EQ(1, i);
+}
+
+TEST(convert, return_value_ref)
+{
+    msgpack::zone z;
+    msgpack::object obj(1, z);
+
+    int i;
+    int const& j = obj.convert(i);
+    EXPECT_EQ(&i, &j);
+    EXPECT_EQ(i, j);
+}
+
+TEST(convert, if_not_nil_nil)
+{
+    msgpack::object obj;
+    int i;
+    EXPECT_FALSE(obj.convert_if_not_nil(i));
+}
+
+TEST(convert, if_not_nil_not_nil)
+{
+    msgpack::zone z;
+    msgpack::object obj(1, z);
+
+    int i;
+    EXPECT_TRUE(obj.convert_if_not_nil(i));
+    EXPECT_EQ(i, 1);
 }

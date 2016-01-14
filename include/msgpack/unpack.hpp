@@ -64,7 +64,9 @@ const size_t COUNTER_SIZE = sizeof(_msgpack_atomic_counter_t);
 
 namespace msgpack {
 
+/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
+/// @endcond
 
 typedef bool (*unpack_reference_func)(msgpack::type::object_type, std::size_t, void*);
 
@@ -719,7 +721,9 @@ inline int context::execute(const char* data, std::size_t len, std::size_t& off)
             case MSGPACK_CS_DOUBLE: {
                 union { uint64_t i; double f; } mem;
                 load<uint64_t>(mem.i, n);
-#if defined(__arm__) && !(__ARM_EABI__) // arm-oabi
+#if defined(TARGET_OS_IPHONE)
+                // ok
+#elif defined(__arm__) && !(__ARM_EABI__) // arm-oabi
                 // https://github.com/msgpack/msgpack-perl/pull/1
                 mem.i = (mem.i & 0xFFFFFFFFUL) << 32UL | (mem.i >> 32UL);
 #endif
@@ -987,30 +991,7 @@ inline int context::execute(const char* data, std::size_t len, std::size_t& off)
 } // detail
 
 
-class unpacked {
-public:
-    unpacked() {}
-
-    unpacked(msgpack::object const& obj, msgpack::unique_ptr<msgpack::zone> z) :
-        m_obj(obj), m_zone(msgpack::move(z)) { }
-
-    void set(msgpack::object const& obj)
-        { m_obj = obj; }
-
-    const msgpack::object& get() const
-        { return m_obj; }
-
-    msgpack::unique_ptr<msgpack::zone>& zone()
-        { return m_zone; }
-
-    const msgpack::unique_ptr<msgpack::zone>& zone() const
-        { return m_zone; }
-
-private:
-    msgpack::object m_obj;
-    msgpack::unique_ptr<msgpack::zone> m_zone;
-};
-
+typedef object_handle unpacked;
 
 class unpacker {
 public:
@@ -1139,8 +1120,6 @@ private:
 #endif // defined(MSGPACK_USE_CPP03)
 };
 
-#if !defined(MSGPACK_USE_CPP03)
-
 unpacked unpack(
     const char* data, std::size_t len, std::size_t& off, bool& referenced,
     unpack_reference_func f = nullptr, void* user_data = nullptr,
@@ -1157,8 +1136,6 @@ unpacked unpack(
     const char* data, std::size_t len,
     unpack_reference_func f = nullptr, void* user_data = nullptr,
     unpack_limit const& limit = unpack_limit());
-
-#endif // !defined(MSGPACK_USE_CPP03)
 
 
 void unpack(unpacked& result,
@@ -1550,8 +1527,6 @@ unpack_imp(const char* data, std::size_t len, std::size_t& off,
 
 // reference version
 
-#if !defined(MSGPACK_USE_CPP03)
-
 inline unpacked unpack(
     const char* data, std::size_t len, std::size_t& off, bool& referenced,
     unpack_reference_func f, void* user_data, unpack_limit const& limit)
@@ -1559,13 +1534,16 @@ inline unpacked unpack(
     msgpack::object obj;
     msgpack::unique_ptr<msgpack::zone> z(new msgpack::zone);
     referenced = false;
+    std::size_t noff = off;
     unpack_return ret = detail::unpack_imp(
-        data, len, off, *z, obj, referenced, f, user_data, limit);
+        data, len, noff, *z, obj, referenced, f, user_data, limit);
 
     switch(ret) {
     case UNPACK_SUCCESS:
+        off = noff;
         return unpacked(obj, msgpack::move(z));
     case UNPACK_EXTRA_BYTES:
+        off = noff;
         return unpacked(obj, msgpack::move(z));
     case UNPACK_CONTINUE:
         throw msgpack::insufficient_bytes("insufficient bytes");
@@ -1601,8 +1579,6 @@ inline unpacked unpack(
     return unpack(data, len, off, referenced, f, user_data, limit);
 }
 
-#endif // !defined(MSGPACK_USE_CPP03)
-
 inline void unpack(unpacked& result,
                    const char* data, std::size_t len, std::size_t& off, bool& referenced,
                    unpack_reference_func f, void* user_data, unpack_limit const& limit)
@@ -1610,15 +1586,18 @@ inline void unpack(unpacked& result,
     msgpack::object obj;
     msgpack::unique_ptr<msgpack::zone> z(new msgpack::zone);
     referenced = false;
+    std::size_t noff = off;
     unpack_return ret = detail::unpack_imp(
-        data, len, off, *z, obj, referenced, f, user_data, limit);
+        data, len, noff, *z, obj, referenced, f, user_data, limit);
 
     switch(ret) {
     case UNPACK_SUCCESS:
+        off = noff;
         result.set(obj);
         result.zone() = msgpack::move(z);
         return;
     case UNPACK_EXTRA_BYTES:
+        off = noff;
         result.set(obj);
         result.zone() = msgpack::move(z);
         return;
@@ -1662,14 +1641,17 @@ inline msgpack::object unpack(
     unpack_reference_func f, void* user_data, unpack_limit const& limit)
 {
     msgpack::object obj;
+    std::size_t noff = off;
     referenced = false;
     unpack_return ret = detail::unpack_imp(
-        data, len, off, z, obj, referenced, f, user_data, limit);
+        data, len, noff, z, obj, referenced, f, user_data, limit);
 
     switch(ret) {
     case UNPACK_SUCCESS:
+        off = noff;
         return obj;
     case UNPACK_EXTRA_BYTES:
+        off = noff;
         return obj;
     case UNPACK_CONTINUE:
         throw msgpack::insufficient_bytes("insufficient bytes");
@@ -1727,7 +1709,9 @@ inline bool unpacker::default_reference_func(msgpack::type::object_type /*type*/
     return true;
 }
 
+/// @cond
 }  // MSGPACK_API_VERSION_NAMESPACE(v1)
+/// @endcond
 
 }  // namespace msgpack
 
