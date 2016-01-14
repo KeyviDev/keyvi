@@ -27,7 +27,9 @@
 
 namespace msgpack {
 
+/// @cond
 MSGPACK_API_VERSION_NAMESPACE(v1) {
+/// @endcond
 
 
 namespace type {
@@ -79,6 +81,33 @@ struct object_ext {
     const char* ptr;
 };
 
+
+#if !defined(MSGPACK_USE_CPP03)
+struct object;
+
+namespace adaptor {
+template <typename T, typename Enabler = void>
+struct as;
+} // namespace adaptor
+
+template <typename T>
+struct has_as {
+private:
+    template <typename U>
+    static auto check(U*) ->
+        typename std::is_same<
+            decltype(msgpack::adaptor::as<U>()(std::declval<msgpack::object>())),
+            T>::type;
+    template <typename>
+    static std::false_type check(...);
+public:
+    using type = decltype(check<T>(nullptr));
+    static constexpr bool value = type::value;
+};
+
+#endif // !defined(MSGPACK_USE_CPP03)
+
+
 struct object {
     union union_type {
         bool boolean;
@@ -100,13 +129,28 @@ struct object {
 
     bool is_nil() const { return type == msgpack::type::NIL; }
 
+#if defined(MSGPACK_USE_CPP03)
+
     template <typename T>
     T as() const;
 
+#else  // defined(MSGPACK_USE_CPP03)
+
     template <typename T>
-    void convert(T& v) const;
+    typename std::enable_if<msgpack::has_as<T>::value, T>::type as() const;
+
     template <typename T>
-    void convert(T* v) const;
+    typename std::enable_if<!msgpack::has_as<T>::value, T>::type as() const;
+
+#endif // defined(MSGPACK_USE_CPP03)
+
+    template <typename T>
+    T& convert(T& v) const;
+    template <typename T>
+    T* convert(T* v) const;
+
+    template <typename T>
+    bool convert_if_not_nil(T& v) const;
 
     object();
 
@@ -143,39 +187,16 @@ struct object_kv {
     msgpack::object val;
 };
 
-namespace detail {
-template <typename Stream, typename T>
-struct packer_serializer;
-} // namespace detail
+struct object::with_zone : object {
+    with_zone(msgpack::zone& zone) : zone(zone) { }
+    msgpack::zone& zone;
+private:
+    with_zone();
+};
 
-msgpack::object const& operator>> (msgpack::object const& o, msgpack::object& v);
-
-template <typename T>
-msgpack::object const& operator>> (msgpack::object const& o, T& v);
-
-template <typename T>
-void operator<< (msgpack::object::with_zone& o, const T& v);
-
-void operator<< (msgpack::object::with_zone& o, const msgpack::object& v);
-
-void operator<< (msgpack::object::with_zone& o, const msgpack::object::with_zone& v);
-
-template <typename Stream>
-class packer;
-
-template <typename Stream>
-msgpack::packer<Stream>& operator<< (msgpack::packer<Stream>& o, const msgpack::object& v);
-
-template <typename Stream>
-msgpack::packer<Stream>& operator<< (msgpack::packer<Stream>& o, const msgpack::object::with_zone& v);
-
-template <typename Stream, typename T>
-msgpack::packer<Stream>& operator<< (msgpack::packer<Stream>& o, const T& v);
-
-template <typename T>
-void operator<< (msgpack::object::with_zone& o, const T& v);
-
+/// @cond
 } // MSGPACK_API_VERSION_NAMESPACE(v1)
+/// @endcond
 
 } // namespace msgpack
 

@@ -21,8 +21,7 @@
 #include <iostream>
 #include <random>
 #include <tpie/tiny.h>
-
-#ifdef TPIE_CPP_TINY
+#include <set>
 
 bool sort_test() {
 	{
@@ -193,17 +192,3 @@ int main(int argc, char ** argv) {
 		;
 }
 
-#else // TPIE_CPP_TINY
-
-bool basic_test() {
-	tpie::log_warning() << "ut-tiny: Tiny is not supported on this system!" << std::endl;
-	return true;
-}
-
-int main(int argc, char ** argv) {
-	return tpie::tests(argc, argv)
-	.test(basic_test, "basic")
-	;
-}
-
-#endif // TPIE_CPP_TINY

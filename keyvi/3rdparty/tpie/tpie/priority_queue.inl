@@ -528,7 +528,7 @@ void priority_queue<T, Comparator, OPQType>::fill_buffer() {
 	{
 	pq_merge_heap<T, Comparator> heap(current_r);
 
-	tpie::array<tpie::auto_ptr<file_stream<T> > > data(current_r);
+	tpie::array<tpie::unique_ptr<file_stream<T> > > data(current_r);
 	for(memory_size_type i = 0; i<current_r; i++) {
 		data[i].reset(tpie_new<file_stream<T> >(block_factor));
 		if(i == 0 && group_size(i)>0) {
@@ -603,7 +603,7 @@ void priority_queue<T, Comparator, OPQType>::fill_group_buffer(group_type group)
 
 		//Create streams for the non-empty slots and initialize
 		//internal heap with one element per slot
-		tpie::array<tpie::auto_ptr<file_stream<T> > > data(setting_k);
+		tpie::array<tpie::unique_ptr<file_stream<T> > > data(setting_k);
 		for(memory_size_type i = 0; i<setting_k; i++) {
 
 			data[i].reset(tpie_new<file_stream<T> >(block_factor));
@@ -704,7 +704,7 @@ void priority_queue<T, Comparator, OPQType>::empty_group(group_type group) {
 		pq_merge_heap<T, Comparator> heap(setting_k);
 
 		// Open streams to slots in group `group', push top element to merge heap
-		tpie::array<tpie::auto_ptr<file_stream<T> > > data(setting_k);
+		tpie::array<tpie::unique_ptr<file_stream<T> > > data(setting_k);
 		for(memory_size_type i = 0; i<setting_k; i++) {
 			data[i].reset(tpie_new<file_stream<T> >(block_factor));
 			data[i]->open(slot_data(group*setting_k+i));

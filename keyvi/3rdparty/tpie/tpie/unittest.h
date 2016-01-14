@@ -27,11 +27,22 @@
 #include <vector>
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 #include <stack>
 
 namespace tpie {
 
+typedef std::chrono::high_resolution_clock test_clock;
+typedef std::chrono::time_point<test_clock> test_time;
+inline test_time test_now() {return test_clock::now();}
+inline double test_millisecs(const test_time & from, const test_time & to) {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(to-from).count();
+}
+	
+inline double test_secs(const test_time & from, const test_time & to) {
+	return std::chrono::duration_cast<std::chrono::seconds>(to-from).count();
+}			
+	
 class teststream_buf: public std::basic_streambuf<char, std::char_traits<char> > {
 private:
 	const static size_t line_size = 2048;
@@ -49,7 +60,7 @@ private:
 	teststream_buf m_buff;
 	size_t failed;
 	size_t total;
-	boost::posix_time::ptime time;
+	test_time time;
 	bool do_time;
 public:
 	teststream(bool do_time);
@@ -68,7 +79,6 @@ public:
 		return o;
 	}
 };
-
 
 testmanip<bool> result(bool success);
 testmanip<bool> success();
@@ -104,7 +114,7 @@ namespace bits {
 	class test_runner {
 		tests * t;
 		bool result;
-		boost::posix_time::ptime m_time;
+		test_time m_time;
 	public:
 		test_runner(tests * t, const std::string & name);
 

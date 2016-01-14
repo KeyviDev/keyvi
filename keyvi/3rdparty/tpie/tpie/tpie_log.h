@@ -26,7 +26,7 @@
 
 #include <vector>
 #include <stack>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <tpie/config.h>
 #include <tpie/logstream.h>
 #include <fstream>
@@ -121,7 +121,7 @@ void finish_default_log();
 
 namespace log_bits {
 
-extern std::vector<boost::shared_ptr<logstream> > log_instances;
+extern std::vector<std::shared_ptr<logstream> > log_instances;
 
 void initiate_log_level(log_level level);
 

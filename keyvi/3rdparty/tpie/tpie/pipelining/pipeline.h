@@ -41,7 +41,8 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Invoke the pipeline.
 	///////////////////////////////////////////////////////////////////////////
-	void operator()(stream_size_type items, progress_indicator_base & pi, memory_size_type mem);
+	void operator()(stream_size_type items, progress_indicator_base & pi, memory_size_type mem,
+					const char * file, const char * function);
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Generate a GraphViz plot of the pipeline
@@ -110,16 +111,19 @@ class pipeline_impl : public pipeline_base {
 public:
 	typedef typename fact_t::constructed_type gen_t;
 
-	inline pipeline_impl(const fact_t & factory)
+	pipeline_impl(fact_t & factory)
 		: r(factory.construct())
 	{
 		this->m_memory = factory.memory();
 		this->m_nodeMap = r.get_node_map();
 	}
 
-	inline operator gen_t() {
-		return r;
-	}
+	pipeline_impl(const pipeline_impl &) = delete;
+	pipeline_impl(pipeline_impl &&) = default;
+
+	pipeline_impl & operator=(const pipeline_impl &) = delete;
+	pipeline_impl & operator=(pipeline_impl &&) = default;
+
 
 private:
 	gen_t r;
@@ -134,36 +138,62 @@ private:
 /// pipeline_impl type.
 ///////////////////////////////////////////////////////////////////////////////
 class pipeline {
+private:
+	struct CurrentPipeSetter {
+		pipeline * old;
+		CurrentPipeSetter(pipeline * self) {
+			old = m_current;
+			m_current = self;
+		}
+
+		~CurrentPipeSetter() {m_current = old;}
+	};
 public:
 	pipeline() {}
+	pipeline(pipeline &&) = default;
+	pipeline(const pipeline &) = default;
+	pipeline & operator=(pipeline &&) = default;
+	pipeline & operator=(const pipeline &) = default;
 
 	template <typename T>
-	pipeline(const T & from) {
-		*this = from;
+	pipeline(T from) {
+		*this = std::move(from);
 	}
 
 	template <typename T>
-	pipeline & operator=(const T & from) {
-		p.reset(new T(from));
+	pipeline & operator=(T from) {
+		p.reset(new T(std::move(from)));
 		return *this;
 	}
 
-	inline void operator()() {
+	pipeline(const std::shared_ptr<bits::pipeline_base> & p): p(p) {}
+
+	void operator()() {
+		CurrentPipeSetter _(this);
 		progress_indicator_null pi;
-		(*p)(1, pi, get_memory_manager().available());
+		(*p)(1, pi, get_memory_manager().available(), nullptr, nullptr);
 	}
-	inline void operator()(stream_size_type items, progress_indicator_base & pi) {
-		(*p)(items, pi, get_memory_manager().available());
+
+	void operator()(stream_size_type items, progress_indicator_base & pi,
+					const char * file, const char * function) {
+		CurrentPipeSetter _(this);
+		(*p)(items, pi, get_memory_manager().available(), file, function);
 	}
-	inline void operator()(stream_size_type items, progress_indicator_base & pi, memory_size_type mem) {
-		(*p)(items, pi, mem);
+
+	void operator()(stream_size_type items, progress_indicator_base & pi, memory_size_type mem,
+					const char * file, const char * function) {
+		CurrentPipeSetter _(this);
+		(*p)(items, pi, mem, file, function);
 	}
-	inline void plot(std::ostream & os = std::cout) {
+	
+	void plot(std::ostream & os = std::cout) {
 		p->plot(os);
 	}
+
 	void plot_full(std::ostream & os = std::cout) {
 		p->plot_full(os);
 	}
+	
 	inline double memory() const {
 		return p->memory();
 	}
@@ -200,8 +230,11 @@ public:
 	}
 
 	void output_memory(std::ostream & o) const;
+
+	static pipeline * current() {return m_current;}
 private:
-	boost::shared_ptr<bits::pipeline_base> p;
+	static pipeline * m_current;
+	std::shared_ptr<bits::pipeline_base> p;
 };
 
 } // namespace pipelining

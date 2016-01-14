@@ -19,10 +19,10 @@
 #ifndef __TEST_UNIT_TEST_TIMER_H__
 #define __TEST_UNIT_TEST_TIMER_H__
 
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <tpie/unittest.h>
 
 class test_timer {
 public:
@@ -31,9 +31,9 @@ public:
 	inline double var() {return ssum/tests-avg()*avg();}
 	inline double sd() {return sqrt(var());}
 	
-	inline void start() {t=boost::posix_time::microsec_clock::local_time();}
+	inline void start() {t=tpie::test_now();}
 	void stop() {
-		double time = static_cast<double>((boost::posix_time::microsec_clock::local_time() - t).total_milliseconds())/1000.0;
+		double time = tpie::test_secs(t, tpie::test_now());
 		sum += time;
 		ssum += time*time;
 		tests += 1;
@@ -52,7 +52,7 @@ private:
 	std::string name;
 	double sum,ssum,l,h;
 	int tests;
-	boost::posix_time::ptime t;
+	tpie::test_time t;
 };
 
 #endif //__TEST_UNIT_TEST_TIMER_H__

@@ -43,13 +43,13 @@ using namespace tpie;
 
 bool basic_test() {
 	size_t z = 104729;
-	internal_priority_queue<boost::uint64_t, bit_pertume_compare<std::greater<boost::uint64_t> > > pq(z);
+	internal_priority_queue<uint64_t, bit_pertume_compare<std::greater<uint64_t> > > pq(z);
 	return basic_pq_test(pq, z);
 }
 
 bool large_cycle(){
 	size_t x = 524*1024*102;
-	internal_priority_queue<boost::uint64_t, bit_pertume_compare<std::greater<boost::uint64_t> > > pq(x);
+	internal_priority_queue<uint64_t, bit_pertume_compare<std::greater<uint64_t> > > pq(x);
 	return cyclic_pq_test(pq, x, 20000000);
 }
 

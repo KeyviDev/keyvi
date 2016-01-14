@@ -27,6 +27,8 @@
 #include <tpie/array.h>
 #include <tpie/tpie_assert.h>
 #include <tpie/compressed/thread.h>
+#include <map>
+#include <memory>
 
 namespace tpie {
 
@@ -208,7 +210,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 class stream_buffer_pool {
 public:
-	typedef boost::shared_ptr<compressor_buffer> buffer_t;
+	typedef std::shared_ptr<compressor_buffer> buffer_t;
 
 	stream_buffer_pool();
 	~stream_buffer_pool();
@@ -241,7 +243,7 @@ stream_buffer_pool & the_stream_buffer_pool();
 ///////////////////////////////////////////////////////////////////////////////
 class stream_buffers {
 public:
-	typedef boost::shared_ptr<compressor_buffer> buffer_t;
+	typedef std::shared_ptr<compressor_buffer> buffer_t;
 
 	const static memory_size_type OWN_BUFFERS = 1;
 

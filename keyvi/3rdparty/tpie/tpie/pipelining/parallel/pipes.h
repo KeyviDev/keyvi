@@ -39,7 +39,7 @@ namespace pipelining {
 ///////////////////////////////////////////////////////////////////////////////
 template <typename fact_t>
 pipe_middle<parallel_bits::factory<fact_t> >
-parallel(const pipe_middle<fact_t> & fact, maintain_order_type maintainOrder, size_t numJobs, size_t bufSize = 2048) {
+parallel(pipe_middle<fact_t> && fact, maintain_order_type maintainOrder, size_t numJobs, size_t bufSize = 2048) {
 	parallel_bits::options opts;
 	switch (maintainOrder) {
 		case arbitrary_order:
@@ -53,7 +53,7 @@ parallel(const pipe_middle<fact_t> & fact, maintain_order_type maintainOrder, si
 	opts.bufSize = bufSize;
 	return pipe_middle<parallel_bits::factory<fact_t> >
 		(parallel_bits::factory<fact_t>
-		 (fact.factory, opts));
+		 (std::move(fact.factory), std::move(opts)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,26 +64,26 @@ parallel(const pipe_middle<fact_t> & fact, maintain_order_type maintainOrder, si
 ///////////////////////////////////////////////////////////////////////////////
 template <typename fact_t>
 pipe_middle<parallel_bits::factory<fact_t> >
-parallel(const pipe_middle<fact_t> & fact, maintain_order_type maintainOrder = arbitrary_order) {
-	return parallel(fact, maintainOrder, default_worker_count());
+parallel(pipe_middle<fact_t> && fact, maintain_order_type maintainOrder = arbitrary_order) {
+	return parallel(std::move(fact), maintainOrder, default_worker_count());
 }
 
 template <typename fact_t>
 pipe_middle<parallel_bits::factory<fact_t> >
-parallel(const pipe_middle<fact_t> & fact, bool maintainOrder, size_t numJobs, size_t bufSize = 2048) {
+parallel(pipe_middle<fact_t> && fact, bool maintainOrder, size_t numJobs, size_t bufSize = 2048) {
 	log_fatal() << "The second argument to tpie::pipelining::parallel has changed.\n"
 		<< "Use maintain_order instead of true and arbitrary_order instead of false."
 		<< std::endl;
-	return parallel(fact, maintainOrder ? maintain_order : arbitrary_order, numJobs, bufSize);
+	return parallel(std::move(fact), maintainOrder ? maintain_order : arbitrary_order, numJobs, bufSize);
 }
 
 template <typename fact_t>
 pipe_middle<parallel_bits::factory<fact_t> >
-parallel(const pipe_middle<fact_t> & fact, bool maintainOrder) {
+parallel(pipe_middle<fact_t> && fact, bool maintainOrder) {
 	log_fatal() << "The second argument to tpie::pipelining::parallel has changed.\n"
 		<< "Use maintain_order instead of true and arbitrary_order instead of false."
 		<< std::endl;
-	return parallel(fact, maintainOrder ? maintain_order : arbitrary_order);
+	return parallel(std::move(fact), maintainOrder ? maintain_order : arbitrary_order);
 }
 
 } // namespace pipelining

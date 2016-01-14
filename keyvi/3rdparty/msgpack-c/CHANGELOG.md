@@ -1,4 +1,62 @@
-2015-3-22 version 1.0.1:
+2015-09-04 version 1.2.0
+  << breaking change >>
+  * Change std::vector<unsigned char> and std::array<unsigned char>
+    mapped to BIN instead of ARRAY (#243)
+  * Remove redundant copy (#285)
+
+  * Add array_ref to map to ARRAY (#243)
+  * Add variant type and adaptor (#349)
+  * Add object::convert_if_not_nil() (#357)
+  * Fix invalid offset update (#354)
+  * Add C++11 support on MSVC2015(#339, #347)
+  * Fix and Improve build system (#346, #350, #361, #363)
+  * Import Boost.Preprocessor as a part of msgpack-c (#312)
+  * Fix OSX with libc++ specific errors (#334, #362)
+  * Add customized containers support (#330)
+  * Add std::unique_ptr and std::shared_ptr support (#329)
+  * Add missing install files (#328)
+  * Add shared/static library switching option (#316)
+  * Improve no throw description on C++11 (#313)
+  * Import Boost.Predef as a part of msgpack-c (#312)
+  * Add map based serialize support (#306)
+  * Add Boost.Fusion support (#305)
+  * Add v4 format RAW support (#304)
+  * Fix zbuffer with empty string problem (#303)
+  * Add non default constructible class support (#302, #324, #327, #331, #332, #345)
+  * Add inline keyword to function (template) (#299)
+  * Add EXT type supporting classes (#292, #308)
+  * Fix raw_ref != comparison (#290)
+  * Add object deep copy (#288)
+  * Remove some warnings (#284, #322, #323, #335)
+  * Improve compiler version checking (#283)
+  * Add return value to object::convert() (#282)
+  * Improve move semantic support in C++11 (#279, #353)
+  * Add Boost.StringRef support (#278)
+  * Improve CI environment (#276, #294, #338)
+  * Add converting to JSON (#274, #301)
+  * Fix iOS specific problem (#270)
+  * Improve doxtgen document generation (#269)
+  * Add Boost.Optional support (#268)
+  * Fix msvc specific problem (#267, #295)
+  * Add base class serialization. (#265, #277)
+  * Add and improve examples. (#264, #310, #311, #341, #342, #344)
+  * Fix wiki URL. (#263)
+2015-04-03 version 1.1.0
+  << breaking change >>
+  * Remove msgpack_fwd.hpp
+  * Improve user types adaptation mechanism (#262)
+    Since version 1.0.0, users need to obey the correct include order.
+    However, it is very difficult to maintain the correct order in big
+    projects. version 1.1.0 removed this order. Users don't need to
+    care about include order. Migration guide from 1.0.x to 1.1.0 has
+    been written. See https://github.com/msgpack/msgpack-c/wiki
+
+  * Fix vector<bool> size check (#251)
+  * Fix inttypes.h inclusion on MSVC (#257)
+  * Support documents generation by Doxygen (#259)
+  * Remove C99 style variable declaration (#253)
+  * Improve documents (https://github.com/msgpack/msgpack-c/wiki)
+2015-03-22 version 1.0.1:
   * Fix compilation error on Mac 10.9 (#244)
   * Fix typos in documents (#240)
   * Update CHANGELOG.md for version 1.0.0 (#242)
@@ -101,4 +159,3 @@
   * Add operator==(object, const T&)
   * MSGPACK_DEFINE macro defines msgpack_object(object* obj, zone* z)
   * C++ programs doesn't need to link "msgpackc" library.
-

@@ -20,14 +20,13 @@
 
 #ifndef __TPIE_TESTTIME_H
 #define __TPIE_TESTTIME_H
-#include <boost/date_time/posix_time/posix_time.hpp>
 #ifndef WIN32
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
 #include <stdint.h>
 #include <time.h>
-
+#include <tpie/unittest.h>
 ///////////////////////////////////////////////////////////////////////////
 /// \file testtime.h 
 /// Time managment for tests
@@ -78,20 +77,20 @@ namespace tpie {
 		///////////////////////////////////////////////////////////////////
 		/// Type used for vaiable holding real time information
 		///////////////////////////////////////////////////////////////////
-		typedef boost::posix_time::ptime test_realtime_t;
+		typedef tpie::test_time test_realtime_t;
 
 		///////////////////////////////////////////////////////////////////
 		/// Sample the real time and store it
 		///////////////////////////////////////////////////////////////////
-		inline void getTestRealtime(test_realtime_t& a) {
-			a = boost::posix_time::microsec_clock::local_time();
+		inline void getTestRealtime(test_time& a) {
+			a = tpie::test_now();
 		}	
 
 		///////////////////////////////////////////////////////////////////
 		/// Calculate real time difference in micro seconds
 		///////////////////////////////////////////////////////////////////
 		inline uint_fast64_t testRealtimeDiff(const test_realtime_t a, const test_realtime_t b) {
-			return (b - a).total_milliseconds();
+			return tpie::test_millisecs(a, b);
 		}
 	}
 }

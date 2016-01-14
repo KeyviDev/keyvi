@@ -45,6 +45,8 @@ public:
 		{
 		}
 
+		source_base(source_base &&) = default;
+		
 		virtual void push(const T & v) = 0;
 
 	protected:
@@ -54,14 +56,16 @@ public:
 	template <typename dest_t>
 	class source_impl : public source_base {
 	public:
-		source_impl(TPIE_TRANSFERABLE(dest_t) dest, node_token token, source_base ** the_source)
+		source_impl(dest_t dest, node_token token, source_base ** the_source)
 			: source_base(token)
 			, the_source(the_source)
-			, dest(TPIE_MOVE(dest))
+			, dest(std::move(dest))
 		{
 			this->set_name("Join source", PRIORITY_INSIGNIFICANT);
 			this->add_push_destination(this->dest);
 		}
+
+		source_impl(source_impl &&) = default;
 
 		virtual void prepare() override {
 			if (*the_source != NULL && *the_source != this) {
@@ -82,8 +86,8 @@ public:
 		dest_t dest;
 	};
 
-	pipe_begin<factory_2<source_impl, node_token, source_base **> > source() {
-		return factory_2<source_impl, node_token, source_base **>(source_token, &the_source);
+	pipe_begin<factory<source_impl, node_token, source_base **> > source() {
+		return factory<source_impl, node_token, source_base **>(source_token, &the_source);
 	}
 
 	class sink_impl : public node {
@@ -110,8 +114,8 @@ public:
 		source_base ** the_source;
 	};
 
-	pipe_end<termfactory_2<sink_impl, node_token, source_base **> > sink() {
-		return termfactory_2<sink_impl, node_token, source_base **>(source_token, &the_source);
+	pipe_end<termfactory<sink_impl, node_token, source_base **> > sink() {
+		return termfactory<sink_impl, node_token, source_base **>(source_token, &the_source);
 	}
 
 	join() : the_source(NULL) {}

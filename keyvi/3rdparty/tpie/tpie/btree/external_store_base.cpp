@@ -21,10 +21,9 @@
 #include <tpie/btree/external_store_base.h>
 
 namespace tpie {
+namespace bbits {
 
-namespace bits {
-
-btree_external_store_base::btree_external_store_base(const std::string & path)
+external_store_base::external_store_base(const std::string & path)
 : m_root()
 , m_path(path)
 , m_height(0)
@@ -47,7 +46,7 @@ btree_external_store_base::btree_external_store_base(const std::string & path)
 	}
 }
 
-btree_external_store_base::~btree_external_store_base() {
+external_store_base::~external_store_base() {
 	tpie::file_accessor::raw_file_accessor m_accessor;
 	m_accessor.try_open_rw(m_path);
 	stream_size_type size = sizeof(size_t) * 2 + sizeof(blocks::block_handle);

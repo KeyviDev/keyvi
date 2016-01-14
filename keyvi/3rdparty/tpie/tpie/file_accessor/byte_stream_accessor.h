@@ -22,6 +22,7 @@
 
 #include <tpie/file_accessor/stream_accessor_base.h>
 #include <tpie/tpie_log.h>
+#include <algorithm>
 
 namespace tpie {
 namespace file_accessor {

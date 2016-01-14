@@ -16,16 +16,18 @@
  *    limitations under the License.
  */
 
-#if defined(__LITTLE_ENDIAN__)
+#if MSGPACK_ENDIAN_LITTLE_BYTE
 #define TAKE8_8(d)  ((uint8_t*)&d)[0]
 #define TAKE8_16(d) ((uint8_t*)&d)[0]
 #define TAKE8_32(d) ((uint8_t*)&d)[0]
 #define TAKE8_64(d) ((uint8_t*)&d)[0]
-#elif defined(__BIG_ENDIAN__)
+#elif MSGPACK_ENDIAN_BIG_BYTE
 #define TAKE8_8(d)  ((uint8_t*)&d)[0]
 #define TAKE8_16(d) ((uint8_t*)&d)[1]
 #define TAKE8_32(d) ((uint8_t*)&d)[3]
 #define TAKE8_64(d) ((uint8_t*)&d)[7]
+#else
+#error msgpack-c supports only big endian and little endian
 #endif
 
 #ifndef msgpack_pack_inline_func
@@ -669,7 +671,9 @@ msgpack_pack_inline_func(_double)(msgpack_pack_user x, double d)
     union { double f; uint64_t i; } mem;
     mem.f = d;
     buf[0] = 0xcb;
-#if defined(__arm__) && !(__ARM_EABI__) // arm-oabi
+#if defined(TARGET_OS_IPHONE)
+    // ok
+#elif defined(__arm__) && !(__ARM_EABI__) // arm-oabi
     // https://github.com/msgpack/msgpack-perl/pull/1
     mem.i = (mem.i & 0xFFFFFFFFUL) << 32UL | (mem.i >> 32UL);
 #endif
@@ -773,6 +777,31 @@ msgpack_pack_inline_func(_str)(msgpack_pack_user x, size_t l)
 }
 
 msgpack_pack_inline_func(_str_body)(msgpack_pack_user x, const void* b, size_t l)
+{
+    msgpack_pack_append_buffer(x, (const unsigned char*)b, l);
+}
+
+/*
+ * Raw (V4)
+ */
+
+msgpack_pack_inline_func(_v4raw)(msgpack_pack_user x, size_t l)
+{
+    if(l < 32) {
+        unsigned char d = 0xa0 | (uint8_t)l;
+        msgpack_pack_append_buffer(x, &TAKE8_8(d), 1);
+    } else if(l < 65536) {
+        unsigned char buf[3];
+        buf[0] = 0xda; _msgpack_store16(&buf[1], (uint16_t)l);
+        msgpack_pack_append_buffer(x, buf, 3);
+    } else {
+        unsigned char buf[5];
+        buf[0] = 0xdb; _msgpack_store32(&buf[1], (uint32_t)l);
+        msgpack_pack_append_buffer(x, buf, 5);
+    }
+}
+
+msgpack_pack_inline_func(_v4raw_body)(msgpack_pack_user x, const void* b, size_t l)
 {
     msgpack_pack_append_buffer(x, (const unsigned char*)b, l);
 }
@@ -886,4 +915,3 @@ msgpack_pack_inline_func(_ext_body)(msgpack_pack_user x, const void* b, size_t l
 #undef msgpack_pack_real_int16
 #undef msgpack_pack_real_int32
 #undef msgpack_pack_real_int64
-

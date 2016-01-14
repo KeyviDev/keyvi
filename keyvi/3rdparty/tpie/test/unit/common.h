@@ -23,7 +23,7 @@
 #include <tpie/memory.h>
 #include <tpie/util.h>
 #include <iostream>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <tpie/tpie.h>
 #include <tpie/sysinfo.h>
 #include <tpie/exception.h>
@@ -31,19 +31,19 @@
 #include <tpie/tpie_log.h>
 
 struct bit_permute {
-	boost::uint64_t operator()(boost::uint64_t i) const{
+	uint64_t operator()(uint64_t i) const{
 		return (i & 0xAAAAAAAAAAAAAAAALL) >> 1 | (i & 0x5555555555555555LL) << 1;
 	}
 };
 
 template <typename T=std::less<uint64_t> >
-struct bit_pertume_compare: std::binary_function<boost::uint64_t, boost::uint64_t, bool> {
+struct bit_pertume_compare: std::binary_function<uint64_t, uint64_t, bool> {
 	bit_permute bp;
 	T c;
-	typedef boost::uint64_t first_argument_type;
-	typedef boost::uint64_t second_argument_type;
+	typedef uint64_t first_argument_type;
+	typedef uint64_t second_argument_type;
 
-	bool operator()(boost::uint64_t a, boost::uint64_t b) const {
+	bool operator()(uint64_t a, uint64_t b) const {
 		return c(bp(a), bp(b));
 	}
 };

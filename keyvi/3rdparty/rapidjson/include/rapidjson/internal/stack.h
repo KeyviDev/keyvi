@@ -132,9 +132,16 @@ public:
     }
 
     template<typename T>
-    T* Bottom() { return (T*)stack_; }
+    T* Bottom() { return reinterpret_cast<T*>(stack_); }
 
-    Allocator& GetAllocator() { return *allocator_; }
+    bool HasAllocator() const {
+        return allocator_ != 0;
+    }
+
+    Allocator& GetAllocator() {
+        RAPIDJSON_ASSERT(allocator_);
+        return *allocator_;
+    }
     bool Empty() const { return stackTop_ == stack_; }
     size_t GetSize() const { return static_cast<size_t>(stackTop_ - stack_); }
     size_t GetCapacity() const { return static_cast<size_t>(stackEnd_ - stack_); }
@@ -161,7 +168,7 @@ private:
 
     void Resize(size_t newCapacity) {
         const size_t size = GetSize();  // Backup the current size
-        stack_ = (char*)allocator_->Realloc(stack_, GetCapacity(), newCapacity);
+        stack_ = static_cast<char*>(allocator_->Realloc(stack_, GetCapacity(), newCapacity));
         stackTop_ = stack_ + size;
         stackEnd_ = stack_ + newCapacity;
     }

@@ -17,9 +17,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with TPIE.  If not, see <http://www.gnu.org/licenses/>
 
-#include <boost/random/uniform_int.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/random/mersenne_twister.hpp>
+#include <random>
 #include <tpie/tpie.h>
 #include <tpie/hash.h>
 
@@ -34,13 +32,12 @@ size_t hash_codes[sizeof(size_t)][256];
 } // namespace hash_bits
 
 void init_hash() {
-	boost::mt19937 rng(9001);
-	boost::uniform_int<size_t> dist(0, std::numeric_limits<size_t>::max());
-	boost::variate_generator<boost::mt19937&, boost::uniform_int<size_t> > generator(rng, dist);
+	std::mt19937 rng(9001);
+	std::uniform_int_distribution<size_t> dist(0, std::numeric_limits<size_t>::max());
 
 	for(size_t i = 0; i < sizeof(size_t); ++i)
 		for(size_t j = 0; j < 256; ++j)
-			hash_codes[i][j] = generator();
+			hash_codes[i][j] = dist(rng);
 }
 
 } // namespace tpie

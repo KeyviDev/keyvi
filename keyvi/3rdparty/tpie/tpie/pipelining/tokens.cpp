@@ -105,22 +105,27 @@ size_t node_map::out_degree(const relmap_t & map, id_t from) const {
 	return std::distance(is.first, is.second);
 }
 
-void node_map::get_successors(id_t from, std::vector<id_t> & successors, bool forward_only) {
-	std::queue<id_t> q;
+void node_map::get_successors(id_t from, std::vector<id_t> & successors, memory_size_type k, bool forward_only) {
+	std::queue<std::pair<id_t, memory_size_type>> q;
 	std::set<id_t> seen;
-	q.push(from);
+	q.push(std::make_pair(from, 0));
 	while (!q.empty()) {
-		id_t v = q.front();
+		auto p = q.front();
+		id_t & v = p.first;
+		memory_size_type & d = p.second;
 		q.pop();
 		if (seen.count(v)) continue;
 		seen.insert(v);
 		successors.push_back(v);
+
+		if(d == k) continue;
+
 		{
 			std::pair<relmapit, relmapit> is = m_relations.equal_range(v);
 			for (relmapit i = is.first; i != is.second; ++i) {
 				switch (i->second.second) {
 					case pushes:
-						q.push(i->second.first);
+						q.push(std::make_pair(i->second.first, d+1));
 						break;
 					case pulls:
 					case depends:
@@ -137,11 +142,11 @@ void node_map::get_successors(id_t from, std::vector<id_t> & successors, bool fo
 						break;
 					case pulls:
 					case depends:
-						q.push(i->second.first);
+						q.push(std::make_pair(i->second.first, d+1));
 						break;
 					case no_forward_depends:
 						if (!forward_only)
-							q.push(i->second.first);
+							q.push(std::make_pair(i->second.first, d+1));
 						break;
 				}
 			}

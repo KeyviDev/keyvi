@@ -27,16 +27,12 @@
 
 #include <tpie/config.h>
 #include <tpie/util.h>
-#include <tpie/atomic.h>
-#include <boost/thread/mutex.hpp>
-#include <boost/unordered_map.hpp>
-#ifndef TPIE_CPP_TYPE_TRAITS
-#include <boost/type_traits/is_polymorphic.hpp>
-#else
+#include <mutex>
+#include <unordered_map>
 #include <type_traits>
-#endif
 #include <utility>
-#include <fstream>
+#include <memory>
+#include <atomic>
 
 namespace tpie {
 
@@ -87,7 +83,7 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	/// Return the memory limit.
 	///////////////////////////////////////////////////////////////////////////
-	inline size_t limit() const throw() {return m_limit;}
+	size_t limit() const throw() {return m_limit;}
 	
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Update the memory limit.
@@ -106,7 +102,7 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Return the current memory limit enforcement policy.
 	///////////////////////////////////////////////////////////////////////////
-	inline enforce_t enforcement() {return m_enforce;}
+	enforce_t enforcement() {return m_enforce;}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \internal
@@ -145,14 +141,14 @@ public:
 
 
 private:
-	atomic_int m_used;
+	std::atomic<size_t> m_used;
 	size_t m_limit;
 	size_t m_maxExceeded;
 	size_t m_nextWarning;
 	enforce_t m_enforce;
 
 #ifndef TPIE_NDEBUG
-	boost::mutex m_mutex;
+	std::mutex m_mutex;
 
 	// Before calling these methods, you must have the mutex.
 	void __register_pointer(void * p, size_t size, const std::type_info & t);
@@ -160,7 +156,7 @@ private:
 	void __assert_tpie_ptr(void * p);
 	void __complain_about_unfreed_memory();
 
-	boost::unordered_map<void *, std::pair<size_t, const std::type_info *> > m_pointers;
+	std::unordered_map<void *, std::pair<size_t, const std::type_info *> > m_pointers;
 #endif
 };
 
@@ -227,14 +223,10 @@ inline void assert_tpie_ptr(void * p) {
 /// \internal
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T, 
-#ifndef TPIE_CPP_TYPE_TRAITS
-	bool x=boost::is_polymorphic<T>::value
-#else
 	bool x=std::is_polymorphic<T>::value
-#endif
 >
 struct __object_addr {
-	inline void * operator()(T * o) {return static_cast<void *>(o);}
+	void * operator()(T * o) {return static_cast<void *>(o);}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -242,7 +234,7 @@ struct __object_addr {
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 struct __object_addr<T, true> {
-	inline void * operator()(T * o) {return dynamic_cast<void *>(o);}
+	void * operator()(T * o) {return dynamic_cast<void *>(o);}
 };
 #endif
 
@@ -259,11 +251,7 @@ inline D ptr_cast(T * t) { return reinterpret_cast<D>(__object_addr<T>()(t)); }
 
 template <typename T>
 inline T * __allocate() {
-#ifndef TPIE_CPP_TYPE_TRAITS
-	if(!boost::is_polymorphic<T>::value) return reinterpret_cast<T *>(new uint8_t[sizeof(T)]);	
-#else
 	if(!std::is_polymorphic<T>::value) return reinterpret_cast<T *>(new uint8_t[sizeof(T)]);	
-#endif
 	uint8_t * x = new uint8_t[sizeof(T)+sizeof(size_t)];
 	*reinterpret_cast<size_t*>(x) = sizeof(T);
 	return reinterpret_cast<T*>(x + sizeof(size_t));
@@ -271,11 +259,7 @@ inline T * __allocate() {
 
 template <typename T>
 inline size_t tpie_size(T * p) {
-#ifndef TPIE_CPP_TYPE_TRAITS
-	if(!boost::is_polymorphic<T>::value) return sizeof(T);
-#else
 	if(!std::is_polymorphic<T>::value) return sizeof(T);
-#endif
 	uint8_t * x = ptr_cast<uint8_t *>(p);
 	return * reinterpret_cast<size_t *>(x - sizeof(size_t));
 }
@@ -289,12 +273,12 @@ template <typename T>
 struct array_allocation_scope_magic {
 	size_t size;
 	T * data;
-	inline array_allocation_scope_magic(size_t s): size(0), data(0) {
+	array_allocation_scope_magic(size_t s): size(0), data(0) {
 		get_memory_manager().register_allocation(s * sizeof(T) );
 		size=s;
 	}
 
-	inline T * allocate() {
+	T * allocate() {
 		data = new T[size];
 		__register_pointer(data, size*sizeof(T), typeid(T));
 		return data;
@@ -307,7 +291,7 @@ struct array_allocation_scope_magic {
 		return d;
 	}
 
-	inline ~array_allocation_scope_magic() {
+	~array_allocation_scope_magic() {
 		if(size) get_memory_manager().register_deallocation(size*sizeof(T));
 	}
 };
@@ -320,9 +304,9 @@ template <typename T>
 struct allocation_scope_magic {
 	size_t deregister;
 	T * data;
-	inline allocation_scope_magic(): deregister(0), data(0) {}
+	allocation_scope_magic(): deregister(0), data(0) {}
 	
-	inline T * allocate() {
+	T * allocate() {
 		get_memory_manager().register_allocation(sizeof(T));
 		deregister = sizeof(T);
 		data = __allocate<T>();
@@ -337,7 +321,7 @@ struct allocation_scope_magic {
 		return d;
 	}
 	
-	inline ~allocation_scope_magic() {
+	~allocation_scope_magic() {
 		if (data) __unregister_pointer(data, sizeof(T), typeid(T));
 		delete[] reinterpret_cast<uint8_t*>(data);
 		if (deregister) get_memory_manager().register_deallocation(deregister);
@@ -356,8 +340,6 @@ inline T * tpie_new_array(size_t size) {
 	return m.finalize();
 }
 
-
-#ifdef DOXYGEN
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Allocate an element of the type given as template parameter, and
 /// register its memory usage with TPIE.
@@ -371,21 +353,12 @@ inline T * tpie_new_array(size_t size) {
 /// \param args The variadic number of arguments to pass to the constructor of
 /// T.
 ///////////////////////////////////////////////////////////////////////////////
-template <typename T, typename Args>
-inline T * tpie_new(Args args);
-
-#elif defined(TPIE_CPP_VARIADIC_TEMPLATES) && defined(TPIE_CPP_RVALUE_REFERENCE)
-
 template <typename T, typename ... Args>
 inline T * tpie_new(Args &&... args) {
 	allocation_scope_magic<T> m; 
 	new(m.allocate()) T(std::forward<Args>(args)...);
 	return m.finalize();
 }
-
-#else
-#include <tpie/memory.inl>
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Delete an object allocated with tpie_new.
@@ -398,11 +371,7 @@ inline void tpie_delete(T * p) throw() {
 	uint8_t * pp = ptr_cast<uint8_t *>(p);
 	__unregister_pointer(pp, tpie_size(p), typeid(*p));
 	p->~T();
-#ifndef TPIE_CPP_TYPE_TRAITS
-	if(!boost::is_polymorphic<T>::value) 
-#else
 	if(!std::is_polymorphic<T>::value) 
-#endif
 		delete[] pp;
 	else
 		delete[] (pp - sizeof(size_t));
@@ -421,61 +390,6 @@ inline void tpie_delete_array(T * a, size_t size) throw() {
 	delete[] a;
 }
 
-template <typename T>
-struct auto_ptr_ref {
-	T * m_ptr;
-	explicit inline auto_ptr_ref(T * ptr) throw(): m_ptr(ptr) {};
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// \brief like std::auto_ptr, but delete the object with tpie_delete.
-/// \tparam T the type of the object.
-///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-class auto_ptr {
-private:
-	T * elm;
-	// auto_ptr(const auto_ptr & o) {unused(o); assert(false);}
-	// auto_ptr & operator = (const auto_ptr & o) {unused(o); assert(false);}
-public:
-	typedef T element_type;
-
-	// D.10.1.1 construct/copy/destroy:
-	explicit inline auto_ptr(T * o=0) throw(): elm(0){reset(o);}	
-	inline auto_ptr(auto_ptr & o) throw(): elm(0) {reset(o.release());}
-	template <class Y> 
-	inline auto_ptr(auto_ptr<Y> & o) throw(): elm(0) {reset(o.release());}
-	
-	inline auto_ptr & operator =(auto_ptr & o) throw() {reset(o.release()); return *this;}
-	template <class Y>
-	inline auto_ptr & operator =(auto_ptr<Y> & o) throw() {reset(o.release()); return *this;}
-	inline auto_ptr & operator =(auto_ptr_ref<T> r) throw() {reset(r.m_ptr); return *this;}
-
-	inline ~auto_ptr() throw() {reset();}
-
-	// D.10.1.2 members:
-	inline T & operator*() const throw() {return *elm;}
-	inline T * operator->() const throw() {return elm;}
-	inline T * get() const throw() {return elm;}	
-	inline T * release() throw () {T * t=elm; elm=0; return t;}	
-	inline void reset(T * o=0) throw () {
-		if (o == elm) return;
-		tpie_delete<T>(elm);
-		assert_tpie_ptr(o);
-		elm=o; 
-	}
-
-	// D.10.1.3 conversions:
-	inline auto_ptr(auto_ptr_ref<T> r) throw(): elm(0)  {reset(r.m_ptr);}
-	
-	template <class Y> 
-		inline operator auto_ptr_ref<Y>() throw() {return auto_ptr_ref<Y>(release());}
-
-	template<class Y> 
-		inline operator auto_ptr<Y>() throw() {return auto_ptr<Y>(release());}
-};
-
-#ifdef TPIE_CPP_RVALUE_REFERENCE
 struct tpie_deleter {
 	template <typename T>
 	void operator()(T * t) {
@@ -489,8 +403,50 @@ struct tpie_deleter {
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 using unique_ptr=std::unique_ptr<T, tpie_deleter>;
-#endif
 
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Create a new unique object using tpie::new
+/// \tparam T the type of the object.
+///////////////////////////////////////////////////////////////////////////////
+template <typename T, typename ... TT>
+inline unique_ptr<T> make_unique(TT && ... tt) {
+	return unique_ptr<T>(tpie_new<T>(std::forward<TT>(tt)...));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Bucket used for memory counting
+///////////////////////////////////////////////////////////////////////////////
+class memory_bucket {
+public:
+	memory_bucket(): count(0) {}
+	
+	std::atomic_size_t count;
+	std::string name;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Class storring a reference to a memory bucket
+///
+/// We do not use raw pointers manly because the go into overloading resolution
+/// with 0.
+///////////////////////////////////////////////////////////////////////////////
+class memory_bucket_ref {
+public:
+	explicit memory_bucket_ref(memory_bucket * b=nullptr) noexcept: bucket(b) {}
+	explicit operator bool() const noexcept {return bucket != nullptr;}
+	memory_bucket_ref(const memory_bucket_ref & o)  = default;
+	memory_bucket_ref(memory_bucket_ref && o) = default;
+	memory_bucket_ref & operator=(const memory_bucket_ref & o) = default;
+	memory_bucket_ref & operator=(memory_bucket_ref && o) = default;
+	memory_bucket & operator*() noexcept {return *bucket;} 
+	const memory_bucket & operator*() const noexcept {return *bucket;} 
+	memory_bucket * operator->() noexcept {return bucket;} 
+	const memory_bucket * operator->() const noexcept {return bucket;}
+	friend bool operator ==(const memory_bucket_ref & l, const memory_bucket_ref & r) noexcept {return l.bucket == r.bucket;}
+	friend bool operator !=(const memory_bucket_ref & l, const memory_bucket_ref & r) noexcept {return l.bucket != r.bucket;}
+private:
+	memory_bucket * bucket;
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief A allocator object usable in STL containers, using the TPIE
@@ -503,6 +459,8 @@ private:
     typedef std::allocator<T> a_t;
     a_t a;
 public:
+	memory_bucket_ref bucket;
+
     typedef typename a_t::size_type size_type;
     typedef typename a_t::difference_type difference_type;
 	typedef typename a_t::pointer pointer;
@@ -511,69 +469,58 @@ public:
 	typedef typename a_t::const_reference const_reference;
     typedef typename a_t::value_type value_type;
 
-	allocator() throw() {}
-	allocator(const allocator & a) throw() {unused(a);}
+	typedef std::true_type propagate_on_container_copy_assignment;
+	typedef std::true_type propagate_on_container_move_assignment;
+	typedef std::true_type propagate_on_container_swap;
+	
+	allocator() = default;
+	allocator(memory_bucket_ref bucket) noexcept : bucket(bucket) {}
+	allocator(const allocator & o) noexcept : bucket(o.bucket) {}
 	template <typename T2>
-	allocator(const allocator<T2> & a) throw() {unused(a);}
+	allocator(const allocator<T2> & o) noexcept : bucket(o.bucket) {}
 
     template <class U> struct rebind {typedef allocator<U> other;};
 
-    inline T * allocate(size_t size, const void * hint=0) {
+    T * allocate(size_t size, const void * hint=0) {
 		get_memory_manager().register_allocation(size * sizeof(T));
+		if (bucket) bucket->count += size * sizeof(T);
 		T * res = a.allocate(size, hint);
 		__register_pointer(res, size, typeid(T));
 		return res;
     }
 
-    inline void deallocate(T * p, size_t n) {
+    void deallocate(T * p, size_t n) {
 		if (p == 0) return;
+		if (bucket) bucket->count -= n * sizeof(T);
 		__unregister_pointer(p, n, typeid(T));
 		get_memory_manager().register_deallocation(n * sizeof(T));
 		return a.deallocate(p, n);
     }
-    inline size_t max_size() const {return a.max_size();}
+    size_t max_size() const noexcept {return a.max_size();}
 
-#ifdef TPIE_CPP_RVALUE_REFERENCE
-#ifdef TPIE_CPP_VARIADIC_TEMPLATES
 	template <typename U, typename ...TT>
-	inline void construct(U * p, TT &&...x) {a.construct(p, x...);}
-#else
-	#ifdef __clang__
-		//push the current warning state
-		#pragma clang diagnostic push
-		//disable warning about "rvalue references are a C++11 extension
-		#pragma clang diagnostic ignored "-Wc++11-extensions" 
-	#endif
-	template <typename TT>
-	inline void construct(T * p, TT && val) {a.construct(p, val);}
-	#ifdef __clang__
-		//restore the warning state
-		#pragma clang diagnostic pop
-	#endif
-#endif
-#endif
-	inline void construct(T * p) {
-#ifdef WIN32
-#pragma warning( push )
-#pragma warning(disable: 4345)
-#endif
-		new(p) T();
-#ifdef WIN32
-#pragma warning( pop )
-#endif
-	}
-    inline void construct(T * p, const T& val) {a.construct(p, val);}
-    inline void destroy(T * p) {a.destroy(p);}    
-	inline pointer address(reference x) const {return &x;}
-	inline const_pointer address(const_reference x) const {return &x;}
+	void construct(U * p, TT &&...x) {a.construct(p, std::forward<TT>(x)...);}
+
+	// void construct(T * p) {
+	// 	new(p) T();
+	// }
+    // void construct(T * p, const T& val) {a.construct(p, val);}
+	template <typename U>
+    void destroy(U * p) {
+        p->~U();
+    }
+	pointer address(reference x) const noexcept {return &x;}
+	const_pointer address(const_reference x) const noexcept {return &x;}
+
+
+	friend bool operator==(const allocator & l, const allocator & r) noexcept {return l.bucket == r.bucket;}
+	friend bool operator!=(const allocator & l, const allocator & r) noexcept {return l.bucket != r.bucket;}
+
+	template <typename U>
+	friend class allocator;
+
+		
 };
-
-template <typename T>
-inline bool operator==(const tpie::allocator<T>&, const tpie::allocator<T>&) {return true;}
-  
-template<typename T>
-inline bool operator!=(const tpie::allocator<T>&, const tpie::allocator<T>&) {return false;}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Find the largest amount of memory that can be allocated as a single
@@ -582,14 +529,5 @@ inline bool operator!=(const tpie::allocator<T>&, const tpie::allocator<T>&) {re
 size_t consecutive_memory_available(size_t granularity=5*1024*1024);
 
 } //namespace tpie
-
-namespace std {
-template <typename T>
-void swap(tpie::auto_ptr<T> & a, tpie::auto_ptr<T> & b) {
-	T * t =a.release();
-	a.reset(b.release());
-	b.reset(t);
-}
-} //namespace std
 
 #endif //__TPIE_MEMORY_H__

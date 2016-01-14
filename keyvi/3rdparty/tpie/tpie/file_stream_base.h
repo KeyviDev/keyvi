@@ -26,7 +26,7 @@
 
 #include <tpie/file_base_crtp.h>
 #include <tpie/stream_crtp.h>
-
+#include <algorithm>
 namespace tpie {
 
 class file_stream_base: public file_base_crtp<file_stream_base>, public stream_crtp<file_stream_base> {

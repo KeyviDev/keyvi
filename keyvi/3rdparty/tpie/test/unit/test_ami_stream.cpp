@@ -24,8 +24,7 @@
 #include "common.h"
 
 #include <iostream>
-#include <boost/filesystem/operations.hpp>
-#include <boost/random.hpp>
+#include <random>
 #include <tpie/tpie.h>
 
 #include <tpie/array.h>
@@ -159,9 +158,9 @@ int stress(size_t actions=1024*1024*10, size_t max_size=1024*1024*128) {
 		size_t location=0;
 		size_t size=0;
 	
-		boost::mt19937 rng;
-		boost::uniform_int<> todo(0, 6);
-		boost::uniform_int<> ddist(0, 123456789);
+		std::mt19937 rng;
+		std::uniform_int_distribution<> todo(0, 6);
+		std::uniform_int_distribution<> ddist(0, 123456789);
 		tpie::ami::stream<int> stream;
 		pi.init(actions);
 		for(size_t action=0; action < actions; ++action) {
@@ -170,7 +169,7 @@ int stress(size_t actions=1024*1024*10, size_t max_size=1024*1024*128) {
 			{
 				size_t cnt=size-location;
 				if (cnt > 0) {
-					boost::uniform_int<> d(1,std::min<size_t>(cnt, chunk_size));
+					std::uniform_int_distribution<> d(1,std::min<size_t>(cnt, chunk_size));
 					cnt=d(rng);
 					std::cerr << location << " " << size << " read: " << cnt << std::endl;
 					for (size_t i=0; i < cnt; ++i) {
@@ -201,7 +200,7 @@ int stress(size_t actions=1024*1024*10, size_t max_size=1024*1024*128) {
 			}
 			case 1: //WRITE
 			{
-				boost::uniform_int<> d(1,chunk_size);
+				std::uniform_int_distribution<> d(1,chunk_size);
 				size_t cnt=std::min<size_t>(d(rng), max_size-location);
 				std::cerr << location << " " << size << " write: " << cnt << std::endl;
 				for (size_t i=0; i < cnt; ++i) {
@@ -222,7 +221,7 @@ int stress(size_t actions=1024*1024*10, size_t max_size=1024*1024*128) {
 			}
 			case 3: //SEEK SOMEWHERE
 			{
-				boost::uniform_int<> d(0, size);
+				std::uniform_int_distribution<> d(0, size);
 				size_t l = d(rng);
 				std::cerr << location << " " << size << " seek: " << l << std::endl;
 				location = l;
@@ -233,7 +232,7 @@ int stress(size_t actions=1024*1024*10, size_t max_size=1024*1024*128) {
 			{
 				size_t cnt=size-location;
 				if (cnt > 0) {
-					boost::uniform_int<> d(1,std::min<size_t>(cnt, chunk_size));
+					std::uniform_int_distribution<> d(1,std::min<size_t>(cnt, chunk_size));
 					cnt=d(rng);
 					std::cerr << location << " " << size << " read array: " << cnt << std::endl;
 					stream.read_array(&arr[0], cnt);
@@ -253,7 +252,7 @@ int stress(size_t actions=1024*1024*10, size_t max_size=1024*1024*128) {
 			}
 			case 5: //WRITE ARRAY
 			{
-				 boost::uniform_int<> d(1,chunk_size);
+				 std::uniform_int_distribution<> d(1,chunk_size);
 				 size_t cnt=std::min<size_t>(d(rng), max_size-location);
 				 std::cerr << location << " " << size << " write array: " << cnt << std::endl;
 				 for (size_t i=0; i < cnt; ++i) {
@@ -267,7 +266,7 @@ int stress(size_t actions=1024*1024*10, size_t max_size=1024*1024*128) {
 			}
 			case 6: //TRUNCATE 
 			{
-				boost::uniform_int<> d(std::max(0, (int)size-(int)chunk_size), std::min(size+chunk_size, max_size));
+				std::uniform_int_distribution<> d(std::max(0, (int)size-(int)chunk_size), std::min(size+chunk_size, max_size));
 				size_t ns=d(rng);
 				std::cerr << location << " " << size << " truncate: " << ns << std::endl;	
 				stream.truncate(ns);

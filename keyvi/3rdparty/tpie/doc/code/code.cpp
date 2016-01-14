@@ -12,7 +12,7 @@
 #include <tpie/tpie.h>
 #include <tpie/tpie_assert.h>
 #include <algorithm>
-#include <boost/random.hpp>
+#include <random>
 #include <string>
 #include <vector>
 

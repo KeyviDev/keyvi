@@ -33,6 +33,8 @@
 #include <tpie/serialization2.h>
 #include <tpie/serialization_stream.h>
 
+#include <tpie/pipelining/node.h>
+
 namespace tpie {
 
 namespace serialization_bits {
@@ -59,12 +61,26 @@ struct sort_parameters {
 	}
 };
 
+template <typename T>
+void set_owner(memory_bucket_ref b, T & item) {
+	memory_size_type serSize = serialized_size(item);
+
+	if (serSize > sizeof(T)) {
+		// amount of memory this item needs for its extra stuff (stuff not in the buffer).
+		serSize -= sizeof(T);
+	}
+
+	b->count += serSize;	
+}
+
+template <typename T>
+void unset_owner(memory_bucket_ref /*b*/, T & /*item*/) {}
+
 template <typename T, typename pred_t>
 class internal_sort {
 	array<T> m_buffer;
 	memory_size_type m_items;
-	memory_size_type m_serializedSize;
-	memory_size_type m_memAvail;
+	memory_size_type m_memForItems;
 
 	memory_size_type m_largestItem;
 
@@ -72,22 +88,29 @@ class internal_sort {
 
 	bool m_full;
 
+	memory_bucket_ref m_buffer_bucket;
+	memory_bucket_ref m_item_bucket;
+
 public:
-	internal_sort(pred_t pred = pred_t())
-		: m_items(0)
-		, m_serializedSize(0)
+	internal_sort(memory_bucket_ref buffer_bucket, 
+				  memory_bucket_ref item_bucket,
+				  pred_t pred = pred_t())
+		: m_buffer(buffer_bucket)
+		, m_items(0)
 		, m_largestItem(sizeof(T))
 		, m_pred(pred)
 		, m_full(false)
+		, m_buffer_bucket(buffer_bucket)
+		, m_item_bucket(item_bucket)
 	{
 	}
 
 	void begin(memory_size_type memAvail) {
 		m_buffer.resize(memAvail / sizeof(T) / 2);
-		m_items = m_serializedSize = 0;
+		m_items = 0;
 		m_largestItem = sizeof(T);
 		m_full = false;
-		m_memAvail = memAvail;
+		m_memForItems = memAvail - m_buffer_bucket->count;
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -104,25 +127,16 @@ public:
 			return false;
 		}
 
-		memory_size_type serSize = serialized_size(item);
+		size_t oldSize = m_item_bucket->count;
+		set_owner(m_item_bucket, item);
 
-		if (serSize > sizeof(T)) {
-			// amount of memory this item needs for its extra stuff (stuff not in the buffer).
-			memory_size_type serializedExtra = serSize - sizeof(T);
-
-			// amount of memory not used for the buffer and not used for extra stuff already.
-			memory_size_type memRemainingExtra = m_memAvail - memory_usage();
-
-			if (serializedExtra > memRemainingExtra) {
-				m_full = true;
-				return false;
-			}
-
-			if (serSize > m_largestItem)
-				m_largestItem = serSize;
+		if (m_item_bucket->count > m_memForItems) {
+			unset_owner(m_item_bucket, item);
+			m_full = true;
+			return false;
 		}
 
-		m_serializedSize += serSize;
+		m_largestItem = std::max(m_largestItem, m_item_bucket->count - oldSize);
 
 		m_buffer[m_items++] = item;
 
@@ -140,7 +154,7 @@ public:
 	/// disk.
 	///////////////////////////////////////////////////////////////////////////
 	memory_size_type current_serialized_size() {
-		return m_serializedSize;
+		return m_item_bucket->count;
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -154,8 +168,7 @@ public:
 	/// calculations.
 	///////////////////////////////////////////////////////////////////////////
 	memory_size_type memory_usage() {
-		return m_buffer.size() * sizeof(T)
-			+ (m_serializedSize - m_items * sizeof(T));
+		return m_buffer_bucket->count + m_item_bucket->count;
 	}
 
 	bool can_shrink_buffer() {
@@ -183,8 +196,8 @@ public:
 	/// \brief Deallocate buffer and call reset().
 	///////////////////////////////////////////////////////////////////////////
 	void free() {
-		m_buffer.resize(0);
 		reset();
+		m_buffer.resize(0);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -192,7 +205,10 @@ public:
 	/// buffer size.
 	///////////////////////////////////////////////////////////////////////////
 	void reset() {
-		m_items = m_serializedSize = 0;
+		for (size_t i = 0 ; i < m_items ; ++i)
+			unset_owner(m_item_bucket, m_buffer[i]);
+		m_item_bucket->count = 0;
+		m_items = 0;
 		m_full = false;
 	}
 };
@@ -475,10 +491,16 @@ private:
 template <typename T, typename pred_t = std::less<T> >
 class serialization_sorter {
 public:
-	typedef boost::shared_ptr<serialization_sorter> ptr;
+	typedef std::shared_ptr<serialization_sorter> ptr;
 
 private:
 	enum sorter_state { state_initial, state_1, state_2, state_3 };
+
+	std::unique_ptr<memory_bucket> m_buffer_bucket_ptr;
+	memory_bucket_ref m_buffer_bucket;
+	std::unique_ptr<memory_bucket> m_item_bucket_ptr;
+	memory_bucket_ref m_item_bucket;
+	pipelining::node * m_owning_node;
 
 	sorter_state m_state;
 	serialization_bits::internal_sort<T, pred_t> m_sorter;
@@ -493,8 +515,13 @@ private:
 
 public:
 	serialization_sorter(memory_size_type minimumItemSize = sizeof(T), pred_t pred = pred_t())
-		: m_state(state_initial)
-		, m_sorter(pred)
+		: m_buffer_bucket_ptr(new memory_bucket())
+		, m_buffer_bucket(memory_bucket_ref(m_buffer_bucket_ptr.get()))
+		, m_item_bucket_ptr(new memory_bucket())
+		, m_item_bucket(memory_bucket_ref(m_item_bucket_ptr.get()))
+		, m_owning_node(nullptr)
+		, m_state(state_initial)
+		, m_sorter(m_buffer_bucket, m_item_bucket, pred)
 		, m_parametersSet(false)
 		, m_files()
 		, m_merger(m_files, pred)
@@ -568,6 +595,20 @@ public:
 		else
 			return m_files.next_level_runs() * (m_sorter.get_largest_item_size() + serialization_reader::memory_usage());
 	}
+
+	void set_owner(pipelining::node * n) {
+		if (m_owning_node != nullptr) {
+			m_buffer_bucket_ptr = std::move(m_owning_node->bucket(0));
+			m_item_bucket_ptr = std::move(m_owning_node->bucket(1));
+		}
+
+		if (n != nullptr) {
+			n->bucket(0) = std::move(m_buffer_bucket_ptr);
+			n->bucket(1) = std::move(m_item_bucket_ptr);
+		}
+
+		m_owning_node = n;
+	}
 private:
 	void calculate_parameters() {
 		if (m_state != state_initial)
@@ -629,9 +670,9 @@ private:
 		m_params.tempDir = tempname::tpie_dir_name();
 		m_files.set_temp_dir(m_params.tempDir);
 
-		log_info() << "Calculated serialization_sorter parameters.\n";
-		m_params.dump(log_info());
-		log_info() << std::flush;
+		log_debug() << "Calculated serialization_sorter parameters.\n";
+		m_params.dump(log_debug());
+		log_debug() << std::flush;
 
 		m_parametersSet = true;
 	}
@@ -644,10 +685,10 @@ public:
 			throw tpie::exception("Bad state in begin");
 		m_state = state_1;
 
-		log_info() << "Before begin; mem usage = "
+		log_debug() << "Before begin; mem usage = "
 			<< get_memory_manager().used() << std::endl;
 		m_sorter.begin(m_params.memoryPhase1 - serialization_writer::memory_usage());
-		log_info() << "After internal sorter begin; mem usage = "
+		log_debug() << "After internal sorter begin; mem usage = "
 			<< get_memory_manager().used() << std::endl;
 		boost::filesystem::create_directory(m_params.tempDir);
 	}
@@ -709,7 +750,7 @@ public:
 			m_reportInternal = false;
 		}
 
-		log_info() << "After internal sorter end; mem usage = "
+		log_debug() << "After internal sorter end; mem usage = "
 			<< get_memory_manager().used() << std::endl;
 
 		m_state = state_2;

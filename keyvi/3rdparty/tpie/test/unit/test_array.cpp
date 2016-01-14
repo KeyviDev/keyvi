@@ -77,30 +77,30 @@ bool basic_test() {
 	return true;
 }
 
-class auto_ptr_test_class {
+class unique_ptr_test_class {
 public:
 	size_t & dc;
 	size_t & cc;
-	auto_ptr_test_class(size_t & cc_, size_t & dc_): dc(dc_), cc(cc_) {
+	unique_ptr_test_class(size_t & cc_, size_t & dc_): dc(dc_), cc(cc_) {
 		++cc;
 	}
-	~auto_ptr_test_class() {
+	~unique_ptr_test_class() {
 		++dc;
 	}
 	size_t hat() {return 42;}
 private:
-	auto_ptr_test_class(const auto_ptr_test_class & o): dc(o.dc), cc(o.cc) {}
+	unique_ptr_test_class(const unique_ptr_test_class & o): dc(o.dc), cc(o.cc) {}
 };
 
 
-bool auto_ptr_test() {
+bool unique_ptr_test() {
 	size_t s=1234;
 	size_t cc=0;
 	size_t dc=0;
-	array<tpie::auto_ptr<auto_ptr_test_class> > a;
+	array<tpie::unique_ptr<unique_ptr_test_class> > a;
 	a.resize(s);
 	for(size_t i=0; i < s; ++i) 
-		a[i].reset(tpie_new<auto_ptr_test_class, size_t &, size_t &>(cc, dc));
+		a[i].reset(tpie_new<unique_ptr_test_class, size_t &, size_t &>(cc, dc));
 	TEST_ENSURE_EQUALITY(cc, s, "Wrong value");
 	TEST_ENSURE_EQUALITY(dc, 0, "Wrong value");
 	size_t x=0;
@@ -110,7 +110,7 @@ bool auto_ptr_test() {
 	TEST_ENSURE_EQUALITY(cc, s, "Wrong value");
 	TEST_ENSURE_EQUALITY(dc, 0, "Wrong value");
 	for(size_t i=0; i < s; ++i) 
-		a[i].reset(tpie_new<auto_ptr_test_class>(cc, dc));
+		a[i].reset(tpie_new<unique_ptr_test_class>(cc, dc));
 
 	TEST_ENSURE_EQUALITY(cc, 2*s, "Wrong value");
 	TEST_ENSURE_EQUALITY(dc, s, "Wrong value");
@@ -475,7 +475,7 @@ int main(int argc, char **argv) {
 	return tpie::tests(argc, argv, 128)
 		.test(basic_test, "basic")
 		.test(iterator_test, "iterators")
-		.test(auto_ptr_test, "auto_ptr")
+		.test(unique_ptr_test, "unique_ptr")
 		.test(array_memory_test(), "memory")
 		.test(basic_bool_test, "bit_basic")
 		.test(iterator_bool_test, "bit_iterators")

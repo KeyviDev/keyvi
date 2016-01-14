@@ -28,16 +28,16 @@ using namespace tpie;
 //
 // Method           			Covered by unit test
 //
-// ctor()						basic, auto_ptr_test
-// ctor(const maybe>T> & o)		basic, auto_ptr_test
-// operator=					basic, auto_ptr_test
-// construct					basic, auto_ptr_test
-// destruct						basic, auto_ptr_test
-// is_constructed				basic, auto_ptr_test
-// operator*					basic, auto_ptr_test
-// const operator* const		basic, auto_ptr_test
-// operator->					auto_ptr_test
-// const operator-> const		auto_ptr_test
+// ctor()						basic, unique_ptr_test
+// ctor(const maybe>T> & o)		basic, unique_ptr_test
+// operator=					basic, unique_ptr_test
+// construct					basic, unique_ptr_test
+// destruct						basic, unique_ptr_test
+// is_constructed				basic, unique_ptr_test
+// operator*					basic, unique_ptr_test
+// const operator* const		basic, unique_ptr_test
+// operator->					unique_ptr_test
+// const operator-> const		unique_ptr_test
 
 bool basic_test() {
 	maybe<std::string> foo; 
@@ -74,13 +74,13 @@ bool basic_test() {
 	return true;
 }
 
-bool auto_ptr_test() {
-	maybe<auto_ptr<int> > foo; 
+bool unique_ptr_test() {
+	maybe<unique_ptr<int> > foo; 
 
 	// test copy constructor and = operator
 	try {
-		maybe<auto_ptr<int> > bar(foo); 
-		maybe<auto_ptr<int> > baz = foo; 
+		maybe<unique_ptr<int> > bar(foo); 
+		maybe<unique_ptr<int> > baz = foo; 
 	} catch(maybe_exception e) {
 		std::cout << "Should not throw an exception" << " " << e.what();
 		return false;
@@ -92,8 +92,8 @@ bool auto_ptr_test() {
 
 	// test copy constructor and = operator
 	try {
-		maybe<auto_ptr<int> > bar(foo); 
-		maybe<auto_ptr<int> > baz = foo; 
+		maybe<unique_ptr<int> > bar(foo); 
+		maybe<unique_ptr<int> > baz = foo; 
 
 		std::cout << "Should have thrown an exception";
 		return false; 
@@ -115,6 +115,6 @@ bool auto_ptr_test() {
 int main(int argc, char **argv) {
 	return tpie::tests(argc, argv, 128)
 		.test(basic_test, "basic")
-		.test(auto_ptr_test, "auto_ptr")
+		.test(unique_ptr_test, "unique_ptr")
 		;
 }

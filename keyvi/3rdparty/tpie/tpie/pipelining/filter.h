@@ -38,13 +38,9 @@ public:
 		F functor;
 		dest_t dest;
 	public:
-#ifdef TPIE_CPP_DECLTYPE
 		typedef typename std::decay<typename unary_traits<F>::argument_type>::type item_type;
-#else
-		typedef typename boost::template unary_traits<F>::argument_type item_type;
-#endif	
-		type(TPIE_TRANSFERABLE(dest_t) dest, const F & functor):
-			functor(functor), dest(TPIE_MOVE(dest)) {
+		type(dest_t dest, const F & functor):
+			functor(functor), dest(std::move(dest)) {
 			set_name(bits::extract_pipe_name(typeid(F).name()), PRIORITY_NO_NAME);
 		}
 		
@@ -63,8 +59,8 @@ public:
 /// \param functor The filter to use
 ///////////////////////////////////////////////////////////////////////////////
 template <typename F>
-pipe_middle<tempfactory_1<bits::filter_t<F>, F> > filter(const F & functor) {
-	return tempfactory_1<bits::filter_t<F>, F >(functor);
+pipe_middle<tempfactory<bits::filter_t<F>, F> > filter(const F & functor) {
+	return tempfactory<bits::filter_t<F>, F >(functor);
 }
 
 } //namespace pipelining

@@ -39,6 +39,7 @@
 #include <tpie/cache_hint.h>
 #include <tpie/access_type.h>
 #include <tpie/types.h>
+#include <algorithm>
 
 namespace tpie {
 

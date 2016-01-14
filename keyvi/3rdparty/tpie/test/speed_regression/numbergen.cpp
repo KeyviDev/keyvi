@@ -20,12 +20,12 @@
 #include <string>
 #include <sstream>
 
-#include <boost/random.hpp>
+#include <random>
 
 #include <tpie/tpie.h>
 #include <tpie/file_stream.h>
 #include <tpie/serialization_stream.h>
-
+#include <ctime>
 struct parameters {
 	int argi;
 	int argc;
@@ -46,9 +46,7 @@ struct parameters {
 typedef double item_type;
 
 uint64_t seed_from_time() {
-	using namespace boost::posix_time;
-	ptime t(microsec_clock::local_time());
-	return static_cast<uint64_t>(t.time_of_day().ticks());
+	return static_cast<uint64_t>(time(nullptr));
 }
 
 template <typename N>
@@ -90,13 +88,11 @@ void go(parameters & params) {
 	tpie::stream_size_type numbers =
 		static_cast<tpie::stream_size_type>(params.megabytes
 											* 1024 * 1024 / sizeof(item_type));
-	boost::mt19937 rng(params.seed);
-	boost::uniform_01<> basedist;
-	boost::variate_generator<boost::mt19937, boost::uniform_01<> >
-		rng01(rng, basedist);
-	boost::exponential_distribution<> dist(2);
+	std::mt19937 rng(params.seed);
+	//std::uniform_real_distribution<> dist;
+	std::exponential_distribution<> dist(2);
 	for (tpie::stream_size_type i = 0; i < numbers; ++i) {
-		item_type x = dist(rng01);
+		item_type x = dist(rng);
 		if (params.gen_tpie) fs.write(x);
 		if (params.gen_serialization) ss.serialize(x);
 	}

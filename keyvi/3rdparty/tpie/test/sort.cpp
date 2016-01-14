@@ -29,8 +29,8 @@ class line_reader_type : public tp::node {
 	dest_t dest;
 
 public:
-	line_reader_type(const dest_t & dest)
-		: dest(dest)
+	line_reader_type(dest_t dest)
+		: dest(std::move(dest))
 	{
 		this->add_push_destination(dest);
 	}
@@ -43,10 +43,7 @@ public:
 	}
 };
 
-tp::pipe_begin<tp::factory_0<line_reader_type> >
-line_reader() {
-	return tp::factory_0<line_reader_type>();
-}
+typedef tp::pipe_begin<tp::factory<line_reader_type> > line_reader;
 
 class line_writer_type : public tp::node {
 public:
@@ -60,10 +57,7 @@ public:
 	}
 };
 
-tp::pipe_end<tp::termfactory_0<line_writer_type> >
-line_writer() {
-	return tp::termfactory_0<line_writer_type>();
-}
+typedef tp::pipe_end<tp::termfactory<line_writer_type> > line_writer;
 
 int main() {
 	tpie::tpie_init();

@@ -20,7 +20,7 @@
 
 #include <iostream>
 #include <boost/filesystem/operations.hpp>
-#include <boost/random.hpp>
+#include <random>
 
 #include <tpie/tpie.h>
 #include <tpie/file_stream.h>
@@ -30,8 +30,6 @@
 
 using namespace tpie;
 using namespace tpie::test;
-
-const size_t default_mb=10240;
 
 typedef tpie::uint64_t count_t;
 typedef tpie::uint64_t test_t;
@@ -69,7 +67,7 @@ public:
 };
 
 class series_random : public series_crtp<series_random> {
-	boost::mt19937 rng;
+	std::mt19937 rng;
 public:
 	const char * get_name() const { return "random"; }
 

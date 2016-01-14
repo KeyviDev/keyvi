@@ -56,7 +56,7 @@ void test(size_t times, size_t size) {
 		btree<btree_internal_store<int> > tree(store);*/
 		temp_file tmp;
 
-		btree<btree_external_store<int> > tree(btree_external_store<int>(tmp.path()));
+		btree<int, btree_external> tree(tmp.path());
 
 		// pre-protocol
 		int x[count];
@@ -75,7 +75,7 @@ void test(size_t times, size_t size) {
 		// searching
 		getTestRealtime(start);
 		for(size_t i = 0; i < count; ++i) {
-			tree.find(i);
+			tree.find((int)i);
 		}
 		getTestRealtime(end);
 		s(testRealtimeDiff(start,end));

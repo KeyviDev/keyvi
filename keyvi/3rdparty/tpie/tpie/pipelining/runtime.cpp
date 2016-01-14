@@ -18,10 +18,12 @@
 // along with TPIE.  If not, see <http://www.gnu.org/licenses/>
 
 #include <tpie/fractional_progress.h>
+#include <tpie/progress_indicator_null.h>
 #include <tpie/disjoint_sets.h>
 #include <tpie/pipelining/tokens.h>
 #include <tpie/pipelining/node.h>
 #include <tpie/pipelining/runtime.h>
+#include <boost/functional/hash.hpp>
 
 namespace tpie {
 
@@ -220,8 +222,7 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 class progress_indicators {
 public:
-	progress_indicators() {
-	}
+	progress_indicators(): fp(nullptr) {}
 
 	~progress_indicators() {
 		if (fp) fp->done();
@@ -230,36 +231,52 @@ public:
 		}
 		m_progressIndicators.resize(0);
 		delete fp;
-		fp = NULL;
+		fp = nullptr;
 	}
 
 	void init(stream_size_type n,
 			  progress_indicator_base & pi,
-			  const std::vector<std::vector<node *> > & phases) {
-		fp = new fractional_progress(&pi);
+			  const std::vector<std::vector<node *> > & phases,
+			  const char * file,
+			  const char * function) {
 		const size_t N = phases.size();
 		m_progressIndicators.resize(N);
+		fp = nullptr;
+		if (!file|| !function) {
+			for (size_t i = 0; i < N; ++i) 
+				m_progressIndicators[i] = new progress_indicator_null();
+			return;
+		}
+		
+		fp = new fractional_progress(&pi);
+		std::size_t uuid = 0;
 		for (size_t i = 0; i < N; ++i) {
-			std::string uid = get_phase_uid(phases[i]);
+			for (node * n: phases[i])
+				boost::hash_combine(uuid, n->get_name());
 			std::string name = get_phase_name(phases[i]);
+			char id[128];
+			// since an int like i cannot be 17 chars long, this cannot overflow
+			sprintf(id, "p%03d:%.100s:%08llX", (int)i, name.c_str(), (unsigned long long)uuid);
 			m_progressIndicators[i] = new fractional_subindicator(
-				*fp, uid.c_str(), TPIE_FSI, n, name.c_str());
+				*fp, id, file, function, n, name.c_str());
 		}
 		fp->init();
 	}
 
 private:
-	std::string get_phase_uid(const std::vector<node *> & phase) {
-		std::stringstream uid;
-		for (size_t i = 0; i < phase.size(); ++i) {
-			uid << typeid(*phase[i]).name() << ':';
-		}
-		return uid.str();
-	}
-
 	std::string get_phase_name(const std::vector<node *> & phase) {
 		priority_type highest = std::numeric_limits<priority_type>::min();
 		size_t highest_node = 0;
+		for (size_t i = 0; i < phase.size(); ++i) {
+			if (phase[i]->get_phase_name_priority() > highest) {
+				highest_node = i;
+				highest = phase[i]->get_phase_name_priority();
+			}
+		}
+		std::string n = phase[highest_node]->get_phase_name();
+		if (!n.empty()) return n;
+
+		highest_node = 0;
 		for (size_t i = 0; i < phase.size(); ++i) {
 			if (phase[i]->get_name_priority() > highest) {
 				highest_node = i;
@@ -272,7 +289,7 @@ private:
 	friend class phase_progress_indicator;
 
 	fractional_progress * fp;
-	std::vector<fractional_subindicator *> m_progressIndicators;
+	std::vector<progress_indicator_base *> m_progressIndicators;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -296,12 +313,12 @@ public:
 		m_pi->done();
 	}
 
-	fractional_subindicator & get() {
+	progress_indicator_base & get() {
 		return *m_pi;
 	}
 
 private:
-	fractional_subindicator * m_pi;
+	progress_indicator_base * m_pi;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -622,8 +639,9 @@ void runtime::get_flush_priorities(const std::map<node *, size_t> & phaseMap, st
 
 void runtime::go(stream_size_type items,
 				 progress_indicator_base & progress,
-				 memory_size_type memory)
-{
+				 memory_size_type memory,
+				 const char * file,
+				 const char * function) {
 	if (get_node_count() == 0)
 		throw tpie::exception("no nodes in pipelining graph");
 
@@ -686,7 +704,7 @@ void runtime::go(stream_size_type items,
 	// Construct fractional progress indicators:
 	// Get the name of each phase and call init() on the given indicator.
 	progress_indicators pi;
-	pi.init(items, progress, phases);
+	pi.init(items, progress, phases, file, function);
 
 	for (size_t i = 0; i < phases.size(); ++i) {
 		// Run each phase:
@@ -959,8 +977,11 @@ void runtime::go_initiators(const std::vector<node *> & phase) {
 	std::vector<node *> initiators;
 	for (size_t i = 0; i < phase.size(); ++i)
 		if (is_initiator(phase[i])) initiators.push_back(phase[i]);
-	for (size_t i = 0; i < initiators.size(); ++i)
+	for (size_t i = 0; i < initiators.size(); ++i) {
+		initiators[i]->set_state(node::STATE_IN_GO);
 		initiators[i]->go();
+		initiators[i]->set_state(node::STATE_AFTER_BEGIN);
+	}
 }
 
 /*static*/

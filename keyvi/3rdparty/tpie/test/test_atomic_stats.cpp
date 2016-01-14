@@ -18,7 +18,7 @@
 // along with TPIE.  If not, see <http://www.gnu.org/licenses/>
 
 #include <iostream>
-#include <boost/thread.hpp>
+#include <thread>
 #include <tpie/tpie.h>
 #include <tpie/sysinfo.h>
 #include <tpie/array.h>
@@ -51,9 +51,9 @@ void increase_stats_worker() {
 void increase_stats() {
 	std::cout << "Run " << workers << " workers, each incrementing the statistic "
 		<< timesPerWorker << " times." << std::endl;
-	tpie::array<boost::thread> threads(workers);
+	tpie::array<std::thread> threads(workers);
 	for (size_t i = 0; i < workers; ++i) {
-		boost::thread t(increase_stats_worker);
+		std::thread t(increase_stats_worker);
 		threads[i].swap(t);
 	}
 	for (size_t i = 0; i < workers; ++i) {

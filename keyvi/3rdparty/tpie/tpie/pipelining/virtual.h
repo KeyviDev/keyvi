@@ -92,18 +92,18 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Concrete implementation of virtsrc.
 ///////////////////////////////////////////////////////////////////////////////
-template <typename dest_t>
-class virtsrc_impl : public virtsrc<typename push_type<dest_t>::type> {
+template <typename dest_t, typename T>
+class virtsrc_impl : public virtsrc<T> {
 public:
-	typedef typename push_type<dest_t>::type item_type;
+	typedef T item_type;
 
 private:
 	typedef typename maybe_add_const_ref<item_type>::type input_type;
 	dest_t dest;
 
 public:
-	virtsrc_impl(TPIE_TRANSFERABLE(dest_t) dest)
-		: dest(TPIE_MOVE(dest))
+	virtsrc_impl(dest_t dest)
+		: dest(std::move(dest))
 	{
 		node::add_push_destination(this->dest);
 		this->set_name("Virtual source", PRIORITY_INSIGNIFICANT);
@@ -141,11 +141,10 @@ public:
 		this->set_plot_options(node::PLOT_BUFFERED | node::PLOT_SIMPLIFIED_HIDE);
 	}
 
-	virtrecv(const virtrecv & other)
-		: node(other)
-		, m_self(other.m_self)
-		, m_virtdest(other.m_virtdest)
-	{
+	virtrecv(virtrecv && o)
+		: node(std::move(o))
+		, m_self(o.m_self)
+		, m_virtdest(std::move(o.m_virtdest)) {
 		m_self = this;
 	}
 
@@ -182,11 +181,11 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 class virt_node {
 public:
-	typedef boost::shared_ptr<virt_node> ptr;
+	typedef std::shared_ptr<virt_node> ptr;
 
 private:
-	std::auto_ptr<node> m_node;
-	std::auto_ptr<virtual_container> m_container;
+	std::unique_ptr<node> m_node;
+	std::unique_ptr<virtual_container> m_container;
 	ptr m_left;
 	ptr m_right;
 
@@ -298,6 +297,8 @@ class access {
 	friend class pipelining::virtual_chunk_begin;
 	template <typename>
 	friend class vfork_node;
+	template <typename>
+	friend class vpush_node;
 
 	template <typename Input>
 	static virtsrc<Input> * get_source(const virtual_chunk_end<Input> &);
@@ -336,8 +337,8 @@ public:
 	/// ownership of it.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename fact_t>
-	virtual_chunk_end(const pipe_end<fact_t> & pipe, virtual_container * ctr = 0) {
-		*this = pipe;
+	virtual_chunk_end(pipe_end<fact_t> && pipe, virtual_container * ctr = 0) {
+		*this = std::forward<pipe_end<fact_t>>(pipe);
 		set_container(ctr);
 	}
 
@@ -354,14 +355,14 @@ public:
 	/// \brief Construct a node and assign it to this virtual chunk.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename fact_t>
-	virtual_chunk_end & operator=(const pipe_end<fact_t> & pipe) {
+	virtual_chunk_end & operator=(pipe_end<fact_t> && pipe) {
 		if (this->m_node) {
 			log_error() << "Virtual chunk assigned twice" << std::endl;
 			throw tpie::exception("Virtual chunk assigned twice");
 		}
 
 		typedef typename fact_t::constructed_type constructed_type;
-		m_src = new bits::virtsrc_impl<constructed_type>(pipe.factory.construct());
+		m_src = new bits::virtsrc_impl<constructed_type, Input>(pipe.factory.construct());
 		this->m_node = bits::virt_node::take_own(m_src);
 		this->m_nodeMap = m_src->get_node_map();
 
@@ -397,8 +398,8 @@ public:
 	/// ownership of it.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename fact_t>
-	virtual_chunk(const pipe_middle<fact_t> & pipe, virtual_container * ctr = 0) {
-		*this = pipe;
+	virtual_chunk(pipe_middle<fact_t> && pipe, virtual_container * ctr = 0) {
+		*this = std::forward<pipe_middle<fact_t>>(pipe);
 		set_container(ctr);
 	}
 
@@ -429,7 +430,7 @@ public:
 	/// \brief Construct a node and assign it to this virtual chunk.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename fact_t>
-	virtual_chunk & operator=(const pipe_middle<fact_t> & pipe) {
+	virtual_chunk & operator=(pipe_middle<fact_t> && pipe) {
 		if (this->m_node) {
 			log_error() << "Virtual chunk assigned twice" << std::endl;
 			throw tpie::exception("Virtual chunk assigned twice");
@@ -437,13 +438,9 @@ public:
 		typedef typename fact_t::template constructed<recv_type>::type constructed_type;
 		recv_type temp(m_recv);
 		this->m_nodeMap = temp.get_node_map();
-		fact_t f = pipe.factory;
+		fact_t f = std::move(pipe.factory);
 		f.set_destination_kind_push();
-#ifndef TPIE_CPP_RVALUE_REFERENCE
-		m_src = new bits::virtsrc_impl<constructed_type>(f.construct(temp));
-#else // TPIE_CPP_RVALUE_REFERENCE
-		m_src = new bits::virtsrc_impl<constructed_type>(f.construct(std::move(temp)));
-#endif // TPIE_CPP_RVALUE_REFERENCE
+		m_src = new bits::virtsrc_impl<constructed_type, Input>(f.construct(std::move(temp)));
 		this->m_node = bits::virt_node::take_own(m_src);
 
 		return *this;
@@ -514,8 +511,8 @@ public:
 	/// ownership of it.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename fact_t>
-	virtual_chunk_begin(const pipe_begin<fact_t> & pipe, virtual_container * ctr = 0) {
-		*this = pipe;
+	virtual_chunk_begin(pipe_begin<fact_t> && pipe, virtual_container * ctr = 0) {
+		*this = std::forward<pipe_begin<fact_t>>(pipe);
 		set_container(ctr);
 	}
 
@@ -537,7 +534,7 @@ public:
 	/// \brief Construct a node and assign it to this virtual chunk.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename fact_t>
-	virtual_chunk_begin & operator=(const pipe_begin<fact_t> & pipe) {
+	virtual_chunk_begin & operator=(pipe_begin<fact_t> && pipe) {
 		if (this->m_node) {
 			log_error() << "Virtual chunk assigned twice" << std::endl;
 			throw tpie::exception("Virtual chunk assigned twice");
@@ -545,13 +542,9 @@ public:
 		typedef typename fact_t::template constructed<recv_type>::type constructed_type;
 		recv_type temp(m_recv);
 		this->m_nodeMap = m_recv->get_node_map();
-		fact_t f = pipe.factory;
+		fact_t f = std::move(pipe.factory);
 		f.set_destination_kind_push();
-#ifndef TPIE_CPP_RVALUE_REFERENCE
-		this->m_node = bits::virt_node::take_own(new constructed_type(f.construct(temp)));
-#else // TPIE_CPP_RVALUE_REFERENCE
 		this->m_node = bits::virt_node::take_own(new constructed_type(f.construct(std::move(temp))));
-#endif // TPIE_CPP_RVALUE_REFERENCE
 		return *this;
 	}
 
@@ -611,18 +604,18 @@ public:
 	public:
 		typedef T item_type;
 
-		type(TPIE_TRANSFERABLE(dest_t) dest, virtual_chunk_end<T> out)
+		type(dest_t && dest, virtual_chunk_end<T> out)
 			: vnode(out.get_node())
 			, dest2(bits::access::get_source(out))
-			, dest(TPIE_MOVE(dest))
+			, dest(std::move(dest))
 		{
 			add_push_destination(this->dest);
-			add_push_destination(*dest2);
+			if (dest2) add_push_destination(*dest2);
 		}
 
 		void push(T v) {
 			dest.push(v);
-			dest2->push(v);
+			if (dest2) dest2->push(v);
 		}
 
 	private:
@@ -635,15 +628,44 @@ public:
 	};
 };
 
+
+template <typename T>
+class vpush_node : public node {
+public:
+	typedef T item_type;
+
+	vpush_node(virtual_chunk_end<T> out)
+		: vnode(out.get_node())
+		, dest(bits::access::get_source(out))
+	{
+		if (dest) add_push_destination(*dest);
+	}
+
+	void push(T v) {
+		if (dest) dest->push(v);
+	}
+
+private:
+	// This counted reference ensures dest is not deleted prematurely.
+	virt_node::ptr vnode;
+	virtsrc<T> * dest;
+};
+
 } // namespace bits
 
 template <typename T>
-pipe_middle<tempfactory_1<bits::vfork_node<T>, virtual_chunk_end<T> > > fork_to_virtual(const virtual_chunk_end<T> & out) {
+pipe_middle<tempfactory<bits::vfork_node<T>, virtual_chunk_end<T> > > fork_to_virtual(const virtual_chunk_end<T> & out) {
 	return out;
 }
 
 template <typename T>
-virtual_chunk<T, T> vfork(const virtual_chunk_end<T> & out) {
+pipe_end<termfactory<bits::vpush_node<T>, virtual_chunk_end<T> > > push_to_virtual(const virtual_chunk_end<T> & out) {
+	return out;
+}
+	
+template <typename T>
+virtual_chunk<T> vfork(const virtual_chunk_end<T> & out) {
+	if (out.empty()) return virtual_chunk<T>();
 	return fork_to_virtual(out);
 }
 

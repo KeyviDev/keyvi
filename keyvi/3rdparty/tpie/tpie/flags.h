@@ -24,7 +24,7 @@
 #ifndef _TPIE_FLAGS_H
 #define _TPIE_FLAGS_H
 
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <tpie/serialization2.h>
 
 namespace tpie {

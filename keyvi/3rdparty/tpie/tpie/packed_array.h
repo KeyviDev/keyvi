@@ -21,8 +21,8 @@
 
 #include <tpie/config.h>
 #include <tpie/util.h>
-#include <boost/static_assert.hpp>
 #include <iterator>
+#include <cassert>
 
 ///////////////////////////////////////////////////////////////////////////
 /// \file packed_array.h
@@ -49,23 +49,23 @@ public:
 	typedef ptrdiff_t difference_type;
 	typedef std::random_access_iterator_tag iterator_category;
 	template <typename TT>
-	inline bool operator==(const TT & o) const {return (self()-o) == 0;}
+	bool operator==(const TT & o) const {return (self()-o) == 0;}
 	template <typename TT>
-	inline bool operator!=(const TT & o) const {return (self()-o) != 0;}
-	inline CT & operator++() {self().index() += forward?1:-1; return self();}
-	inline CT operator++(int) {CT x=self(); ++self(); return x;}
-	inline CT & operator--() {self().index() += forward?-1:1; return self();}
-	inline CT operator--(int) {CT x=self(); --self(); return x;}
-	inline bool operator<(const CT & o)  const {return (self()-o) < 0;}
-	inline bool operator>(const CT & o)  const {return (self()-o) > 0;}
-	inline bool operator<=(const CT & o) const {return (self()-o) <= 0;}
-	inline bool operator>=(const CT & o) const {return (self()-o) >= 0;}
-	inline ptrdiff_t operator-(const CT & o) const {return forward ? (self().index() - o.index()) : (o.index() - self().index());}
-	inline CT operator+(difference_type n) const {CT x=self(); return x += n;}
-	inline CT operator-(difference_type n) const {CT x=self(); return x -= n;}
-	inline CT & operator+=(difference_type n) {self().index() += (forward?n:-n); return self();}
-	inline CT & operator-=(difference_type n) {self().index() += (forward?n:-n); return self();}
-	inline RT operator[](difference_type n) {return *(self() + n);}
+	bool operator!=(const TT & o) const {return (self()-o) != 0;}
+	CT & operator++() {self().index() += forward?1:-1; return self();}
+	CT operator++(int) {CT x=self(); ++self(); return x;}
+	CT & operator--() {self().index() += forward?-1:1; return self();}
+	CT operator--(int) {CT x=self(); --self(); return x;}
+	bool operator<(const CT & o)  const {return (self()-o) < 0;}
+	bool operator>(const CT & o)  const {return (self()-o) > 0;}
+	bool operator<=(const CT & o) const {return (self()-o) <= 0;}
+	bool operator>=(const CT & o) const {return (self()-o) >= 0;}
+	ptrdiff_t operator-(const CT & o) const {return forward ? (self().index() - o.index()) : (o.index() - self().index());}
+	CT operator+(difference_type n) const {CT x=self(); return x += n;}
+	CT operator-(difference_type n) const {CT x=self(); return x -= n;}
+	CT & operator+=(difference_type n) {self().index() += (forward?n:-n); return self();}
+	CT & operator-=(difference_type n) {self().index() += (forward?n:-n); return self();}
+	RT operator[](difference_type n) {return *(self() + n);}
 };
 
 template <typename CT, bool f, typename RT>
@@ -91,40 +91,40 @@ public:
 	typedef size_t storage_type;
 private:
 	// TODO is this necessary?
-	BOOST_STATIC_ASSERT(sizeof(storage_type) * 8 % B == 0);
+	static_assert(sizeof(storage_type) * 8 % B == 0, "Bad storrage");
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Logical elements per physical element.
 	///////////////////////////////////////////////////////////////////////////
-	static inline size_t perword() {
+	static size_t perword() {
 		return sizeof(storage_type) * 8 / B;
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Physical element index that contains a given logical element.
 	///////////////////////////////////////////////////////////////////////////
-	static inline size_t high(size_t index) {
+	static size_t high(size_t index) {
 		return index/perword();
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Bit position where a given logical element resides.
 	///////////////////////////////////////////////////////////////////////////
-	static inline size_t low(size_t index) {
+	static size_t low(size_t index) {
 		return B*(index%perword());
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Number of physical elements needed to store m logical elements.
 	///////////////////////////////////////////////////////////////////////////
-	static inline size_t words(size_t m) {
+	static size_t words(size_t m) {
 		return (perword()-1+m)/perword();
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Mask that will extract the lowest order logical element.
 	///////////////////////////////////////////////////////////////////////////
-	static inline storage_type mask() {
+	static storage_type mask() {
 		return (1 << B)-1;
 	}
 
@@ -148,7 +148,7 @@ private:
 		template <bool> friend class packed_array::iter_base;
 		template <bool> friend class packed_array::const_iter_base;
 		operator T() const {return static_cast<T>((elms[high(index)] >> low(index))&mask());}
-	 	inline iter_return_type & operator=(const T b) {
+	 	iter_return_type & operator=(const T b) {
 			storage_type * p = elms+high(index);
 			size_t i = low(index);
 			*p = (*p & ~(mask()<<i)) | ((b & mask()) << i);
@@ -171,8 +171,8 @@ private:
 		template <typename, bool, typename> friend class packed_array_iter_facade;
 		iter_base(storage_type * elms, size_t index): elm(elms, index) {};
 
-		inline size_t & index() {return elm.index;}
-		inline const size_t & index() const {return elm.index;}
+		size_t & index() {return elm.index;}
+		const size_t & index() const {return elm.index;}
 	public:
 		typedef iter_return_type value_type;
 		typedef iter_return_type & reference;
@@ -201,8 +201,8 @@ private:
 		template <typename, bool, typename> friend class packed_array_iter_facade;
 		const_iter_base(const storage_type * e, size_t i): elms(e), idx(i) {}
 
-		inline size_t & index() {return idx;}
-		inline const size_t & index() const {return idx;}
+		size_t & index() {return idx;}
+		const size_t & index() const {return idx;}
 	public:
 		typedef vssucks value_type;
 		typedef vssucks reference;
@@ -227,12 +227,12 @@ private:
 		return_type(storage_type * p_, size_t i_): p(p_), i(i_) {}
 		friend class packed_array;
 	public:
-	 	inline operator T() const {return static_cast<T>((*p >> i) & mask());}
-	 	inline return_type & operator=(const T b) {
+	 	operator T() const {return static_cast<T>((*p >> i) & mask());}
+	 	return_type & operator=(const T b) {
 			*p = (*p & ~(mask()<<i)) | ((static_cast<const storage_type>(b) & mask()) << i);
 	 		return *this;
 		}
-	 	inline return_type & operator=(const return_type & t){
+	 	return_type & operator=(const return_type & t){
 	 		*this = (T) t;
 	 		return *this;
 	 	}
@@ -270,7 +270,7 @@ public:
 	/// \copybrief linear_memory_structure_doc::memory_coefficient()
 	/// \copydetails linear_memory_structure_doc::memory_coefficient()
 	/////////////////////////////////////////////////////////
-	inline static double memory_coefficient(){
+	static double memory_coefficient(){
 		return B/8.0;
 	}
 	
@@ -288,7 +288,7 @@ public:
 	/// The elements have undefined values
 	/// \param s The number of elements in the array
 	/////////////////////////////////////////////////////////
-	packed_array(size_t s=0): m_elements(0), m_size(0) {resize(s);}
+	packed_array(size_t s=0): m_elements(nullptr), m_size(0) {resize(s);}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Construct array of given size.
@@ -296,14 +296,23 @@ public:
 	/// \param s The number of elements in the array
 	/// \param value Each entry of the array is initialized with this value
 	/////////////////////////////////////////////////////////
-	packed_array(size_t s, T value): m_elements(0), m_size(0) {resize(s,value);}
+	packed_array(size_t s, T value): m_elements(nullptr), m_size(0) {resize(s,value);}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Construct a copy of another array
 	/// \param other The array to copy
 	/////////////////////////////////////////////////////////
-	packed_array(const packed_array & a): m_elements(0), m_size(0) {*this=a;}
+	packed_array(const packed_array & a): m_elements(nullptr), m_size(0) {*this=a;}
 
+	/////////////////////////////////////////////////////////
+	/// \brief Move another aray into me
+	/// \param other The array to copy
+	/////////////////////////////////////////////////////////
+	packed_array(packed_array && a): m_elements(a.m_elements), m_size(a.m_size) {
+		a.m_elements = nullptr;
+		a.m_size = 0;
+	}
+	
 	/////////////////////////////////////////////////////////
 	/// \brief Free up all memory used by the array
 	/////////////////////////////////////////////////////////
@@ -324,6 +333,18 @@ public:
 	}
 
 	/////////////////////////////////////////////////////////
+	/// \brief Move another array
+	///
+	/////////////////////////////////////////////////////////
+	packed_array & operator=(packed_array && a) {
+		resize(0);
+		std::swap(m_elements, a.m_elements);
+		std::swap(m_size, a.m_size);
+		return *this;
+	}
+
+
+	/////////////////////////////////////////////////////////
 	/// \brief Change the size of the array
 	///
 	/// All elements are lost, after resize the value of the entries
@@ -334,7 +355,7 @@ public:
 		if (s == m_size) return;
 		tpie_delete_array(m_elements, words(m_size));
 		m_size = s;
-		m_elements = m_size?tpie_new_array<storage_type>(words(m_size)):0;
+		m_elements = m_size?tpie_new_array<storage_type>(words(m_size)):nullptr;
 	}
 
 	/////////////////////////////////////////////////////////
@@ -369,14 +390,14 @@ public:
 	///
 	/// \return the size of the array
 	/////////////////////////////////////////////////////////
-	inline size_t size() const {return m_size;}
+	size_t size() const {return m_size;}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Check if the array is empty
 	///
 	/// \return true if and only if size is 0
 	/////////////////////////////////////////////////////////
-	inline bool empty() const {return m_size ==0;}
+	bool empty() const {return m_size ==0;}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Return an array entry
@@ -384,7 +405,7 @@ public:
 	/// \param i the index of the entry to return
 	/// \return the array entry
 	/////////////////////////////////////////////////////////
-	inline T operator[](size_t t)const {
+	T operator[](size_t t)const {
 		assert(t < m_size);
 		return static_cast<T>((m_elements[high(t)] >> low(t))&mask());
 	}	
@@ -395,7 +416,7 @@ public:
 	/// \param i the index of the entry to return
 	/// \return The object behaving like a reference
 	/////////////////////////////////////////////////////////
-	inline return_type operator[](size_t t) {
+	return_type operator[](size_t t) {
 		assert(t < m_size);
 		return return_type(m_elements+high(t), low(t));
 	}
@@ -406,7 +427,7 @@ public:
 	/// \param i the index of the element we want an iterator to
 	/// \return an iterator to the i'th element
 	/////////////////////////////////////////////////////////
-	inline iterator find(size_type i) {return iterator(m_elements,i);}
+	iterator find(size_type i) {return iterator(m_elements,i);}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Return a const iterator to the i'th element of the array
@@ -414,42 +435,42 @@ public:
 	/// \param i the index of the element we want an iterator to
 	/// \return a const iterator to the i'th element
 	/////////////////////////////////////////////////////////
-	inline const_iterator find(size_type i) const {return const_iterator(m_elements,i);}
+	const_iterator find(size_type i) const {return const_iterator(m_elements,i);}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Return an iterator to the beginning of the array
 	///
 	/// \return an iterator tho the beginning of the array
 	/////////////////////////////////////////////////////////
-	inline iterator begin() {return iterator(m_elements,0);}
+	iterator begin() {return iterator(m_elements,0);}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Return a const iterator to the beginning of the array
 	///
 	/// \return a const iterator tho the beginning of the array
 	/////////////////////////////////////////////////////////
-	inline const_iterator begin() const {return const_iterator(m_elements,0);}
+	const_iterator begin() const {return const_iterator(m_elements,0);}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Return an iterator to the end of the array
 	///
 	/// \return an iterator tho the end of the array
 	/////////////////////////////////////////////////////////
-	inline iterator end() {return iterator(m_elements,m_size);}
+	iterator end() {return iterator(m_elements,m_size);}
 
 	/////////////////////////////////////////////////////////
 	/// \brief Return a const iterator to the end of the array
 	///
 	/// \return a const iterator tho the end of the array
 	/////////////////////////////////////////////////////////
-	inline const_iterator end() const {return const_iterator(m_elements,m_size);}
+	const_iterator end() const {return const_iterator(m_elements,m_size);}
 
 	//We use m_elements -1 as basic for the reverse operators
 	//To make sure that the index of rend is positive
-	inline reverse_iterator rbegin() {return reverse_iterator(m_elements-1, perword()+m_size-1);}
-	inline const_reverse_iterator rbegin() const {return const_reverse_iterator(m_elements-1, perword()+m_size-1);}
-	inline reverse_iterator rend() {return reverse_iterator(m_elements-1, perword()-1);}
-	inline const_reverse_iterator rend() const {return const_reverse_iterator(m_elements-1, perword()-1);}
+	reverse_iterator rbegin() {return reverse_iterator(m_elements-1, perword()+m_size-1);}
+	const_reverse_iterator rbegin() const {return const_reverse_iterator(m_elements-1, perword()+m_size-1);}
+	reverse_iterator rend() {return reverse_iterator(m_elements-1, perword()-1);}
+	const_reverse_iterator rend() const {return const_reverse_iterator(m_elements-1, perword()-1);}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Swap two arrays.

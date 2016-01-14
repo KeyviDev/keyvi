@@ -24,8 +24,9 @@
 /// \file compressed/request.h  Compressor thread requests and responses.
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
+#include <memory>
+#include <thread>
+#include <condition_variable>
 #include <tpie/tpie_assert.h>
 #include <tpie/tempname.h>
 #include <tpie/file_accessor/file_accessor.h>
@@ -148,7 +149,7 @@ public:
 	}
 
 private:
-	boost::condition_variable m_changed;
+	std::condition_variable m_changed;
 
 	// Information about the write
 	stream_size_type m_blockNumber;
@@ -192,9 +193,9 @@ protected:
 
 class read_request : public request_base {
 public:
-	typedef boost::shared_ptr<compressor_buffer> buffer_t;
+	typedef std::shared_ptr<compressor_buffer> buffer_t;
 	typedef file_accessor::byte_stream_accessor<default_raw_file_accessor> file_accessor_t;
-	typedef boost::condition_variable condition_t;
+	typedef std::condition_variable condition_t;
 
 	read_request(buffer_t buffer,
 				 file_accessor_t * fileAccessor,
@@ -238,7 +239,7 @@ private:
 
 class write_request : public request_base {
 public:
-	typedef boost::shared_ptr<compressor_buffer> buffer_t;
+	typedef std::shared_ptr<compressor_buffer> buffer_t;
 	typedef file_accessor::byte_stream_accessor<default_raw_file_accessor> file_accessor_t;
 
 	write_request(const buffer_t & buffer,

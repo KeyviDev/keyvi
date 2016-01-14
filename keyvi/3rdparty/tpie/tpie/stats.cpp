@@ -21,54 +21,54 @@
 // the number of statistics to be recorded.
 
 #include <tpie/stats.h>
-#include <tpie/atomic.h>
+#include <atomic>
 
 namespace {
-	tpie::atomic_stream_size_type temp_file_usage;
-	tpie::atomic_stream_size_type bytes_read;
-	tpie::atomic_stream_size_type bytes_written;
-	tpie::atomic_stream_size_type user[20];
+	std::atomic<tpie::stream_size_type> temp_file_usage;
+	std::atomic<tpie::stream_size_type> bytes_read;
+	std::atomic<tpie::stream_size_type> bytes_written;
+	std::atomic<tpie::stream_size_type> user[20];
 } // unnamed namespace
 
 namespace tpie {
 
 	stream_size_type get_temp_file_usage() {
-		return temp_file_usage.fetch();
+		return temp_file_usage.load();
 	}
 
 	void increment_temp_file_usage(stream_offset_type delta) {
-		stream_size_type x = temp_file_usage.add_and_fetch(delta);
+		stream_size_type x = temp_file_usage.fetch_add(delta);
 		if (static_cast<stream_offset_type>(x) < 0) {
 			// Somebody has a net negative temp_file_usage!
 			// This is a race, but this branch is only taken when
 			// the application has a negative temp_file_usage,
 			// which is a bug in the stats reporting of the application.
-			temp_file_usage.sub(x);
+			temp_file_usage.fetch_sub(x);
 		}
 	}
 
 	stream_size_type get_bytes_read() {
-		return bytes_read.fetch();
+		return bytes_read.load();
 	}
 
 	stream_size_type get_bytes_written() {
-		return bytes_written.fetch();
+		return bytes_written.load();
 	}
 
 	void increment_bytes_read(stream_size_type delta) {
-		bytes_read.add(delta);
+		bytes_read.fetch_add(delta);
 	}
 	
 	void increment_bytes_written(stream_size_type delta) {
-		bytes_written.add(delta);
+		bytes_written.fetch_add(delta);
 	}
 
 	stream_size_type get_user(size_t i) {
-		return (i < sizeof(user)) ? user[i].fetch() : 0;
+		return (i < sizeof(user)) ? user[i].load() : 0;
 	}
 
 	void increment_user(size_t i, stream_size_type delta) {
-		if (i < sizeof(user)) user[i].add(delta);
+		if (i < sizeof(user)) user[i].fetch_add(delta);
 	}
 }  //  tpie namespace
 

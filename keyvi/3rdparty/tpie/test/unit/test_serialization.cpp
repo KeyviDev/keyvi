@@ -22,9 +22,6 @@
 #include <tpie/serialization2.h>
 #include <tpie/serialization_stream.h>
 #include <map>
-#include <boost/random/linear_congruential.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/filesystem.hpp>
 
 using namespace tpie;
 using namespace std;

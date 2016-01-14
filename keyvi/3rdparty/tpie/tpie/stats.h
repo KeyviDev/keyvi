@@ -24,7 +24,7 @@
 #ifndef _TPIE_STATS_H
 #define _TPIE_STATS_H
 #include <tpie/types.h>
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 namespace tpie {
 
@@ -65,30 +65,23 @@ namespace tpie {
 	void increment_user(size_t i, stream_size_type delta);
 
 class ptime {
+private:
+	typedef std::chrono::steady_clock clock;
+	typedef std::chrono::time_point<clock> time_point;
 public:
-	ptime()
-		: m_ptime(boost::posix_time::not_a_date_time)
-	{
-	}
+	ptime() {}
 
-	static ptime now() {
-		return ptime(boost::posix_time::microsec_clock::universal_time());
-	}
+	static ptime now() {return clock::now();}
 
 	static double seconds(const ptime & t1, const ptime & t2) {
-		if (t1.m_ptime.is_special() || t2.m_ptime.is_special()) {
-			return 0.0;
-		}
-		return (t2.m_ptime - t1.m_ptime).total_microseconds() / 1000000.0;
+		return std::chrono::duration_cast<std::chrono::seconds>(
+			t2.m_ptime - t1.m_ptime).count();
 	}
 
 private:
-	boost::posix_time::ptime m_ptime;
+	time_point m_ptime;
 
-	ptime(boost::posix_time::ptime ptime)
-		: m_ptime(ptime)
-	{
-	}
+	ptime(time_point ptime): m_ptime(ptime) {}
 };
 
 class stat_timer {
