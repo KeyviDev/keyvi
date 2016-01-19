@@ -30,13 +30,34 @@
 
 #include "compression/compression_strategy.h"
 
+//#define ENABLE_TRACING
+#include "dictionary/util/trace.h"
+
 namespace keyvi {
 namespace compression {
 
 /** A compression strategy that wraps zlib. */
 struct ZlibCompressionStrategy final : public CompressionStrategy {
   ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION)
-    : compression_level_(compression_level) {}
+    : compression_level_(compression_level) {
+
+    // init zlib structure for compression
+
+    zstream_compress_.zalloc = Z_NULL;
+    zstream_compress_.zfree = Z_NULL;
+    zstream_compress_.opaque = Z_NULL;
+
+    // see zlib.h level 9 means more speed for the price of memory
+    const int mem_level = 9;
+
+    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, MAX_WBITS, mem_level, Z_DEFAULT_STRATEGY) != Z_OK) {
+      throw std::bad_alloc();
+    }
+  }
+
+  ~ZlibCompressionStrategy(){
+    deflateEnd(&zstream_compress_);
+  }
 
   inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
       DoCompress(buffer, raw, raw_size);
@@ -45,38 +66,34 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
   inline void DoCompress(buffer_t& buffer, const char* raw, size_t raw_size) {
 
-    z_stream zs;                        // z_stream is zlib's control structure
-    memset(&zs, 0, sizeof(zs));
+    TRACE("Zlib compress length %d", raw_size);
 
-    if (deflateInit(&zs, compression_level_) != Z_OK)
-      throw(std::runtime_error("deflateInit failed while compressing."));
-
-    zs.next_in = (Bytef*)raw;
-    zs.avail_in = raw_size;           // set the z_stream's input
-
-    size_t output_length = deflateBound(&zs, raw_size);
+    zstream_compress_.next_in = (Bytef*)raw;
+    zstream_compress_.avail_in = raw_size;           // set the z_stream's input
+    size_t output_length = deflateBound(&zstream_compress_, raw_size);
     buffer.resize(output_length + 1);
+
+
+    TRACE("Zlib compress output length %d", output_length);
 
     buffer[0] = static_cast<char>(ZLIB_COMPRESSION);
 
     int ret;
 
     // compress bytes
-    zs.next_out = reinterpret_cast<Bytef*>(buffer.data() + 1);
-    zs.avail_out = buffer.size() - 1;
+    zstream_compress_.next_out = reinterpret_cast<Bytef*>(buffer.data() + 1);
+    zstream_compress_.avail_out = buffer.size() - 1;
 
-    ret = deflate(&zs, Z_FINISH);
+    ret = deflate(&zstream_compress_, Z_FINISH);
 
-    output_length = zs.total_out;
-
-    deflateEnd(&zs);
+    output_length = zstream_compress_.total_out;
 
     if (ret != Z_STREAM_END) {          // an error occurred that was not EOF
       std::ostringstream oss;
-      oss << "Exception during zlib compression: (" << ret << ") " << zs.msg;
+      oss << "Exception during zlib compression: (" << ret << ") " << zstream_compress_.msg;
       throw(std::runtime_error(oss.str()));
     }
-
+    deflateReset(&zstream_compress_);
     buffer.resize(output_length + 1);
   }
 
@@ -127,6 +144,8 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
  private:
   int compression_level_;
+  z_stream zstream_compress_;
+  //char outbuffer_[32768];
 };
 
 } /* namespace compression */
