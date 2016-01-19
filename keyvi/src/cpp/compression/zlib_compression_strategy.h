@@ -30,6 +30,9 @@
 
 #include "compression/compression_strategy.h"
 
+//#define ENABLE_TRACING
+#include "dictionary/util/trace.h"
+
 namespace keyvi {
 namespace compression {
 
@@ -63,12 +66,15 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
   inline void DoCompress(buffer_t& buffer, const char* raw, size_t raw_size) {
 
+    TRACE("Zlib compress length %d", raw_size);
 
     zstream_compress_.next_in = (Bytef*)raw;
     zstream_compress_.avail_in = raw_size;           // set the z_stream's input
-
     size_t output_length = deflateBound(&zstream_compress_, raw_size);
     buffer.resize(output_length + 1);
+
+
+    TRACE("Zlib compress output length %d", output_length);
 
     buffer[0] = static_cast<char>(ZLIB_COMPRESSION);
 
@@ -87,7 +93,7 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
       oss << "Exception during zlib compression: (" << ret << ") " << zstream_compress_.msg;
       throw(std::runtime_error(oss.str()));
     }
-
+    deflateReset(&zstream_compress_);
     buffer.resize(output_length + 1);
   }
 
