@@ -32,6 +32,7 @@ For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in 
 
 ## Read
   * [Announcement blog post](https://cliqz.com/en/aboutus/blog/keyvi)
+  * [Search Meetup Munich Slidedeck](http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz)
 
 ## Usage
 
