@@ -95,40 +95,22 @@ void compile_multiple(CompilerType& compiler, std::function<std::pair<std::strin
 }
 
 template<typename CompilerType>
-void finalize_compile(CompilerType& compiler, std::string& output,
-                      size_t partition_size = 0, const std::string& manifest = "") {
-  if (partition_size == 0) {
-    std::ofstream out_stream(output, std::ios::binary);
-    compiler.Compile(callback);
-    try {
-      compiler.SetManifestFromString(manifest);
-    } catch(boost::property_tree::json_parser::json_parser_error const& error) {
-      std::cout << "Failed to set manifest: " << manifest << std::endl;
-      std::cout << error.what() << std::endl;
-    }
-    compiler.Write(out_stream);
-    out_stream.close();
-  } else {
-    std::string output_part_zero = output + ".0";
-    int partition_number = 1;
-    std::ofstream out_stream(output_part_zero, std::ios::binary);
-
-    while (compiler.CompileNext(partition_size, out_stream, 2, callback)) {
-      std::cout << "Finalize partition " << partition_number << std::endl;
-
-      out_stream.close();
-      out_stream.open(output + "." + std::to_string(partition_number),
-                      std::ios::binary);
-      ++partition_number;
-    }
-
-    out_stream.close();
+void finalize_compile(CompilerType& compiler, std::string& output, const std::string& manifest = "") {
+  std::ofstream out_stream(output, std::ios::binary);
+  compiler.Compile(callback);
+  try {
+    compiler.SetManifestFromString(manifest);
+  } catch(boost::property_tree::json_parser::json_parser_error const& error) {
+    std::cout << "Failed to set manifest: " << manifest << std::endl;
+    std::cout << error.what() << std::endl;
   }
+  compiler.Write(out_stream);
+  out_stream.close();
 }
 
 template<class BucketT = uint32_t>
 void compile_integer(std::vector<std::string>& input, std::string& output,
-                     size_t memory_limit, size_t partition_size = 0,
+                     size_t memory_limit,
                      const std::string& manifest = "",
                      const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
@@ -156,13 +138,12 @@ void compile_integer(std::vector<std::string>& input, std::string& output,
   };
   compile_multiple(compiler, parser, input);
 
-  finalize_compile(compiler, output, partition_size, manifest);
+  finalize_compile(compiler, output, manifest);
 }
 
 template<class Compiler>
 void compile_strings_inner(Compiler& compiler,
                            std::vector<std::string>& input, std::string& output,
-                           size_t partition_size = 0,
                            const std::string& manifest = "") {
   std::function<std::pair<std::string, std::string>(std::string)> parser = [] (std::string line) {
     size_t tab = line.find('\t');
@@ -176,24 +157,24 @@ void compile_strings_inner(Compiler& compiler,
 
   compile_multiple(compiler, parser, input);
 
-  finalize_compile(compiler, output, partition_size, manifest);
+  finalize_compile(compiler, output, manifest);
 }
 
 template<class BucketT = uint32_t>
 void compile_strings(std::vector<std::string>& input, std::string& output,
-                     size_t memory_limit, size_t partition_size = 0,
+                     size_t memory_limit,
                      const std::string& manifest = "",
                      const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::StringValueStore> compiler(
           memory_limit, value_store_params);
-  compile_strings_inner(compiler, input, output, partition_size, manifest);
+  compile_strings_inner(compiler, input, output, manifest);
 }
 
 template<class BucketT = uint32_t>
 void compile_key_only(std::vector<std::string>& input, std::string& output,
-                      size_t memory_limit, size_t partition_size = 0,
+                      size_t memory_limit,
                       const std::string& manifest = "",
                       const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
@@ -214,19 +195,19 @@ void compile_key_only(std::vector<std::string>& input, std::string& output,
 
   compile_multiple(compiler, parser, input);
 
-  finalize_compile(compiler, output, partition_size, manifest);
+  finalize_compile(compiler, output, manifest);
 }
 
 template<class BucketT = uint32_t>
 void compile_json(std::vector<std::string>& input, std::string& output,
-                  size_t memory_limit, size_t partition_size = 0,
+                  size_t memory_limit,
                   const std::string& manifest = "",
                   const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::JsonValueStore> compiler(
           memory_limit, value_store_params);
-  compile_strings_inner(compiler, input, output, partition_size, manifest);
+  compile_strings_inner(compiler, input, output, manifest);
 }
 
 /** Extracts the value store parameters. */
@@ -268,9 +249,6 @@ int main(int argc, char** argv) {
       "dictionary-type,d",
       boost::program_options::value<std::string>()->default_value("integer"),
       "type of dictionary (integer (default), string, key-only, json)");
-  description.add_options()("partition-size,p",
-                            boost::program_options::value<size_t>(),
-                            "create partitions with a maximum size");
   description.add_options()("compact,c", "Compact Mode");
   description.add_options()(
       "value-store-parameter,V",
@@ -314,11 +292,6 @@ int main(int argc, char** argv) {
       compact = true;
   }
 
-  size_t partition_size = 0;
-  if (vm.count("partition-size")) {
-    partition_size = vm["partition-size"].as<size_t>();
-  }
-
   std::string manifest = vm["manifest"].as<std::string>();
   std::cout << manifest << std::endl;
 
@@ -340,33 +313,33 @@ int main(int argc, char** argv) {
     if (dictionary_type == "integer") {
       if (compact){
         compile_integer<uint16_t>(input_files, output_file, memory_limit,
-                                  partition_size, manifest, value_store_params);
+                                  manifest, value_store_params);
       } else {
-        compile_integer(input_files, output_file, memory_limit, partition_size,
+        compile_integer(input_files, output_file, memory_limit,
                         manifest, value_store_params);
       }
     } else if (dictionary_type == "string") {
       if (compact){
         compile_strings<uint16_t>(input_files, output_file, memory_limit,
-                                  partition_size, manifest, value_store_params);
+                                  manifest, value_store_params);
       } else {
-        compile_strings(input_files, output_file, memory_limit, partition_size,
+        compile_strings(input_files, output_file, memory_limit,
                         manifest, value_store_params);
       }
     } else if (dictionary_type == "key-only") {
       if (compact){
         compile_key_only<uint16_t>(input_files, output_file, memory_limit,
-                                   partition_size, manifest, value_store_params);
+                                   manifest, value_store_params);
       } else {
-        compile_key_only(input_files, output_file, memory_limit, partition_size,
+        compile_key_only(input_files, output_file, memory_limit,
                          manifest, value_store_params);
       }
     } else if (dictionary_type == "json") {
       if (compact){
         compile_json<uint16_t>(input_files, output_file, memory_limit,
-                               partition_size, manifest, value_store_params);
+                               manifest, value_store_params);
       } else {
-        compile_json(input_files, output_file, memory_limit, partition_size,
+        compile_json(input_files, output_file, memory_limit,
                      manifest, value_store_params);
       }
     } else {
