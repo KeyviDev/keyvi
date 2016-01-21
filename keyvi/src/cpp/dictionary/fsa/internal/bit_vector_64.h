@@ -268,7 +268,7 @@ final {
     size_t size_ = Tsize;
 
     inline int Position(uint64_t number) const {
-      return __builtin_ffsl(number) - 1;
+      return __builtin_ffsll(number) - 1;
     }
 
 
