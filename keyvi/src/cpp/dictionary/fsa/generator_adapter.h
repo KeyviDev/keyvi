@@ -39,8 +39,8 @@ class GeneratorAdapterInterface {
 
   virtual void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                ValueStoreT::no_value) {}
+  virtual void Add(const std::string& input_key, const fsa::ValueHandle& value) {}
 
-  virtual void Reset() {}
   virtual size_t GetFsaSize() const {return 0;}
   virtual void CloseFeeding() {}
   virtual void Write(std::ostream& stream) {}
@@ -55,8 +55,8 @@ template<class PersistenceT, class ValueStoreT, class OffsetTypeT, class HashCod
 class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, ValueStoreT> {
  public:
   GeneratorAdapter(size_t memory_limit = 1073741824,
-                   const generator_param_t& value_store_params = generator_param_t()):
-                     generator_(memory_limit, value_store_params)
+                   const generator_param_t& value_store_params = generator_param_t(), ValueStoreT* value_store = NULL):
+                     generator_(memory_limit, value_store_params, value_store)
  {}
 
   void Add(const std::string& input_key, typename ValueStoreT::value_t value =
@@ -64,8 +64,8 @@ class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, Val
     generator_.Add(input_key, value);
   }
 
-  void Reset(){
-    generator_.Reset();
+  void Add(const std::string& input_key, const fsa::ValueHandle& value) {
+    generator_.Add(input_key, value);
   }
 
   size_t GetFsaSize() const {

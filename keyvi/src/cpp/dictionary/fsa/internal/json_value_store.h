@@ -283,6 +283,15 @@ class JsonValueStore final : public IValueStoreWriter {
     return JSON_VALUE_STORE;
   }
 
+  /**
+   * Close the value store, so no more updates;
+   */
+  void CloseFeeding() {
+    values_extern_->Persist();
+    // free up memory from hashtable
+    hash_.Clear();
+  }
+
   void Write(std::ostream& stream) {
     boost::property_tree::ptree pt;
     pt.put("size", std::to_string(values_buffer_size_));

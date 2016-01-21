@@ -216,6 +216,14 @@ class StringValueStore final : public IValueStoreWriter {
           stream.write((const char*) &string_values_[0], string_values_.size());
         }
 
+        /**
+         * Close the value store, so no more updates;
+         */
+        void CloseFeeding() {
+          // free up memory from hashtable
+          hash_.Clear();
+        }
+
        private:
         std::vector<char> string_values_;
         MinimizationHash<StringPointer> hash_;

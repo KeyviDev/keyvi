@@ -125,12 +125,18 @@ enum generator_state {
  */
 typedef const internal::IValueStoreWriter::vs_param_t generator_param_t;
 
+struct ValueHandle final {
+  uint64_t value_idx;
+  uint32_t weight;
+  bool no_minimization;
+};
+
 template<class PersistenceT, class ValueStoreT = internal::NullValueStore, class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
 class Generator
 final {
    public:
     Generator(size_t memory_limit = 1073741824,
-              const generator_param_t& params = generator_param_t())
+              const generator_param_t& params = generator_param_t(), ValueStoreT* value_store = NULL)
         : memory_limit_(memory_limit), params_(params) {
 
       // use 50% or limit minus 200MB for the memory limit of the hashtable
@@ -148,11 +154,17 @@ final {
 
       persistence_ = new PersistenceT(memory_limit - memory_limit_minimization,
                                       params_[TEMPORARY_PATH_KEY]);
-      value_store_ = new ValueStoreT(params_);
 
       stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
       builder_ = new internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>(
           memory_limit_minimization, persistence_, ValueStoreT::inner_weight, minimize_);
+
+      if (value_store != NULL) {
+        value_store_ = value_store;
+      } else {
+        value_store_ = new ValueStoreT(params_);
+      }
+
     }
 
     ~Generator() {
@@ -169,39 +181,6 @@ final {
 
     Generator& operator=(Generator const&) = delete;
     Generator(const Generator& that) = delete;
-
-    void Reset(){
-      // TODO: refactor for code reusage
-      // delete the old data structures and create new ones
-
-      delete persistence_;
-      delete value_store_;
-      if (stack_) {
-        delete stack_;
-      }
-
-      if (builder_) {
-        delete builder_;
-      }
-
-      // use 50% or limit minus 200MB for the memory limit of the hashtable
-      size_t memory_limit_minimization = std::max(
-          memory_limit_ / 2, memory_limit_ - (200 * 1024 * 1024));
-
-      persistence_ = new PersistenceT(memory_limit_ - memory_limit_minimization,
-                                      params_[TEMPORARY_PATH_KEY]);
-      value_store_ = new ValueStoreT(params_);
-
-      stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
-      builder_ = new internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>(
-          memory_limit_minimization, persistence_, ValueStoreT::inner_weight, minimize_);
-
-      last_key_ = std::string();
-      highest_stack_ = 0;
-      number_of_keys_added_ = 0;
-      state_ = generator_state::EMPTY;
-      start_state_ = 0;
-    }
 
     /**
      * Add a key-value pair to the generator.
@@ -224,12 +203,57 @@ final {
       ConsumeStack(commonPrefixLength);
 
       // put everything that is not common between the two strings (the suffix) into the stack
-      FeedStack(commonPrefixLength, input_key.size(), key, value);
+      FeedStack(commonPrefixLength, input_key.size(), key);
+
+      // get value and mark final state
+      bool no_minimization = false;
+      uint64_t value_idx = value_store_->GetValue(value, no_minimization);
+
+      stack_->InsertFinalState(input_key.size(), value_idx, no_minimization);
+
+      // count number of entries
+      ++number_of_keys_added_;
 
       // if inner weights are used update them
       uint32_t weight = value_store_->GetWeightValue(value);
       if (weight > 0){
         stack_->UpdateWeights(0, input_key.size() + 1, weight);
+      }
+
+      last_key_ = key;
+      state_ = generator_state::FEEDING;
+    }
+
+    /**
+     * Add a key and previously inserted value to the generator.
+     * @param input_key The input key.
+     * @param ValueHandle A handle returned by a previous call to RegisterValue
+     */
+    void Add(const std::string& input_key, const ValueHandle& handle) {
+
+      const char* key = input_key.c_str();
+
+      size_t commonPrefixLength = get_common_prefix_length(last_key_.c_str(), key);
+
+      if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {
+        last_key_ = key;
+        return;
+      }
+
+      // check which stack can be consumed (packed into the sparse array)
+      ConsumeStack(commonPrefixLength);
+
+      // put everything that is not common between the two strings (the suffix) into the stack
+      FeedStack(commonPrefixLength, input_key.size(), key);
+
+      stack_->InsertFinalState(input_key.size(), handle.value_idx, handle.no_minimization);
+
+      // count number of entries
+      ++number_of_keys_added_;
+
+      // if inner weights are used update them
+      if (handle.weight > 0){
+        stack_->UpdateWeights(0, input_key.size() + 1, handle.weight);
       }
 
       last_key_ = key;
@@ -334,8 +358,7 @@ final {
       internal::SerializationUtils::WriteJsonRecord(stream, pt);
     }
 
-    inline void FeedStack(const size_t start, const size_t end, const char* key,
-                   typename ValueStoreT::value_t value) {
+    inline void FeedStack(const size_t start, const size_t end, const char* key) {
       for (size_t i = start; i < end; ++i) {
         uint32_t ukey =
             static_cast<uint32_t>(static_cast<unsigned char>(key[i]));
@@ -346,15 +369,6 @@ final {
       if (end > highest_stack_) {
         highest_stack_ = end;
       }
-
-      // mark final state
-      bool no_minimization = false;
-      auto value_idx = value_store_->GetValue(value, no_minimization);
-
-      stack_->InsertFinalState(end, value_idx, no_minimization);
-
-      // count number of entries
-      ++number_of_keys_added_;
     }
 
     inline void ConsumeStack(const size_t end) {
