@@ -67,6 +67,12 @@ class IntValueStore final : public IValueStoreWriter {
   }
 
   void Write(std::ostream& stream) {}
+
+  /**
+   * Close the value store, so no more updates;
+   */
+  void CloseFeeding() {
+  }
 };
 
 /**
@@ -101,6 +107,12 @@ class IntValueStoreWithInnerWeights final : public IValueStoreWriter {
   }
 
   void Write(std::ostream& stream) {}
+
+  /**
+   * Close the value store, so no more updates;
+   */
+  void CloseFeeding() {
+  }
 };
 
 class IntValueStoreReader final: public IValueStoreReader{

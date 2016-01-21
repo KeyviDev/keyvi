@@ -64,6 +64,13 @@ class NullValueStore final : public IValueStoreWriter {
   }
 
   void Write(std::ostream& stream) {}
+
+  /**
+   * Close the value store, so no more updates;
+   */
+  void CloseFeeding() {
+  }
+
 };
 
 class NullValueStoreReader final: public IValueStoreReader{

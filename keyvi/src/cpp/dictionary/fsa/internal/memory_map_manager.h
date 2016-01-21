@@ -180,13 +180,8 @@ final {
         for (int i =0; i < number_of_chunks_; i++)
         {
           std::ifstream data_file;
-          boost::filesystem::path filename(directory_);
-          filename /= filename_pattern_;
-          filename += "_";
-          filename += std::to_string(i);
-
-          data_file.open (filename.native().c_str());
-          stream << data_file;
+          data_file.open (GetFilenameForChunk(i).native().c_str(), std::ios::binary);
+          stream << data_file.rdbuf();
           data_file.close();
         }
       } else if (number_of_chunks_ == 0) {
@@ -212,9 +207,16 @@ final {
    void Persist() {
      persisted_ = true;
      for (auto& m : mappings_) {
-       delete m.mapping_;
+       m.region_->flush();
        delete m.region_;
+       delete m.mapping_;
      }
+
+     // truncate last file according to the written buffers
+     if (number_of_chunks_ > 1) {
+       boost::filesystem::resize_file(GetFilenameForChunk(number_of_chunks_ - 1), tail_ - ((number_of_chunks_ - 1) * chunk_size_));
+     }
+
      mappings_.clear();
    }
 
@@ -232,6 +234,14 @@ final {
     bool persisted_ = false;
     size_t number_of_chunks_ = 0;
 
+    boost::filesystem::path GetFilenameForChunk(int i) const {
+      boost::filesystem::path filename(directory_);
+      filename /= filename_pattern_;
+      filename += "_";
+      filename += std::to_string(i);
+      return filename;
+    }
+
     void* GetChunk(size_t chunk_number) {
       while (chunk_number >= number_of_chunks_) {
         CreateMapping();
@@ -243,10 +253,7 @@ final {
     void CreateMapping() {
       mapping new_mapping;
 
-      boost::filesystem::path filename(directory_);
-      filename /= filename_pattern_;
-      filename += "_";
-      filename += std::to_string(number_of_chunks_);
+      boost::filesystem::path filename = GetFilenameForChunk(number_of_chunks_);
 
       std::filebuf fbuf;
       fbuf.open(

@@ -138,6 +138,7 @@ class DictionaryCompiler
      * Do the final compilation
      */
     void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
+      value_store_->CloseFeeding();
       sorter_.end();
       sorter_.merge_runs();
       CreateGenerator();
@@ -237,14 +238,6 @@ class DictionaryCompiler
 
       return handle;
     }
-
-    /**
-     * Signal that all values have been inserted.
-     */
-    void CloseValueRegistration(){
-      value_store_->CloseFeeding();
-    }
-
 };
 
 /**
