@@ -21,7 +21,7 @@ To create a dpkg (debian/ubuntu package) run:
 
 #### Linux
 
-In addition to a working gcc build environment, install the following libraries, e.g. using apt: boost (dev packages), scons, snappy, zlib, cmake.
+In addition to a working gcc build environment, install the following libraries, e.g. using apt: boost (dev packages, at least version 1.54), scons, snappy, zlib, cmake.
 
 #### MAC
 
