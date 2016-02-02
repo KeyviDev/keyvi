@@ -177,7 +177,7 @@ final {
 
     void Write (std::ostream& stream, size_t end) const {
       if (persisted_) {
-        for (int i =0; i < number_of_chunks_; i++)
+        for (size_t i =0; i < number_of_chunks_; i++)
         {
           std::ifstream data_file;
           data_file.open (GetFilenameForChunk(i).native().c_str(), std::ios::binary);
