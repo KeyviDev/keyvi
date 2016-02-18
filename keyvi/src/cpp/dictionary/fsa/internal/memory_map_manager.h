@@ -213,7 +213,7 @@ final {
      }
 
      // truncate last file according to the written buffers
-     if (number_of_chunks_ > 1) {
+     if (number_of_chunks_ > 0) {
        boost::filesystem::resize_file(GetFilenameForChunk(number_of_chunks_ - 1), tail_ - ((number_of_chunks_ - 1) * chunk_size_));
      }
 
