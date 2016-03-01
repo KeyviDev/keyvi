@@ -242,10 +242,10 @@ private:
 	size_t m_size;
 
 	template <typename>
-	friend class btree_node;
+	friend class ::tpie::btree_node;
 
 	template <typename>
-	friend class btree_iterator;
+	friend class ::tpie::btree_iterator;
 
 	template <typename, typename>
 	friend class bbits::tree;
