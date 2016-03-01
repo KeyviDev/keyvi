@@ -413,6 +413,33 @@ public:
 	};
 };
 
+template <typename dest_t, typename equal_t>
+class unique_t : public node {
+public:
+	typedef typename push_type<dest_t>::type item_type;
+
+	unique_t(dest_t && dest, equal_t equal) 
+		: equal(equal), dest(std::move(dest)) {}
+
+	void begin() override {
+		first = true;
+	}
+
+	void push(const item_type & item) {
+		if (!first && equal(prev, item))
+			return;
+		first = false;
+		dest.push(item);
+		prev = item;
+	}
+
+private:
+	bool first;
+	equal_t equal;
+	item_type prev;
+	dest_t dest;
+};
+
 } // namespace bits
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -598,6 +625,17 @@ template <typename fact_t>
 pipe_begin<tempfactory<bits::pull_source_t<fact_t>, fact_t &&> > 
 pull_source(pullpipe_begin<fact_t> && from) {
 	return tempfactory<bits::pull_source_t<fact_t>, fact_t &&>(std::move(from.factory));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Filter consecutive duplicates out
+///
+/// When items are pushed in 
+/// Whenever a pushed itme is same as the previous, it is dropped
+///////////////////////////////////////////////////////////////////////////////
+template <typename equal_t>
+pipe_middle<tfactory<bits::unique_t, Args<equal_t>, equal_t> > unique(equal_t equal) {
+	return {equal};
 }
 
 }
