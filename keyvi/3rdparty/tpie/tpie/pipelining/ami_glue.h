@@ -27,10 +27,10 @@ namespace pipelining {
 namespace bits {
 
 template <typename dest_t>
-class input_ami_stream_t : public node {
+class ami_input_t : public node {
 public:
 	typedef typename dest_t::item_type item_type;
-	input_ami_stream_t(dest_t && dest, typename tpie::ami::stream<item_type> & stream)
+	ami_input_t(dest_t && dest, typename tpie::ami::stream<item_type> & stream)
 		: stream(stream), dest(std::move(dest)) {}
 
 	void propagate() override {
@@ -57,10 +57,10 @@ private:
 };
 
 template <typename dest_t>
-class input_ami_stack_t : public node {
+class ami_input_stack_t : public node {
 public:
 	typedef typename dest_t::item_type item_type;
-	input_ami_stack_t(dest_t && dest, typename tpie::ami::stack<item_type> & stack)
+	ami_input_stack_t(dest_t && dest, typename tpie::ami::stack<item_type> & stack)
 		: stack(stack), dest(std::move(dest)) {}
 	
 	void propagate() override {
@@ -83,10 +83,10 @@ private:
 };
 
 template <typename T>
-class pull_input_ami_stack_t : public node {
+class ami_pull_input_stack_t : public node {
 public:
 	typedef T item_type;
-	pull_input_ami_stack_t(tpie::ami::stack<item_type> & stack) 
+	ami_pull_input_stack_t(tpie::ami::stack<item_type> & stack) 
 		: stack(stack) {}
 	
 	void propagate() override {
@@ -99,7 +99,7 @@ public:
 	}
 	
 	T pull() {
-		item_type *item;
+		const item_type *item;
 		stack.pop(&item);
 		return *item;
 	}
@@ -107,6 +107,27 @@ public:
 private:
 
 	typename tpie::ami::stack<item_type> & stack;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// \class ami_output_t
+///
+/// file_stream output terminator.
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+class ami_output_t : public node {
+public:
+	typedef T item_type;
+
+	inline ami_output_t(tpie::ami::stream<T> & stream) : stream(stream) {
+		set_name("Write", PRIORITY_INSIGNIFICANT);
+	}
+
+	inline void push(const T & item) {
+		stream.write_item(item);
+	}
+private:
+	tpie::ami::stream<T> & stream;
 };
 
 } // namespace bits
@@ -117,9 +138,9 @@ private:
 /// \param input The ami::stream from which it pushes items
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline pipe_begin<factory<bits::input_ami_stream_t, tpie::ami::stream<T> &> > 
-input_ami_stream(tpie::ami::stream<T> & input) {
-	return factory<bits::input_ami_stream_t, tpie::ami::stream<T> &>(input);
+inline pipe_begin<factory<bits::ami_input_t, tpie::ami::stream<T> &> > 
+ami_input(tpie::ami::stream<T> & input) {
+	return factory<bits::ami_input_t, tpie::ami::stream<T> &>(input);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,9 +149,9 @@ input_ami_stream(tpie::ami::stream<T> & input) {
 /// \param input The ami::stack from which it pushes items
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline pipe_begin<factory<bits::input_ami_stack_t, tpie::ami::stack<T> &> > 
-input_ami_stack(tpie::ami::stack<T> & input) {
-	return factory<bits::input_ami_stack_t, tpie::ami::stack<T> &>(input);
+inline pipe_begin<factory<bits::ami_input_stack_t, tpie::ami::stack<T> &> > 
+ami_input_stack(tpie::ami::stack<T> & input) {
+	return factory<bits::ami_input_stack_t, tpie::ami::stack<T> &>(input);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,11 +160,18 @@ input_ami_stack(tpie::ami::stack<T> & input) {
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
 inline pullpipe_begin<termfactory<bits::pull_input_t<T>, tpie::ami::stack<T> &> > 
-pull_input_ami_stack(tpie::ami::stack<T> & fs) {
+ami_pull_input_stack(tpie::ami::stack<T> & fs) {
 	return termfactory<bits::pull_input_t<T>, tpie::ami::stack<T> &>(fs);
 }
 
-
+///////////////////////////////////////////////////////////////////////////////
+/// \brief A pipelining node that writes the pushed items to an ami stream.
+/// \param fs The stream that items should be written to
+///////////////////////////////////////////////////////////////////////////////
+template <typename T>
+inline pipe_end<termfactory<bits::ami_output_t<T>, tpie::ami::stream<T> &> > ami_output(tpie::ami::stream<T> & fs) {
+	return termfactory<bits::ami_output_t<T>, tpie::ami::stream<T> &>(fs);
+}
 
 } // namespace pipelining
 
