@@ -25,6 +25,7 @@
 #ifndef ENTRY_ITERATOR_H_
 #define ENTRY_ITERATOR_H_
 
+#include <cstring>
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/traversal/traversal_base.h"
 
@@ -106,8 +107,12 @@ class EntryIterator final{
     return !(operator==(other));
   }
 
+  bool operator<(const EntryIterator& other) const {
+    return strcmp((const char*) traversal_stack_.data(), (const char*) other.traversal_stack_.data()) > 0;
+  }
+
  private:
-  /** Cleares the iterator, i.e. makes it equal to the empty iterator. */
+  /** Clears the iterator, i.e. makes it equal to the empty iterator. */
   void Clear() {
     fsa_ = nullptr;
     current_state_ = 0;

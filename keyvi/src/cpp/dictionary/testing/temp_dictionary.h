@@ -57,8 +57,12 @@ final {
       fsa_ = compilation::CompilationUtils::CompileString(input, file_name_);
     }
 
-    fsa::automata_t GetFsa() {
+    fsa::automata_t GetFsa() const {
       return fsa_;
+    }
+
+    const std::string& GetFileName() const {
+      return file_name_;
     }
 
     ~TempDictionary() {
