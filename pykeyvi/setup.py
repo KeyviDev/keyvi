@@ -35,8 +35,8 @@ extra_link_arguments = []
 
 if (sys.platform == 'darwin'):
     additional_compile_flags.append("-DOS_MACOSX")
-    linklibraries.remove('boost_thread')
-    linklibraries.append('boost_thread-mt')
+    linklibraries_static_or_dynamic.remove('boost_thread')
+    linklibraries_static_or_dynamic.append('boost_thread-mt')
 
 #########################
 # Custom 'build' command
