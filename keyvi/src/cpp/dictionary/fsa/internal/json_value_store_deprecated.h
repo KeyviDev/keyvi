@@ -34,6 +34,8 @@
 #define RAPIDJSON_SSE42
 #endif
 
+#include <boost/lexical_cast.hpp>
+
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -74,7 +76,7 @@ namespace internal {
               internal::SerializationUtils::ReadJsonRecord(stream);
 
           size_t offset = stream.tellg();
-          size_t strings_size = properties_.get<size_t>("size");
+          size_t strings_size = boost::lexical_cast<size_t>(properties_.get<std::string>("size"));
 
           // check for file truncation
           if (strings_size > 0) {

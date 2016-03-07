@@ -26,6 +26,7 @@
 #define AUTOMATA_H_
 
 #include <sys/mman.h>
+#include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -70,14 +71,18 @@ final {
       sparse_array_properties_ = internal::SerializationUtils::ReadJsonRecord(
           in_stream);
 
-      compact_size_ = sparse_array_properties_.get<uint32_t>("version", 1) == 2;
+      compact_size_ = boost::lexical_cast<uint32_t> (sparse_array_properties_.get<std::string>("version")) == 2;
       size_t bucket_size = compact_size_ ? sizeof(uint16_t) : sizeof(uint32_t);
+
+      // get start state and number of keys
+      start_state_ = boost::lexical_cast<uint64_t> (automata_properties_.get<std::string>("start_state"));
+      number_of_keys_ = boost::lexical_cast<uint64_t> (automata_properties_.get<std::string>("number_of_keys"));
 
       size_t offset = in_stream.tellg();
 
       file_mapping_ = new boost::interprocess::file_mapping(
           filename, boost::interprocess::read_only);
-      size_t array_size = sparse_array_properties_.get<size_t>("size");
+      size_t array_size = boost::lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
 
       in_stream.seekg(offset + array_size + bucket_size * array_size - 1);
 
@@ -119,8 +124,9 @@ final {
 
       // initialize value store
       internal::value_store_t value_store_type =
-          static_cast<internal::value_store_t>(automata_properties_.get<int>(
-              "value_store_type"));
+          static_cast<internal::value_store_t>(
+              boost::lexical_cast<int> (automata_properties_.get<std::string>(
+              "value_store_type")));
       value_store_reader_ = internal::ValueStoreFactory::MakeReader(value_store_type, in_stream, file_mapping_);
 
       in_stream.close();
@@ -143,11 +149,11 @@ final {
      * @return index of root state.
      */
     uint64_t GetStartState() const {
-      return automata_properties_.get<uint64_t>("start_state");
+      return start_state_;
     }
 
     uint64_t GetNumberOfKeys() const {
-      return automata_properties_.get<uint64_t>("number_of_keys");
+      return number_of_keys_;
     }
 
     uint64_t TryWalkTransition(uint64_t starting_state, unsigned char c) const {
@@ -469,6 +475,8 @@ final {
     uint32_t* transitions_;
     uint16_t* transitions_compact_;
     bool compact_size_;
+    uint64_t start_state_;
+    uint64_t number_of_keys_;
 
     inline uint64_t ResolvePointer(uint64_t starting_state, unsigned char c) const {
       if (!compact_size_) {
