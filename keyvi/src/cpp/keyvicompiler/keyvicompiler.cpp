@@ -287,7 +287,8 @@ int main(int argc, char** argv) {
     memory_limit = vm["memory-limit"].as<size_t>();
   }
 
-  bool compact = false;
+  // make compact the default
+  bool compact = true;
   if (vm.count("compact")) {
       compact = true;
   }
