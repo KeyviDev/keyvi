@@ -46,8 +46,8 @@ namespace internal {
 class MemoryMapManager
 final {
    public:
-    MemoryMapManager(size_t chunk_size, boost::filesystem::path directory,
-                     boost::filesystem::path filename_pattern)
+    MemoryMapManager(const size_t chunk_size, const boost::filesystem::path directory,
+                     const boost::filesystem::path filename_pattern)
         : chunk_size_(chunk_size),
           directory_(directory),
           filename_pattern_(filename_pattern) {
@@ -64,7 +64,7 @@ final {
      *
      * This API is to check first whether GetAdress is safe to use.
      */
-    bool GetAddressQuickTestOk(size_t offset, size_t length){
+    bool GetAddressQuickTestOk(size_t offset, size_t length) const {
       size_t chunk_offset = offset % chunk_size_;
 
       return (length <= (chunk_size_ - chunk_offset));
@@ -83,7 +83,7 @@ final {
      *
      * This API is to be used when GetAdress is not safe to use.
      */
-    void GetBuffer(size_t offset, void* buffer, size_t buffer_length) {
+    void GetBuffer(const size_t offset, void* buffer, const size_t buffer_length) {
       size_t chunk_number = offset / chunk_size_;
       size_t chunk_offset = offset % chunk_size_;
 
@@ -97,30 +97,6 @@ final {
       std::memcpy((char*) buffer + first_chunk_size, (char*) chunk_address_part2, second_chunk_size);
     }
 
-    /**
-     * DEPRECATED: Append to the buffer starting from the given offset.
-     * Note: Append(buffer, buffer_length) shall be used instead.
-     *
-     * @param offset offset at where to append.
-     * @param buffer the buffer to append.
-     * @param buffer_length the buffer length to append.
-     */
-    void Append(size_t offset, void* buffer, size_t buffer_length){
-      size_t chunk_number = offset / chunk_size_;
-      size_t chunk_offset = offset % chunk_size_;
-
-      void* chunk_address = GetChunk(chunk_number);
-      size_t first_chunk_size = std::min(buffer_length, chunk_size_ - chunk_offset);
-      std::memcpy((char*)chunk_address + chunk_offset, buffer, first_chunk_size);
-
-      // handle overflow
-      if (buffer_length != first_chunk_size) {
-        void* chunk_address_part2 = GetChunk(chunk_number + 1);
-        std::memcpy((char*)chunk_address_part2, (char*)buffer + first_chunk_size, buffer_length - first_chunk_size);
-      }
-
-      tail_ = offset + buffer_length;
-    }
 
     /**
      * Append to the buffer at the current tail.
@@ -128,21 +104,23 @@ final {
      * @param buffer the buffer to append
      * @param buffer_length the buffer length to append
      */
-    void Append(void* buffer, size_t buffer_length){
+    void Append(const void* buffer, const size_t buffer_length){
       size_t chunk_number = tail_ / chunk_size_;
       size_t chunk_offset = tail_ % chunk_size_;
 
-      void* chunk_address = GetChunk(chunk_number);
-      size_t first_chunk_size = std::min(buffer_length, chunk_size_ - chunk_offset);
-      std::memcpy((char*)chunk_address + chunk_offset, buffer, first_chunk_size);
+      size_t remaining = buffer_length;
 
-      // handle overflow
-      if (buffer_length != first_chunk_size) {
-        void* chunk_address_part2 = GetChunk(chunk_number + 1);
-        std::memcpy((char*)chunk_address_part2, (char*)buffer + first_chunk_size, buffer_length - first_chunk_size);
+      while (remaining > 0) {
+        size_t chunk_number = tail_ / chunk_size_;
+        size_t chunk_offset = tail_ % chunk_size_;
+
+        void* chunk_address = GetChunk(chunk_number);
+        size_t copy_size = std::min(buffer_length, chunk_size_ - chunk_offset);
+        std::memcpy((char*)chunk_address + chunk_offset, buffer, copy_size);
+
+        remaining -= copy_size;
+        tail_ += copy_size;
       }
-
-      tail_ += buffer_length;
     }
 
     void push_back(const char c){
@@ -154,7 +132,7 @@ final {
       ++tail_;
     }
 
-    bool Compare(size_t offset, void* buffer, size_t buffer_length){
+    bool Compare(const size_t offset, const void* buffer, const size_t buffer_length){
       size_t chunk_number = offset / chunk_size_;
       size_t chunk_offset = offset % chunk_size_;
 
@@ -175,7 +153,7 @@ final {
       return (std::memcmp((char*)chunk_address_part2, (char*)buffer + first_chunk_size, buffer_length - first_chunk_size) == 0);
     }
 
-    void Write (std::ostream& stream, size_t end) const {
+    void Write (std::ostream& stream, const size_t end) const {
       if (persisted_) {
         for (size_t i =0; i < number_of_chunks_; i++)
         {
@@ -242,7 +220,7 @@ final {
       return filename;
     }
 
-    void* GetChunk(size_t chunk_number) {
+    void* GetChunk(const size_t chunk_number) {
       while (chunk_number >= number_of_chunks_) {
         CreateMapping();
       }

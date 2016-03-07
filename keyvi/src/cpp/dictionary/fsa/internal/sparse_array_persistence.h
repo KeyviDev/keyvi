@@ -197,15 +197,13 @@ final {
       if (labels_) {
         size_t highest_write_position = std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_);
 
-        labels_extern_->Append(in_memory_buffer_offset_,
-                                    labels_,
+        labels_extern_->Append(labels_,
                                     (highest_write_position - in_memory_buffer_offset_));
 
         // in place re-write
         HostOrderToPersistenceOrder(transitions_, highest_write_position - in_memory_buffer_offset_);
 
-        transitions_extern_->Append(in_memory_buffer_offset_ * sizeof(BucketT),
-                                    transitions_,
+        transitions_extern_->Append(transitions_,
                                     (highest_write_position - in_memory_buffer_offset_) * sizeof(BucketT));
 
         delete[] labels_;
@@ -251,8 +249,7 @@ final {
     size_t highest_raw_write_bucket_ = 0;
 
     inline void FlushBuffers() {
-      labels_extern_->Append(in_memory_buffer_offset_,
-                                  labels_,
+      labels_extern_->Append(labels_,
                                   flush_size_);
 
       TRACE ("Write labels from %d to %d (flushsize %d)", in_memory_buffer_offset_, in_memory_buffer_offset_ + flush_size_, flush_size_);
@@ -260,8 +257,7 @@ final {
       // in place re-write
       HostOrderToPersistenceOrder(transitions_, flush_size_);
 
-      transitions_extern_->Append(in_memory_buffer_offset_ * sizeof(BucketT),
-                                  transitions_,
+      transitions_extern_->Append(transitions_,
                                   flush_size_ * sizeof(BucketT));
 
       size_t overlap = buffer_size_ - flush_size_;
