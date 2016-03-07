@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE ( MergeKeyOnlyDicts) {
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
-  merger.Merge();
+  merger.Merge("merged-dict.kv");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

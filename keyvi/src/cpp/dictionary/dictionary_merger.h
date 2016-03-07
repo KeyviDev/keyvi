@@ -52,13 +52,14 @@ final {
     dicts_to_merge_.push_back(fsa);
   }
 
-  void Merge(){
-    std::priority_queue<fsa::EntryIterator> pqueue;
+  void Merge(const std::string& filename){
+    std::priority_queue<std::pair<fsa::EntryIterator, int>> pqueue;
     fsa::EntryIterator end_it;
 
+    int i = 0;
     for (auto fsa: dicts_to_merge_) {
       fsa::EntryIterator e_it(fsa);
-      pqueue.push(e_it);
+      pqueue.push(std::make_pair(e_it, i++));
     }
 
     fsa::Generator<PersistenceT, ValueStoreT> generator;
@@ -66,21 +67,21 @@ final {
     while(!pqueue.empty()){
       auto e = pqueue.top();
       pqueue.pop();
-      std::cout<<e.GetKey()<< std::endl;
-      generator.Add(e.GetKey());
 
-      if (++e != end_it) {
+      // todo: check for same keys and merge only the last one
+
+      std::cout<<e.first.GetKey()<< std::endl;
+
+
+      generator.Add(e.first.GetKey());
+
+      if (++e.first != end_it) {
         pqueue.push(e);
       }
     }
-    generator.Compile();
+    generator.CloseFeeding();
 
-  }
-
-  void Write(std::ostream& stream) {
-  }
-
-  void WriteToFile(std::string& filename) {
+    generator.WriteToFile(filename);
   }
 
  private:
