@@ -15,7 +15,7 @@ You need a package that can be installed on the OS you are using.
 For Amazons EMR '4.3.0' - the latest at time of writing - a package is available for download:
 
     sudo pip-2.7 install msgpack-python
-    wget https://github.com/cliqz-oss/keyvi-package/blob/master/bin/amazon-linux-2015.09/python-keyvi-0.1.14-1.x86_64.rpm?raw=true -O python-keyvi.rpm
+    wget https://github.com/cliqz-oss/keyvi-package/blob/master/bin/amazon-linux-2015.09/python-keyvi-0.1.16-1.x86_64.rpm?raw=true -O python-keyvi.rpm
     sudo rpm -i python-keyvi.rpm
     
 Note mspack-python is a dependency which we need to install manually in this case.
