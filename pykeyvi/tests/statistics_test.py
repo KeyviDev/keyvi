@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
+import os
 import pykeyvi
 from test_tools import tmp_dictionary
 
@@ -22,6 +23,21 @@ def test_manifest():
         m = d.GetManifest()
         assert m['author'] == "Zapp Brannigan"
 
+def test_manifest_after_compile():
+    c = pykeyvi.KeyOnlyDictionaryCompiler()
+    c.Add("Leela")
+    c.Add("Kif")
+    c.Compile()
+    c.SetManifest({"author": "Zapp Brannigan"})
+    file_name = 'brannigan_manifest2.kv'
+    try:
+        c.WriteToFile(file_name)
+        d = pykeyvi.Dictionary(file_name)
+        m = d.GetManifest()
+        assert m['author'] == "Zapp Brannigan"
+        del d
+    finally:
+        os.remove(file_name)
 
 def test_statistics():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
