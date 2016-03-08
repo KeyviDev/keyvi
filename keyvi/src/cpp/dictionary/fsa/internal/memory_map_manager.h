@@ -105,9 +105,6 @@ final {
      * @param buffer_length the buffer length to append
      */
     void Append(const void* buffer, const size_t buffer_length){
-      size_t chunk_number = tail_ / chunk_size_;
-      size_t chunk_offset = tail_ % chunk_size_;
-
       size_t remaining = buffer_length;
       size_t buffer_offset = 0;
 
