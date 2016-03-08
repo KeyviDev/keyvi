@@ -18,6 +18,8 @@ def test_simple():
     c = pykeyvi.JsonDictionaryCompiler()
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
+    # use python syntax ala __setitem__
+    c["abd"] = '{"a" : 3}'
     with tmp_dictionary(c, 'simple_json.kv') as d:
         assert len(d) == 2
         assert d["abc"].GetValueAsString() == '{"a":2}'

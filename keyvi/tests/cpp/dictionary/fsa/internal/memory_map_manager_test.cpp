@@ -117,6 +117,44 @@ BOOST_AUTO_TEST_CASE( GetBuffer ) {
   boost::filesystem::remove_all(path);
 }
 
+BOOST_AUTO_TEST_CASE( AppendLargeChunk ) {
+  size_t chunkSize = 4096;
+
+  boost::filesystem::path path = boost::filesystem::temp_directory_path();
+  path /= boost::filesystem::unique_path(
+      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  boost::filesystem::create_directory(path);
+  MemoryMapManager m(chunkSize, path, "append large chunk test");
+
+  char buffer[16384];
+  std::fill(buffer, buffer+4096, 'y');
+  std::fill(buffer+4096, buffer+16384, 'x');
+  buffer[8887] = 'w';
+  buffer[8889] = 'y';
+
+  buffer[9503] = 'a';
+  buffer[9504] = 'b';
+
+  buffer[12003] = 'c';
+  buffer[12005] = 'd';
+
+  buffer[14000] = 'e';
+  buffer[14001] = 'f';
+
+  buffer[16382] = 'g';
+  buffer[16383] = 'h';
+
+  m.Append(buffer, 16384);
+
+  BOOST_CHECK_EQUAL('x', ((char*)m.GetAddress(8888))[0]);
+  BOOST_CHECK_EQUAL('a', ((char*)m.GetAddress(9503))[0]);
+  BOOST_CHECK_EQUAL('x', ((char*)m.GetAddress(12004))[0]);
+  BOOST_CHECK_EQUAL('e', ((char*)m.GetAddress(14000))[0]);
+  BOOST_CHECK_EQUAL('h', ((char*)m.GetAddress(16383))[0]);
+
+  boost::filesystem::remove_all(path);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 
