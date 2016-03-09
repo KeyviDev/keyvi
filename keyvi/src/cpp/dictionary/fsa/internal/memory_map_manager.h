@@ -109,8 +109,6 @@ final {
       size_t buffer_offset = 0;
 
       while (remaining > 0) {
-
-      while (remaining > 0) {
         size_t chunk_number = tail_ / chunk_size_;
         size_t chunk_offset = tail_ % chunk_size_;
 
