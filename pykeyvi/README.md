@@ -9,6 +9,12 @@ Ensure you build the C++ extension in release mode. After that just use the setu
     python setup.py build
     python setup.py install
 
+#### Building on Mac
+
+In order to build on Mac you might have to force 64bit only with:
+
+    export ARCHFLAGS="-arch x86_64"
+
 ## Develop
 
 pykeyvi uses cython and [autowrap](https://github.com/uweschmitt/autowrap). All source files can be found in the src 

@@ -127,7 +127,8 @@ BOOST_AUTO_TEST_CASE( AppendLargeChunk ) {
   MemoryMapManager m(chunkSize, path, "append large chunk test");
 
   char buffer[16384];
-  std::fill(buffer, buffer+16384, 'x');
+  std::fill(buffer, buffer+4096, 'y');
+  std::fill(buffer+4096, buffer+16384, 'x');
   buffer[8887] = 'w';
   buffer[8889] = 'y';
 

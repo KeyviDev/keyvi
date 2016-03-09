@@ -105,10 +105,10 @@ final {
      * @param buffer_length the buffer length to append
      */
     void Append(const void* buffer, const size_t buffer_length){
-      size_t chunk_number = tail_ / chunk_size_;
-      size_t chunk_offset = tail_ % chunk_size_;
-
       size_t remaining = buffer_length;
+      size_t buffer_offset = 0;
+
+      while (remaining > 0) {
 
       while (remaining > 0) {
         size_t chunk_number = tail_ / chunk_size_;
@@ -116,10 +116,11 @@ final {
 
         void* chunk_address = GetChunk(chunk_number);
         size_t copy_size = std::min(buffer_length, chunk_size_ - chunk_offset);
-        std::memcpy((char*)chunk_address + chunk_offset, buffer, copy_size);
+        std::memcpy((char*)chunk_address + chunk_offset, (char*)buffer + buffer_offset, copy_size);
 
         remaining -= copy_size;
         tail_ += copy_size;
+        buffer_offset += copy_size;
       }
     }
 
