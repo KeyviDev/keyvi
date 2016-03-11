@@ -108,7 +108,20 @@ class EntryIterator final{
   }
 
   bool operator<(const EntryIterator& other) const {
-    return strcmp((const char*) traversal_stack_.data(), (const char*) other.traversal_stack_.data()) > 0;
+
+    int compare_result = memcmp((const char*) other.traversal_stack_.data(),
+                  (const char*) traversal_stack_.data(),
+                  std::min(traversal_stack_.size(), other.traversal_stack_.size()));
+
+    if (compare_result == 0) {
+      return traversal_stack_.size() < other.traversal_stack_.size();
+    }
+
+    return compare_result > 0;
+  }
+
+  bool operator>(const EntryIterator& other) const {
+    return !(operator<(other));
   }
 
  private:

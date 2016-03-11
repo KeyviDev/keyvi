@@ -132,7 +132,7 @@ void encodeVarint(int_t value, buffer_t& output) {
  * @param value The input value. Any standard integer type is allowed.
  */
 template<typename int_t = uint64_t>
-int_t decodeVarint(uint8_t* input) {
+int_t decodeVarint(const uint8_t* input) {
   int_t ret = 0;
   for (uint8_t i = 0;; i++) {
     ret |= (int_t)(input[i] & 127) << (7 * i);
@@ -150,7 +150,7 @@ int_t decodeVarint(uint8_t* input) {
  * @param value The input value. Any standard integer type is allowed.
  */
 template<typename int_t = uint64_t>
-int_t decodeVarshort(uint16_t* input) {
+int_t decodeVarshort(const uint16_t* input) {
   int_t ret = 0;
   for (uint8_t i = 0;; i++) {
     ret |= (int_t)(input[i] & 32767) << (15 * i);

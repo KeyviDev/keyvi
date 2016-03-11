@@ -275,8 +275,7 @@ class StringValueStore final : public IValueStoreWriter {
           delete strings_region_;
         }
 
-        virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value)
-            override {
+        virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
           attributes_t attributes(new attributes_raw_t());
 
           std::string raw_value(strings_ + fsa_value);
@@ -285,7 +284,7 @@ class StringValueStore final : public IValueStoreWriter {
           return attributes;
         }
 
-        virtual std::string GetValueAsString(uint64_t fsa_value) override {
+        virtual std::string GetValueAsString(uint64_t fsa_value) const override {
           return std::string(strings_ + fsa_value);
         }
 

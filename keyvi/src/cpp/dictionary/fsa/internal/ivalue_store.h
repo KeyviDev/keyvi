@@ -117,7 +117,7 @@ class IValueStoreReader {
    * @param fsa_value numeric value
    * @return The value in form of attributes
    */
-  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) = 0;
+  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const = 0;
 
   /**
    * Get Value as string in raw format
@@ -125,7 +125,7 @@ class IValueStoreReader {
    * @param fsa_value
    * @return the value as string without any decompression
    */
-  virtual std::string GetRawValueAsString(uint64_t fsa_value) {
+  virtual std::string GetRawValueAsString(uint64_t fsa_value) const {
     return GetValueAsString(fsa_value);
   }
 
@@ -135,7 +135,7 @@ class IValueStoreReader {
    * @param fsa_value
    * @return the value as string
    */
-  virtual std::string GetValueAsString(uint64_t fsa_value) = 0;
+  virtual std::string GetValueAsString(uint64_t fsa_value) const = 0;
 
   /**
    * Get statistical information about the storage.

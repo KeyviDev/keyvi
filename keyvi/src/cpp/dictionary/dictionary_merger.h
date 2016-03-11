@@ -53,7 +53,9 @@ final {
   }
 
   void Merge(const std::string& filename){
-    std::priority_queue<std::pair<fsa::EntryIterator, int>> pqueue;
+    std::priority_queue<std::pair<fsa::EntryIterator, int>,
+                        std::vector<std::pair<fsa::EntryIterator, int>>,
+                        std::greater<std::pair<fsa::EntryIterator, int>>> pqueue;
     fsa::EntryIterator end_it;
 
     int i = 0;

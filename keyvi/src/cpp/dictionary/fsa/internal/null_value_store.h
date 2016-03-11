@@ -77,11 +77,11 @@ class NullValueStoreReader final: public IValueStoreReader{
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) override {
+  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     return attributes_t();
   }
 
-  virtual std::string GetValueAsString(uint64_t fsa_value) override {
+  virtual std::string GetValueAsString(uint64_t fsa_value) const override {
     return "";
   }
 };
