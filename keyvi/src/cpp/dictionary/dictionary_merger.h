@@ -64,7 +64,9 @@ final {
       pqueue.push(std::make_pair(e_it, i++));
     }
 
-    fsa::Generator<PersistenceT, ValueStoreT> generator;
+    ValueStoreT* value_store = new ValueStoreT();
+
+    fsa::Generator<PersistenceT, ValueStoreT> generator(1073741824, fsa::generator_param_t(), value_store);
 
     while(!pqueue.empty()){
       auto e = pqueue.top();
@@ -74,8 +76,17 @@ final {
 
       std::cout<<e.first.GetKey()<< std::endl;
 
+      fsa::ValueHandle handle;
+      handle.no_minimization = false;
 
-      generator.Add(e.first.GetKey());
+      // if inner weights are used update them
+      //handle.weight = value_store_->GetWeightValue(value);
+
+      handle.value_idx = value_store->GetValue(e.first.GetFsa()->GetValueStore()->GetValueStorePayload(),
+                                               e.first.GetValueId(),
+                                               handle.no_minimization);
+
+      generator.Add(e.first.GetKey(), handle);
 
       if (++e.first != end_it) {
         pqueue.push(e);

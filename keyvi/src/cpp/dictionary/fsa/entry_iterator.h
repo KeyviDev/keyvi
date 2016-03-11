@@ -124,6 +124,10 @@ class EntryIterator final{
     return !(operator<(other));
   }
 
+  automata_t GetFsa() const {
+    return fsa_;
+  }
+
  private:
   /** Clears the iterator, i.e. makes it equal to the empty iterator. */
   void Clear() {

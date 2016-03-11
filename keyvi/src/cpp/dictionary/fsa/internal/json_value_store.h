@@ -42,6 +42,7 @@
 #include "dictionary/fsa/internal/lru_generation_cache.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
+#include "dictionary/dictionary_merger_fwd.h"
 
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
@@ -213,39 +214,14 @@ class JsonValueStore final : public IValueStoreWriter {
   size_t values_buffer_size_ = 0;
   boost::filesystem::path temporary_directory_;
 
-  uint64_t MergeValue(const unsigned char* buffer, bool& no_minimization) {
-    ++number_of_values_;
+ private:
 
-    if (!minimize_){
-      TRACE("Minimization is turned off.");
-      no_minimization = true;
-      return AddValue();
-    }
+   template<typename , typename>
+   friend class ::keyvi::dictionary::DictionaryMerger;
 
-    size_t buffer_length = util::decodeVarint(buffer);
-
-    const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(),
-                                                     values_extern_);
-    const RawPointer p = hash_.Get(stp);
-
-    if (!p.IsEmpty()) {
-      // found the same value again, minimize
-      TRACE("Minimized value");
-      return p.GetOffset();
-    } // else persist string value
-
-    no_minimization = true;
-    TRACE("New unique value");
-    ++number_of_unique_values_;
-
-    uint64_t pt = AddValue();
-
-    TRACE("add value to hash at %d, length %d", pt, string_buffer_.size());
-    hash_.Add(RawPointer(pt, stp.GetHashcode(), string_buffer_.size()));
-
-    return pt;
-
-  }
+   uint64_t GetValue(const char*p, uint64_t v, bool& no_minimization){
+     return 0;
+   }
 
   uint64_t AddValue(){
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
@@ -341,15 +317,9 @@ class JsonValueStoreReader final: public IValueStoreReader {
   }
 
  private:
-  //friend class ::keyvi::dictionary::DictionaryMerger;
-
   boost::interprocess::mapped_region* strings_region_;
   const char* strings_;
   boost::property_tree::ptree properties_;
-
-  const char* GetValueBuffer(uint64_t fsa_value) const {
-    return strings_ + fsa_value;
-  }
 };
 
 } /* namespace internal */

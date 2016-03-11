@@ -26,6 +26,7 @@
 #define NULL_VALUE_STORE_H_
 
 #include "dictionary/fsa/internal/ivalue_store.h"
+#include "dictionary/dictionary_merger_fwd.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -69,6 +70,15 @@ class NullValueStore final : public IValueStoreWriter {
    * Close the value store, so no more updates;
    */
   void CloseFeeding() {
+  }
+
+ private:
+
+  template<typename , typename>
+  friend class ::keyvi::dictionary::DictionaryMerger;
+
+  uint64_t GetValue(const char*p, uint64_t v, bool& no_minimization){
+    return 0;
   }
 
 };

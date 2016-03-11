@@ -32,6 +32,8 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/variant.hpp>
 
+#include "dictionary/dictionary_merger_fwd.h"
+
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
@@ -143,6 +145,15 @@ class IValueStoreReader {
 
   virtual std::string GetStatistics() const {
     return "";
+  }
+
+  private:
+
+  template<typename , typename>
+  friend class ::keyvi::dictionary::DictionaryMerger;
+
+  virtual const char* GetValueStorePayload() const {
+    return 0;
   }
 };
 
