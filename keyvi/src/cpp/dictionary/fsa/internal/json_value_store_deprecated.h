@@ -110,7 +110,7 @@ namespace internal {
         }
 
         virtual value_store_t GetValueStoreType() const override {
-              return JSON_VALUE_STORE_DEPRECATED;
+          return JSON_VALUE_STORE_DEPRECATED;
         }
 
         virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {

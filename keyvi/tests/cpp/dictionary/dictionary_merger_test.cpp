@@ -127,6 +127,60 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDicts) {
   std::remove(filename.c_str());
 }
 
+BOOST_AUTO_TEST_CASE ( MergeStringDicts) {
+  std::vector<std::pair<std::string, std::string>> test_data = {
+            { "abc", "a" },
+            { "abbc", "b" },
+            { "abbcd", "c" },
+            { "abcde", "a" },
+            { "abdd", "b" },
+            { "bba", "c" },
+        };
+  testing::TempDictionary dictionary (test_data);
+
+  std::vector<std::pair<std::string, std::string>> test_data2 = {
+             { "abbe", "d" },
+             { "abcd", "a" },
+             { "bbacd", "f" },
+         };
+  testing::TempDictionary dictionary2 (test_data2);
+
+  std::string filename ("merged-dict-string.kv");
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> merger;
+  merger.Add(dictionary.GetFileName());
+  merger.Add(dictionary2.GetFileName());
+
+  merger.Merge(filename);
+
+  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+  dictionary_t d(new Dictionary(fsa));
+
+  BOOST_CHECK(d->Contains("abc"));
+  BOOST_CHECK(d->Contains("abbc"));
+  BOOST_CHECK(d->Contains("abbcd"));
+  BOOST_CHECK(d->Contains("abcde"));
+  BOOST_CHECK(d->Contains("abdd"));
+  BOOST_CHECK(d->Contains("bba"));
+
+  BOOST_CHECK_EQUAL("a", d->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("b", d->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("c", d->operator[]("abbcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("a", d->operator[]("abcde").GetValueAsString());
+  BOOST_CHECK_EQUAL("b", d->operator[]("abdd").GetValueAsString());
+  BOOST_CHECK_EQUAL("c", d->operator[]("bba").GetValueAsString());
+
+  BOOST_CHECK(d->Contains("abcd"));
+  BOOST_CHECK(d->Contains("abbe"));
+  BOOST_CHECK(d->Contains("bbacd"));
+
+  BOOST_CHECK_EQUAL("a", d->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("d", d->operator[]("abbe").GetValueAsString());
+  BOOST_CHECK_EQUAL("f", d->operator[]("bbacd").GetValueAsString());
+
+  std::remove(filename.c_str());
+}
+
+
 BOOST_AUTO_TEST_CASE ( MergeIncompatible ) {
 
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
