@@ -165,7 +165,7 @@ class JsonValueStore final : public IValueStoreWriter {
     return 0;
   }
 
-  value_store_t GetValueStoreType() const {
+  static value_store_t GetValueStoreType() {
     return JSON_VALUE_STORE;
   }
 
@@ -285,6 +285,10 @@ class JsonValueStoreReader final: public IValueStoreReader {
 
   ~JsonValueStoreReader() {
     delete strings_region_;
+  }
+
+  virtual value_store_t GetValueStoreType() const override {
+      return JSON_VALUE_STORE;
   }
 
   virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {

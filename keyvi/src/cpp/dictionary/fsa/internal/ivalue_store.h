@@ -113,6 +113,8 @@ class IValueStoreReader {
   virtual ~IValueStoreReader() {
   }
 
+  virtual value_store_t GetValueStoreType() const = 0;
+
   /**
    * Generic value format.
    *

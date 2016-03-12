@@ -25,6 +25,7 @@
 #ifndef TEMP_DICTIONARY_H_
 #define TEMP_DICTIONARY_H_
 
+#include <stdio.h>
 #include <boost/filesystem.hpp>
 #include <dictionary/compilation/compilation_utils.h>
 

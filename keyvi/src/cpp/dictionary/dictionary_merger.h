@@ -48,7 +48,10 @@ final {
   void Add (const std::string& filename){
     fsa::automata_t fsa (new fsa::Automata(filename.c_str()));
 
-    // todo: check that new added dict are compatible
+    if (fsa->GetValueStore()->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
+      throw std::invalid_argument("Dictionaries must have the same type.");
+    }
+
     dicts_to_merge_.push_back(fsa);
   }
 
@@ -74,12 +77,10 @@ final {
 
       // todo: check for same keys and merge only the last one
 
-      std::cout<<e.first.GetKey()<< std::endl;
-
       fsa::ValueHandle handle;
       handle.no_minimization = false;
 
-      // if inner weights are used update them
+      // Todo: if inner weights are used update them
       //handle.weight = value_store_->GetWeightValue(value);
 
       handle.value_idx = value_store->GetValue(e.first.GetFsa()->GetValueStore()->GetValueStorePayload(),

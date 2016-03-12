@@ -109,6 +109,10 @@ namespace internal {
           delete strings_region_;
         }
 
+        virtual value_store_t GetValueStoreType() const override {
+              return JSON_VALUE_STORE_DEPRECATED;
+        }
+
         virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
           attributes_t attributes(new attributes_raw_t());
 

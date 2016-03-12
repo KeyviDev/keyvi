@@ -56,15 +56,15 @@ class NullValueStore final : public IValueStoreWriter {
     return 0;
   }
 
-  uint32_t GetWeightValue(value_t value){
+  uint32_t GetWeightValue(value_t value) const {
     return 0;
   }
 
-  value_store_t GetValueStoreType(){
+  static value_store_t GetValueStoreType() {
     return NULL_VALUE_STORE;
   }
 
-  void Write(std::ostream& stream) {}
+  void Write(std::ostream& stream) const {}
 
   /**
    * Close the value store, so no more updates;
@@ -86,6 +86,10 @@ class NullValueStore final : public IValueStoreWriter {
 class NullValueStoreReader final: public IValueStoreReader{
  public:
   using IValueStoreReader::IValueStoreReader;
+
+  virtual value_store_t GetValueStoreType() const override {
+    return NULL_VALUE_STORE;
+  }
 
   virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     return attributes_t();
