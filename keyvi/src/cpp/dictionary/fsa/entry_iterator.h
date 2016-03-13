@@ -60,12 +60,12 @@ class EntryIterator final{
     }
   }
 
-  std::string GetKey() {
+  std::string GetKey() const {
     TRACE ("depth: %d", GetDepth());
     return std::string((const char*) traversal_stack_.data(), GetDepth());
   }
 
-  void WriteKey(std::ostream& stream){
+  void WriteKey(std::ostream& stream) const {
     stream.write((const char*) traversal_stack_.data(), GetDepth());
   }
 
