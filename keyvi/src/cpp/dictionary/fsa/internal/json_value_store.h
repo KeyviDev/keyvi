@@ -70,7 +70,7 @@ class JsonValueStore final : public IValueStoreWriter {
   static const uint64_t no_value = 0;
   static const bool inner_weight = false;
 
-  JsonValueStore(const vs_param_t& parameters, size_t memory_limit = 104857600)
+  JsonValueStore(const vs_param_t& parameters = vs_param_t(), size_t memory_limit = 104857600)
       : IValueStoreWriter(parameters), hash_(memory_limit) {
     temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
     temporary_directory_ /= boost::filesystem::unique_path(
@@ -115,7 +115,6 @@ class JsonValueStore final : public IValueStoreWriter {
     boost::filesystem::remove_all(temporary_directory_);
   }
 
-  JsonValueStore() = delete;
   JsonValueStore& operator=(JsonValueStore const&) = delete;
   JsonValueStore(const JsonValueStore& that) = delete;
 
@@ -219,8 +218,10 @@ class JsonValueStore final : public IValueStoreWriter {
    template<typename , typename>
    friend class ::keyvi::dictionary::DictionaryMerger;
 
-   uint64_t GetValue(const char*p, uint64_t v, bool& no_minimization){
-     return 0;
+   uint64_t GetValue(const char* payload, uint64_t fsa_value, bool& no_minimization){
+     std::string packed_string = util::decodeVarintString(payload + fsa_value);
+
+     return GetValue(util::DecodeJsonValue(packed_string), no_minimization);
    }
 
   uint64_t AddValue(){
@@ -324,6 +325,10 @@ class JsonValueStoreReader final: public IValueStoreReader {
   boost::interprocess::mapped_region* strings_region_;
   const char* strings_;
   boost::property_tree::ptree properties_;
+
+  virtual const char* GetValueStorePayload() const override {
+    return strings_;
+  }
 };
 
 } /* namespace internal */

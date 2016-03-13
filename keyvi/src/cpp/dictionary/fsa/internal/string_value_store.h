@@ -305,13 +305,13 @@ class StringValueStore final : public IValueStoreWriter {
           return std::string(strings_ + fsa_value);
         }
 
-        virtual const char* GetValueStorePayload() const override {
-          return strings_;
-        }
-
        private:
         boost::interprocess::mapped_region* strings_region_;
         const char* strings_;
+
+        virtual const char* GetValueStorePayload() const override {
+          return strings_;
+        }
       };
 
 } /* namespace internal */

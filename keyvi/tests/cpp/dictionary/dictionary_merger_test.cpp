@@ -180,6 +180,59 @@ BOOST_AUTO_TEST_CASE ( MergeStringDicts) {
   std::remove(filename.c_str());
 }
 
+BOOST_AUTO_TEST_CASE ( MergeJsonDicts) {
+  std::vector<std::pair<std::string, std::string>> test_data = {
+            { "abc", "{a:1}" },
+            { "abbc", "{b:2}" },
+            { "abbcd", "{c:3}" },
+            { "abcde", "{a:1}" },
+            { "abdd", "{b:2}" },
+            { "bba", "{c:3}" },
+        };
+  testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(test_data);
+
+  std::vector<std::pair<std::string, std::string>> test_data2 = {
+             { "abbe", "{d:4}" },
+             { "abcd", "{a:1}" },
+             { "bbacd", "{f:5}" },
+         };
+  testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(test_data2);
+
+  std::string filename ("merged-dict-json.kv");
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> merger;
+  merger.Add(dictionary.GetFileName());
+  merger.Add(dictionary2.GetFileName());
+
+  merger.Merge(filename);
+
+  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+  dictionary_t d(new Dictionary(fsa));
+
+  BOOST_CHECK(d->Contains("abc"));
+  BOOST_CHECK(d->Contains("abbc"));
+  BOOST_CHECK(d->Contains("abbcd"));
+  BOOST_CHECK(d->Contains("abcde"));
+  BOOST_CHECK(d->Contains("abdd"));
+  BOOST_CHECK(d->Contains("bba"));
+
+  BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{b:2}\"", d->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("abbcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcde").GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{b:2}\"", d->operator[]("abdd").GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("bba").GetValueAsString());
+
+  BOOST_CHECK(d->Contains("abcd"));
+  BOOST_CHECK(d->Contains("abbe"));
+  BOOST_CHECK(d->Contains("bbacd"));
+
+  BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{f:5}\"", d->operator[]("bbacd").GetValueAsString());
+
+  std::remove(filename.c_str());
+}
+
 
 BOOST_AUTO_TEST_CASE ( MergeIncompatible ) {
 

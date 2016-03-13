@@ -30,6 +30,7 @@
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
+#include "dictionary/fsa/internal/json_value_store.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -81,6 +82,27 @@ class CompilationUtils {
       fsa::automata_t f(new fsa::Automata(file_name.c_str()));
       return f;
     }
+
+  static fsa::automata_t CompileJson(std::vector<std::pair<std::string, std::string>>& input, std::string& file_name){
+        std::sort(input.begin(), input.end());
+
+        fsa::internal::SparseArrayPersistence<> p(2048,
+                                             boost::filesystem::temp_directory_path());
+
+        fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> g;
+
+        for(auto pair : input){
+          g.Add(pair.first, pair.second);
+        }
+
+        g.CloseFeeding();
+        std::ofstream out_stream(file_name, std::ios::binary);
+        g.Write(out_stream);
+        out_stream.close();
+
+        fsa::automata_t f(new fsa::Automata(file_name.c_str()));
+        return f;
+      }
 
   static fsa::automata_t CompileIntWithInnerWeights(std::vector<std::pair<std::string, uint32_t>>& input, std::string& file_name){
       std::sort(input.begin(), input.end());
