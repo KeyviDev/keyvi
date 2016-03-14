@@ -148,6 +148,11 @@ ext_modules = [Extension('pykeyvi',
 
 PACKAGE_NAME = 'python-keyvi'
 
+install_requires = [
+    'msgpack-python',
+    'python-snappy',
+    ]
+
 setup(
     name = PACKAGE_NAME,
     version = '0.1.14',
@@ -162,4 +167,5 @@ setup(
     download_url = 'https://github.com/cliqz/keyvi/tarball/v0.1.14',
     keywords = ['FST'],
     classifiers = [],
+    install_requires=install_requires,
 )
