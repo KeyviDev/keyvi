@@ -9,7 +9,6 @@ from  AutowrapRefHolder cimport AutowrapRefHolder
 from  libcpp cimport bool
 from  libc.string cimport const_char
 from cython.operator cimport dereference as deref, preincrement as inc, address as address
-import msgpack
 from cython.operator cimport dereference, preincrement
 cimport cython.operator as co
 from cluster cimport JumpConsistentHashString as _JumpConsistentHashString_cluster
@@ -114,8 +113,8 @@ cdef class StringDictionaryCompiler:
 
 
     def SetManifest(self, manifest):
-        import json
-        self.inst.get().SetManifestFromString(json.dumps(manifest)) 
+        m = json.dumps(manifest)
+        self.inst.get().SetManifestFromString(m) 
 
 cdef class JsonDictionaryCompiler:
 
@@ -192,8 +191,8 @@ cdef class JsonDictionaryCompiler:
 
 
     def SetManifest(self, manifest):
-        import json
-        self.inst.get().SetManifestFromString(json.dumps(manifest)) 
+        m = json.dumps(manifest)
+        self.inst.get().SetManifestFromString(m) 
 
 cdef class Dictionary:
 
@@ -510,8 +509,8 @@ cdef class CompletionDictionaryCompiler:
 
 
     def SetManifest(self, manifest):
-        import json
-        self.inst.get().SetManifestFromString(json.dumps(manifest))
+        m = json.dumps(manifest)
+        self.inst.get().SetManifestFromString(m)
 
 
 # definition for all compilers
@@ -676,8 +675,8 @@ cdef class KeyOnlyDictionaryCompiler:
 
 
     def SetManifest(self, manifest):
-        import json
-        self.inst.get().SetManifestFromString(json.dumps(manifest)) 
+        m = json.dumps(manifest)
+        self.inst.get().SetManifestFromString(m) 
 
 cdef class Match:
 
@@ -796,6 +795,25 @@ cdef class Match:
         else:
             raise Exception("Unsupported Value Type")
 
+
+    def GetValue(self):
+        """Decodes a keyvi value and returns it."""
+        value = self.inst.get().GetRawValueAsString()
+        if value is None or len(value) == 0:
+            return None
+
+        elif value[0] == '\x00':
+            return msgpack.loads(value[1:])
+
+        elif value[0] == '\x01':
+            value = zlib.decompress(value[1:])
+
+        elif value[0] == '\x02':
+            value = snappy.decompress(value[1:])
+
+        return msgpack.loads(value)
+
+
     def dumps(self):
         m=[]
         do_pack_rest = False
@@ -845,7 +863,12 @@ cdef class Match:
  
  
 # import uint32_t type
-from libc.stdint cimport uint32_t 
+from libc.stdint cimport uint32_t
+
+import json
+import msgpack
+import zlib
+import snappy 
  
 # same import style as autowrap
 from match cimport Match as _Match
