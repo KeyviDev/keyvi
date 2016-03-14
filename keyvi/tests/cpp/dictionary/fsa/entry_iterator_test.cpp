@@ -32,6 +32,46 @@ BOOST_AUTO_TEST_CASE( EmptyDictionary ) {
   BOOST_CHECK(end_it == it);
 }
 
+BOOST_AUTO_TEST_CASE( DictionariesIteratorCompare ) {
+
+  std::vector<std::string> test_data =
+          { "aaa", "aaaa", "aabc", "cdef", "ef" };
+
+  std::vector<std::string> test_data2 =
+            { "bbb", "bcd", "cdag", "effffff" };
+
+
+  testing::TempDictionary dictionary(test_data);
+  automata_t f = dictionary.GetFsa();
+
+  testing::TempDictionary dictionary2(test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  EntryIterator it1(f);
+  EntryIterator it1_2(f);
+
+  EntryIterator it2(f2);
+
+  EntryIterator end_it = EntryIterator();
+
+  BOOST_CHECK(it1<it2);
+
+  ++it1_2;
+  BOOST_CHECK(it1<it1_2);
+  ++it1;
+  BOOST_CHECK(it1==it1_2);
+  BOOST_CHECK(it1<it2);
+  ++it1;
+  BOOST_CHECK(it1>it1_2);
+  BOOST_CHECK(it1<it2);
+  ++it1;
+  BOOST_CHECK(it1>it2);
+  ++it1;
+  ++it1;
+  BOOST_CHECK(end_it == it1);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */

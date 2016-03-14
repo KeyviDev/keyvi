@@ -202,11 +202,11 @@ class StringValueStore final : public IValueStoreWriter {
           return 0;
         }
 
-        value_store_t GetValueStoreType() const {
+        static value_store_t GetValueStoreType() {
           return STRING_VALUE_STORE;
         }
 
-        void Write(std::ostream& stream) {
+        void Write(std::ostream& stream) const {
 
           boost::property_tree::ptree pt;
           pt.put("size", std::to_string(string_values_.size()));
@@ -228,6 +228,18 @@ class StringValueStore final : public IValueStoreWriter {
        private:
         std::vector<char> string_values_;
         MinimizationHash<StringPointer> hash_;
+
+
+        template<typename , typename>
+        friend class ::keyvi::dictionary::DictionaryMerger;
+
+        uint64_t GetValue(const char*p, uint64_t fsa_value, bool& no_minimization){
+          // simple, not optimized version
+
+          std::string value(p + fsa_value);
+
+          return GetValue(value, no_minimization);
+        }
       };
 
       class StringValueStoreReader final: public IValueStoreReader {
@@ -275,8 +287,12 @@ class StringValueStore final : public IValueStoreWriter {
           delete strings_region_;
         }
 
-        virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value)
-            override {
+        virtual value_store_t GetValueStoreType() const override {
+          return STRING_VALUE_STORE;
+        }
+
+
+        virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
           attributes_t attributes(new attributes_raw_t());
 
           std::string raw_value(strings_ + fsa_value);
@@ -285,13 +301,17 @@ class StringValueStore final : public IValueStoreWriter {
           return attributes;
         }
 
-        virtual std::string GetValueAsString(uint64_t fsa_value) override {
+        virtual std::string GetValueAsString(uint64_t fsa_value) const override {
           return std::string(strings_ + fsa_value);
         }
 
        private:
         boost::interprocess::mapped_region* strings_region_;
         const char* strings_;
+
+        virtual const char* GetValueStorePayload() const override {
+          return strings_;
+        }
       };
 
 } /* namespace internal */

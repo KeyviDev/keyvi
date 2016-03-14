@@ -38,6 +38,7 @@
 #include "dictionary/util/vint.h"
 #include "dictionary/util/endian.h"
 #include "dictionary/fsa/internal/intrinsics.h"
+#include "dictionary/dictionary_merger_fwd.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -477,6 +478,13 @@ final {
     bool compact_size_;
     uint64_t start_state_;
     uint64_t number_of_keys_;
+
+    template<typename , typename>
+    friend class ::keyvi::dictionary::DictionaryMerger;
+
+    internal::IValueStoreReader* GetValueStore() const {
+      return value_store_reader_;
+    }
 
     inline uint64_t ResolvePointer(uint64_t starting_state, unsigned char c) const {
       if (!compact_size_) {

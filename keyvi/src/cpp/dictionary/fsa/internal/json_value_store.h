@@ -41,7 +41,8 @@
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/lru_generation_cache.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
-#include "dictionary/util/vint.h"
+#include "dictionary/fsa/internal/value_store_persistence.h"
+#include "dictionary/dictionary_merger_fwd.h"
 
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
@@ -65,126 +66,11 @@ namespace internal {
  */
 class JsonValueStore final : public IValueStoreWriter {
  public:
-
-  struct RawPointer final {
-   public:
-    RawPointer() : RawPointer(0, 0, 0) {}
-
-    RawPointer(uint64_t offset, int hashcode, size_t length)
-        : offset_(offset), hashcode_(hashcode), length_(length) {
-      if (length > USHRT_MAX) {
-        length_ = USHRT_MAX;
-      }
-    }
-
-    int GetHashcode() const {
-      return hashcode_;
-    }
-
-    uint64_t GetOffset() const {
-      return offset_;
-    }
-
-    ushort GetLength() const {
-      return length_;
-    }
-
-    int GetCookie() const {
-      return cookie_;
-    }
-
-    void SetCookie(int value) {
-      cookie_ = static_cast<ushort>(value);
-    }
-
-    bool IsEmpty() const {
-      return offset_ == 0 && hashcode_ == 0 && length_ == 0;
-    }
-
-    bool operator==(const RawPointer& l) {
-      return offset_ == l.offset_;
-    }
-
-    static size_t GetMaxCookieSize() {
-      return MaxCookieSize;
-    }
-
-   private:
-    static const size_t MaxCookieSize = 0xFFFF;
-
-    uint64_t offset_;
-    int32_t hashcode_;
-    ushort length_;
-    ushort cookie_ = 0;
-
-  };
-
-  template<class PersistenceT>
-  struct RawPointerForCompare final {
-   public:
-    RawPointerForCompare(const char* value, size_t value_size, PersistenceT* persistence)
-        : value_(value), value_size_(value_size), persistence_(persistence) {
-
-      // calculate a hashcode
-      int32_t h = 31;
-
-      for(size_t i = 0; i < value_size_; ++i) {
-        h = (h * 54059) ^ (value[i] * 76963);
-      }
-
-      TRACE("hashcode %d", h);
-
-      hashcode_ = h;
-    }
-
-    int GetHashcode() const {
-      return hashcode_;
-    }
-
-    bool operator==(const RawPointer& l) const {
-      TRACE("check equality, 1st hashcode");
-
-      // First filter - check if hash code  is the same
-      if (l.GetHashcode() != hashcode_) {
-        return false;
-      }
-
-      TRACE("check equality, 2nd length");
-      size_t length_l = l.GetLength();
-
-      if (length_l < USHRT_MAX) {
-        if (length_l != value_size_) {
-          return false;
-        }
-
-        TRACE("check equality, 3rd buffer %d %d %d", l.GetOffset(), value_size_, util::getVarintLength(length_l));
-        // we know the length, skip the length byte and compare the value
-        return persistence_->Compare(l.GetOffset() + util::getVarintLength(length_l), (void*) value_, value_size_);
-      }
-
-      // we do not know the length, first get it, then compare
-      char buf[8];
-      persistence_->GetBuffer(l.GetOffset(), buf, 8);
-
-      length_l = util::decodeVarint((uint8_t*)buf);
-
-      TRACE("check equality, 3rd buffer %d %d", l.GetOffset(), value_size_);
-      return persistence_->Compare(l.GetOffset() + util::getVarintLength(length_l), (void*) value_, value_size_);
-    }
-
-   private:
-    const char* value_;
-    size_t value_size_;
-    PersistenceT* persistence_;
-    int32_t hashcode_;
-  };
-
   typedef std::string value_t;
   static const uint64_t no_value = 0;
   static const bool inner_weight = false;
 
-  // boost::filesystem::path temporary_path,
-  JsonValueStore(const vs_param_t& parameters, size_t memory_limit = 104857600)
+  JsonValueStore(const vs_param_t& parameters = vs_param_t(), size_t memory_limit = 104857600)
       : IValueStoreWriter(parameters), hash_(memory_limit) {
     temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
     temporary_directory_ /= boost::filesystem::unique_path(
@@ -229,7 +115,6 @@ class JsonValueStore final : public IValueStoreWriter {
     boost::filesystem::remove_all(temporary_directory_);
   }
 
-  JsonValueStore() = delete;
   JsonValueStore& operator=(JsonValueStore const&) = delete;
   JsonValueStore(const JsonValueStore& that) = delete;
 
@@ -279,7 +164,7 @@ class JsonValueStore final : public IValueStoreWriter {
     return 0;
   }
 
-  value_store_t GetValueStoreType() const {
+  static value_store_t GetValueStoreType() {
     return JSON_VALUE_STORE;
   }
 
@@ -327,6 +212,17 @@ class JsonValueStore final : public IValueStoreWriter {
   size_t number_of_unique_values_ = 0;
   size_t values_buffer_size_ = 0;
   boost::filesystem::path temporary_directory_;
+
+ private:
+
+   template<typename , typename>
+   friend class ::keyvi::dictionary::DictionaryMerger;
+
+   uint64_t GetValue(const char* payload, uint64_t fsa_value, bool& no_minimization){
+     std::string packed_string = util::decodeVarintString(payload + fsa_value);
+
+     return GetValue(util::DecodeJsonValue(packed_string), no_minimization);
+   }
 
   uint64_t AddValue(){
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
@@ -392,8 +288,11 @@ class JsonValueStoreReader final: public IValueStoreReader {
     delete strings_region_;
   }
 
-  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value)
-      override {
+  virtual value_store_t GetValueStoreType() const override {
+      return JSON_VALUE_STORE;
+  }
+
+  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());
 
     std::string raw_value = util::decodeVarintString(strings_ + fsa_value);
@@ -405,11 +304,11 @@ class JsonValueStoreReader final: public IValueStoreReader {
     return attributes;
   }
 
-  virtual std::string GetRawValueAsString(uint64_t fsa_value) override {
+  virtual std::string GetRawValueAsString(uint64_t fsa_value) const override {
     return util::decodeVarintString(strings_ + fsa_value);
   }
 
-  virtual std::string GetValueAsString(uint64_t fsa_value) override {
+  virtual std::string GetValueAsString(uint64_t fsa_value) const override {
     TRACE("JsonValueStoreReader GetValueAsString");
     std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
 
@@ -426,6 +325,10 @@ class JsonValueStoreReader final: public IValueStoreReader {
   boost::interprocess::mapped_region* strings_region_;
   const char* strings_;
   boost::property_tree::ptree properties_;
+
+  virtual const char* GetValueStorePayload() const override {
+    return strings_;
+  }
 };
 
 } /* namespace internal */

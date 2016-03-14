@@ -25,6 +25,7 @@
 #ifndef TEMP_DICTIONARY_H_
 #define TEMP_DICTIONARY_H_
 
+#include <stdio.h>
 #include <boost/filesystem.hpp>
 #include <dictionary/compilation/compilation_utils.h>
 
@@ -57,8 +58,19 @@ final {
       fsa_ = compilation::CompilationUtils::CompileString(input, file_name_);
     }
 
-    fsa::automata_t GetFsa() {
+    static TempDictionary makeTempDictionaryFromJson(std::vector<std::pair<std::string, std::string>>& input) {
+      TempDictionary t;
+      t.CreateFileName();
+      t.fsa_ = compilation::CompilationUtils::CompileJson(input, t.file_name_);
+      return t;
+    }
+
+    fsa::automata_t GetFsa() const {
       return fsa_;
+    }
+
+    const std::string& GetFileName() const {
+      return file_name_;
     }
 
     ~TempDictionary() {
@@ -68,6 +80,8 @@ final {
    private:
     fsa::automata_t fsa_;
     std::string file_name_;
+
+    TempDictionary(){}
 
     void CreateFileName() {
       boost::filesystem::path temp_path =

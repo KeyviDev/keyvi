@@ -25,6 +25,7 @@
 #ifndef ENTRY_ITERATOR_H_
 #define ENTRY_ITERATOR_H_
 
+#include <cstring>
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/traversal/traversal_base.h"
 
@@ -59,12 +60,12 @@ class EntryIterator final{
     }
   }
 
-  std::string GetKey() {
+  std::string GetKey() const {
     TRACE ("depth: %d", GetDepth());
     return std::string((const char*) traversal_stack_.data(), GetDepth());
   }
 
-  void WriteKey(std::ostream& stream){
+  void WriteKey(std::ostream& stream) const {
     stream.write((const char*) traversal_stack_.data(), GetDepth());
   }
 
@@ -106,8 +107,29 @@ class EntryIterator final{
     return !(operator==(other));
   }
 
+  bool operator<(const EntryIterator& other) const {
+
+    int compare_result = memcmp((const char*) other.traversal_stack_.data(),
+                  (const char*) traversal_stack_.data(),
+                  std::min(traversal_stack_.size(), other.traversal_stack_.size()));
+
+    if (compare_result == 0) {
+      return traversal_stack_.size() < other.traversal_stack_.size();
+    }
+
+    return compare_result > 0;
+  }
+
+  bool operator>(const EntryIterator& other) const {
+    return !(operator<(other));
+  }
+
+  automata_t GetFsa() const {
+    return fsa_;
+  }
+
  private:
-  /** Cleares the iterator, i.e. makes it equal to the empty iterator. */
+  /** Clears the iterator, i.e. makes it equal to the empty iterator. */
   void Clear() {
     fsa_ = nullptr;
     current_state_ = 0;

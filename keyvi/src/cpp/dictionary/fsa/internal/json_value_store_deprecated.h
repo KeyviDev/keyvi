@@ -109,8 +109,11 @@ namespace internal {
           delete strings_region_;
         }
 
-        virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value)
-            override {
+        virtual value_store_t GetValueStoreType() const override {
+          return JSON_VALUE_STORE_DEPRECATED;
+        }
+
+        virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
           attributes_t attributes(new attributes_raw_t());
 
           std::string raw_value = util::decodeVarintString(strings_ + fsa_value);
@@ -122,11 +125,11 @@ namespace internal {
           return attributes;
         }
 
-        virtual std::string GetRawValueAsString(uint64_t fsa_value) override {
+        virtual std::string GetRawValueAsString(uint64_t fsa_value) const override {
           return util::decodeVarintString(strings_ + fsa_value);
         }
 
-        virtual std::string GetValueAsString(uint64_t fsa_value) override {
+        virtual std::string GetValueAsString(uint64_t fsa_value) const override {
           TRACE("JsonValueStoreDeprecatedReader GetValueAsString");
           std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
 
@@ -161,7 +164,7 @@ namespace internal {
         boost::property_tree::ptree properties_;
 
         /** Decompress an STL string using zlib and return the original data. */
-        std::string decompress_string(const std::string& str)
+        std::string decompress_string(const std::string& str) const
         {
             z_stream zs;                        // z_stream is zlib's control structure
             memset(&zs, 0, sizeof(zs));

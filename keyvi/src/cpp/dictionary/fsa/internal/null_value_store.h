@@ -26,6 +26,7 @@
 #define NULL_VALUE_STORE_H_
 
 #include "dictionary/fsa/internal/ivalue_store.h"
+#include "dictionary/dictionary_merger_fwd.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -55,20 +56,29 @@ class NullValueStore final : public IValueStoreWriter {
     return 0;
   }
 
-  uint32_t GetWeightValue(value_t value){
+  uint32_t GetWeightValue(value_t value) const {
     return 0;
   }
 
-  value_store_t GetValueStoreType(){
+  static value_store_t GetValueStoreType() {
     return NULL_VALUE_STORE;
   }
 
-  void Write(std::ostream& stream) {}
+  void Write(std::ostream& stream) const {}
 
   /**
    * Close the value store, so no more updates;
    */
   void CloseFeeding() {
+  }
+
+ private:
+
+  template<typename , typename>
+  friend class ::keyvi::dictionary::DictionaryMerger;
+
+  uint64_t GetValue(const char*p, uint64_t v, bool& no_minimization){
+    return 0;
   }
 
 };
@@ -77,11 +87,15 @@ class NullValueStoreReader final: public IValueStoreReader{
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) override {
+  virtual value_store_t GetValueStoreType() const override {
+    return NULL_VALUE_STORE;
+  }
+
+  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     return attributes_t();
   }
 
-  virtual std::string GetValueAsString(uint64_t fsa_value) override {
+  virtual std::string GetValueAsString(uint64_t fsa_value) const override {
     return "";
   }
 };
