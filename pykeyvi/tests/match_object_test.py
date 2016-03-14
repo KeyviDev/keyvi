@@ -33,3 +33,13 @@ def test_unicode_attributes():
     assert m.GetAttribute("küy") == 22
     m.SetAttribute("k2", " 吃饭了吗".decode("utf-8"))
     assert m.GetAttribute("k2") == " 吃饭了吗"
+
+def test_get_value():
+    c = pykeyvi.JsonDictionaryCompiler()
+    c.Add("abc", '{"a" : 2}')
+    c.Add("abd", '{"a" : 3}')
+    with tmp_dictionary(c, 'match_object_json.kv') as d:
+        m = d["abc"]
+        assert m.GetValue() == {"a":2}
+        m = d["abd"]
+        assert m.GetValue() == {"a":3}
