@@ -27,6 +27,7 @@
 
 #include <string>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "compression/compression_strategy.h"
 #include "compression/zlib_compression_strategy.h"

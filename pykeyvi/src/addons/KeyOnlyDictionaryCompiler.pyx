@@ -20,5 +20,5 @@
 
 
     def SetManifest(self, manifest):
-        import json
-        self.inst.get().SetManifestFromString(json.dumps(manifest))
+        m = json.dumps(manifest)
+        self.inst.get().SetManifestFromString(m)

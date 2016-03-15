@@ -3,6 +3,6 @@ cdef extern from "<memory>" namespace "std":
         shared_ptr()
         shared_ptr(T*)
         void reset()
-        T* get()
+        T* get() nogil
         int unique()
         int use_count()

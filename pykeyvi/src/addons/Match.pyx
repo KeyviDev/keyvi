@@ -1,4 +1,3 @@
-import msgpack
 
 
     def GetAttribute(self, key):
@@ -28,6 +27,25 @@ import msgpack
             self.inst.get().SetAttribute(<libcpp_string> key, <bool> value)
         else:
             raise Exception("Unsupported Value Type")
+
+
+    def GetValue(self):
+        """Decodes a keyvi value and returns it."""
+        value = self.inst.get().GetRawValueAsString()
+        if value is None or len(value) == 0:
+            return None
+
+        elif value[0] == '\x00':
+            return msgpack.loads(value[1:])
+
+        elif value[0] == '\x01':
+            value = zlib.decompress(value[1:])
+
+        elif value[0] == '\x02':
+            value = snappy.decompress(value[1:])
+
+        return msgpack.loads(value)
+
 
     def dumps(self):
         m=[]

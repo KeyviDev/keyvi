@@ -33,6 +33,7 @@
 #include <boost/variant.hpp>
 
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/util/json_value.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -126,11 +127,14 @@ class IValueStoreReader {
   /**
    * Get Value as string in raw format
    *
+   * Note: The raw format is an implementation detail of keyvi, not an official binary interface.
+   * Value store implementers can override this method for performance reasons.
+   *
    * @param fsa_value
    * @return the value as string without any decompression
    */
   virtual std::string GetRawValueAsString(uint64_t fsa_value) const {
-    return GetValueAsString(fsa_value);
+    return util::EncodeJsonValue(GetValueAsString(fsa_value));
   }
 
   /**
