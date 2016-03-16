@@ -133,7 +133,7 @@ class EntryIterator final{
   void Clear() {
     fsa_ = nullptr;
     current_state_ = 0;
-    current_state_ = 0;
+    current_value_ = 0;
   }
 
   void TraverseToNextFinalState() {

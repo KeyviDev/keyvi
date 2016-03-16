@@ -17,6 +17,7 @@ from dictionary cimport Dictionary as _Dictionary
 from forward_backward_completion cimport ForwardBackwardCompletion as _ForwardBackwardCompletion
 from normalization cimport FsaTransform as _FsaTransform
 from dictionary_compiler cimport JsonDictionaryCompiler as _JsonDictionaryCompiler
+from dictionary_merger cimport JsonDictionaryMerger as _JsonDictionaryMerger
 from dictionary_compiler cimport KeyOnlyDictionaryCompiler as _KeyOnlyDictionaryCompiler
 from generator cimport KeyOnlyDictionaryGenerator as _KeyOnlyDictionaryGenerator
 from match cimport Match as _Match
@@ -37,6 +38,27 @@ def JumpConsistentHashString(bytes in_0 ,  in_1 ):
     cdef uint32_t _r = _JumpConsistentHashString_cluster(input_in_0, (<uint32_t>in_1))
     py_result = <uint32_t>_r
     return py_result 
+
+cdef class JsonDictionaryMerger:
+
+    cdef shared_ptr[_JsonDictionaryMerger] inst
+
+    def __dealloc__(self):
+         self.inst.reset()
+
+    
+    def __init__(self):
+        self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger())
+    
+    def Merge(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    
+        self.inst.get().Merge((<libcpp_string>in_0))
+    
+    def Add(self, bytes in_0 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    
+        self.inst.get().Add((<libcpp_string>in_0)) 
 
 cdef class StringDictionaryCompiler:
 
