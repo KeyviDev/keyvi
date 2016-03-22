@@ -280,6 +280,9 @@ class StringValueStore final : public IValueStoreWriter {
               *file_mapping, boost::interprocess::read_only, offset,
               strings_size, 0, map_options);
 
+          // prevent pre-fetching pages by the OS which does not make sense as values usually fit into few pages
+          strings_region_->advise(boost::interprocess::mapped_region::advice_types::advice_random);
+
           strings_ = (const char*) strings_region_->get_address();
         }
 
