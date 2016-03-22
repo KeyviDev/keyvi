@@ -108,12 +108,19 @@ final {
       size_t remaining = buffer_length;
       size_t buffer_offset = 0;
 
+      TRACE("append %ld %ld", buffer_offset, remaining);
+
       while (remaining > 0) {
+        TRACE("next chunk remaining: %ld", remaining);
+
         size_t chunk_number = tail_ / chunk_size_;
         size_t chunk_offset = tail_ % chunk_size_;
+        TRACE ("chunk number: %ld offset %ld", chunk_number, chunk_offset);
 
         void* chunk_address = GetChunk(chunk_number);
-        size_t copy_size = std::min(buffer_length, chunk_size_ - chunk_offset);
+        size_t copy_size = std::min(remaining, chunk_size_ - chunk_offset);
+        TRACE ("copy size: %ld", copy_size);
+
         std::memcpy((char*)chunk_address + chunk_offset, (char*)buffer + buffer_offset, copy_size);
 
         remaining -= copy_size;
