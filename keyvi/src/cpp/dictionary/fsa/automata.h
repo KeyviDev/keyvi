@@ -113,6 +113,10 @@ final {
           *file_mapping_, boost::interprocess::read_only, offset + array_size,
           bucket_size * array_size, 0, map_options);
 
+      // prevent pre-fetching pages by the OS which does not make sense for the FST structure
+      labels_region_->advise(boost::interprocess::mapped_region::advice_types::advice_random);
+      transitions_region_->advise(boost::interprocess::mapped_region::advice_types::advice_random);
+
       TRACE("full file size %zu", offset + array_size + bucket_size * array_size);
 
       labels_ = (unsigned char*) labels_region_->get_address();

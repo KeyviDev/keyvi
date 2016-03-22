@@ -31,6 +31,7 @@
 #include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
+#include "dictionary/dictionary_merger.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -52,6 +53,10 @@ typedef keyvi::dictionary::DictionaryCompiler<
 typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
     keyvi::dictionary::fsa::internal::StringValueStore> StringDictionaryCompiler;
+
+typedef keyvi::dictionary::DictionaryMerger<
+    keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
+    keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryMerger;
 
 
 } /* namespace dictionary */
