@@ -40,9 +40,9 @@ class EntryIterator final{
 
  public:
   EntryIterator()
-      : current_state_(0),
-        current_value_(0),
-        fsa_(nullptr) {
+      : fsa_(nullptr),
+        current_state_(0),
+        current_value_(0) {
   }
 
   EntryIterator(automata_t f) : EntryIterator(f, f->GetStartState()) {}
@@ -105,6 +105,14 @@ class EntryIterator final{
 
   bool operator!=(const EntryIterator &other) const {
     return !(operator==(other));
+  }
+
+  bool operator==(const std::string& other_key) const {
+    if (GetDepth() != other_key.size()) {
+      return false;
+    }
+
+    return std::memcmp(other_key.c_str(), (const char*) traversal_stack_.data(), other_key.size() == 0);
   }
 
   bool operator<(const EntryIterator& other) const {
