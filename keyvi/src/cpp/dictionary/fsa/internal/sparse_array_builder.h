@@ -362,7 +362,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
     // else overflow encoding
     uint16_t vshort_pointer[8];
-    uint8_t vshort_size = 0;
+    size_t vshort_size = 0;
 
     util::encodeVarshort(transitionPointer_high, vshort_pointer, &vshort_size);
 
@@ -441,7 +441,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
                                   FINAL_OFFSET_CODE, 0);
 
     uint16_t vshort_pointer[8];
-    uint8_t vshort_size = 0;
+    size_t vshort_size = 0;
 
     util::encodeVarshort(value, vshort_pointer, &vshort_size);
 
