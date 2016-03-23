@@ -219,22 +219,47 @@ class JsonValueStore final : public IValueStoreWriter {
    friend class ::keyvi::dictionary::DictionaryMerger;
 
    uint64_t GetValue(const char* payload, uint64_t fsa_value, bool& no_minimization){
-     std::string packed_string = util::decodeVarintString(payload + fsa_value);
+     size_t buffer_size;
 
-     return GetValue(util::DecodeJsonValue(packed_string), no_minimization);
+     const char* full_buf = payload + fsa_value;
+     const char* buf_ptr = util::decodeVarintString(full_buf, &buffer_size);
+
+     const RawPointerForCompare<MemoryMapManager> stp(buf_ptr, buffer_size,
+                                                          values_extern_);
+     const RawPointer p = hash_.Get(stp);
+
+     if (!p.IsEmpty()) {
+       // found the same value again, minimize
+       TRACE("Minimized value");
+       return p.GetOffset();
+     } // else persist string value
+
+     no_minimization = true;
+     TRACE("New unique value");
+     ++number_of_unique_values_;
+
+     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
+     size_t full_buf_size = (buf_ptr-full_buf) + buffer_size;
+
+     values_extern_->Append((void*)full_buf,
+                                full_buf_size);
+     values_buffer_size_ += full_buf_size;
+
+     hash_.Add(RawPointer(pt, stp.GetHashcode(), buffer_size));
+
+     return pt;
    }
 
   uint64_t AddValue(){
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
+    size_t length;
 
-    dictionary::util::encodeVarint(string_buffer_.size(), *values_extern_);
-    values_buffer_size_ += util::getVarintLength(string_buffer_.size());
-
+    dictionary::util::encodeVarint(string_buffer_.size(), *values_extern_, &length);
+    values_buffer_size_ += length;
     values_extern_->Append((void*)string_buffer_.data(),
                            string_buffer_.size());
     values_buffer_size_ += string_buffer_.size();
 
-    TRACE("add value to hash at %d, length %d", pt, string_buffer_.size());
     return pt;
   }
 
