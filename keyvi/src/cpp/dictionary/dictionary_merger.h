@@ -50,11 +50,14 @@ final {
     int priority;
     bool operator<(const SegmentEntryForMerge& rhs) const
     {
-      if (entry_iterator.GetKey() == rhs.entry_iterator.GetKey()) {
-        return priority < rhs.priority;
-      }
+      // very important difference in semantics: we have to ensure that in case of equal key,
+      // the iterator with the higher priority is taken
 
-      return entry_iterator > rhs.entry_iterator;
+      if (priority < rhs.priority) {
+        return entry_iterator > rhs.entry_iterator;
+       }
+
+      return rhs.entry_iterator < entry_iterator;
     }
   };
 
@@ -94,8 +97,6 @@ final {
 
       top_key = entry_it.entry_iterator.GetKey();
 
-      TRACE("top key: %s, 2nd key %s", top_key.c_str(), top_second_key.c_str());
-
       // check for same keys and merge only the most recent one
       while (!pqueue.empty() and pqueue.top().entry_iterator.operator==(top_key)) {
 
@@ -114,6 +115,7 @@ final {
 
       // Todo: if inner weights are used update them
       //handle.weight = value_store_->GetWeightValue(value);
+      handle.weight = 0;
 
       handle.value_idx = value_store->GetValue(entry_it.entry_iterator.GetFsa()->GetValueStore()->GetValueStorePayload(),
                                                entry_it.entry_iterator.GetValueId(),
