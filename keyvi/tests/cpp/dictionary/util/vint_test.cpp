@@ -142,6 +142,17 @@ BOOST_AUTO_TEST_CASE( VIntDecode) {
 
   BOOST_CHECK_EQUAL((const char*)buffer + 1, buf_ptr);
   BOOST_CHECK_EQUAL(15, size);
+
+  uint8_t long_buffer[1000];
+
+  encodeVarint(800, buffer, &size);
+  BOOST_CHECK_EQUAL(2, size);
+
+  size = 99;
+  buf_ptr = decodeVarintString((const char*)buffer, &size);
+
+  BOOST_CHECK_EQUAL((const char*)buffer + 2, buf_ptr);
+  BOOST_CHECK_EQUAL(800, size);
 }
 
 
