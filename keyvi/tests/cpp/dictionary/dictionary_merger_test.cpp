@@ -136,6 +136,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
 
   std::vector<std::pair<std::string, uint32_t>> test_data2 = {
              { "abc", 25 },
+             { "abbc", 42 },
              { "abcd", 21 },
              { "abbc", 30 },
          };
@@ -178,6 +179,8 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
 
   BOOST_CHECK_EQUAL("22", d2->operator[]("abc").GetValueAsString());
   BOOST_CHECK_EQUAL("21", d2->operator[]("abcd").GetValueAsString());
+
+  // overwritten by 2nd
   BOOST_CHECK_EQUAL("24", d2->operator[]("abbc").GetValueAsString());
 
   std::remove(filename.c_str());
@@ -218,6 +221,7 @@ BOOST_AUTO_TEST_CASE ( MergeStringDicts) {
 
   std::vector<std::pair<std::string, std::string>> test_data2 = {
              { "abbe", "d" },
+             { "abbc", "z" },
              { "abcd", "a" },
              { "bbacd", "f" },
          };
@@ -241,7 +245,9 @@ BOOST_AUTO_TEST_CASE ( MergeStringDicts) {
   BOOST_CHECK(d->Contains("bba"));
 
   BOOST_CHECK_EQUAL("a", d->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("b", d->operator[]("abbc").GetValueAsString());
+
+  // overwritten by 2nd
+  BOOST_CHECK_EQUAL("z", d->operator[]("abbc").GetValueAsString());
   BOOST_CHECK_EQUAL("c", d->operator[]("abbcd").GetValueAsString());
   BOOST_CHECK_EQUAL("a", d->operator[]("abcde").GetValueAsString());
   BOOST_CHECK_EQUAL("b", d->operator[]("abdd").GetValueAsString());
@@ -271,6 +277,7 @@ BOOST_AUTO_TEST_CASE ( MergeJsonDicts) {
 
   std::vector<std::pair<std::string, std::string>> test_data2 = {
              { "abbe", "{d:4}" },
+             { "abbc", "{b:3}" },
              { "abcd", "{a:1}" },
              { "bbacd", "{f:5}" },
          };
@@ -294,7 +301,9 @@ BOOST_AUTO_TEST_CASE ( MergeJsonDicts) {
   BOOST_CHECK(d->Contains("bba"));
 
   BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("\"{b:2}\"", d->operator[]("abbc").GetValueAsString());
+
+  // overwritten by 2nd
+  BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc").GetValueAsString());
   BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("abbcd").GetValueAsString());
   BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcde").GetValueAsString());
   BOOST_CHECK_EQUAL("\"{b:2}\"", d->operator[]("abdd").GetValueAsString());
