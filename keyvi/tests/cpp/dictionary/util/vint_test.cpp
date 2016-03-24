@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_SUITE( VariableLengthIntegerCodingTests )
 BOOST_AUTO_TEST_CASE( VShortSimple ) {
 
   uint16_t buffer[8];
-  uint8_t size;
+  size_t size;
 
   encodeVarshort(77777, buffer, &size);
   BOOST_CHECK_EQUAL(2, size);
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE( VShortSimple ) {
 BOOST_AUTO_TEST_CASE( VShortLength) {
 
   uint16_t buffer[16];
-  uint8_t size;
+  size_t size;
 
   encodeVarshort(77777, buffer, &size);
   BOOST_CHECK_EQUAL(util::getVarshortLength(77777), size);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE( VShortLength) {
 BOOST_AUTO_TEST_CASE( VShortSimple2) {
 
   uint16_t buffer[16];
-  uint8_t size;
+  size_t size;
 
   uint64_t pointer = 380108;
 
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE( VShortSimple2) {
 
 BOOST_AUTO_TEST_CASE( VIntLength) {
   uint8_t buffer[32];
-  uint8_t size;
+  size_t size;
 
   encodeVarint(77777, buffer, &size);
   BOOST_CHECK_EQUAL(util::getVarintLength(77777), size);
@@ -130,6 +130,31 @@ BOOST_AUTO_TEST_CASE( VIntLength) {
   encodeVarint(x, buffer, &size);
   BOOST_CHECK_EQUAL(2, size);
 }
+
+BOOST_AUTO_TEST_CASE( VIntDecode) {
+  uint8_t buffer[32];
+  size_t size;
+  encodeVarint(15, buffer, &size);
+  BOOST_CHECK_EQUAL(1, size);
+
+  size = 99;
+  const char* buf_ptr = decodeVarintString((const char*)buffer, &size);
+
+  BOOST_CHECK_EQUAL((const char*)buffer + 1, buf_ptr);
+  BOOST_CHECK_EQUAL(15, size);
+
+  uint8_t long_buffer[1000];
+
+  encodeVarint(800, buffer, &size);
+  BOOST_CHECK_EQUAL(2, size);
+
+  size = 99;
+  buf_ptr = decodeVarintString((const char*)buffer, &size);
+
+  BOOST_CHECK_EQUAL((const char*)buffer + 2, buf_ptr);
+  BOOST_CHECK_EQUAL(800, size);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 

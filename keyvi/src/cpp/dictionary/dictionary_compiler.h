@@ -121,9 +121,8 @@ class DictionaryCompiler
     void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                  ValueStoreT::no_value) {
 
-      sorter_.push(key_value_t(input_key, RegisterValue(value)));
-
       size_of_keys_ += input_key.size();
+      sorter_.push(key_value_t(std::move(input_key), RegisterValue(value)));
     }
 
 #ifdef Py_PYTHON_H
@@ -157,7 +156,7 @@ class DictionaryCompiler
 
           TRACE("adding to generator: %s", key_value.key.c_str());
 
-          generator_->Add(key_value.key, key_value.value);
+          generator_->Add(std::move(key_value.key), key_value.value);
           ++added_key_values_;
           if (progress_callback && (added_key_values_ % callback_trigger_ == 0)){
             progress_callback(added_key_values_, number_of_items_, user_data);

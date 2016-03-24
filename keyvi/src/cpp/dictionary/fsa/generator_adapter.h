@@ -61,11 +61,11 @@ class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, Val
 
   void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                  ValueStoreT::no_value) {
-    generator_.Add(input_key, value);
+    generator_.Add(std::move(input_key), value);
   }
 
   void Add(const std::string& input_key, const fsa::ValueHandle& value) {
-    generator_.Add(input_key, value);
+    generator_.Add(std::move(input_key), value);
   }
 
   size_t GetFsaSize() const {

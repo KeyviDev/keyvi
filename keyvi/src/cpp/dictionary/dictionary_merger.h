@@ -50,11 +50,14 @@ final {
     int priority;
     bool operator<(const SegmentEntryForMerge& rhs) const
     {
-      if (entry_iterator.GetKey() == rhs.entry_iterator.GetKey()) {
-        return priority < rhs.priority;
-      }
+      // very important difference in semantics: we have to ensure that in case of equal key,
+      // the iterator with the higher priority is taken
 
-      return entry_iterator > rhs.entry_iterator;
+      if (priority < rhs.priority) {
+        return entry_iterator > rhs.entry_iterator;
+       }
+
+      return rhs.entry_iterator < entry_iterator;
     }
   };
 
@@ -86,20 +89,23 @@ final {
 
     fsa::Generator<PersistenceT, ValueStoreT> generator(1073741824, fsa::generator_param_t(), value_store);
 
+    std::string top_key;
+
     while(!pqueue.empty()){
       auto entry_it = pqueue.top();
       pqueue.pop();
 
-      auto key = entry_it.entry_iterator.GetKey();
+      top_key = entry_it.entry_iterator.GetKey();
 
       // check for same keys and merge only the most recent one
-      while (!pqueue.empty() and pqueue.top().entry_iterator.GetKey() == key) {
+      while (!pqueue.empty() and pqueue.top().entry_iterator.operator==(top_key)) {
 
         auto to_inc = pqueue.top();
         TRACE("removing element with prio %d (in favor of %d)", to_inc.priority, entry_it.priority);
 
         pqueue.pop();
         if (++to_inc.entry_iterator != end_it) {
+          TRACE("push iterator");
           pqueue.push(to_inc);
         }
       }
@@ -109,18 +115,21 @@ final {
 
       // Todo: if inner weights are used update them
       //handle.weight = value_store_->GetWeightValue(value);
+      handle.weight = 0;
 
       handle.value_idx = value_store->GetValue(entry_it.entry_iterator.GetFsa()->GetValueStore()->GetValueStorePayload(),
                                                entry_it.entry_iterator.GetValueId(),
                                                handle.no_minimization);
 
-      TRACE("Add key: %s", key.c_str());
-      generator.Add(key, handle);
+      TRACE("Add key: %s", top_key.c_str());
+      generator.Add(std::move(top_key), handle);
 
       if (++entry_it.entry_iterator != end_it) {
         pqueue.push(entry_it);
       }
     }
+    TRACE("finished iterating, do final compile.");
+
     generator.CloseFeeding();
 
     generator.WriteToFile(filename);

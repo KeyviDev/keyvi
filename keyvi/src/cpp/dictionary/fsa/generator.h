@@ -236,7 +236,7 @@ final {
       size_t commonPrefixLength = get_common_prefix_length(last_key_.c_str(), key);
 
       if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {
-        last_key_ = key;
+        last_key_ = std::move(input_key);
         return;
       }
 
@@ -256,7 +256,7 @@ final {
         stack_->UpdateWeights(0, input_key.size() + 1, handle.weight);
       }
 
-      last_key_ = key;
+      last_key_ = std::move(input_key);
       state_ = generator_state::FEEDING;
     }
 
