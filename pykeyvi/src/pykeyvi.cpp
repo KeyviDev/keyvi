@@ -8524,7 +8524,7 @@ static PyObject *__pyx_pw_7pykeyvi_10Dictionary_17get(PyObject *__pyx_v_self, Py
 }
 
 static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16get(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key, PyObject *__pyx_v_default) {
-  keyvi::dictionary::Match *__pyx_v__r;
+  boost::shared_ptr<keyvi::dictionary::Match>  __pyx_v__r;
   struct __pyx_obj_7pykeyvi_Match *__pyx_v_py_result = 0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -8541,7 +8541,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16get(struct __pyx_obj_7pykeyvi_
  *     def get (self, key, default = None):
  *         assert isinstance(key, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
  * 
- *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])
+ *         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
@@ -8556,29 +8556,29 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16get(struct __pyx_obj_7pykeyvi_
   /* "pykeyvi.pyx":288
  *         assert isinstance(key, bytes), 'arg in_0 wrong type'
  * 
- *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])             # <<<<<<<<<<<<<<
+ *         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))             # <<<<<<<<<<<<<<
  * 
- *         if _r.IsEmpty():
+ *         if _r.get().IsEmpty():
  */
   __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_key); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v__r = new keyvi::dictionary::Match(((*__pyx_v_self->inst.get())[((const char *)__pyx_t_2)]));
+  __pyx_v__r = boost::shared_ptr<keyvi::dictionary::Match> (new keyvi::dictionary::Match(((*__pyx_v_self->inst.get())[((const char *)__pyx_t_2)])));
 
   /* "pykeyvi.pyx":290
- *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])
+ *         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
  * 
- *         if _r.IsEmpty():             # <<<<<<<<<<<<<<
+ *         if _r.get().IsEmpty():             # <<<<<<<<<<<<<<
  *             return default
  *         cdef Match py_result = Match.__new__(Match)
  */
-  __pyx_t_1 = (__pyx_v__r->IsEmpty() != 0);
+  __pyx_t_1 = (__pyx_v__r.get()->IsEmpty() != 0);
   if (__pyx_t_1) {
 
     /* "pykeyvi.pyx":291
  * 
- *         if _r.IsEmpty():
+ *         if _r.get().IsEmpty():
  *             return default             # <<<<<<<<<<<<<<
  *         cdef Match py_result = Match.__new__(Match)
- *         py_result.inst = shared_ptr[_Match](_r)
+ *         py_result.inst = _r
  */
     __Pyx_XDECREF(__pyx_r);
     __Pyx_INCREF(__pyx_v_default);
@@ -8586,19 +8586,19 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16get(struct __pyx_obj_7pykeyvi_
     goto __pyx_L0;
 
     /* "pykeyvi.pyx":290
- *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])
+ *         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
  * 
- *         if _r.IsEmpty():             # <<<<<<<<<<<<<<
+ *         if _r.get().IsEmpty():             # <<<<<<<<<<<<<<
  *             return default
  *         cdef Match py_result = Match.__new__(Match)
  */
   }
 
   /* "pykeyvi.pyx":292
- *         if _r.IsEmpty():
+ *         if _r.get().IsEmpty():
  *             return default
  *         cdef Match py_result = Match.__new__(Match)             # <<<<<<<<<<<<<<
- *         py_result.inst = shared_ptr[_Match](_r)
+ *         py_result.inst = _r
  *         return py_result
  */
   __pyx_t_3 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)__pyx_ptype_7pykeyvi_Match), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 292; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -8610,15 +8610,15 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_16get(struct __pyx_obj_7pykeyvi_
   /* "pykeyvi.pyx":293
  *             return default
  *         cdef Match py_result = Match.__new__(Match)
- *         py_result.inst = shared_ptr[_Match](_r)             # <<<<<<<<<<<<<<
+ *         py_result.inst = _r             # <<<<<<<<<<<<<<
  *         return py_result
  * 
  */
-  __pyx_v_py_result->inst = boost::shared_ptr<keyvi::dictionary::Match> (__pyx_v__r);
+  __pyx_v_py_result->inst = __pyx_v__r;
 
   /* "pykeyvi.pyx":294
  *         cdef Match py_result = Match.__new__(Match)
- *         py_result.inst = shared_ptr[_Match](_r)
+ *         py_result.inst = _r
  *         return py_result             # <<<<<<<<<<<<<<
  * 
  *     def __contains__(self, key):
@@ -8796,7 +8796,7 @@ static PyObject *__pyx_pw_7pykeyvi_10Dictionary_23__getitem__(PyObject *__pyx_v_
 }
 
 static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22__getitem__(struct __pyx_obj_7pykeyvi_Dictionary *__pyx_v_self, PyObject *__pyx_v_key) {
-  keyvi::dictionary::Match *__pyx_v__r;
+  boost::shared_ptr<keyvi::dictionary::Match>  __pyx_v__r;
   struct __pyx_obj_7pykeyvi_Match *__pyx_v_py_result = 0;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -8814,7 +8814,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22__getitem__(struct __pyx_obj_7
  *     def __getitem__ (self, key):
  *         assert isinstance(key, bytes), 'arg in_0 wrong type'             # <<<<<<<<<<<<<<
  * 
- *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])
+ *         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
@@ -8829,29 +8829,29 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22__getitem__(struct __pyx_obj_7
   /* "pykeyvi.pyx":307
  *         assert isinstance(key, bytes), 'arg in_0 wrong type'
  * 
- *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])             # <<<<<<<<<<<<<<
+ *         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))             # <<<<<<<<<<<<<<
  * 
- *         if _r.IsEmpty():
+ *         if _r.get().IsEmpty():
  */
   __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_key); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 307; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v__r = new keyvi::dictionary::Match(((*__pyx_v_self->inst.get())[((const char *)__pyx_t_2)]));
+  __pyx_v__r = boost::shared_ptr<keyvi::dictionary::Match> (new keyvi::dictionary::Match(((*__pyx_v_self->inst.get())[((const char *)__pyx_t_2)])));
 
   /* "pykeyvi.pyx":309
- *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])
+ *         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
  * 
- *         if _r.IsEmpty():             # <<<<<<<<<<<<<<
+ *         if _r.get().IsEmpty():             # <<<<<<<<<<<<<<
  *             raise KeyError(key)
  *         cdef Match py_result = Match.__new__(Match)
  */
-  __pyx_t_1 = (__pyx_v__r->IsEmpty() != 0);
+  __pyx_t_1 = (__pyx_v__r.get()->IsEmpty() != 0);
   if (__pyx_t_1) {
 
     /* "pykeyvi.pyx":310
  * 
- *         if _r.IsEmpty():
+ *         if _r.get().IsEmpty():
  *             raise KeyError(key)             # <<<<<<<<<<<<<<
  *         cdef Match py_result = Match.__new__(Match)
- *         py_result.inst = shared_ptr[_Match](_r)
+ *         py_result.inst = _r
  */
     __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
@@ -8866,19 +8866,19 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22__getitem__(struct __pyx_obj_7
     {__pyx_filename = __pyx_f[0]; __pyx_lineno = 310; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
     /* "pykeyvi.pyx":309
- *         cdef _Match * _r = new _Match(deref(self.inst.get())[(<const_char *>key)])
+ *         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
  * 
- *         if _r.IsEmpty():             # <<<<<<<<<<<<<<
+ *         if _r.get().IsEmpty():             # <<<<<<<<<<<<<<
  *             raise KeyError(key)
  *         cdef Match py_result = Match.__new__(Match)
  */
   }
 
   /* "pykeyvi.pyx":311
- *         if _r.IsEmpty():
+ *         if _r.get().IsEmpty():
  *             raise KeyError(key)
  *         cdef Match py_result = Match.__new__(Match)             # <<<<<<<<<<<<<<
- *         py_result.inst = shared_ptr[_Match](_r)
+ *         py_result.inst = _r
  *         return py_result
  */
   __pyx_t_4 = __pyx_tp_new_7pykeyvi_Match(((PyTypeObject *)__pyx_ptype_7pykeyvi_Match), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 311; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -8890,15 +8890,15 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_22__getitem__(struct __pyx_obj_7
   /* "pykeyvi.pyx":312
  *             raise KeyError(key)
  *         cdef Match py_result = Match.__new__(Match)
- *         py_result.inst = shared_ptr[_Match](_r)             # <<<<<<<<<<<<<<
+ *         py_result.inst = _r             # <<<<<<<<<<<<<<
  *         return py_result
  * 
  */
-  __pyx_v_py_result->inst = boost::shared_ptr<keyvi::dictionary::Match> (__pyx_v__r);
+  __pyx_v_py_result->inst = __pyx_v__r;
 
   /* "pykeyvi.pyx":313
  *         cdef Match py_result = Match.__new__(Match)
- *         py_result.inst = shared_ptr[_Match](_r)
+ *         py_result.inst = _r
  *         return py_result             # <<<<<<<<<<<<<<
  * 
  *     def _key_iterator_wrapper(self, iterator):

@@ -5,7 +5,7 @@
     
         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
 
-        if _r.IsEmpty():
+        if _r.get().IsEmpty():
             return default
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r
@@ -24,7 +24,7 @@
     
         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
 
-        if _r.IsEmpty():
+        if _r.get().IsEmpty():
             raise KeyError(key)
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r
