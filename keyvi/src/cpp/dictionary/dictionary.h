@@ -332,13 +332,16 @@ final {
     }
 
    /**
-    * Match a key near
+    * Match a key near: Match as much as possible exact given the minimum prefix length and then return everything below.
+    *
+    * If greedy is True it matches everything below the minimum_prefix_length, but in the order of exact first.
     *
     * @param key
     * @param minimum_prefix_length
+    * @param greedy if true matches everything below minimum prefix
     * @return
     */
-   MatchIterator::MatchIteratorPair GetNear(const std::string& key, size_t minimum_prefix_length) {
+   MatchIterator::MatchIteratorPair GetNear(const std::string& key, size_t minimum_prefix_length, bool greedy=false) {
      uint64_t state = fsa_->GetStartState();
 
      TRACE("GetNear %s, matching prefix first", key.substr(0, minimum_prefix_length).c_str());
@@ -375,7 +378,7 @@ final {
                      traversal_stack));
 
      auto tfunc =
-       [data, key, minimum_prefix_length] () {
+       [data, key, minimum_prefix_length, greedy] () {
          TRACE("prefix completion callback called");
 
 
@@ -401,9 +404,11 @@ final {
 
                data->traverser++;
 
-               // remember the depth
-               TRACE("found a match, remember depth, only allow matches with same depth %ld", data->traverser.GetTraversalPayload().exact_depth);
-               data->matched_depth = data->traverser.GetTraversalPayload().exact_depth;
+               if (!greedy) {
+                 // remember the depth
+                 TRACE("found a match, remember depth, only allow matches with same depth %ld", data->traverser.GetTraversalPayload().exact_depth);
+                 data->matched_depth = data->traverser.GetTraversalPayload().exact_depth;
+               }
                return m;
              }
              data->traverser++;
