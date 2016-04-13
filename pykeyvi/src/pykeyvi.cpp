@@ -7704,7 +7704,8 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6_GetNear_0(struct __pyx_obj_7py
   int __pyx_t_3;
   std::string __pyx_t_4;
   size_t __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
+  keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_t_6;
+  PyObject *__pyx_t_7 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -7763,7 +7764,13 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6_GetNear_0(struct __pyx_obj_7py
  */
   __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_in_0); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_5 = __Pyx_PyInt_As_size_t(__pyx_v_minimum_prefix_length); if (unlikely((__pyx_t_5 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v__r = __pyx_v_self->inst.get()->GetNear(((std::string)__pyx_t_4), ((size_t)__pyx_t_5));
+  try {
+    __pyx_t_6 = __pyx_v_self->inst.get()->GetNear(((std::string)__pyx_t_4), ((size_t)__pyx_t_5));
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_v__r = __pyx_t_6;
 
   /* "pykeyvi.pyx":251
  * 
@@ -7772,11 +7779,11 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6_GetNear_0(struct __pyx_obj_7py
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_6 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)__pyx_ptype_7pykeyvi_MatchIterator), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 251; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_6);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_6, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 251; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_6);
-  __pyx_t_6 = 0;
+  __pyx_t_7 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)__pyx_ptype_7pykeyvi_MatchIterator), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 251; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_7);
+  if (!(likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 251; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_7);
+  __pyx_t_7 = 0;
 
   /* "pykeyvi.pyx":252
  *         cdef _MatchIteratorPair _r = self.inst.get().GetNear((<libcpp_string>in_0), (<size_t>minimum_prefix_length))
@@ -7818,7 +7825,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_6_GetNear_0(struct __pyx_obj_7py
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
   __Pyx_AddTraceback("pykeyvi.Dictionary._GetNear_0", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
@@ -7922,7 +7929,8 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_8_GetNear_1(struct __pyx_obj_7py
   std::string __pyx_t_4;
   size_t __pyx_t_5;
   bool __pyx_t_6;
-  PyObject *__pyx_t_7 = NULL;
+  keyvi::dictionary::MatchIterator::MatchIteratorPair __pyx_t_7;
+  PyObject *__pyx_t_8 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -8009,7 +8017,13 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_8_GetNear_1(struct __pyx_obj_7py
   __pyx_t_4 = __pyx_convert_string_from_py_std__in_string(__pyx_v_in_0); if (unlikely(PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_5 = __Pyx_PyInt_As_size_t(__pyx_v_minimum_prefix_length); if (unlikely((__pyx_t_5 == (size_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_greedy); if (unlikely((__pyx_t_6 == (bool)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v__r = __pyx_v_self->inst.get()->GetNear(((std::string)__pyx_t_4), ((size_t)__pyx_t_5), ((bool)__pyx_t_6));
+  try {
+    __pyx_t_7 = __pyx_v_self->inst.get()->GetNear(((std::string)__pyx_t_4), ((size_t)__pyx_t_5), ((bool)__pyx_t_6));
+  } catch(...) {
+    __Pyx_CppExn2PyErr();
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_v__r = __pyx_t_7;
 
   /* "pykeyvi.pyx":264
  * 
@@ -8018,11 +8032,11 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_8_GetNear_1(struct __pyx_obj_7py
  *         py_result.it = _r.begin()
  *         py_result.end = _r.end()
  */
-  __pyx_t_7 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)__pyx_ptype_7pykeyvi_MatchIterator), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_7);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_7);
-  __pyx_t_7 = 0;
+  __pyx_t_8 = __pyx_tp_new_7pykeyvi_MatchIterator(((PyTypeObject *)__pyx_ptype_7pykeyvi_MatchIterator), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_8);
+  if (!(likely(__Pyx_TypeTest(__pyx_t_8, __pyx_ptype_7pykeyvi_MatchIterator)))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 264; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_py_result = ((struct __pyx_obj_7pykeyvi_MatchIterator *)__pyx_t_8);
+  __pyx_t_8 = 0;
 
   /* "pykeyvi.pyx":265
  *         cdef _MatchIteratorPair _r = self.inst.get().GetNear((<libcpp_string>in_0), (<size_t>minimum_prefix_length), (<bool>greedy))
@@ -8064,7 +8078,7 @@ static PyObject *__pyx_pf_7pykeyvi_10Dictionary_8_GetNear_1(struct __pyx_obj_7py
 
   /* function exit code */
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_8);
   __Pyx_AddTraceback("pykeyvi.Dictionary._GetNear_1", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
