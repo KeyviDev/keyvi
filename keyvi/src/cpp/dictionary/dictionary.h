@@ -344,6 +344,10 @@ final {
    MatchIterator::MatchIteratorPair GetNear(const std::string& key, size_t minimum_prefix_length, bool greedy=false) {
      uint64_t state = fsa_->GetStartState();
 
+     if (key.size() < minimum_prefix_length) {
+       return MatchIterator::EmptyIteratorPair();
+     }
+
      TRACE("GetNear %s, matching prefix first", key.substr(0, minimum_prefix_length).c_str());
      for (size_t i = 0; i < minimum_prefix_length; ++i) {
        state = fsa_->TryWalkTransition(state, key[i]);
