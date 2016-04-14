@@ -51,7 +51,8 @@ linklibraries =  [ "tpie",
    "boost_regex",
    "boost_thread",
    "z",
-   "snappy"
+   "snappy",
+   "pthread"
    ]
 
 if buildmode == 'coverage':
