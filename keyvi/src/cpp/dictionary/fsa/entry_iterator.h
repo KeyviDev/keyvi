@@ -112,7 +112,11 @@ class EntryIterator final{
       return false;
     }
 
-    return std::memcmp(other_key.c_str(), (const char*) traversal_stack_.data(), other_key.size() == 0);
+    return std::memcmp(other_key.c_str(), (const char*) traversal_stack_.data(), other_key.size()) == 0;
+  }
+
+  bool operator!=(const std::string& other_key) const {
+    return !(operator==(other_key));
   }
 
   bool operator<(const EntryIterator& other) const {

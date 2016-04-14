@@ -101,6 +101,26 @@ inline void TraversalState<NearTransition>::Clear() {
   traversal_state_payload.transitions.push_back(NearTransition(0, 0));
 }
 
+template<>
+inline size_t& TraversalStack<NearTransition>::operator-- (){
+  if (traversal_stack_payload.exact_depth == traversal_stack_payload.current_depth) {
+    TRACE("reduce exact match to %d", traversal_stack_payload.current_depth - 1);
+    --traversal_stack_payload.exact_depth;
+  }
+
+  return --traversal_stack_payload.current_depth;
+}
+
+template<>
+inline size_t TraversalStack<NearTransition>::operator-- (int){
+  if (traversal_stack_payload.exact_depth == traversal_stack_payload.current_depth) {
+    TRACE("reduce exact match to %d", traversal_stack_payload.current_depth - 1);
+    --traversal_stack_payload.exact_depth;
+  }
+
+  return traversal_stack_payload.current_depth--;
+}
+
 } /* namespace traversal */
 } /* namespace fsa */
 } /* namespace dictionary */
