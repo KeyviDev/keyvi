@@ -402,17 +402,18 @@ final {
                Match m(0,
                    data->traverser.GetDepth() + key.size(),
                    match_str,
-                   0,
+                   minimum_prefix_length + data->traverser.GetTraversalPayload().exact_depth,
                    data->traverser.GetFsa(),
                    data->traverser.GetStateValue());
-
-               data->traverser++;
 
                if (!greedy) {
                  // remember the depth
                  TRACE("found a match, remember depth, only allow matches with same depth %ld", data->traverser.GetTraversalPayload().exact_depth);
                  data->matched_depth = data->traverser.GetTraversalPayload().exact_depth;
                }
+
+               data->traverser++;
+
                return m;
              }
              data->traverser++;

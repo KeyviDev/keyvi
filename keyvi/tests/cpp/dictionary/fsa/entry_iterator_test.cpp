@@ -71,6 +71,30 @@ BOOST_AUTO_TEST_CASE( DictionariesIteratorCompare ) {
   BOOST_CHECK(end_it == it1);
 }
 
+BOOST_AUTO_TEST_CASE( DictionariesIteratorCompareString ) {
+
+  std::vector<std::string> test_data =
+          { "aaa", "aaaa", "aabc", "cdef", "ef" };
+
+  testing::TempDictionary dictionary(test_data);
+  automata_t f = dictionary.GetFsa();
+
+  EntryIterator it(f);
+
+  BOOST_CHECK_EQUAL("aaa", it.GetKey());
+  BOOST_CHECK(it == "aaa");
+  ++it;
+  BOOST_CHECK_EQUAL("aaaa", it.GetKey());
+  BOOST_CHECK(it != "aaaaa");
+  BOOST_CHECK(it == "aaaa");
+  ++it;
+  BOOST_CHECK_EQUAL("aabc", it.GetKey());
+  BOOST_CHECK(it != "a");
+  BOOST_CHECK(it == "aabc");
+  ++it;
+}
+
+
 
 BOOST_AUTO_TEST_SUITE_END()
 
