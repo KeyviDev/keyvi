@@ -235,6 +235,7 @@ final {
     }
 
     void CreateMapping() {
+      TRACE("create new mapping %d", number_of_chunks_ + 1);
       mapping new_mapping;
 
       boost::filesystem::path filename = GetFilenameForChunk(number_of_chunks_);
@@ -253,7 +254,10 @@ final {
           filename.native().c_str(), boost::interprocess::read_write);
 
       new_mapping.region_ = new boost::interprocess::mapped_region(
-          *new_mapping.mapping_, boost::interprocess::read_write);
+          *new_mapping.mapping_, boost::interprocess::copy_on_write);
+
+      // prevent pre-fetching pages by the OS which does not make sense as values usually fit into few pages
+      new_mapping.region_->advise(boost::interprocess::mapped_region::advice_types::advice_random);
 
       mappings_.push_back(new_mapping);
       ++number_of_chunks_;

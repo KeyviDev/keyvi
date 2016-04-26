@@ -188,6 +188,33 @@ BOOST_AUTO_TEST_CASE( Appendchunkoverflow ) {
   boost::filesystem::remove_all(path);
 }
 
+BOOST_AUTO_TEST_CASE( Persist ) {
+  size_t chunkSize = 4096;
+
+  boost::filesystem::path path = boost::filesystem::temp_directory_path();
+  path /= boost::filesystem::unique_path(
+      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  boost::filesystem::create_directory(path);
+  MemoryMapManager m(chunkSize, path, "append large chunk test");
+
+  char buffer[4096];
+  std::fill(buffer, buffer+4096, 'x');
+  m.Append(buffer, 4096);
+  m.Append(buffer, 1);
+
+  m.Persist();
+
+  auto filename = path;
+  filename /= "out";
+  std::ofstream out_stream(filename.native(), std::ios::binary);
+  m.Write(out_stream, 0 );
+  BOOST_CHECK_EQUAL(4097, out_stream.tellp());
+  out_stream.close();
+
+  boost::filesystem::remove_all(path);
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace internal */
