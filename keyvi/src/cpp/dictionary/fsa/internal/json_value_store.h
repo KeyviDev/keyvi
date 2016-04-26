@@ -140,7 +140,7 @@ class JsonValueStore final : public IValueStoreWriter {
 
     const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(),
                                                      values_extern_);
-    const RawPointer p = hash_.Get(stp);
+    const RawPointer<> p = hash_.Get(stp);
 
     if (!p.IsEmpty()) {
       // found the same value again, minimize
@@ -155,7 +155,7 @@ class JsonValueStore final : public IValueStoreWriter {
     uint64_t pt = AddValue();
 
     TRACE("add value to hash at %d, length %d", pt, string_buffer_.size());
-    hash_.Add(RawPointer(pt, stp.GetHashcode(), string_buffer_.size()));
+    hash_.Add(RawPointer<>(pt, stp.GetHashcode(), string_buffer_.size()));
 
     return pt;
   }
@@ -205,7 +205,7 @@ class JsonValueStore final : public IValueStoreWriter {
   size_t compression_threshold_;
   bool minimize_ = true;
 
-  LeastRecentlyUsedGenerationsCache<RawPointer> hash_;
+  LeastRecentlyUsedGenerationsCache<RawPointer<>> hash_;
   compression::buffer_t string_buffer_;
   msgpack::sbuffer msgpack_buffer_;
   size_t number_of_values_ = 0;
@@ -226,7 +226,7 @@ class JsonValueStore final : public IValueStoreWriter {
 
      const RawPointerForCompare<MemoryMapManager> stp(buf_ptr, buffer_size,
                                                           values_extern_);
-     const RawPointer p = hash_.Get(stp);
+     const RawPointer<> p = hash_.Get(stp);
 
      if (!p.IsEmpty()) {
        // found the same value again, minimize
@@ -245,7 +245,7 @@ class JsonValueStore final : public IValueStoreWriter {
                                 full_buf_size);
      values_buffer_size_ += full_buf_size;
 
-     hash_.Add(RawPointer(pt, stp.GetHashcode(), buffer_size));
+     hash_.Add(RawPointer<>(pt, stp.GetHashcode(), buffer_size));
 
      return pt;
    }
