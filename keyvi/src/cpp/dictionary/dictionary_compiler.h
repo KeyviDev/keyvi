@@ -34,6 +34,7 @@
 #include "dictionary/fsa/internal/null_value_store.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/generator_adapter.h"
+#include "dictionary/fsa/internal/constants.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -103,7 +104,12 @@ class DictionaryCompiler
       sorter_.set_available_memory(memory_limit);
       sorter_.begin();
 
-      value_store_= new ValueStoreT(params);
+      if (params_.count(TEMPORARY_PATH_KEY) == 0) {
+        params_[TEMPORARY_PATH_KEY] =
+            boost::filesystem::temp_directory_path().string();
+      }
+
+      value_store_= new ValueStoreT(params_);
     }
 
     ~DictionaryCompiler(){
@@ -205,7 +211,7 @@ class DictionaryCompiler
     util::TpieIntializer& initializer_;
     tpie::serialization_sorter<key_value_t> sorter_;
     size_t memory_limit_;
-    compiler_param_t params_;
+    fsa::internal::IValueStoreWriter::vs_param_t params_;
     ValueStoreT* value_store_;
     fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>* generator_ = nullptr;
     bool sort_finalized_ = false;
