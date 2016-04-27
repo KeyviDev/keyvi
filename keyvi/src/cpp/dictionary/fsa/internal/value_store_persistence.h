@@ -114,7 +114,7 @@ struct RawPointer final {
       return hashcode_;
     }
 
-    bool operator==(const RawPointer<>& l) const {
+    bool operator==(const RawPointer<HashCodeTypeT>& l) const {
       TRACE("check equality, 1st hashcode");
 
       // First filter - check if hash code  is the same
