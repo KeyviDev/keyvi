@@ -171,14 +171,20 @@ final {
       } else if (number_of_chunks_ == 0) {
         return;
       }else {
-        // write all but the last
-        for (size_t i = 0; i< number_of_chunks_ - 1; ++i){
-          char *ptr = (char*) mappings_[i].region_->get_address();
-          stream.write (ptr, chunk_size_);
+        size_t remaining = end;
+        int chunk = 0;
+
+        while (remaining > 0) {
+          size_t bytes_in_chunk = std::min(chunk_size_, remaining);
+          TRACE("write chunk %d, with size: %ld, remaining: %ld", i, bytes_in_chunk, remaining);
+
+          char *ptr = (char*) mappings_[chunk].region_->get_address();
+                    stream.write (ptr, bytes_in_chunk);
+
+          remaining -= bytes_in_chunk;
+          ++chunk;
         }
-        char *ptr = (char*) mappings_[number_of_chunks_ - 1].region_->get_address();
-          stream.write (ptr, end - ((number_of_chunks_ - 1) * chunk_size_));
-        }
+      }
     }
 
    size_t GetSize() const {
