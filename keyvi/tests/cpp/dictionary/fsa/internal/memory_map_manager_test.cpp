@@ -188,7 +188,43 @@ BOOST_AUTO_TEST_CASE( Appendchunkoverflow ) {
   boost::filesystem::remove_all(path);
 }
 
+BOOST_AUTO_TEST_CASE( chunkbehindtail ) {
+  size_t chunkSize = 4096;
+
+  boost::filesystem::path path = boost::filesystem::temp_directory_path();
+  path /= boost::filesystem::unique_path(
+      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  boost::filesystem::create_directory(path);
+  MemoryMapManager m(chunkSize, path, "append large chunk test");
+
+  char buffer[1024];
+  std::fill(buffer, buffer+1024, 'x');
+  m.Append(buffer, 1024);
+  std::fill(buffer, buffer+1024, 'y');
+  m.Append(buffer, 1024);
+  std::fill(buffer, buffer+1024, 'z');
+  m.Append(buffer, 1024);
+  std::fill(buffer, buffer+1024, '1');
+  m.Append(buffer, 1023);
+
+  // tail should now be at 4096
+  BOOST_CHECK_EQUAL(4095, m.GetSize());
+
+  // force a new chunk to be created, although tail does not require it
+  m.GetBuffer(4094, &buffer, 10);
+
+  auto filename = path;
+  filename /= "out";
+  std::ofstream out_stream(filename.native(), std::ios::binary);
+  m.Write(out_stream, m.GetSize() );
+  BOOST_CHECK_EQUAL(4095, out_stream.tellp());
+  out_stream.close();
+
+  boost::filesystem::remove_all(path);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
+
 
 } /* namespace internal */
 } /* namespace fsa */
