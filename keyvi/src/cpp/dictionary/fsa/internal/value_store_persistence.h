@@ -38,18 +38,19 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
+template<class HashCodeTypeT = int32_t>
 struct RawPointer final {
    public:
     RawPointer() : RawPointer(0, 0, 0) {}
 
-    RawPointer(uint64_t offset, int hashcode, size_t length)
+    RawPointer(uint64_t offset, HashCodeTypeT hashcode, size_t length)
         : offset_(offset), hashcode_(hashcode), length_(length) {
       if (length > USHRT_MAX) {
         length_ = USHRT_MAX;
       }
     }
 
-    int GetHashcode() const {
+    HashCodeTypeT GetHashcode() const {
       return hashcode_;
     }
 
@@ -85,20 +86,20 @@ struct RawPointer final {
     static const size_t MaxCookieSize = 0xFFFF;
 
     uint64_t offset_;
-    int32_t hashcode_;
+    HashCodeTypeT hashcode_;
     ushort length_;
     ushort cookie_ = 0;
 
   };
 
-  template<class PersistenceT>
+  template<class PersistenceT, class HashCodeTypeT = int32_t>
   struct RawPointerForCompare final {
    public:
     RawPointerForCompare(const char* value, size_t value_size, PersistenceT* persistence)
         : value_(value), value_size_(value_size), persistence_(persistence) {
 
       // calculate a hashcode
-      int32_t h = 31;
+      HashCodeTypeT h = 31;
 
       for(size_t i = 0; i < value_size_; ++i) {
         h = (h * 54059) ^ (value[i] * 76963);
@@ -109,11 +110,11 @@ struct RawPointer final {
       hashcode_ = h;
     }
 
-    int GetHashcode() const {
+    HashCodeTypeT GetHashcode() const {
       return hashcode_;
     }
 
-    bool operator==(const RawPointer& l) const {
+    bool operator==(const RawPointer<HashCodeTypeT>& l) const {
       TRACE("check equality, 1st hashcode");
 
       // First filter - check if hash code  is the same
@@ -148,7 +149,7 @@ struct RawPointer final {
     const char* value_;
     size_t value_size_;
     PersistenceT* persistence_;
-    int32_t hashcode_;
+    HashCodeTypeT hashcode_;
   };
 
 } /* namespace internal */
