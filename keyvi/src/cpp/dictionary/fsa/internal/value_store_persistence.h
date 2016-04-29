@@ -50,7 +50,7 @@ struct RawPointer final {
       }
     }
 
-    int GetHashcode() const {
+    HashCodeTypeT GetHashcode() const {
       return hashcode_;
     }
 
@@ -99,7 +99,7 @@ struct RawPointer final {
         : value_(value), value_size_(value_size), persistence_(persistence) {
 
       // calculate a hashcode
-      int h = 31;
+      HashCodeTypeT h = 31;
 
       for(size_t i = 0; i < value_size_; ++i) {
         h = (h * 54059) ^ (value[i] * 76963);
@@ -110,7 +110,7 @@ struct RawPointer final {
       hashcode_ = h;
     }
 
-    int GetHashcode() const {
+    HashCodeTypeT GetHashcode() const {
       return hashcode_;
     }
 
