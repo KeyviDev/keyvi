@@ -304,6 +304,8 @@ cdef class Dictionary:
         return py_result
     
     def get (self, key, default = None):
+        if isinstance(key, unicode):
+            key = key.encode('utf-8')
         assert isinstance(key, bytes), 'arg in_0 wrong type'
     
         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
@@ -315,6 +317,9 @@ cdef class Dictionary:
         return py_result
 
     def __contains__(self, key):
+        if isinstance(key, unicode):
+            key = key.encode('utf-8')
+
         assert isinstance(key, bytes), 'arg in_0 wrong type'
 
         return self.inst.get().Contains(key)
@@ -323,6 +328,9 @@ cdef class Dictionary:
         return self.inst.get().GetSize()
 
     def __getitem__ (self, key):
+        if isinstance(key, unicode):
+            key = key.encode('utf-8')
+
         assert isinstance(key, bytes), 'arg in_0 wrong type'
     
         cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
