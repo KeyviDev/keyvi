@@ -70,8 +70,8 @@ public:
 
       TRACE("state %d", state);
 
-      //Todo: automatic resize
-      traversal_stack.resize(2000);
+      // reserve some capacity
+      traversal_stack.reserve(100);
 
       if (depth == query_length) {
         Match first_match;
@@ -128,8 +128,8 @@ public:
                     data->traverser++;
                     continue;
                   }
-
-                  data->traversal_stack[query_length + data->traverser.GetDepth()-1] = label;
+                  data->traversal_stack.resize(query_length + data->traverser.GetDepth()-1);
+                  data->traversal_stack.push_back(label);
                   TRACE("Current depth %d (%d)", query_length + data->traverser.GetDepth() -1, data->traversal_stack.size());
                   if (data->traverser.IsFinalState()) {
                     TRACE("found final state at depth %d %s", query_length + data->traverser.GetDepth(), std::string(reinterpret_cast<char*> (&data->traversal_stack[0]), query_length + data->traverser.GetDepth()).c_str());
