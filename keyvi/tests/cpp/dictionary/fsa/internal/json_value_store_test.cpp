@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE( persistence )
   auto file_mapping = new boost::interprocess::file_mapping(
             filename.c_str(), boost::interprocess::read_only);
 
-  JsonValueStoreReader reader(in_stream, file_mapping, false);
+  JsonValueStoreReader reader(in_stream, file_mapping, loading_strategy_types::lazy);
 
   BOOST_CHECK_EQUAL(value, reader.GetValueAsString(v));
   BOOST_CHECK_EQUAL("{\"mytestvalue2\":23}", reader.GetValueAsString(w));
