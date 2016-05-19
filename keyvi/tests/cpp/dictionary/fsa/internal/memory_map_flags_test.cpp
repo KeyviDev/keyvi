@@ -46,8 +46,8 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestLazy ) {
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
 
-  BOOST_CHECK(key_advise_flags == -1);
-  BOOST_CHECK(value_advise_flags == -1);
+  BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
+  BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
 }
 
 BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate ) {
@@ -61,8 +61,8 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate ) {
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE));
 
-  BOOST_CHECK(key_advise_flags == -1);
-  BOOST_CHECK(value_advise_flags == -1);
+  BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
+  BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
 }
 
 BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_key_part ) {
@@ -76,8 +76,8 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_key_part ) {
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
 
-  BOOST_CHECK(key_advise_flags == -1);
-  BOOST_CHECK(value_advise_flags == -1);
+  BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
+  BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
 }
 
 BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_lazy ) {
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestlazy_no_readahead_value_part ) {
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
 
-  BOOST_CHECK(key_advise_flags == -1);
+  BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_random);
 }
 
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestpopulate_key_part_no_readahead_value_par
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
 
-  BOOST_CHECK(key_advise_flags == -1);
+  BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_random);
 }
 

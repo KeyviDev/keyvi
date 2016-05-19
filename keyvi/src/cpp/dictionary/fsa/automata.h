@@ -53,9 +53,9 @@ final {
 
    public:
     Automata(const char * filename, bool load_lazy):
-      Automata(filename, load_lazy ? default_loading_strategy : loading_strategy_types::populate) {}
+      Automata(filename, load_lazy ? loading_strategy_types::default_os : loading_strategy_types::populate) {}
 
-    Automata(const char * filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
+    explicit Automata(const char * filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
       std::ifstream in_stream(filename, std::ios::binary);
 
       if (!in_stream.good()) {
@@ -95,7 +95,7 @@ final {
         throw std::invalid_argument("file is corrupt(truncated)");
       }
 
-      boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
+      const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
       TRACE("labels start offset: %d", offset);
       labels_region_ = new boost::interprocess::mapped_region(
@@ -106,12 +106,11 @@ final {
           *file_mapping_, boost::interprocess::read_only, offset + array_size,
           bucket_size * array_size, 0, map_options);
 
-      auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
+      const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
 
-      if (advise != -1) {
-        labels_region_->advise(advise);
-        transitions_region_->advise(advise);
-      }
+      labels_region_->advise(advise);
+      transitions_region_->advise(advise);
+
       TRACE("full file size %zu", offset + array_size + bucket_size * array_size);
 
       labels_ = (unsigned char*) labels_region_->get_address();

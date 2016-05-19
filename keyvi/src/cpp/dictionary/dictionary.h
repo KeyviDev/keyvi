@@ -50,7 +50,7 @@ final {
    * @param load_lazy whether to load lazy.
    */
     Dictionary(const char* filename, bool load_lazy)
-        : fsa_(new fsa::Automata(filename, load_lazy)) {
+        : fsa_(std::make_shared<fsa::Automata>(filename, load_lazy)) {
       TRACE("Dictionary from file %s", filename);
     }
 
@@ -60,8 +60,8 @@ final {
      * @param filename filename to load keyvi file from.
      * @param loading_strategy optional: Loading strategy to use.
      */
-    Dictionary(const char* filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
-       : fsa_(new fsa::Automata(filename, loading_strategy)) {
+    explicit Dictionary(const char* filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+       : fsa_(std::make_shared<fsa::Automata>(filename, loading_strategy)) {
       TRACE("Dictionary from file %s", filename);
     }
 

@@ -291,17 +291,15 @@ class JsonValueStoreReader final: public IValueStoreReader {
       }
     }
 
-    boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options;
+    const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 
     strings_region_ = new boost::interprocess::mapped_region(
         *file_mapping, boost::interprocess::read_only, offset,
         strings_size, 0, map_options);
 
-    auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
+    const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
 
-    if (advise != -1) {
-      strings_region_->advise(advise);
-    }
+    strings_region_->advise(advise);
 
     strings_ = (const char*) strings_region_->get_address();
   }

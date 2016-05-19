@@ -31,16 +31,16 @@
 namespace keyvi {
 namespace dictionary {
 
-typedef enum { lazy, // load data as needed with some read-ahead
+enum class loading_strategy_types {
+               default_os, // no special treatment, use whatever the OS/Boost has as default
+               lazy, // load data as needed with some read-ahead
                populate, // immediately load everything in memory (blocks until everything is fully read)
                populate_key_part, // populate only the key part, load value part lazy
                populate_lazy, // load data lazy but ask the OS to read ahead if possible (does not block)
                lazy_no_readahead, // disable any read-ahead (for cases when index > x * main memory)
                lazy_no_readahead_value_part, // disable read-ahead only for the value part
                populate_key_part_no_readahead_value_part // populate the key part, but disable read ahead value part
-             } loading_strategy_types;
-
-static const loading_strategy_types default_loading_strategy = loading_strategy_types(-1);
+             };
 
 namespace fsa {
 namespace internal {
@@ -54,7 +54,13 @@ public:
     * @return flags to be used for mmap (via boost).
     */
    static int FSAGetMemoryMapOptions(const loading_strategy_types strategy) {
-     if (strategy == default_loading_strategy) {
+#ifdef _Win32
+
+     // there is no comparable fine-grained control on windows, so simply use the defaults
+     return boost::interprocess::default_map_options;
+#else // not _Win32
+
+     if (strategy ==  loading_strategy_types::default_os) {
        return boost::interprocess::default_map_options;
      }
 
@@ -67,9 +73,9 @@ public:
 #endif
 
      switch (strategy){
-       case populate:
-       case populate_key_part:
-       case populate_key_part_no_readahead_value_part:
+       case loading_strategy_types::populate:
+       case loading_strategy_types::populate_key_part:
+       case loading_strategy_types::populate_key_part_no_readahead_value_part:
          flags |= MAP_POPULATE;
          break;
        default:
@@ -77,6 +83,7 @@ public:
      }
 
      return flags;
+#endif // not _Win32
    }
 
    /**
@@ -86,12 +93,17 @@ public:
     * @return flags to be used for mmap (via boost).
     */
    static int ValuesGetMemoryMapOptions(const loading_strategy_types strategy) {
-     int flags = 0;
+#ifdef _Win32
 
-     if (strategy == default_loading_strategy) {
+     // there is no comparable fine-grained control on windows, so simply use the defaults
+     return boost::interprocess::default_map_options;
+#else // not _Win32
+
+     if (strategy == loading_strategy_types::default_os) {
        return boost::interprocess::default_map_options;
      }
 
+     int flags = 0;
      flags |= MAP_SHARED;
 
 #ifdef MAP_NOSYNC
@@ -99,7 +111,7 @@ public:
 #endif
 
      switch (strategy){
-       case populate:
+       case loading_strategy_types::populate:
          flags |= MAP_POPULATE;
          break;
        default:
@@ -107,49 +119,63 @@ public:
      }
 
      return flags;
+#endif // not _Win32
    }
+
 
    /**
     * Translates the loading strategy into the according options for madvise. To be used for loading the FSA part.
     *
     * @param strategy load strategy
-    * @return advise to be used for madvise (via boost).
+    * @return advise to be used for madvise (via boost)
     */
    static boost::interprocess::mapped_region::advice_types FSAGetMemoryMapAdvices(const loading_strategy_types strategy) {
+#ifdef _Win32
+
+     // there is no madvise on windows, so simply use the default
+     return boost::interprocess::mapped_region::advice_types::advice_normal;
+#else // _Win32
      switch (strategy){
-       case lazy_no_readahead:
+       case loading_strategy_types::lazy_no_readahead:
          return boost::interprocess::mapped_region::advice_types::advice_random;
-       case lazy_no_readahead_value_part:
-       case populate_key_part_no_readahead_value_part:
+       case loading_strategy_types::lazy_no_readahead_value_part:
+       case loading_strategy_types::populate_key_part_no_readahead_value_part:
          break;
-       case populate_lazy:
+       case loading_strategy_types::populate_lazy:
          return boost::interprocess::mapped_region::advice_types::advice_willneed;
        default:
          break;
      }
 
-     return (boost::interprocess::mapped_region::advice_types) -1;
+     return boost::interprocess::mapped_region::advice_types::advice_normal;
+#endif
    }
 
    /**
     * Translates the loading strategy into the according options for madvise. To be used for loading the Values part.
     *
     * @param strategy load strategy
-    * @return advise to be used for madvise (via boost).
+    * @return advise to be used for madvise (via boost)
     */
    static boost::interprocess::mapped_region::advice_types ValuesGetMemoryMapAdvices(const loading_strategy_types strategy) {
+#ifdef _Win32
+
+     // there is no madvise on windows, so simply use the default
+     return boost::interprocess::mapped_region::advice_types::advice_normal;
+#else // _Win32
      switch (strategy){
-       case lazy_no_readahead:
-       case lazy_no_readahead_value_part:
-       case populate_key_part_no_readahead_value_part:
+       case loading_strategy_types::lazy_no_readahead:
+       case loading_strategy_types::lazy_no_readahead_value_part:
+       case loading_strategy_types::populate_key_part_no_readahead_value_part:
          return boost::interprocess::mapped_region::advice_types::advice_random;
-       case populate_lazy:
+       case loading_strategy_types::populate_lazy:
          return boost::interprocess::mapped_region::advice_types::advice_willneed;
        default:
          break;
      }
 
-     return (boost::interprocess::mapped_region::advice_types) -1;
+     return boost::interprocess::mapped_region::advice_types::advice_normal;
+#endif
   }
 };
 

@@ -282,7 +282,7 @@ cdef class Dictionary:
     
     def _init_1(self, bytes filename , int in_1 ):
         assert isinstance(filename, bytes), 'arg filename wrong type'
-        assert in_1 in [0, 1, 2, 3, 4, 5, 6], 'arg in_1 wrong type'
+        assert in_1 in [0, 1, 2, 3, 4, 5, 6, 7], 'arg in_1 wrong type'
         cdef const_char * input_filename = <const_char *> filename
     
         self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename, (<_loading_strategy_types>in_1)))
@@ -290,7 +290,7 @@ cdef class Dictionary:
     def __init__(self, *args):
         if (len(args)==1) and (isinstance(args[0], bytes)):
              self._init_0(*args)
-        elif (len(args)==2) and (isinstance(args[0], bytes)) and (args[1] in [0, 1, 2, 3, 4, 5, 6]):
+        elif (len(args)==2) and (isinstance(args[0], bytes)) and (args[1] in [0, 1, 2, 3, 4, 5, 6, 7]):
              self._init_1(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
@@ -487,13 +487,14 @@ cdef class ForwardBackwardCompletion:
         self.inst = shared_ptr[_ForwardBackwardCompletion](new _ForwardBackwardCompletion(input_in_0, input_in_1)) 
 
 cdef class loading_strategy_types:
-    lazy = 0
-    populate = 1
-    populate_key_part = 2
-    populate_lazy = 3
-    lazy_no_readahead = 4
-    lazy_no_readahead_value_part = 5
-    populate_key_part_no_readahead_value_part = 6 
+    default_os = 0
+    lazy = 1
+    populate = 2
+    populate_key_part = 3
+    populate_lazy = 4
+    lazy_no_readahead = 5
+    lazy_no_readahead_value_part = 6
+    populate_key_part_no_readahead_value_part = 7 
 
 cdef class CompletionDictionaryCompiler:
 

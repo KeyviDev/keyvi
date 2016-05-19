@@ -7,6 +7,7 @@ from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
 
 cdef extern from "dictionary/dictionary.h" namespace "keyvi::dictionary":
     ctypedef enum loading_strategy_types:
+        default_os, # no special treatment, use whatever the OS/Boost has as default
         lazy, # load data as needed with some read-ahead
         populate, # immediately load everything in memory (blocks until everything is fully read)
         populate_key_part, # populate only the key part, load value part lazy
