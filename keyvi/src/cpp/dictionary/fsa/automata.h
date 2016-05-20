@@ -33,6 +33,7 @@
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/value_store_factory.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
+#include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/traversal/traversal_base.h"
 #include "dictionary/fsa/traversal/weighted_traversal.h"
 #include "dictionary/util/vint.h"
@@ -47,12 +48,14 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-
 class Automata
 final {
 
    public:
-    Automata(const char * filename, bool load_lazy=false) {
+    Automata(const char * filename, bool load_lazy):
+      Automata(filename, load_lazy ? loading_strategy_types::default_os : loading_strategy_types::populate) {}
+
+    explicit Automata(const char * filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
       std::ifstream in_stream(filename, std::ios::binary);
 
       if (!in_stream.good()) {
@@ -92,17 +95,7 @@ final {
         throw std::invalid_argument("file is corrupt(truncated)");
       }
 
-      boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options;
-
-#ifdef MAP_HUGETLB
-      map_options |= MAP_HUGETLB;
-#endif
-
-      if (!load_lazy) {
-#ifdef MAP_POPULATE
-        map_options |= MAP_POPULATE;
-#endif
-      }
+      const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
       TRACE("labels start offset: %d", offset);
       labels_region_ = new boost::interprocess::mapped_region(
@@ -113,9 +106,10 @@ final {
           *file_mapping_, boost::interprocess::read_only, offset + array_size,
           bucket_size * array_size, 0, map_options);
 
-      // prevent pre-fetching pages by the OS which does not make sense for the FST structure
-      labels_region_->advise(boost::interprocess::mapped_region::advice_types::advice_random);
-      transitions_region_->advise(boost::interprocess::mapped_region::advice_types::advice_random);
+      const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
+
+      labels_region_->advise(advise);
+      transitions_region_->advise(advise);
 
       TRACE("full file size %zu", offset + array_size + bucket_size * array_size);
 
@@ -535,6 +529,7 @@ final {
       TRACE("Compact Transition after resolve %d", resolved_ptr);
       return resolved_ptr;
     }
+
   };
 
   // shared pointer

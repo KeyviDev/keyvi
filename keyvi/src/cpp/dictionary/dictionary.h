@@ -40,8 +40,28 @@ namespace dictionary {
 class Dictionary
 final {
    public:
-    Dictionary(const char* filename, bool load_lazy = false)
-        : fsa_(new fsa::Automata(filename, load_lazy)) {
+
+  /**
+   * DEPRECATED: Initialize a dictionary in lazy or non-lazy mode.
+   *
+   * Use Dictionary(filename, loading_strategy) instead.
+   *
+   * @param filename the filename
+   * @param load_lazy whether to load lazy.
+   */
+    Dictionary(const char* filename, bool load_lazy)
+        : fsa_(std::make_shared<fsa::Automata>(filename, load_lazy)) {
+      TRACE("Dictionary from file %s", filename);
+    }
+
+    /**
+     * Initialize a dictionary from a file.
+     *
+     * @param filename filename to load keyvi file from.
+     * @param loading_strategy optional: Loading strategy to use.
+     */
+    explicit Dictionary(const char* filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+       : fsa_(std::make_shared<fsa::Automata>(filename, loading_strategy)) {
       TRACE("Dictionary from file %s", filename);
     }
 

@@ -25,6 +25,7 @@
 #ifndef VALUE_STORE_FACTORY_H_
 #define VALUE_STORE_FACTORY_H_
 
+#include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/null_value_store.h"
 #include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
@@ -39,18 +40,18 @@ namespace internal {
 class ValueStoreFactory final {
  public:
   static IValueStoreReader* MakeReader(value_store_t type, std::istream& stream,
-                                boost::interprocess::file_mapping* file_mapping, bool load_lazy = false){
+                                boost::interprocess::file_mapping* file_mapping, loading_strategy_types loading_strategy = loading_strategy_types::lazy){
     switch (type){
       case NULL_VALUE_STORE:
         return new NullValueStoreReader(stream, file_mapping);
       case INT_VALUE_STORE:
         return new IntValueStoreReader(stream, file_mapping);
       case STRING_VALUE_STORE:
-        return new StringValueStoreReader(stream, file_mapping, load_lazy);
+        return new StringValueStoreReader(stream, file_mapping, loading_strategy);
       case JSON_VALUE_STORE_DEPRECATED:
-        return new JsonValueStoreDeprecatedReader(stream, file_mapping, load_lazy);
+        return new JsonValueStoreDeprecatedReader(stream, file_mapping, false);
       case JSON_VALUE_STORE:
-        return new JsonValueStoreReader(stream, file_mapping, load_lazy);
+        return new JsonValueStoreReader(stream, file_mapping, loading_strategy);
       default:
         throw std::invalid_argument("Unknown Value Storage type");
     }

@@ -11,6 +11,7 @@ from  libc.string cimport const_char
 from cython.operator cimport dereference as deref, preincrement as inc, address as address
 from cython.operator cimport dereference, preincrement
 cimport cython.operator as co
+from dictionary cimport loading_strategy_types as _loading_strategy_types
 from cluster cimport JumpConsistentHashString as _JumpConsistentHashString_cluster
 from dictionary_compiler cimport CompletionDictionaryCompiler as _CompletionDictionaryCompiler
 from dictionary cimport Dictionary as _Dictionary
@@ -279,17 +280,17 @@ cdef class Dictionary:
         cdef const_char * input_filename = <const_char *> filename
         self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
     
-    def _init_1(self, bytes filename ,  load_lazy ):
+    def _init_1(self, bytes filename , int in_1 ):
         assert isinstance(filename, bytes), 'arg filename wrong type'
-        assert isinstance(load_lazy, (int, long)), 'arg load_lazy wrong type'
+        assert in_1 in [0, 1, 2, 3, 4, 5, 6, 7], 'arg in_1 wrong type'
         cdef const_char * input_filename = <const_char *> filename
     
-        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename, (<bool>load_lazy)))
+        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename, (<_loading_strategy_types>in_1)))
     
     def __init__(self, *args):
         if (len(args)==1) and (isinstance(args[0], bytes)):
              self._init_0(*args)
-        elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
+        elif (len(args)==2) and (isinstance(args[0], bytes)) and (args[1] in [0, 1, 2, 3, 4, 5, 6, 7]):
              self._init_1(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
@@ -484,6 +485,16 @@ cdef class ForwardBackwardCompletion:
         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
         cdef shared_ptr[_Dictionary] input_in_1 = in_1.inst
         self.inst = shared_ptr[_ForwardBackwardCompletion](new _ForwardBackwardCompletion(input_in_0, input_in_1)) 
+
+cdef class loading_strategy_types:
+    default_os = 0
+    lazy = 1
+    populate = 2
+    populate_key_part = 3
+    populate_lazy = 4
+    lazy_no_readahead = 5
+    lazy_no_readahead_value_part = 6
+    populate_key_part_no_readahead_value_part = 7 
 
 cdef class CompletionDictionaryCompiler:
 

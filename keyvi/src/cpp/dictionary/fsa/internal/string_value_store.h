@@ -29,6 +29,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "dictionary/fsa/internal/ivalue_store.h"
+#include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/minimization_hash.h"
 
@@ -247,7 +248,7 @@ class StringValueStore final : public IValueStoreWriter {
         using IValueStoreReader::IValueStoreReader;
 
         StringValueStoreReader(std::istream& stream,
-                               boost::interprocess::file_mapping* file_mapping, bool load_lazy = false)
+                               boost::interprocess::file_mapping* file_mapping, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
             : IValueStoreReader(stream, file_mapping) {
 
           boost::property_tree::ptree properties =
@@ -264,24 +265,15 @@ class StringValueStore final : public IValueStoreWriter {
             }
           }
 
-          boost::interprocess::map_options_t map_options = boost::interprocess::default_map_options;
-
-#ifdef MAP_HUGETLB
-          map_options |= MAP_HUGETLB;
-#endif
-
-          if (!load_lazy) {
-#ifdef MAP_POPULATE
-            map_options |= MAP_POPULATE;
-#endif
-          }
+          const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 
           strings_region_ = new boost::interprocess::mapped_region(
               *file_mapping, boost::interprocess::read_only, offset,
               strings_size, 0, map_options);
 
-          // prevent pre-fetching pages by the OS which does not make sense as values usually fit into few pages
-          strings_region_->advise(boost::interprocess::mapped_region::advice_types::advice_random);
+          const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
+
+          strings_region_->advise(advise);
 
           strings_ = (const char*) strings_region_->get_address();
         }
