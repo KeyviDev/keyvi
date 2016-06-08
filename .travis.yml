@@ -45,11 +45,10 @@ addons:
     packages:
     - gcc-4.8
     - g++-4.8
-    - clang
+# disabled due to https://github.com/travis-ci/travis-ci/issues/6120    - clang
     - scons
     - valgrind
     - cmake
-    - clang
     - libboost-thread1.55-dev
     - libboost-system1.55-dev
     - libboost-test1.55-dev
