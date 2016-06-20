@@ -126,7 +126,7 @@ final {
           static_cast<internal::value_store_t>(
               boost::lexical_cast<int> (automata_properties_.get<std::string>(
               "value_store_type")));
-      value_store_reader_ = internal::ValueStoreFactory::MakeReader(value_store_type, in_stream, file_mapping_);
+      value_store_reader_ = internal::ValueStoreFactory::MakeReader(value_store_type, in_stream, file_mapping_, loading_strategy);
 
       in_stream.close();
     }
