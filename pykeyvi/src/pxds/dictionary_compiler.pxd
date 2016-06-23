@@ -30,7 +30,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         JsonDictionaryCompiler() except +
         JsonDictionaryCompiler(size_t memory_limit) except +
         JsonDictionaryCompiler(size_t memory_limit, libcpp_map[libcpp_string, libcpp_string] value_store_params) except +
-        void Add(const_char*, const_char*) except +
+        void Add(const_char*, const_char*) except + # wrap-ignore
         void __setitem__(const_char*, const_char*) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
