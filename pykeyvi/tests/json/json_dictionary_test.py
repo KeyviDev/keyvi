@@ -48,3 +48,18 @@ def test_simple_snappy():
         m = d.GetStatistics()['Value Store']
         assert m['__compression'] == "snappy"
         assert m['__compression_threshold'] == "0"
+
+def test_unicode_compile():
+    c = pykeyvi.JsonDictionaryCompiler()
+    c.Add("üöä", '{"y" : 2}')
+    c.Add("üüüüüüabd".decode('utf-8'), '{"a" : 3}')
+    c.Add(u"ääääädäd", '{"b" : 33}')
+
+    with tmp_dictionary(c, 'simple_json.kv') as d:
+        assert len(d) == 3
+        assert d["üöä"].GetValueAsString() == '{"y":2}'
+        assert d[u"üöä"].GetValueAsString() == '{"y":2}'
+        assert d["üüüüüüabd"].GetValueAsString() == '{"a":3}'
+        assert d["ääääädäd"].GetValueAsString() == '{"b":33}'
+
+
