@@ -76,13 +76,15 @@ void unserialize(Src & s, keyvi::dictionary::key_value_pair & pt) {
   unserialize(s, pt.value);
 }
 
+typedef const fsa::internal::IValueStoreWriter::vs_param_t compiler_param_t;
+
 /**
  * Dictionary Compiler
  */
 template<class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryCompiler
   final {
-    typedef const fsa::internal::IValueStoreWriter::vs_param_t compiler_param_t;
+
     typedef key_value_pair key_value_t;
     typedef std::function<void (size_t , size_t, void*)> callback_t;
 
@@ -108,6 +110,13 @@ class DictionaryCompiler
         params_[TEMPORARY_PATH_KEY] =
             boost::filesystem::temp_directory_path().string();
       }
+
+      if (params_.count(STABLE_INSERTS) > 0 && params_[STABLE_INSERTS] == "true") {
+        // minimization has to be turned off in this case.
+        params_[MINIMIZATION_KEY] = "off";
+        stable_insert_ = true;
+      }
+
 
       value_store_= new ValueStoreT(params_);
     }
@@ -146,6 +155,12 @@ class DictionaryCompiler
       value_store_->CloseFeeding();
       sorter_.end();
       sorter_.merge_runs();
+
+      // check that at least 1 item is there
+      if (!sorter_.can_pull()) {
+        return;
+      }
+
       CreateGenerator();
 
       {
@@ -157,16 +172,58 @@ class DictionaryCompiler
           callback_trigger_ = 100000;
         }
 
-        while (sorter_.can_pull()) {
-          key_value_t key_value = sorter_.pull();
+        if (!stable_insert_) {
 
-          TRACE("adding to generator: %s", key_value.key.c_str());
+          while (sorter_.can_pull()) {
+            key_value_t key_value = sorter_.pull();
 
-          generator_->Add(std::move(key_value.key), key_value.value);
-          ++added_key_values_;
-          if (progress_callback && (added_key_values_ % callback_trigger_ == 0)){
-            progress_callback(added_key_values_, number_of_items_, user_data);
+            TRACE("adding to generator: %s", key_value.key.c_str());
+
+            generator_->Add(std::move(key_value.key), key_value.value);
+            ++added_key_values_;
+            if (progress_callback && (added_key_values_ % callback_trigger_ == 0)){
+              progress_callback(added_key_values_, number_of_items_, user_data);
+            }
           }
+
+        } else {
+
+          // special mode for stable (incremental) inserts, in this case we have to respect the order and take
+          // the last value if keys are equal
+
+          key_value_t last_key_value = sorter_.pull();
+
+          while (sorter_.can_pull()) {
+            key_value_t key_value = sorter_.pull();
+
+            // dedup with last one wins
+            if (last_key_value.key == key_value.key) {
+              TRACE("Detected duplicated keys, dedup them, last one wins.");
+
+              // we know that last added values have a lower id (minimization is turned off)
+              if (last_key_value.value.value_idx < key_value.value.value_idx) {
+                last_key_value = key_value;
+              }
+              continue;
+            }
+
+            TRACE("adding to generator: %s", last_key_value.key.c_str());
+
+            generator_->Add(std::move(last_key_value.key), last_key_value.value);
+            ++added_key_values_;
+            if (progress_callback && (added_key_values_ % callback_trigger_ == 0)){
+              progress_callback(added_key_values_, number_of_items_, user_data);
+            }
+
+            last_key_value = key_value;
+          }
+
+          // add the last one
+          TRACE("adding to generator: %s", last_key_value.key.c_str());
+
+          generator_->Add(std::move(last_key_value.key), last_key_value.value);
+          ++added_key_values_;
+
         }
       }
 
@@ -221,6 +278,7 @@ class DictionaryCompiler
 
     size_t size_of_keys_ = 0;
     boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
+    bool stable_insert_ = false;
 
     void CreateGenerator();
 
