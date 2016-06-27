@@ -194,8 +194,8 @@ final {
 
       size_t commonPrefixLength = get_common_prefix_length(last_key_.c_str(), key);
 
+      // keys are equal, just return
       if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {
-        last_key_ = key;
         return;
       }
 
@@ -235,8 +235,8 @@ final {
 
       size_t commonPrefixLength = get_common_prefix_length(last_key_.c_str(), key);
 
+      // keys are equal, just return
       if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {
-        last_key_ = std::move(input_key);
         return;
       }
 
