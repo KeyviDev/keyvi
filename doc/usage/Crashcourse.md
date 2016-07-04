@@ -163,3 +163,23 @@ and try:
 
     cat sample.txt | python normalize.py
     
+### Simple Statistics
+
+Both Keyvi Inspector and the Python API provide an easy way to obtain the number of keys and values in a keyvi-compiled file. 
+
+Example: If there is a keyvi file `foobar.keyvi` with key-value pairs, one can get simple count statistics as follows:
+
+```
+$ keyviinspector -i foobar.keyvi -s
+
+General
+{"version":"1","start_state":"42613522","number_of_keys":"1768342","value_store_type":"5","number_of_states":"37309831","manifest":""}
+
+Persistence
+{"version":"2","size":"42613783"}
+
+Value Store
+{"size":"5684145126","values":"2100578","unique_values":"2100571","__compression":"raw","__compression_threshold":"32"}
+```
+
+Similarly, With py-keyvi `d.GetStatistics()` on the keyvi dictionary object `d` can output the same information.
