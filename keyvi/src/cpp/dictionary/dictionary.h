@@ -287,8 +287,7 @@ final {
         m = Match(
             offset,
             last_final_state_position,
-            /*text.substr(0, last_final_state_position),*/
-            std::string(text.c_str() + offset, last_final_state_position - offset),
+            text.substr(offset, last_final_state_position - offset),
             0,
             fsa_,
             fsa_->GetStateValue(last_final_state));

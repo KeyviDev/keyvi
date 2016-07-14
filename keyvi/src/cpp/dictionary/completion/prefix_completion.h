@@ -93,7 +93,7 @@ final {
         if (fsa_->IsFinalState(state)) {
           TRACE("prefix matched depth %d %s", query_length + data->traverser.GetDepth(), std::string(reinterpret_cast<char*> (&data->traversal_stack[0]), query_length + data->traverser.GetDepth()).c_str());
           first_match = Match(
-              0, query_length, std::string(query.c_str(), query_length), 0, fsa_, fsa_->GetStateValue(state));
+              0, query_length, query, 0, fsa_, fsa_->GetStateValue(state));
         }
 
         auto tfunc =
@@ -185,7 +185,7 @@ final {
         if (depth == query_length && fsa_->IsFinalState(state)) {
           TRACE("prefix matched depth %d %s", query_length + data->traverser.GetDepth(), std::string(query, query_length).c_str());
           first_match = Match(
-              0, query_length, std::string(query.c_str(), query_length), 0, fsa_, fsa_->GetStateValue(state));
+              0, query_length, query, 0, fsa_, fsa_->GetStateValue(state));
         }
 
         auto tfunc =
