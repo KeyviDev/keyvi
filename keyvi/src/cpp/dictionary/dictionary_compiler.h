@@ -109,7 +109,9 @@ class DictionaryCompiler
       if (params_.count(TEMPORARY_PATH_KEY) == 0) {
         params_[TEMPORARY_PATH_KEY] =
             boost::filesystem::temp_directory_path().string();
-
+      } else {
+        // set temp path for tpie
+        initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
       }
 
       TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
