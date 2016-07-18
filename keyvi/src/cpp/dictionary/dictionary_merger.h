@@ -62,7 +62,12 @@ final {
   };
 
  public:
-  DictionaryMerger(): dicts_to_merge_(){
+  DictionaryMerger(size_t memory_limit = 1073741824,
+                   const compiler_param_t& params = compiler_param_t()):
+                     dicts_to_merge_(), memory_limit_(memory_limit), params_(params){
+    if (params_.count(TEMPORARY_PATH_KEY) == 0) {
+      params_[TEMPORARY_PATH_KEY] = boost::filesystem::temp_directory_path().string();
+    }
   }
 
   void Add (const std::string& filename){
@@ -85,9 +90,9 @@ final {
       pqueue.push(SegmentEntryForMerge(e_it, i++));
     }
 
-    ValueStoreT* value_store = new ValueStoreT();
+    ValueStoreT* value_store = new ValueStoreT(params_);
 
-    fsa::Generator<PersistenceT, ValueStoreT> generator(1073741824, fsa::generator_param_t(), value_store);
+    fsa::Generator<PersistenceT, ValueStoreT> generator(memory_limit_, params_, value_store);
 
     std::string top_key;
 
@@ -137,7 +142,8 @@ final {
 
  private:
   std::vector<fsa::automata_t> dicts_to_merge_;
-
+  size_t memory_limit_;
+  fsa::internal::IValueStoreWriter::vs_param_t params_;
 };
 
 } /* namespace dictionary */
