@@ -31,12 +31,15 @@
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/entry_iterator.h"
+#include "dictionary/fsa/internal/constants.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {
+
+typedef const fsa::internal::IValueStoreWriter::vs_param_t merger_param_t;
 
 template<class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryMerger
@@ -63,7 +66,7 @@ final {
 
  public:
   DictionaryMerger(size_t memory_limit = 1073741824,
-                   const compiler_param_t& params = compiler_param_t()):
+                   const merger_param_t& params = merger_param_t()):
                      dicts_to_merge_(), memory_limit_(memory_limit), params_(params){
     if (params_.count(TEMPORARY_PATH_KEY) == 0) {
       params_[TEMPORARY_PATH_KEY] = boost::filesystem::temp_directory_path().string();
