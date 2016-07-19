@@ -3,6 +3,8 @@
 
 import os
 import pykeyvi
+import shutil
+import tempfile
 
 def test_compiler_no_compile_edge_case():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
@@ -25,3 +27,19 @@ def test_tmp_dir():
     finally:
         os.chdir(cwd)
         os.rmdir("tmp_dir_test")
+
+
+def test_tmp_dir_defined():
+    def run_compile(tmpdir):
+        c = pykeyvi.JsonDictionaryCompiler(1073741824, {"temporary_path": tmpdir})
+        c.Add("abc", "{'a':2}")
+        c.Compile()
+        assert len(os.listdir(test_dir)) != 0
+
+    try:
+        test_dir = "tmp_dir_test_defined"
+        os.mkdir(test_dir)
+        run_compile(test_dir)
+    finally:
+        pykeyvi.JsonDictionaryCompiler()
+        shutil.rmtree(test_dir)
