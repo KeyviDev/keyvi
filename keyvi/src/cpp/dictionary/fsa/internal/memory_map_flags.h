@@ -28,6 +28,14 @@
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
+// Mac has no MAP_POPULATE
+#if defined(OS_MACOSX)
+#ifndef MAP_POPULATE
+#define MAP_POPULATE 0
+#endif
+#endif
+
+
 namespace keyvi {
 namespace dictionary {
 
