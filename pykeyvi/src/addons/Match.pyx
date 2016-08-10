@@ -31,20 +31,11 @@
 
     def GetValue(self):
         """Decodes a keyvi value and returns it."""
-        value = self.inst.get().GetRawValueAsString()
-        if value is None or len(value) == 0:
+        cdef libcpp_string packed_value = self.inst.get().GetMsgPackedValueAsString()
+        if packed_value.empty():
             return None
 
-        elif value[0] == '\x00':
-            return msgpack.loads(value[1:])
-
-        elif value[0] == '\x01':
-            value = zlib.decompress(value[1:])
-
-        elif value[0] == '\x02':
-            value = snappy.decompress(value[1:])
-
-        return msgpack.loads(value)
+        return msgpack.loads(packed_value)
 
 
     def dumps(self):

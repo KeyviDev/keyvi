@@ -4,5 +4,3 @@ from libc.stdint cimport uint32_t
 
 import json
 import msgpack
-import zlib
-import snappy

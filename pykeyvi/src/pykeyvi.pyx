@@ -806,6 +806,11 @@ cdef class Match:
         py_result = <libcpp_string>_r
         return py_result
     
+    def GetMsgPackedValueAsString(self):
+        cdef libcpp_string _r = self.inst.get().GetMsgPackedValueAsString()
+        py_result = <libcpp_string>_r
+        return py_result
+    
     def IsEmpty(self):
         cdef bool _r = self.inst.get().IsEmpty()
         py_result = <bool>_r
@@ -893,20 +898,11 @@ cdef class Match:
 
     def GetValue(self):
         """Decodes a keyvi value and returns it."""
-        value = self.inst.get().GetRawValueAsString()
-        if value is None or len(value) == 0:
+        cdef libcpp_string packed_value = self.inst.get().GetMsgPackedValueAsString()
+        if packed_value.empty():
             return None
 
-        elif value[0] == '\x00':
-            return msgpack.loads(value[1:])
-
-        elif value[0] == '\x01':
-            value = zlib.decompress(value[1:])
-
-        elif value[0] == '\x02':
-            value = snappy.decompress(value[1:])
-
-        return msgpack.loads(value)
+        return msgpack.loads(packed_value)
 
 
     def dumps(self):
@@ -961,9 +957,7 @@ cdef class Match:
 from libc.stdint cimport uint32_t
 
 import json
-import msgpack
-import zlib
-import snappy 
+import msgpack 
  
 # same import style as autowrap
 from match cimport Match as _Match
