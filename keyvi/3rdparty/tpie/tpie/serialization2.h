@@ -94,7 +94,7 @@ private:
 	static long magic(...);
 public:
 	static bool const value=
-		std::is_pod<T>::value || sizeof(magic<T>((T*)0))==sizeof(char);
+		(std::is_pod<T>::value || sizeof(magic<T>((T*)nullptr))==sizeof(char)) && !std::is_pointer<T>::value;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,8 +102,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 template <typename D, typename T>
 void serialize(D & dst, const T & v,
-			   typename std::enable_if<is_trivially_serializable<T>::value
-			   && !std::is_pointer<T>::value >::type * = 0) {
+			   typename std::enable_if<is_trivially_serializable<T>::value>::type * = 0) {
 	dst.write((const char *)&v, sizeof(T));
 }
 
@@ -112,8 +111,7 @@ void serialize(D & dst, const T & v,
 ///////////////////////////////////////////////////////////////////////////////
 template <typename S, typename T>
 void unserialize(S & src, T & v,
-				 typename std::enable_if<is_trivially_serializable<T>::value
-				 && !std::is_pointer<T>::value>::type * = 0) {
+				 typename std::enable_if<is_trivially_serializable<T>::value>::type * = 0) {
 	src.read((char *)&v, sizeof(T));
 }
 
@@ -125,8 +123,7 @@ namespace bits {
 ///////////////////////////////////////////////////////////////////////////////
 template <typename D, typename T,
 		  bool is_simple_itr=tpie::is_simple_iterator<T>::value,
-		  bool is_pod=std::is_pod<typename std::iterator_traits<T>::value_type>::value,
-		  bool is_pointer=std::is_pointer<typename std::iterator_traits<T>::value_type>::value>
+		  bool is_ts=is_trivially_serializable<typename std::iterator_traits<T>::value_type>::value>
 struct array_encode_magic {
 	void operator()(D & dst, T start, T end) {
 		using tpie::serialize;
@@ -135,7 +132,7 @@ struct array_encode_magic {
 };
 
 template <typename D, typename T>
-struct array_encode_magic<D, T, true, true, false> {
+struct array_encode_magic<D, T, true, true> {
 	void operator()(D & d, T start, T end) {
 		if (start == end) {
 			// Do not dereference two iterators pointing to null
@@ -153,8 +150,7 @@ struct array_encode_magic<D, T, true, true, false> {
 ///////////////////////////////////////////////////////////////////////////////
 template <typename D, typename T,
 		  bool is_simple_itr=tpie::is_simple_iterator<T>::value,
-		  bool is_pod=std::is_pod<typename std::iterator_traits<T>::value_type>::value,
-		  bool is_pointer=std::is_pointer<typename std::iterator_traits<T>::value_type>::value>
+		  bool is_ts=is_trivially_serializable<typename std::iterator_traits<T>::value_type>::value>
 struct array_decode_magic {
 	void operator()(D & dst, T start, T end) {
 		using tpie::unserialize;
@@ -163,7 +159,7 @@ struct array_decode_magic {
 };
 
 template <typename D, typename T>
-struct array_decode_magic<D, T, true, true, false> {
+struct array_decode_magic<D, T, true, true> {
 	void operator()(D & d, T start, T end) {
 		if (start == end) {
 			// Do not dereference two iterators pointing to null

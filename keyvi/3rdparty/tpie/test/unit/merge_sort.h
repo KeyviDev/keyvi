@@ -75,7 +75,8 @@ static bool sort_test(memory_size_type m1,
 					  double mb_data,
 					  memory_size_type extraMemory = 0,
 					  bool evacuateBeforeMerge = false,
-					  bool evacuateBeforeReport = false)
+					  bool evacuateBeforeReport = false,
+					  memory_size_type file_limit = 0)
 {
 	m1 *= 1024*1024;
 	m2 *= 1024*1024;
@@ -88,6 +89,7 @@ static bool sort_test(memory_size_type m1,
 	relative_memory_usage m(extraMemory);
 	sorter s;
 	s.set_available_memory(m1, m2, m3);
+	s.set_available_files(file_limit);
 
 	log_debug() << "Begin phase 1" << std::endl;
 	m.set_threshold(m1);
@@ -177,6 +179,13 @@ static bool evacuate_before_report_test() {
 	return sort_test(20,20,20,50, 0, false, true);
 }
 
+static bool file_limit_test(int limit) {
+	get_file_manager().set_limit(limit);
+	get_file_manager().set_enforcement(file_manager::ENFORCE_THROW);
+
+	return sort_test(15,15,15,40, 0, false, false, limit);
+}
+
 public:
 
 static tests & add_all(tests & t) {
@@ -190,6 +199,10 @@ static tests & add_all(tests & t) {
 		.test(evacuate_before_merge_test, "evacuate_before_merge")
 		.test(evacuate_before_report_test, "evacuate_before_report")
 		;
+}
+
+static tests & add_file_limit_test(tests & t, int limit) {
+	return t.test(file_limit_test, "file_limit", "limit", limit);
 }
 
 };

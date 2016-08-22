@@ -36,13 +36,14 @@
 
 #include <tpie/tempname.h>
 #include <tpie/uncompressed_stream.h>
-#include <tpie/file_count.h>
 
 #include <tpie/tpie_log.h>
 
 #include <tpie/stream_usage.h>
 
 #include <tpie/tpie_assert.h>
+
+#include <tpie/file_manager.h>
 
 namespace tpie {
 
@@ -291,7 +292,7 @@ public:
     /// of streams currently opened by TPIE.
     ////////////////////////////////////////////////////////////////////////////
     size_t available_streams(void) {
-		return available_files();
+		return get_file_manager().available();
     }
     
     ////////////////////////////////////////////////////////////////////////////

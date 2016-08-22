@@ -595,7 +595,7 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Clear hash map.
 	///////////////////////////////////////////////////////////////////////////
-	inline void clear() const {tbl.clear();}
+	inline void clear() {tbl.clear();}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -612,7 +612,7 @@ template <typename key_t,
 		  typename equal_t=std::equal_to<key_t>,
 		  typename index_t=size_t,
 		  template <typename, typename, typename, typename> class table_t=linear_probing_hash_table>
-class hash_set {
+class hash_set : public linear_memory_base< hash_set<key_t, hash_t, equal_t, index_t, table_t> > {
 private:
 	typedef table_t<key_t, hash_t, equal_t, index_t> tbl_t;
 	tbl_t tbl;

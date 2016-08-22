@@ -27,6 +27,8 @@
 #include <tpie/tempname.h>
 #include <tpie/serialization_stream.h>
 #include <tpie/config.h>
+#include <tpie/file_accessor/file_accessor.h>
+#include <tpie/file_manager.h>
 
 #ifdef WIN32
 class open_file_monitor {
@@ -66,11 +68,11 @@ private:
 
 public:
 	open_file_monitor() {
-		m_openFiles = tpie::open_file_count();
+		m_openFiles = tpie::get_file_manager().used();
 	}
 
 	bool ensure_closed_and_delete(std::string fileName) {
-		tpie::memory_size_type openFiles = tpie::open_file_count();
+		tpie::memory_size_type openFiles = tpie::get_file_manager().used();
 		tpie::log_debug() << "Open file count was " << m_openFiles
 						  << "; is now " << openFiles << std::endl;
 		if (openFiles != m_openFiles) {
@@ -86,7 +88,7 @@ public:
 			tpie::log_error() << "Failed to unlink file: " << ::strerror(errno) << std::endl;
 			return false;
 		}
-		if (tpie::open_file_count() != m_openFiles) {
+		if (tpie::get_file_manager().used() != m_openFiles) {
 			tpie::log_error() << "ensure_closed_and_delete: Even after unlink, "
 								 "file count does not match." << std::endl;
 		}
@@ -101,12 +103,13 @@ bool test_test() {
 	tpie::log_debug() << "Temporary file is " << fileName << std::endl;
 	boost::filesystem::remove(fileName);
 	open_file_monitor m;
-	FILE * fp = ::fopen(fileName.c_str(), "w");
+	tpie::file_accessor::raw_file_accessor fa;
+	fa.open_wo(fileName);
 	TEST_ENSURE(boost::filesystem::exists(fileName),
 				"fopen did not create file");
 	TEST_ENSURE(!m.ensure_closed_and_delete(fileName),
 				"ensure_closed_and_delete is wrong");
-	::fclose(fp);
+	fa.close_i();
 	TEST_ENSURE(m.ensure_closed_and_delete(fileName),
 				"ensure_closed_and_delete is wrong");
 	return true;
@@ -158,11 +161,45 @@ bool serialization_reader_dtor_test() {
 	return true;
 }
 
+bool file_limit_enforcement_test() {
+	int limit = 5;
+	int should_error = limit;
+
+	tpie::get_file_manager().set_limit(limit);
+	tpie::get_file_manager().set_enforcement(tpie::file_manager::ENFORCE_THROW);
+
+	std::vector<tpie::file_accessor::raw_file_accessor> fas(should_error + 1);
+	int i = 0;
+	for (auto &fa : fas) {
+		std::string fileName = tpie::tempname::tpie_name();
+		try {
+			fa.open_wo(fileName);
+		} catch(const tpie::out_of_resource_error &e) {
+			if (i == should_error) {
+				continue;
+			} else {
+				return false;
+			}
+		}
+		if (i == should_error) {
+			return false;
+		}
+		i++;
+	}
+
+	for (auto &fa : fas) {
+		fa.close_i();
+	}
+
+	return true;
+}
+
 int main(int argc, char ** argv) {
 	return tpie::tests(argc, argv)
 		.test(test_test, "internal")
 		.test(serialization_writer_close_test, "serialization_writer_close")
 		.test(serialization_writer_dtor_test, "serialization_writer_dtor")
 		.test(serialization_reader_dtor_test, "serialization_reader_dtor")
+		.test(file_limit_enforcement_test, "file_limit_enforcement")
 		;
 }

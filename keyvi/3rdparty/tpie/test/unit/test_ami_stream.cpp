@@ -109,7 +109,7 @@ bool basic() {
 			s.seek(idx);
 
 			if (i%2 == 0) {
-				uint64_t *read;
+				uint64_t *read = nullptr;
 				s.read_item(&read);
 				if (*read != data[idx]) {
 					tpie::log_error() << "Expected element " << idx << " to be " << data[idx] << ", got " << *read << std::endl;

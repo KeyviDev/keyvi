@@ -36,7 +36,7 @@ class linear_t : public node {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	inline linear_t(dest_t dest, item_type factor, item_type term) : dest(std::move(dest)), factor(factor), term(term) {
+	inline linear_t(dest_t dest, item_type factor, item_type term) : factor(factor), term(term), dest(std::move(dest)) {
 		add_push_destination(this->dest);
 		set_name("Linear transform", PRIORITY_INSIGNIFICANT);
 	}
@@ -44,9 +44,33 @@ public:
 		dest.push(item*factor+term);
 	}
 private:
+	item_type factor, term;
 	dest_t dest;
-	item_type factor;
-	item_type term;
+};
+
+template <typename dest_t>
+class range_t : public node {
+public:
+	typedef typename push_type<dest_t>::type item_type;
+
+	range_t(dest_t dest, item_type from, item_type to, item_type increment) : from(from), to(to), increment(increment), dest(std::move(dest)) {}
+
+	void propagate() {
+		stream_size_type items = (from - to) / increment;
+		set_steps(items);
+		forward("items", items);
+	}
+	
+	virtual void go() override {
+		for (item_type i=from; i < to; i += increment) {
+			dest.push(i);
+			step(1);
+		}
+	}
+
+private:
+	item_type from, to, increment;
+	dest_t dest;
 };
 
 } // namespace bits
@@ -62,6 +86,13 @@ inline pipe_middle<factory<bits::linear_t, T, T> >
 linear(T factor, T term) {
 	return factory<bits::linear_t, T, T>(factor, term);
 }
+
+template <typename T>
+inline pipe_begin<factory<bits::range_t, T, T, T> >
+range(T from, T to, T increment = 1) {
+	return factory<bits::range_t, T, T, T>(from, to, increment);
+}
+
 
 } // namespace pipelining
 

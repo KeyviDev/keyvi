@@ -63,7 +63,7 @@ public:
 	}
 
 	void set_calc_node(node & calc) {
-		add_dependency(calc);
+		add_memory_share_dependency(calc);
 	}
 
 	virtual void propagate() override {
@@ -86,12 +86,11 @@ public:
 	}
 
 	void add_calc_dependency(node_token tkn) {
-		add_dependency(tkn);
+		add_memory_share_dependency(tkn);
 	}
 
 protected:
 	virtual void set_available_memory(memory_size_type availableMemory) override {
-		node::set_available_memory(availableMemory);
 		if (!m_propagate_called)
 			m_sorter->set_phase_3_memory(availableMemory);
 	}
@@ -231,6 +230,8 @@ public:
 		m_sorter->set_owner(this);
 	}
 
+	virtual bool is_go_free() const override {return m_sorter->is_merge_runs_free();}
+
 	virtual void go() override {
 		progress_indicator_base * pi = proxy_progress_indicator();
 		log_debug() << "TODO: Progress information during merging." << std::endl;
@@ -259,12 +260,11 @@ public:
 	}
 
 	void set_input_node(node & input) {
-		add_dependency(input);
+		add_memory_share_dependency(input);
 	}
 
 protected:
 	virtual void set_available_memory(memory_size_type availableMemory) override {
-		node::set_available_memory(availableMemory);
 		if (!m_propagate_called)
 			m_sorter->set_phase_2_memory(availableMemory);
 	}
@@ -330,7 +330,6 @@ public:
 
 protected:
 	virtual void set_available_memory(memory_size_type availableMemory) override {
-		node::set_available_memory(availableMemory);
 		if (!m_propagate_called)
 			m_sorter->set_phase_1_memory(availableMemory);
 	}
@@ -358,7 +357,7 @@ public:
 	};
 
 	template <typename dest_t>
-	typename constructed<dest_t>::type construct(dest_t dest) const {
+	typename constructed<dest_t>::type construct(dest_t dest) {
 		typedef typename push_type<dest_t>::type item_type;
 		typedef typename constructed<dest_t>::Traits Traits;
 

@@ -79,21 +79,30 @@ class priority_queue {
 	typedef memory_size_type group_type;
 	typedef memory_size_type slot_type;
 public:
+	static constexpr float default_blocksize = 0.0625; 
+	
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Constructor.
 	///
 	/// \param f Factor of memory that the priority queue is allowed to use.
 	/// \param b Block factor
 	///////////////////////////////////////////////////////////////////////////
-	priority_queue(double f=1.0, float b=0.0625);
+	priority_queue(double f=1.0, float b=default_blocksize, stream_size_type n = std::numeric_limits<stream_size_type>::max());
 
 #ifndef DOXYGEN
 	// \param mmavail Number of bytes the priority queue is allowed to use.
 	// \param b Block factor
-	priority_queue(memory_size_type mm_avail, float b=0.0625);
+	priority_queue(memory_size_type mm_avail, float b=default_blocksize, stream_size_type n = std::numeric_limits<stream_size_type>::max());
 #endif
 
-
+	/////////////////////////////////////////////////////////
+    ///
+    /// Compute the maximal amount of memory it makes sence
+	/// to give a queue that will contain atmount n elements
+    ///
+    /////////////////////////////////////////////////////////
+	static memory_size_type memory_usage(stream_size_type n, float b=default_blocksize);
+	
     /////////////////////////////////////////////////////////
     ///
     /// Destructor
@@ -205,7 +214,7 @@ private:
 
 	float block_factor;
 
-	void init(memory_size_type mm_avail);
+	void init(memory_size_type mm_avail, stream_size_type n = std::numeric_limits<stream_size_type>::max() );
 
     void             slot_start_set(slot_type slot, memory_size_type n);
     memory_size_type slot_start(slot_type slot) const;

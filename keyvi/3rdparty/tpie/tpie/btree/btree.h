@@ -577,6 +577,14 @@ public:
 		return m_state.store().size() == 0;
 	}
 	
+	void set_metadata(const std::string & data) {
+		m_state.store().set_metadata(data);
+	}
+	
+	std::string get_metadata() {
+		return m_state.store().get_metadata();
+	}
+	
 	/**
 	 * Construct a btree with the given storage
 	 */

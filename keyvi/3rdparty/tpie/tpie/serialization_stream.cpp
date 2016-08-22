@@ -404,7 +404,7 @@ void serialization_reverse_reader::open(temp_file & tempFile) {
 
 stream_size_type serialization_reverse_reader::offset() {
 	if (m_blockSize == 0)
-		return size();
+		return 0;
 
 	// size of blocks not read at all
 	stream_size_type remainingBlocks = m_blockNumber * block_size();

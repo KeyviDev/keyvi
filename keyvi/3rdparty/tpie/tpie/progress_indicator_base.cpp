@@ -35,7 +35,6 @@ public:
 
 	static double seconds(const ptime & t1, const ptime & t2) {
 		if (t1.m_ptime.is_special() || t2.m_ptime.is_special()) {
-			tp_assert(false, "ptime::seconds: Special ptime");
 			return 0.0;
 		}
 		return (t2.m_ptime - t1.m_ptime).total_microseconds() / 1000000.0;

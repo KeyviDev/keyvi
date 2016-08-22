@@ -63,7 +63,7 @@ public:
 		self().end(n);
 	}
 
-	virtual const char * name() const { return self().get_name(); }
+	const char * name() const override { return self().get_name(); }
 };
 
 class series_random : public series_crtp<series_random> {

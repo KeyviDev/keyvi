@@ -63,6 +63,7 @@ public:
 	inline void set_cache_hint(cache_hint cacheHint);
 
 private:
+	inline void _open(const std::string & path, int flags, mode_t mode);
 	inline void give_advice();
 };
 

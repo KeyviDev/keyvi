@@ -18,6 +18,7 @@
 // along with TPIE.  If not, see <http://www.gnu.org/licenses/>
 
 #include <tpie/pipelining/pipeline.h>
+#include <tpie/pipelining/subpipeline.h>
 #include <tpie/pipelining/node.h>
 #include <unordered_map>
 #include <iostream>
@@ -51,7 +52,7 @@ namespace bits {
 
 typedef std::unordered_map<const node *, size_t> nodes_t;
 
-void pipeline_base::plot_impl(std::ostream & out, bool full) {
+void pipeline_base_base::plot_impl(std::ostream & out, bool full) {
 	typedef tpie::pipelining::bits::node_map::id_t id_t;
 
 	node_map::ptr nodeMap = m_nodeMap->find_authority();
@@ -99,17 +100,22 @@ void pipeline_base::plot_impl(std::ostream & out, bool full) {
 			case no_forward_depends:
 				out << '"' << name(nodeMap, s) << "\" -> \"" << name(nodeMap, t) << "\" [arrowhead=none,arrowtail=normal,dir=both,style=dotted];\n";
 				break;
+			case memory_share_depends:
+				out << '"' << name(nodeMap, s) << "\" -> \"" << name(nodeMap, t) << "\" [arrowhead=none,arrowtail=normal,dir=both,style=tapered];\n";
+				break;
+
 		}
 	}
 	out << '}' << std::endl;
 }
 
 void pipeline_base::operator()(stream_size_type items, progress_indicator_base & pi,
+							   const memory_size_type initialFiles,
 							   const memory_size_type initialMemory,
 							   const char * file, const char * function) {
 	node_map::ptr map = m_nodeMap->find_authority();
 	runtime rt(map);
-	rt.go(items, pi, initialMemory, file, function);
+	rt.go(items, pi, initialFiles, initialMemory, file, function);
 
 	/*
 	typedef std::vector<phase> phases_t;
@@ -138,17 +144,11 @@ void pipeline_base::operator()(stream_size_type items, progress_indicator_base &
 	*/
 }
 
-void pipeline_base::forward_any(std::string key, const boost::any & value) {
-	node_map::ptr map = m_nodeMap->find_authority();
-	runtime rt(map);
-	std::vector<node *> sources;
-	rt.get_item_sources(sources);
-	for (size_t j = 0; j < sources.size(); ++j) {
-		sources[j]->forward_any(key, value);
-	}
+void pipeline_base_base::forward_any(std::string key, any_noncopyable value) {
+	get_node_map()->find_authority()->forward(key, std::move(value));
 }
 
-bool pipeline_base::can_fetch(std::string key) {
+bool pipeline_base_base::can_fetch(std::string key) {
 	node_map::ptr map = m_nodeMap->find_authority();
 	runtime rt(map);
 	std::vector<node *> sinks;
@@ -159,7 +159,7 @@ bool pipeline_base::can_fetch(std::string key) {
 	return false;
 }
 
-boost::any pipeline_base::fetch_any(std::string key) {
+any_noncopyable & pipeline_base_base::fetch_any(std::string key) {
 	node_map::ptr map = m_nodeMap->find_authority();
 	runtime rt(map);
 	std::vector<node *> sinks;
@@ -205,20 +205,34 @@ void pipeline_base::order_before(pipeline_base & other) {
 	}
 }
 
-
-	
-} // namespace bits
-
-pipeline * pipeline::m_current = NULL;
-	
-void pipeline::output_memory(std::ostream & o) const {
-	bits::node_map::ptr nodeMap = p->get_node_map()->find_authority();
+void pipeline_base_base::output_memory(std::ostream & o) const {
+	bits::node_map::ptr nodeMap = get_node_map()->find_authority();
 	for (bits::node_map::mapit i = nodeMap->begin(); i != nodeMap->end(); ++i) {
 		bits::node_map::val_t p = nodeMap->get(i->first);
 		o << p->get_name() << ": min=" << p->get_minimum_memory() << "; max=" << p->get_available_memory() << "; prio=" << p->get_memory_fraction() << ";" << std::endl;
 
 	}
 }
+
+void subpipeline_base::begin(stream_size_type items, progress_indicator_base & pi,
+							 memory_size_type filesAvailable, memory_size_type mem,
+							 const char * file, const char * function) {
+	rt.reset(new runtime(m_nodeMap->find_authority()));
+	gc = rt->go_init(items, pi, filesAvailable, mem, file, function);
+	rt->go_until(gc.get(), frontNode);
+}
+	
+void subpipeline_base::end() {
+	rt->go_until(gc.get(), nullptr);
+	gc.reset();
+	rt.reset();
+}
+
+	
+} // namespace bits
+
+pipeline * pipeline::m_current = NULL;
+	
 
 } // namespace pipelining
 

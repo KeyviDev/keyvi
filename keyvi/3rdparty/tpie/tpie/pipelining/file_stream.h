@@ -26,10 +26,18 @@
 #include <tpie/pipelining/factory_helpers.h>
 #include <tpie/pipelining/pipe_base.h>
 #include <tpie/maybe.h>
+#include <tpie/flags.h>
 
 namespace tpie {
-
 namespace pipelining {
+
+enum stream_option {
+	STREAM_RESET=1,
+	STREAM_CLOSE=2
+};
+
+TPIE_DECLARE_OPERATORS_FOR_FLAGS(stream_option)
+typedef tpie::flags<stream_option> stream_options;
 
 namespace bits {
 
@@ -43,19 +51,21 @@ class input_t : public node {
 public:
 	typedef typename push_type<dest_t>::type item_type;
 
-	inline input_t(dest_t dest, file_stream<item_type> & fs) : dest(std::move(dest)), fs(fs) {
+	input_t(dest_t dest, file_stream<item_type> & fs, stream_options options) : options(options), fs(fs), dest(std::move(dest)) {
 		add_push_destination(this->dest);
 		set_name("Read", PRIORITY_INSIGNIFICANT);
 		set_minimum_memory(fs.memory_usage());
 	}
 
 	virtual void propagate() override {
+		if (options & STREAM_RESET) fs.seek(0);
+		
 		if (fs.is_open()) {
-			forward("items", fs.size());
+			forward("items", fs.size() - fs.offset());
+			set_steps(fs.size() - fs.offset());
 		} else {
 			forward("items", 0);
 		}
-		set_steps(fs.size());
 	}
 
 	virtual void go() override {
@@ -67,10 +77,52 @@ public:
 		}
 	}
 
+	virtual void end() override {
+		if (options & STREAM_CLOSE) fs.close();
+	}
+
+private:
+	stream_options options;
+	file_stream<item_type> & fs;
+	dest_t dest;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// \class input_t
+///
+/// file_stream input generator.
+///////////////////////////////////////////////////////////////////////////////
+template <typename dest_t>
+class named_input_t : public node {
+public:
+	typedef typename push_type<dest_t>::type item_type;
+
+	named_input_t(dest_t dest, std::string path) : dest(std::move(dest)), path(path) {
+		add_push_destination(this->dest);
+		set_name("Read", PRIORITY_INSIGNIFICANT);
+		set_minimum_memory(file_stream<item_type>::memory_usage());
+	}
+
+	virtual void propagate() override {
+		fs.construct();
+		fs->open(path, access_read);
+		forward("items", fs->size());
+		set_steps(fs->size());
+	}
+
+	virtual void go() override {
+		while (fs->can_read()) {
+			dest.push(fs->read());
+			step();
+		}
+		fs.destruct();
+	}
 private:
 	dest_t dest;
-	file_stream<item_type> & fs;
+	maybe<file_stream<item_type> > fs;
+	std::string path;
 };
+
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \class pull_input_t
@@ -82,25 +134,32 @@ class pull_input_t : public node {
 public:
 	typedef T item_type;
 
-	inline pull_input_t(file_stream<T> & fs) : fs(fs) {
+	pull_input_t(file_stream<T> & fs, stream_options options) : options(options), fs(fs) {
 		set_name("Read", PRIORITY_INSIGNIFICANT);
 		set_minimum_memory(fs.memory_usage());
 	}
 
 	virtual void propagate() override {
-		forward("items", fs.size());
-		set_steps(fs.size());
+		if (options & STREAM_RESET) fs.seek(0);
+		forward("items", fs.size()-fs.offset());
+		set_steps(fs.size()-fs.offset());
 	}
 
-	inline T pull() {
+	T pull() {
 		step();
 		return fs.read();
 	}
 
-	inline bool can_pull() {
+	bool can_pull() {
 		return fs.can_read();
 	}
 
+	virtual void end() override {
+		if (options & STREAM_CLOSE) fs.close();
+	}
+
+private:
+	stream_options options;
 	file_stream<T> & fs;
 };
 
@@ -114,14 +173,15 @@ class pull_reverse_input_t : public node {
 public:
 	typedef T item_type;
 
-	inline pull_reverse_input_t(file_stream<T> & fs) : fs(fs) {
+	pull_reverse_input_t(file_stream<T> & fs, stream_options options) : options(options), fs(fs) {
 		set_name("Read", PRIORITY_INSIGNIFICANT);
 		set_minimum_memory(fs.memory_usage());
 	}
 
 	virtual void propagate() override {
-		forward("items", fs.size());
-		set_steps(fs.size());
+		if (options & STREAM_RESET) fs.seek(0, file_stream<T>::end);
+		forward("items", fs.offset());
+		set_steps(fs.offset());
 	}
 
 	inline T pull() {
@@ -133,6 +193,12 @@ public:
 		return fs.can_read_back();
 	}
 
+	virtual void end() override {
+		if (options & STREAM_CLOSE) fs.close();
+	}
+
+private:
+	stream_options options;
 	file_stream<T> & fs;
 };
 
@@ -187,12 +253,12 @@ class output_t : public node {
 public:
 	typedef T item_type;
 
-	inline output_t(file_stream<T> & fs) : fs(fs) {
+	output_t(file_stream<T> & fs) : fs(fs) {
 		set_name("Write", PRIORITY_INSIGNIFICANT);
 		set_minimum_memory(fs.memory_usage());
 	}
 
-	inline void push(const T & item) {
+	void push(const T & item) {
 		fs.write(item);
 	}
 private:
@@ -243,7 +309,7 @@ class pull_output_t : public node {
 public:
 	typedef typename pull_type<source_t>::type item_type;
 
-	inline pull_output_t(source_t source, file_stream<item_type> & fs) : source(std::move(source)), fs(fs) {
+	pull_output_t(source_t source, file_stream<item_type> & fs) : source(std::move(source)), fs(fs) {
 		add_pull_source(this->source);
 		set_name("Write", PRIORITY_INSIGNIFICANT);
 		set_minimum_memory(fs.memory_usage());
@@ -256,56 +322,49 @@ public:
 		}
 		source.end();
 	}
-
+	
+private:
 	source_t source;
 	file_stream<item_type> & fs;
 };
 
-template <typename T>
-class tee_t {
+template <typename dest_t, typename T>
+class tee_t: public node {
 public:
-	template <typename dest_t>
-	class type: public node {
-	public:
-		typedef T item_type;
-		type(dest_t dest, file_stream<item_type> & fs): fs(fs), dest(std::move(dest)) {
-			set_minimum_memory(fs.memory_usage());
-		}
-
-		void push(const item_type & i) {
-			fs.write(i);
-			dest.push(i);
-		}
-	private:
-		file_stream<item_type> & fs;
-		dest_t dest;
-	};
+	typedef T item_type;
+	tee_t(dest_t dest, file_stream<item_type> & fs): fs(fs), dest(std::move(dest)) {
+		set_minimum_memory(fs.memory_usage());
+	}
+	
+	void push(const item_type & i) {
+		fs.write(i);
+		dest.push(i);
+	}
+private:
+	file_stream<item_type> & fs;
+	dest_t dest;
 };
 
-template <typename T>
+template <typename source_t, typename T>
 class pull_tee_t {
 public:
-	template <typename source_t>
-	class type: public node {
-	public:
-		typedef T item_type;
-		type(source_t source, file_stream<item_type> & fs): fs(fs), source(std::move(source)) {
-			set_minimum_memory(fs.memory_usage());
-		}
+	typedef T item_type;
+	pull_tee_t(source_t source, file_stream<item_type> & fs): fs(fs), source(std::move(source)) {
+		set_minimum_memory(fs.memory_usage());
+	}
 		
-		bool can_pull() {
-			return source.can_pull();
-		}
-		
-		item_type pull() {
-			item_type i = source.pull();
-			fs.write(i);
-			return i;
-		}
-	private:
-		file_stream<item_type> & fs;
-		source_t source;
-	};
+	bool can_pull() {
+		return source.can_pull();
+	}
+	
+	item_type pull() {
+		item_type i = source.pull();
+		fs.write(i);
+		return i;
+	}
+private:
+	file_stream<item_type> & fs;
+	source_t source;
 };
 
 } // namespace bits
@@ -314,29 +373,44 @@ public:
 /// \brief Pipelining nodes that pushes the contents of the given file stream
 /// to the next node in the pipeline.
 /// \param fs The file stream from which it pushes items
+/// \param options Stream options
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline pipe_begin<factory<bits::input_t, file_stream<T> &> > input(file_stream<T> & fs) {
-	return factory<bits::input_t, file_stream<T> &>(fs);
+inline pipe_begin<factory<bits::input_t, file_stream<T> &, stream_options> > input(file_stream<T> & fs,
+																				   stream_options options=stream_options()) {
+	return {fs, options};
 }
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Pipelining nodes that pushes the contents of the named file stream
+/// to the next node in the pipeline.
+/// \param path The file stream from which it pushes items
+///////////////////////////////////////////////////////////////////////////////
+typedef pipe_begin<factory<bits::named_input_t, std::string> > named_input; 
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief A pipelining pull-node that reads items from the given file_stream
 /// \param fs The file stream from which it reads items.
+/// \param options Stream options
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline pullpipe_begin<termfactory<bits::pull_input_t<T>, file_stream<T> &> > pull_input(file_stream<T> & fs) {
-	return termfactory<bits::pull_input_t<T>, file_stream<T> &>(fs);
+inline pullpipe_begin<termfactory<bits::pull_input_t<T>, file_stream<T> &, stream_options> > pull_input(
+	file_stream<T> & fs,
+	stream_options options=stream_options()) {
+	return {fs, options};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief A pipelining pull-node that reads items in reverse order from the
 /// given file_stream
 /// \param fs The file stream from which it reads items.
+/// \param options Stream options
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-inline pullpipe_begin<termfactory<bits::pull_reverse_input_t<T>, file_stream<T> &> > pull_reverse_input(file_stream<T> & fs) {
-	return termfactory<bits::pull_reverse_input_t<T>, file_stream<T> &>(fs);
+inline pullpipe_begin<termfactory<bits::pull_reverse_input_t<T>, file_stream<T> &, stream_options> > pull_reverse_input(
+	file_stream<T> & fs,
+	stream_options options=stream_options()) {
+	return {fs, options};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -355,7 +429,7 @@ inline pullpipe_begin<termfactory<bits::named_pull_input_t<T>, std::string> > na
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
 inline pipe_end<termfactory<bits::output_t<T>, file_stream<T> &> > output(file_stream<T> & fs) {
-	return termfactory<bits::output_t<T>, file_stream<T> &>(fs);
+	return {fs};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -374,7 +448,7 @@ inline pipe_end<termfactory<bits::named_output_t<T>, std::string> > named_output
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
 inline pullpipe_end<factory<bits::pull_output_t, file_stream<T> &> > pull_output(file_stream<T> & fs) {
-	return factory<bits::pull_output_t, file_stream<T> &>(fs);
+	return {fs};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -383,8 +457,9 @@ inline pullpipe_end<factory<bits::pull_output_t, file_stream<T> &> > pull_output
 /// \param fs The file stream that items should be written to
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-inline pipe_middle<factory<bits::tee_t<typename push_type<T>::type>::template type, T &> >
-tee(T & fs) {return factory<bits::tee_t<typename push_type<T>::type>::template type, T &>(fs);}
+inline pipe_middle<tfactory<bits::tee_t, Args<typename T::item_type>, T &> > tee(T & fs) {
+	return {fs};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief A pull-pipe node that when pulled from will pull from its source,
@@ -392,8 +467,9 @@ tee(T & fs) {return factory<bits::tee_t<typename push_type<T>::type>::template t
 /// \param fs The file stream that items should be written to
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T>
-inline pullpipe_middle<factory<bits::pull_tee_t<typename push_type<T>::type>::template type, T &> >
-pull_tee(T & fs) {return factory<bits::pull_tee_t<typename push_type<T>::type>::template type, T &>(fs);}
+inline pullpipe_middle<tfactory<bits::pull_tee_t, Args<typename T::item_type>, T &> > pull_tee(T & fs) {
+	return {fs};
+}
 
 } // namespace pipelining
 

@@ -24,39 +24,39 @@
 
 namespace tpie {
 
-class merge_sort_not_ready : exception {
+class merge_sort_not_ready : public exception {
 public:
 	inline merge_sort_not_ready() : tpie::exception("Merge sort did not have memory assigned") {}
 };
 
 namespace pipelining {
 
-class not_initiator_node : tpie::exception {
+class not_initiator_node : public tpie::exception {
 public:
 	inline not_initiator_node() : tpie::exception("Not an initiator node") {}
 };
 
-class no_initiator_node : tpie::exception {
+class no_initiator_node : public tpie::exception {
 public:
 	no_initiator_node() : tpie::exception("Phase has no initiator node") {}
 };
 
-class virtual_chunk_not_ready : tpie::exception {
+class virtual_chunk_not_ready : public tpie::exception {
 public:
 	inline virtual_chunk_not_ready() : tpie::exception("Virtual receiver is missing a destination") {}
 };
 
-class virtual_chunk_missing_begin : tpie::exception {
+class virtual_chunk_missing_begin : public tpie::exception {
 public:
 	inline virtual_chunk_missing_begin() : tpie::exception("Virtual begin chunk contains no pipes") {}
 };
 
-class virtual_chunk_missing_middle : tpie::exception {
+class virtual_chunk_missing_middle : public tpie::exception {
 public:
 	inline virtual_chunk_missing_middle() : tpie::exception("Virtual middle chunk contains no pipes, and input type is not output type") {}
 };
 
-class virtual_chunk_missing_end : tpie::exception {
+class virtual_chunk_missing_end : public tpie::exception {
 public:
 	inline virtual_chunk_missing_end() : tpie::exception("Virtual end chunk contains no pipes") {}
 };

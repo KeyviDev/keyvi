@@ -68,8 +68,7 @@ sudo tar xvf path/to/tpie/build/tpie-1.0.0-Linux.tar.gz
 \endverbatim
 
 To link your application with TPIE, may manually specify the linker flags
-<tt>-ltpie -lboost_system -lboost_filesystem -lboost_date_time
--lboost_thread</tt>, or you may use the example \c CMakeLists.txt from the
+<tt>-ltpie -lboost_system -lboost_filesystem -lboost_date_time</tt>, or you may use the example \c CMakeLists.txt from the
 \c tpie/example/ directory to find the TPIE installation using CMake.
 
 <h2>Windows</h2>

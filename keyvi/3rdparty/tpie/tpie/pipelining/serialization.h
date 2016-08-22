@@ -51,6 +51,7 @@ public:
 		set_name("Serialization reader");
 		add_push_destination(this->dest);
 		set_minimum_memory(rd->memory_usage());
+		set_minimum_resource_usage(FILES, 1);
 	}
 
 	virtual void propagate() override {
@@ -86,6 +87,7 @@ public:
 	{
 		set_name("Serialization writer");
 		set_minimum_memory(wr->memory_usage());
+		set_minimum_resource_usage(FILES, 1);
 	}
 
 	void push(const T & x) {
@@ -134,6 +136,7 @@ public:
 	{
 		this->set_name("Serialization reverse writer");
 		//TODO memory
+		set_minimum_resource_usage(FILES, 1);
 		set_plot_options(PLOT_BUFFERED | PLOT_SIMPLIFIED_HIDE);
 	}
 
@@ -175,6 +178,7 @@ public:
 		add_dependency(input_token);
 		add_push_destination(this->dest);
 		//TODO memory
+		set_minimum_resource_usage(FILES, 1);
 		set_plot_options(PLOT_BUFFERED);
 	}
 
@@ -218,8 +222,8 @@ public:
 		{
 		set_name("Serialization reverse reader");
 		add_dependency(input_token);
-		add_push_destination(this->dest);
 		//TODO memory
+		set_minimum_resource_usage(FILES, 1);
 		set_plot_options(PLOT_BUFFERED);
 	}
 
@@ -267,6 +271,7 @@ public:
 		, items(0) {
 		set_name("Serialization buffer writer");
 		//TODO memory
+		set_minimum_resource_usage(FILES, 1);
 		set_plot_options(PLOT_BUFFERED | PLOT_SIMPLIFIED_HIDE);
 	}
 
@@ -307,6 +312,7 @@ public:
 		add_dependency(input_token);
 		add_push_destination(this->dest);
 		//TODO MEMORY
+		set_minimum_resource_usage(FILES, 1);
 		set_name("Serialization buffer reader");
 		set_plot_options(PLOT_BUFFERED);
 	}
@@ -352,6 +358,7 @@ public:
 		add_dependency(input_token);
 		set_name("Fetching items", PRIORITY_SIGNIFICANT);
 		//TODO memory
+		set_minimum_resource_usage(FILES, 1);
 		set_plot_options(PLOT_BUFFERED);
 	}
 

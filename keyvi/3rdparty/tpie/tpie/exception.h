@@ -67,5 +67,23 @@ struct job_manager_exception: public exception {
 	job_manager_exception(): exception("") {};
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Thrown when trying to allocate too much of a resource.
+///
+/// When the resource limit is exceeded and the resource limit enforcement policy
+/// is set to THROW, this error is thrown by the resource subsystem.
+///////////////////////////////////////////////////////////////////////////////
+struct out_of_resource_error: public exception {
+	out_of_resource_error(const std::string & s): exception(s) {} 
+};
+
+struct out_of_memory_error: public out_of_resource_error {
+	out_of_memory_error(const std::string & s): out_of_resource_error(s) {} 
+};
+
+struct out_of_files_error: public out_of_resource_error {
+	out_of_files_error(const std::string & s): out_of_resource_error(s) {} 
+};
+
 }
 #endif //__TPIE_EXCEPTION_H__

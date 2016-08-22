@@ -50,6 +50,11 @@ void node_map::link(node_map::ptr target) {
 	for (relmapit i = target->m_relationsInv.begin(); i != target->m_relationsInv.end(); ++i) {
 		m_relationsInv.insert(*i);
 	}
+	for (auto i = target->m_pipelineForwards.begin(); i != m_pipelineForwards.end(); ++i) {
+		m_pipelineForwards[i->first] = std::move(i->second);
+	}
+	std::move(target->m_pipeBaseForwards.begin(), target->m_pipeBaseForwards.end(),
+			  std::back_inserter(m_pipeBaseForwards));
 	target->m_tokens.clear();
 	target->m_authority = this;
 
@@ -130,6 +135,7 @@ void node_map::get_successors(id_t from, std::vector<id_t> & successors, memory_
 					case pulls:
 					case depends:
 					case no_forward_depends:
+					case memory_share_depends:
 						break;
 				}
 			}
@@ -142,6 +148,7 @@ void node_map::get_successors(id_t from, std::vector<id_t> & successors, memory_
 						break;
 					case pulls:
 					case depends:
+					case memory_share_depends:
 						q.push(std::make_pair(i->second.first, d+1));
 						break;
 					case no_forward_depends:
@@ -151,6 +158,12 @@ void node_map::get_successors(id_t from, std::vector<id_t> & successors, memory_
 				}
 			}
 		}
+	}
+}
+
+void node_map::forward_pipe_base_forwards() {
+	for (auto &t : m_pipeBaseForwards) {
+		get(t.from)->forward(t.key, std::move(t.value));
 	}
 }
 

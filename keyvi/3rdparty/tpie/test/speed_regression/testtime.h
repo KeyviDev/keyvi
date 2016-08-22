@@ -90,7 +90,7 @@ namespace tpie {
 		/// Calculate real time difference in micro seconds
 		///////////////////////////////////////////////////////////////////
 		inline uint_fast64_t testRealtimeDiff(const test_realtime_t a, const test_realtime_t b) {
-			return tpie::test_millisecs(a, b);
+			return (uint_fast64_t)tpie::test_millisecs(a, b);
 		}
 	}
 }

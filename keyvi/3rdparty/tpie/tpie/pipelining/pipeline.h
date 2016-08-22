@@ -20,11 +20,11 @@
 #ifndef __TPIE_PIPELINING_PIPELINE_H__
 #define __TPIE_PIPELINING_PIPELINE_H__
 
-#include <boost/any.hpp>
 #include <tpie/types.h>
 #include <iostream>
 #include <tpie/pipelining/tokens.h>
 #include <tpie/progress_indicator_null.h>
+#include <tpie/file_manager.h>
 
 namespace tpie {
 
@@ -34,16 +34,10 @@ namespace bits {
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \class pipeline_base
-/// Virtual superclass for pipelines implementing the function call operator.
+/// Virtual superclass for pipelines and subpipelines
 ///////////////////////////////////////////////////////////////////////////////
-class pipeline_base {
+class pipeline_base_base {
 public:
-	///////////////////////////////////////////////////////////////////////////
-	/// \brief Invoke the pipeline.
-	///////////////////////////////////////////////////////////////////////////
-	void operator()(stream_size_type items, progress_indicator_base & pi, memory_size_type mem,
-					const char * file, const char * function);
-
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Generate a GraphViz plot of the pipeline
 	///
@@ -73,32 +67,60 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	void plot_full(std::ostream & out) {plot_impl(out, true);}
 
-	double memory() const {
-		return m_memory;
-	}
-
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Virtual dtor.
 	///////////////////////////////////////////////////////////////////////////
-	virtual ~pipeline_base() {}
+	virtual ~pipeline_base_base() {}
+
+	void forward_any(std::string key, any_noncopyable value);
+	
+	bool can_fetch(std::string key);
+
+	any_noncopyable & fetch_any(std::string key);
 
 	node_map::ptr get_node_map() const {
 		return m_nodeMap;
 	}
 
-	void forward_any(std::string key, const boost::any & value);
+	void output_memory(std::ostream & o) const;	
+protected:
+	node_map::ptr m_nodeMap;	
 
-	bool can_fetch(std::string key);
+private:
+	void plot_impl(std::ostream & out, bool full);	
+};
+	
 
-	boost::any fetch_any(std::string key);
+///////////////////////////////////////////////////////////////////////////////
+/// \class pipeline_base
+/// Virtual superclass for pipelines implementing the function call operator.
+///////////////////////////////////////////////////////////////////////////////
+class pipeline_base: public pipeline_base_base {
+public:
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Invoke the pipeline.
+	///////////////////////////////////////////////////////////////////////////
+	void operator()(stream_size_type items, progress_indicator_base & pi,
+					memory_size_type filesAvailable, memory_size_type mem,
+					const char * file, const char * function);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Invoke the pipeline with amount of available files automatically
+	/// configured.
+	///////////////////////////////////////////////////////////////////////////
+	void operator()(stream_size_type items, progress_indicator_base & pi,
+					memory_size_type mem,
+					const char * file, const char * function) {
+		operator()(items, pi, get_file_manager().available(), mem, file, function);
+	}
+
+	double memory() const {
+		return m_memory;
+	}
 
 	void order_before(pipeline_base & other);
-
 protected:
-	node_map::ptr m_nodeMap;
 	double m_memory;
-private:
-	void plot_impl(std::ostream & out, bool full);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -171,19 +193,27 @@ public:
 	void operator()() {
 		CurrentPipeSetter _(this);
 		progress_indicator_null pi;
-		(*p)(1, pi, get_memory_manager().available(), nullptr, nullptr);
+		(*p)(1, pi, get_file_manager().available(), get_memory_manager().available(), nullptr, nullptr);
 	}
 
 	void operator()(stream_size_type items, progress_indicator_base & pi,
 					const char * file, const char * function) {
 		CurrentPipeSetter _(this);
-		(*p)(items, pi, get_memory_manager().available(), file, function);
+		(*p)(items, pi, get_file_manager().available(), get_memory_manager().available(), file, function);
 	}
 
-	void operator()(stream_size_type items, progress_indicator_base & pi, memory_size_type mem,
+	void operator()(stream_size_type items, progress_indicator_base & pi,
+					memory_size_type mem,
 					const char * file, const char * function) {
 		CurrentPipeSetter _(this);
-		(*p)(items, pi, mem, file, function);
+		(*p)(items, pi, get_file_manager().available(), mem, file, function);
+	}
+
+	void operator()(stream_size_type items, progress_indicator_base & pi,
+			memory_size_type filesAvailable, memory_size_type mem,
+					const char * file, const char * function) {
+		CurrentPipeSetter _(this);
+		(*p)(items, pi, filesAvailable, mem, file, function);
 	}
 	
 	void plot(std::ostream & os = std::cout) {
@@ -197,7 +227,8 @@ public:
 	inline double memory() const {
 		return p->memory();
 	}
-	inline bits::node_map::ptr get_node_map() const {
+
+	bits::node_map::ptr get_node_map() const {
 		return p->get_node_map();
 	}
 
@@ -205,23 +236,23 @@ public:
 		return p->can_fetch(key);
 	}
 
-	boost::any fetch_any(std::string key) {
+	any_noncopyable & fetch_any(std::string key) {
 		return p->fetch_any(key);
 	}
 
 	template <typename T>
-	T fetch(std::string key) {
-		boost::any a = fetch_any(key);
-		return *boost::any_cast<T>(&a);
+	T & fetch(std::string key) {
+		any_noncopyable &a = fetch_any(key);
+		return any_cast<T>(a);
 	}
 
-	void forward_any(std::string key, const boost::any & value) {
-		return p->forward_any(key, value);
+	void forward_any(std::string key, any_noncopyable value) {
+		p->forward_any(key, std::move(value));
 	}
 
 	template <typename T>
 	void forward(std::string key, T value) {
-		forward_any(key, boost::any(value));
+		forward_any(key, any_noncopyable(std::move(value)));
 	}
 
 	pipeline & then(pipeline & other) {
@@ -229,7 +260,7 @@ public:
 		return other;
 	}
 
-	void output_memory(std::ostream & o) const;
+	void output_memory(std::ostream & o) const {p->output_memory(o);}
 
 	static pipeline * current() {return m_current;}
 private:

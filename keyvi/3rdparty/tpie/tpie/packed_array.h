@@ -145,8 +145,7 @@ private:
 		storage_type * elms;
 		size_t index;
 	public:
-		template <bool> friend class packed_array::iter_base;
-		template <bool> friend class packed_array::const_iter_base;
+		template <typename, int> friend class packed_array;
 		operator T() const {return static_cast<T>((elms[high(index)] >> low(index))&mask());}
 	 	iter_return_type & operator=(const T b) {
 			storage_type * p = elms+high(index);

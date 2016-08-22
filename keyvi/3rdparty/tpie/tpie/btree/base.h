@@ -71,6 +71,7 @@ struct int_opt {static const int O=i;};
 static const int f_internal = 1;
 static const int f_static = 2;
 static const int f_unordered = 4;
+static const int f_serialized = 8;
 
 } //namespace bbits
 
@@ -98,8 +99,12 @@ using btree_dynamic = bbits::int_opt<0>;
 using btree_unordered = bbits::int_opt<bbits::f_unordered>;
 using btree_ordered = bbits::int_opt<0>;
 
+using btree_serialized = bbits::int_opt<bbits::f_serialized>;
+using btree_not_serialized = bbits::int_opt<0>;
+
 namespace bbits {
 
+//O = flags, a, b = B-tree parameters, C = comparator, K = key extractor, A = augmenter
 template <int O_, int a_, int b_, typename C_, typename K_, typename A_>
 struct Opt {
 	static const int O=O_;
@@ -193,6 +198,9 @@ class internal_store;
 template <typename T, typename A, std::size_t a, std::size_t b>
 class external_store;
 
+template <typename T, typename A, std::size_t a, std::size_t b>
+class serialized_store;
+
 struct enab {};
 
 template <typename X, bool b>
@@ -210,7 +218,9 @@ public:
 	static const bool is_internal = O::O & bbits::f_internal;
 	static const bool is_static = O::O & bbits::f_static;
 	static const bool is_ordered = ! (O::O & bbits::f_unordered);
-
+	static const bool is_serialized = O::O & bbits::f_serialized;
+	static_assert(!is_serialized || is_static, "Serialized B-tree cannot be dynamic.");
+	
 	typedef typename std::conditional<
 		is_ordered,
 		typename O::K,
@@ -259,7 +269,12 @@ public:
 	typedef typename std::conditional<
 		is_internal,
 		bbits::internal_store<value_type, combined_augment, O::a, O::b>,
-		bbits::external_store<value_type, combined_augment, O::a, O::b> >::type store_type;
+		typename std::conditional<
+			is_serialized,
+			bbits::serialized_store<value_type, combined_augment, O::a, O::b>,
+			bbits::external_store<value_type, combined_augment, O::a, O::b>
+			>::type
+		>::type store_type;
 	
 	typedef typename store_type::internal_type internal_type;
 	typedef typename store_type::leaf_type leaf_type;

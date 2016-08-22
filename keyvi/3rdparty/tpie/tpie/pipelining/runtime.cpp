@@ -31,6 +31,10 @@ namespace pipelining {
 
 namespace bits {
 
+struct not_a_dag_exception : public exception {
+	not_a_dag_exception(const std::string &s) : exception(s) {}
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief  Directed graph with nodes of type T.
 ///
@@ -50,6 +54,10 @@ public:
 		add_node(u);
 		add_node(v);
 		m_edgeLists[u].push_back(v);
+	}
+
+	const std::set<T> & get_node_set() const {
+		return m_nodes;
 	}
 
 	const std::vector<T> & get_edge_list(const T & i) const {
@@ -104,7 +112,12 @@ private:
 		}
 
 		size_t visit(T u) {
-			if (m_finishTime.count(u)) return m_finishTime[u];
+			if (m_finishTime.count(u)) {
+				if (m_finishTime[u] == 0) {
+					throw not_a_dag_exception("Cycle detected in graph");
+				}
+				return m_finishTime[u];
+			}
 			m_finishTime[u] = 0;
 			++m_time;
 			const std::vector<T> & edgeList = get_edge_list(u);
@@ -126,46 +139,142 @@ private:
 	};
 };
 
+class resource_runtime {
+public:
+	resource_runtime(const std::vector<node *> & nodes, resource_type type)
+	: m_nodes(nodes)
+	, m_minimumUsage(0)
+	, m_maximumUsage(0)
+	, m_fraction(0.0)
+	, m_type(type)
+	{
+		const size_t N = m_nodes.size();
+		for (size_t i = 0; i < N; ++i) {
+			m_minimumUsage += minimum_usage(i);
+			m_maximumUsage += maximum_usage(i);
+			m_fraction += fraction(i);
+		}
+	}
+
+	// Node accessors
+	memory_size_type minimum_usage(size_t i) const {
+		return m_nodes[i]->get_minimum_resource_usage(m_type);
+	};
+	memory_size_type maximum_usage(size_t i) const {
+		return m_nodes[i]->get_maximum_resource_usage(m_type);
+	};
+	double fraction(size_t i) const {
+		return m_nodes[i]->get_resource_fraction(m_type);
+	};
+
+	// Node accessor aggregates
+	memory_size_type sum_minimum_usage() const {
+		return m_minimumUsage;
+	};
+	memory_size_type sum_maximum_usage() const {
+		return m_maximumUsage;
+	};
+	double sum_fraction() const {
+		return m_fraction;
+	};
+
+	// Node mutator
+	void set_usage(size_t i, memory_size_type usage) {
+		m_nodes[i]->_internal_set_available_of_resource(m_type, usage);
+	};
+
+	void assign_usage(double factor) {
+		for (size_t i = 0; i < m_nodes.size(); ++i)
+			set_usage(i, get_assigned_usage(i, factor));
+	};
+
+	// Special case of assign_usage when factor is zero.
+	void assign_minimum_resource() {
+		for (size_t i = 0; i < m_nodes.size(); ++i)
+			set_usage(i, minimum_usage(i));
+	};
+
+	memory_size_type sum_assigned_usage(double factor) const {
+		memory_size_type total = 0;
+		for (size_t i = 0; i < m_nodes.size(); ++i)
+			total += get_assigned_usage(i, factor);
+		return total;
+	};
+
+	memory_size_type get_assigned_usage(size_t i, double factor) const {
+		return clamp(minimum_usage(i), maximum_usage(i), factor * fraction(i));
+	};
+
+	static memory_size_type clamp(memory_size_type lo, memory_size_type hi,
+								  double v) {
+		if (v < lo) return lo;
+		if (v > hi) return hi;
+		return static_cast<memory_size_type>(v);
+	};
+
+	void print_usage(double c, std::ostream & os) {
+		size_t cw = 12;
+		size_t prec_frac = 2;
+		std::string sep(2, ' ');
+
+		os	<< "\nPipelining phase " << m_type << " assigned\n"
+			<< std::setw(cw) << "Minimum"
+			<< std::setw(cw) << "Maximum"
+			<< std::setw(cw) << "Fraction"
+			<< std::setw(cw) << "Assigned"
+			<< sep << "Name\n";
+
+		for (size_t i = 0; i < m_nodes.size(); ++i) {
+			std::string frac;
+			{
+				std::stringstream ss;
+				ss << std::fixed << std::setprecision(prec_frac)
+					<< fraction(i);
+				frac = ss.str();
+			}
+
+			stream_size_type lo = minimum_usage(i);
+			stream_size_type hi = maximum_usage(i);
+			stream_size_type assigned = get_assigned_usage(i, c);
+
+			os	<< std::setw(cw) << lo;
+			if (hi == std::numeric_limits<stream_size_type>::max()) {
+				os << std::setw(cw) << "inf";
+			} else {
+				os << std::setw(cw) << hi;
+			}
+			os	<< std::setw(cw) << frac
+				<< std::setw(cw) << assigned
+				<< sep
+				<< m_nodes[i]->get_name().substr(0, 50) << '\n';
+		}
+		os << std::endl;
+	}
+
+protected:
+	const std::vector<node *> & m_nodes;
+	memory_size_type m_minimumUsage;
+	memory_size_type m_maximumUsage;
+	double m_fraction;
+	resource_type m_type;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Helper methods for file assignment.
+/// The file assignment algorithm is in runtime::get_files_factor.
+///////////////////////////////////////////////////////////////////////////////
+class file_runtime : public resource_runtime {
+public:
+	file_runtime(const std::vector<node *> & nodes) : resource_runtime(nodes, FILES) {}
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Helper methods for memory assignment.
 /// The memory assignment algorithm is in runtime::get_memory_factor.
 ///////////////////////////////////////////////////////////////////////////////
-class memory_runtime {
+class memory_runtime : public resource_runtime {
 public:
-	memory_runtime(const std::vector<node *> & nodes);
-
-	// Node accessors
-	memory_size_type minimum_memory(size_t i) const;
-	memory_size_type maximum_memory(size_t i) const;
-	double fraction(size_t i) const;
-
-	// Node accessor aggregates
-	memory_size_type sum_minimum_memory() const;
-	memory_size_type sum_maximum_memory() const;
-	double sum_fraction() const;
-
-	// Node mutator
-	void set_memory(size_t i, memory_size_type mem);
-
-	void assign_memory(double factor);
-
-	// Special case of assign_memory when factor is zero.
-	void assign_minimum_memory();
-
-	memory_size_type sum_assigned_memory(double factor) const;
-
-	memory_size_type get_assigned_memory(size_t i, double factor) const;
-
-	static memory_size_type clamp(memory_size_type lo, memory_size_type hi,
-								  double v);
-
-	void print_memory(double c, std::ostream & os);
-
-private:
-	const std::vector<node *> & m_nodes;
-	memory_size_type m_minimumMemory;
-	memory_size_type m_maximumMemory;
-	double m_fraction;
+	memory_runtime(const std::vector<node *> & nodes) : resource_runtime(nodes, MEMORY) {}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,6 +292,16 @@ public:
 	memory_size_type sum_assigned_memory(size_t phase) const; // sum the assigned memory for datastructures used in the phase using the factors given to the minimize_factor method
 	void assign_memory();
 
+	void free_datastructures(size_t phase) {
+		auto & ds = m_nodeMap.get_datastructures();
+		for (auto & p: m_datastructures) {
+			if (p.second.right_most_phase != phase) continue;
+			auto it = ds.find(p.first);
+			if (it == ds.end()) continue;
+			it->second.second.reset();
+		}
+	}
+	
 	//void print_memory(double c, std::ostream & os);
 private:
 	static memory_size_type clamp(memory_size_type lo, memory_size_type hi, double v);
@@ -209,6 +328,27 @@ private:
 	node_map & m_nodeMap;
 };
 
+std::string get_phase_name(const std::vector<node *> & phase) {
+	priority_type highest = std::numeric_limits<priority_type>::lowest();
+	size_t highest_node = 0;
+	for (size_t i = 0; i < phase.size(); ++i) {
+		if (phase[i]->get_phase_name_priority() > highest && phase[i]->get_phase_name().size()) {
+			highest_node = i;
+			highest = phase[i]->get_phase_name_priority();
+		}
+	}
+	std::string n = phase[highest_node]->get_phase_name();
+	if (!n.empty()) return n;
+	
+	highest_node = 0;
+	for (size_t i = 0; i < phase.size(); ++i) {
+		if (phase[i]->get_name_priority() > highest) {
+			highest_node = i;
+			highest = phase[i]->get_name_priority();
+		}
+	}
+	return phase[highest_node]->get_name();
+}
 
 	
 ///////////////////////////////////////////////////////////////////////////////
@@ -222,7 +362,15 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 class progress_indicators {
 public:
-	progress_indicators(): fp(nullptr) {}
+	progress_indicators(): fp(nullptr), m_nulls(false) {}
+
+	progress_indicators(const progress_indicators & o) = delete;
+	progress_indicators & operator =(const progress_indicators & o) = delete;
+	progress_indicators & operator =(const progress_indicators && o) = delete;
+	progress_indicators(progress_indicators && o): fp(o.fp), m_nulls(o.m_nulls), m_progressIndicators(std::move(o.m_progressIndicators)) {
+		o.fp = nullptr;
+		o.m_progressIndicators.clear();
+	}
 
 	~progress_indicators() {
 		if (fp) fp->done();
@@ -243,10 +391,12 @@ public:
 		m_progressIndicators.resize(N);
 		fp = nullptr;
 		if (!file|| !function) {
+			m_nulls = true;
 			for (size_t i = 0; i < N; ++i) 
 				m_progressIndicators[i] = new progress_indicator_null();
 			return;
 		}
+		m_nulls = false;
 		
 		fp = new fractional_progress(&pi);
 		std::size_t uuid = 0;
@@ -264,31 +414,10 @@ public:
 	}
 
 private:
-	std::string get_phase_name(const std::vector<node *> & phase) {
-		priority_type highest = std::numeric_limits<priority_type>::min();
-		size_t highest_node = 0;
-		for (size_t i = 0; i < phase.size(); ++i) {
-			if (phase[i]->get_phase_name_priority() > highest) {
-				highest_node = i;
-				highest = phase[i]->get_phase_name_priority();
-			}
-		}
-		std::string n = phase[highest_node]->get_phase_name();
-		if (!n.empty()) return n;
-
-		highest_node = 0;
-		for (size_t i = 0; i < phase.size(); ++i) {
-			if (phase[i]->get_name_priority() > highest) {
-				highest_node = i;
-				highest = phase[i]->get_name_priority();
-			}
-		}
-		return phase[highest_node]->get_name();
-	}
-
 	friend class phase_progress_indicator;
 
 	fractional_progress * fp;
+	bool m_nulls;
 	std::vector<progress_indicator_base *> m_progressIndicators;
 };
 
@@ -298,10 +427,24 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 class phase_progress_indicator {
 public:
+	phase_progress_indicator() : m_pi(nullptr) {}
+	phase_progress_indicator(const phase_progress_indicator &) = delete;
+	phase_progress_indicator(phase_progress_indicator && o): m_pi(o.m_pi) {o.m_pi = nullptr;}
+
+	phase_progress_indicator & operator=(const phase_progress_indicator &) = delete;
+	phase_progress_indicator & operator=(phase_progress_indicator && o) {
+		if (m_pi) m_pi->done(); 
+		m_pi = o.m_pi;
+		o.m_pi = nullptr;
+		return *this;
+	}
+
 	phase_progress_indicator(progress_indicators & pi, size_t phaseNumber,
-							 const std::vector<node *> & nodes)
+							 const std::vector<node *> & nodes, bool emptyFace)
 		: m_pi(pi.m_progressIndicators[phaseNumber])
 	{
+		if (emptyFace && !pi.m_nulls)
+			static_cast<fractional_subindicator*>(m_pi)->set_crumb("");
 		stream_size_type steps = 0;
 		for (size_t j = 0; j < nodes.size(); ++j) {
 			steps += nodes[j]->get_steps();
@@ -310,7 +453,7 @@ public:
 	}
 
 	~phase_progress_indicator() {
-		m_pi->done();
+		if (m_pi) m_pi->done();
 	}
 
 	progress_indicator_base & get() {
@@ -349,125 +492,6 @@ public:
 private:
 	std::vector<node *> m_topologicalOrder;
 };
-
-memory_runtime::memory_runtime(const std::vector<node *> & nodes)
-	: m_nodes(nodes)
-	, m_minimumMemory(0)
-	, m_maximumMemory(0)
-	, m_fraction(0.0)
-{
-	const size_t N = m_nodes.size();
-	for (size_t i = 0; i < N; ++i) {
-		m_minimumMemory += minimum_memory(i);
-		m_maximumMemory += maximum_memory(i);
-		m_fraction += fraction(i);
-	}
-}
-
-// Node accessors
-memory_size_type memory_runtime::minimum_memory(size_t i) const {
-	return m_nodes[i]->get_minimum_memory();
-}
-
-memory_size_type memory_runtime::maximum_memory(size_t i) const {
-	return m_nodes[i]->get_maximum_memory();
-}
-
-double memory_runtime::fraction(size_t i) const {
-	return m_nodes[i]->get_memory_fraction();
-}
-
-// Node accessor aggregates
-memory_size_type memory_runtime::sum_minimum_memory() const {
-	return m_minimumMemory;
-}
-
-memory_size_type memory_runtime::sum_maximum_memory() const {
-	return m_maximumMemory;
-}
-
-double memory_runtime::sum_fraction() const {
-	return m_fraction;
-}
-
-
-// Node mutator
-void memory_runtime::set_memory(size_t i, memory_size_type mem) {
-	m_nodes[i]->set_available_memory(mem);
-}
-
-void memory_runtime::assign_memory(double factor) {
-	for (size_t i = 0; i < m_nodes.size(); ++i)
-		set_memory(i, get_assigned_memory(i, factor));
-}
-
-// Special case of assign_memory when factor is zero.
-void memory_runtime::assign_minimum_memory() {
-	for (size_t i = 0; i < m_nodes.size(); ++i)
-		set_memory(i, minimum_memory(i));
-}
-
-memory_size_type memory_runtime::sum_assigned_memory(double factor) const {
-	memory_size_type memoryAssigned = 0;
-	for (size_t i = 0; i < m_nodes.size(); ++i)
-		memoryAssigned += get_assigned_memory(i, factor);
-	return memoryAssigned;
-}
-
-memory_size_type memory_runtime::get_assigned_memory(size_t i,
-													 double factor) const {
-	return clamp(minimum_memory(i), maximum_memory(i),
-				 factor * fraction(i));
-}
-
-/*static*/
-memory_size_type memory_runtime::clamp(memory_size_type lo,
-									   memory_size_type hi,
-									   double v)
-{
-	if (v < lo) return lo;
-	if (v > hi) return hi;
-	return static_cast<memory_size_type>(v);
-}
-
-void memory_runtime::print_memory(double c, std::ostream & os) {
-	size_t cw = 12;
-	size_t prec_frac = 2;
-	std::string sep(2, ' ');
-
-	os	<< "\nPipelining phase memory assigned\n"
-		<< std::setw(cw) << "Minimum"
-		<< std::setw(cw) << "Maximum"
-		<< std::setw(cw) << "Fraction"
-		<< std::setw(cw) << "Assigned"
-		<< sep << "Name\n";
-
-	for (size_t i = 0; i < m_nodes.size(); ++i) {
-		std::string frac;
-		{
-			std::stringstream ss;
-			ss << std::fixed << std::setprecision(prec_frac)
-				<< fraction(i);
-			frac = ss.str();
-		}
-
-		stream_size_type lo = minimum_memory(i);
-		stream_size_type hi = maximum_memory(i);
-		stream_size_type assigned = get_assigned_memory(i, c);
-
-		os	<< std::setw(cw) << lo;
-		if (hi == std::numeric_limits<stream_size_type>::max()) {
-			os << std::setw(cw) << "inf";
-		} else {
-			os << std::setw(cw) << hi;
-		}
-		os	<< std::setw(cw) << frac
-			<< std::setw(cw) << assigned
-			<< sep
-			<< m_nodes[i]->get_name().substr(0, 50) << '\n';
-	}
-	os << std::endl;
-}
 
 datastructure_runtime::datastructure_runtime(const std::vector<std::vector<node *> > & phases, node_map & nodeMap)
 	: m_nodeMap(nodeMap)
@@ -562,18 +586,26 @@ memory_size_type datastructure_runtime::clamp(memory_size_type lo, memory_size_t
 void datastructure_runtime::assign_memory() {
 	for(std::map<std::string, datastructure_info_t>::iterator i = m_datastructures.begin(); i != m_datastructures.end(); ++i) {
 		memory_size_type mem = clamp(i->second.min, i->second.max, i->second.factor * i->second.priority);
-		m_nodeMap.get_datastructures().insert(std::make_pair(i->first, std::make_pair(mem, boost::any())));
+		m_nodeMap.get_datastructures().insert(std::make_pair(i->first, std::make_pair(mem, any_noncopyable())));
 	}
 }
 
-runtime::runtime(node_map::ptr nodeMap)
-	: m_nodeMap(*nodeMap)
-{
-}
-
-size_t runtime::get_node_count() {
-	return m_nodeMap.size();
-}
+struct gocontext {
+	std::map<node *, size_t> phaseMap;
+	std::vector<size_t> flushPriorities;
+	graph<size_t> phaseGraph;
+	graph<size_t> orderedPhaseGraph;
+	std::vector<std::vector<node *> > phases;
+	std::unordered_set<node_map::id_t> evacuateWhenDone;
+	std::vector<graph<node *> > itemFlow;
+	std::vector<graph<node *> > actor;
+	datastructure_runtime drt;
+	progress_indicators pi;
+	size_t i;
+	memory_size_type files;
+	memory_size_type memory;
+	phase_progress_indicator phaseProgress;
+};
 
 size_t calculate_recursive_flush_priority(size_t phase, std::vector<std::pair<size_t, bool> > & mem, const std::vector<size_t> & flushPriorities, const graph<size_t> & phaseGraph) {
 	if(mem[phase].second)
@@ -603,6 +635,17 @@ public:
 private:
 	const std::vector<std::pair<size_t, bool> > & m_priorities;
 };
+
+	
+runtime::runtime(node_map::ptr nodeMap)
+	: m_nodeMap(*nodeMap)
+{
+}
+
+size_t runtime::get_node_count() {
+	return m_nodeMap.size();
+}
+
 
 void runtime::get_ordered_graph(const std::vector<size_t> & flushPriorities, const graph<size_t> & phaseGraph, graph<size_t> & orderedPhaseGraph) {
 	std::vector<std::pair<size_t, bool> > recursiveFlushPriorites;
@@ -637,11 +680,13 @@ void runtime::get_flush_priorities(const std::map<node *, size_t> & phaseMap, st
 	}
 }
 
-void runtime::go(stream_size_type items,
-				 progress_indicator_base & progress,
-				 memory_size_type memory,
-				 const char * file,
-				 const char * function) {
+void gocontextdel::operator()(void * p) {delete static_cast<gocontext*>(p);}
+	
+gocontext_ptr runtime::go_init(stream_size_type items,
+							 progress_indicator_base & progress,
+							 memory_size_type files,
+							 memory_size_type memory,
+							 const char * file, const char * function) {
 	if (get_node_count() == 0)
 		throw tpie::exception("no nodes in pipelining graph");
 
@@ -667,7 +712,7 @@ void runtime::go(stream_size_type items,
 	// Build phases vector
 
 	std::vector<std::vector<node *> > phases;
-	std::vector<bool> evacuateWhenDone;
+	std::unordered_set<node_map::id_t> evacuateWhenDone;
 	get_phases(phaseMap, orderedPhaseGraph, evacuateWhenDone, phases);
 
 	// Build item flow graph and actor graph for each phase
@@ -676,15 +721,19 @@ void runtime::go(stream_size_type items,
 	std::vector<graph<node *> > actor;
 	get_actor_graphs(phases, actor);
 
-	// Check that each phase has at least one initiator
-	ensure_initiators(phases);
-
+	// Make the nodeMap forward all the forwards calls
+	// made on pipe_bases
+	m_nodeMap.forward_pipe_base_forwards();
+	
 	// Toposort item flow graph for each phase
 	// and call node::prepare in item source to item sink order
 	prepare_all(itemFlow);
 
 	// build the datastructure runtime
 	datastructure_runtime drt(phases, m_nodeMap); 
+
+	// Gather node file requirements and assign files to each phase
+	assign_files(phases, files);
 
 	// Gather node memory requirements and assign memory to each phase
 	assign_memory(phases, memory, drt);
@@ -706,28 +755,91 @@ void runtime::go(stream_size_type items,
 	progress_indicators pi;
 	pi.init(items, progress, phases, file, function);
 
-	for (size_t i = 0; i < phases.size(); ++i) {
+	return gocontext_ptr(new gocontext{
+			std::move(phaseMap),
+				std::move(flushPriorities),
+				std::move(phaseGraph),
+				std::move(orderedPhaseGraph),
+				std::move(phases),
+				std::move(evacuateWhenDone),
+				std::move(itemFlow),
+				std::move(actor),
+				std::move(drt),
+				std::move(pi),
+				0,
+				files,
+				memory,
+				phase_progress_indicator()});
+}
+	
+
+void runtime::go_until(gocontext * gc, node * node) {
+	if (gc->i > gc->phases.size()) return;
+	
+	if (gc->i != 0) {
+		begin_end beginEnd(gc->actor[gc->i-1]);
+		beginEnd.end();
+	}
+
+	for (; gc->i < gc->phases.size(); ++gc->i) {
 		// Run each phase:
 		// Evacuate previous if necessary
-		if (i > 0 && evacuateWhenDone[i-1]) evacuate_all(phases[i-1]);
+		auto & phase = gc->phases[gc->i];
+		log_debug() << "Running pipe phase " << get_phase_name(phase) << std::endl;
+		
+		if (gc->i > 0) evacuate_all(gc->phases[gc->i-1], gc->evacuateWhenDone);
+			
 		// call propagate in item source to item sink order
-		propagate_all(itemFlow[i]);
+		propagate_all(gc->itemFlow[gc->i]);
+		// reassign files to all nodes in the phase
+		reassign_files(gc->phases, gc->i, gc->files);
 		// reassign memory to all nodes in the phase
-		reassign_memory(phases, i, memory, drt);
+		reassign_memory(gc->phases, gc->i, gc->memory, gc->drt);
+
+		bool emptyFace = true;
+		for (auto n: phase)
+			if (is_initiator(n) && !n->is_go_free())
+				emptyFace = false;
+		
 		// sum number of steps and call pi.init()
-		phase_progress_indicator phaseProgress(pi, i, phases[i]);
+		gc->phaseProgress = phase_progress_indicator(gc->pi, gc->i, phase, emptyFace);
+		
 		// set progress indicators on each node
-		set_progress_indicators(phases[i], phaseProgress.get());
+		set_progress_indicators(phase, gc->phaseProgress.get());
 		// call begin in leaf to root actor order
-		begin_end beginEnd(actor[i]);
+		begin_end beginEnd(gc->actor[gc->i]);
 		beginEnd.begin();
+		
 		// call go on initiators
-		go_initiators(phases[i]);
+		for (auto n: phase)
+			if (n == node) {
+				gc->i++;
+				return;
+			}
+		go_initiators(gc->phases[gc->i]);
+
 		// call end in root to leaf actor order
 		beginEnd.end();
+
+		gc->drt.free_datastructures(gc->i);
+
 		// call pi.done in ~phase_progress_indicator
+		gc->phaseProgress = phase_progress_indicator();
 	}
 	// call fp->done in ~progress_indicators
+	gc->i++;
+}
+		
+void runtime::go(stream_size_type items,
+				 progress_indicator_base & progress,
+				 memory_size_type filesAvailable,
+				 memory_size_type memory,
+				 const char * file,
+				 const char * function) {
+	gocontext_ptr gc = go_init(items, progress, filesAvailable, memory, file, function);
+	// Check that each phase has at least one initiator
+	ensure_initiators(gc->phases);
+	go_until(gc.get(), nullptr);
 }
 
 void runtime::get_item_sources(std::vector<node *> & itemSources) {
@@ -749,6 +861,7 @@ void runtime::get_item_sources(std::vector<node *> & itemSources) {
 			case pulls:
 			case depends:
 			case no_forward_depends:
+			case memory_share_depends:
 				possibleSources.erase(from);
 				break;
 		}
@@ -778,6 +891,7 @@ void runtime::get_item_sinks(std::vector<node *> & itemSinks) {
 			case pulls:
 			case depends:
 			case no_forward_depends:
+			case memory_share_depends:
 				possibleSinks.erase(to);
 				break;
 		}
@@ -804,7 +918,9 @@ void runtime::get_phase_map(std::map<node *, size_t> & phaseMap) {
 
 	const node_map::relmap_t & relations = m_nodeMap.get_relations();
 	for (node_map::relmapit i = relations.begin(); i != relations.end(); ++i) {
-		if (i->second.second != depends && i->second.second != no_forward_depends)
+		if (i->second.second != depends 
+			&& i->second.second != no_forward_depends
+			&& i->second.second != memory_share_depends)
 			unionFind.union_set(numbering[i->first], numbering[i->second.first]);
 	}
 
@@ -830,7 +946,9 @@ void runtime::get_phase_graph(const std::map<node *, size_t> & phaseMap,
 
 	const node_map::relmap_t & relations = m_nodeMap.get_relations();
 	for (node_map::relmapit i = relations.begin(); i != relations.end(); ++i) {
-		if (i->second.second == depends || i->second.second == no_forward_depends)
+		if (i->second.second == depends 
+			|| i->second.second == no_forward_depends
+			|| i->second.second == memory_share_depends)
 			phaseGraph.add_edge(phaseMap.find(m_nodeMap.get(i->second.first))->second,
 								phaseMap.find(m_nodeMap.get(i->first))->second);
 	}
@@ -856,11 +974,163 @@ std::vector<size_t> runtime::inverse_permutation(const std::vector<size_t> & f) 
 
 void runtime::get_phases(const std::map<node *, size_t> & phaseMap,
 						 const graph<size_t> & phaseGraph,
-						 std::vector<bool> & evacuateWhenDone,
+						 std::unordered_set<node_map::id_t> & evacuateWhenDone,
 						 std::vector<std::vector<node *> > & phases)
 {
+	/*
+	 * We have a dependency edge saying that a node in one phase shares memory with a node in another phase.
+	 * If these two phases are not executed consecutively the shared memory will have to be evacuated to disk,
+	 * since some other phase running between the two phases could need the memory.
+	 * Obviously we want to minimize the number of evacuations, but how?
+	 *
+	 * Let a normal dependency between two phase be represented by a black edge
+	 * and let a memory sharing dependency be represented by a red edge if the memory can be evacuated
+	 * and green if it cannot be evacuated.
+	 * We say that a non-black edge is satisfied if its two end points are consecutive in the topological order,
+	 * so the objective is to maximize the number of satisfied edges.
+	 * Also we must satisfy ALL green edges, if this is not possible the input is malformed,
+	 * and someone has to implement an evacuate method somewhere.
+	 *
+	 * First note that a non-black edges cannot be satisfied
+	 * if there exists an alternative path from its source to its destination (with length at least 2),
+	 * so any such red edge can be recolored to black, if there is any such green edge the input is invalid.
+	 *
+	 * Next note that for any node we can satisfy at most one outgoing edge, and at most one incoming edge.
+	 */
+
+	std::vector<std::pair<size_t, size_t>> blackEdges;
+	std::vector<std::pair<size_t, size_t>> redEdges;
+	std::unordered_map<size_t, size_t> greenEdges;
+	std::unordered_map<size_t, size_t> revGreenEdges;
+
+	const node_map::relmap_t & relations = m_nodeMap.find_authority()->get_relations();
+	for (node_map::relmapit i = relations.begin(); i != relations.end(); ++i) {
+		// from and to is swapped in the relationship so that
+		// to depends on from, meaning from should be run before to
+		node *from = m_nodeMap.get(i->second.first);
+		node *to = m_nodeMap.get(i->first);
+
+		size_t fromPhase = phaseMap.find(from)->second;
+		size_t toPhase = phaseMap.find(to)->second;
+		bits::node_relation rel = i->second.second;
+
+		if (fromPhase == toPhase) {
+			// Not an edge between two different phases
+			continue;
+		}
+
+		if (rel != memory_share_depends) {
+			// Black edge
+			log_debug() << "Black edge: " << fromPhase << " -> " << toPhase << std::endl;
+			blackEdges.push_back({fromPhase, toPhase});
+			continue;
+		}
+
+		if (from->can_evacuate()) {
+			// Red edge
+			log_debug() << "Red edge: " << fromPhase << " -> " << toPhase << std::endl;
+			redEdges.push_back({fromPhase, toPhase});
+		} else {
+			// Green edge
+			log_debug() << "Green edge: " << fromPhase << " -> " << toPhase << std::endl;
+
+			// Check if we already have a green edge from fromPhase or to toPhase
+			// If so one of edges can't be satisfied, but all green edges must be satisfied
+			if (greenEdges.find(fromPhase) != greenEdges.end() ||
+				revGreenEdges.find(toPhase) != revGreenEdges.end()) {
+				throw tpie::exception("get_phases: can't satisfy all green edges");
+			}
+			greenEdges[fromPhase] = toPhase;
+			revGreenEdges[toPhase] = fromPhase;
+		}
+	}
+
+	disjoint_sets<size_t> contractedNodes(phaseGraph.size());
+	for (size_t i : phaseGraph.get_node_set()) {
+		contractedNodes.make_set(i);
+	}
+
+	for (const auto & p : greenEdges) {
+		contractedNodes.union_set(p.first, p.second);
+	}
+
+	std::unordered_map<size_t, graph<size_t>> greenPaths;
+	for (const auto & p : greenEdges) {
+		size_t i = contractedNodes.find_set(p.first);
+		greenPaths[i].add_edge(p.first, p.second);
+	}
+
+	graph<size_t> contractedGraph;
+	for (size_t i : phaseGraph.get_node_set()) {
+		contractedGraph.add_node(contractedNodes.find_set(i));
+	}
+
+	/*
+	 * Greedily prefer red edges over black in the topological order.
+	 * First we add all black edges to the graph then all the red.
+	 * If there is both a black edge and red edge between the same contracted node,
+	 * we shall consider the edge as a red edge.
+	 * This ensure that dfs in the topological order implementation
+	 * will visit red edges later than black edges.
+	 */
+	std::set<std::pair<size_t, size_t>> redEdgesSet;
+	for (auto p : redEdges) {
+		p.first = contractedNodes.find_set(p.first);
+		p.second = contractedNodes.find_set(p.second);
+		redEdgesSet.insert(p);
+	}
+
+	for (bool addingRedEdge : {false, true}) {
+		const auto * edges = addingRedEdge? &redEdges: &blackEdges;
+		for (const auto & p : *edges) {
+			size_t i = contractedNodes.find_set(p.first);
+			size_t j = contractedNodes.find_set(p.second);
+
+			/*
+			 * If we have an edge from one contracted node to another
+			 * it must either be a green edge or an edge going
+			 * in the same direction as the green path, because the graph is a DAG.
+			 * So if we find a topological order for new the graph,
+			 * the topological order without contractions will also satisfy this edge.
+			 */
+			if (i == j) {
+				continue;
+			}
+
+			/*
+			 * If we are adding black edges, but there is also a red edge
+			 * between the same nodes, we should first add it after adding all black edges.
+			 */
+			if (!addingRedEdge && redEdgesSet.count({i, j})) {
+				continue;
+			}
+
+			if (!contractedGraph.has_edge(i, j)) {
+				contractedGraph.add_edge(i, j);
+			}
+		}
+	}
+
 	std::vector<size_t> topologicalOrder;
-	phaseGraph.rootfirst_topological_order(topologicalOrder);
+	try {
+		contractedGraph.rootfirst_topological_order(topologicalOrder);
+	} catch(not_a_dag_exception & e) {
+		throw tpie::exception("get_phases: can't satisfy all green edges");
+	}
+
+	// Expand contracted edges in topologicalOrder
+	for (const auto & p : greenPaths) {
+		size_t i = p.first;
+		const graph<size_t> & g = p.second;
+
+		std::vector<size_t> path;
+		g.topological_order(path);
+
+		auto it = std::find(topologicalOrder.begin(), topologicalOrder.end(), i);
+		*it = *path.rbegin();
+		topologicalOrder.insert(it, path.begin(), path.end() - 1);
+	}
+
 	// topologicalOrder[0] is the first phase to run,
 	// topologicalOrder[1] the next, and so on.
 
@@ -876,10 +1146,21 @@ void runtime::get_phases(const std::map<node *, size_t> & phaseMap,
 		phases[topoOrderMap[i->second]].push_back(i->first);
 	}
 
-	evacuateWhenDone.resize(phases.size(), false);
-	for (size_t i = 0; i + 1 < phases.size(); ++i) {
-		if (!phaseGraph.has_edge(topologicalOrder[i], topologicalOrder[i+1]))
-			evacuateWhenDone[i] = true;
+	std::unordered_set<node_map::id_t> previousNodes;
+	bits::node_map::ptr nodeMap = (phases.front().front())->get_node_map()->find_authority();
+	for (const auto & phase : phases) {
+		for (const auto node : phase) {
+			const auto range = nodeMap->get_relations().equal_range(node->get_id());
+			for (auto it = range.first ; it != range.second ; ++it) {
+				if (it->second.second != memory_share_depends) continue;
+				if (previousNodes.count(it->second.first) != 0) continue;
+				evacuateWhenDone.emplace(it->second.first);
+			}
+		}
+		previousNodes.clear();
+		for (const auto node : phase) {
+			previousNodes.emplace(node->get_id());
+		}
 	}
 }
 
@@ -911,7 +1192,9 @@ void runtime::get_graph(std::vector<node *> & phase, graph<node *> & result,
 		for (relmapit j = edges.first; j != edges.second; ++j) {
 			node * u = m_nodeMap.get(j->first);
 			node * v = m_nodeMap.get(j->second.first);
-			if (j->second.second == depends || j->second.second == no_forward_depends) continue;
+			if (j->second.second == depends) continue;
+			if (j->second.second == no_forward_depends) continue;
+			if (j->second.second == memory_share_depends) continue;
 			if (itemFlow && j->second.second == pulls) std::swap(u, v);
 			result.add_edge(u, v);
 		}
@@ -948,11 +1231,16 @@ void runtime::prepare_all(const std::vector<graph<node *> > & itemFlow) {
 	}
 }
 
-void runtime::evacuate_all(const std::vector<node *> & phase) {
-	for (size_t i = 0; i < phase.size(); ++i) {
-		if (phase[i]->can_evacuate()) {
-			phase[i]->evacuate();
-			tpie::log_debug() << "Evacuated node " << phase[i]->get_id() << std::endl;
+void runtime::evacuate_all(const std::vector<node *> & phase, 
+						   const std::unordered_set<node_map::id_t> & evacuateWhenDone) {
+	for (auto node : phase) {
+		if (evacuateWhenDone.count(node->get_id()) == 0)
+			continue;
+		if (node->can_evacuate()) {
+			node->evacuate();
+			tpie::log_debug() << "Evacuated node " << node->get_id() << std::endl;
+		} else {
+			tpie::log_warning() << "Need to evacuate but not possible." << node->get_id() << std::endl;
 		}
 	}
 }
@@ -985,6 +1273,89 @@ void runtime::go_initiators(const std::vector<node *> & phase) {
 }
 
 /*static*/
+void runtime::set_resource_being_assigned(const std::vector<node *> & nodes,
+										  resource_type type) {
+	for (node * n : nodes)
+		n->set_resource_being_assigned(type);
+}
+
+/*static*/
+void runtime::assign_files(const std::vector<std::vector<node *> > & phases,
+							memory_size_type files) {
+	for (size_t phase = 0; phase < phases.size(); ++phase) {
+		file_runtime frt(phases[phase]);
+
+		double c = get_files_factor(files, frt);
+#ifndef TPIE_NDEBUG
+		frt.print_usage(c, log_debug());
+#endif // TPIE_NDEBUG
+		set_resource_being_assigned(phases[phase], FILES);
+		frt.assign_usage(c);
+		set_resource_being_assigned(phases[phase], NO_RESOURCE);
+	}
+}
+
+/*static*/
+void runtime::reassign_files(const std::vector<std::vector<node *> > & phases,
+							  size_t phase,
+							  memory_size_type files) {
+	file_runtime frt(phases[phase]);
+	double c = get_files_factor(files, frt);
+#ifndef TPIE_NDEBUG
+	frt.print_usage(c, log_debug());
+#endif // TPIE_NDEBUG
+	set_resource_being_assigned(phases[phase], FILES);
+	frt.assign_usage(c);
+	set_resource_being_assigned(phases[phase], NO_RESOURCE);
+}
+
+/*static*/
+double runtime::get_files_factor(memory_size_type files, const file_runtime & frt) {
+	memory_size_type min = frt.sum_minimum_usage();
+	if (min > files) {
+		log_warning() << "Not enough files for pipelining phase ("
+					  << min << " > " << files << ")"
+					  << std::endl;
+		return 0.0;
+	}
+
+	// This case is handled specially to avoid dividing by zero later on.
+	double fraction_sum = frt.sum_fraction();
+	if (fraction_sum < 1e-9) {
+		return 0.0;
+	}
+
+	double c_lo = 0.0;
+	double c_hi = 1.0;
+	// Exponential search
+	memory_size_type oldFilesAssigned = 0;
+	while (true) {
+		double factor = files * c_hi / fraction_sum;
+		memory_size_type filesAssigned = frt.sum_assigned_usage(factor);
+		if (filesAssigned < files && filesAssigned != oldFilesAssigned)
+			c_hi *= 2;
+		else
+			break;
+		oldFilesAssigned = filesAssigned;
+	}
+
+	// Binary search
+	while (c_hi - c_lo > 1e-6) {
+		double c = c_lo + (c_hi-c_lo)/2;
+		double factor = files * c / fraction_sum;
+		memory_size_type filesAssigned = frt.sum_assigned_usage(factor);
+
+		if (filesAssigned > files) {
+			c_hi = c;
+		} else {
+			c_lo = c;
+		}
+	}
+
+	return files * c_lo / fraction_sum;
+}
+
+/*static*/
 void runtime::assign_memory(const std::vector<std::vector<node *> > & phases,
 							memory_size_type memory,
 							datastructure_runtime & drt) {
@@ -1000,9 +1371,11 @@ void runtime::assign_memory(const std::vector<std::vector<node *> > & phases,
 
 		double c = get_memory_factor(memory, phase, mrt, drt, true);
 #ifndef TPIE_NDEBUG
-		mrt.print_memory(c, log_debug());
+		mrt.print_usage(c, log_debug());
 #endif // TPIE_NDEBUG
-		mrt.assign_memory(c);
+		set_resource_being_assigned(phases[phase], MEMORY);
+		mrt.assign_usage(c);
+		set_resource_being_assigned(phases[phase], NO_RESOURCE);
 	}
 	drt.assign_memory();
 }
@@ -1015,14 +1388,16 @@ void runtime::reassign_memory(const std::vector<std::vector<node *> > & phases,
 	memory_runtime mrt(phases[phase]);
 	double c = get_memory_factor(memory, phase, mrt, drt, true);
 #ifndef TPIE_NDEBUG
-	mrt.print_memory(c, log_debug());
+	mrt.print_usage(c, log_debug());
 #endif // TPIE_NDEBUG
-	mrt.assign_memory(c);
+	set_resource_being_assigned(phases[phase], MEMORY);
+	mrt.assign_usage(c);
+	set_resource_being_assigned(phases[phase], NO_RESOURCE);
 }
 
 /*static*/
 double runtime::get_memory_factor(memory_size_type memory, memory_size_type phase, const memory_runtime & mrt, const datastructure_runtime & drt, bool datastructures_locked) {
-	memory_size_type min = mrt.sum_minimum_memory() + drt.sum_minimum_memory(phase);
+	memory_size_type min = mrt.sum_minimum_usage() + drt.sum_minimum_memory(phase);
 	if (min > memory) {
 		log_warning() << "Not enough memory for pipelining phase ("
 					  << min << " > " << memory << ")"
@@ -1042,7 +1417,7 @@ double runtime::get_memory_factor(memory_size_type memory, memory_size_type phas
 	memory_size_type oldMemoryAssigned = 0;
 	while (true) {
 		double factor = memory * c_hi / fraction_sum;
-		memory_size_type memoryAssigned = mrt.sum_assigned_memory(factor) + (datastructures_locked ? drt.sum_assigned_memory(phase) : drt.sum_assigned_memory(factor, phase));
+		memory_size_type memoryAssigned = mrt.sum_assigned_usage(factor) + (datastructures_locked ? drt.sum_assigned_memory(phase) : drt.sum_assigned_memory(factor, phase));
 		if (memoryAssigned < memory && memoryAssigned != oldMemoryAssigned)
 			c_hi *= 2;
 		else
@@ -1054,7 +1429,7 @@ double runtime::get_memory_factor(memory_size_type memory, memory_size_type phas
 	while (c_hi - c_lo > 1e-6) {
 		double c = c_lo + (c_hi-c_lo)/2;
 		double factor = memory * c / fraction_sum;
-		memory_size_type memoryAssigned = mrt.sum_assigned_memory(factor) + (datastructures_locked ? drt.sum_assigned_memory(phase) : drt.sum_assigned_memory(factor, phase));
+		memory_size_type memoryAssigned = mrt.sum_assigned_usage(factor) + (datastructures_locked ? drt.sum_assigned_memory(phase) : drt.sum_assigned_memory(factor, phase));
 
 		if (memoryAssigned > memory) {
 			c_hi = c;

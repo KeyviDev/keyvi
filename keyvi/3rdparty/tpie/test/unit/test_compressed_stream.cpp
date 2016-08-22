@@ -949,6 +949,44 @@ bool write_only_test() {
 	return success;
 }
 
+bool stack_test() {
+	constexpr uint32_t block_items = 4;
+	auto bof = tpie::file_stream<uint32_t>::calculate_block_factor(block_items);
+	tpie::file_stream<uint32_t> fs_a(bof), fs_b(bof), fs_c(bof);
+	fs_a.open(tpie::compression_none);
+	fs_b.open(tpie::compression_none);
+	fs_c.open(tpie::compression_all);
+
+	constexpr uint32_t cnt = block_items * 2; 
+
+	for (uint32_t i=0; i < cnt; ++i) {
+		fs_a.write(i);
+		fs_b.write(i);
+		fs_c.write(i);
+	}
+	
+	for (uint32_t i=cnt-1; i < cnt; --i) {
+		uint32_t val;
+		val = fs_a.read_back();
+		if (i != val) {
+			tpie::log_error() << "Bad value " << val << " instead of " << i << std::endl;
+			return false;
+		}
+		val = fs_b.read_back();
+		if (i != val) {
+			tpie::log_error() << "Bad value " << val << " instead of " << i << std::endl;
+			return false;
+		}
+		val = fs_c.read_back();
+		if (i != val) {
+			tpie::log_error() << "Bad value " << val << " instead of " << i << std::endl;
+			return false;
+		}
+	}
+		
+	return true;
+}
+
 template <tpie::compression_flags flags>
 tpie::tests & add_tests(tpie::tests & t, std::string suffix) {
 	typedef tests<flags> T;
@@ -991,5 +1029,5 @@ int main(int argc, char ** argv) {
 		.test(write_peek_test, "write_peek", "n", static_cast<size_t>(1 << 23))
 		/* .test(read_only_test, "read_only") */
 		.test(write_only_test, "write_only")
-		;
+		.test(stack_test, "lockstep_reverse");
 }

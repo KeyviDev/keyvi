@@ -53,7 +53,7 @@ public:
 	}
 };
 
-bool sort_upper_bound_test() {
+bool sort_upper_bound_test_base(memory_size_type dataUpperBound) {
 	typedef use_merge_sort Traits;
 	typedef Traits::sorter sorter;
 	typedef Traits::test_t test_t;
@@ -62,7 +62,6 @@ bool sort_upper_bound_test() {
 	memory_size_type m2 = 20  *1024*1024;
 	memory_size_type m3 = 20  *1024*1024;
 	memory_size_type dataSize = 15*1024*1024;
-	memory_size_type dataUpperBound = 80*1024*1024;
 
 	memory_size_type items = dataSize / sizeof(test_t);
 
@@ -84,6 +83,14 @@ bool sort_upper_bound_test() {
 
 	TEST_ENSURE_EQUALITY(io, get_bytes_written(), "The number of bytes written was not correct.")
 	return true;
+}
+
+bool sort_upper_bound_test() {
+	return sort_upper_bound_test_base(80*1024*1024);
+}
+
+bool sort_faulty_upper_bound_test() {
+	return sort_upper_bound_test_base(400);  // much lower than dataSize
 }
 
 bool temp_file_usage_test() {
@@ -156,6 +163,7 @@ int main(int argc, char ** argv) {
 	return
 		sort_tester<use_merge_sort>::add_all(t)
 		.test(sort_upper_bound_test, "sort_upper_bound")
+		.test(sort_faulty_upper_bound_test, "sort_faulty_upper_bound")
 		.test(temp_file_usage_test, "temp_file_usage")
 		.test(tall_tree_test, "tall_tree", "fanout", static_cast<size_t>(6), "height", static_cast<size_t>(1))
 		;

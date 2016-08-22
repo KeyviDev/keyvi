@@ -69,7 +69,7 @@ public:
 
 int main(int argc, char ** argv) {
 	tests t(argc, argv);
-	return
-		sort_tester<use_serialization_sorter>::add_all(t)
-		;
+	sort_tester<use_serialization_sorter>::add_all(t);
+	sort_tester<use_serialization_sorter>::add_file_limit_test(t, 3);
+	return t;
 }
