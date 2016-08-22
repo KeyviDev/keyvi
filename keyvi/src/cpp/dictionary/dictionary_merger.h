@@ -27,6 +27,7 @@
 #define DICTIONARY_MERGER_H_
 
 #include <queue>
+#include <memory>
 
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/automata.h"
@@ -44,25 +45,50 @@ typedef const fsa::internal::IValueStoreWriter::vs_param_t merger_param_t;
 template<class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryMerger
 final {
- private:
-  struct SegmentEntryForMerge
-  {
-    SegmentEntryForMerge(fsa::EntryIterator& e, int p): entry_iterator(e), priority(p) {}
+private:
+    class SegmentIterator {
+        using EntryIteratorPtr = std::shared_ptr<fsa::EntryIterator>;
 
-    fsa::EntryIterator entry_iterator;
-    int priority;
-    bool operator<(const SegmentEntryForMerge& rhs) const
-    {
-      // very important difference in semantics: we have to ensure that in case of equal key,
-      // the iterator with the higher priority is taken
+    public:
+        SegmentIterator(const fsa::EntryIterator& e, int p) :
+                entry_iterator_ptr_(std::make_shared<fsa::EntryIterator>(e)),
+                priority_(p)
+        {}
 
-      if (priority < rhs.priority) {
-        return entry_iterator > rhs.entry_iterator;
-       }
+        bool operator<(const SegmentIterator& rhs) const {
+            // very important difference in semantics: we have to ensure that in case of equal key,
+            // the iterator with the higher priority is taken
 
-      return rhs.entry_iterator < entry_iterator;
-    }
-  };
+            if (priority_ < rhs.priority_) {
+                return entryIterator() > rhs.entryIterator();
+            }
+
+            return rhs.entryIterator() < entryIterator();
+        }
+
+        operator bool() const {
+            return entryIterator() != endIterator();
+        }
+
+        SegmentIterator& operator++() {
+            ++(*entry_iterator_ptr_);
+            return *this;
+        }
+
+        const fsa::EntryIterator& entryIterator() const {
+            return *entry_iterator_ptr_;
+        }
+
+    private:
+        static const fsa::EntryIterator& endIterator() {
+            static fsa::EntryIterator end_it;
+            return end_it;
+        }
+
+    private:
+        EntryIteratorPtr entry_iterator_ptr_;
+        int priority_;
+    };
 
  public:
   DictionaryMerger(size_t memory_limit = 1073741824,
@@ -84,13 +110,12 @@ final {
   }
 
   void Merge(const std::string& filename){
-    std::priority_queue<SegmentEntryForMerge> pqueue;
-    fsa::EntryIterator end_it;
+    std::priority_queue<SegmentIterator> pqueue;
 
     int i = 0;
     for (auto fsa: dicts_to_merge_) {
       fsa::EntryIterator e_it(fsa);
-      pqueue.push(SegmentEntryForMerge(e_it, i++));
+      pqueue.push(SegmentIterator(e_it, i++));
     }
 
     ValueStoreT* value_store = new ValueStoreT(params_);
@@ -100,19 +125,19 @@ final {
     std::string top_key;
 
     while(!pqueue.empty()){
-      auto entry_it = pqueue.top();
+      auto segment_it = pqueue.top();
       pqueue.pop();
 
-      top_key = entry_it.entry_iterator.GetKey();
+      top_key = segment_it.entryIterator().GetKey();
 
       // check for same keys and merge only the most recent one
-      while (!pqueue.empty() and pqueue.top().entry_iterator.operator==(top_key)) {
+      while (!pqueue.empty() and pqueue.top().entryIterator().operator==(top_key)) {
 
         auto to_inc = pqueue.top();
         TRACE("removing element with prio %d (in favor of %d)", to_inc.priority, entry_it.priority);
 
         pqueue.pop();
-        if (++to_inc.entry_iterator != end_it) {
+        if (++to_inc) {
           TRACE("push iterator");
           pqueue.push(to_inc);
         }
@@ -125,15 +150,15 @@ final {
       //handle.weight = value_store_->GetWeightValue(value);
       handle.weight = 0;
 
-      handle.value_idx = value_store->GetValue(entry_it.entry_iterator.GetFsa()->GetValueStore()->GetValueStorePayload(),
-                                               entry_it.entry_iterator.GetValueId(),
+      handle.value_idx = value_store->GetValue(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
+                                               segment_it.entryIterator().GetValueId(),
                                                handle.no_minimization);
 
       TRACE("Add key: %s", top_key.c_str());
       generator.Add(std::move(top_key), handle);
 
-      if (++entry_it.entry_iterator != end_it) {
-        pqueue.push(entry_it);
+      if (++segment_it) {
+        pqueue.push(segment_it);
       }
     }
     TRACE("finished iterating, do final compile.");
