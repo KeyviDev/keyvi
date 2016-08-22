@@ -44,11 +44,11 @@
 
     def _value_iterator_wrapper(self, iterator):
         for m in iterator:
-            yield m.GetRawValueAsString()
+            yield m.GetValue()
 
     def _item_iterator_wrapper(self, iterator):
         for m in iterator:
-            yield (m.GetMatchedString(), m.GetRawValueAsString())
+            yield (m.GetMatchedString(), m.GetValue())
 
     def GetAllKeys(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()

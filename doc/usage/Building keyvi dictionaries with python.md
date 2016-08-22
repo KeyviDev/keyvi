@@ -18,10 +18,14 @@ type              | details
 ----------------- | --------------------------------------------------------------------------------------------- 
 integer           | CompletionDictionaryCompiler
 key-only          | KeyOnlyDictionaryCompiler
-string            | JsonDictionaryCompilerCompact
-json              | StringDictionaryCompilerCompact
+string            | StringDictionaryCompilerCompact
+json              | JsonDictionaryCompilerCompact
 
 For dictionaries with values, Add takes the value as second parameter:
 
     compiler.Add("foo", 42)
+    
+To ensure that you do not run out of disk space while compiling, set $TMPDIR to a disk with enough free space.
+    
+    export TMPDIR=/mnt/tmp
 
