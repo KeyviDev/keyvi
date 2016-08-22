@@ -188,6 +188,15 @@ struct Match {
     return fsa_->GetRawValueAsString(state_);
   }
 
+  std::string GetMsgPackedValueAsString() const {
+    const std::string raw_value = GetRawValueAsString();
+    if (raw_value.empty()) {
+        return raw_value;
+    }
+    const compression::decompress_func_t decompressor = compression::decompressor_by_code(raw_value);
+    return decompressor(raw_value);
+  }
+
   /**
    * being able to set the value, e.g. when keyvi is used over network boundaries
    *

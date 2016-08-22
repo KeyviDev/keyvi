@@ -150,7 +150,6 @@ PACKAGE_NAME = 'python-keyvi'
 
 install_requires = [
     'msgpack-python',
-    'python-snappy',
     ]
 
 setup(

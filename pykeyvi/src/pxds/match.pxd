@@ -18,6 +18,7 @@ cdef extern from "dictionary/match.h" namespace "keyvi::dictionary":
         PyObject* GetAttributePy(libcpp_string) nogil except + # wrap-ignore
         libcpp_string GetValueAsString() except +
         libcpp_string GetRawValueAsString() except +
+        libcpp_string GetMsgPackedValueAsString() except + # wrap-ignore
         void SetRawValue(libcpp_string) except + # wrap-ignore
         void SetAttribute(libcpp_string, libcpp_string) except + # wrap-ignore
         void SetAttribute(libcpp_string, float) except + # wrap-ignore
