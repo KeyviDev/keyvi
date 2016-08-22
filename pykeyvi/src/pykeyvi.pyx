@@ -806,11 +806,6 @@ cdef class Match:
         py_result = <libcpp_string>_r
         return py_result
     
-    def GetMsgPackedValueAsString(self):
-        cdef libcpp_string _r = self.inst.get().GetMsgPackedValueAsString()
-        py_result = <libcpp_string>_r
-        return py_result
-    
     def IsEmpty(self):
         cdef bool _r = self.inst.get().IsEmpty()
         py_result = <bool>_r
