@@ -41,7 +41,7 @@ public:
 	~external_store_base();
 
 protected:
-	blocks::block_handle m_root;	
+	blocks::block_handle m_root;
 	std::string m_path;
 	size_t m_height;
 	size_t m_size;

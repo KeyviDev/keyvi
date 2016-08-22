@@ -22,7 +22,9 @@
 
 #include <tpie/fractional_progress.h>
 #include <tpie/pipelining/tokens.h>
+#include <tpie/pipelining/node.h>
 #include <set>
+#include <unordered_set>
 
 namespace tpie {
 
@@ -32,8 +34,16 @@ namespace bits {
 
 template <typename T>
 class graph;
+class file_runtime;
 class memory_runtime;
 class datastructure_runtime;
+
+struct gocontext;
+struct gocontextdel {
+	void operator()(void *);
+};
+typedef std::unique_ptr<gocontext, gocontextdel> gocontext_ptr;
+
 	
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief  Execute the pipeline contained in a node_map.
@@ -56,6 +66,14 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	size_t get_node_count();
 
+	gocontext_ptr go_init(stream_size_type items,
+						 progress_indicator_base & progress,
+						 memory_size_type files,
+						 memory_size_type memory,
+						 const char * file, const char * function);
+	
+	void go_until(gocontext * gc, node * node=nullptr);
+
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief  Execute the pipeline.
 	///
@@ -73,6 +91,7 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	void go(stream_size_type items,
 			progress_indicator_base & progress,
+			memory_size_type files,
 			memory_size_type memory,
 			const char * file, const char * function);
 
@@ -123,12 +142,12 @@ public:
 	/// \brief  Compute topological phase order.
 	///
 	/// The vector phases[i] will contain the nodes in the ith phase to run.
-	/// If no node in phases[i] has a dependency to a node in phases[i-1],
-	/// evacuateWhenDone[i] is set to true.
+	/// For each node in phase[i], if the node has a memory share dependency to
+	/// any node not in phases[i-1], the node is contained in evacuateWhenDone.
 	///////////////////////////////////////////////////////////////////////////
 	void get_phases(const std::map<node *, size_t> & phaseMap,
 					const graph<size_t> & phaseGraph,
-					std::vector<bool> & evacuateWhenDone,
+					std::unordered_set<node_map::id_t> & evacuateWhenDone,
 					std::vector<std::vector<node *> > & phases);
 
 	///////////////////////////////////////////////////////////////////////////
@@ -175,9 +194,11 @@ public:
 	void prepare_all(const std::vector<graph<node *> > & itemFlow);
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief  Call evacuate on all nodes for which can_evacuate() is true.
+	/// \brief  Call evacuate on all nodes in evacuateWhenDone for which
+	/// can_evacuate() is true.
 	///////////////////////////////////////////////////////////////////////////
-	void evacuate_all(const std::vector<node *> & phase);
+	void evacuate_all(const std::vector<node *> & phase,
+					  const std::unordered_set<node_map::id_t> & evacuateWhenDone);
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief  Call propagate on all nodes in item source to sink order.
@@ -195,6 +216,31 @@ public:
 	/// indicator.
 	///////////////////////////////////////////////////////////////////////////
 	void go_initiators(const std::vector<node *> & phase);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Internal method used by go().
+	///////////////////////////////////////////////////////////////////////////
+	static void set_resource_being_assigned(const std::vector<node *> & nodes,
+											resource_type type);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Internal method used by go().
+	///////////////////////////////////////////////////////////////////////////
+	static void assign_files(const std::vector<std::vector<node *> > & phases,
+							  memory_size_type files);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Internal method used by go().
+	///////////////////////////////////////////////////////////////////////////
+	static void reassign_files(const std::vector<std::vector<node *> > & phases,
+								memory_size_type phase,
+								memory_size_type files);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Internal method used by assign_memory().
+	///////////////////////////////////////////////////////////////////////////
+	static double get_files_factor(memory_size_type files,
+								   const file_runtime & frt);
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief  Internal method used by go().

@@ -24,13 +24,13 @@
 #include <tpie/pipelining/tokens.h>
 #include <tpie/progress_indicator_base.h>
 #include <tpie/progress_indicator_null.h>
-#include <boost/any.hpp>
 #include <tpie/pipelining/priority_type.h>
 #include <tpie/pipelining/predeclare.h>
 #include <tpie/pipelining/node_name.h>
 #include <tpie/pipelining/node_traits.h>
 #include <tpie/flags.h>
 #include <limits>
+#include <tpie/resources.h>
 
 namespace tpie {
 
@@ -49,20 +49,24 @@ public:
 
 } // namespace bits
 
-struct node_parameters {
-	node_parameters();
+struct node_resource_parameters {
+	memory_size_type minimum = 0;
+	memory_size_type maximum = std::numeric_limits<memory_size_type>::max();
+	double fraction = 0.0;
 
-	memory_size_type minimumMemory;
-	memory_size_type maximumMemory;
-	double memoryFraction;
+	memory_size_type available = 0;
+};
+
+struct node_parameters {
+	node_resource_parameters resource_parameters[resource_type::TOTAL_RESOURCE_TYPES];
 
 	std::string name;
-	priority_type namePriority;
+	priority_type namePriority = PRIORITY_NO_NAME;
 
 	std::string phaseName;
-	priority_type phaseNamePriority;
+	priority_type phaseNamePriority = PRIORITY_NO_NAME;
 
-	stream_size_type stepsTotal;
+	stream_size_type stepsTotal = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,6 +77,8 @@ struct node_parameters {
 ///////////////////////////////////////////////////////////////////////////////
 class node {
 public:
+	typedef boost::optional<any_noncopyable &> maybeany_t;
+
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief  Options for how to plot this node
 	//////////////////////////////////////////////////////////////////////////
@@ -104,11 +110,73 @@ public:
 	virtual ~node() {}
 
 	///////////////////////////////////////////////////////////////////////////
+	/// \brief Get the minimum amount of the resource declared by this node.
+	/// Defaults to zero when no minimum has been set.
+	///////////////////////////////////////////////////////////////////////////
+	inline memory_size_type get_minimum_resource_usage(resource_type type) const {
+		return m_parameters.resource_parameters[type].minimum;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Get the maximum amount of the resource declared by this node.
+	/// Defaults to maxint when no maximum has been set.
+	///////////////////////////////////////////////////////////////////////////
+	inline memory_size_type get_maximum_resource_usage(resource_type type) const {
+		return m_parameters.resource_parameters[type].maximum;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Get the priority for the specific resource of this node.
+	///////////////////////////////////////////////////////////////////////////
+	inline double get_resource_fraction(resource_type type) const {
+		return m_parameters.resource_parameters[type].fraction;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Get the amount of the specific resource assigned to this node.
+	///////////////////////////////////////////////////////////////////////////
+	inline memory_size_type get_available_of_resource(resource_type type) const {
+		return m_parameters.resource_parameters[type].available;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Called by implementers to declare minimum resource requirements.
+	///////////////////////////////////////////////////////////////////////////
+	void set_minimum_resource_usage(resource_type type, memory_size_type usage);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Called by implementers to declare maximum resource requirements.
+	///
+	/// To signal that you don't want to use this resource,
+	/// set minimum resource usage and the resource fraction to zero.
+	///////////////////////////////////////////////////////////////////////////
+	void set_maximum_resource_usage(resource_type type, memory_size_type usage);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \Brief Set the resource priority of this node. Resources are
+	/// distributed proportionally to the priorities of the nodes in the given
+	/// phase.
+	///////////////////////////////////////////////////////////////////////////
+	void set_resource_fraction(resource_type type, double f);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Called by the resource manager to notify the node's available
+	/// amount of resource has changed.
+	///////////////////////////////////////////////////////////////////////////
+	virtual void resource_available_changed(resource_type, memory_size_type) {
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Used internally to assign the available resource to the node.
+	///////////////////////////////////////////////////////////////////////////
+	void _internal_set_available_of_resource(resource_type type, memory_size_type available);
+
+	///////////////////////////////////////////////////////////////////////////
 	/// \brief Get the minimum amount of memory declared by this node.
 	/// Defaults to zero when no minimum has been set.
 	///////////////////////////////////////////////////////////////////////////
 	inline memory_size_type get_minimum_memory() const {
-		return m_parameters.minimumMemory;
+		return get_minimum_resource_usage(MEMORY);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -116,37 +184,64 @@ public:
 	/// Defaults to maxint when no maximum has been set.
 	///////////////////////////////////////////////////////////////////////////
 	inline memory_size_type get_maximum_memory() const {
-		return m_parameters.maximumMemory;
+		return get_maximum_resource_usage(MEMORY);
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Get the memory priority of this node.
+	///////////////////////////////////////////////////////////////////////////
+	inline double get_memory_fraction() const {
+		return get_resource_fraction(MEMORY);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Get the amount of memory assigned to this node.
 	///////////////////////////////////////////////////////////////////////////
 	inline memory_size_type get_available_memory() const {
-		return m_availableMemory;
+		return get_available_of_resource(MEMORY);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief Get the amount of memory assigned to this node.
+	/// \brief Called by implementers to declare minimum memory requirements.
 	///////////////////////////////////////////////////////////////////////////
-	inline memory_size_type get_used_memory() const {
-		memory_size_type ans=0;
-		for (const auto & p: m_buckets)
-			if (p) ans += p->count;
-		return ans;
+	void set_minimum_memory(memory_size_type minimumMemory) {
+		set_minimum_resource_usage(MEMORY, minimumMemory);
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Called by implementers to declare maximum memory requirements.
+	///
+	/// To signal that you don't want any memory, set minimum memory and the
+	/// memory fraction to zero.
+	///////////////////////////////////////////////////////////////////////////
+	void set_maximum_memory(memory_size_type maximumMemory) {
+		set_maximum_resource_usage(MEMORY, maximumMemory);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \Brief Set the memory priority of this node. Memory is distributed
 	/// proportionally to the priorities of the nodes in the given phase.
 	///////////////////////////////////////////////////////////////////////////
-	void set_memory_fraction(double f);
+	void set_memory_fraction(double f) {
+		set_resource_fraction(MEMORY, f);
+	}
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief Get the memory priority of this node.
+	/// \brief Called by the memory manager to set the amount of memory
+	/// assigned to this node.
 	///////////////////////////////////////////////////////////////////////////
-	inline double get_memory_fraction() const {
-		return m_parameters.memoryFraction;
+	virtual void set_available_memory(memory_size_type availableMemory) {
+		unused(availableMemory);
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Get the amount of memory currently used by this node.
+	///////////////////////////////////////////////////////////////////////////
+	inline memory_size_type get_used_memory() const {
+		memory_size_type ans=0;
+		for (const auto & p: m_buckets)
+			if (p) ans += p->count;
+		return ans;
 	}
 
 	///////////////////////////////////////////////////////////////////////////
@@ -204,6 +299,8 @@ public:
 	virtual void begin() {
 	}
 
+	virtual bool is_go_free() const {return false;}
+	
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief For initiator nodes, execute this phase by pushing all items
 	/// to be pushed. For non-initiator nodes, the default implementation
@@ -334,6 +431,20 @@ public:
 	}
 
 	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Used internally to check order of method calls.
+	///////////////////////////////////////////////////////////////////////////
+	resource_type get_resource_being_assigned() const {
+		return m_resourceBeingAssigned;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief  Used internally to check order of method calls.
+	///////////////////////////////////////////////////////////////////////////
+	void set_resource_being_assigned(resource_type type) {
+		m_resourceBeingAssigned = type;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
 	/// \brief  Get options specified for plot(), as a combination of
 	/// \c node::PLOT values.
 	///////////////////////////////////////////////////////////////////////////
@@ -383,7 +494,7 @@ protected:
 #ifdef _WIN32
 #pragma warning( pop )
 #endif // _WIN32
-
+public:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Called by implementers to declare a push destination.
 	///////////////////////////////////////////////////////////////////////////
@@ -419,24 +530,21 @@ protected:
 	void add_dependency(const node & dest);
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief Called by implementers to declare minimum memory requirements.
+	/// \brief Called by implementers to declare a node memory share
+	/// dependency, that is, a requirement that another node has end() called
+	/// before the begin() of this node, and memory shared between end() and
+	/// begin() unless evacuate() is called
 	///////////////////////////////////////////////////////////////////////////
-	void set_minimum_memory(memory_size_type minimumMemory);
+	void add_memory_share_dependency(const node_token & dest);
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief Called by implementers to declare maximum memory requirements.
-	///
-	/// To signal that you don't want any memory, set minimum memory and the
-	/// memory fraction to zero.
+	/// \brief Called by implementers to declare a node memory share
+	/// dependency, that is, a requirement that another node has end() called
+	/// before the begin() of this node, and memory shared between end() and
+	/// begin() unless evacuate() is called
 	///////////////////////////////////////////////////////////////////////////
-	void set_maximum_memory(memory_size_type maximumMemory);
+	void add_memory_share_dependency(const node & dest);
 
-	///////////////////////////////////////////////////////////////////////////
-	/// \brief Called by the memory manager to set the amount of memory
-	/// assigned to this node.
-	///////////////////////////////////////////////////////////////////////////
-	virtual void set_available_memory(memory_size_type availableMemory);
-public:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Called by implementers to forward auxiliary data to successors.
 	/// If explicitForward is false, the data will not override data forwarded
@@ -455,57 +563,60 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	template <typename T>
 	void forward(std::string key, T value, memory_size_type k = std::numeric_limits<memory_size_type>::max()) {
-		forward_any(key, boost::any(value), k);
+		forward_any(key, any_noncopyable(std::move(value)), k);
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief See \ref node::forward.
 	///////////////////////////////////////////////////////////////////////////
-	void forward_any(std::string key, boost::any value, memory_size_type k = std::numeric_limits<memory_size_type>::max());
+	void forward_any(std::string key, any_noncopyable value, memory_size_type k = std::numeric_limits<memory_size_type>::max());
 
 private:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Called by forward_any to add forwarded data.
-	//
-	/// If explicitForward is false, the data will not override data forwarded
-	/// with explicitForward == true.
 	///////////////////////////////////////////////////////////////////////////
-	void add_forwarded_data(std::string key, boost::any value, bool explicitForward);
+	void add_forwarded_data(std::string key, node_token::id_t from_node);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Called by fetch_any to get data forwarded from this node.
+	///////////////////////////////////////////////////////////////////////////
+	maybeany_t get_forwarded_data_maybe(std::string key);
 
 public:
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Find out if there is a piece of auxiliary data forwarded with a
 	/// given name.
 	///////////////////////////////////////////////////////////////////////////
-	inline bool can_fetch(std::string key) {
-		return m_values.count(key) != 0;
+	bool can_fetch(std::string key) {
+		return bool(fetch_maybe(key));
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	/// \brief Fetch piece of auxiliary data as boost::any (the internal
+	/// \brief Fetch piece of auxiliary data as any_noncopyable (the internal
+	/// representation) wrapped in a boost::optional which is unitialized
+	/// if the key is not found.
+	///////////////////////////////////////////////////////////////////////////
+	maybeany_t fetch_maybe(std::string key);
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Fetch piece of auxiliary data as any_noncopyable (the internal
 	/// representation).
 	///////////////////////////////////////////////////////////////////////////
-	boost::any fetch_any(std::string key);
+	any_noncopyable & fetch_any(std::string key);
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Fetch piece of auxiliary data, expecting a given value type.
 	///////////////////////////////////////////////////////////////////////////
 	template <typename T>
-	inline T fetch(std::string key) {
-		if (m_values.count(key) == 0) {
-			std::stringstream ss;
-			ss << "Tried to fetch nonexistent key '" << key
-			   << "' of type " << typeid(T).name()
-			   << " in " << get_name() << " of type " << typeid(*this).name();
-			throw invalid_argument_exception(ss.str());
-		}
+	inline T & fetch(std::string key) {
+		any_noncopyable &item = fetch_any(key);
 		try {
-			return boost::any_cast<T>(m_values[key].first);
-		} catch (boost::bad_any_cast m) {
+			return any_cast<T>(item);
+		} catch (bad_any_noncopyable_cast m) {
 			std::stringstream ss;
 			ss << "Trying to fetch key '" << key << "' of type "
 			   << typeid(T).name() << " but forwarded data was of type "
-			   << m_values[key].first.type().name() << ". Message was: " << m.what();
+			   << item.type().name() << ". Message was: " << m.what();
 			throw invalid_argument_exception(ss.str());
 		}
 	}
@@ -605,13 +716,13 @@ public:
 	///////////////////////////////////////////////////////////////////////////////
 	template<typename T>
 	void set_datastructure(const std::string & name, T datastructure) {
-		bits::node_map::datastructuremap_t & structures = get_node_map()->get_datastructures();
+		bits::node_map::datastructuremap_t & structures = get_node_map()->find_authority()->get_datastructures();
 		bits::node_map::datastructuremap_t::iterator i = structures.find(name);
 
 		if(i == structures.end())
 			throw tpie::exception("attempted to set non-registered datastructure");
 
-		i->second.second = datastructure;
+		i->second.second = move_if_movable<T>(datastructure);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -620,16 +731,24 @@ public:
 	/// \tparam the type of the datastructure
 	///////////////////////////////////////////////////////////////////////////////
 	template<typename T>
-	T get_datastructure(const std::string & name) {
-		bits::node_map::datastructuremap_t & structures = get_node_map()->get_datastructures();
+	T & get_datastructure(const std::string & name) {
+		bits::node_map::datastructuremap_t & structures = get_node_map()->find_authority()->get_datastructures();
 		bits::node_map::datastructuremap_t::iterator i = structures.find(name);
 
 		if(i == structures.end())
 			throw tpie::exception("attempted to get non-registered datastructure");
 
-		return boost::any_cast<T>(i->second.second);
+		return any_cast<T>(i->second.second);
 	}
 
+	void unset_datastructure(const std::string & name) {
+		bits::node_map::datastructuremap_t & structures = get_node_map()->find_authority()->get_datastructures();
+		bits::node_map::datastructuremap_t::iterator i = structures.find(name);
+
+		if(i == structures.end()) return;
+		i->second.second.reset();
+	}
+	
 private:
 	struct datastructure_info_t {
 		datastructure_info_t() : min(0), max(std::numeric_limits<memory_size_type>::max()) {}
@@ -692,17 +811,17 @@ private:
 	node_token token;
 
 	node_parameters m_parameters;
-	memory_size_type m_availableMemory;
 	std::vector<std::unique_ptr<memory_bucket> > m_buckets;
 	
-	typedef std::map<std::string, std::pair<boost::any, bool> > valuemap;
-	valuemap m_values;
+	std::map<std::string, any_noncopyable> m_forwardedFromHere;
+	std::map<std::string, node_token::id_t> m_forwardedToHere;
 
 	datastructuremap_t m_datastructures;
 	memory_size_type m_flushPriority;
 	stream_size_type m_stepsLeft;
 	progress_indicator_base * m_pi;
 	STATE m_state;
+	resource_type m_resourceBeingAssigned = NO_RESOURCE;
 	std::unique_ptr<progress_indicator_base> m_piProxy;
 	flags<PLOT> m_plotOptions;
 

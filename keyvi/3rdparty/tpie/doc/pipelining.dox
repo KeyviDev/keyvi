@@ -74,7 +74,7 @@ private:
 	dest_t dest;
 };
 
-typedef tp::pipe_middle<tp::factory_0<hello_world_type> > hello_world;
+typedef tp::pipe_middle<tp::factory<hello_world_type> > hello_world;
 \endcode
 
 A node implementation may supply the following extra information to the framework
@@ -185,7 +185,7 @@ private:
 	dest_t dest;
 };
 
-typedef tp::pipe_middle<tp::factory_0<hello_world_type> > hello_world;
+typedef tp::pipe_middle<tp::factory<hello_world_type> > hello_world;
 \endcode
 
 \section sec_pull Pull nodes
@@ -207,28 +207,23 @@ The implementation details of pull nodes are similar to regular nodes. The follo
 template <typename source_t>
 class pull_hello_world_type : public node {
 public:
-	typedef int item_type;
-
-	pull_hello_world_type(source_t source) : source(std::move(source)) {
-		add_pull_source(source);
-	}
-
-	item_type pull() {
-		int item = source.can_pull();
-		if (item % 2 == 0)
-			return item/2;
-		return (3 * item + 1);
-	}
-
-	bool can_pull() {
-		return source.can_pull();
-	}
-
+    typedef int item_type;
+    pull_hello_world_type(source_t source) : source(std::move(source)) {
+        add_pull_source(source);
+    }
+    item_type pull() {
+        int item = source.pull();
+        if (item % 2 == 0)
+            return item/2;
+        return (3 * item + 1);
+    }
+    bool can_pull() {
+        return source.can_pull();
+    }
 private:
-	source_t source;
+    source_t source;
 };
-
-typedef pullpipe_middle<factory_0<pull_hello_world_type> > pull_hello_world;
+typedef pullpipe_middle<factory<pull_hello_world_type> > pull_hello_world;
 \endcode
 
 \section sec_forming_pipelines Forming pipelines
@@ -359,8 +354,8 @@ public:
 };
 
 template <typename source_t>
-inline pipe_begin<tempfactory_1<square_t<source_t>, source_t> > square(const source_t & source) {
-	return tempfactory_1<square_t<source_t>, source_t >(source);
+inline pipe_begin<tempfactory<square_t<source_t>, source_t> > square(const source_t & source) {
+	return tempfactory<square_t<source_t>, source_t >(source);
 }
 \endcode
 \code
@@ -671,7 +666,7 @@ instantiate the node implementations.
 Usually, the built-in factories contained in \c factory_helpers.h will suffice:
 
 \code
-typedef tpie::pipelining::factory_0<hello_world_type> hello_world_factory;
+typedef tpie::pipelining::factory<hello_world_type> hello_world_factory;
 \endcode
 
 but in some cases it is helpful to implement one's own factory.
@@ -731,7 +726,7 @@ To use the above defined factories, we might write the following:
 \code
 using namespace tpie;
 using namespace tpie::pipelining;
-factory_1<input_t, file_stream<memory_size_type> &> fact0(inputstream);
+factory<input_t, file_stream<memory_size_type> &> fact0(inputstream);
 hello_world_factory fact1;
 goodbye_world_factory fact2;
 pipeline p = fact0.construct(fact1.construct(fact2.construct()));
@@ -743,14 +738,14 @@ helper classes to ease the construction of pipelines, namely the descendants of
 \c pipe_base which are called \c pipe_begin, \c pipe_middle and \c pipe_end.
 
 \code
-inline pipe_middle<factory_0<hello_world_type> >
+inline pipe_middle<factory<hello_world_type> >
 hello_world() {
-	return factory_0<hello_world_type>();
+	return factory<hello_world_type>();
 }
 
-inline pipe_end<termfactory_0<goodbye_world_type> >
+inline pipe_end<termfactory<goodbye_world_type> >
 goodbye_world() {
-	return termfactory_0<goodbye_world_type>();
+	return termfactory<goodbye_world_type>();
 }
 \endcode
 

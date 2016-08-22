@@ -53,6 +53,8 @@ add_unittest(compressed_stream
 
 	odd_block_size write_only
 	write_peek
+
+	lockstep_reverse
 )
 add_unittest(btree
 	internal_augment
@@ -95,6 +97,7 @@ add_unittest(merge_sort
 	evacuate_before_merge
 	evacuate_before_report
 	sort_upper_bound
+	sort_faulty_upper_bound
 	temp_file_usage
 	tall_tree
 	)
@@ -110,6 +113,7 @@ add_unittest(serialization_sort
 	small_final_fanout
 	evacuate_before_merge
 	evacuate_before_report
+	file_limit
 	)
 add_unittest(stats simple)
 add_unittest(stream
@@ -151,6 +155,9 @@ add_unittest(pipelining
 	merger_memory
 	bound_fetch_forward
 	fetch_forward
+	forward_multiple_pipelines
+	forward_unique_ptr
+	pipe_base_forward
 	virtual
 	virtual_cref_item_type
 	virtual_fork
@@ -165,16 +172,27 @@ add_unittest(pipelining
 	parallel_push_in_end
 	node_map
 	join
+	split
 	copy_ctor
 	datastructures
 	phase_priority_test
 	set_flush_priority_test
 	node_map
+	subpipeline
+	file_limit_sort
+	passive_virtual_management
+	join_split_dealloc
 	)
-add_unittest(pipelining_runtime evacuate get_phase_graph)
+add_unittest(pipelining_runtime evacuate get_phase_graph evacuate_phase_graph)
 add_unittest(pipelining_serialization basic reverse sort)
 add_unittest(maybe basic unique_ptr)
-add_unittest(close_file internal serialization_writer_close serialization_writer_dtor serialization_reader_dtor)
+add_unittest(close_file
+	internal
+	serialization_writer_close
+	serialization_writer_dtor
+	serialization_reader_dtor
+	file_limit_enforcement
+)
 add_unittest(node_name gcc msvc)
 add_unittest(snappy basic)
 

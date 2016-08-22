@@ -40,10 +40,16 @@ namespace tpie {
 namespace serialization_bits {
 
 struct sort_parameters {
-	/** Memory available while forming sorted runs. */
+	/** files available while forming sorted runs. */
+	memory_size_type filesPhase1;
+	/** memory available while forming sorted runs. */
 	memory_size_type memoryPhase1;
+	/** files available while merging runs. */
+	memory_size_type filesPhase2;
 	/** Memory available while merging runs. */
 	memory_size_type memoryPhase2;
+	/** files available during output phase. */
+	memory_size_type filesPhase3;
 	/** Memory available during output phase. */
 	memory_size_type memoryPhase3;
 	/** Minimum size of serialized items. */
@@ -53,8 +59,11 @@ struct sort_parameters {
 
 	void dump(std::ostream & out) const {
 		out << "Serialization merge sort parameters\n"
+			<< "Phase 1 files:               " << filesPhase1 << '\n'
 			<< "Phase 1 memory:              " << memoryPhase1 << '\n'
+			<< "Phase 2 files:               " << filesPhase2 << '\n'
 			<< "Phase 2 memory:              " << memoryPhase2 << '\n'
+			<< "Phase 3 files:               " << filesPhase3 << '\n'
 			<< "Phase 3 memory:              " << memoryPhase3 << '\n'
 			<< "Minimum item size:           " << minimumItemSize << '\n'
 			<< "Temporary directory:         " << tempDir << '\n';
@@ -513,6 +522,16 @@ private:
 	bool m_reportInternal;
 	const T * m_nextInternalItem;
 
+	static const memory_size_type defaultFiles = 253; // Default number of files available, when not using set_available_files
+	static const memory_size_type minimumFilesPhase1 = 1;
+	static const memory_size_type maximumFilesPhase1 = 1;
+	static const memory_size_type minimumFilesPhase2 = 3;
+	static const memory_size_type maximumFilesPhase2 = std::numeric_limits<memory_size_type>::max();
+	static const memory_size_type minimumFilesPhase3 = 3;
+	static const memory_size_type maximumFilesPhase3 = std::numeric_limits<memory_size_type>::max();
+
+	const int defaultMaxFiles = 253;
+
 public:
 	serialization_sorter(memory_size_type minimumItemSize = sizeof(T), pred_t pred = pred_t())
 		: m_buffer_bucket_ptr(new memory_bucket())
@@ -529,6 +548,9 @@ public:
 		, m_reportInternal(false)
 		, m_nextInternalItem(0)
 	{
+		m_params.filesPhase1 = 0;
+		m_params.filesPhase2 = 0;
+		m_params.filesPhase3 = 0;
 		m_params.memoryPhase1 = 0;
 		m_params.memoryPhase2 = 0;
 		m_params.memoryPhase3 = 0;
@@ -536,30 +558,64 @@ public:
 	}
 
 private:
-	// set_phase_?_memory helper
-	inline void maybe_calculate_parameters() {
-		if (m_state != state_initial)
-			throw tpie::exception("Bad state in maybe_calculate_parameters");
-		if (m_params.memoryPhase1 > 0 &&
-			m_params.memoryPhase2 > 0 &&
-			m_params.memoryPhase3 > 0)
-			calculate_parameters();
+	// Checks if we should still be able to change parameters
+	inline void check_not_started() {
+		if (m_state != state_initial) {
+			throw tpie::exception("Can't change parameters after sorting has started");
+		}
 	}
 
 public:
+	inline void set_phase_1_files(memory_size_type f1) {
+		m_params.filesPhase1 = f1;
+		check_not_started();
+	}
+
+	inline void set_phase_2_files(memory_size_type f2) {
+		m_params.filesPhase2 = f2;
+		check_not_started();
+	}
+
+	inline void set_phase_3_files(memory_size_type f3) {
+		m_params.filesPhase3 = f3;
+		check_not_started();
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Calculate parameters from given amount of files.
+	/// \param f Files available for phase 1, 2 and 3
+	///////////////////////////////////////////////////////////////////////////
+	inline void set_available_files(memory_size_type f) {
+		m_params.filesPhase1 = m_params.filesPhase2 = m_params.filesPhase3 = f;
+		check_not_started();
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	/// \brief Calculate parameters from given amount of files.
+	/// \param f1 Files available for phase 1
+	/// \param f2 Files available for phase 2
+	/// \param f3 Files available for phase 3
+	///////////////////////////////////////////////////////////////////////////
+	inline void set_available_files(memory_size_type f1, memory_size_type f2, memory_size_type f3) {
+		m_params.filesPhase1 = f1;
+		m_params.filesPhase2 = f2;
+		m_params.filesPhase3 = f3;
+		check_not_started();
+	}
+
 	void set_phase_1_memory(memory_size_type m1) {
 		m_params.memoryPhase1 = m1;
-		maybe_calculate_parameters();
+		check_not_started();
 	}
 
 	void set_phase_2_memory(memory_size_type m2) {
 		m_params.memoryPhase2 = m2;
-		maybe_calculate_parameters();
+		check_not_started();
 	}
 
 	void set_phase_3_memory(memory_size_type m3) {
 		m_params.memoryPhase3 = m3;
-		maybe_calculate_parameters();
+		check_not_started();
 	}
 
 	void set_available_memory(memory_size_type m) {
@@ -610,9 +666,27 @@ public:
 		m_owning_node = n;
 	}
 private:
+	static memory_size_type clamp(memory_size_type lo, memory_size_type val, memory_size_type hi) {
+		return std::max(lo, std::min(val, hi));
+	}
+
 	void calculate_parameters() {
 		if (m_state != state_initial)
 			throw tpie::exception("Bad state in calculate_parameters");
+
+		if(!m_params.filesPhase1)
+			m_params.filesPhase1 = clamp(minimumFilesPhase1, defaultFiles, maximumFilesPhase1);
+		if(!m_params.filesPhase2)
+			m_params.filesPhase2 = clamp(minimumFilesPhase2, defaultFiles, maximumFilesPhase2);
+		if(!m_params.filesPhase3)
+			m_params.filesPhase3 = clamp(minimumFilesPhase3, defaultFiles, maximumFilesPhase3);
+
+		if(m_params.filesPhase1 < minimumFilesPhase1)
+			throw tpie::exception("file limit for phase 1 too small (" + std::to_string(m_params.filesPhase1) + " < " + std::to_string(minimumFilesPhase1) + ")");
+		if(m_params.filesPhase2 < minimumFilesPhase2)
+			throw tpie::exception("file limit for phase 2 too small (" + std::to_string(m_params.filesPhase2) + " < " + std::to_string(minimumFilesPhase2) + ")");
+		if(m_params.filesPhase3 < minimumFilesPhase3)
+			throw tpie::exception("file limit for phase 3 too small (" + std::to_string(m_params.filesPhase3) + " < " + std::to_string(minimumFilesPhase3) + ")");
 
 		memory_size_type memAvail1 = m_params.memoryPhase1;
 		if (memAvail1 <= serialization_writer::memory_usage()) {
@@ -657,7 +731,7 @@ private:
 		memory_size_type perFanout = m_params.minimumItemSize + serialization_reader::memory_usage();
 
 		// Floored division to compute the largest possible fanout.
-		memory_size_type fanout = fanoutMemory / perFanout;
+		memory_size_type fanout = std::min(fanoutMemory / perFanout, m_params.filesPhase2 - 1);
 		if (fanout < 2) {
 			log_error() << "Not enough memory for merging, even when minimum item size is assumed. "
 				<< "mem avail = " << memForMerge
@@ -680,7 +754,7 @@ private:
 public:
 	void begin() {
 		if (!m_parametersSet)
-			throw tpie::exception("Parameters not set in serialization_sorter");
+			calculate_parameters();
 		if (m_state != state_initial)
 			throw tpie::exception("Bad state in begin");
 		m_state = state_1;
@@ -784,6 +858,24 @@ public:
 		return 0;
 	}
 
+
+	bool is_merge_runs_free() {
+		if (m_state != state_2)
+			throw tpie::exception("Bad state in end");
+		if (m_reportInternal) return true;
+
+		memory_size_type largestItem = m_sorter.get_largest_item_size();
+		memory_size_type fanoutMemory = m_params.memoryPhase2 - serialization_writer::memory_usage();
+		memory_size_type perFanout = largestItem + serialization_reader::memory_usage();
+		memory_size_type fanout = std::min(m_params.filesPhase2 - 1, fanoutMemory / perFanout);
+		
+		memory_size_type finalFanoutMemory = m_params.memoryPhase3;
+		memory_size_type finalFanout = std::min(
+				{m_params.filesPhase3 - 1, fanout, finalFanoutMemory / perFanout});
+
+		return m_files.next_level_runs() <= finalFanout;
+	}
+	
 	void merge_runs() {
 		if (m_state != state_2)
 			throw tpie::exception("Bad state in end");
@@ -808,7 +900,7 @@ public:
 		// Only change the item size to largestItem rather than minimumItemSize.
 		memory_size_type fanoutMemory = m_params.memoryPhase2 - serialization_writer::memory_usage();
 		memory_size_type perFanout = largestItem + serialization_reader::memory_usage();
-		memory_size_type fanout = fanoutMemory / perFanout;
+		memory_size_type fanout = std::min(fanoutMemory / perFanout, m_params.filesPhase2 - 1);
 
 		if (fanout < 2) {
 			log_error() << "Not enough memory for merging. "
@@ -820,9 +912,8 @@ public:
 		}
 
 		memory_size_type finalFanoutMemory = m_params.memoryPhase3;
-		memory_size_type finalFanout =
-			std::min(fanout,
-					 finalFanoutMemory / perFanout);
+		memory_size_type finalFanout = std::min(
+				{m_params.filesPhase3 - 1, fanout, finalFanoutMemory / perFanout});
 
 		if (finalFanout < 2) {
 			log_error() << "Not enough memory for merging (final fanout < 2). "

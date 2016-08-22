@@ -21,6 +21,8 @@
 #define __TPIE_PIPELINING_PIPE_CONTAINER_H__
 
 #include <type_traits>
+#include <memory>
+#include <typeinfo>
 
 namespace tpie {
 namespace pipelining {
@@ -138,6 +140,92 @@ F container_construct_copy(container<T1...> & cont, T2 && ... a) {
 	return bits::dispatch_gen<sizeof...(T1)>::type::template run_copy<F>(cont, std::move(a)...);
 }
 
+namespace bits {
+
+class any_noncopyable_cont_base {
+public:
+	virtual ~any_noncopyable_cont_base() {};
+	virtual const std::type_info & type() const {
+		return typeid(void);
+	}
+};
+
+template <typename T>
+class any_noncopyable_cont: public any_noncopyable_cont_base {
+public:
+	any_noncopyable_cont(T value): value(move_if_movable<T>(value)) {}
+	T value;
+	const std::type_info & type() const override {
+		return typeid(value);
+	}
+};
+
+} //namespace bits
+
+class bad_any_noncopyable_cast: public std::bad_cast {
+public:
+	const char * what() const noexcept override {return "bad any_noncopyable cast";}
+};
+    
+class any_noncopyable {
+public:
+	template <typename T>
+	explicit any_noncopyable(T t) {
+		cont = std::unique_ptr<bits::any_noncopyable_cont_base>(
+			new bits::any_noncopyable_cont<T>(move_if_movable<T>(t)));
+	}
+	
+	any_noncopyable() = default;
+	any_noncopyable(const any_noncopyable &) = delete;
+	any_noncopyable(any_noncopyable &&) = default;
+	any_noncopyable & operator=(const any_noncopyable & o) = delete;
+	any_noncopyable & operator=(any_noncopyable && o) = default;
+	
+	template <typename T>
+	any_noncopyable & operator=(T t) {
+		cont = std::unique_ptr<bits::any_noncopyable_cont_base>(
+			new bits::any_noncopyable_cont<T>(move_if_movable<T>(t)));
+		return *this;
+	}
+	
+	explicit operator bool() {return (bool)cont;}
+	
+	void reset() {cont.reset();}
+	
+	template <typename T>
+	friend const T & any_cast(const any_noncopyable & a);
+	
+	template <typename T>
+	friend T & any_cast(any_noncopyable & a);
+	
+	friend void swap(any_noncopyable & l, any_noncopyable & r);
+
+	const std::type_info & type() const {
+		if (!cont) return typeid(void);
+		auto val = cont.get();
+		return val->type();
+	}
+private:
+	std::unique_ptr<bits::any_noncopyable_cont_base> cont;
+};
+
+template <typename T>
+const T & any_cast(const any_noncopyable & a) {
+	if (!a.cont) throw bad_any_noncopyable_cast();
+	auto val = a.cont.get();
+	if (typeid(*val) != typeid(bits::any_noncopyable_cont<T>)) throw bad_any_noncopyable_cast();
+	return static_cast<const bits::any_noncopyable_cont<T>*>(val)->value;
+}
+
+template <typename T>
+T & any_cast(any_noncopyable & a) {
+	if (!a.cont) throw bad_any_noncopyable_cast();
+	auto val = a.cont.get();
+	if (typeid(*val) != typeid(bits::any_noncopyable_cont<T>)) throw bad_any_noncopyable_cast();
+	return static_cast<bits::any_noncopyable_cont<T>*>(val)->value;
+}
+
+inline void swap(any_noncopyable & l, any_noncopyable & r) {std::swap(l.cont, r.cont);}
 
 } //namespace pipelining
 } //namespace tpie

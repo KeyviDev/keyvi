@@ -44,6 +44,8 @@ public:
 	virtual void pop_breadcrumb();
 	virtual void init(stream_size_type range);
 	virtual void done();
+
+	void set_crumb(const std::string & c) {m_crumb = c;}
 	
 	void setup(progress_indicator_base * parent,
 			   stream_size_type outerRange,

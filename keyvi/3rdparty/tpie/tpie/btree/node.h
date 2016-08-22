@@ -149,7 +149,7 @@ public:
 	 *
 	 * Requires is_leaf()
 	 */
-	value_type value(size_t i) const {
+	const value_type & value(size_t i) const {
 		tp_assert(m_is_leaf, "Not leaf");
 		return m_state->store().get(m_leaf, i);
 	}

@@ -56,8 +56,11 @@ enum subsystem {
 	HASH=128,
 	/** \brief Generate temporary files */
 	TEMPFILE=256,
+	/** \brief Needed for working with files and implicitly by all
+	 * TPIE algorithm and data structure implementations. */
+	FILE_MANAGER=512,
 	/** \brief Alias for all default subsystems. */
-    ALL=MEMORY_MANAGER | DEFAULT_LOGGING | PROGRESS | PRIMEDB | JOB_MANAGER | STREAMS | HASH | TEMPFILE
+    ALL=MEMORY_MANAGER | DEFAULT_LOGGING | PROGRESS | PRIMEDB | JOB_MANAGER | STREAMS | HASH | TEMPFILE | FILE_MANAGER
 };
 
 TPIE_DECLARE_OPERATORS_FOR_FLAGS(subsystem)
@@ -88,7 +91,7 @@ memory_size_type get_block_size();
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Set the TPIE block size.
 ///
-/// It is not safe to change the block size once TPIE has been initialized.
+/// It is not safe to change the block size when any streams are open.
 ///////////////////////////////////////////////////////////////////////////////
 void set_block_size(memory_size_type block_size);
 

@@ -26,10 +26,16 @@
 namespace tpie {
 
 struct sort_parameters {
-	/** Memory available while forming sorted runs. */
+	/** files available while forming sorted runs. */
+	memory_size_type filesPhase1;
+	/** memory available while forming sorted runs. */
 	memory_size_type memoryPhase1;
+	/** files available while merging runs. */
+	memory_size_type filesPhase2;
 	/** Memory available while merging runs. */
 	memory_size_type memoryPhase2;
+	/** files available during output phase. */
+	memory_size_type filesPhase3;
 	/** Memory available during output phase. */
 	memory_size_type memoryPhase3;
 	/** Run length, subject to memory restrictions during phase 2.
@@ -41,17 +47,20 @@ struct sort_parameters {
 	/** Maximum item count for internal reporting, subject to memory
 	 * restrictions in all phases. Less or equal to runLength. */
 	memory_size_type internalReportThreshold;
-	/** Fanout of merge tree during phase 3. */
+	/** Fanout of merge tree during phase 2. */
 	memory_size_type fanout;
-	/** Fanout of merge tree during phase 4. Less or equal to fanout. */
+	/** Fanout of merge tree during phase 3. Less or equal to fanout. */
 	memory_size_type finalFanout;
 
 	void dump(std::ostream & out) const {
 		out << "Merge sort parameters\n"
+			<< "Phase 1 files:               " << filesPhase1 << '\n'
 			<< "Phase 1 memory:              " << memoryPhase1 << '\n'
 			<< "Run length:                  " << runLength << '\n'
+			<< "Phase 2 files:               " << filesPhase2 << '\n'
 			<< "Phase 2 memory:              " << memoryPhase2 << '\n'
 			<< "Fanout:                      " << fanout << '\n'
+			<< "Phase 3 files:               " << filesPhase3 << '\n'
 			<< "Phase 3 memory:              " << memoryPhase3 << '\n'
 			<< "Final merge level fanout:    " << finalFanout << '\n'
 			<< "Internal report threshold:   " << internalReportThreshold << '\n';

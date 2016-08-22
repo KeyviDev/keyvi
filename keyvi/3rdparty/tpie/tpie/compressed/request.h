@@ -51,10 +51,10 @@ namespace tpie {
 class compressor_response {
 public:
 	compressor_response()
-		: m_blockNumber(std::numeric_limits<stream_size_type>::max())
+		: m_done(false)
+		, m_blockNumber(std::numeric_limits<stream_size_type>::max())
 		, m_readOffset(0)
 		, m_blockSize(0)
-		, m_done(false)
 		, m_endOfStream(false)
 		, m_nextReadOffset(0)
 		, m_nextBlockSize(0)
@@ -131,7 +131,12 @@ public:
 		return m_readOffset;
 	}
 
-	// read, stream
+	// any, thread
+	void set_done() {
+		m_done = true;
+	}
+
+	// any, stream
 	bool done() {
 		return m_done;
 	}
@@ -151,13 +156,15 @@ public:
 private:
 	std::condition_variable m_changed;
 
+	// Information about either read or write
+	bool m_done;
+
 	// Information about the write
 	stream_size_type m_blockNumber;
 	stream_size_type m_readOffset;
 	memory_size_type m_blockSize;
 
 	// Information about the read
-	bool m_done;
 	bool m_endOfStream;
 	stream_size_type m_nextReadOffset;
 	memory_size_type m_nextBlockSize;
@@ -292,11 +299,13 @@ public:
 
 	// must have lock!
 	void update_recorded_size() {
+		m_response->set_done();
 		if (m_tempFile != NULL) m_tempFile->update_recorded_size(m_fileAccessor->file_size());
 	}
 
 	// must have lock!
 	void update_recorded_size(stream_size_type fileSize) {
+		m_response->set_done();
 		if (m_tempFile != NULL) m_tempFile->update_recorded_size(fileSize);
 	}
 

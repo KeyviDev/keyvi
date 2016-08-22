@@ -477,6 +477,11 @@ bool external_bound_test() {
 	return bound_test(TA<btree_external>(), tmp.path());
 }
 
+bool serialized_build_test() {
+    temp_file tmp;
+    return build_test(TA<btree_external, btree_serialized, btree_static>(), tmp.path());
+}
+
 int main(int argc, char **argv) {
 	return tpie::tests(argc, argv)
 		.test(internal_basic_test, "internal_basic")
@@ -492,7 +497,8 @@ int main(int argc, char **argv) {
 		.test(external_key_and_comparator_test, "external_key_and_compare")
 		.test(external_augment_test, "external_augment")
         .test(external_build_test, "external_build")
-		.test(external_bound_test, "external_bound");
+		.test(external_bound_test, "external_bound")
+		.test(serialized_build_test, "serialized_build");
 }
 
 

@@ -70,14 +70,20 @@ public:
 	}
 
 	void add_calc_dependency(node_token tkn) {
-		add_dependency(tkn);
+		add_memory_share_dependency(tkn);
 	}
 		
 protected:
-	virtual void set_available_memory(memory_size_type availableMemory) override {
-		node::set_available_memory(availableMemory);
-		if (!m_propagate_called)
-			m_sorter->set_phase_3_memory(availableMemory);
+	virtual void resource_available_changed(resource_type type, memory_size_type available) override {
+		// TODO: Handle changing parameters of sorter after data structures has been frozen, i.e. after propagate
+		if (m_propagate_called)
+			return;
+
+		if (type == MEMORY)
+			m_sorter->set_phase_3_memory(available);
+		else if (type == FILES) {
+			m_sorter->set_phase_3_files(available);
+		}
 	}
 
 	sort_output_base(sorterptr sorter)
@@ -109,6 +115,8 @@ public:
 	sort_pull_output_t(sorterptr sorter)
 		: sort_output_base<T, pred_t, store_t>(sorter)
 	{
+		this->set_minimum_resource_usage(FILES, sorter_t::minimumFilesPhase3);
+		this->set_resource_fraction(FILES, 1.0);
 		this->set_minimum_memory(sorter_t::minimum_memory_phase_3());
 		this->set_maximum_memory(sorter_t::maximum_memory_phase_3());
 		this->set_name("Write sorted output", PRIORITY_INSIGNIFICANT);
@@ -168,6 +176,8 @@ public:
 		, dest(std::move(dest))
 	{
 		this->add_push_destination(dest);
+		this->set_minimum_resource_usage(FILES, sorter_t::minimumFilesPhase3);
+		this->set_resource_fraction(FILES, 1.0);
 		this->set_minimum_memory(sorter_t::minimum_memory_phase_3());
 		this->set_maximum_memory(sorter_t::maximum_memory_phase_3());
 		this->set_name("Write sorted output", PRIORITY_INSIGNIFICANT);
@@ -231,6 +241,8 @@ public:
 	}
 
 	void init() {
+		set_minimum_resource_usage(FILES, sorter_t::minimumFilesPhase2);
+		set_resource_fraction(FILES, 1.0);
 		set_minimum_memory(sorter_t::minimum_memory_phase_2());
 		set_name("Perform merge heap", PRIORITY_SIGNIFICANT);
 		set_memory_fraction(1.0);
@@ -252,6 +264,8 @@ public:
 		m_sorter.reset();
 	}
 
+	virtual bool is_go_free() const override {return m_sorter->is_calc_free();}
+	
 	virtual void go() override {
 		progress_indicator_base * pi = proxy_progress_indicator();
 		m_sorter->calc(*pi);
@@ -271,14 +285,20 @@ public:
 	}
 
 	void set_input_node(node & input) {
-		add_dependency(input);
+		add_memory_share_dependency(input);
 	}
 
 protected:
-	virtual void set_available_memory(memory_size_type availableMemory) override {
-		node::set_available_memory(availableMemory);
-		if (!m_propagate_called)
-			m_sorter->set_phase_2_memory(availableMemory);
+	virtual void resource_available_changed(resource_type type, memory_size_type available) override {
+		// TODO: Handle changing parameters of sorter after data structures has been frozen, i.e. after propagate
+		if (m_propagate_called)
+			return;
+
+		if (type == MEMORY)
+			m_sorter->set_phase_2_memory(available);
+		else if (type == FILES) {
+			m_sorter->set_phase_2_files(available);
+		}
 	}
 
 private:
@@ -310,8 +330,10 @@ public:
 		, dest(std::move(dest))
 	{
 		this->dest.set_input_node(*this);
-		set_minimum_memory(sorter_t::minimum_memory_phase_1());
 		set_name("Form input runs", PRIORITY_SIGNIFICANT);
+		set_minimum_resource_usage(FILES, sorter_t::minimumFilesPhase1);
+		set_resource_fraction(FILES, 0.0);
+		set_minimum_memory(m_sorter->minimum_memory_phase_1());
 		set_memory_fraction(1.0);
 		set_plot_options(PLOT_BUFFERED | PLOT_SIMPLIFIED_HIDE);
 	}
@@ -319,7 +341,6 @@ public:
 	virtual void propagate() override {
 		if (this->can_fetch("items"))
 			m_sorter->set_items(this->fetch<stream_size_type>("items"));
-		m_sorter->begin();
 		m_propagate_called = true;
 	}
 
@@ -332,6 +353,7 @@ public:
 	}
 
 	void begin() override {
+		m_sorter->begin();
 		m_sorter->set_owner(this);
 	}
 
@@ -353,10 +375,16 @@ public:
 	}
 
 protected:
-	virtual void set_available_memory(memory_size_type availableMemory) override {
-		node::set_available_memory(availableMemory);
-		if (!m_propagate_called)
-			m_sorter->set_phase_1_memory(availableMemory);
+	virtual void resource_available_changed(resource_type type, memory_size_type available) override {
+		// TODO: Handle changing parameters of sorter after data structures has been frozen, i.e. after propagate
+		if (m_propagate_called)
+			return;
+
+		if (type == MEMORY)
+			m_sorter->set_phase_1_memory(available);
+		else if (type == FILES) {
+			m_sorter->set_phase_1_files(available);
+		}
 	}
 private:
 	sorterptr m_sorter;
@@ -381,7 +409,7 @@ public:
 	};
 	
 	template <typename dest_t>
-	typename constructed<dest_t>::type construct(dest_t dest) const {
+	typename constructed<dest_t>::type construct(dest_t dest) {
 		typedef typename push_type<dest_t>::type item_type;
 		typedef typename store_t::template element_type<item_type>::type element_type;
 		typedef typename constructed<dest_t>::pred_type pred_type;
@@ -563,7 +591,6 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Pipelined sorter with push input and pull output.
 /// Get the input pipe with \c input() and the output pullpipe with \c output().
-/// input() must not be called after output().
 /// \tparam T The type of item to sort
 /// \tparam pred_t The predicate (e.g. std::less<T>) indicating the predicate
 /// on which to order an item before another.
@@ -598,20 +625,20 @@ public:
 	/// \brief Get the input push node.
 	///////////////////////////////////////////////////////////////////////////
 	input_pipe_t input() {
-		tp_assert(m_sorterInput, "Output called more then once");
+		tp_assert(m_sorterInput, "input() called more than once");
 		auto ret = bits::passive_sorter_factory_input<item_type, pred_t, store_t>(
 			std::move(m_sorterInput), m_calc_token);
-		return std::move(ret);
+		return {std::move(ret)};
 	}
 
 	///////////////////////////////////////////////////////////////////////////
 	/// \brief Get the output pull node.
 	///////////////////////////////////////////////////////////////////////////
 	output_pipe_t output() {
-		tp_assert(m_sorterOutput, "Output called more then once");
+		tp_assert(m_sorterOutput, "output() called more than once");
 		auto ret =  bits::passive_sorter_factory_output<item_type, pred_t, store_t>(
 			std::move(m_sorterOutput), m_calc_token);
-		return std::move(ret);
+		return {std::move(ret)};
 	}
 	
 private:

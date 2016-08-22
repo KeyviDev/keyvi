@@ -19,7 +19,6 @@
 #include "common.h"
 #include <tpie/array.h>
 #include <tpie/file_accessor/file_accessor.h>
-#include <tpie/file_count.h>
 #include <tpie/file_stream.h>
 #include <tpie/tempname.h>
 
@@ -27,7 +26,7 @@ using namespace tpie;
 
 bool file_count_test() {
 	temp_file tmp;
-	memory_size_type avail = available_files();
+	memory_size_type avail = get_file_manager().available();
 	memory_size_type itemSize;
 	memory_size_type blockSize;
 	memory_size_type userDataSize = 0;

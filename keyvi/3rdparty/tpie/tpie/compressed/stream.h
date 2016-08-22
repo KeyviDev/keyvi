@@ -69,7 +69,7 @@ struct open {
 	friend inline open::type operator^(open::type a, open::type b)
 	{ return (open::type) ((int) a ^ (int) b); }
 	friend inline open::type operator~(open::type a)
-	{ return (open::type) (int) ~a; }
+	{ return (open::type) ~(int) a; }
 
 	static type translate(access_type accessType, cache_hint cacheHint, compression_flags compressionFlags) {
 		return (type) ((
@@ -418,6 +418,13 @@ protected:
 	/** Response from compressor thread; protected by compressor thread mutex. */
 	compressor_response m_response;
 
+	/** When use_compression() is true:
+	 * Indicates whether m_response is the response to a write request.
+	 * Used for knowing where to read next in read/read_back.
+	 * */
+	bool m_updateReadOffsetFromWrite = false;
+	stream_size_type m_lastWriteBlockNumber;
+
 	seek_state::type m_seekState;
 
 	/** Position relating to the currently loaded buffer.
@@ -528,7 +535,7 @@ public:
 			close();
 		} catch (std::exception & e) {
 			log_error() << "Someone threw an error in file_stream::~file_stream: " << e.what() << std::endl;
-			throw;
+			abort();
 		}
 	}
 
@@ -617,6 +624,7 @@ public:
 	void seek(stream_offset_type offset, offset_type whence=beginning) {
 		tp_assert(is_open(), "seek: !is_open");
 		uncache_read_writes();
+		m_updateReadOffsetFromWrite = false;
 		if (!use_compression()) {
 			// Handle uncompressed case by delegating to set_position.
 			switch (whence) {
@@ -721,6 +729,7 @@ private:
 		// No need to flush block
 		m_buffer.reset();
 		m_response.clear_block_info();
+		m_updateReadOffsetFromWrite = false;
 		compressor_thread_lock l(compressor());
 		finish_requests(l);
 		get_buffer(l, 0);
@@ -794,6 +803,7 @@ private:
 			m_currentFileSize = std::numeric_limits<stream_size_type>::max();
 			compressor_thread_lock l(compressor());
 			m_response.clear_block_info();
+			m_updateReadOffsetFromWrite = false;
 		}
 		m_size = offset;
 		if (offset < m_offset) {
@@ -872,6 +882,8 @@ public:
 	/// \c get_position.
 	///////////////////////////////////////////////////////////////////////////
 	void set_position(const stream_position & pos) {
+		m_updateReadOffsetFromWrite = false;
+
 		// If the code is correct, short circuiting is not necessary;
 		// if the code is not correct, short circuiting might mask faults.
 		/*
@@ -1042,6 +1054,7 @@ public:
 			if (m_nextItem == m_bufferEnd) {
 				compressor_thread_lock lock(compressor());
 				if (m_bufferDirty) {
+					m_updateReadOffsetFromWrite = true;
 					flush_block(lock);
 				}
 				if (offset() == size()) {
@@ -1064,8 +1077,10 @@ public:
 
 		if (m_nextItem == m_bufferEnd) {
 			compressor_thread_lock l(compressor());
-			if (m_bufferDirty)
+			if (m_bufferDirty) {
+				m_updateReadOffsetFromWrite = true;
 				flush_block(l);
+			}
 			get_buffer(l, m_streamBlocks);
 			m_nextItem = m_bufferBegin;
 		}
@@ -1104,6 +1119,8 @@ private:
 		uncache_read_writes();
 
 		compressor_thread_lock l(compressor());
+		
+		m_updateReadOffsetFromWrite = false;
 
 		if (this->m_bufferDirty)
 			flush_block(l);
@@ -1266,8 +1283,25 @@ private:
 		compressor().request(r);
 		m_bufferDirty = false;
 
+		if (m_updateReadOffsetFromWrite) {
+			m_lastWriteBlockNumber = blockNumber;
+		}
+
 		if (blockNumber == m_streamBlocks) {
 			++m_streamBlocks;
+		}
+	}
+
+	void maybe_update_read_offset(compressor_thread_lock & lock) {
+		if (m_updateReadOffsetFromWrite && use_compression()) {
+			while (!m_response.done()) {
+				m_response.wait(lock);
+			}
+			if (m_response.has_block_info(m_lastWriteBlockNumber)) {
+				m_readOffset = m_response.get_read_offset(m_lastWriteBlockNumber);
+				m_nextReadOffset = m_readOffset + m_response.get_block_size(m_lastWriteBlockNumber);
+			}
+			m_updateReadOffsetFromWrite = false;
 		}
 	}
 
@@ -1279,6 +1313,8 @@ private:
 	void read_next_block(compressor_thread_lock & lock, stream_size_type blockNumber) {
 		uncache_read_writes();
 		get_buffer(lock, blockNumber);
+
+		maybe_update_read_offset(lock);
 
 		stream_size_type readOffset;
 		if (m_buffer->get_state() == compressor_buffer_state::clean) {
@@ -1336,6 +1372,9 @@ private:
 		uncache_read_writes();
 		tp_assert(use_compression(), "read_previous_block: !use_compression");
 		get_buffer(lock, blockNumber);
+
+		maybe_update_read_offset(lock);
+
 		if (m_buffer->get_state() == compressor_buffer_state::clean) {
 			m_readOffset = m_buffer->get_read_offset();
 			m_nextReadOffset = m_readOffset + m_buffer->get_block_size();

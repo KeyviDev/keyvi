@@ -19,13 +19,18 @@
 
 #include "common.h"
 #include <tpie/pipelining.h>
+#include <tpie/pipelining/subpipeline.h>
 #include <tpie/file_stream.h>
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <tpie/sysinfo.h>
 #include <tpie/pipelining/virtual.h>
+#include <tpie/pipelining/serialization.h>
 #include <tpie/progress_indicator_arrow.h>
 #include <tpie/pipelining/helpers.h>
+#include <tpie/pipelining/split.h>
+#include <tpie/resource_manager.h>
 
 using namespace tpie;
 using namespace tpie::pipelining;
@@ -821,6 +826,119 @@ bool bound_fetch_forward_test() {
 	return true;
 }
 
+bool forward_unique_ptr_result = true;
+
+template <typename dest_t>
+struct FUP1 : public node {
+	dest_t dest;
+	FUP1(dest_t dest) : dest(std::move(dest)) {}
+
+	virtual void propagate() override {
+		forward("item", std::unique_ptr<int>(new int(293)));
+	}
+
+	virtual void go() override {
+	}
+};
+
+struct FUP2 : public node {
+	virtual void propagate() override {
+		if (!can_fetch("item")) {
+			log_error() << "Cannot fetch item" << std::endl;
+			forward_unique_ptr_result = false;
+			return;
+		}
+		auto &p = fetch<std::unique_ptr<int>>("item");
+		if (*p != 293) {
+			log_error() << "Expected 293, not " << *p << std::endl;
+			forward_unique_ptr_result = false;
+			return;
+		}
+	}
+};
+
+bool forward_unique_ptr_test() {
+	std::unique_ptr<int> ptr(new int(1337));
+	pipeline p = make_pipe_begin<FUP1>()
+		| make_pipe_end<FUP2>();
+	p.plot(log_info());
+	p.forward("ptr", std::move(ptr));
+	p();
+	if (!forward_unique_ptr_result) return false;
+	if (!p.can_fetch("ptr")) {
+		log_error() << "Cannot fetch ptr" << std::endl;
+		return false;
+	}
+	auto &ptr2 = p.fetch<std::unique_ptr<int>>("ptr");
+	if (*ptr2 != 1337) {
+		log_error() << "Expected 1337, not " << *ptr2 << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool forward_multiple_pipelines_test() {
+	passive_sorter<int> ps;
+	pipeline p = input_vector(std::vector<int>{3, 2, 1}) | ps.input();
+	p.forward("test", 8);
+	pipeline p_ = input_vector(std::vector<int>{5, 6, 7}) | add_pairs(ps.output()) | null_sink<int>();
+	p();
+	int val = p_.fetch<int>("test");
+	return val == 8;
+}
+
+bool pipe_base_forward_result = true;
+
+struct PBF_base : public node {
+	int n;
+	PBF_base(int n) : n(n) {}
+
+	virtual void prepare() override {
+		for (int i = 1; i <= 3; i++) {
+			std::string item = "item" + std::to_string(i);
+			bool fetchable = can_fetch(item);
+			if (n < i) {
+				if (fetchable) {
+					log_error() << "Pipe segment " << n
+								<< " could fetch item " << i << "." << std::endl;
+					pipe_base_forward_result = false;
+				}
+			} else {
+				if (!fetchable) {
+					log_error() << "Pipe segment " << n
+								<< " couldn't fetch item " << i << "." << std::endl;
+					pipe_base_forward_result = false;
+				}
+				int value = fetch<int>(item);
+				if (value != i) {
+					log_error() << "Pipe segment " << n
+								<< " fetched item " << i
+								<< " with value " << value << "." << std::endl;
+					pipe_base_forward_result = false;
+				}
+			}
+		}
+	}
+};
+
+template <typename dest_t>
+struct PBF : public PBF_base {
+	dest_t dest;
+	PBF(dest_t dest, int n) : PBF_base(n), dest(std::move(dest)) {}
+
+	virtual void go() override {
+	}
+};
+
+bool pipe_base_forward_test() {
+	pipeline p = make_pipe_begin<PBF>(1).forward("item1", 1)
+		| make_pipe_middle<PBF>(2).forward("item2", 2)
+		| make_pipe_end<PBF_base>(3).forward("item3", 3);
+	p();
+
+	return pipe_base_forward_result;
+}
+
 // Assume that dest_t::item_type is a reference type.
 // Push a dereferenced zero pointer to the destination.
 template <typename dest_t>
@@ -1552,7 +1670,7 @@ public:
 		if (edges.size() != nodes*nodes) throw std::invalid_argument("edges has wrong size");
 	}
 
-	node_map_tester construct() const {
+	node_map_tester construct() {
 		std::vector<node_map_tester *> nodes;
 		node_map_tester node;
 		this->init_node(node);
@@ -1587,17 +1705,17 @@ public:
 	}
 };
 
-bool node_map_test(size_t nodes, bool hasInitiator, const std::string & edges) {
+bool node_map_test(size_t nodes, bool acyclic, const std::string & edges) {
 	node_map_tester_factory fact(nodes, edges);
 	pipeline p =
 		tpie::pipelining::bits::pipeline_impl<node_map_tester_factory>(fact);
 	p.plot(log_info());
 	try {
 		p();
-	} catch (const no_initiator_node &) {
-		return !hasInitiator;
+	} catch (const exception &) {
+		return !acyclic;
 	}
-	return hasInitiator;
+	return acyclic;
 }
 
 void node_map_multi_test(teststream & ts) {
@@ -1633,7 +1751,7 @@ void node_map_multi_test(teststream & ts) {
 		  "<."));
 	ts << "item_cycle" << result
 		(node_map_test
-		 (3, true,
+		 (3, false,
 		  ".><"
 		  "..>"
 		  "..."));
@@ -1663,6 +1781,35 @@ bool join_test() {
 	for (int i = 0; i < 20; ++i) {
 		if (o[i] == i % 10) continue;
 		log_error() << "Wrong output item got " << o[i] << " expected " << i%10 << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool split_test() {
+	std::vector<int> i(10);
+	std::vector<int> o1, o2;
+
+	for (int j = 0; j < 10; ++j) {
+		i[j] = j;
+	}
+
+	split<int> j;
+	pipeline p1 = input_vector(i) | j.sink();
+	pipeline p2 = j.source() | output_vector(o1);
+	pipeline p3 = j.source() | output_vector(o2);
+
+	p3.plot(log_info());
+	p3();
+
+	if (o1.size() != 10 || o2.size() != 10) {
+		log_error() << "Wrong output size " << o1.size() << " " << o2.size() << " expected 10" << std::endl;
+		return false;
+	}
+
+	for (int i = 0; i < 10; ++i) {
+		if (o1[i] == i % 10 && o2[i] == i % 10) continue;
+		log_error() << "Wrong output item got " << o1[i] << " " << o2[i] << " expected " << i%10 << std::endl;
 		return false;
 	}
 	return true;
@@ -1926,6 +2073,162 @@ bool phase_priority_test() {
 	return true;
 }
 
+template <typename dest_t>
+class subpipe_tester_type: public node {
+public:
+	struct dest_pusher: public node {
+		dest_pusher(dest_t & dest, int first): first(first), dest(dest) {}
+		void push(int second) {
+			dest.push(std::make_pair(first, second));
+		}					  
+		int first;
+		dest_t & dest;
+	};
+		
+	subpipeline<int> sp;
+	int first;
+	subpipe_tester_type(dest_t dest): dest(std::move(dest)) {
+		set_memory_fraction(2);
+	}
+
+	void prepare() override {
+		first = 1234;
+	}
+	
+	void push(std::pair<int, int> i) {
+		if (i.first != first) {
+			if (first != 1234)
+				sp.end();
+			first = i.first;
+			sp = sort() | pipe_end<termfactory<dest_pusher, dest_t &, int>>(dest, first);
+			sp.begin(get_available_memory());
+		}
+		sp.push(i.second);
+	}
+
+	void end() override {
+		if (first != 1234)
+			sp.end();
+	}
+		
+	dest_t dest;
+};
+
+typedef pipe_middle<factory<subpipe_tester_type> > subpipe_tester;
+
+bool subpipeline_test() {
+	constexpr int outer_size = 10;
+	constexpr int inner_size = 3169; //Must be prime
+	std::vector<std::pair<int, int> > items;
+	for (int i=0; i < outer_size; ++i) {
+		for (int j=0; j < inner_size; ++j)
+			items.push_back(std::make_pair(i, (j*13) % inner_size));
+	}
+
+	std::vector<std::pair<int, int> > items2;
+	
+	pipeline p = input_vector(items) | subpipe_tester() | output_vector(items2);
+	p();
+	if (items2.size() != items.size()) return false;
+
+	int cnt=0;
+	for (int i=0; i < outer_size; ++i)
+		for (int j=0; j < inner_size; ++j) 
+			if (items2[cnt++] != std::make_pair(i, j)) return false;
+		
+	return true;
+}
+
+bool file_limit_sort_test() {
+	int N = 1000000;
+	int B = 10000;
+	// Merge sort needs at least 3 open files for binary merge sort
+	// + 2 open files to store stream_position objects for sorted runs.
+	int F = 5;
+
+	get_memory_manager().set_limit(5000000);
+
+	set_block_size(B * sizeof(int));
+	get_file_manager().set_limit(F);
+	get_file_manager().set_enforcement(file_manager::ENFORCE_THROW);
+
+	std::vector<int> items;
+	for (int i = 0; i < N; i++) {
+		items.push_back(N - i);
+	}
+
+	std::vector<int> items2;
+
+	pipeline p = input_vector(items) | sort() | output_vector(items2);
+	p();
+
+	return true;
+}
+
+template<typename T>
+virtual_chunk<int, int> passive_virtual_chunk() {
+    T passive;
+    return virtual_chunk<int, int>(fork(passive.input())
+                                   | buffer()
+                                   | merge(passive.output()));
+}
+
+template<typename T>
+void passive_virtual_test(teststream & ts, const char * cname, const std::vector<int> & input, const std::vector<int> & expected_output) {
+    ts << cname;
+
+    auto vc = passive_virtual_chunk<T>();
+
+    std::vector<int> output;
+    pipeline p = virtual_chunk_begin<int>(input_vector(input))
+                 | vc
+                 | virtual_chunk_end<int>(output_vector<int>(output));
+    p();
+
+    // Output is interleaved with the input
+    auto expected = expected_output;
+    for (size_t i = 0; i < input.size(); i++) {
+        expected.insert(expected.begin() + i * 2, input[i]);
+    }
+
+    ts << result(output == expected);
+}
+
+void passive_virtual_test_multi(teststream & ts) {
+    std::vector<int> input    = {3, 4, 1, 2};
+    std::vector<int> reversed = {2, 1, 4, 3};
+    std::vector<int> sorted   = {1, 2, 3, 4};
+
+#define TEST(T, expected) passive_virtual_test<T<int>>(ts, #T, input, expected)
+
+    TEST(passive_sorter, sorted);
+    TEST(passive_buffer, input);
+    TEST(passive_reverser, reversed);
+    TEST(serialization_passive_sorter, sorted);
+    TEST(passive_serialization_buffer, input);
+    TEST(passive_serialization_reverser, reversed);
+
+#undef TEST
+}
+
+bool join_split_dealloc_test() {
+    std::vector<int> v{1, 2, 3};
+    pipeline p, p1, p2, p3;
+
+    {
+        join<int> j;
+        split<int> s;
+
+        p = input_vector(v) | s.sink();
+        p1 = s.source() | j.sink();
+        p2 = s.source() | j.sink();
+        p3 = j.source() | null_sink<int>();
+    }
+
+    p();
+
+    return true;
+}
 
 int main(int argc, char ** argv) {
 	return tpie::tests(argc, argv)
@@ -1949,6 +2252,9 @@ int main(int argc, char ** argv) {
 	.test(merger_memory_test, "merger_memory", "n", static_cast<size_t>(10))
 	.test(fetch_forward_test, "fetch_forward")
 	.test(bound_fetch_forward_test, "bound_fetch_forward")
+	.test(forward_unique_ptr_test, "forward_unique_ptr")
+	.test(forward_multiple_pipelines_test, "forward_multiple_pipelines")
+	.test(pipe_base_forward_test, "pipe_base_forward")
 	.test(virtual_test, "virtual")
 	.test(virtual_fork_test, "virtual_fork")
 	.test(virtual_cref_item_type_test, "virtual_cref_item_type")
@@ -1963,10 +2269,15 @@ int main(int argc, char ** argv) {
 	.test(parallel_own_buffer_test, "parallel_own_buffer")
 	.test(parallel_push_in_end_test, "parallel_push_in_end")
 	.test(join_test, "join")
+	.test(split_test, "split")
+	.test(subpipeline_test, "subpipeline")
 	.multi_test(node_map_multi_test, "node_map")
 	.test(copy_ctor_test, "copy_ctor")
 	.test(set_flush_priority_test, "set_flush_priority_test")
 	.test(phase_priority_test, "phase_priority_test")
 	.multi_test(datastructure_test_multi, "datastructures")
+	.test(file_limit_sort_test, "file_limit_sort")
+	.multi_test(passive_virtual_test_multi, "passive_virtual_management")
+	.test(join_split_dealloc_test, "join_split_dealloc")
 	;
 }

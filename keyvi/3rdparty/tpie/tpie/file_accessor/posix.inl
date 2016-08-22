@@ -19,7 +19,7 @@
 #include <tpie/config.h>
 #include <string.h>
 #include <tpie/exception.h>
-#include <tpie/file_count.h>
+#include <tpie/file_manager.h>
 #include <tpie/file_accessor/posix.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -105,32 +105,37 @@ inline stream_size_type posix::file_size_i() {
 	return static_cast<stream_size_type>(buf.st_size);
 }
 
-void posix::open_wo(const std::string & path) {
-	m_fd = ::open(path.c_str(), O_RDWR | O_TRUNC | O_CREAT, 0666);
-	if (m_fd == -1) throw_errno(path);
+void posix::_open(const std::string & path, int flags, mode_t mode = 0755) {
+	m_fd = ::open(path.c_str(), flags, mode);
+	if (m_fd == -1) {
+		return;
+	}
+	get_file_manager().increment_open_file_count();
 	give_advice();
+}
+
+void posix::open_wo(const std::string & path) {
+	_open(path, O_RDWR | O_TRUNC | O_CREAT, 0666);
+	if (m_fd == -1) throw_errno(path);
 }
 
 void posix::open_ro(const std::string & path) {
-	m_fd = ::open(path.c_str(), O_RDONLY);
+	_open(path, O_RDONLY);
 	if (m_fd == -1) throw_errno(path);
-	give_advice();
 }
 
 bool posix::try_open_rw(const std::string & path) {
-	m_fd = ::open(path.c_str(), O_RDWR);
+	_open(path.c_str(), O_RDWR);
 	if (m_fd == -1) {
 		if (errno != ENOENT) throw_errno(path);
 		return false;
 	}
-	give_advice();
 	return true;
 }
 
 void posix::open_rw_new(const std::string & path) {
-	m_fd = ::open(path.c_str(), O_RDWR | O_CREAT, 0666);
+	_open(path.c_str(), O_RDWR | O_CREAT, 0666);
 	if (m_fd == -1) throw_errno(path);
-	give_advice();
 }
 
 bool posix::is_open() const {
@@ -139,7 +144,9 @@ bool posix::is_open() const {
 
 void posix::close_i() {
 	if (m_fd != 0) {
-		::close(m_fd);
+		if (::close(m_fd) == 0) {
+			get_file_manager().decrement_open_file_count();
+		}
 	}
 	m_fd=0;
 }

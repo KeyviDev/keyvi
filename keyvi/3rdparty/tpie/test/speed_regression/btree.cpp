@@ -59,10 +59,10 @@ void test(size_t times, size_t size) {
 		btree<int, btree_external> tree(tmp.path());
 
 		// pre-protocol
-		int x[count];
+		std::vector<int> x(count);
 		for(size_t i = 0; i < count; ++i)
 			x[i] = i;
-		std::random_shuffle(x, x + count);
+		std::random_shuffle(x.begin(), x.end());
 
 		// insertion
 		getTestRealtime(start);
@@ -81,7 +81,7 @@ void test(size_t times, size_t size) {
 		s(testRealtimeDiff(start,end));
 
 		// deletion
-		std::random_shuffle(x, x + count);
+		std::random_shuffle(x.begin(), x.end());
 
 		getTestRealtime(start);
 		for(size_t i = 0; i < count; ++i) {

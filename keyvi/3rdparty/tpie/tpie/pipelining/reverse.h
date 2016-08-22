@@ -45,6 +45,7 @@ public:
 	{
 		set_name("Store items", PRIORITY_SIGNIFICANT);
 		set_minimum_memory(stack<item_type>::memory_usage());
+		set_minimum_resource_usage(FILES, 1);
 		set_plot_options(PLOT_BUFFERED | PLOT_SIMPLIFIED_HIDE);
 	}
 
@@ -115,6 +116,7 @@ public:
 		add_push_destination(this->dest);
 		set_name("Output reversed", PRIORITY_INSIGNIFICANT);
 		set_minimum_memory(this->m_stack->memory_usage());
+		set_minimum_resource_usage(FILES, 1);
 		set_plot_options(PLOT_BUFFERED);
 	}
 

@@ -397,7 +397,7 @@ void sort_manager<T,I,M>::compute_sort_params(void){
 	// number of substreams we want.  It may not be able to due to
 	// operating system restrictions, such as on the number of regions
 	// that can be mmap()ed in, max number of file descriptors, etc.
-	int availableStreams = static_cast<int>(available_files());
+	int availableStreams = static_cast<int>(get_file_manager().available());
 	    
 	// Merging requires an available stream/file decriptor for
 	// each of the mrgArity input strems. We need one additional file descriptor

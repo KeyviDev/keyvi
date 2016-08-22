@@ -19,7 +19,6 @@
 #include <tpie/config.h>
 #include <string.h>
 #include <tpie/exception.h>
-#include <tpie/file_count.h>
 #include <tpie/file_accessor/stream_accessor_base.h>
 #include <tpie/stats.h>
 #include <sys/types.h>
@@ -28,6 +27,7 @@
 #include <errno.h>
 #include <limits>
 #include <tpie/compressed/scheme.h>
+#include <tpie/file_manager.h>
 
 namespace tpie {
 namespace file_accessor {
@@ -151,7 +151,6 @@ void stream_accessor_base<file_accessor_t>::open(const std::string & path,
 			write_header(false);
 		}
 	}
-	increment_open_file_count();
 	m_open = true;
 	if (write && m_maxUserDataSize < maxUserDataSize) {
 		close();
@@ -166,7 +165,6 @@ void stream_accessor_base<file_accessor_t>::close() {
 	if (m_write)
 		write_header(true);
 	m_fileAccessor.close_i();
-	decrement_open_file_count();
 	m_open = false;
 }
 

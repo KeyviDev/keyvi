@@ -44,6 +44,7 @@
 \ref tpie::pipelining::store_sort
 \ref tpie::pipelining::tee
 \ref tpie::pipelining::unzip
+\ref tpie::pipelining::visit
 \ref tpie::pipelining::zip
 \endsecreflist
 

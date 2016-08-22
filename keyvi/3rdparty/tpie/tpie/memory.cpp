@@ -28,86 +28,9 @@
 
 namespace tpie {
 
-inline void segfault() {
-	std::abort();
-}
-
 memory_manager * mm = 0;
 
-memory_manager::memory_manager()
-	: m_used(0), m_limit(0), m_maxExceeded(0), m_nextWarning(0), m_enforce(ENFORCE_WARN) {}
-
-size_t memory_manager::used() const throw() {
-	return m_used.load();
-}
-
-size_t memory_manager::available() const throw() {
-	size_t used = m_used.load();
-	size_t limit = m_limit;
-	if (used < limit) return limit-used;
-	return 0;
-}
-
-} // namespace tpie
-
-void tpie_print_memory_complaint(std::ostream & os, size_t bytes, size_t usage, size_t limit) {
-	os << "Memory limit exceeded by " << tpie::bits::pretty_print::size_type(usage - limit)
-	   << " (" << (usage-limit) * 100 / limit << "%), while trying to allocate " << tpie::bits::pretty_print::size_type(bytes) << "."
-	   << " Limit is " << tpie::bits::pretty_print::size_type(limit) << ", but " << tpie::bits::pretty_print::size_type(usage) << " would be used.";
-}
-
-namespace tpie {
-
-void memory_manager::register_allocation(size_t bytes) {
-	switch(m_enforce) {
-	case ENFORCE_IGNORE:
-		m_used.fetch_add(bytes);
-		break;
-	case ENFORCE_THROW: {
-		size_t usage = m_used.fetch_add(bytes);
-		if (usage > m_limit && m_limit > 0) {
-			std::stringstream ss;
-			tpie_print_memory_complaint(ss, bytes, usage, m_limit);
-			throw out_of_memory_error(ss.str().c_str());
-		}
-		break; }
-	case ENFORCE_DEBUG:
-	case ENFORCE_WARN: {
-		size_t usage = m_used.fetch_add(bytes);
-		if (usage > m_limit && usage - m_limit > m_maxExceeded && m_limit > 0) {
-			m_maxExceeded = usage - m_limit;
-			if (m_maxExceeded >= m_nextWarning) {
-				m_nextWarning = m_maxExceeded + m_maxExceeded/8;
-				std::ostream & os = (m_enforce == ENFORCE_DEBUG) ? log_debug() : log_warning();
-				tpie_print_memory_complaint(os, bytes, usage, m_limit);
-				os << std::endl;
-			}
-		}
-		break; }
-	};
-}
-
-void memory_manager::register_deallocation(size_t bytes) {
-#ifndef TPIE_NDEBUG
-	size_t usage = m_used.fetch_sub(bytes);
-	if (bytes > usage) {
-		log_error() << "Error in deallocation, trying to deallocate " << bytes << " bytes, while only " <<
-			usage << " were allocated" << std::endl;
-		segfault();
-	}
-#else
-	m_used.fetch_sub(bytes);
-#endif
-}
-
-
-void memory_manager::set_limit(size_t new_limit) {
-	m_limit = new_limit;
-}
-
-void memory_manager::set_enforcement(enforce_t e) {
-	m_enforce = e;
-}
+memory_manager::memory_manager(): resource_manager(MEMORY) {}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \internal \brief Buffers messages to the debug log.
@@ -182,6 +105,9 @@ std::pair<uint8_t *, size_t> memory_manager::__allocate_consecutive(size_t upper
 	return std::make_pair(res, best);
 }
 
+void memory_manager::throw_out_of_resource_error(const std::string & s) {
+	throw out_of_memory_error(s);
+}
 
 #ifndef TPIE_NDEBUG
 void memory_manager::register_pointer(void * p, size_t size, const std::type_info & t) {
@@ -193,7 +119,7 @@ void memory_manager::__register_pointer(void * p, size_t size, const std::type_i
 	if (m_pointers.count(p) != 0) {
 		log_error() << "Trying to register pointer " << p << " of size " 
 					<< size << " which is already registered" << std::endl;
-		segfault();
+		std::abort();
 	}
 	m_pointers[p] = std::make_pair(size, &t);;
 }
@@ -208,17 +134,17 @@ void memory_manager::__unregister_pointer(void * p, size_t size, const std::type
 	if (i == m_pointers.end()) {
 		log_error() << "Trying to deregister pointer " << p << " of size "
 					<< size << " which was never registered" << std::endl;
-		segfault();
+		std::abort();
 	} else {
 		if (i->second.first != size) {
 			log_error() << "Trying to deregister pointer " << p << " of size "
 						<< size << " which was registered with size " << i->second.first << std::endl;
-			segfault();
+			std::abort();
 		}
 		if (*i->second.second != t) {
 			log_error() << "Trying to deregister pointer " << p << " of type "
 						<< t.name() << " which was registered with size " << i->second.second->name() << std::endl;
-			segfault();
+			std::abort();
 		}
 		m_pointers.erase(i);
 	}
@@ -232,7 +158,7 @@ void memory_manager::assert_tpie_ptr(void * p) {
 void memory_manager::__assert_tpie_ptr(void * p) {
 	if (!p || m_pointers.count(p)) return;
 	log_error() << p << " has not been allocated with tpie_new" << std::endl;
-	segfault();
+	std::abort();
 }
 
 void memory_manager::complain_about_unfreed_memory() {

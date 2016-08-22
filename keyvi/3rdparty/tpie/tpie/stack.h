@@ -289,6 +289,9 @@ public:
 		return size();
     }
 
+	tpie::stack<T> & underlying_stack() {
+		return m_ulate;
+	}
 private:
 
 	temp_file m_tempFile;

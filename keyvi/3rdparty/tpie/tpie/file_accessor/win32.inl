@@ -20,7 +20,7 @@
 
 #include <string.h>
 #include <tpie/exception.h>
-#include <tpie/file_count.h>
+#include <tpie/file_manager.h>
 #include <tpie/file_accessor/win32.h>
 #include <tpie/util.h>
 #include <sys/types.h>
@@ -88,18 +88,25 @@ void win32::set_cache_hint(cache_hint cacheHint) {
 	}
 }
 
+void win32::_open(const std::string & path, DWORD access, DWORD create_mode) {
+	m_fd = CreateFile(path.c_str(), access, shared_flags, 0, create_mode, m_creationFlag, 0);
+	if (m_fd == INVALID_HANDLE_VALUE) return;
+
+	get_file_manager().increment_open_file_count();
+}
+
 void win32::open_wo(const std::string & path) {
-	m_fd = CreateFile(path.c_str(), GENERIC_WRITE, shared_flags, 0, CREATE_ALWAYS, m_creationFlag, 0);
+	_open(path, GENERIC_WRITE, CREATE_ALWAYS);
 	if (m_fd == INVALID_HANDLE_VALUE) throw_getlasterror();
 }
 
 void win32::open_ro(const std::string & path) {
-	m_fd = CreateFile(path.c_str(), GENERIC_READ, shared_flags, 0, OPEN_EXISTING, m_creationFlag, 0);
+	_open(path, GENERIC_READ, OPEN_EXISTING);
 	if (m_fd == INVALID_HANDLE_VALUE) throw_getlasterror();
 }
 
 bool win32::try_open_rw(const std::string & path) {
-	m_fd = CreateFile(path.c_str(), GENERIC_READ | GENERIC_WRITE , shared_flags, 0, OPEN_EXISTING, m_creationFlag, 0);
+	_open(path, GENERIC_READ | GENERIC_WRITE, OPEN_EXISTING);
 	if (m_fd == INVALID_HANDLE_VALUE) {
 		if (GetLastError() != ERROR_FILE_NOT_FOUND) throw_getlasterror();
 		return false;
@@ -108,7 +115,7 @@ bool win32::try_open_rw(const std::string & path) {
 }
 
 void win32::open_rw_new(const std::string & path) {
-	m_fd = CreateFile(path.c_str(), GENERIC_READ | GENERIC_WRITE , shared_flags, 0, CREATE_NEW, m_creationFlag, 0);
+	_open(path, GENERIC_READ | GENERIC_WRITE, CREATE_NEW);
 	if (m_fd == INVALID_HANDLE_VALUE) throw_getlasterror();
 }
 
@@ -118,7 +125,9 @@ bool win32::is_open() const {
 
 void win32::close_i() {
 	if (m_fd != INVALID_HANDLE_VALUE) {
-		CloseHandle(m_fd);
+		if(CloseHandle(m_fd)) {
+			get_file_manager().decrement_open_file_count();
+		}
 	}
 	m_fd=INVALID_HANDLE_VALUE;
 }

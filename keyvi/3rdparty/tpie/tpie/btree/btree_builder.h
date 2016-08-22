@@ -90,7 +90,7 @@ private:
         }
 
 		leaf.augment = m_state.m_augmenter(node_type(&m_state, leaf.leaf));
-
+		m_state.store().flush();
         m_leaves.push_back(leaf);
     }
 
@@ -108,7 +108,8 @@ private:
         }
 
         internal.augment = m_state.m_augmenter(node_type(&m_state, internal.internal));
-
+		m_state.store().flush();
+		
         // push the internal node to the deque of nodes
         if(m_internal_nodes.size() < 1) m_internal_nodes.push_back(std::deque<internal_summary>());
         m_internal_nodes[0].push_back(internal);
@@ -126,6 +127,7 @@ private:
             m_internal_nodes[level].pop_front();
         }
         internal.augment = m_state.m_augmenter(node_type(&m_state, internal.internal));
+		m_state.store().flush();
 
         // push the internal node to the deque of nodes
         if(m_internal_nodes.size() < level+2) m_internal_nodes.push_back(std::deque<internal_summary>());
@@ -187,7 +189,7 @@ public:
 	*/
 	template <typename X=enab>
 	explicit builder(std::string path, comp_type comp=comp_type(), augmenter_type augmenter=augmenter_type(), enable<X, !is_internal> =enab() )
-        : m_state(store_type(path), std::move(augmenter), typename state_type::keyextract_type())
+        : m_state(store_type(path, true), std::move(augmenter), typename state_type::keyextract_type())
         , m_comp(comp)
     {}
 
@@ -209,11 +211,11 @@ public:
         if(m_items.size() < leaf_tipping_point()) return;
 		extract_nodes();
     }
-
+    
 	/**
 	* \brief Constructs and returns a btree from the value that was pushed to the builder. The btree builder should not be used again after this point.
 	*/
-    tree_type build() {
+    tree_type build(const std::string & metadata = std::string()) {
         // finish building the tree by traversing all levels and constructing leaves/nodes
 
         // construct one or two leaves if neccesary
@@ -257,7 +259,11 @@ public:
             else
                 m_state.store().set_root(m_internal_nodes.back().front().internal);
         }
-
+		if (metadata.size()) {
+			m_state.store().flush();
+			m_state.store().set_metadata(metadata);
+		}
+		m_state.store().finalize_build();
         return tree_type(std::move(m_state), std::move(m_comp));
     }
 

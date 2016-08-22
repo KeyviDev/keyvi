@@ -74,13 +74,15 @@
 #include <tpie/exception.h>
 #include <tpie/pipelining/exception.h>
 #include <tpie/pipelining/predeclare.h>
+#include <tpie/pipelining/container.h>
 #include <tpie/types.h>
 #include <tpie/tpie_assert.h>
 #include <map>
 #include <vector>
 #include <iostream>
 #include <boost/intrusive_ptr.hpp>
-#include <boost/any.hpp>
+#include <boost/optional.hpp>
+#include <unordered_map>
 
 namespace tpie {
 
@@ -92,7 +94,8 @@ enum node_relation {
 	pushes,
 	pulls,
 	depends,
-	no_forward_depends
+	no_forward_depends,
+	memory_share_depends
 };
 
 class node_map {
@@ -106,9 +109,18 @@ public:
 	typedef std::multimap<id_t, std::pair<id_t, node_relation> > relmap_t;
 	typedef relmap_t::const_iterator relmapit;
 
-	typedef std::map<std::string, std::pair<memory_size_type, boost::any> > datastructuremap_t;
+	typedef std::unordered_map<std::string, std::pair<memory_size_type, any_noncopyable> > datastructuremap_t;
+
+	typedef boost::optional<any_noncopyable &> maybeany_t;
+	typedef std::unordered_map<std::string, any_noncopyable> forwardmap_t;
 
 	typedef boost::intrusive_ptr<node_map> ptr;
+
+	struct pipe_base_forward_t {
+		id_t from;
+		std::string key;
+		any_noncopyable value;
+	};
 
 	static  ptr create() {
 		return ptr(new node_map);
@@ -191,6 +203,23 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	void get_successors(id_t from, std::vector<id_t> & successors, memory_size_type k, bool forward_only=false);
 
+	void forward(std::string key, any_noncopyable value) {
+		m_pipelineForwards[key] = std::move(value);
+	}
+
+	maybeany_t fetch_maybe(std::string key) {
+		auto it = m_pipelineForwards.find(key);
+		if (it == m_pipelineForwards.end()) {
+			return maybeany_t();
+		}
+		return maybeany_t(it->second);
+	}
+
+	void forward_from_pipe_base(id_t from, std::string key, any_noncopyable value) {
+		m_pipeBaseForwards.push_back({from, key, std::move(value)});
+	}
+
+	void forward_pipe_base_forwards();
 
 	friend void intrusive_ptr_add_ref(node_map * m) {
 		m->m_refCnt++;
@@ -206,6 +235,8 @@ private:
 	relmap_t m_relations;
 	relmap_t m_relationsInv;
 	datastructuremap_t m_datastructures;
+	forwardmap_t m_pipelineForwards;
+	std::vector<pipe_base_forward_t> m_pipeBaseForwards;
 
 	size_t out_degree(const relmap_t & map, id_t from, node_relation rel) const;
 	size_t out_degree(const relmap_t & map, id_t from) const;
@@ -234,7 +265,7 @@ public:
 	typedef bits::node_map::val_t val_t;
 
 	// Use for the simple case in which a node owns its own token
-	inline node_token(val_t owner)
+	explicit node_token(val_t owner)
 		: m_tokens(bits::node_map::create())
 		, m_id(m_tokens->add_token(owner))
 		, m_free(false)

@@ -77,9 +77,9 @@ public:
 	~compressor_thread_lock() {
 		ptime t3 = ptime::now();
 		// Time blocked
-		increment_user(0, ptime::seconds(t1, t2)*1000000);
+		increment_user(0, (stream_size_type)(ptime::seconds(t1, t2)*1000000));
 		// Time held
-		increment_user(1, ptime::seconds(t2, t3)*1000000);
+		increment_user(1, (stream_size_type)(ptime::seconds(t2, t3)*1000000));
 	}
 
 	lock_t & get_lock() {

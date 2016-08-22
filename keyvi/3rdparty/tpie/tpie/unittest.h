@@ -36,11 +36,11 @@ typedef std::chrono::high_resolution_clock test_clock;
 typedef std::chrono::time_point<test_clock> test_time;
 inline test_time test_now() {return test_clock::now();}
 inline double test_millisecs(const test_time & from, const test_time & to) {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(to-from).count();
+	return std::chrono::duration_cast<std::chrono::duration<double, std::milli> >(to-from).count();
 }
 	
 inline double test_secs(const test_time & from, const test_time & to) {
-	return std::chrono::duration_cast<std::chrono::seconds>(to-from).count();
+	return std::chrono::duration_cast<std::chrono::duration<double>>(to-from).count();
 }			
 	
 class teststream_buf: public std::basic_streambuf<char, std::char_traits<char> > {

@@ -36,6 +36,9 @@ static tpie::memory_size_type the_block_size=0;
 namespace tpie {
 
 void tpie_init(flags<subsystem> subsystems) {
+	if (subsystems & FILE_MANAGER)
+	 	init_file_manager();
+
 	if (subsystems & MEMORY_MANAGER)	
 	 	init_memory_manager();
 
@@ -87,6 +90,9 @@ void tpie_finish(flags<subsystem> subsystems) {
 
 	if (subsystems & MEMORY_MANAGER)	
 	 	finish_memory_manager();
+
+	if (subsystems & FILE_MANAGER)
+	 	finish_file_manager();
 
 	if (subsystems & TEMPFILE)
 		finish_tempfile();

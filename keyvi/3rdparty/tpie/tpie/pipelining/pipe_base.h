@@ -151,6 +151,16 @@ public:
 		return std::move(self());
 	}
 
+	child_t forward_any(const std::string & key, any_noncopyable value) {
+		self().factory.forward(key, std::move(value));
+		return std::move(self());
+	}
+
+	template <typename T>
+	child_t forward(const std::string & key, T value) {
+		return forward_any(key, any_noncopyable(value));
+	}
+
 protected:
 	inline child_t & self() {return *static_cast<child_t*>(this);}
 	inline const child_t & self() const {return *static_cast<const child_t*>(this);}

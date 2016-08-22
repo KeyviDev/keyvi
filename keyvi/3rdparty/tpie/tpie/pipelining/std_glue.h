@@ -32,46 +32,67 @@ namespace pipelining {
 
 namespace bits {
 
-template <typename dest_t>
+template <typename dest_t, typename T, typename A>
 class input_vector_t : public node {
 public:
-	typedef typename push_type<dest_t>::type item_type;
+	typedef T item_type;
 
-	inline input_vector_t(dest_t dest, const std::vector<item_type> & input) : dest(std::move(dest)), input(input) {
+	input_vector_t(dest_t dest, const std::vector<T, A> & input) : dest(std::move(dest)), input(input) {
 		add_push_destination(this->dest);
 	}
 
-	virtual void propagate() override {
+	void propagate() override {
 		forward("items", static_cast<stream_size_type>(input.size()));
 		set_steps(input.size());
 	}
 
-	virtual void go() override {
-		typedef typename std::vector<item_type>::const_iterator IT;
-		for (IT i = input.begin(); i != input.end(); ++i) {
-			dest.push(*i);
+	void go() override {
+		for (auto & i: input) {
+			dest.push(i);
 			step();
 		}
 	}
 private:
 	dest_t dest;
-	const std::vector<item_type> & input;
+	const std::vector<T, A> & input;
 };
 
-template <typename T>
+template <typename T, typename A>
+class pull_input_vector_t : public node {
+public:
+	typedef T item_type;
+	
+	pull_input_vector_t(const std::vector<T, A> & input) : input(input) {}
+
+	void propagate() override {
+		forward("items", static_cast<stream_size_type>(input.size()));
+	}
+
+	void begin() override {idx=0;};
+	bool can_pull() const {return idx < input.size();}
+	const T & peek() const {return input[idx];}
+	const T & pull() {return input[idx++];}
+	
+private:
+	size_t idx;
+	const std::vector<T, A> & input;
+};
+
+
+template <typename T, typename A>
 class output_vector_t : public node {
 public:
 	typedef T item_type;
 
-	inline output_vector_t(std::vector<T> & output) : output(output) {
-	}
+	output_vector_t(std::vector<T, A> & output) : output(output) {}
 
-	inline void push(const T & item) {
+	void push(const T & item) {
 		output.push_back(item);
 	}
 private:
-	std::vector<item_type> & output;
+	std::vector<item_type, A> & output;
 };
+
 
 template <typename F>
 class lambda_t {
@@ -122,18 +143,28 @@ public:
 /// next node in the pipeline.
 /// \param input The vector from which it pushes items
 ///////////////////////////////////////////////////////////////////////////////
-template<typename T>
-inline pipe_begin<factory<bits::input_vector_t, const std::vector<T> &> > input_vector(const std::vector<T> & input) {
-	return factory<bits::input_vector_t, const std::vector<T> &>(input);
+template<typename T, typename A>
+inline pipe_begin<tfactory<bits::input_vector_t, Args<T, A>, const std::vector<T, A> &> > input_vector(const std::vector<T, A> & input) {
+	return {input};
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Pipelining nodes that pushes the contents of the given vector to the
+/// next node in the pipeline.
+/// \param input The vector from which it pushes items
+///////////////////////////////////////////////////////////////////////////////
+template<typename T, typename A>
+inline pullpipe_begin<termfactory<bits::pull_input_vector_t<T, A>, const std::vector<T, A> &> > pull_input_vector(const std::vector<T, A> & input) {
+	return {input};
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Pipelining node that pushes items to the given vector.
 /// \param output The vector to push items to
 ///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-inline pipe_end<termfactory<bits::output_vector_t<T>, std::vector<T> &> > output_vector(std::vector<T> & output) {
-	return termfactory<bits::output_vector_t<T>, std::vector<T> &>(output);
+template <typename T, typename A>
+inline pipe_end<termfactory<bits::output_vector_t<T, A>, std::vector<T, A> &> > output_vector(std::vector<T, A> & output) {
+	return termfactory<bits::output_vector_t<T, A>, std::vector<T, A> &>(output);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

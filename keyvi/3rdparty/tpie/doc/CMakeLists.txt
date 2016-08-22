@@ -18,8 +18,8 @@ else (INTERNAL_DOCS)
 endif(INTERNAL_DOCS)
 
 ADD_CUSTOM_TARGET(apidocs
-	sh -c "sed -e \"s/@VERSION@/`git describe --always`/g\" ${PROJECT_SOURCE_DIR}/doc/header.html > ${PROJECT_BINARY_DIR}/doc/header.html"
-	COMMAND sh -c "sed -e \"s/@VERSION@/`git describe --always`/g\" ${PROJECT_SOURCE_DIR}/doc/footer.html > ${PROJECT_BINARY_DIR}/doc/footer.html"
+	sh -c "sed -e \"s/\@VERSION\@/`git describe --always`/g\" ${PROJECT_SOURCE_DIR}/doc/header.html > ${PROJECT_BINARY_DIR}/doc/header.html"
+	COMMAND sh -c "sed -e \"s/\@VERSION\@/`git describe --always`/g\" ${PROJECT_SOURCE_DIR}/doc/footer.html > ${PROJECT_BINARY_DIR}/doc/footer.html"
 	COMMAND ${DOXYGEN} ${DOXYFILE}
 	VERBATIM)
 

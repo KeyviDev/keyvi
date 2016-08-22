@@ -47,7 +47,7 @@ public:
 	public:
 		typedef typename push_type<dest_t>::type item_type;
 
-		type(dest_t dest, fact_t && fact) : dest(std::move(dest)), with(fact.construct()) {
+		type(dest_t dest, fact_t fact) : dest(std::move(dest)), with(fact.construct()) {
 			add_push_destination(this->dest);
 			add_pull_source(with);
 		}
@@ -69,9 +69,9 @@ public:
 /// for each item pushed to it.
 ///////////////////////////////////////////////////////////////////////////////
 template <typename pull_t>
-inline pipe_middle<factory<bits::merge_t<pull_t>::template type, pull_t  &&> >
-merge(pullpipe_begin<pull_t> && with) {
-	return factory<bits::merge_t<pull_t>::template type, pull_t &&>(std::move(with.factory));
+inline pipe_middle<factory<bits::merge_t<pull_t>::template type, pull_t> >
+merge(pullpipe_begin<pull_t> with) {
+	return {std::move(with.factory)};
 }
 
 } // namespace pipelining

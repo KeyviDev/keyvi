@@ -28,6 +28,8 @@
 
 #include <io.h>
 #include <windows.h>
+#include <IntSafe.h>
+#include <string>
 #undef NO_ERROR
 
 #include <tpie/file_accessor/stream_accessor_base.h>
@@ -61,6 +63,9 @@ public:
 	inline bool is_open() const;
 
 	inline void set_cache_hint(cache_hint cacheHint);
+
+private:
+	inline void _open(const std::string & path, DWORD access, DWORD create_mode);
 };
 
 }
