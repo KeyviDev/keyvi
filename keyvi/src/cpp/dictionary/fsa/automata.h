@@ -533,7 +533,7 @@ final {
   };
 
   // shared pointer
-  typedef std::shared_ptr<Automata> automata_t;
+  typedef std::shared_ptr<const Automata> automata_t;
 
   } /* namespace fsa */
   } /* namespace dictionary */

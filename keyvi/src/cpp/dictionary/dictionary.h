@@ -69,8 +69,7 @@ final {
         : fsa_(f) {
     }
 
-    // temporary implementation
-    fsa::automata_t GetFsa() const {
+    const fsa::automata_t GetFsa() const {
       return fsa_;
     }
 
