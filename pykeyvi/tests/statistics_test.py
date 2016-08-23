@@ -51,3 +51,31 @@ def test_statistics():
         size = int(gen.get('number_of_keys', 0))
         assert size == 2
         assert man.get('author') == "Zapp Brannigan"
+
+def test_manifest_for_merger():
+    try:
+        c = pykeyvi.JsonDictionaryCompiler()
+        c.Add("abc", '{"a" : 2}')
+        c.Compile()
+        c.SetManifest({"author": "Zapp Brannigan"})
+        c.WriteToFile('manifest_json_merge1.kv')
+
+        c2 = pykeyvi.JsonDictionaryCompiler()
+        c2.Add("abd", '{"a" : 3}')
+        c2.Compile()
+        c2.SetManifest({"author": "Leela"})
+        c2.WriteToFile('manifest_json_merge2.kv')
+
+        merger = pykeyvi.JsonDictionaryMerger()
+        merger.SetManifest({"author": "Fry"})
+        merger.Merge('manifest_json_merged.kv')
+
+        d = pykeyvi.Dictionary('manifest_json_merged.kv')
+        m = d.GetManifest()
+        assert m['author'] == "Fry"
+        del d
+
+    finally:
+        os.remove('manifest_json_merge1.kv')
+        os.remove('manifest_json_merge2.kv')
+        os.remove('manifest_json_merged.kv')

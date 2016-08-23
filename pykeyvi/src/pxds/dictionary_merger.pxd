@@ -10,4 +10,5 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         JsonDictionaryMerger(size_t memory_limit) except +
         JsonDictionaryMerger(size_t memory_limit, libcpp_map[libcpp_string, libcpp_string] value_store_params) except +
         void Add(libcpp_string) except +
+        void SetManifestFromString(libcpp_string) # wrap-ignore
         void Merge(libcpp_string) nogil

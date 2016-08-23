@@ -84,7 +84,11 @@ cdef class JsonDictionaryMerger:
     def Add(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
     
-        self.inst.get().Add((<libcpp_string>in_0)) 
+        self.inst.get().Add((<libcpp_string>in_0))
+    
+    def SetManifest(self, manifest):
+        m = json.dumps(manifest)
+        self.inst.get().SetManifestFromString(m) 
 
 cdef class StringDictionaryCompiler:
 
@@ -945,6 +949,7 @@ cdef class Match:
                              m.SetScore(unserialized[4])
 
         return m 
+ 
  
  
  
