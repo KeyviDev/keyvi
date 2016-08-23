@@ -52,10 +52,10 @@ class Automata
 final {
 
    public:
-    Automata(const char * filename, bool load_lazy):
+    Automata(const std::string&  filename, bool load_lazy):
       Automata(filename, load_lazy ? loading_strategy_types::default_os : loading_strategy_types::populate) {}
 
-    explicit Automata(const char * filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
+    explicit Automata(const std::string&  filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
       std::ifstream in_stream(filename, std::ios::binary);
 
       if (!in_stream.good()) {
@@ -85,7 +85,7 @@ final {
       size_t offset = in_stream.tellg();
 
       file_mapping_ = new boost::interprocess::file_mapping(
-          filename, boost::interprocess::read_only);
+          filename.c_str(), boost::interprocess::read_only);
       size_t array_size = boost::lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
 
       in_stream.seekg(offset + array_size + bucket_size * array_size - 1);

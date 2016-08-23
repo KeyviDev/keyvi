@@ -5,7 +5,7 @@
             key = key.encode('utf-8')
         assert isinstance(key, bytes), 'arg in_0 wrong type'
     
-        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
+        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<libcpp_string>key)]))
 
         if _r.get().IsEmpty():
             return default
@@ -30,7 +30,7 @@
 
         assert isinstance(key, bytes), 'arg in_0 wrong type'
     
-        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
+        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<libcpp_string>key)]))
 
         if _r.get().IsEmpty():
             raise KeyError(key)
