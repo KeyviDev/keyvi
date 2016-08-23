@@ -200,7 +200,7 @@ final {
       ConsumeStack(commonPrefixLength);
 
       // put everything that is not common between the two strings (the suffix) into the stack
-      FeedStack(commonPrefixLength, input_key.size(), input_key.c_str());
+      FeedStack(commonPrefixLength, input_key);
 
       // get value and mark final state
       bool no_minimization = false;
@@ -239,7 +239,7 @@ final {
       ConsumeStack(commonPrefixLength);
 
       // put everything that is not common between the two strings (the suffix) into the stack
-      FeedStack(commonPrefixLength, input_key.size(), input_key.c_str());
+      FeedStack(commonPrefixLength, input_key);
 
       stack_->InsertFinalState(input_key.size(), handle.value_idx, handle.no_minimization);
 
@@ -353,16 +353,16 @@ final {
       internal::SerializationUtils::WriteJsonRecord(stream, pt);
     }
 
-    inline void FeedStack(const size_t start, const size_t end, const std::string& key) {
-      for (size_t i = start; i < end; ++i) {
+    inline void FeedStack(const size_t start, const std::string& key) {
+      for (size_t i = start; i < key.size(); ++i) {
         uint32_t ukey =
             static_cast<uint32_t>(static_cast<unsigned char>(key[i]));
         stack_->Insert(i, ukey, 0);
       }
 
       // remember highest stack
-      if (end > highest_stack_) {
-        highest_stack_ = end;
+      if (key.size() > highest_stack_) {
+        highest_stack_ = key.size();
       }
     }
 
