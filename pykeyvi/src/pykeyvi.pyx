@@ -84,7 +84,11 @@ cdef class JsonDictionaryMerger:
     def Add(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
     
-        self.inst.get().Add((<libcpp_string>in_0)) 
+        self.inst.get().Add((<libcpp_string>in_0))
+    
+    def SetManifest(self, manifest):
+        m = json.dumps(manifest)
+        self.inst.get().SetManifestFromString(m) 
 
 cdef class StringDictionaryCompiler:
 
@@ -125,21 +129,21 @@ cdef class StringDictionaryCompiler:
     def Add(self, bytes in_0 , bytes in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef const_char * input_in_1 = <const_char *> in_1
-        self.inst.get().Add(input_in_0, input_in_1)
+    
+    
+        self.inst.get().Add((<libcpp_string>in_0), (<libcpp_string>in_1))
     
     def __setitem__(self, bytes in_0 , bytes in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef const_char * input_in_1 = <const_char *> in_1
-        self.inst.get().__setitem__(input_in_0, input_in_1)
+    
+    
+        self.inst.get().__setitem__((<libcpp_string>in_0), (<libcpp_string>in_1))
     
     def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
+    
+        self.inst.get().WriteToFile((<libcpp_string>in_0))
     
     def __enter__(self):
         return self
@@ -175,9 +179,9 @@ cdef class JsonDictionaryCompiler:
     def __setitem__(self, bytes in_0 , bytes in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef const_char * input_in_1 = <const_char *> in_1
-        self.inst.get().__setitem__(input_in_0, input_in_1)
+    
+    
+        self.inst.get().__setitem__((<libcpp_string>in_0), (<libcpp_string>in_1))
     
     def _init_0(self):
         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler())
@@ -209,8 +213,8 @@ cdef class JsonDictionaryCompiler:
     
     def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
+    
+        self.inst.get().WriteToFile((<libcpp_string>in_0))
     
     def __enter__(self):
         return self
@@ -226,11 +230,11 @@ cdef class JsonDictionaryCompiler:
 
         if isinstance(key, unicode):
             key = key.encode('UTF-8')
-        cdef const_char * input_in_0 = <const_char *> key
+        cdef libcpp_string input_in_0 = <libcpp_string> key
 
         if isinstance(value, unicode):
             value = value.encode('UTF-8')
-        cdef const_char * input_in_1 = <const_char *> value
+        cdef libcpp_string input_in_1 = <libcpp_string> value
 
         self.inst.get().Add(input_in_0, input_in_1)
 
@@ -260,8 +264,8 @@ cdef class Dictionary:
     
     def LookupText(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().LookupText(input_in_0)
+    
+        cdef _MatchIteratorPair _r = self.inst.get().LookupText((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -269,8 +273,8 @@ cdef class Dictionary:
     
     def Lookup(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().Lookup(input_in_0)
+    
+        cdef _MatchIteratorPair _r = self.inst.get().Lookup((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -310,15 +314,15 @@ cdef class Dictionary:
     
     def _init_0(self, bytes filename ):
         assert isinstance(filename, bytes), 'arg filename wrong type'
-        cdef const_char * input_filename = <const_char *> filename
-        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename))
+    
+        self.inst = shared_ptr[_Dictionary](new _Dictionary((<libcpp_string>filename)))
     
     def _init_1(self, bytes filename , int in_1 ):
         assert isinstance(filename, bytes), 'arg filename wrong type'
         assert in_1 in [0, 1, 2, 3, 4, 5, 6, 7], 'arg in_1 wrong type'
-        cdef const_char * input_filename = <const_char *> filename
     
-        self.inst = shared_ptr[_Dictionary](new _Dictionary(input_filename, (<_loading_strategy_types>in_1)))
+    
+        self.inst = shared_ptr[_Dictionary](new _Dictionary((<libcpp_string>filename), (<_loading_strategy_types>in_1)))
     
     def __init__(self, *args):
         if (len(args)==1) and (isinstance(args[0], bytes)):
@@ -330,8 +334,8 @@ cdef class Dictionary:
     
     def Get(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().Get(input_in_0)
+    
+        cdef _MatchIteratorPair _r = self.inst.get().Get((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -342,7 +346,7 @@ cdef class Dictionary:
             key = key.encode('utf-8')
         assert isinstance(key, bytes), 'arg in_0 wrong type'
     
-        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
+        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<libcpp_string>key)]))
 
         if _r.get().IsEmpty():
             return default
@@ -367,7 +371,7 @@ cdef class Dictionary:
 
         assert isinstance(key, bytes), 'arg in_0 wrong type'
     
-        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<const_char *>key)]))
+        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<libcpp_string>key)]))
 
         if _r.get().IsEmpty():
             raise KeyError(key)
@@ -454,9 +458,9 @@ cdef class PrefixCompletion:
     def GetFuzzyCompletions(self, bytes in_0 ,  max_edit_distance ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(max_edit_distance, (int, long)), 'arg max_edit_distance wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
     
-        cdef _MatchIteratorPair _r = self.inst.get().GetFuzzyCompletions(input_in_0, (<int>max_edit_distance))
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetFuzzyCompletions((<libcpp_string>in_0), (<int>max_edit_distance))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -469,8 +473,8 @@ cdef class PrefixCompletion:
     
     def GetCompletions(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -486,8 +490,8 @@ cdef class ForwardBackwardCompletion:
     
     def _GetCompletions_0(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -496,9 +500,9 @@ cdef class ForwardBackwardCompletion:
     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
     
-        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0), (<int>in_1))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -540,16 +544,16 @@ cdef class CompletionDictionaryCompiler:
     def __setitem__(self, bytes in_0 ,  in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
     
-        self.inst.get().__setitem__(input_in_0, (<int>in_1))
+    
+        self.inst.get().__setitem__((<libcpp_string>in_0), (<int>in_1))
     
     def Add(self, bytes in_0 ,  in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
     
-        self.inst.get().Add(input_in_0, (<int>in_1))
+    
+        self.inst.get().Add((<libcpp_string>in_0), (<int>in_1))
     
     def _init_0(self):
         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
@@ -627,8 +631,8 @@ cdef class MultiWordCompletion:
     
     def _GetCompletions_0(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0)
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -637,9 +641,9 @@ cdef class MultiWordCompletion:
     def _GetCompletions_1(self, bytes in_0 ,  in_1 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
     
-        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions(input_in_0, (<int>in_1))
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0), (<int>in_1))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
@@ -693,16 +697,16 @@ cdef class KeyOnlyDictionaryGenerator:
     
     def Add(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().Add(input_in_0)
+    
+        self.inst.get().Add((<libcpp_string>in_0))
     
     def CloseFeeding(self):
         self.inst.get().CloseFeeding()
     
     def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0) 
+    
+        self.inst.get().WriteToFile((<libcpp_string>in_0)) 
 
 cdef class KeyOnlyDictionaryCompiler:
 
@@ -742,8 +746,8 @@ cdef class KeyOnlyDictionaryCompiler:
     
     def Add(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().Add(input_in_0)
+    
+        self.inst.get().Add((<libcpp_string>in_0))
     
     def WriteToFile(self, bytes in_0 ):
         assert isinstance(in_0, bytes), 'arg in_0 wrong type'
@@ -945,6 +949,7 @@ cdef class Match:
                              m.SetScore(unserialized[4])
 
         return m 
+ 
  
  
  

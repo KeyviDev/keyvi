@@ -109,6 +109,15 @@ private:
     dicts_to_merge_.push_back(fsa);
   }
 
+  /**
+   * Set a custom manifest to be embedded into the index file.
+   *
+   * @param manifest as JSON string
+   */
+  void SetManifestFromString(const std::string& manifest){
+    manifest_ = manifest;
+  }
+
   void Merge(const std::string& filename){
     std::priority_queue<SegmentIterator> pqueue;
 
@@ -165,6 +174,7 @@ private:
 
     generator.CloseFeeding();
 
+    generator.SetManifestFromString(manifest_);
     generator.WriteToFile(filename);
   }
 
@@ -172,6 +182,7 @@ private:
   std::vector<fsa::automata_t> dicts_to_merge_;
   size_t memory_limit_;
   fsa::internal::IValueStoreWriter::vs_param_t params_;
+  std::string manifest_ = std::string();
 };
 
 } /* namespace dictionary */

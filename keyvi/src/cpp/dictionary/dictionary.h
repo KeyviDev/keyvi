@@ -49,7 +49,7 @@ final {
    * @param filename the filename
    * @param load_lazy whether to load lazy.
    */
-    Dictionary(const char* filename, bool load_lazy)
+    Dictionary(const std::string& filename, bool load_lazy)
         : fsa_(std::make_shared<fsa::Automata>(filename, load_lazy)) {
       TRACE("Dictionary from file %s", filename);
     }
@@ -60,7 +60,7 @@ final {
      * @param filename filename to load keyvi file from.
      * @param loading_strategy optional: Loading strategy to use.
      */
-    explicit Dictionary(const char* filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+    explicit Dictionary(const std::string&  filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
        : fsa_(std::make_shared<fsa::Automata>(filename, loading_strategy)) {
       TRACE("Dictionary from file %s", filename);
     }
@@ -69,8 +69,7 @@ final {
         : fsa_(f) {
     }
 
-    // temporary implementation
-    fsa::automata_t GetFsa() {
+    fsa::automata_t GetFsa() const {
       return fsa_;
     }
 
@@ -88,9 +87,9 @@ final {
      * @param key The key
      * @return True if key is in the dictionary, False otherwise.
      */
-    bool Contains(const char* key) const {
+    bool Contains(const std::string& key) const {
       uint64_t state = fsa_->GetStartState();
-      size_t key_length = strlen(key);
+      const size_t key_length = key.size();
 
       TRACE("Contains for %s", key);
       for (size_t i = 0; i < key_length; ++i) {
@@ -111,9 +110,9 @@ final {
       return false;
     }
 
-    Match operator[](const char* key) const {
+    Match operator[](const std::string&  key) const {
       uint64_t state = fsa_->GetStartState();
-      size_t text_length = strlen(key);
+      const size_t text_length = key.size();
 
       for (size_t i = 0; i < text_length; ++i) {
         state = fsa_->TryWalkTransition(state, key[i]);
@@ -142,9 +141,9 @@ final {
      * @param key the key to lookup.
      * @return a match iterator
      */
-    MatchIterator::MatchIteratorPair Get(const char* key) const {
+    MatchIterator::MatchIteratorPair Get(const std::string& key) const {
       uint64_t state = fsa_->GetStartState();
-      size_t text_length = strlen(key);
+      const size_t text_length = key.size();
 
       for (size_t i = 0; i < text_length; ++i) {
         state = fsa_->TryWalkTransition(state, key[i]);
@@ -256,11 +255,11 @@ final {
      * @param text the input
      * @return a match iterator.
      */
-    MatchIterator::MatchIteratorPair Lookup(const char* text,
+    MatchIterator::MatchIteratorPair Lookup(const std::string& text,
                                             size_t offset = 0) {
 
       uint64_t state = fsa_->GetStartState();
-      size_t text_length = strlen(text);
+      const size_t text_length = text.size();
       uint64_t last_final_state = 0;
       size_t last_final_state_position = 0;
 
@@ -287,8 +286,7 @@ final {
         m = Match(
             offset,
             last_final_state_position,
-            /*text.substr(0, last_final_state_position),*/
-            std::string(text + offset, last_final_state_position - offset),
+            text.substr(offset, last_final_state_position - offset),
             0,
             fsa_,
             fsa_->GetStateValue(last_final_state));
@@ -313,9 +311,9 @@ final {
      * @param text the input
      * @return a match iterator.
      */
-    MatchIterator::MatchIteratorPair LookupText(const char* text) {
+    MatchIterator::MatchIteratorPair LookupText(const std::string& text) {
 
-      size_t text_length = strlen(text);
+      const size_t text_length = text.size();
       std::queue<MatchIterator> iterators;
 
       TRACE("LookupText, 1st lookup for: %s", text);
