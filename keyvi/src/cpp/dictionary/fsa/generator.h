@@ -189,7 +189,7 @@ final {
     void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                  ValueStoreT::no_value) {
 
-      size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
+      const size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
 
       // keys are equal, just return
       if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {
@@ -228,7 +228,7 @@ final {
      */
     void Add(const std::string& input_key, const ValueHandle& handle) {
 
-      size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
+      const size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
 
       // keys are equal, just return
       if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {

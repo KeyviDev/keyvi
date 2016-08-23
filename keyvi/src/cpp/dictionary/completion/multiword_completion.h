@@ -49,7 +49,7 @@ public:
     }
 
     MatchIterator::MatchIteratorPair GetCompletions(
-        const char* query, int number_of_results = 10) {
+        const std::string& query, int number_of_results = 10) const {
 
       uint64_t state = fsa_->GetStartState();
       size_t number_of_tokens;

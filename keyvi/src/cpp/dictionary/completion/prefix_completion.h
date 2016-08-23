@@ -50,10 +50,10 @@ final {
     }
 
     MatchIterator::MatchIteratorPair GetCompletions(
-        const char* query, int number_of_results = 10) {
+        const std::string& query, int number_of_results = 10) {
 
       uint64_t state = fsa_->GetStartState();
-      size_t query_length = strlen(query);
+      const size_t query_length = query.size();
       size_t depth = 0;
 
       std::vector<unsigned char> traversal_stack;
@@ -93,7 +93,7 @@ final {
         if (fsa_->IsFinalState(state)) {
           TRACE("prefix matched depth %d %s", query_length + data->traverser.GetDepth(), std::string(reinterpret_cast<char*> (&data->traversal_stack[0]), query_length + data->traverser.GetDepth()).c_str());
           first_match = Match(
-              0, query_length, std::string(query, query_length), 0, fsa_, fsa_->GetStateValue(state));
+              0, query_length, std::string(query.c_str(), query_length), 0, fsa_, fsa_->GetStateValue(state));
         }
 
         auto tfunc =
@@ -137,16 +137,16 @@ final {
     }
 
     MatchIterator::MatchIteratorPair GetFuzzyCompletions(
-        const char* query, int max_edit_distance) {
+        const std::string& query, int max_edit_distance) {
 
       uint64_t state = fsa_->GetStartState();
-      size_t query_length = strlen(query);
+      const size_t query_length = query.size();
       size_t depth = 0;
       const size_t minimum_exact_prefix = 2;
       size_t exact_prefix = std::min(query_length, minimum_exact_prefix);
       std::vector<int> codepoints;
 
-      utf8::unchecked::utf8to32(query, query + query_length,
+      utf8::unchecked::utf8to32(query.c_str(), query.c_str() + query_length,
                                 back_inserter(codepoints));
 
       stringdistance::Levenshtein metric(codepoints, 20, 3);
@@ -185,7 +185,7 @@ final {
         if (depth == query_length && fsa_->IsFinalState(state)) {
           TRACE("prefix matched depth %d %s", query_length + data->traverser.GetDepth(), std::string(query, query_length).c_str());
           first_match = Match(
-              0, query_length, std::string(query, query_length), 0, fsa_, fsa_->GetStateValue(state));
+              0, query_length, std::string(query.c_str(), query_length), 0, fsa_, fsa_->GetStateValue(state));
         }
 
         auto tfunc =

@@ -57,10 +57,10 @@ final {
     };
 
     MatchIterator::MatchIteratorPair GetCompletions(
-        const char* query, int number_of_results = 10) {
+        const std::string& query, int number_of_results = 10) {
 
       // get query length
-      size_t query_length = strlen(query);
+      const size_t query_length = query.size();
 
       // get tokens
       std::vector<std::string> strs;

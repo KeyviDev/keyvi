@@ -90,7 +90,7 @@ final {
      */
     bool Contains(const std::string& key) const {
       uint64_t state = fsa_->GetStartState();
-      size_t key_length = key.size();
+      const size_t key_length = key.size();
 
       TRACE("Contains for %s", key);
       for (size_t i = 0; i < key_length; ++i) {
@@ -113,7 +113,7 @@ final {
 
     Match operator[](const std::string&  key) const {
       uint64_t state = fsa_->GetStartState();
-      size_t text_length = key.size();
+      const size_t text_length = key.size();
 
       for (size_t i = 0; i < text_length; ++i) {
         state = fsa_->TryWalkTransition(state, key[i]);
@@ -144,7 +144,7 @@ final {
      */
     MatchIterator::MatchIteratorPair Get(const std::string& key) const {
       uint64_t state = fsa_->GetStartState();
-      size_t text_length = key.size();
+      const size_t text_length = key.size();
 
       for (size_t i = 0; i < text_length; ++i) {
         state = fsa_->TryWalkTransition(state, key[i]);
@@ -260,7 +260,7 @@ final {
                                             size_t offset = 0) {
 
       uint64_t state = fsa_->GetStartState();
-      size_t text_length = text.size();
+      const size_t text_length = text.size();
       uint64_t last_final_state = 0;
       size_t last_final_state_position = 0;
 
@@ -315,7 +315,7 @@ final {
      */
     MatchIterator::MatchIteratorPair LookupText(const std::string& text) {
 
-      size_t text_length = text.size();
+      const size_t text_length = text.size();
       std::queue<MatchIterator> iterators;
 
       TRACE("LookupText, 1st lookup for: %s", text);
