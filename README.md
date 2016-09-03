@@ -13,6 +13,11 @@ Keyvi - the short form for "Key value index" - defines a special subtype of the 
 [cov-badge]: https://coveralls.io/repos/cliqz-oss/keyvi/badge.svg?branch=master&service=github
 [cov-link]:  https://coveralls.io/github/cliqz-oss/keyvi?branch=master
 
+## Introduction
+  * [BBuzz2016 talk](https://www.youtube.com/watch?v=GBjisdmHe4g)
+  * [Announcement blog post](https://cliqz.com/en/aboutus/blog/keyvi)
+  * [Search Meetup Munich Slidedeck](http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz)
+
 ## Install
 
 ### Quick
@@ -30,9 +35,6 @@ tools are also part of the C++ code. For instructions check the [Readme](/keyvi/
 
 For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
 
-## Read
-  * [Announcement blog post](https://cliqz.com/en/aboutus/blog/keyvi)
-  * [Search Meetup Munich Slidedeck](http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz)
 
 ## Usage
 
