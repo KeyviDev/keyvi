@@ -14,6 +14,11 @@ def test_compiler_no_compile_edge_case():
     del c
 
 
+def test_compiler_no_compile_edge_case_empty():
+    c = pykeyvi.KeyOnlyDictionaryCompiler()
+    del c
+
+
 def test_compiler_empty():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
     with test_tools.tmp_dictionary(c, 'empty.kv') as d:
