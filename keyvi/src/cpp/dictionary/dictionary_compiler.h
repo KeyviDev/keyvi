@@ -160,15 +160,10 @@ class DictionaryCompiler
       value_store_->CloseFeeding();
       sorter_.end();
       sorter_.merge_runs();
-
-      // check that at least 1 item is there
-      if (!sorter_.can_pull()) {
-        return;
-      }
-
       CreateGenerator();
 
-      {
+      // check that at least 1 item is there
+      if (sorter_.can_pull()) {
         number_of_items_ = sorter_.item_count();
 
         callback_trigger_ = 1+(number_of_items_-1)/100;
