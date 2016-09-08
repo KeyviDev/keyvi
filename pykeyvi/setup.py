@@ -156,7 +156,7 @@ with symlink_keyvi() as _:
         user_options = _bdist_rpm.bdist_rpm.user_options + custom_user_options
 
         def run(self):
-            def_setup_call = "%s %s build" % (self.python, os.path.basename(sys.argv[0]))
+            def_setup_call = "%s %s build" % (self.python, path.basename(sys.argv[0]))
 
             if self.staticlinkboost:
                 def_setup_call += " --staticlinkboost"
@@ -174,12 +174,12 @@ with symlink_keyvi() as _:
     ext_modules = [Extension('pykeyvi',
                              include_dirs=[autowrap_data_dir,
                                            tpie_include_dir,
-                                           os.path.join(dictionary_sources, 'src/cpp'),
-                                           os.path.join(dictionary_sources, '3rdparty/rapidjson/include'),
-                                           os.path.join(dictionary_sources, '3rdparty/msgpack-c/include'),
-                                           os.path.join(dictionary_sources, '3rdparty/utf8'),
-                                           os.path.join(dictionary_sources, '3rdparty/misc'),
-                                           os.path.join(dictionary_sources, '3rdparty/xchange/src')],
+                                           path.join(dictionary_sources, 'src/cpp'),
+                                           path.join(dictionary_sources, '3rdparty/rapidjson/include'),
+                                           path.join(dictionary_sources, '3rdparty/msgpack-c/include'),
+                                           path.join(dictionary_sources, '3rdparty/utf8'),
+                                           path.join(dictionary_sources, '3rdparty/misc'),
+                                           path.join(dictionary_sources, '3rdparty/xchange/src')],
                              language='c++',
                              sources=['src/pykeyvi.cpp'],
                              extra_compile_args=['-std=c++11', '-msse4.2'] + additional_compile_flags,
