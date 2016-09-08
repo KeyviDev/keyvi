@@ -5,22 +5,25 @@ import pykeyvi
 
 import sys
 import os
+import tempfile
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
 
+tmp_dir = tempfile.gettempdir()
+
 def test_invalid_filemagic():
-    fd = open('broken_file','w')
+    fd = open(os.path.join(tmp_dir, 'broken_file'),'w')
     fd.write ('dead beef')
     fd.close()
     exception_caught = False
     try:
-        d=pykeyvi.Dictionary('broken_file')
+        d=pykeyvi.Dictionary(os.path.join(tmp_dir, 'broken_file'))
     except ValueError:
         exception_caught = True
 
     assert exception_caught
-    os.remove('broken_file')
+    os.remove(os.path.join(tmp_dir, 'broken_file'))
 
 def test_truncated_file_json():
     c=pykeyvi.JsonDictionaryCompiler()
@@ -30,20 +33,20 @@ def test_truncated_file_json():
     c.Add('d', '{2:3}')
     c.Compile()
 
-    c.WriteToFile('truncation_test.kv')
-    size = os.path.getsize('truncation_test.kv')
+    c.WriteToFile(os.path.join(tmp_dir,'truncation_test.kv'))
+    size = os.path.getsize(os.path.join(tmp_dir, 'truncation_test.kv'))
 
-    fd_in = open('truncation_test.kv')
-    fd = open('truncation_test1.kv', 'w')
+    fd_in = open(os.path.join(tmp_dir,'truncation_test.kv'))
+    fd = open(os.path.join(tmp_dir,'truncation_test1.kv'), 'w')
     fd.write(fd_in.read(size/2))
     fd.close()
 
     exception_caught = False
     try:
-        d=pykeyvi.Dictionary('truncation_test1.kv')
+        d=pykeyvi.Dictionary(os.path.join(tmp_dir, 'truncation_test1.kv'))
     except ValueError:
         exception_caught = True
 
     assert exception_caught
-    os.remove('truncation_test1.kv')
-    os.remove('truncation_test.kv')
+    os.remove(os.path.join(tmp_dir, 'truncation_test1.kv'))
+    os.remove(os.path.join(tmp_dir, 'truncation_test.kv'))
