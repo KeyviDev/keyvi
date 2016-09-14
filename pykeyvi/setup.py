@@ -151,26 +151,6 @@ with symlink_keyvi() as _:
             _build_ext.build_ext.run(self)
 
 
-    class bdist_rpm(custom_opts, _bdist_rpm.bdist_rpm):
-        parent = _bdist_rpm.bdist_rpm
-        user_options = _bdist_rpm.bdist_rpm.user_options + custom_user_options
-
-        def run(self):
-            def_setup_call = "%s %s build" % (self.python, path.basename(sys.argv[0]))
-
-            if self.staticlinkboost:
-                def_setup_call += " --staticlinkboost"
-
-            def_setup_call += " --mode " + self.mode
-            with tempfile.NamedTemporaryFile(suffix="_pykeyvi_rpm") as tmp:
-                # Do stuff with tmp
-                tmp.write(def_setup_call)
-                tmp.flush()
-                self.build_script = tmp.name
-
-                self.parent.run(self)
-
-
     ext_modules = [Extension('pykeyvi',
                              include_dirs=[autowrap_data_dir,
                                            tpie_include_dir,
@@ -200,7 +180,7 @@ with symlink_keyvi() as _:
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
         license="ASL 2.0",
-        cmdclass={'build_ext': build_ext, 'build': build, 'bdist_rpm': bdist_rpm},
+        cmdclass={'build_ext': build_ext, 'build': build },
         ext_modules=ext_modules,
         zip_safe=False,
         url='https://github.com/cliqz/keyvi',
