@@ -71,6 +71,12 @@ defined(OS_DRAGONFLYBSD)
 #error "Unknown endianess"
 #endif
 
+// tmp workaround to test travis docker builds
+#define htole16(x) (x)
+#define le16toh(x) (x)
+#define be32toh(x) (x)
+#define htobe32(x) (x)
+
 #endif
 
 
