@@ -1,10 +1,8 @@
 from setuptools import setup, Extension
 import distutils.command.build as _build
-import distutils.command.bdist_rpm as _bdist_rpm
 import distutils.command.build_ext as _build_ext
 import os
 import sys
-import tempfile
 import subprocess
 import multiprocessing
 
@@ -22,7 +20,7 @@ def symlink_keyvi():
         yield
 
 
-with symlink_keyvi() as _:
+with symlink_keyvi():
     # workaround for autwrap bug (includes incompatible boost)
     autowrap_data_dir = "autowrap_includes"
 
@@ -140,7 +138,7 @@ with symlink_keyvi() as _:
                 tpie_build_cmd = 'mkdir -p {}'.format(tpie_build_dir)
                 tpie_build_cmd += ' && cd {}'.format(tpie_build_dir)
                 tpie_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=Release ' \
-                                  ' -D TPIE_PARALLEL_SORT=1 -D CMAKE_CXX_FLAGS="-fPIC -std=c++11"' \
+                                  ' -D TPIE_PARALLEL_SORT=1 -D COMPILE_TEST=OFF -D CMAKE_CXX_FLAGS="-fPIC -std=c++11"' \
                                   ' -D CMAKE_INSTALL_PREFIX={} ..'.format(tpie_install_prefix)
                 tpie_build_cmd += ' && make -j {}'.format(cpu_count)
                 tpie_build_cmd += ' && make install'
