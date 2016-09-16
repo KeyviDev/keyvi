@@ -83,6 +83,8 @@ script:
   - ln -s ../../keyvi/src/cpp/ .
   - cd ..
   - cd ..
+  - rm -rf pykeyvi/build
+  - rm -rf pykeyvi/dist
   - rm -rf keyvi/3rdparty/tpie/build/
   - docker run --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/build_wheels.sh
 
