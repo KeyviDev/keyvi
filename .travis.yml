@@ -83,7 +83,7 @@ script:
   - ln -s ../../keyvi/src/cpp/ .
   - cd ..
   - cd ..
-  - rm -rf /keyvi/keyvi/3rdparty/tpie/build/
+  - rm -rf keyvi/3rdparty/tpie/build/
   - docker run --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/build_wheels.sh
 
 after_success:
