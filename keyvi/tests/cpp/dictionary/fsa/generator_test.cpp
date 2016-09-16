@@ -172,6 +172,22 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
   BOOST_CHECK(it == end_it);
 }
 
+BOOST_AUTO_TEST_CASE( state_exception_handling ) {
+  internal::SparseArrayPersistence<> p(2048,
+                                       boost::filesystem::temp_directory_path());
+
+  Generator<internal::SparseArrayPersistence<>> g;
+
+  BOOST_CHECK_THROW( g.WriteToFile("somefile"), generator_exception );
+
+  g.Add("abcd");
+  BOOST_CHECK_THROW( g.WriteToFile("somefile"), generator_exception );
+  g.CloseFeeding();
+  BOOST_CHECK_THROW( g.CloseFeeding(), generator_exception );
+
+  BOOST_CHECK_THROW( g.Add("cdef"), generator_exception );
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */
