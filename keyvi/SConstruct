@@ -104,7 +104,7 @@ tpie_build_cmd = "cd 3rdparty/tpie && mkdir -p build && cd build &&"
 if custom_boost:
     tpie_build_cmd += " export BOOST_ROOT={} &&".format(custom_boost)
 
-tpie_build_cmd += " CXX=" + env["CXX"] + " cmake"
+tpie_build_cmd += " CXX=" + env["CXX"] + " cmake -D COMPILE_TEST=OFF"
 tpie_build_cmd += " -D CMAKE_BUILD_TYPE:STRING=Release -D CMAKE_INSTALL_PREFIX=install -D TPIE_PARALLEL_SORT=1 -D CMAKE_CXX_FLAGS=\"-fPIC -std=c++11\" .. && "
 tpie_build_cmd += "make -j " + str(GetOption('num_jobs')) + " && make install"
 
