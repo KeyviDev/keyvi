@@ -61,6 +61,14 @@
 #elif defined(OS_FREEBSD) || defined(OS_OPENBSD) || defined(OS_NETBSD) || defined(OS_DRAGONFLYBSD)
     #include <sys/types.h>
     #include <sys/endian.h>
+#elif defined(__linux__) && (__BYTE_ORDER == __LITTLE_ENDIAN) && (__GLIBC__ <= 2 && __GLIBC_MINOR__ < 9)
+
+    #define CLQ_LITTLE_ENDIAN
+    #define htole16(x) (x)
+    #define le16toh(x) (x)
+    #define htobe32(x) __bswap_32(x)
+    #define be32toh(x) __bswap_32(x)
+
 #else
     #include <endian.h>
     #if __BYTE_ORDER == __LITTLE_ENDIAN
@@ -70,12 +78,6 @@
     #else
         #error "Unknown endianess"
     #endif
-
-// tmp workaround to test travis docker builds
-#define htole16(x) (x)
-#define le16toh(x) (x)
-#define be32toh(x) (x)
-#define htobe32(x) (x)
 
 #endif
 
