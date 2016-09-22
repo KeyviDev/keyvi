@@ -3,5 +3,5 @@ set -ev
 
 docker run --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/travis/build_wheels.sh
 
-pip install --user python_keyvi -f wheelhouse/
+pip install --user wheelhouse/python_keyvi*.whl
 py.test tests/
