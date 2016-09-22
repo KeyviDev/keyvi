@@ -27,10 +27,10 @@ env:
     - CONF=debug   ARCH=x86_64
     - CONF=release ARCH=x86_64
     - CONF=coverage ARCH=x86_64
+    - PACKAGING=1   DOCKER_IMAGE=cliqz/keyvi-manylinux-builder
   global:
     - GITHUB_REPO='cliqz-oss/keyvi'
     - secure: "cy3LYIeuSxIdDt4GArpStoawmlEXy7oVX/Z72hwcXVj6EgQ8za16GaayQCLbHy9Hlm0K42QmWg4s7iOm/QzKBlZAwvHMktmHIVoovXe+i83bRVclMr/zvzhEeSyCy4xbBEBT8qt4p0dwX4hOF6cfy+rpNsI+CMBbGgMSS/MZHm/FmF5fKqcZBJfZfEPOqOukID4NPirDlZ8Jmg8JR1K722+xXvwbSif0a6wJ3p517JjYJxO8a7AzdXJMXC3sJmpsSCBwp+NG9BrwJ/MgQFHKUEhPoPFOEI7P57rH9Cax8+y9j7ukwlB36Ae5ApddcXYbQMOtpoA+DvR5JbsbYWi4/T6qUntYmpRy5gPVD/IwIAldEt3iERswjWFHgUjN+JaJ6YqQHl5ks++NZbB6W8eqP2Id1Oa669b6uxFn62Ln43TcvY4bapJEscj7goReiQGjwIWjBxphP/eJaPae642HnpBijPjAG+uA8IyO2nuY/+xULMiNXDFGVmBC5VfYp95Y71ZlUpfUv6u96mXc3ruWmDRzGNNgNXmzIGfD5bxn2uxMykOW6ubG4mnxOT/qMia8yrYsPYdBsvc1u2XWHAUUrHPVr9HmFo68y3AfuXwXH2Eb0fGTxNmaihabcqoBdm6HRK3aRLqXweBI2xXyOY8Tf07hUy+G7qkg2ZrsEgwWg+k="  # COVERALLS_REPO_TOKEN
-    - DOCKER_IMAGE=cliqz/keyvi-manylinux-builder
 
 before_install:
   - pip install --user --download-cache $HOME/.pip-cache --use-wheel --install-option="--no-cython-compile" cython
@@ -71,11 +71,8 @@ addons:
     - libstdc++-4.8-dev
 
 script:
-  - ./travis/build_linux.sh
-  - rm -rf pykeyvi/build
-  - rm -rf pykeyvi/dist
-  - rm -rf keyvi/3rdparty/tpie/build/
-  - docker run --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/build_wheels.sh
+  - if [ "$PACKAGING" != "1" ]; then ./travis/build_linux.sh ; fi
+  - if [ "$PACKAGING" == "1" ]; then docker run --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/build_wheels.sh ; fi
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/coverage.sh ; fi
