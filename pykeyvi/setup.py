@@ -165,7 +165,7 @@ with symlink_keyvi():
                              library_dirs=[tpie_lib_dir],
                              libraries=linklibraries)]
 
-    PACKAGE_NAME = 'python-keyvi'
+    PACKAGE_NAME = 'pykeyvi'
 
     install_requires = [
         'msgpack-python',
