@@ -12,7 +12,3 @@ for whl in dist/*.whl; do
     auditwheel show $whl
     auditwheel repair $whl -w wheelhouse/
 done
-
-#${PYBIN}/pip install pytest
-#${PYBIN}/pip install python_keyvi -f wheelhouse/
-#${PYBIN}/py.test tests/

@@ -72,7 +72,7 @@ addons:
 
 script:
   - if [ "$PACKAGING" != "1" ]; then ./travis/build_linux.sh ; fi
-  - if [ "$PACKAGING" == "1" ]; then docker run --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/build_wheels.sh ; fi
+  - if [ "$PACKAGING" == "1" ]; then ./travis/build_manylinux_package.sh ; fi
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/coverage.sh ; fi
