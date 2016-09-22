@@ -72,16 +72,11 @@ addons:
 
 script:
   - ./travis/build_linux.sh
-# workaround for coverage measurement: symlink cpp source:
-  - cd pykeyvi/src
-  - ln -s ../../keyvi/src/cpp/ .
-  - cd ..
-  - cd ..
   - rm -rf pykeyvi/build
   - rm -rf pykeyvi/dist
   - rm -rf keyvi/3rdparty/tpie/build/
   - docker run --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/build_wheels.sh
 
 after_success:
-  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then coveralls -r keyvi -b keyvi --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' -e 3rdparty -E '.*/tests/*.cpp' --dump keyvi.cov_report > /dev/null && coveralls -r pykeyvi -b pykeyvi --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp \-s '"$PWD"'/keyvi' -E '.*3rdparty' -E '.*/pykeyvi.cpp' -E '.*autowrap.*' --dump pykeyvi.cov_report --follow-symlinks > /dev/null && export COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} && coveralls-merge  keyvi.cov_report pykeyvi.cov_report ; fi
+  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/coverage.sh ; fi
 
