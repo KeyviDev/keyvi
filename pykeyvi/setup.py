@@ -51,6 +51,7 @@ with symlink_keyvi():
 
     if sys.platform == 'darwin':
         additional_compile_flags.append("-DOS_MACOSX")
+        additional_compile_flags.append('-mmacosx-version-min=10.9')
         linklibraries_static_or_dynamic.remove('boost_thread')
         linklibraries_static_or_dynamic.append('boost_thread-mt')
 
