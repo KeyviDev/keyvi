@@ -34,6 +34,7 @@ env:
 
 before_install:
   - pip install --upgrade pip
+  - pip install --user twine
   - pip install --user --use-wheel --install-option="--no-cython-compile" cython
   - pip install --user --use-wheel pytest
   - pip install --user --use-wheel msgpack-python
@@ -78,3 +79,9 @@ script:
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/coverage.sh ; fi
 
+deploy:
+  provider: script
+  script: travis/upload_packages.sh
+  skip_cleanup: true
+  on:
+    tags: true
