@@ -2,4 +2,6 @@
 set -ev
 
 cd pykeyvi
-twine upload --config-file ../travis/pypirc -r pypitest -u $PYPI_USERNAME -p $PYPI_PASSWORD wheelhouse/*
+if [ -n "$(ls -A wheelhouse)" ]; then
+    twine upload --config-file ../travis/pypirc -r pypitest -u $PYPI_USERNAME -p $PYPI_PASSWORD wheelhouse/*
+fi
