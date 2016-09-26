@@ -13,10 +13,6 @@ compiler:
 python:
   - 2.7
 
-cache:
-  directories:
-    - $HOME/.pip-cache
-
 env:
   matrix:
     - CONF=debug   ARCH=x86_64
