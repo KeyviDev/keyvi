@@ -1,6 +1,17 @@
 recursive-include autowrap_includes *.hpp
+include src/pykeyvi.cpp
+
 recursive-include keyvi/src/cpp *.h
+
 recursive-include keyvi/3rdparty *.h
 recursive-include keyvi/3rdparty *.inl
 recursive-include keyvi/3rdparty *.hpp
-recursive-include keyvi/3rdparty *.a
+recursive-include keyvi/3rdparty *.cpp
+recursive-include keyvi/3rdparty *.cpp.in
+
+recursive-include keyvi/3rdparty CMakeLists.txt
+recursive-include keyvi/3rdparty *.cmake
+recursive-include keyvi/3rdparty *.cmake.in
+
+recursive-include keyvi/3rdparty/tpie *.md
+graft keyvi/3rdparty/tpie/doc
