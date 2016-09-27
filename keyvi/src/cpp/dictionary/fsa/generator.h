@@ -25,6 +25,7 @@
 #ifndef GENERATOR_H_
 #define GENERATOR_H_
 
+#include <stdexcept>
 #include <arpa/inet.h>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -84,19 +85,26 @@ inline const char* c_stringify<std::string>(std::string const & str) {
 /**
  *  states of the generator
  *
- * EMPTY - generator is ready for consumption (status after constructor)
- * FEEDING - generator got some data but expects more or close()
+ * FEEDING - generator is ready for consumption, expects more data or close()
  * FINALIZING - generator got all data
  * COMPILED - automaton created, client can now call write(), get_automaton_t() and/or get_buffer()
  *
  */
 
-enum generator_state {
-  EMPTY,
+enum class generator_state {
   FEEDING,
   FINALIZING,
   COMPILED
 };
+
+/**
+ * Exception class for generator, thrown when generator is used in the wrong order.
+ */
+
+class generator_exception final: public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
 
 /**
  * Allows for generating a fsa from a sorted list of key-value pairs.
@@ -189,6 +197,10 @@ final {
     void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                  ValueStoreT::no_value) {
 
+      if(state_ != generator_state::FEEDING) {
+        throw generator_exception("not in feeding state");
+      }
+
       const size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
 
       // keys are equal, just return
@@ -227,6 +239,9 @@ final {
      * @param ValueHandle A handle returned by a previous call to RegisterValue
      */
     void Add(const std::string& input_key, const ValueHandle& handle) {
+      if(state_ != generator_state::FEEDING) {
+        throw generator_exception("not in feeding state");
+      }
 
       const size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
 
@@ -256,6 +271,12 @@ final {
     }
 
     void CloseFeeding() {
+      if(state_ != generator_state::FEEDING) {
+        throw generator_exception("not in feeding state");
+      }
+
+      state_ = generator_state::FINALIZING;
+
       // Consume all but stack[0].
       ConsumeStack(0);
 
@@ -268,10 +289,6 @@ final {
           (*unpackedState)[0].label, persistence_->ReadTransitionLabel(start_state_ + (*unpackedState)[0].label),
           (*unpackedState)[0].label == persistence_->ReadTransitionLabel(start_state_ + (*unpackedState)[0].label) ? "OK" : "BROKEN");
 
-      // todo: Special case: Automaton is empty??
-
-      state_ = generator_state::COMPILED;
-
       // free structures that are not needed anymore
       delete stack_;
       stack_ = 0;
@@ -280,6 +297,8 @@ final {
       builder_ = 0;
 
       persistence_->Flush();
+
+      state_ = generator_state::COMPILED;
     }
 
     /**
@@ -287,6 +306,10 @@ final {
      * @param stream The stream to write into.
      */
     void Write(std::ostream& stream) {
+      if(state_ != generator_state::COMPILED) {
+        throw generator_exception("not compiled yet");
+      }
+
       stream << "KEYVIFSA";
       WriteHeader(stream);
       // write data from persistence
@@ -335,7 +358,7 @@ final {
     std::string last_key_ = std::string();
     size_t highest_stack_ = 0;
     uint64_t number_of_keys_added_ = 0;
-    generator_state state_ = generator_state::EMPTY;
+    generator_state state_ = generator_state::FEEDING;
     OffsetTypeT start_state_ = 0;
     uint64_t number_of_states_ = 0;
     boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
