@@ -91,7 +91,7 @@ inline const char* c_stringify<std::string>(std::string const & str) {
  *
  */
 
-enum generator_state {
+enum class generator_state {
   FEEDING,
   FINALIZING,
   COMPILED
@@ -101,8 +101,8 @@ enum generator_state {
  * Exception class for generator, thrown when generator is used in the wrong order.
  */
 
-struct generator_exception: public std::runtime_error {
-  generator_exception(const std::string & s): std::runtime_error(s) {};
+class generator_exception final: public std::runtime_error {
+  using std::runtime_error::runtime_error;
 };
 
 
@@ -197,7 +197,7 @@ final {
     void Add(const std::string& input_key, typename ValueStoreT::value_t value =
                  ValueStoreT::no_value) {
 
-      if(state_ != FEEDING) {
+      if(state_ != generator_state::FEEDING) {
         throw generator_exception("not in feeding state");
       }
 
@@ -239,7 +239,7 @@ final {
      * @param ValueHandle A handle returned by a previous call to RegisterValue
      */
     void Add(const std::string& input_key, const ValueHandle& handle) {
-      if(state_ != FEEDING) {
+      if(state_ != generator_state::FEEDING) {
         throw generator_exception("not in feeding state");
       }
 
@@ -271,11 +271,11 @@ final {
     }
 
     void CloseFeeding() {
-      if(state_ != FEEDING) {
+      if(state_ != generator_state::FEEDING) {
         throw generator_exception("not in feeding state");
       }
 
-      state_ = FINALIZING;
+      state_ = generator_state::FINALIZING;
 
       // Consume all but stack[0].
       ConsumeStack(0);
@@ -289,10 +289,6 @@ final {
           (*unpackedState)[0].label, persistence_->ReadTransitionLabel(start_state_ + (*unpackedState)[0].label),
           (*unpackedState)[0].label == persistence_->ReadTransitionLabel(start_state_ + (*unpackedState)[0].label) ? "OK" : "BROKEN");
 
-      // todo: Special case: Automaton is empty??
-
-      state_ = generator_state::COMPILED;
-
       // free structures that are not needed anymore
       delete stack_;
       stack_ = 0;
@@ -302,7 +298,7 @@ final {
 
       persistence_->Flush();
 
-      state_ = COMPILED;
+      state_ = generator_state::COMPILED;
     }
 
     /**
@@ -310,7 +306,7 @@ final {
      * @param stream The stream to write into.
      */
     void Write(std::ostream& stream) {
-      if(state_ != COMPILED) {
+      if(state_ != generator_state::COMPILED) {
         throw generator_exception("not compiled yet");
       }
 
