@@ -152,11 +152,16 @@ with symlink_keyvi():
                 except:
                     cpu_count = 1
 
+                CMAKE_CXX_FLAGS='-fPIC -std=c++11'
+                if sys.platform == 'darwin':
+                    CMAKE_CXX_FLAGS += ' -mmacosx-version-min=10.9'
+
                 tpie_build_cmd = 'mkdir -p {}'.format(tpie_build_dir)
                 tpie_build_cmd += ' && cd {}'.format(tpie_build_dir)
                 tpie_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=Release ' \
-                                  ' -D TPIE_PARALLEL_SORT=1 -D COMPILE_TEST=OFF -D CMAKE_CXX_FLAGS="-fPIC -std=c++11 -mmacosx-version-min=10.9"' \
-                                  ' -D CMAKE_INSTALL_PREFIX={} ..'.format(tpie_install_prefix)
+                                  ' -D TPIE_PARALLEL_SORT=1 -D COMPILE_TEST=OFF -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
+                                  ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX} ..'.format(
+                                        CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=tpie_install_prefix)
                 tpie_build_cmd += ' && make -j {}'.format(cpu_count)
                 tpie_build_cmd += ' && make install'
 
