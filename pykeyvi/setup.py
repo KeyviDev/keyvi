@@ -5,6 +5,7 @@ import os
 import sys
 import subprocess
 import multiprocessing
+import shutil
 
 from contextlib import contextmanager
 from os import path
@@ -47,13 +48,18 @@ with symlink_keyvi():
         "z"
     ]
 
+    mac_os_static_libs_dir = 'mac_os_static_libs'
+
     extra_link_arguments = []
+    link_library_dirs = [tpie_lib_dir]
 
     if sys.platform == 'darwin':
         additional_compile_flags.append("-DOS_MACOSX")
         additional_compile_flags.append('-mmacosx-version-min=10.9')
         linklibraries_static_or_dynamic.remove('boost_thread')
         linklibraries_static_or_dynamic.append('boost_thread-mt')
+        link_library_dirs.append(mac_os_static_libs_dir)
+        extra_link_arguments.append('-L{}'.format(mac_os_static_libs_dir))
 
     #########################
     # Custom 'build' command
@@ -130,6 +136,16 @@ with symlink_keyvi():
 
     class build_ext(_build_ext.build_ext):
         def run(self):
+            if sys.platform == 'darwin':
+                if not os.path.exists(mac_os_static_libs_dir):
+                    os.makedirs(mac_os_static_libs_dir)
+
+                for lib in linklibraries_static_or_dynamic:
+                    lib_file_name = 'lib{}.a'.format(lib)
+                    src_file = path.join('/usr/local/lib', lib_file_name)
+                    dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
+                    shutil.copyfile(src_file, dst_file)
+
             if not path.exists(path.join(tpie_lib_dir, 'libtpie.a')):
                 try:
                     cpu_count = multiprocessing.cpu_count()
@@ -139,7 +155,7 @@ with symlink_keyvi():
                 tpie_build_cmd = 'mkdir -p {}'.format(tpie_build_dir)
                 tpie_build_cmd += ' && cd {}'.format(tpie_build_dir)
                 tpie_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=Release ' \
-                                  ' -D TPIE_PARALLEL_SORT=1 -D COMPILE_TEST=OFF -D CMAKE_CXX_FLAGS="-fPIC -std=c++11"' \
+                                  ' -D TPIE_PARALLEL_SORT=1 -D COMPILE_TEST=OFF -D CMAKE_CXX_FLAGS="-fPIC -std=c++11 -mmacosx-version-min=10.9"' \
                                   ' -D CMAKE_INSTALL_PREFIX={} ..'.format(tpie_install_prefix)
                 tpie_build_cmd += ' && make -j {}'.format(cpu_count)
                 tpie_build_cmd += ' && make install'
@@ -162,8 +178,8 @@ with symlink_keyvi():
                              language='c++',
                              sources=['src/pykeyvi.cpp'],
                              extra_compile_args=['-std=c++11', '-msse4.2'] + additional_compile_flags,
-                             extra_link_args=[],
-                             library_dirs=[tpie_lib_dir],
+                             extra_link_args=extra_link_arguments,
+                             library_dirs=link_library_dirs,
                              libraries=linklibraries)]
 
     PACKAGE_NAME = 'pykeyvi'
