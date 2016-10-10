@@ -1,4 +1,5 @@
 from libcpp.string cimport string as libcpp_string
+from libcpp.string  cimport string as libcpp_utf8_string
 from libcpp.map cimport map as libcpp_map
 from libc.string cimport const_char
 
@@ -9,6 +10,6 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         JsonDictionaryMerger() except +
         JsonDictionaryMerger(size_t memory_limit) except +
         JsonDictionaryMerger(size_t memory_limit, libcpp_map[libcpp_string, libcpp_string] value_store_params) except +
-        void Add(libcpp_string) except +
-        void SetManifestFromString(libcpp_string) # wrap-ignore
-        void Merge(libcpp_string) nogil
+        void Add(libcpp_utf8_string) except +
+        void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
+        void Merge(libcpp_utf8_string) nogil
