@@ -7,6 +7,6 @@ cd ..
 
 cd pykeyvi
 python setup.py bdist_wheel -d osx_wheel
-pip install osx_wheel/*.whl
+sudo pip install osx_wheel/*.whl
 py.test tests
 cd ..
