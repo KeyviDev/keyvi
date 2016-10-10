@@ -170,6 +170,9 @@ private:
         pqueue.push(segment_it);
       }
     }
+
+    dicts_to_merge_.clear();
+
     TRACE("finished iterating, do final compile.");
 
     generator.CloseFeeding();
