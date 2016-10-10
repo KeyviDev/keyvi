@@ -31,12 +31,8 @@ env:
 
 before_install:
   - pip install --upgrade pip
-  - pip install --user twine
-  - pip install --user --use-wheel --install-option="--no-cython-compile" cython
-  - pip install --user --use-wheel pytest
-  - pip install --user --use-wheel msgpack-python
-  - if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install --user --use-wheel coveralls-merge; fi
-  - if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install --user --use-wheel cpp-coveralls; fi
+  - pip install twine pytest msgpack-python
+  - if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install coveralls-merge cpp-coveralls ; fi
 
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
