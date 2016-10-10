@@ -6,7 +6,7 @@ scons -j 4 mode=release
 cd ..
 
 cd pykeyvi
-python setup.py bdist_wheel -d wheelhouse
-pip install wheelhouse/*.whl
+python setup.py bdist_wheel -d osx_wheel
+pip install osx_wheel/*.whl
 py.test tests
 cd ..

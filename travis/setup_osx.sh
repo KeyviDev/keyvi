@@ -2,4 +2,4 @@
 set -ev
 
 brew update
-brew install snappy scons
+brew install snappy scons cmake
