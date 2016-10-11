@@ -1,5 +1,6 @@
 from libc.string cimport const_char
 from libcpp.string cimport string as libcpp_string
+from libcpp.string cimport string as libcpp_utf8_string
 from libc.stdint cimport uint32_t
 from libcpp cimport bool
 from match cimport Match
@@ -17,16 +18,16 @@ cdef extern from "dictionary/dictionary.h" namespace "keyvi::dictionary":
         populate_key_part_no_readahead_value_part # populate the key part, but disable read ahead value part
         
     cdef cppclass Dictionary:
-        Dictionary (libcpp_string filename) except +
-        Dictionary (libcpp_string filename, loading_strategy_types) except +
-        bool Contains (libcpp_string) # wrap-ignore
-        Match operator[](libcpp_string) # wrap-ignore
-        _MatchIteratorPair Get (libcpp_string)
-        _MatchIteratorPair GetNear (libcpp_string, size_t minimum_prefix_length) except +
-        _MatchIteratorPair GetNear (libcpp_string, size_t minimum_prefix_length, bool greedy) except +
+        Dictionary (libcpp_utf8_string filename) except +
+        Dictionary (libcpp_utf8_string filename, loading_strategy_types) except +
+        bool Contains (libcpp_utf8_string) # wrap-ignore
+        Match operator[](libcpp_utf8_string) # wrap-ignore
+        _MatchIteratorPair Get (libcpp_utf8_string)
+        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except +
+        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except +
         _MatchIteratorPair GetAllItems () # wrap-ignore
-        _MatchIteratorPair Lookup(libcpp_string)
-        _MatchIteratorPair LookupText(libcpp_string)
+        _MatchIteratorPair Lookup(libcpp_utf8_string)
+        _MatchIteratorPair LookupText(libcpp_utf8_string)
         libcpp_string GetManifestAsString() except + # wrap-ignore
         libcpp_string GetStatistics() # wrap-ignore
         uint32_t GetSize() # wrap-ignore

@@ -1,11 +1,14 @@
 #cython: c_string_encoding=ascii  # for cython>=0.19
 from  libcpp.string  cimport string as libcpp_string
+from  libcpp.string  cimport string as libcpp_utf8_string
 from  libcpp.set     cimport set as libcpp_set
 from  libcpp.vector  cimport vector as libcpp_vector
 from  libcpp.pair    cimport pair as libcpp_pair
 from  libcpp.map     cimport map  as libcpp_map
 from  smart_ptr cimport shared_ptr
 from  AutowrapRefHolder cimport AutowrapRefHolder
+from  AutowrapPtrHolder cimport AutowrapPtrHolder
+from  AutowrapConstPtrHolder cimport AutowrapConstPtrHolder
 from  libcpp cimport bool
 from  libc.string cimport const_char
 from cython.operator cimport dereference as deref, preincrement as inc, address as address
@@ -66,7 +69,7 @@ cdef class JsonDictionaryMerger:
         self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger((<size_t>memory_limit), deref(v1)))
         del v1
     
-    def __init__(self, *args):
+    def __init__(self, *args , **kwargs):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
@@ -76,14 +79,16 @@ cdef class JsonDictionaryMerger:
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def Merge(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Merge(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst.get().Merge((<libcpp_string>in_0))
     
-    def Add(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Add(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst.get().Add((<libcpp_string>in_0))
     
     def SetManifest(self, manifest):
@@ -116,7 +121,7 @@ cdef class StringDictionaryCompiler:
         self.inst = shared_ptr[_StringDictionaryCompiler](new _StringDictionaryCompiler((<size_t>memory_limit), deref(v1)))
         del v1
     
-    def __init__(self, *args):
+    def __init__(self, *args , **kwargs):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
@@ -126,23 +131,28 @@ cdef class StringDictionaryCompiler:
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def Add(self, bytes in_0 , bytes in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-    
-    
+    def Add(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(in_1, (bytes, unicode)), 'arg in_1 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+        if isinstance(in_1, unicode):
+            in_1 = in_1.encode('utf-8')
         self.inst.get().Add((<libcpp_string>in_0), (<libcpp_string>in_1))
     
-    def __setitem__(self, bytes in_0 , bytes in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-    
-    
+    def __setitem__(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(in_1, (bytes, unicode)), 'arg in_1 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+        if isinstance(in_1, unicode):
+            in_1 = in_1.encode('utf-8')
         self.inst.get().__setitem__((<libcpp_string>in_0), (<libcpp_string>in_1))
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def WriteToFile(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst.get().WriteToFile((<libcpp_string>in_0))
     
     def __enter__(self):
@@ -176,12 +186,14 @@ cdef class JsonDictionaryCompiler:
          self.inst.reset()
 
     
-    def __setitem__(self, bytes in_0 , bytes in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-    
-    
-        self.inst.get().__setitem__((<libcpp_string>in_0), (<libcpp_string>in_1))
+    def Add(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(in_1, (bytes, unicode)), 'arg in_1 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+        if isinstance(in_1, unicode):
+            in_1 = in_1.encode('utf-8')
+        self.inst.get().Add((<libcpp_string>in_0), (<libcpp_string>in_1))
     
     def _init_0(self):
         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler())
@@ -201,7 +213,7 @@ cdef class JsonDictionaryCompiler:
         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler((<size_t>memory_limit), deref(v1)))
         del v1
     
-    def __init__(self, *args):
+    def __init__(self, *args , **kwargs):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
@@ -211,9 +223,19 @@ cdef class JsonDictionaryCompiler:
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def __setitem__(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(in_1, (bytes, unicode)), 'arg in_1 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+        if isinstance(in_1, unicode):
+            in_1 = in_1.encode('utf-8')
+        self.inst.get().__setitem__((<libcpp_string>in_0), (<libcpp_string>in_1))
     
+    def WriteToFile(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst.get().WriteToFile((<libcpp_string>in_0))
     
     def __enter__(self):
@@ -222,21 +244,6 @@ cdef class JsonDictionaryCompiler:
     
     def __exit__(self, type, value, traceback):
         self.Compile()
-
-
-    def Add(self, key , value ):
-        assert isinstance(key, (bytes, unicode)), 'arg in_0 wrong type'
-        assert isinstance(value, (bytes, unicode)), 'arg in_1 wrong type'
-
-        if isinstance(key, unicode):
-            key = key.encode('UTF-8')
-        cdef libcpp_string input_in_0 = <libcpp_string> key
-
-        if isinstance(value, unicode):
-            value = value.encode('UTF-8')
-        cdef libcpp_string input_in_1 = <libcpp_string> value
-
-        self.inst.get().Add(input_in_0, input_in_1)
 
         
     def Compile(self, *args):
@@ -262,28 +269,31 @@ cdef class Dictionary:
          self.inst.reset()
 
     
-    def LookupText(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def LookupText(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef _MatchIteratorPair _r = self.inst.get().LookupText((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return py_result
     
-    def Lookup(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Lookup(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef _MatchIteratorPair _r = self.inst.get().Lookup((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return py_result
     
-    def _GetNear_0(self, bytes in_0 ,  minimum_prefix_length ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def _GetNear_0(self,  in_0 ,  minimum_prefix_length ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         assert isinstance(minimum_prefix_length, (int, long)), 'arg minimum_prefix_length wrong type'
-    
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
     
         cdef _MatchIteratorPair _r = self.inst.get().GetNear((<libcpp_string>in_0), (<size_t>minimum_prefix_length))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
@@ -291,11 +301,12 @@ cdef class Dictionary:
         py_result.end = _r.end()
         return py_result
     
-    def _GetNear_1(self, bytes in_0 ,  minimum_prefix_length ,  greedy ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def _GetNear_1(self,  in_0 ,  minimum_prefix_length ,  greedy ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         assert isinstance(minimum_prefix_length, (int, long)), 'arg minimum_prefix_length wrong type'
         assert isinstance(greedy, (int, long)), 'arg greedy wrong type'
-    
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
     
     
         cdef _MatchIteratorPair _r = self.inst.get().GetNear((<libcpp_string>in_0), (<size_t>minimum_prefix_length), (<bool>greedy))
@@ -304,37 +315,40 @@ cdef class Dictionary:
         py_result.end = _r.end()
         return py_result
     
-    def GetNear(self, *args):
-        if (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
+    def GetNear(self, *args ):
+        if (len(args)==2) and (isinstance(args[0], (bytes, unicode))) and (isinstance(args[1], (int, long))):
             return self._GetNear_0(*args)
-        elif (len(args)==3) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))) and (isinstance(args[2], (int, long))):
+        elif (len(args)==3) and (isinstance(args[0], (bytes, unicode))) and (isinstance(args[1], (int, long))) and (isinstance(args[2], (int, long))):
             return self._GetNear_1(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def _init_0(self, bytes filename ):
-        assert isinstance(filename, bytes), 'arg filename wrong type'
-    
+    def _init_0(self,  filename ):
+        assert isinstance(filename, (bytes, unicode)), 'arg filename wrong type'
+        if isinstance(filename, unicode):
+            filename = filename.encode('utf-8')
         self.inst = shared_ptr[_Dictionary](new _Dictionary((<libcpp_string>filename)))
     
-    def _init_1(self, bytes filename , int in_1 ):
-        assert isinstance(filename, bytes), 'arg filename wrong type'
+    def _init_1(self,  filename , int in_1 ):
+        assert isinstance(filename, (bytes, unicode)), 'arg filename wrong type'
         assert in_1 in [0, 1, 2, 3, 4, 5, 6, 7], 'arg in_1 wrong type'
-    
+        if isinstance(filename, unicode):
+            filename = filename.encode('utf-8')
     
         self.inst = shared_ptr[_Dictionary](new _Dictionary((<libcpp_string>filename), (<_loading_strategy_types>in_1)))
     
-    def __init__(self, *args):
-        if (len(args)==1) and (isinstance(args[0], bytes)):
+    def __init__(self, *args , **kwargs):
+        if (len(args)==1) and (isinstance(args[0], (bytes, unicode))):
              self._init_0(*args)
-        elif (len(args)==2) and (isinstance(args[0], bytes)) and (args[1] in [0, 1, 2, 3, 4, 5, 6, 7]):
+        elif (len(args)==2) and (isinstance(args[0], (bytes, unicode))) and (args[1] in [0, 1, 2, 3, 4, 5, 6, 7]):
              self._init_1(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def Get(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Get(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef _MatchIteratorPair _r = self.inst.get().Get((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
@@ -435,9 +449,10 @@ cdef class FsaTransform:
          self.inst.reset()
 
     
-    def Normalize(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Normalize(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef libcpp_string _r = self.inst.get().Normalize((<libcpp_string>in_0))
         py_result = <libcpp_string>_r
         return py_result
@@ -455,10 +470,11 @@ cdef class PrefixCompletion:
          self.inst.reset()
 
     
-    def GetFuzzyCompletions(self, bytes in_0 ,  max_edit_distance ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def GetFuzzyCompletions(self,  in_0 ,  max_edit_distance ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         assert isinstance(max_edit_distance, (int, long)), 'arg max_edit_distance wrong type'
-    
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
     
         cdef _MatchIteratorPair _r = self.inst.get().GetFuzzyCompletions((<libcpp_string>in_0), (<int>max_edit_distance))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
@@ -471,9 +487,10 @@ cdef class PrefixCompletion:
         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
         self.inst = shared_ptr[_PrefixCompletion](new _PrefixCompletion(input_in_0))
     
-    def GetCompletions(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def GetCompletions(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
@@ -488,19 +505,21 @@ cdef class ForwardBackwardCompletion:
          self.inst.reset()
 
     
-    def _GetCompletions_0(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def _GetCompletions_0(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return py_result
     
-    def _GetCompletions_1(self, bytes in_0 ,  in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def _GetCompletions_1(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-    
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
     
         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0), (<int>in_1))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
@@ -508,10 +527,10 @@ cdef class ForwardBackwardCompletion:
         py_result.end = _r.end()
         return py_result
     
-    def GetCompletions(self, *args):
-        if (len(args)==1) and (isinstance(args[0], bytes)):
+    def GetCompletions(self, *args ):
+        if (len(args)==1) and (isinstance(args[0], (bytes, unicode))):
             return self._GetCompletions_0(*args)
-        elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
+        elif (len(args)==2) and (isinstance(args[0], (bytes, unicode))) and (isinstance(args[1], (int, long))):
             return self._GetCompletions_1(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
@@ -541,17 +560,19 @@ cdef class CompletionDictionaryCompiler:
          self.inst.reset()
 
     
-    def __setitem__(self, bytes in_0 ,  in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def __setitem__(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-    
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
     
         self.inst.get().__setitem__((<libcpp_string>in_0), (<int>in_1))
     
-    def Add(self, bytes in_0 ,  in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def Add(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-    
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
     
         self.inst.get().Add((<libcpp_string>in_0), (<int>in_1))
     
@@ -573,7 +594,7 @@ cdef class CompletionDictionaryCompiler:
         self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit), deref(v1)))
         del v1
     
-    def __init__(self, *args):
+    def __init__(self, *args , **kwargs):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
@@ -629,19 +650,21 @@ cdef class MultiWordCompletion:
         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
         self.inst = shared_ptr[_MultiWordCompletion](new _MultiWordCompletion(input_in_0))
     
-    def _GetCompletions_0(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def _GetCompletions_0(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return py_result
     
-    def _GetCompletions_1(self, bytes in_0 ,  in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def _GetCompletions_1(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-    
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
     
         cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0), (<int>in_1))
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
@@ -649,10 +672,10 @@ cdef class MultiWordCompletion:
         py_result.end = _r.end()
         return py_result
     
-    def GetCompletions(self, *args):
-        if (len(args)==1) and (isinstance(args[0], bytes)):
+    def GetCompletions(self, *args ):
+        if (len(args)==1) and (isinstance(args[0], (bytes, unicode))):
             return self._GetCompletions_0(*args)
-        elif (len(args)==2) and (isinstance(args[0], bytes)) and (isinstance(args[1], (int, long))):
+        elif (len(args)==2) and (isinstance(args[0], (bytes, unicode))) and (isinstance(args[1], (int, long))):
             return self._GetCompletions_1(*args)
         else:
                raise Exception('can not handle type of %s' % (args,)) 
@@ -665,21 +688,24 @@ cdef class PredictiveCompression:
          self.inst.reset()
 
     
-    def Compress(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Compress(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef libcpp_string _r = self.inst.get().Compress((<libcpp_string>in_0))
         py_result = <libcpp_string>_r
         return py_result
     
-    def __init__(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def __init__(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst = shared_ptr[_PredictiveCompression](new _PredictiveCompression((<libcpp_string>in_0)))
     
-    def Uncompress(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Uncompress(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         cdef libcpp_string _r = self.inst.get().Uncompress((<libcpp_string>in_0))
         py_result = <libcpp_string>_r
         return py_result 
@@ -695,17 +721,19 @@ cdef class KeyOnlyDictionaryGenerator:
     def __init__(self):
         self.inst = shared_ptr[_KeyOnlyDictionaryGenerator](new _KeyOnlyDictionaryGenerator())
     
-    def Add(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Add(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst.get().Add((<libcpp_string>in_0))
     
     def CloseFeeding(self):
         self.inst.get().CloseFeeding()
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def WriteToFile(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst.get().WriteToFile((<libcpp_string>in_0)) 
 
 cdef class KeyOnlyDictionaryCompiler:
@@ -734,7 +762,7 @@ cdef class KeyOnlyDictionaryCompiler:
         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler((<size_t>memory_limit), deref(v1)))
         del v1
     
-    def __init__(self, *args):
+    def __init__(self, *args , **kwargs):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
@@ -744,9 +772,10 @@ cdef class KeyOnlyDictionaryCompiler:
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def Add(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-    
+    def Add(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst.get().Add((<libcpp_string>in_0))
     
     def WriteToFile(self, bytes in_0 ):
@@ -800,9 +829,10 @@ cdef class Match:
         py_result = <float>_r
         return py_result
     
-    def SetMatchedString(self, bytes matched_string ):
-        assert isinstance(matched_string, bytes), 'arg matched_string wrong type'
-    
+    def SetMatchedString(self,  matched_string ):
+        assert isinstance(matched_string, (bytes, unicode)), 'arg matched_string wrong type'
+        if isinstance(matched_string, unicode):
+            matched_string = matched_string.encode('utf-8')
         self.inst.get().SetMatchedString((<libcpp_string>matched_string))
     
     def GetValueAsString(self):
@@ -853,7 +883,7 @@ cdef class Match:
     
         self.inst = shared_ptr[_Match](new _Match((deref(m.inst.get()))))
     
-    def __init__(self, *args):
+    def __init__(self, *args , **kwargs):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], Match)):
