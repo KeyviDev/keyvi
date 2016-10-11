@@ -56,8 +56,10 @@ class DCTTestHelper final{
 }
 };
 
-BOOST_AUTO_TEST_CASE( minimizationIntInnerWeights ) {
+typedef boost::mpl::list<sort::InMemorySorter<key_value_t>, sort::TpieSorter<key_value_t>> sorter_types;
 
+BOOST_AUTO_TEST_CASE_TEMPLATE( minimizationIntInnerWeights, SorterT, sorter_types )
+{
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
     { "fb#fb msg downl de", 22 },
@@ -84,7 +86,8 @@ BOOST_AUTO_TEST_CASE( minimizationIntInnerWeights ) {
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<>,
-      fsa::internal::IntValueStoreWithInnerWeights> compiler;
+      fsa::internal::IntValueStoreWithInnerWeights,
+      SorterT> compiler;
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -124,8 +127,8 @@ BOOST_AUTO_TEST_CASE( minimizationIntInnerWeights ) {
   std::remove(file_name.c_str());
 }
 
-BOOST_AUTO_TEST_CASE( sortOrder ) {
-
+BOOST_AUTO_TEST_CASE_TEMPLATE( sortOrder, SorterT, sorter_types )
+{
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
     { "uboot", 22 },
@@ -138,7 +141,8 @@ BOOST_AUTO_TEST_CASE( sortOrder ) {
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<>,
-      fsa::internal::IntValueStoreWithInnerWeights> compiler;
+      fsa::internal::IntValueStoreWithInnerWeights,
+      SorterT> compiler;
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -209,8 +213,8 @@ BOOST_AUTO_TEST_CASE( sortOrder ) {
   std::remove(file_name.c_str());
 }
 
-BOOST_AUTO_TEST_CASE( compactSize ) {
-
+BOOST_AUTO_TEST_CASE_TEMPLATE( compactSize, SorterT, sorter_types )
+{
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
     { "uboot", 22 },
@@ -223,7 +227,8 @@ BOOST_AUTO_TEST_CASE( compactSize ) {
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<uint16_t>,
-      fsa::internal::IntValueStoreWithInnerWeights> compiler;
+      fsa::internal::IntValueStoreWithInnerWeights,
+      SorterT> compiler;
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -261,11 +266,12 @@ BOOST_AUTO_TEST_CASE( compactSize ) {
   BOOST_CHECK(it == end_it);
 }
 
-BOOST_AUTO_TEST_CASE( stableInsert ) {
-
+BOOST_AUTO_TEST_CASE_TEMPLATE( stableInsert, SorterT, sorter_types )
+{
   // simulating  permutation
   std::vector<std::pair<std::string, std::string>> test_data = {
     { "aa", "\"{1:2}\"" },
+    { "ab", "\"{2:44}\""},
     { "bb", "\"{33:23}\"" },
     { "cc", "\"{3:24}\"" },
     { "aa", "\"{2:27}\"" },
@@ -278,11 +284,16 @@ BOOST_AUTO_TEST_CASE( stableInsert ) {
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<uint16_t>,
-      fsa::internal::JsonValueStore> compiler(10485760, params);
+      fsa::internal::JsonValueStore,
+      SorterT> compiler(10485760, params);
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
   }
+
+  // test delete
+  compiler.Delete("ab");
+
   compiler.Compile();
 
   boost::filesystem::path temp_path =
@@ -314,6 +325,74 @@ BOOST_AUTO_TEST_CASE( stableInsert ) {
   BOOST_CHECK_EQUAL("\"{5:22}\"", it.GetValueAsString());
   ++it;
   BOOST_CHECK(it == end_it);
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE( addAndDeletes, SorterT, sorter_types )
+{
+  keyvi::dictionary::compiler_param_t params = {{STABLE_INSERTS, "true"}};
+
+  keyvi::dictionary::DictionaryCompiler<
+          fsa::internal::SparseArrayPersistence<uint16_t>,
+          fsa::internal::JsonValueStore,
+          SorterT> compiler(10485760, params);
+
+  // add, delete, add again
+  compiler.Add("aa", "1");
+  compiler.Delete("aa");
+  compiler.Delete("aa");
+  compiler.Add("aa", "2");
+
+  // delete, add
+  compiler.Delete("bb");
+  compiler.Add("bb", "1");
+
+  // add, delete, last item
+  compiler.Add("zz", "1");
+  compiler.Delete("zz");
+
+  compiler.Compile();
+
+  boost::filesystem::path temp_path =
+      boost::filesystem::temp_directory_path();
+
+  temp_path /= boost::filesystem::unique_path(
+        "dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
+  std::string file_name = temp_path.native();
+
+  compiler.WriteToFile(file_name);
+
+  Dictionary d(file_name.c_str());
+
+  fsa::automata_t f(d.GetFsa());
+
+  fsa::EntryIterator it(f);
+  fsa::EntryIterator end_it;
+
+  BOOST_CHECK_EQUAL("aa", it.GetKey());
+  BOOST_CHECK_EQUAL("2", it.GetValueAsString());
+  ++it;
+
+  BOOST_CHECK_EQUAL("bb", it.GetKey());
+  BOOST_CHECK_EQUAL("1", it.GetValueAsString());
+  ++it;
+
+  BOOST_CHECK(it == end_it);
+
+  std::remove(file_name.c_str());
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE( DeleteUnsupported, SorterT, sorter_types )
+{
+  keyvi::dictionary::compiler_param_t params = {};
+
+  keyvi::dictionary::DictionaryCompiler<
+            fsa::internal::SparseArrayPersistence<uint16_t>,
+            fsa::internal::JsonValueStore,
+            SorterT> compiler(10485760, params);
+
+  // add, delete, add again
+  compiler.Add("aa", "1");
+  BOOST_CHECK_THROW( compiler.Delete("aa"), compiler_exception);
 }
 
 

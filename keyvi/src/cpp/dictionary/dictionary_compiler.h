@@ -28,9 +28,9 @@
 #include <algorithm>
 #include <functional>
 #include <boost/property_tree/ptree.hpp>
-#include "tpie/serialization_sorter.h"
-
-#include "dictionary/util/tpie_initializer.h"
+#include "dictionary/sort/sorter_common.h"
+#include "dictionary/sort/in_memory_sorter.h"
+#include "dictionary/sort/tpie_sorter.h"
 #include "dictionary/fsa/internal/null_value_store.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/generator_adapter.h"
@@ -42,50 +42,33 @@
 namespace keyvi {
 namespace dictionary {
 
+typedef const fsa::internal::IValueStoreWriter::vs_param_t compiler_param_t;
+typedef sort::key_value_pair<std::string, fsa::ValueHandle> key_value_t;
+
 /**
- * structure for internal processing
- * Note: Not using std::pair because it did not compile with Tpie
+ * Exception class for generator, thrown when generator is used in the wrong order.
  */
-struct key_value_pair {
-  key_value_pair() : key(), value() {
-  }
 
-  key_value_pair(const std::string& k, const fsa::ValueHandle& v): key(k), value(v) {}
-
-  bool operator<(const key_value_pair kv) const {
-    return key < kv.key;
-  }
-
-  std::string key;
-  fsa::ValueHandle value;
+struct compiler_exception: public std::runtime_error {
+  using std::runtime_error::runtime_error;
 };
 
-/**
- * Tpie serialization and deserialization for sorting.
- */
-template<typename Dst>
-void serialize(Dst & d, const keyvi::dictionary::key_value_pair & pt) {
-  using tpie::serialize;
-  serialize(d, pt.key);
-  serialize(d, pt.value);
-}
-template<typename Src>
-void unserialize(Src & s, keyvi::dictionary::key_value_pair & pt) {
-  using tpie::unserialize;
-  unserialize(s, pt.key);
-  unserialize(s, pt.value);
-}
-
-typedef const fsa::internal::IValueStoreWriter::vs_param_t compiler_param_t;
+#define KEYVI_USE_TPIE
 
 /**
  * Dictionary Compiler
  */
-template<class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
+template<class PersistenceT,
+class ValueStoreT = fsa::internal::NullValueStore,
+#ifdef KEYVI_USE_TPIE
+class SorterT = sort::TpieSorter<key_value_t>>
+#else
+class SorterT = sort::InMemorySorter<key_value_t>>
+#endif
 class DictionaryCompiler
   final {
 
-    typedef key_value_pair key_value_t;
+    //typedef key_value_pair key_value_t;
     typedef std::function<void (size_t , size_t, void*)> callback_t;
 
    public:
@@ -99,12 +82,9 @@ class DictionaryCompiler
      */
     DictionaryCompiler(size_t memory_limit = 1073741824,
                        const compiler_param_t& params = compiler_param_t())
-        : initializer_(util::TpieIntializer::getInstance()),
-          sorter_(),
+        : sorter_(memory_limit, params),
           memory_limit_(memory_limit),
           params_(params) {
-      sorter_.set_available_memory(memory_limit);
-      sorter_.begin();
 
       if (params_.count(TEMPORARY_PATH_KEY) == 0) {
         params_[TEMPORARY_PATH_KEY] =
@@ -113,15 +93,9 @@ class DictionaryCompiler
 
       TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
-      // set temp path for tpie
-      initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
-
       if (params_.count(STABLE_INSERTS) > 0 && params_[STABLE_INSERTS] == "true") {
-        // minimization has to be turned off in this case.
-        params_[MINIMIZATION_KEY] = "off";
         stable_insert_ = true;
       }
-
 
       value_store_= new ValueStoreT(params_);
     }
@@ -142,7 +116,7 @@ class DictionaryCompiler
                  ValueStoreT::no_value) {
 
       size_of_keys_ += input_key.size();
-      sorter_.push(key_value_t(std::move(input_key), RegisterValue(value)));
+      sorter_.push_back(key_value_t(std::move(input_key), RegisterValue(value)));
     }
 
 #ifdef Py_PYTHON_H
@@ -153,36 +127,53 @@ class DictionaryCompiler
     }
 #endif
 
+    void Delete(const std::string& input_key) {
+      if (!stable_insert_) {
+        throw compiler_exception("delete only available when using stable_inserts option");
+      }
+
+      fsa::ValueHandle handle = {
+          0,                                    // offset of value
+          count_++,                             // counter(order)
+          0,                                    // weight
+          false,                                // minimization
+          true                                  // deleted flag
+      };
+
+      sorter_.push_back(key_value_t(std::move(input_key), handle));
+    }
+
     /**
      * Do the final compilation
      */
     void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
+
+      size_t added_key_values = 0;
+      size_t callback_trigger = 0;
+
       value_store_->CloseFeeding();
-      sorter_.end();
-      sorter_.merge_runs();
+      sorter_.sort();
       CreateGenerator();
 
-      // check that at least 1 item is there
-      if (sorter_.can_pull()) {
-        number_of_items_ = sorter_.item_count();
+      if (sorter_.size() > 0)
+      {
+        size_t number_of_items = sorter_.size();
 
-        callback_trigger_ = 1+(number_of_items_-1)/100;
+        callback_trigger = 1+(number_of_items-1)/100;
 
-        if (callback_trigger_ > 100000) {
-          callback_trigger_ = 100000;
+        if (callback_trigger > 100000) {
+          callback_trigger = 100000;
         }
 
         if (!stable_insert_) {
 
-          while (sorter_.can_pull()) {
-            key_value_t key_value = sorter_.pull();
-
+          for (auto key_value: sorter_) {
             TRACE("adding to generator: %s", key_value.key.c_str());
 
             generator_->Add(std::move(key_value.key), key_value.value);
-            ++added_key_values_;
-            if (progress_callback && (added_key_values_ % callback_trigger_ == 0)){
-              progress_callback(added_key_values_, number_of_items_, user_data);
+            ++added_key_values;
+            if (progress_callback && (added_key_values % callback_trigger == 0)){
+              progress_callback(added_key_values, number_of_items, user_data);
             }
           }
 
@@ -191,28 +182,33 @@ class DictionaryCompiler
           // special mode for stable (incremental) inserts, in this case we have to respect the order and take
           // the last value if keys are equal
 
-          key_value_t last_key_value = sorter_.pull();
+          auto key_values_it = sorter_.begin();
+          key_value_t last_key_value = *key_values_it++;
 
-          while (sorter_.can_pull()) {
-            key_value_t key_value = sorter_.pull();
+          while (key_values_it != sorter_.end())
+          {
+            key_value_t key_value = *key_values_it++;
 
             // dedup with last one wins
             if (last_key_value.key == key_value.key) {
               TRACE("Detected duplicated keys, dedup them, last one wins.");
 
-              // we know that last added values have a lower id (minimization is turned off)
-              if (last_key_value.value.value_idx < key_value.value.value_idx) {
+              // check the counter to determine which key_value has been added last
+              if (last_key_value.value.count < key_value.value.count) {
                 last_key_value = key_value;
               }
               continue;
             }
 
-            TRACE("adding to generator: %s", last_key_value.key.c_str());
-
-            generator_->Add(std::move(last_key_value.key), last_key_value.value);
-            ++added_key_values_;
-            if (progress_callback && (added_key_values_ % callback_trigger_ == 0)){
-              progress_callback(added_key_values_, number_of_items_, user_data);
+            if (!last_key_value.value.deleted) {
+              TRACE("adding to generator: %s", last_key_value.key.c_str());
+              generator_->Add(std::move(last_key_value.key), last_key_value.value);
+              ++added_key_values;
+              if (progress_callback && (added_key_values % callback_trigger == 0)){
+                progress_callback(added_key_values, number_of_items, user_data);
+              }
+            } else {
+              TRACE("skipping deleted key: %s", last_key_value.key.c_str());
             }
 
             last_key_value = key_value;
@@ -220,13 +216,15 @@ class DictionaryCompiler
 
           // add the last one
           TRACE("adding to generator: %s", last_key_value.key.c_str());
+          if (!last_key_value.value.deleted) {
+            generator_->Add(std::move(last_key_value.key), last_key_value.value);
+          }
 
-          generator_->Add(std::move(last_key_value.key), last_key_value.value);
-          ++added_key_values_;
-
+          ++added_key_values;
         }
       }
 
+      sorter_.clear();
       generator_->CloseFeeding();
     }
 
@@ -265,19 +263,15 @@ class DictionaryCompiler
     }
 
    private:
-    util::TpieIntializer& initializer_;
-    tpie::serialization_sorter<key_value_t> sorter_;
+    SorterT sorter_;
     size_t memory_limit_;
     fsa::internal::IValueStoreWriter::vs_param_t params_;
     ValueStoreT* value_store_;
     fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>* generator_ = nullptr;
-    bool sort_finalized_ = false;
-    size_t added_key_values_ = 0;
-    size_t number_of_items_ = 0;
-    size_t callback_trigger_ = 0;
-
-    size_t size_of_keys_ = 0;
     boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
+    size_t count_ = 0;
+    size_t size_of_keys_ = 0;
+    bool sort_finalized_ = false;
     bool stable_insert_ = false;
 
     void CreateGenerator();
@@ -291,13 +285,16 @@ class DictionaryCompiler
     fsa::ValueHandle RegisterValue(typename ValueStoreT::value_t value =
                  ValueStoreT::no_value){
 
-      fsa::ValueHandle handle;
-      handle.no_minimization = false;
+      bool no_minimization;
+      uint64_t value_idx = value_store_->GetValue(value, no_minimization);
 
-      handle.value_idx = value_store_->GetValue(value, handle.no_minimization);
-
-      // if inner weights are used update them
-      handle.weight = value_store_->GetWeightValue(value);
+      fsa::ValueHandle handle = {
+          value_idx,                            // offset of value
+          count_++,                             // counter(order)
+          value_store_->GetWeightValue(value),  // weight
+          no_minimization,                      // minimization
+          false                                 // deleted flag
+      };
 
       return handle;
     }
@@ -308,8 +305,8 @@ class DictionaryCompiler
  *
  * todo: expose, so that it can be overridden from outside.
  */
-template<class PersistenceT, class ValueStoreT>
-inline void DictionaryCompiler<PersistenceT, ValueStoreT>::CreateGenerator()
+template<class PersistenceT, class ValueStoreT, class SorterT>
+inline void DictionaryCompiler<PersistenceT, ValueStoreT, SorterT>::CreateGenerator()
 {
   // todo: find good parameters for auto-guessing this
   if (size_of_keys_ > UINT32_MAX){
