@@ -38,12 +38,12 @@ template<typename KeyValueT>
 class InMemorySorter final {
 
  public:
-  typedef typename std::vector<KeyValueT>::iterator iterator; // first change: add typename
+  typedef typename std::vector<KeyValueT>::iterator iterator;
 
   /**
-   * Instantiate a TPIE sorter (external memory sort).
+   * Instantiate a in memory sorter. This is a simple heap based sorter, everything must fit in memory.
    *
-   * @param memory_limit memory limit for internal memory usage
+   * @param memory_limit ignored, everything is in memory, client has to ensure it fits in memory.
    */
   InMemorySorter(size_t memory_limit = 1073741824, const sorter_param_t& params = sorter_param_t())
       : params_(params) {

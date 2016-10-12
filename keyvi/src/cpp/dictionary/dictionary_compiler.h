@@ -30,11 +30,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include "dictionary/sort/sorter_common.h"
 #include "dictionary/sort/in_memory_sorter.h"
-#include "dictionary/sort/tpie_sorter.h"
 #include "dictionary/fsa/internal/null_value_store.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/generator_adapter.h"
 #include "dictionary/fsa/internal/constants.h"
+
+#if !defined(KEYVI_DISABLE_TPIE)
+#include "dictionary/sort/tpie_sorter.h"
+#endif
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -53,14 +56,12 @@ struct compiler_exception: public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-#define KEYVI_USE_TPIE
-
 /**
  * Dictionary Compiler
  */
 template<class PersistenceT,
 class ValueStoreT = fsa::internal::NullValueStore,
-#ifdef KEYVI_USE_TPIE
+#if !defined(KEYVI_DISABLE_TPIE)
 class SorterT = sort::TpieSorter<key_value_t>>
 #else
 class SorterT = sort::InMemorySorter<key_value_t>>
