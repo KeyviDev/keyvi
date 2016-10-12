@@ -68,8 +68,7 @@ class SorterT = sort::InMemorySorter<key_value_t>>
 class DictionaryCompiler
   final {
 
-    //typedef key_value_pair key_value_t;
-    typedef std::function<void (size_t , size_t, void*)> callback_t;
+   typedef std::function<void (size_t , size_t, void*)> callback_t;
 
    public:
     /**

@@ -135,27 +135,11 @@ typedef const internal::IValueStoreWriter::vs_param_t generator_param_t;
 struct ValueHandle final {
 
   bool operator==(const ValueHandle other) const {
-    if (value_idx != other.value_idx) {
-      return false;
-    }
-
-    if (count != other.count) {
-      return false;
-    }
-
-    if (weight != other.weight) {
-      return false;
-    }
-
-    if (no_minimization != other.no_minimization) {
-      return false;
-    }
-
-    if (deleted != other.deleted) {
-      return false;
-    }
-
-    return true;
+    return (value_idx == other.value_idx)
+        && (count == other.count)
+        && (weight == other.weight)
+        && (no_minimization == other.no_minimization)
+        && (deleted == other.deleted);
   }
 
   uint64_t value_idx;
