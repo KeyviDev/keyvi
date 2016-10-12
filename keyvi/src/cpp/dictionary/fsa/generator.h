@@ -142,6 +142,10 @@ struct ValueHandle final {
         && (deleted == other.deleted);
   }
 
+  bool operator!=(const ValueHandle other) const {
+    return !(*this == other);
+  }
+
   uint64_t value_idx;
   size_t count;
   uint32_t weight;

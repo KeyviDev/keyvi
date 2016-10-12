@@ -186,6 +186,28 @@ BOOST_AUTO_TEST_CASE( state_exception_handling ) {
   BOOST_CHECK_THROW( g.CloseFeeding(), generator_exception );
 
   BOOST_CHECK_THROW( g.Add("cdef"), generator_exception );
+
+  ValueHandle handle;
+  BOOST_CHECK_THROW( g.Add("ghij", handle), generator_exception );
+}
+
+BOOST_AUTO_TEST_CASE( value_handle ) {
+  ValueHandle handle = {0,0,0,false, false};
+  ValueHandle handle2 = {1,0,0,false, false};
+  ValueHandle handle3 = {0,1,0,false, false};
+  ValueHandle handle4 = {0,0,1,false, false};
+  ValueHandle handle5 = {0,0,0,true, false};
+  ValueHandle handle6 = {0,0,0,false, true};
+
+  BOOST_CHECK(handle == handle);
+  BOOST_CHECK(handle != handle2);
+  BOOST_CHECK(handle != handle3);
+  BOOST_CHECK(handle != handle4);
+  BOOST_CHECK(handle != handle5);
+  BOOST_CHECK(handle != handle6);
+  BOOST_CHECK(handle6 == handle6);
+  BOOST_CHECK(handle3 != handle4);
+  BOOST_CHECK(handle5 != handle6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
