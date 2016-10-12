@@ -52,6 +52,11 @@ typedef keyvi::dictionary::DictionaryCompiler<
 
 typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
+    keyvi::dictionary::fsa::internal::JsonValueStore,
+    keyvi::dictionary::sort::InMemorySorter<key_value_t>> JsonDictionaryCompilerSmallData;
+
+typedef keyvi::dictionary::DictionaryCompiler<
+    keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
     keyvi::dictionary::fsa::internal::StringValueStore> StringDictionaryCompiler;
 
 typedef keyvi::dictionary::DictionaryMerger<

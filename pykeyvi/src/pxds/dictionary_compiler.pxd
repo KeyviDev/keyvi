@@ -37,6 +37,17 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifestFromString(libcpp_utf8_string) except + # wrap-ignore
         void WriteToFile(libcpp_utf8_string)
+    
+    cdef cppclass JsonDictionaryCompilerSmallData:
+        JsonDictionaryCompilerSmallData() except +
+        JsonDictionaryCompilerSmallData(size_t memory_limit) except +
+        JsonDictionaryCompilerSmallData(size_t memory_limit, libcpp_map[libcpp_string, libcpp_string] value_store_params) except +
+        void Add(libcpp_string, libcpp_string) except + # wrap-ignore
+        void __setitem__(libcpp_string, libcpp_string) except +
+        void Compile() nogil # wrap-ignore
+        void Compile(callback_t, void*) nogil # wrap-ignore
+        void SetManifestFromString(libcpp_string) except + # wrap-ignore
+        void WriteToFile(libcpp_string)
         
     cdef cppclass StringDictionaryCompiler:
         StringDictionaryCompiler() except +
