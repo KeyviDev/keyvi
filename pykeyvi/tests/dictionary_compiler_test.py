@@ -4,6 +4,7 @@
 import os
 import pykeyvi
 import shutil
+import tempfile
 import test_tools
 
 
