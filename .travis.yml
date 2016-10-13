@@ -77,7 +77,7 @@ script:
   - if [ "$BUILD_TYPE" == "linux" ]; then ./travis/build_linux.sh ; fi
   - if [ "$BUILD_TYPE" == "manylinux" ]; then ./travis/build_manylinux_package.sh ; fi
   - if [ "$BUILD_TYPE" == "sdist" ]; then ./travis/build_sdist_package.sh ; fi
-  - if [ "$BUILD_TYPE" == "osx" ]; then ./travis/build_osx_package.sh ; fi
+  - if [ "$BUILD_TYPE" == "osx" ]; then travis_wait ./travis/build_osx_package.sh ; fi
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/coverage.sh ; fi
