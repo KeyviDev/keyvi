@@ -8,5 +8,5 @@ cd ..
 cd pykeyvi
 python setup.py bdist_wheel -d wheelhouse
 sudo pip install wheelhouse/*.whl
-py.test tests
+travis_wait py.test tests
 cd ..
