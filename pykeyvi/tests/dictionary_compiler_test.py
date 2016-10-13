@@ -4,6 +4,7 @@
 import os
 import pykeyvi
 import shutil
+import tempfile
 import test_tools
 
 
@@ -32,9 +33,10 @@ def test_compiler_empty_json():
 
 def test_tmp_dir():
     cwd = os.getcwd()
+    os.chdir(tempfile.gettempdir())
     try:
         os.mkdir("tmp_dir_test")
-        os.chdir(os.path.join(cwd, "tmp_dir_test"))
+        os.chdir(os.path.join(tempfile.gettempdir(), "tmp_dir_test"))
         c = pykeyvi.JsonDictionaryCompiler()
         c.Add("abc", "{'a':2}")
         assert len(os.listdir('.')) == 0
@@ -44,7 +46,7 @@ def test_tmp_dir():
         assert len(os.listdir('.')) == 0
     finally:
         os.chdir(cwd)
-        os.rmdir("tmp_dir_test")
+        os.rmdir(os.path.join(tempfile.gettempdir(), "tmp_dir_test"))
 
 
 def test_tmp_dir_defined():
@@ -54,8 +56,8 @@ def test_tmp_dir_defined():
         c.Compile()
         assert len(os.listdir(test_dir)) != 0
 
+    test_dir = os.path.join(tempfile.gettempdir(), "tmp_dir_test_defined")
     try:
-        test_dir = "tmp_dir_test_defined"
         os.mkdir(test_dir)
         run_compile(test_dir)
     finally:

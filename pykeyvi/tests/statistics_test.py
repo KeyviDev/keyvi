@@ -2,6 +2,7 @@
 # Usage: py.test tests
 
 import os
+import tempfile
 import pykeyvi
 from test_tools import tmp_dictionary
 
@@ -29,7 +30,7 @@ def test_manifest_after_compile():
     c.Add("Kif")
     c.Compile()
     c.SetManifest({"author": "Zapp Brannigan"})
-    file_name = 'brannigan_manifest2.kv'
+    file_name = os.path.join(tempfile.gettempdir(),'brannigan_manifest2.kv')
     try:
         c.WriteToFile(file_name)
         d = pykeyvi.Dictionary(file_name)

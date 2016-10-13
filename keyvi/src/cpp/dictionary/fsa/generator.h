@@ -133,9 +133,24 @@ class generator_exception final: public std::runtime_error {
 typedef const internal::IValueStoreWriter::vs_param_t generator_param_t;
 
 struct ValueHandle final {
+
+  bool operator==(const ValueHandle other) const {
+    return (value_idx == other.value_idx)
+        && (count == other.count)
+        && (weight == other.weight)
+        && (no_minimization == other.no_minimization)
+        && (deleted == other.deleted);
+  }
+
+  bool operator!=(const ValueHandle other) const {
+    return !(*this == other);
+  }
+
   uint64_t value_idx;
+  size_t count;
   uint32_t weight;
   bool no_minimization;
+  bool deleted;
 };
 
 template<class PersistenceT, class ValueStoreT = internal::NullValueStore, class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
