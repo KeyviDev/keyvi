@@ -18,8 +18,8 @@ type              | details
 ----------------- | --------------------------------------------------------------------------------------------- 
 integer           | CompletionDictionaryCompiler
 key-only          | KeyOnlyDictionaryCompiler
-string            | StringDictionaryCompilerCompact
-json              | JsonDictionaryCompilerCompact
+string            | StringDictionaryCompiler
+json              | JsonDictionaryCompiler
 
 For dictionaries with values, Add takes the value as second parameter:
 
