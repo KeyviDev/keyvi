@@ -765,6 +765,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = readme.zh-cn.md \
+                         CHANGELOG.md \
                          include/rapidjson/rapidjson.h \
                          include/ \
                          doc/features.zh-cn.md \
@@ -774,6 +775,7 @@ INPUT                  = readme.zh-cn.md \
                          doc/encoding.zh-cn.md \
                          doc/dom.zh-cn.md \
                          doc/sax.zh-cn.md \
+                         doc/schema.zh-cn.md \
                          doc/performance.zh-cn.md \
                          doc/internals.md \
                          doc/faq.zh-cn.md

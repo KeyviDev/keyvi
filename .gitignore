@@ -2,6 +2,7 @@
 !/bin/data
 !/bin/encodings
 !/bin/jsonchecker
+!/bin/types
 /build
 /doc/html
 /doc/doxygen_*.db
@@ -19,5 +20,6 @@ Testing
 /googletest
 install_manifest.txt
 Doxyfile
+Doxyfile.zh-cn
 DartConfiguration.tcl
 *.nupkg
