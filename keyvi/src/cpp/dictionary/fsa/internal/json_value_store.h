@@ -94,6 +94,11 @@ class JsonValueStore final : public IValueStoreWriter {
       minimize_ = false;
     }
 
+    if (parameters_.count(SINGLE_PRECISION_FLOAT_KEY) > 0 && parameters_[SINGLE_PRECISION_FLOAT_KEY] == "single") {
+      // set single precision float mode
+      msgpack_buffer_.set_single_precision_float();
+    }
+
     compressor_.reset(compression::compression_strategy(compressor));
     raw_compressor_.reset(compression::compression_strategy("raw"));
     // This is beyond ugly, but needed for EncodeJsonValue :(
@@ -208,7 +213,7 @@ class JsonValueStore final : public IValueStoreWriter {
 
   LeastRecentlyUsedGenerationsCache<RawPointer<>> hash_;
   compression::buffer_t string_buffer_;
-  msgpack::sbuffer msgpack_buffer_;
+  util::msgpack_buffer msgpack_buffer_;
   size_t number_of_values_ = 0;
   size_t number_of_unique_values_ = 0;
   size_t values_buffer_size_ = 0;

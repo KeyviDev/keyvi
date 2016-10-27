@@ -50,6 +50,7 @@
 #define COMPRESSION_KEY "compression"
 #define COMPRESSION_THRESHOLD_KEY "compression_threshold"
 #define MINIMIZATION_KEY "minimization"
+#define SINGLE_PRECISION_FLOAT_KEY "floating_point_precision"
 #define STABLE_INSERTS "stable_insert"
 
 
