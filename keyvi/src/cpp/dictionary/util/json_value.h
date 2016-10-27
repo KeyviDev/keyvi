@@ -32,8 +32,8 @@
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
 #include "msgpack/type/rapidjson.hpp"
-#include "msgpack/zbuffer.hpp"
 #include "compression/compression_selector.h"
+#include "dictionary/util/msgpack_util.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -68,7 +68,7 @@ inline std::string DecodeJsonValue(const std::string& encoded_value) {
 inline void EncodeJsonValue(
     std::function<void (compression::buffer_t&, const char*, size_t)> long_compress,
     std::function<void (compression::buffer_t&, const char*, size_t)> short_compress,
-    msgpack::sbuffer& msgpack_buffer,
+    msgpack_buffer& msgpack_buffer,
     compression::buffer_t& buffer,
     const std::string& raw_value, size_t compression_threshold=32) {
   rapidjson::Document json_document;
@@ -101,7 +101,7 @@ inline void EncodeJsonValue(
  */
 inline std::string EncodeJsonValue(const std::string& raw_value,
                                    size_t compression_threshold=32) {
-  msgpack::sbuffer msgpack_buffer;
+  msgpack_buffer msgpack_buffer;
   compression::buffer_t buffer;
 
   EncodeJsonValue(static_cast<void(*) (compression::buffer_t&, const char*, size_t)>(
