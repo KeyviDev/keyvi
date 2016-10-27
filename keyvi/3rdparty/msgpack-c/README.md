@@ -1,7 +1,7 @@
 `msgpack` for C/C++
 ===================
 
-Version 1.2.0 [![Build Status](https://travis-ci.org/msgpack/msgpack-c.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-c) [![Build status](https://ci.appveyor.com/api/projects/status/8kstcgt79qj123mw/branch/master?svg=true)](https://ci.appveyor.com/project/redboltz/msgpack-c/branch/master)
+Version 1.4.2 [![Build Status](https://travis-ci.org/msgpack/msgpack-c.svg?branch=master)](https://travis-ci.org/msgpack/msgpack-c) [![Build status](https://ci.appveyor.com/api/projects/status/8kstcgt79qj123mw/branch/master?svg=true)](https://ci.appveyor.com/project/redboltz/msgpack-c/branch/master)
 
 It's like JSON but small and fast.
 
@@ -96,7 +96,7 @@ int main(void)
     // convert msgpack::object instance into the original type.
     // if the type is mismatched, it throws msgpack::type_error exception.
     msgpack::type::tuple<int, bool, std::string> dst;
-    deserialized.convert(&dst);
+    deserialized.convert(dst);
 
     return 0;
 }
@@ -112,7 +112,9 @@ Usage
 When you use msgpack on C++03 and C++11, you can just add
 msgpack-c/include to your include path:
 
-    g++ -I msgpack-c/include your_source_file.cpp
+    g++ -I msgpack-c/include -DMSGPACK_DISABLE_LEGACY_NIL -DMSGPACK_DISABLE_LEGACY_CONVERT your_source_file.cpp
+
+See [MSGPACK_DISABLE_LEGACY_NIL](https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_configure#msgpack_disable_legacy_nil-since-140) and [MSGPACK_DISABLE_LEGACY_CONVERT](https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_configure#msgpack_disable_legacy_convert-since-140).
 
 If you want to use C version of msgpack, you need to build it. You can
 also install the C and C++ versions of msgpack.
@@ -215,5 +217,5 @@ Here's the list of [great contributors](https://github.com/msgpack/msgpack-c/gra
 License
 -------
 
-`msgpack-c` is licensed under the Apache License Version 2.0. See
-the [`LICENSE`](./LICENSE) file for details.
+`msgpack-c` is licensed under the Boost Software License, Version 1.0. See
+the [`LICENSE_1_0.txt`](./LICENSE_1_0.txt) file for details.

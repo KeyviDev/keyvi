@@ -1,8 +1,9 @@
 SUBDIRS = src test
 
 DOC_FILES = \
+		Doxyfile \
 		README.md \
-		LICENSE \
+		LICENSE_1_0.txt \
 		NOTICE \
 		msgpack_vc8.vcproj \
 		msgpack_vc8.sln
