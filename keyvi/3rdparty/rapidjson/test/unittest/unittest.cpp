@@ -15,7 +15,18 @@
 #include "unittest.h"
 #include "rapidjson/rapidjson.h"
 
+#ifdef __clang__
+#pragma GCC diagnostic push
+#if __has_warning("-Wdeprecated")
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif
+#endif
+
 AssertException::~AssertException() throw() {}
+
+#ifdef __clang__
+#pragma GCC diagnostic pop
+#endif
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
@@ -24,6 +35,7 @@ int main(int argc, char **argv) {
 
 #ifdef _MSC_VER
     _CrtMemState memoryState = { 0 };
+    (void)memoryState;
     _CrtMemCheckpoint(&memoryState);
     //_CrtSetBreakAlloc(X);
     //void *testWhetherMemoryLeakDetectionWorks = malloc(1);
