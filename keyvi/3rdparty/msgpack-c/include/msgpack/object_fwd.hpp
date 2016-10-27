@@ -3,17 +3,9 @@
 //
 // Copyright (C) 2008-2014 FURUHASHI Sadayuki and KONDO Takatoshi
 //
-//    Licensed under the Apache License, Version 2.0 (the "License");
-//    you may not use this file except in compliance with the License.
-//    You may obtain a copy of the License at
-//
-//        http://www.apache.org/licenses/LICENSE-2.0
-//
-//    Unless required by applicable law or agreed to in writing, software
-//    distributed under the License is distributed on an "AS IS" BASIS,
-//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//    See the License for the specific language governing permissions and
-//    limitations under the License.
+//    Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//    http://www.boost.org/LICENSE_1_0.txt)
 //
 
 #ifndef MSGPACK_OBJECT_FWD_HPP
@@ -107,7 +99,10 @@ public:
 
 #endif // !defined(MSGPACK_USE_CPP03)
 
-
+/// Object class that corresponding to MessagePack format object
+/**
+ * See https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_object
+ */
 struct object {
     union union_type {
         bool boolean;
@@ -127,42 +122,117 @@ struct object {
     msgpack::type::object_type type;
     union_type via;
 
+    /// Cheking nil
+    /**
+     * @return If the object is nil, then return true, else return false.
+     */
     bool is_nil() const { return type == msgpack::type::NIL; }
 
 #if defined(MSGPACK_USE_CPP03)
 
+    /// Get value as T
+    /**
+     * If the object can't be converted to T, msgpack::type_error would be thrown.
+     * @tparam T The type you want to get.
+     * @return The converted object.
+     */
     template <typename T>
     T as() const;
 
 #else  // defined(MSGPACK_USE_CPP03)
 
+    /// Get value as T
+    /**
+     * If the object can't be converted to T, msgpack::type_error would be thrown.
+     * @tparam T The type you want to get.
+     * @return The converted object.
+     */
     template <typename T>
     typename std::enable_if<msgpack::has_as<T>::value, T>::type as() const;
 
+    /// Get value as T
+    /**
+     * If the object can't be converted to T, msgpack::type_error would be thrown.
+     * @tparam T The type you want to get.
+     * @return The converted object.
+     */
     template <typename T>
     typename std::enable_if<!msgpack::has_as<T>::value, T>::type as() const;
 
 #endif // defined(MSGPACK_USE_CPP03)
 
+    /// Convert the object
+    /**
+     * If the object can't be converted to T, msgpack::type_error would be thrown.
+     * @tparam T The type of v.
+     * @param v The value you want to get. `v` is output parameter. `v` is overwritten by converted value from the object.
+     * @return The reference of `v`.
+     */
     template <typename T>
     T& convert(T& v) const;
+
+
+#if !defined(MSGPACK_DISABLE_LEGACY_CONVERT)
+    /// Convert the object (obsolete)
+    /**
+     * If the object can't be converted to T, msgpack::type_error would be thrown.
+     * @tparam T The type of v.
+     * @param v The pointer of the value you want to get. `v` is output parameter. `*v` is overwritten by converted value from the object.
+     * @return The pointer of `v`.
+     */
     template <typename T>
     T* convert(T* v) const;
+#endif // !defined(MSGPACK_DISABLE_LEGACY_CONVERT)
 
+    /// Convert the object if not nil
+    /**
+     * If the object is not nil and can't be converted to T, msgpack::type_error would be thrown.
+     * @tparam T The type of v.
+     * @param v The value you want to get. `v` is output parameter. `v` is overwritten by converted value from the object if the object is not nil.
+     * @return If the object is nil, then return false, else return true.
+     */
     template <typename T>
     bool convert_if_not_nil(T& v) const;
 
+    /// Default constructor. The object is set to nil.
     object();
 
+    /// Copy constructor. Object is shallow copied.
     object(const msgpack_object& o);
 
+    /// Construct object from T
+    /**
+     * If `v` is the type that is corresponding to MessegePack format str, bin, ext, array, or map,
+     * you need to call `object(const T& v, msgpack::zone& z)` instead of this constructor.
+     *
+     * @tparam T The type of `v`.
+     * @param v The value you want to convert.
+     */
     template <typename T>
     explicit object(const T& v);
 
+    /// Construct object from T
+    /**
+     * The object is constructed on the zone `z`.
+     * See https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_object
+     *
+     * @tparam T The type of `v`.
+     * @param v The value you want to convert.
+     * @param z The zone that is used by the object.
+     */
     template <typename T>
     object(const T& v, msgpack::zone& z);
 
-    // obsolete
+    /// Construct object from T (obsolete)
+    /**
+     * The object is constructed on the zone `z`.
+     * Use `object(const T& v, msgpack::zone& z)` instead of this constructor.
+     * See https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_object
+     *
+     * @tparam T The type of `v`.
+     * @param v The value you want to convert.
+     * @param z The pointer to the zone that is used by the object.
+     */
     template <typename T>
     object(const T& v, msgpack::zone* z);
 
@@ -188,7 +258,7 @@ struct object_kv {
 };
 
 struct object::with_zone : object {
-    with_zone(msgpack::zone& zone) : zone(zone) { }
+    with_zone(msgpack::zone& z) : zone(z) { }
     msgpack::zone& zone;
 private:
     with_zone();
