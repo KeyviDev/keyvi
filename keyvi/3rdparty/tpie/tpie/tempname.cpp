@@ -49,23 +49,15 @@ std::string default_path;
 std::string default_base_name = "TPIE";
 std::string default_extension;
 std::stack<std::string> subdirs;
-memory_size_type file_index = 0;
 
 }
 
 std::string tempname::get_system_path() {
-#ifdef WIN32
-	//set temporary path
-	CHAR temp_path[MAX_PATH];
-		
-	if (GetTempPath(MAX_PATH,temp_path) != 0) {
-		return std::string(temp_path);
-	} else {
-		TP_LOG_WARNING_ID("Could not get default system path, using current working dir.\n");
-		return ".";
-	}
+	auto p = boost::filesystem::temp_directory_path();
+#if BOOST_FILESYSTEM_VERSION == 3
+	return p.string();
 #else
-	return "/var/tmp";
+	return p.file_string();
 #endif
 }
 
@@ -80,35 +72,38 @@ std::string get_timestamp() {
 	return name;
 }
 
-std::string construct_name(std::string post_base, std::string timestamp, std::string suffix, int i) {
+std::string construct_name(std::string post_base, std::string timestamp, std::string suffix) {
 	std::stringstream ss;
 	ss << default_base_name << "_";
 	if(!post_base.empty())
 		ss << post_base << "_";
 	if(!timestamp.empty())
 		ss << timestamp << "_";
-	ss << i << suffix;
+	ss << "%%%%-%%%%-%%%%-%%%%" << suffix;
 
-	return ss.str();
+	auto p = boost::filesystem::unique_path(ss.str());
+
+#if BOOST_FILESYSTEM_VERSION == 3
+	return p.string();
+#else
+	return p.file_string();
+#endif
 }
 
 void create_subdir() {
 	boost::filesystem::path base_dir = tempname::get_actual_path();
 	boost::filesystem::path p;
-	for (int i=0; i < 42; ++i) {
-		p = base_dir / construct_name("", get_timestamp(), "", i);
-		if ( !boost::filesystem::exists(p) && boost::filesystem::create_directory(p)) {
+	p = base_dir / construct_name("", get_timestamp(), "");
+	if ( !boost::filesystem::exists(p) && boost::filesystem::create_directory(p)) {
 #if BOOST_FILESYSTEM_VERSION == 3
-			std::string path = p.string();
+		std::string path = p.string();
 #else
-			std::string path = p.file_string();
+		std::string path = p.file_string();
 #endif
-			if (!subdirs.empty() && subdirs.top().empty())
-				subdirs.pop();
-			subdirs.push(path);
-			return;
-		}
-
+		if (!subdirs.empty() && subdirs.top().empty())
+			subdirs.pop();
+		subdirs.push(path);
+		return;
 	}
 	throw tempfile_error("Unable to find free name for temporary folder");
 }
@@ -116,15 +111,13 @@ void create_subdir() {
 std::string gen_temp(const std::string& post_base, const std::string& dir, const std::string& suffix) {
 	if (!dir.empty()) {
 		boost::filesystem::path p;
-		for (int i=0; i < 42; ++i) {
-			p = dir; p /= construct_name(post_base, get_timestamp(), suffix, i);
-			if ( !boost::filesystem::exists(p) ) {
+		p = dir; p /= construct_name(post_base, get_timestamp(), suffix);
+		if ( !boost::filesystem::exists(p) ) {
 #if BOOST_FILESYSTEM_VERSION == 3
-				return p.string();
+			return p.string();
 #else
-				return p.file_string();
+			return p.file_string();
 #endif
-			}
 		}
 		throw tempfile_error("Unable to find free name for temporary file");
 	}
@@ -132,7 +125,7 @@ std::string gen_temp(const std::string& post_base, const std::string& dir, const
 		if (subdirs.empty() || subdirs.top().empty()) create_subdir();
 
 		boost::filesystem::path p = subdirs.top();
-		p /= construct_name(post_base, "", suffix, file_index++);
+		p /= construct_name(post_base, "", suffix);
 
 #if BOOST_FILESYSTEM_VERSION == 3
 		return p.string();
@@ -198,31 +191,30 @@ bool tempname::try_directory(const std::string& path, const std::string& subdir)
 		}
 	}
 
-	for(size_t i = 0; i < 42; ++i) {
-		boost::filesystem::path f = p / construct_name("", get_timestamp(), "", i);
-		if(boost::filesystem::exists(f)) continue;
+	boost::filesystem::path f = p / construct_name("", get_timestamp(), "");
+	if(boost::filesystem::exists(f)) return false;
 
 #if BOOST_FILESYSTEM_VERSION == 3
-		std::string file_path = f.string();
+	std::string file_path = f.string();
 #else
-		std::string file_path = f.directory_string();
+	std::string file_path = f.directory_string();
 #endif
 
-		try {
-			{
-				tpie::file_accessor::raw_file_accessor accessor;
-				accessor.open_rw_new(file_path);
-				accessor.write_i(static_cast<const void*>(&i), sizeof(i));
-			}
-			if(exists)
-				boost::filesystem::remove_all(file_path);
-			else
-				boost::filesystem::remove_all(p);
-			return true;
+	try {
+		{
+			tpie::file_accessor::raw_file_accessor accessor;
+			accessor.open_rw_new(file_path);
+			int i = 0xbadf00d;
+			accessor.write_i(static_cast<const void*>(&i), sizeof(i));
 		}
-		catch(tpie::exception) {}
-		catch (boost::filesystem::filesystem_error) {}
+		if(exists)
+			boost::filesystem::remove_all(file_path);
+		else
+			boost::filesystem::remove_all(p);
+		return true;
 	}
+	catch(tpie::exception) {}
+	catch (boost::filesystem::filesystem_error) {}
 
 	return false;
 	// remove file
