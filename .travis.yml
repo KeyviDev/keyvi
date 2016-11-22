@@ -38,7 +38,7 @@ matrix:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./travis/setup_osx.sh ; fi
-  - pip install --upgrade pip
+  - sudo pip install --upgrade pip
   - sudo pip install twine pytest msgpack-python
   - if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install coveralls-merge cpp-coveralls ; fi
 
