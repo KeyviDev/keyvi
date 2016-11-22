@@ -220,8 +220,8 @@ final {
         symbol +=16;
       }
 #else
-      uint64_t* labels_as_ll = (unsigned long int *) (labels_ + starting_state);
-      uint64_t* mask_as_ll = (unsigned long int *) (OUTGOING_TRANSITIONS_MASK);
+      uint64_t* labels_as_ll = (uint64_t*) (labels_ + starting_state);
+      uint64_t* mask_as_ll = (uint64_t*) (OUTGOING_TRANSITIONS_MASK);
       unsigned char symbol = 0;
 
       // check 8 bytes at a time
@@ -323,8 +323,8 @@ final {
         symbol +=16;
       }
     #else
-      uint64_t* labels_as_ll = (unsigned long int *) (labels_ + starting_state);
-      uint64_t* mask_as_ll = (unsigned long int *) (OUTGOING_TRANSITIONS_MASK);
+      uint64_t* labels_as_ll = (uint64_t*) (labels_ + starting_state);
+      uint64_t* mask_as_ll = (uint64_t*) (OUTGOING_TRANSITIONS_MASK);
       unsigned char symbol = 0;
 
       // check 8 bytes at a time
