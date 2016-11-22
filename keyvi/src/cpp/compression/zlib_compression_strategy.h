@@ -38,8 +38,7 @@ namespace compression {
 
 /** A compression strategy that wraps zlib. */
 struct ZlibCompressionStrategy final : public CompressionStrategy {
-  ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION)
-    : compression_level_(compression_level) {
+  ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION) {
 
     // init zlib structure for compression
 
@@ -143,7 +142,6 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
   std::string name() const { return "zlib"; }
 
  private:
-  int compression_level_;
   z_stream zstream_compress_;
   //char outbuffer_[32768];
 };
