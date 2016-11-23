@@ -1,2 +1,4 @@
 # PyTest
 .cache/v/cache/lastfailed
+pykeyvi.egg-info/
+dist/
