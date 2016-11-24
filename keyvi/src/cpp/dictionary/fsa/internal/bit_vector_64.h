@@ -43,7 +43,7 @@ template<std::size_t Tsize>
 struct BitVector
 final {
    public:
-    template<std::size_t TsizeOther> friend class BitVector;
+    template<std::size_t TsizeOther> friend struct BitVector;
 
     BitVector():bits_() {
       Clear();
