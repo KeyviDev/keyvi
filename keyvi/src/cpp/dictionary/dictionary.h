@@ -41,19 +41,6 @@ class Dictionary
 final {
    public:
 
-  /**
-   * DEPRECATED: Initialize a dictionary in lazy or non-lazy mode.
-   *
-   * Use Dictionary(filename, loading_strategy) instead.
-   *
-   * @param filename the filename
-   * @param load_lazy whether to load lazy.
-   */
-    Dictionary(const std::string& filename, bool load_lazy)
-        : fsa_(std::make_shared<fsa::Automata>(filename, load_lazy)) {
-      TRACE("Dictionary from file %s", filename);
-    }
-
     /**
      * Initialize a dictionary from a file.
      *

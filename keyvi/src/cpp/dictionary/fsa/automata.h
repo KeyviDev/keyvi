@@ -51,9 +51,7 @@ namespace fsa {
 class Automata
 final {
 
-   public:
-    Automata(const std::string&  filename, bool load_lazy):
-      Automata(filename, load_lazy ? loading_strategy_types::default_os : loading_strategy_types::populate) {}
+public:
 
     explicit Automata(const std::string&  filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
       std::ifstream in_stream(filename, std::ios::binary);
