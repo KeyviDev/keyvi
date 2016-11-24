@@ -52,8 +52,11 @@ class Automata
 final {
 
 public:
-
     explicit Automata(const std::string&  filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
+        using namespace ::boost;
+        using namespace ::boost::interprocess;
+        using namespace internal;
+
       std::ifstream in_stream(filename, std::ios::binary);
 
       if (!in_stream.good()) {
@@ -68,23 +71,20 @@ public:
         throw std::invalid_argument("not a keyvi file");
       }
 
-      automata_properties_ = internal::SerializationUtils::ReadJsonRecord(
-          in_stream);
-      sparse_array_properties_ = internal::SerializationUtils::ReadJsonRecord(
-          in_stream);
+        automata_properties_ = SerializationUtils::ReadJsonRecord(in_stream);
+        sparse_array_properties_ = SerializationUtils::ReadJsonRecord(in_stream);
 
-      compact_size_ = boost::lexical_cast<uint32_t> (sparse_array_properties_.get<std::string>("version")) == 2;
-      size_t bucket_size = compact_size_ ? sizeof(uint16_t) : sizeof(uint32_t);
+        compact_size_ = lexical_cast<uint32_t> (sparse_array_properties_.get<std::string>("version")) == 2;
+        size_t bucket_size = compact_size_ ? sizeof(uint16_t) : sizeof(uint32_t);
 
-      // get start state and number of keys
-      start_state_ = boost::lexical_cast<uint64_t> (automata_properties_.get<std::string>("start_state"));
-      number_of_keys_ = boost::lexical_cast<uint64_t> (automata_properties_.get<std::string>("number_of_keys"));
+        // get start state and number of keys
+        start_state_ = lexical_cast<uint64_t> (automata_properties_.get<std::string>("start_state"));
+        number_of_keys_ = lexical_cast<uint64_t> (automata_properties_.get<std::string>("number_of_keys"));
 
       size_t offset = in_stream.tellg();
 
-      file_mapping_ = new boost::interprocess::file_mapping(
-          filename.c_str(), boost::interprocess::read_only);
-      size_t array_size = boost::lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
+      file_mapping_ = file_mapping(filename.c_str(), boost::interprocess::read_only);
+      size_t array_size = lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
 
       in_stream.seekg(offset + array_size + bucket_size * array_size - 1);
 
@@ -93,50 +93,39 @@ public:
         throw std::invalid_argument("file is corrupt(truncated)");
       }
 
-      const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
+        const map_options_t map_options = MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
-      TRACE("labels start offset: %d", offset);
-      labels_region_ = new boost::interprocess::mapped_region(
-          *file_mapping_, boost::interprocess::read_only, offset, array_size, 0, map_options);
+        TRACE("labels start offset: %d", offset);
+        labels_region_ = mapped_region(file_mapping_, interprocess::read_only, offset, array_size, 0, map_options);
 
-      TRACE("transitions start offset: %d", offset + array_size);
-      transitions_region_ = new boost::interprocess::mapped_region(
-          *file_mapping_, boost::interprocess::read_only, offset + array_size,
-          bucket_size * array_size, 0, map_options);
+        TRACE("transitions start offset: %d", offset + array_size);
+        transitions_region_ = mapped_region(file_mapping_, interprocess::read_only, offset + array_size,
+                                            bucket_size * array_size, 0, map_options);
 
-      const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
+        const auto advise = MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
 
-      labels_region_->advise(advise);
-      transitions_region_->advise(advise);
+        labels_region_.advise(advise);
+        transitions_region_.advise(advise);
 
       TRACE("full file size %zu", offset + array_size + bucket_size * array_size);
 
-      labels_ = (unsigned char*) labels_region_->get_address();
-      transitions_ = (uint32_t*) transitions_region_->get_address();
-      transitions_compact_ = (uint16_t*) transitions_region_->get_address();
+        labels_ = static_cast<unsigned char*>(labels_region_.get_address());
+        transitions_ = static_cast<uint32_t*>(transitions_region_.get_address());
+        transitions_compact_ = static_cast<uint16_t*>(transitions_region_.get_address());
 
       // forward 1 position
       in_stream.get();
       TRACE("value store position %zu", in_stream.tellg());
 
       // initialize value store
-      internal::value_store_t value_store_type =
-          static_cast<internal::value_store_t>(
-              boost::lexical_cast<int> (automata_properties_.get<std::string>(
-              "value_store_type")));
-      value_store_reader_ = internal::ValueStoreFactory::MakeReader(value_store_type, in_stream, file_mapping_, loading_strategy);
+        value_store_t value_store_type = static_cast<value_store_t>(
+                lexical_cast<int>(automata_properties_.get<std::string>("value_store_type")));
+
+        value_store_reader_.reset(ValueStoreFactory::MakeReader(value_store_type, in_stream, &file_mapping_, loading_strategy));
 
       in_stream.close();
     }
 
-    ~Automata() {
-      delete value_store_reader_;
-      delete file_mapping_;
-      delete labels_region_;
-      delete transitions_region_;
-    }
-
-    Automata() = delete;
     Automata& operator=(Automata const&) = delete;
     Automata(const Automata& that) = delete;
 
@@ -464,10 +453,10 @@ public:
    private:
     boost::property_tree::ptree automata_properties_;
     boost::property_tree::ptree sparse_array_properties_;
-    internal::IValueStoreReader* value_store_reader_;
-    boost::interprocess::file_mapping* file_mapping_;
-    boost::interprocess::mapped_region* labels_region_;
-    boost::interprocess::mapped_region* transitions_region_;
+    std::unique_ptr<internal::IValueStoreReader>  value_store_reader_;
+    boost::interprocess::file_mapping   file_mapping_;
+    boost::interprocess::mapped_region  labels_region_;
+    boost::interprocess::mapped_region  transitions_region_;
     unsigned char* labels_;
     uint32_t* transitions_;
     uint16_t* transitions_compact_;
@@ -479,7 +468,7 @@ public:
     friend class ::keyvi::dictionary::DictionaryMerger;
 
     internal::IValueStoreReader* GetValueStore() const {
-      return value_store_reader_;
+      return value_store_reader_.get();
     }
 
     inline uint64_t ResolvePointer(uint64_t starting_state, unsigned char c) const {
