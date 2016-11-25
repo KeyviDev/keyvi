@@ -111,13 +111,11 @@ class JsonValueStore final : public IValueStoreWriter {
 
     size_t external_memory_chunk_size = 1073741824;
 
-    values_extern_ = new MemoryMapManager(external_memory_chunk_size,
-                                          temporary_directory_,
-                                          "json_values_filebuffer");
+    values_extern_.reset(new MemoryMapManager(external_memory_chunk_size, temporary_directory_,
+                                                "json_values_filebuffer"));
   }
 
   ~JsonValueStore() {
-    delete values_extern_;
     boost::filesystem::remove_all(temporary_directory_);
   }
 
@@ -144,8 +142,7 @@ class JsonValueStore final : public IValueStoreWriter {
       return AddValue();
     }
 
-    const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(),
-                                                     values_extern_);
+    const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(), values_extern_.get());
     const RawPointer<> p = hash_.Get(stp);
 
     if (!p.IsEmpty()) {
@@ -197,8 +194,8 @@ class JsonValueStore final : public IValueStoreWriter {
     values_extern_->Write(stream, values_buffer_size_);
   }
 
- private:
-  MemoryMapManager* values_extern_;
+private:
+    std::unique_ptr<MemoryMapManager>   values_extern_;
 
   /*
    * Compressors & the associated compression functions. Ugly, but
@@ -230,8 +227,7 @@ class JsonValueStore final : public IValueStoreWriter {
      const char* full_buf = payload + fsa_value;
      const char* buf_ptr = util::decodeVarintString(full_buf, &buffer_size);
 
-     const RawPointerForCompare<MemoryMapManager> stp(buf_ptr, buffer_size,
-                                                          values_extern_);
+     const RawPointerForCompare<MemoryMapManager> stp(buf_ptr, buffer_size, values_extern_.get());
      const RawPointer<> p = hash_.Get(stp);
 
      if (!p.IsEmpty()) {
