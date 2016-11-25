@@ -2,6 +2,6 @@
 set -ev
 
 brew update
-brew install snappy scons cmake
-sudo easy_install pip
-sudo pip install wheel
+brew install snappy scons
+sudo -H easy_install pip
+sudo -H pip install wheel

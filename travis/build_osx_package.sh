@@ -7,6 +7,6 @@ cd ..
 
 cd pykeyvi
 python setup.py bdist_wheel -d wheelhouse
-sudo pip install wheelhouse/*.whl
+sudo -H pip install wheelhouse/*.whl
 py.test tests
 cd ..
