@@ -55,28 +55,39 @@ cdef class JsonDictionaryMerger:
     def _init_0(self):
         self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger())
     
-    def _init_1(self,  memory_limit ):
+    def _init_1(self,  append_merge ):
+        assert isinstance(append_merge, (int, long)), 'arg append_merge wrong type'
+    
+        self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger((<bool>append_merge)))
+    
+    def _init_2(self,  append_merge ,  memory_limit ):
+        assert isinstance(append_merge, (int, long)), 'arg append_merge wrong type'
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
     
-        self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger((<size_t>memory_limit)))
     
-    def _init_2(self,  memory_limit , dict value_store_params ):
+        self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger((<bool>append_merge), (<size_t>memory_limit)))
+    
+    def _init_3(self,  append_merge ,  memory_limit , dict value_store_params ):
+        assert isinstance(append_merge, (int, long)), 'arg append_merge wrong type'
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
         assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
     
-        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+    
+        cdef libcpp_map[libcpp_string, libcpp_string] * v2 = new libcpp_map[libcpp_string, libcpp_string]()
         for key, value in value_store_params.items():
-           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
-        self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger((<size_t>memory_limit), deref(v1)))
-        del v1
+           deref(v2)[ <libcpp_string> key ] = <libcpp_string> value
+        self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger((<bool>append_merge), (<size_t>memory_limit), deref(v2)))
+        del v2
     
     def __init__(self, *args , **kwargs):
         if not args:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
-        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], (int, long))):
              self._init_2(*args)
+        elif (len(args)==3) and (isinstance(args[0], (int, long))) and (isinstance(args[1], (int, long))) and (isinstance(args[2], dict) and all(isinstance(k, bytes) for k in args[2].keys()) and all(isinstance(v, bytes) for v in args[2].values())):
+             self._init_3(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     

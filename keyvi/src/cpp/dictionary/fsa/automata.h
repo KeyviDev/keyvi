@@ -49,11 +49,20 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+/// TODO: refator (split) class Automata, so there is no need for param "loadVS" and friend classes
 class Automata
 final {
 
 public:
-    explicit Automata(const std::string&  filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
+    explicit Automata(const std::string&  filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+            : Automata(filename, loading_strategy, true)
+    {}
+
+private:
+    template<typename , typename>
+    friend class ::keyvi::dictionary::DictionaryMerger;
+
+    explicit Automata(const std::string& filename, loading_strategy_types loading_strategy , const bool loadVS) {
         using namespace ::boost;
         using namespace ::boost::interprocess;
         using namespace internal;
@@ -94,12 +103,16 @@ public:
         transitions_ = static_cast<uint32_t*>(transitions_region_.get_address());
         transitions_compact_ = static_cast<uint16_t*>(transitions_region_.get_address());
 
-        const value_store_t value_store_type = static_cast<value_store_t>(
-                lexical_cast<int>(automata_properties_.get<std::string>("value_store_type")));
 
-        value_store_reader_.reset(ValueStoreFactory::MakeReader(value_store_type, keyViFile.valueStoreStream(),
-                                                                &file_mapping_, loading_strategy));
+        if (loadVS) {
+            const value_store_t value_store_type = static_cast<value_store_t>(
+                    lexical_cast<int>(automata_properties_.get<std::string>("value_store_type")));
+
+            value_store_reader_.reset(ValueStoreFactory::MakeReader(value_store_type, keyViFile.valueStoreStream(),
+                                                                    &file_mapping_, loading_strategy));
+        }
     }
+public:
 
     Automata& operator=(Automata const&) = delete;
     Automata(const Automata& that) = delete;
@@ -390,26 +403,31 @@ public:
     }
 
     internal::IValueStoreReader::attributes_t GetValueAsAttributeVector(uint64_t state_value) const {
-      return value_store_reader_->GetValueAsAttributeVector(state_value);
+        assert(value_store_reader_);
+        return value_store_reader_->GetValueAsAttributeVector(state_value);
     }
 
     std::string GetValueAsString(uint64_t state_value) const {
-      return value_store_reader_->GetValueAsString(state_value);
+        assert(value_store_reader_);
+        return value_store_reader_->GetValueAsString(state_value);
     }
 
     std::string GetRawValueAsString(uint64_t state_value) const {
+        assert(value_store_reader_);
       return value_store_reader_->GetRawValueAsString(state_value);
     }
 
     std::string GetStatistics() const {
-      std::ostringstream buf;
-      buf << "General" << std::endl;
-      boost::property_tree::write_json (buf, automata_properties_, false);
-      buf << std::endl << "Persistence" << std::endl;
-      boost::property_tree::write_json (buf, sparse_array_properties_, false);
-      buf << std::endl << "Value Store" << std::endl;
-      buf << value_store_reader_->GetStatistics();
-      return buf.str();
+        assert(value_store_reader_);
+
+        std::ostringstream buf;
+        buf << "General" << std::endl;
+        boost::property_tree::write_json (buf, automata_properties_, false);
+        buf << std::endl << "Persistence" << std::endl;
+        boost::property_tree::write_json (buf, sparse_array_properties_, false);
+        buf << std::endl << "Value Store" << std::endl;
+        buf << value_store_reader_->GetStatistics();
+        return buf.str();
     }
 
     boost::property_tree::ptree GetManifest() const {
@@ -443,7 +461,8 @@ public:
     friend class ::keyvi::dictionary::DictionaryMerger;
 
     internal::IValueStoreReader* GetValueStore() const {
-      return value_store_reader_.get();
+        assert(value_store_reader_);
+        return value_store_reader_.get();
     }
 
     inline uint64_t ResolvePointer(uint64_t starting_state, unsigned char c) const {

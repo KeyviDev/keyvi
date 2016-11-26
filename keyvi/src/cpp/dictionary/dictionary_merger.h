@@ -50,16 +50,16 @@ private:
         using EntryIteratorPtr = std::shared_ptr<fsa::EntryIterator>;
 
     public:
-        SegmentIterator(const fsa::EntryIterator& e, int p) :
+        SegmentIterator(const fsa::EntryIterator& e, size_t segmentIndex) :
                 entry_iterator_ptr_(std::make_shared<fsa::EntryIterator>(e)),
-                priority_(p)
+                segmentIndex_(segmentIndex)
         {}
 
         bool operator<(const SegmentIterator& rhs) const {
             // very important difference in semantics: we have to ensure that in case of equal key,
             // the iterator with the higher priority is taken
 
-            if (priority_ < rhs.priority_) {
+            if (segmentIndex_ < rhs.segmentIndex_) {
                 return entryIterator() > rhs.entryIterator();
             }
 
@@ -79,6 +79,10 @@ private:
             return *entry_iterator_ptr_;
         }
 
+        const size_t segmentIndex() const {
+            return segmentIndex_;
+        }
+
     private:
         static const fsa::EntryIterator& endIterator() {
             static fsa::EntryIterator end_it;
@@ -87,12 +91,14 @@ private:
 
     private:
         EntryIteratorPtr entry_iterator_ptr_;
-        int priority_;
+        size_t segmentIndex_;
     };
 
 public:
-    DictionaryMerger(size_t memory_limit = 1073741824, const merger_param_t& params = merger_param_t())
-            : dicts_to_merge_(),
+    DictionaryMerger(bool append_merge = false,
+                     size_t memory_limit = 1073741824, const merger_param_t& params = merger_param_t())
+            : appendMerge_(append_merge),
+              dicts_to_merge_(),
               memory_limit_(memory_limit),
               params_(params)
     {
@@ -102,10 +108,17 @@ public:
     }
 
     void Add(const std::string& filename) {
-        fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+        inputFiles_.push_back(filename);
 
-        if (fsa->GetValueStore()->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
-            throw std::invalid_argument("Dictionaries must have the same type.");
+        fsa::automata_t fsa;
+
+        if (appendMerge_) {
+            fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
+        } else {
+            fsa.reset(new fsa::Automata(filename));
+            if (fsa->GetValueStore()->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
+                throw std::invalid_argument("Dictionaries must have the same type.");
+            }
         }
 
         dicts_to_merge_.push_back(fsa);
@@ -129,7 +142,7 @@ public:
             pqueue.push(SegmentIterator(e_it, i++));
         }
 
-        ValueStoreT* value_store = new ValueStoreT(params_);
+        ValueStoreT* value_store = appendMerge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
 
         fsa::Generator<PersistenceT, ValueStoreT> generator(memory_limit_, params_, value_store);
 
@@ -161,10 +174,14 @@ public:
             //handle.weight = value_store_->GetWeightValue(value);
             handle.weight = 0;
 
-            handle.value_idx = value_store->GetValue(
-                    segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
-                    segment_it.entryIterator().GetValueId(),
-                    handle.no_minimization);
+            if (appendMerge_) {
+                handle.value_idx = value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
+            } else {
+                handle.value_idx = value_store->GetValue(
+                        segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
+                        segment_it.entryIterator().GetValueId(),
+                        handle.no_minimization);
+            }
 
             TRACE("Add key: %s", top_key.c_str());
             generator.Add(std::move(top_key), handle);
@@ -185,7 +202,10 @@ public:
     }
 
 private:
-    std::vector<fsa::automata_t> dicts_to_merge_;
+    const bool                      appendMerge_;
+    std::vector<fsa::automata_t>    dicts_to_merge_;
+    std::vector<std::string>        inputFiles_;
+
     size_t memory_limit_;
     fsa::internal::IValueStoreWriter::vs_param_t params_;
     std::string manifest_ = std::string();
