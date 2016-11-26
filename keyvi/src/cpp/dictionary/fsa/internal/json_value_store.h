@@ -127,7 +127,7 @@ class JsonValueStore final : public IValueStoreWriter {
             util::KeyViFile keyViFile(filename);
 
             auto& vsStream = keyViFile.valueStoreStream();
-            boost::property_tree::ptree props = internal::SerializationUtils::ReadJsonRecord(vsStream);
+            const boost::property_tree::ptree props = internal::SerializationUtils::ReadValueStoreProperties(vsStream);
             offsets_.push_back(values_buffer_size_);
 
             number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
@@ -228,7 +228,7 @@ class JsonValueStore final : public IValueStoreWriter {
             for (const auto& filename: inputFiles_) {
                 util::KeyViFile keyViFile(filename);
                 auto &in_stream = keyViFile.valueStoreStream();
-                internal::SerializationUtils::ReadJsonRecord(in_stream);
+                internal::SerializationUtils::ReadValueStoreProperties(in_stream);
 
                 stream << in_stream.rdbuf();
             }
@@ -323,19 +323,10 @@ class JsonValueStoreReader final: public IValueStoreReader {
       : IValueStoreReader(stream, file_mapping) {
     TRACE("JsonValueStoreReader construct");
 
-    properties_ =
-        internal::SerializationUtils::ReadJsonRecord(stream);
+    properties_ = internal::SerializationUtils::ReadValueStoreProperties(stream);
 
-    size_t offset = stream.tellg();
-    size_t strings_size = boost::lexical_cast<size_t> (properties_.get<std::string>("size"));
-
-    // check for file truncation
-    if (strings_size > 0) {
-      stream.seekg(strings_size - 1, stream.cur);
-      if (stream.peek() == EOF) {
-        throw std::invalid_argument("file is corrupt(truncated)");
-      }
-    }
+    const size_t offset = stream.tellg();
+    const size_t strings_size = boost::lexical_cast<size_t> (properties_.get<std::string>("size"));
 
     const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 
