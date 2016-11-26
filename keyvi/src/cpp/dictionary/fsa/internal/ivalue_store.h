@@ -26,6 +26,8 @@
 #define IVALUE_STORE_H_
 
 #include <map>
+#include <vector>
+#include <string>
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -80,7 +82,15 @@ class IValueStoreWriter {
    *                   value store what parameters it wants to use (if any).
    */
   IValueStoreWriter(const vs_param_t& parameters = vs_param_t()) : parameters_(parameters) {}
-  //IValueStoreWriter() : IValueStoreWriter(vs_param_t()) {}
+
+    /// TODO: workaround till ValueStore merger classes are separated from ValueStore writer
+    IValueStoreWriter(const std::vector<std::string> &)
+            : IValueStoreWriter()
+    {}
+
+    uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) {
+        return 0;
+    }
 
   virtual ~IValueStoreWriter() {
   }
