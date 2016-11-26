@@ -59,8 +59,6 @@ public:
     {}
 
 private:
-    template<typename , typename>
-    friend class ::keyvi::dictionary::DictionaryMerger;
 
     explicit Automata(const std::string& filename, loading_strategy_types loading_strategy , const bool loadVS) {
         using namespace ::boost;
