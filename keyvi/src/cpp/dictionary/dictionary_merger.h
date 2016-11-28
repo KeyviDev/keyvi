@@ -143,7 +143,7 @@ public:
     void Merge(const std::string& filename) {
         std::priority_queue<SegmentIterator> pqueue;
 
-        int i = 0;
+        size_t i = 0;
         for (auto fsa: dicts_to_merge_) {
             fsa::EntryIterator e_it(fsa);
             pqueue.push(SegmentIterator(e_it, i++));
