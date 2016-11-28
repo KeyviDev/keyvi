@@ -209,7 +209,7 @@ public:
     }
 
 private:
-    bool                            appendMerge_;
+    bool                            appendMerge_ = false;
     std::vector<fsa::automata_t>    dicts_to_merge_;
     std::vector<std::string>        inputFiles_;
 
