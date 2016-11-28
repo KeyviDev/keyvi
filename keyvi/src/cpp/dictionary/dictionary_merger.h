@@ -109,7 +109,7 @@ public:
             params_[TEMPORARY_PATH_KEY] = boost::filesystem::temp_directory_path().string();
         }
         if (params_.count(MERGE_MODE) > 0) {
-            appendMerge_ = MERGE_APPEND == params_[MERGE_MODE];
+            append_merge_ = MERGE_APPEND == params_[MERGE_MODE];
         }
     }
 
@@ -118,7 +118,7 @@ public:
 
         fsa::automata_t fsa;
 
-        if (appendMerge_) {
+        if (append_merge_) {
             fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
         } else {
             fsa.reset(new fsa::Automata(filename));
@@ -149,7 +149,7 @@ public:
             pqueue.push(SegmentIterator(e_it, i++));
         }
 
-        ValueStoreT* value_store = appendMerge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
+        ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
 
         fsa::Generator<PersistenceT, ValueStoreT> generator(memory_limit_, params_, value_store);
 
@@ -181,7 +181,7 @@ public:
             //handle.weight = value_store_->GetWeightValue(value);
             handle.weight = 0;
 
-            if (appendMerge_) {
+            if (append_merge_) {
                 handle.value_idx = value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
             } else {
                 handle.value_idx = value_store->GetValue(
@@ -209,7 +209,7 @@ public:
     }
 
 private:
-    bool                            appendMerge_ = false;
+    bool                            append_merge_ = false;
     std::vector<fsa::automata_t>    dicts_to_merge_;
     std::vector<std::string>        inputFiles_;
 
