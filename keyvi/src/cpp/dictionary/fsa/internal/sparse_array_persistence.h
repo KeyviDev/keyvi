@@ -126,6 +126,9 @@ final {
                          BucketT transitionPointer) {
 
       TRACE("write transition at %d with %d/%d", offset, transitionId, transitionPointer);
+
+      highest_raw_write_bucket_ = std::max(highest_raw_write_bucket_, offset);
+
       if (offset >= in_memory_buffer_offset_) {
 #ifdef PERSISTENCE_DEBUG
         assert (labels_[offset - in_memory_buffer_offset_] == 0);
@@ -143,25 +146,6 @@ final {
       BucketT* transition_ptr = (BucketT*) transitions_extern_->GetAddress(
                 offset * sizeof(BucketT));
       *transition_ptr = HostOrderToPesistenceOrder(transitionPointer);
-    }
-
-    void WriteRawValue(size_t offset, void* buffer, size_t length) {
-#ifdef PERSISTENCE_DEBUG
-        assert (offset + length < in_memory_buffer_offset_+ buffer_size_);
-
-        assert (transitions_[offset - in_memory_buffer_offset_] == 0);
-
-        for (size_t i; i< length/2; ++i){
-          assert (transitions_[offset - in_memory_buffer_offset_ + i] == 0);
-        }
-#endif
-
-        // todo: this is rather pointless: 99% are small copies not worth the call overhead
-        memcpy(transitions_ + offset - in_memory_buffer_offset_, buffer, length);
-
-        // persist the highest position we write into
-        highest_raw_write_bucket_ = std::max(highest_raw_write_bucket_, offset + length);
-      return;
     }
 
     int ReadTransitionLabel(size_t offset) const {
@@ -195,7 +179,7 @@ final {
     void Flush() {
       // make idempotent, so it can be called twice or more);
       if (labels_) {
-        size_t highest_write_position = std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_);
+        size_t highest_write_position = std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_ + 1);
 
         labels_extern_->Append(labels_,
                                     (highest_write_position - in_memory_buffer_offset_));

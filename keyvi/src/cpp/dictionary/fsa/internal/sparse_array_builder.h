@@ -367,7 +367,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     util::encodeVarshort(transitionPointer_high, vshort_pointer, &vshort_size);
 
     // find free spots in the sparse array where the pointer fits in
-    uint64_t start_position = offset > 512 ? offset - 512 : 0;
+    size_t start_position = offset > 512 ? offset - 512 : 0;
 
     for (;;) {
       start_position = taken_positions_in_sparsearray_.NextFreeSlot(
@@ -417,11 +417,10 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
     TRACE("Write Overflow transition at %d, length %d", start_position, vshort_size);
 
-    persistence_->WriteRawValue(start_position, &vshort_pointer,
-                                vshort_size * sizeof(uint16_t));
     // write the values
     for (auto i = 0; i < vshort_size; ++i) {
       taken_positions_in_sparsearray_.Set(start_position + i);
+      persistence_->WriteTransition(start_position + i, 0, vshort_pointer[i]);
     }
 
     // encode the pointer to that bucket
@@ -445,8 +444,10 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
     util::encodeVarshort(value, vshort_pointer, &vshort_size);
 
-    persistence_->WriteRawValue(offset + FINAL_OFFSET_TRANSITION, &vshort_pointer,
-                                vshort_size * sizeof(uint16_t));
+    for (size_t i = 0; i < vshort_size; ++i) {
+      persistence_->WriteTransition(offset + FINAL_OFFSET_TRANSITION + i,
+                                    static_cast<unsigned char>(FINAL_OFFSET_CODE + i), vshort_pointer[i]);
+    }
   }
 
 };
