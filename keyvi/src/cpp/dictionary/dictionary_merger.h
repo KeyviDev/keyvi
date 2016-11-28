@@ -50,16 +50,21 @@ private:
         using EntryIteratorPtr = std::shared_ptr<fsa::EntryIterator>;
 
     public:
-        SegmentIterator(const fsa::EntryIterator& e, size_t segmentIndex) :
+        /**
+         *
+         * @param segment_index, merge segment index also used as a priority indicator
+         *                          when comparing two keys with the same value.
+         */
+        SegmentIterator(const fsa::EntryIterator& e, size_t segment_index) :
                 entry_iterator_ptr_(std::make_shared<fsa::EntryIterator>(e)),
-                segmentIndex_(segmentIndex)
+                segment_index_(segment_index)
         {}
 
         bool operator<(const SegmentIterator& rhs) const {
             // very important difference in semantics: we have to ensure that in case of equal key,
-            // the iterator with the higher priority is taken
+            // the iterator with the higher index (priority) is taken
 
-            if (segmentIndex_ < rhs.segmentIndex_) {
+            if (segment_index_ < rhs.segment_index_) {
                 return entryIterator() > rhs.entryIterator();
             }
 
@@ -80,7 +85,7 @@ private:
         }
 
         const size_t segmentIndex() const {
-            return segmentIndex_;
+            return segment_index_;
         }
 
     private:
@@ -91,7 +96,7 @@ private:
 
     private:
         EntryIteratorPtr entry_iterator_ptr_;
-        size_t segmentIndex_;
+        size_t segment_index_;
     };
 
 public:
