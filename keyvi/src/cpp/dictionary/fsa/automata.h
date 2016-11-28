@@ -60,7 +60,7 @@ public:
 
 private:
 
-    explicit Automata(const std::string& filename, loading_strategy_types loading_strategy , const bool loadVS) {
+    explicit Automata(const std::string& filename, loading_strategy_types loading_strategy , const bool load_value_store) {
         using namespace ::boost;
         using namespace ::boost::interprocess;
         using namespace internal;
@@ -102,7 +102,7 @@ private:
         transitions_compact_ = static_cast<uint16_t*>(transitions_region_.get_address());
 
 
-        if (loadVS) {
+        if (load_value_store) {
             const value_store_t value_store_type = static_cast<value_store_t>(
                     lexical_cast<int>(automata_properties_.get<std::string>("value_store_type")));
 
