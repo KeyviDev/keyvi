@@ -46,13 +46,12 @@
 
 // Value option key names
 
-#define TEMPORARY_PATH_KEY "temporary_path"
-#define COMPRESSION_KEY "compression"
-#define COMPRESSION_THRESHOLD_KEY "compression_threshold"
-#define MINIMIZATION_KEY "minimization"
-#define SINGLE_PRECISION_FLOAT_KEY "floating_point_precision"
-#define STABLE_INSERTS "stable_insert"
-
+static const std::string TEMPORARY_PATH_KEY = "temporary_path";
+static const std::string COMPRESSION_KEY = "compression";
+static const std::string COMPRESSION_THRESHOLD_KEY = "compression_threshold";
+static const std::string MINIMIZATION_KEY = "minimization";
+static const std::string SINGLE_PRECISION_FLOAT_KEY = "floating_point_precision";
+static const std::string STABLE_INSERTS = "stable_insert";
 static const std::string MERGE_MODE = "merge_mode";
 static const std::string MERGE_APPEND = "append";
 
