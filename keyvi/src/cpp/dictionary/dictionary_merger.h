@@ -122,9 +122,10 @@ public:
             fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
         } else {
             fsa.reset(new fsa::Automata(filename));
-            if (fsa->GetValueStore()->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
-                throw std::invalid_argument("Dictionaries must have the same type.");
-            }
+        }
+
+        if (fsa->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
+            throw std::invalid_argument("Dictionaries must have the same type.");
         }
 
         dicts_to_merge_.push_back(fsa);

@@ -102,11 +102,10 @@ private:
         transitions_compact_ = static_cast<uint16_t*>(transitions_region_.get_address());
 
 
-        if (load_value_store) {
-            const value_store_t value_store_type = static_cast<value_store_t>(
+        value_store_type_ = static_cast<value_store_t>(
                     lexical_cast<int>(automata_properties_.get<std::string>("value_store_type")));
-
-            value_store_reader_.reset(ValueStoreFactory::MakeReader(value_store_type, keyViFile.valueStoreStream(),
+        if (load_value_store) {
+            value_store_reader_.reset(ValueStoreFactory::MakeReader(value_store_type_, keyViFile.valueStoreStream(),
                                                                     &file_mapping_, loading_strategy));
         }
     }
@@ -126,6 +125,10 @@ public:
 
     uint64_t GetNumberOfKeys() const {
       return number_of_keys_;
+    }
+
+    internal::value_store_t GetValueStoreType() const {
+        return value_store_type_;
     }
 
     uint64_t TryWalkTransition(uint64_t starting_state, unsigned char c) const {
@@ -454,6 +457,7 @@ public:
     bool compact_size_;
     uint64_t start_state_;
     uint64_t number_of_keys_;
+    internal::value_store_t value_store_type_;
 
     template<typename , typename>
     friend class ::keyvi::dictionary::DictionaryMerger;
