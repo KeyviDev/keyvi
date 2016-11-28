@@ -53,6 +53,8 @@
 #define SINGLE_PRECISION_FLOAT_KEY "floating_point_precision"
 #define STABLE_INSERTS "stable_insert"
 
+static const std::string MERGE_MODE = "merge_mode";
+static const std::string MERGE_APPEND = "append";
 
 /**
  * Lookup table to find outgoing transitions quickly(in parallel) by xor'ing the real buffer with this table.

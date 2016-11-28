@@ -42,6 +42,7 @@ key_values_3 = {
     'f' : {"f": 2}
 }
 
+GB = 1024 * 1024 * 1024
 
 def generate_keyvi(key_values, filename):
 
@@ -52,8 +53,8 @@ def generate_keyvi(key_values, filename):
     dictionary_compiler.Compile()
     dictionary_compiler.WriteToFile(filename)
 
-@pytest.mark.parametrize('merger', [pykeyvi.JsonDictionaryMerger(True),
-                                    pykeyvi.JsonDictionaryMerger(False)])
+@pytest.mark.parametrize('merger', [pykeyvi.JsonDictionaryMerger(),
+                                    pykeyvi.JsonDictionaryMerger(GB, {'merge_mode': 'append'})])
 def test_merge(merger):
 
     tmp_dir = tempfile.mkdtemp()

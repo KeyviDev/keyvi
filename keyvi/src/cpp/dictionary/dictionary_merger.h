@@ -100,15 +100,16 @@ private:
     };
 
 public:
-    DictionaryMerger(bool append_merge = false,
-                     size_t memory_limit = 1073741824, const merger_param_t& params = merger_param_t())
-            : appendMerge_(append_merge),
-              dicts_to_merge_(),
+    DictionaryMerger(size_t memory_limit = 1073741824, const merger_param_t& params = merger_param_t())
+            : dicts_to_merge_(),
               memory_limit_(memory_limit),
               params_(params)
     {
         if (params_.count(TEMPORARY_PATH_KEY) == 0) {
             params_[TEMPORARY_PATH_KEY] = boost::filesystem::temp_directory_path().string();
+        }
+        if (params_.count(MERGE_MODE) > 0) {
+            appendMerge_ = MERGE_APPEND == params_[MERGE_MODE];
         }
     }
 
@@ -207,7 +208,7 @@ public:
     }
 
 private:
-    const bool                      appendMerge_;
+    bool                            appendMerge_;
     std::vector<fsa::automata_t>    dicts_to_merge_;
     std::vector<std::string>        inputFiles_;
 
