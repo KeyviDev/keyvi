@@ -41,7 +41,7 @@ AddOption('--boost-dir',
 
 debugcompilerflags = ['-ggdb3']   #extra compile flags for debug
 coveragecompilerflags = debugcompilerflags + ['-O0' ,'--coverage'] 
-releasecompilerflags = ['-O3']         #extra compile flags for release
+releasecompilerflags = ['-O3', '-DNDEBUG']  #extra compile flags for release
 
 linklibraries =  [ "tpie",
    "boost_program_options",
