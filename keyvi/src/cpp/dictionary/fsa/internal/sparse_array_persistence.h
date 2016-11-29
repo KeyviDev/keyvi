@@ -201,7 +201,7 @@ final {
       boost::property_tree::ptree pt;
       pt.put("version", GetVersion());
 
-      size_t highest_write_position = std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_);
+      size_t highest_write_position = std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_ + 1);
 
       pt.put("size",
              std::to_string(highest_write_position));
