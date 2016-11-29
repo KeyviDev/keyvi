@@ -19,21 +19,30 @@ sys.path.append(os.path.join(root, "../"))
 
 key_values_1 = {
     'a' : {"a": 2},
+    'bzzzz' : {"b": 2},
+    'bbb' : {"b": 2},
     'b' : {"b": 2}
 }
 
 key_values_2 = {
     'a' : {"ab": 23},
     'c' : {"c": 2},
+    'i' : {"c": 2},
+    'ia' : {"c": 2},
     'd' : {"d": 2}
 }
 
 key_values_3 = {
     'e' : {"e": 2},
     'd' : {"dddd": 1233},
+    'e1' : {"e": 2},
+    'e2' : {"e": 22},
+    'e3' : {"e": 21},
+    'e4' : {"e": 2},
     'f' : {"f": 2}
 }
 
+GB = 1024 * 1024 * 1024
 
 def generate_keyvi(key_values, filename):
 
@@ -44,8 +53,9 @@ def generate_keyvi(key_values, filename):
     dictionary_compiler.Compile()
     dictionary_compiler.WriteToFile(filename)
 
-
-def test_merge():
+@pytest.mark.parametrize('merger', [pykeyvi.JsonDictionaryMerger(),
+                                    pykeyvi.JsonDictionaryMerger(GB, {'merge_mode': 'append'})])
+def test_merge(merger):
 
     tmp_dir = tempfile.mkdtemp()
     try:
@@ -59,7 +69,6 @@ def test_merge():
         generate_keyvi(key_values_3, file_3)
 
 
-        merger = pykeyvi.JsonDictionaryMerger()
         merger.Add(file_1)
         merger.Add(file_2)
         merger.Add(file_3)

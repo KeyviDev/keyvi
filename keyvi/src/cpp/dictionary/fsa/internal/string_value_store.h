@@ -251,19 +251,11 @@ class StringValueStore final : public IValueStoreWriter {
                                boost::interprocess::file_mapping* file_mapping, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
             : IValueStoreReader(stream, file_mapping) {
 
-          boost::property_tree::ptree properties =
-              internal::SerializationUtils::ReadJsonRecord(stream);
+          const boost::property_tree::ptree properties = internal::SerializationUtils::ReadValueStoreProperties(stream);
 
-          size_t offset = stream.tellg();
-          size_t strings_size = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
+          const size_t offset = stream.tellg();
+          const size_t strings_size = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
 
-          // check for file truncation
-          if (strings_size > 0) {
-            stream.seekg(strings_size - 1, stream.cur);
-            if (stream.peek() == EOF) {
-              throw std::invalid_argument("file is corrupt(truncated)");
-            }
-          }
 
           const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 

@@ -40,6 +40,7 @@
 #include "dictionary/util/endian.h"
 #include "dictionary/fsa/internal/intrinsics.h"
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/keyvi_file.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -48,58 +49,47 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+/// TODO: refator (split) class Automata, so there is no need for param "loadVS" and friend classes
 class Automata
 final {
 
 public:
-    explicit Automata(const std::string&  filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
+    explicit Automata(const std::string&  filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+            : Automata(filename, loading_strategy, true)
+    {}
+
+private:
+
+    explicit Automata(const std::string& filename, loading_strategy_types loading_strategy , const bool load_value_store) {
         using namespace ::boost;
         using namespace ::boost::interprocess;
         using namespace internal;
 
-      std::ifstream in_stream(filename, std::ios::binary);
+        KeyViFile keyViFile(filename);
 
-      if (!in_stream.good()) {
-        throw std::invalid_argument("file not found");
-      }
-
-      char magic[8];
-      in_stream.read(magic, sizeof(magic));
-
-      // check magic
-      if (std::strncmp(magic, "KEYVIFSA", 8)){
-        throw std::invalid_argument("not a keyvi file");
-      }
-
-        automata_properties_ = SerializationUtils::ReadJsonRecord(in_stream);
-        sparse_array_properties_ = SerializationUtils::ReadJsonRecord(in_stream);
-
-        compact_size_ = lexical_cast<uint32_t> (sparse_array_properties_.get<std::string>("version")) == 2;
-        size_t bucket_size = compact_size_ ? sizeof(uint16_t) : sizeof(uint32_t);
-
-        // get start state and number of keys
+        automata_properties_ = keyViFile.automataProperties();
         start_state_ = lexical_cast<uint64_t> (automata_properties_.get<std::string>("start_state"));
         number_of_keys_ = lexical_cast<uint64_t> (automata_properties_.get<std::string>("number_of_keys"));
 
-      size_t offset = in_stream.tellg();
+        std::istream& persistenceStream = keyViFile.persistenceStream();
+        sparse_array_properties_ = SerializationUtils::ReadJsonRecord(persistenceStream);
 
-      file_mapping_ = file_mapping(filename.c_str(), boost::interprocess::read_only);
-      size_t array_size = lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
+        compact_size_ = lexical_cast<uint32_t> (sparse_array_properties_.get<std::string>("version")) == 2;
+        const size_t bucket_size = compact_size_ ? sizeof(uint16_t) : sizeof(uint32_t);
+        const size_t array_size = lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
 
-      in_stream.seekg(offset + array_size + bucket_size * array_size - 1);
+        const std::streampos offset = persistenceStream.tellg();
 
-      // check for file truncation
-      if (in_stream.peek() == EOF) {
-        throw std::invalid_argument("file is corrupt(truncated)");
-      }
+        file_mapping_ = file_mapping(filename.c_str(), interprocess::read_only);
 
         const map_options_t map_options = MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
         TRACE("labels start offset: %d", offset);
         labels_region_ = mapped_region(file_mapping_, interprocess::read_only, offset, array_size, 0, map_options);
 
-        TRACE("transitions start offset: %d", offset + array_size);
-        transitions_region_ = mapped_region(file_mapping_, interprocess::read_only, offset + array_size,
+        const std::streamoff transitionsOffset = offset + static_cast<int64_t>(array_size);
+        TRACE("transitions start offset: %d", transitionsOffset);
+        transitions_region_ = mapped_region(file_mapping_, interprocess::read_only, transitionsOffset,
                                             bucket_size * array_size, 0, map_options);
 
         const auto advise = MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
@@ -107,24 +97,19 @@ public:
         labels_region_.advise(advise);
         transitions_region_.advise(advise);
 
-      TRACE("full file size %zu", offset + array_size + bucket_size * array_size);
-
         labels_ = static_cast<unsigned char*>(labels_region_.get_address());
         transitions_ = static_cast<uint32_t*>(transitions_region_.get_address());
         transitions_compact_ = static_cast<uint16_t*>(transitions_region_.get_address());
 
-      // forward 1 position
-      in_stream.get();
-      TRACE("value store position %zu", in_stream.tellg());
 
-      // initialize value store
-        value_store_t value_store_type = static_cast<value_store_t>(
-                lexical_cast<int>(automata_properties_.get<std::string>("value_store_type")));
-
-        value_store_reader_.reset(ValueStoreFactory::MakeReader(value_store_type, in_stream, &file_mapping_, loading_strategy));
-
-      in_stream.close();
+        value_store_type_ = static_cast<value_store_t>(
+                    lexical_cast<int>(automata_properties_.get<std::string>("value_store_type")));
+        if (load_value_store) {
+            value_store_reader_.reset(ValueStoreFactory::MakeReader(value_store_type_, keyViFile.valueStoreStream(),
+                                                                    &file_mapping_, loading_strategy));
+        }
     }
+public:
 
     Automata& operator=(Automata const&) = delete;
     Automata(const Automata& that) = delete;
@@ -140,6 +125,10 @@ public:
 
     uint64_t GetNumberOfKeys() const {
       return number_of_keys_;
+    }
+
+    internal::value_store_t GetValueStoreType() const {
+        return value_store_type_;
     }
 
     uint64_t TryWalkTransition(uint64_t starting_state, unsigned char c) const {
@@ -415,26 +404,31 @@ public:
     }
 
     internal::IValueStoreReader::attributes_t GetValueAsAttributeVector(uint64_t state_value) const {
-      return value_store_reader_->GetValueAsAttributeVector(state_value);
+        assert(value_store_reader_);
+        return value_store_reader_->GetValueAsAttributeVector(state_value);
     }
 
     std::string GetValueAsString(uint64_t state_value) const {
-      return value_store_reader_->GetValueAsString(state_value);
+        assert(value_store_reader_);
+        return value_store_reader_->GetValueAsString(state_value);
     }
 
     std::string GetRawValueAsString(uint64_t state_value) const {
+        assert(value_store_reader_);
       return value_store_reader_->GetRawValueAsString(state_value);
     }
 
     std::string GetStatistics() const {
-      std::ostringstream buf;
-      buf << "General" << std::endl;
-      boost::property_tree::write_json (buf, automata_properties_, false);
-      buf << std::endl << "Persistence" << std::endl;
-      boost::property_tree::write_json (buf, sparse_array_properties_, false);
-      buf << std::endl << "Value Store" << std::endl;
-      buf << value_store_reader_->GetStatistics();
-      return buf.str();
+        assert(value_store_reader_);
+
+        std::ostringstream buf;
+        buf << "General" << std::endl;
+        boost::property_tree::write_json (buf, automata_properties_, false);
+        buf << std::endl << "Persistence" << std::endl;
+        boost::property_tree::write_json (buf, sparse_array_properties_, false);
+        buf << std::endl << "Value Store" << std::endl;
+        buf << value_store_reader_->GetStatistics();
+        return buf.str();
     }
 
     boost::property_tree::ptree GetManifest() const {
@@ -463,12 +457,14 @@ public:
     bool compact_size_;
     uint64_t start_state_;
     uint64_t number_of_keys_;
+    internal::value_store_t value_store_type_;
 
     template<typename , typename>
     friend class ::keyvi::dictionary::DictionaryMerger;
 
     internal::IValueStoreReader* GetValueStore() const {
-      return value_store_reader_.get();
+        assert(value_store_reader_);
+        return value_store_reader_.get();
     }
 
     inline uint64_t ResolvePointer(uint64_t starting_state, unsigned char c) const {
