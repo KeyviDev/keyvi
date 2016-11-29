@@ -40,7 +40,7 @@
 #include "dictionary/util/endian.h"
 #include "dictionary/fsa/internal/intrinsics.h"
 #include "dictionary/dictionary_merger_fwd.h"
-#include "dictionary/util/keyvi_file.h"
+#include "dictionary/keyvi_file.h"
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -65,7 +65,7 @@ private:
         using namespace ::boost::interprocess;
         using namespace internal;
 
-        util::KeyViFile keyViFile(filename);
+        KeyViFile keyViFile(filename);
 
         automata_properties_ = keyViFile.automataProperties();
         start_state_ = lexical_cast<uint64_t> (automata_properties_.get<std::string>("start_state"));

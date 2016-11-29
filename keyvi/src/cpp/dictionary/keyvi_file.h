@@ -33,7 +33,6 @@
 
 namespace keyvi {
 namespace dictionary {
-namespace util {
 
 class KeyViFile {
     using ptree=boost::property_tree::ptree;
@@ -92,7 +91,6 @@ private:
     std::streampos  valueStoreOffset_;
 };
 
-} /* namespace util */
 } /* namespace dictionary */
 } /* namespace keyvi */
 #endif //KEYVI_FILE_H

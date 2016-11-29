@@ -44,7 +44,7 @@
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
 #include "dictionary/dictionary_merger_fwd.h"
-#include "dictionary/util/keyvi_file.h"
+#include "dictionary/keyvi_file.h"
 
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
@@ -124,7 +124,7 @@ class JsonValueStore final : public IValueStoreWriter {
               offsets_()
     {
         for (const auto& filename: inputFiles) {
-            util::KeyViFile keyViFile(filename);
+            KeyViFile keyViFile(filename);
 
             auto& vsStream = keyViFile.valueStoreStream();
             const boost::property_tree::ptree props = internal::SerializationUtils::ReadValueStoreProperties(vsStream);
@@ -226,7 +226,7 @@ class JsonValueStore final : public IValueStoreWriter {
             values_extern_->Write(stream, values_buffer_size_);
         } else {
             for (const auto& filename: inputFiles_) {
-                util::KeyViFile keyViFile(filename);
+                KeyViFile keyViFile(filename);
                 auto &in_stream = keyViFile.valueStoreStream();
                 internal::SerializationUtils::ReadValueStoreProperties(in_stream);
 
