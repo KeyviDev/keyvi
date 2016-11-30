@@ -44,6 +44,7 @@
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/keyvi_file.h"
 
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
@@ -63,8 +64,9 @@ namespace fsa {
 namespace internal {
 
 /**
- * Value store where the value consists of a single integer.
+ * Value store where the value is a json object.
  */
+/// TODO: move merge logic into dedicated JsonValueStoreMerger class
 class JsonValueStore final : public IValueStoreWriter {
  public:
   typedef std::string value_t;
@@ -111,15 +113,35 @@ class JsonValueStore final : public IValueStoreWriter {
 
     size_t external_memory_chunk_size = 1073741824;
 
-    values_extern_ = new MemoryMapManager(external_memory_chunk_size,
-                                          temporary_directory_,
-                                          "json_values_filebuffer");
+    values_extern_.reset(new MemoryMapManager(external_memory_chunk_size, temporary_directory_,
+                                                "json_values_filebuffer"));
   }
 
-  ~JsonValueStore() {
-    delete values_extern_;
-    boost::filesystem::remove_all(temporary_directory_);
-  }
+    JsonValueStore(const std::vector<std::string>& inputFiles)
+            : hash_(0),
+              mergeMode_(true),
+              inputFiles_(inputFiles),
+              offsets_()
+    {
+        for (const auto& filename: inputFiles) {
+            KeyViFile keyViFile(filename);
+
+            auto& vsStream = keyViFile.valueStoreStream();
+            const boost::property_tree::ptree props = internal::SerializationUtils::ReadValueStoreProperties(vsStream);
+            offsets_.push_back(values_buffer_size_);
+
+            number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
+            number_of_unique_values_ += boost::lexical_cast<size_t>(props.get<std::string>("unique_values"));
+            values_buffer_size_ += boost::lexical_cast<size_t>(props.get<std::string>("size"));
+        }
+    }
+
+
+    ~JsonValueStore() {
+        if (!mergeMode_) {
+            boost::filesystem::remove_all(temporary_directory_);
+        }
+    }
 
   JsonValueStore& operator=(JsonValueStore const&) = delete;
   JsonValueStore(const JsonValueStore& that) = delete;
@@ -144,8 +166,7 @@ class JsonValueStore final : public IValueStoreWriter {
       return AddValue();
     }
 
-    const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(),
-                                                     values_extern_);
+    const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(), values_extern_.get());
     const RawPointer<> p = hash_.Get(stp);
 
     if (!p.IsEmpty()) {
@@ -166,6 +187,10 @@ class JsonValueStore final : public IValueStoreWriter {
     return pt;
   }
 
+    uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) const {
+        return offsets_[fileIndex] + oldIndex;
+    }
+
   uint32_t GetWeightValue(value_t value) const {
     return 0;
   }
@@ -183,22 +208,35 @@ class JsonValueStore final : public IValueStoreWriter {
     hash_.Clear();
   }
 
-  void Write(std::ostream& stream) {
-    boost::property_tree::ptree pt;
-    pt.put("size", std::to_string(values_buffer_size_));
-    pt.put("values", std::to_string(number_of_values_));
-    pt.put("unique_values", std::to_string(number_of_unique_values_));
-    pt.put(std::string("__") + COMPRESSION_KEY, compressor_->name());
-    pt.put(std::string("__") + COMPRESSION_THRESHOLD_KEY, compression_threshold_);
+    void Write(std::ostream& stream) {
+        boost::property_tree::ptree pt;
+        pt.put("size", std::to_string(values_buffer_size_));
+        pt.put("values", std::to_string(number_of_values_));
+        pt.put("unique_values", std::to_string(number_of_unique_values_));
 
-    internal::SerializationUtils::WriteJsonRecord(stream, pt);
-    TRACE("Wrote JSON header, stream at %d", stream.tellp());
+        if (!mergeMode_) {
+            pt.put(std::string("__") + COMPRESSION_KEY, compressor_->name());
+            pt.put(std::string("__") + COMPRESSION_THRESHOLD_KEY, compression_threshold_);
+        }
 
-    values_extern_->Write(stream, values_buffer_size_);
-  }
+        internal::SerializationUtils::WriteJsonRecord(stream, pt);
+        TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
- private:
-  MemoryMapManager* values_extern_;
+        if (!mergeMode_) {
+            values_extern_->Write(stream, values_buffer_size_);
+        } else {
+            for (const auto& filename: inputFiles_) {
+                KeyViFile keyViFile(filename);
+                auto &in_stream = keyViFile.valueStoreStream();
+                internal::SerializationUtils::ReadValueStoreProperties(in_stream);
+
+                stream << in_stream.rdbuf();
+            }
+        }
+    }
+
+private:
+    std::unique_ptr<MemoryMapManager>   values_extern_;
 
   /*
    * Compressors & the associated compression functions. Ugly, but
@@ -219,7 +257,11 @@ class JsonValueStore final : public IValueStoreWriter {
   size_t values_buffer_size_ = 0;
   boost::filesystem::path temporary_directory_;
 
- private:
+    const bool                  mergeMode_ = false;
+    std::vector<std::string>    inputFiles_;
+    std::vector<size_t>         offsets_;
+
+private:
 
    template<typename , typename>
    friend class ::keyvi::dictionary::DictionaryMerger;
@@ -230,8 +272,7 @@ class JsonValueStore final : public IValueStoreWriter {
      const char* full_buf = payload + fsa_value;
      const char* buf_ptr = util::decodeVarintString(full_buf, &buffer_size);
 
-     const RawPointerForCompare<MemoryMapManager> stp(buf_ptr, buffer_size,
-                                                          values_extern_);
+     const RawPointerForCompare<MemoryMapManager> stp(buf_ptr, buffer_size, values_extern_.get());
      const RawPointer<> p = hash_.Get(stp);
 
      if (!p.IsEmpty()) {
@@ -282,19 +323,10 @@ class JsonValueStoreReader final: public IValueStoreReader {
       : IValueStoreReader(stream, file_mapping) {
     TRACE("JsonValueStoreReader construct");
 
-    properties_ =
-        internal::SerializationUtils::ReadJsonRecord(stream);
+    properties_ = internal::SerializationUtils::ReadValueStoreProperties(stream);
 
-    size_t offset = stream.tellg();
-    size_t strings_size = boost::lexical_cast<size_t> (properties_.get<std::string>("size"));
-
-    // check for file truncation
-    if (strings_size > 0) {
-      stream.seekg(strings_size - 1, stream.cur);
-      if (stream.peek() == EOF) {
-        throw std::invalid_argument("file is corrupt(truncated)");
-      }
-    }
+    const size_t offset = stream.tellg();
+    const size_t strings_size = boost::lexical_cast<size_t> (properties_.get<std::string>("size"));
 
     const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 

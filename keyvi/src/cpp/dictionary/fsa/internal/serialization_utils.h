@@ -28,6 +28,7 @@
 #include <arpa/inet.h>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace keyvi {
 namespace dictionary {
@@ -63,6 +64,23 @@ class SerializationUtils {
     boost::property_tree::read_json(string_stream, properties);
     return properties;
   }
+
+    static boost::property_tree::ptree ReadValueStoreProperties(std::istream &stream) {
+        const auto properties = ReadJsonRecord(stream);
+        const auto offset = stream.tellg();
+
+        // check for file truncation
+        const size_t vsSize = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
+        if (vsSize > 0) {
+            stream.seekg(vsSize - 1, stream.cur);
+            if (stream.peek() == EOF) {
+                throw std::invalid_argument("file is corrupt(truncated)");
+            }
+        }
+
+        stream.seekg(offset);
+        return properties;
+    }
 
   /**
    * Utility method to return a property tree from a JSON string.
