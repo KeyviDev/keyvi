@@ -31,6 +31,9 @@
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/int_value_store.h"
 
+//#define ENABLE_TRACING
+#include "dictionary/util/trace.h"
+
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
@@ -169,6 +172,81 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
   BOOST_CHECK_EQUAL(2622207, it.GetValueId());
   ++it;
 
+  BOOST_CHECK(it == end_it);
+}
+
+BOOST_AUTO_TEST_CASE( feedwithoutclose ) {
+  // test that just triggers the case (if) generato is created but FSA creation is not finalized
+
+  auto g = new   Generator<internal::SparseArrayPersistence<>, internal::IntValueStoreWithInnerWeights>;
+  g->Add("eads", 576);
+
+  g->Add("facebook", 4368451);
+  g->Add("youtube", 2622207);
+  delete g;
+}
+
+BOOST_AUTO_TEST_CASE( manifesttest ) {
+  Generator<internal::SparseArrayPersistence<>> g;
+  g.Add(std::string("aaa"));
+  g.Add(std::string("abcde"));
+  g.Add("bar");
+  g.Add("foo");
+  g.Add("zar");
+
+  g.CloseFeeding();
+
+  g.SetManifestFromString("{\"version\":\"42\"}");
+
+  std::ofstream out_stream("testFile3", std::ios::binary);
+  g.Write(out_stream);
+  out_stream.close();
+
+  automata_t f(new Automata("testFile3"));
+  BOOST_CHECK_EQUAL("{\"version\":\"42\"}\n", f->GetManifestAsString());
+}
+
+
+BOOST_AUTO_TEST_CASE( zeroBytes ) {
+  internal::SparseArrayPersistence<> p(2048,
+                                     boost::filesystem::temp_directory_path());
+
+  TRACE("test zerobyte");
+  Generator<internal::SparseArrayPersistence<>> g;
+  g.Add(std::string("\0bbcd", 5));
+  g.Add(std::string("a\0abc", 5));
+  g.Add("aaaa");
+  g.Add(std::string("aabb\0", 5));
+  g.Add("aacd");
+  g.Add("bbcd");
+
+  g.CloseFeeding();
+
+  std::ofstream out_stream("testFileZB", std::ios::binary);
+  g.Write(out_stream);
+  out_stream.close();
+
+  TRACE("test zerobyte: load FSA");
+  automata_t f(new Automata("testFileZB"));
+
+  auto zero_state_walk = f->TryWalkTransition(f->GetStartState(), 0);
+  BOOST_CHECK(zero_state_walk != 0);
+  TRACE("test zerobyte: tested zb FSA");
+  EntryIterator it(f);
+  EntryIterator end_it;
+
+  BOOST_CHECK_EQUAL(std::string("\0bbcd", 5), it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL(std::string("a\0abc", 5), it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL("aaaa", it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL(std::string("aabb\0",5), it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL("aacd", it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL("bbcd", it.GetKey());
+  ++it;
   BOOST_CHECK(it == end_it);
 }
 

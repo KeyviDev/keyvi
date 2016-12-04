@@ -157,6 +157,32 @@ BOOST_AUTO_TEST_CASE( DictGetNear ) {
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
 }
 
+BOOST_AUTO_TEST_CASE( DictGetZerobyte ) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = { { std::string("\0test", 5), 22 }, {
+      "otherkey", 24 }, { std::string("ot\0her",6), 444 }, { "bar\0", 200 }, };
+
+  testing::TempDictionary dictionary(test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  bool matched = false;
+  for (auto m : d->Get(std::string("\0test", 5))){
+      BOOST_CHECK_EQUAL(std::string("\0test", 5), m.GetMatchedString());
+      BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m.GetAttribute("weight")));
+      matched=true;
+  }
+  BOOST_CHECK(matched);
+
+  matched = false;
+  for (auto m : d->Get("test2")){
+      matched=true;
+  }
+
+  BOOST_CHECK(!matched);
+
+  auto m = (*d)[std::string("\0test", 5)];
+  BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -72,7 +72,7 @@ final {
 
         TRACE("CP traverser: wrapped traverser %x %d", label, wrapped_state_traverser_.GetDepth());
 
-        if (label > 0) {
+        if (wrapped_state_traverser_) {
           PruneHistory(wrapped_state_traverser_.GetDepth() - 1);
 
           if (transitions_stack_.empty() || utf8_length_stack_.back() == 0) {
@@ -135,6 +135,10 @@ final {
 
     int GetStateLabel() {
       return codepoint_;
+    }
+
+    operator bool() const {
+      return wrapped_state_traverser_;
     }
 
    private:

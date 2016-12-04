@@ -24,6 +24,7 @@ def test_simple():
         assert len(d) == 2
         assert d["abc"].GetValueAsString() == '{"a":2}'
         assert d["abd"].GetValueAsString() == '{"a":3}'
+        assert len([(k, v) for k, v in d.GetAllItems()]) == 2
 
 def test_simple_zlib():
     c = pykeyvi.JsonDictionaryCompiler(50000000, {'compression': 'z', 'compression_threshold': '0'})

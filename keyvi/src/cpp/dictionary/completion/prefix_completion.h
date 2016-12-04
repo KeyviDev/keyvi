@@ -101,12 +101,10 @@ final {
               TRACE("prefix completion callback called");
 
               for (;;) {
-                unsigned char label = data->traverser.GetStateLabel();
-
-                if (label) {
+                if (data->traverser) {
 
                   data->traversal_stack.resize(query_length+data->traverser.GetDepth()-1);
-                  data->traversal_stack.push_back(label);
+                  data->traversal_stack.push_back(data->traverser.GetStateLabel());
                   TRACE("Current depth %d (%d)", query_length + data->traverser.GetDepth() -1, data->traversal_stack.size());
                   if (data->traverser.IsFinalState()) {
                     std::string match_str = std::string(reinterpret_cast<char*> (&data->traversal_stack[0]), query_length + data->traverser.GetDepth())
@@ -192,13 +190,11 @@ final {
             [data, query_length, max_edit_distance, exact_prefix] () {
               TRACE("prefix completion callback called");
               for (;;) {
-                int label = data->traverser.GetStateLabel();
-
-                if (label) {
+                if (data->traverser) {
 
                   TRACE("Current depth %d", exact_prefix + data->traverser.GetDepth() -1);
 
-                  int score = data->metric.Put(label, exact_prefix + data->traverser.GetDepth() - 1);
+                  int score = data->metric.Put(data->traverser.GetStateLabel(), exact_prefix + data->traverser.GetDepth() - 1);
 
                   TRACE("Intermediate score %d", score);
 
