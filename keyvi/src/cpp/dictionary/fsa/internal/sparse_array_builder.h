@@ -318,6 +318,9 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       }
     }
 #endif
+    // no other state should start at this offset
+    state_start_positions_.Set(offset);
+
     // 2nd pass: write the actual values into the buckets
     for (i = 0; i < len; ++i) {
       typename UnpackedState<SparseArrayPersistence<uint16_t>>::Transition e = unpacked_state[i];
@@ -336,9 +339,6 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       // as all states have this, no need to code it specially
       UpdateWeightIfNeeded(offset, weight);
     }
-
-    // no other state should start at this offset
-    state_start_positions_.Set(offset);
   }
 
   inline void UpdateWeightIfNeeded(const size_t offset,
@@ -752,6 +752,9 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
       }
     }
 #endif
+    // no other state should start at this offset
+    state_start_positions_.Set(offset);
+
     // 2nd pass: write the actual values into the buckets
     for (i = 0; i < len; ++i) {
       typename UnpackedState<SparseArrayPersistence<uint32_t>>::Transition e = unpacked_state[i];
@@ -770,9 +773,6 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
       // as all states have this, no need to code it specially
       UpdateWeightIfNeeded(offset, weight);
     }
-
-    // no other state should start at this offset
-    state_start_positions_.Set(offset);
   }
 
   inline void UpdateWeightIfNeeded(const size_t offset,
