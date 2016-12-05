@@ -12,8 +12,12 @@ def dump(args):
     dictionary = pykeyvi.Dictionary(args.input_file)
     with open(args.output_file, 'w') as file_out:
         for key, value in dictionary.GetAllItems():
+            if args.json_dumps:
+                key = json.dumps(key)
             file_out.write(key)
             if value:
+                if args.json_dumps:
+                    value = json.dumps(value)
                 file_out.write('\t' + value)
             file_out.write('\n')
 
@@ -53,6 +57,8 @@ def main():
     dump_parser = subparsers.add_parser('dump')
     dump_parser.add_argument('input_file', type=str, metavar='FILE')
     dump_parser.add_argument('output_file', type=str, metavar='OUT_FILE')
+    dump_parser.add_argument('-j', '--json-dumps', action='store_true',
+                             help='wrap values with json.dumps()')
 
     compile_parser = subparsers.add_parser('compile')
     compile_parser.add_argument('input_file', type=str, metavar='FILE')
