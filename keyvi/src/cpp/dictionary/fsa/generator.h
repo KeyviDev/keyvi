@@ -381,7 +381,7 @@ final {
 
     void WriteHeader(std::ostream& stream) {
       boost::property_tree::ptree pt;
-      pt.put("version", "1");
+      pt.put("version", "2");
       pt.put("start_state", std::to_string(start_state_));
       pt.put("number_of_keys", std::to_string(number_of_keys_added_));
       pt.put("value_store_type", std::to_string(value_store_->GetValueStoreType()));
