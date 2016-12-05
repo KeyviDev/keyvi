@@ -8,17 +8,22 @@ def stats(input_file):
     print json.dumps(pykeyvi.Dictionary(input_file).GetStatistics(), indent=4, sort_keys=True)
 
 
-def dump(input_file, output_file):
-    dictionary = pykeyvi.Dictionary(input_file)
-    with open(output_file, 'w') as file_out:
+def dump(args):
+    dictionary = pykeyvi.Dictionary(args.input_file)
+    with open(args.output_file, 'w') as file_out:
         for key, value in dictionary.GetAllItems():
+            if args.json_dumps:
+                key = json.dumps(key)
             file_out.write(key)
             if value:
+                if args.json_dumps:
+                    value = json.dumps(value)
                 file_out.write('\t' + value)
             file_out.write('\n')
 
 
-def compile(input_file, output_file, dict_type):
+def compile(args):
+    dict_type = args.dict_type
     if dict_type == 'json':
         dictionary = pykeyvi.JsonDictionaryCompiler()
     elif dict_type == 'key-only':
@@ -26,7 +31,7 @@ def compile(input_file, output_file, dict_type):
     else:
         return 'Must never reach here'
 
-    with open(input_file) as file_in:
+    with open(args.input_file) as file_in:
         for line in file_in:
             line = line.rstrip('\n')
             try:
@@ -39,7 +44,7 @@ def compile(input_file, output_file, dict_type):
                 print 'Can not parse line: {}'.format(line)
 
     dictionary.Compile()
-    dictionary.WriteToFile(output_file)
+    dictionary.WriteToFile(args.output_file)
 
 
 def main():
@@ -52,6 +57,8 @@ def main():
     dump_parser = subparsers.add_parser('dump')
     dump_parser.add_argument('input_file', type=str, metavar='FILE')
     dump_parser.add_argument('output_file', type=str, metavar='OUT_FILE')
+    dump_parser.add_argument('-j', '--json-dumps', action='store_true',
+                             help='wrap values with json.dumps()')
 
     compile_parser = subparsers.add_parser('compile')
     compile_parser.add_argument('input_file', type=str, metavar='FILE')
@@ -64,9 +71,9 @@ def main():
     if args.command == 'stats':
         stats(args.input_file)
     elif args.command == 'dump':
-        dump(args.input_file, args.output_file)
+        dump(args)
     elif args.command == 'compile':
-        compile(args.input_file, args.output_file, args.dict_type)
+        compile(args)
     else:
         return 'Must never reach here'
 
