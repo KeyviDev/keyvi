@@ -130,7 +130,15 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteGhostState ) {
   u2.Add(65, 100);
   u2.Add(66, 101);
   u2.Add(233, 102);
+  for (int i = 1; i < 255 + 65; ++i) {
+    // mark transitions
+    if (i == 255) {
+      continue;
+    }
+    b.taken_positions_in_sparsearray_.Set(i);
+  }
 
+  b.FindFreeBucket(u2);
   b.WriteState(0xff,u2);
 
   // 0 + 255 -> 255 should not exist as it would mean u1 has a transition 255
