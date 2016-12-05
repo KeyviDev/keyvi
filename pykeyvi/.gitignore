@@ -1,4 +1,7 @@
 # PyTest
 .cache/v/cache/lastfailed
+
+# build artifacts
 pykeyvi.egg-info/
+build/
 dist/
