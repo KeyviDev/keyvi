@@ -133,9 +133,12 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
   LeastRecentlyUsedGenerationsCache<PackedState<OffsetTypeT, HashCodeTypeT>>* state_hashtable_;
   SlidingWindowBitArrayPositionTracker state_start_positions_;
   SlidingWindowBitArrayPositionTracker taken_positions_in_sparsearray_;
+  SlidingWindowBitArrayPositionTracker zerobyte_scrambling_state_start_positions_; //< special construct to mark states already in use for zerobyte handling
 
   OffsetTypeT FindFreeBucket(
-      const UnpackedState<SparseArrayPersistence<uint16_t>>& unpacked_state) const {
+      UnpackedState<SparseArrayPersistence<uint16_t>>& unpacked_state) const {
+
+    // states (state ids) start with 1 as 0 is reserved to mark a 'none-state'
     OffsetTypeT start_position =
         highest_persisted_state_ > SPARSE_ARRAY_SEARCH_OFFSET ?
             highest_persisted_state_ - SPARSE_ARRAY_SEARCH_OFFSET : 1;
@@ -147,6 +150,12 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     do {
       TRACE ("Find free position, probing %d", start_position);
       start_position = state_start_positions_.NextFreeSlot(start_position);
+
+      if (zerobyte_scrambling_state_start_positions_.IsSet(start_position)) {
+        TRACE("clash with zerobyte start position, skip it.");
+        ++start_position;
+        continue;
+      }
 
       if (unpacked_state.IsFinal()) {
         if (state_start_positions_.IsSet(
@@ -176,6 +185,37 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
           continue;
         }
 
+        if (unpacked_state[0].label != 0 && !taken_positions_in_sparsearray_.IsSet(start_position)) {
+          TRACE("Need special handling for zero-byte state, position %ld", start_position);
+
+          // state has no 0-byte, we have to 'scramble' the 0-byte to avoid a ghost state
+          if (start_position >= NUMBER_OF_STATE_CODINGS) {
+            OffsetTypeT zerobyte_scrambling_state = state_start_positions_.NextFreeSlot(start_position - NUMBER_OF_STATE_CODINGS);
+
+            if (zerobyte_scrambling_state >=  start_position) {
+              // unable to scramble zero byte position
+              TRACE ("unable to scramble zero byte position, continue search");
+              ++start_position;
+              continue;
+            }
+
+            unsigned char zerobyte_scrambling_label = static_cast<unsigned char> (start_position - zerobyte_scrambling_state);
+            // avoid finalizing a state by mistake
+            if (zerobyte_scrambling_label == FINAL_OFFSET_CODE && state_start_positions_.IsSet(
+                start_position - NUMBER_OF_STATE_CODINGS)) {
+
+              TRACE ("unable to scramble zero byte position (state finalization), continue search");
+              ++start_position;
+              continue;
+            }
+
+            TRACE("Found zero byte label %d ,position %ld", zerobyte_scrambling_label, zerobyte_scrambling_state);
+
+            unpacked_state.SetZerobyteState(zerobyte_scrambling_state);
+            unpacked_state.SetZerobyteLabel(zerobyte_scrambling_label);
+          }
+        }
+
         TRACE ("found slot at %d", start_position);
         return start_position;
       }
@@ -200,12 +240,35 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       highest_persisted_state_ = offset;
     }
 
-    // make sure no other state is placed at offset - 255, which could cause interference
-    if ((unpacked_state[0].label == 1) && offset >= NUMBER_OF_STATE_CODINGS) {
-      state_start_positions_.Set(offset - NUMBER_OF_STATE_CODINGS);
-    }
-
     persistence_->BeginNewState(offset);
+
+    if (unpacked_state[0].label != 0) {
+      // make sure no other state is placed at offset - 256, which could cause interference
+      if ((unpacked_state[0].label == 1) && offset >= NUMBER_OF_STATE_CODINGS) {
+        state_start_positions_.Set(offset - NUMBER_OF_STATE_CODINGS);
+      }
+
+      TRACE ("no zero byte, need special handling");
+
+      // check if something is already written there
+      if (!taken_positions_in_sparsearray_.IsSet(offset)) {
+        if (offset >= NUMBER_OF_STATE_CODINGS) {
+          // block the position as a possible start state
+          zerobyte_scrambling_state_start_positions_.Set(unpacked_state.GetZerobyteState());
+        }
+
+        // write the zerobyte label (it can get overridden later, which is ok)
+        WriteTransition(offset, unpacked_state.GetZerobyteLabel(), 0);
+      }
+    } else {
+      // first bit is a 0 byte, so check [1]
+      // make sure no other state is placed at offset - 256, which could cause interference
+      if (unpacked_state.size() > 1 && (unpacked_state[1].label == 1) && offset >= NUMBER_OF_STATE_CODINGS) {
+        state_start_positions_.Set(offset - NUMBER_OF_STATE_CODINGS);
+      }
+
+      TRACE ("zero byte to be written");
+    }
 
     //TRACE ("WriteState at offset %d, state size %d", offset, unpacked_state.size());
 
@@ -249,20 +312,18 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       }
     }
 #endif
-    // 2nd pass: write the actual values into the buckets
+    // no other state should start at this offset
+    state_start_positions_.Set(offset);
 
-    // index 0 is reserved for control mechanisms in langs, chs start from 0
+    // 2nd pass: write the actual values into the buckets
     for (i = 0; i < len; ++i) {
       typename UnpackedState<SparseArrayPersistence<uint16_t>>::Transition e = unpacked_state[i];
       if (e.label < FINAL_OFFSET_TRANSITION) {
         WriteTransition(offset + e.label, e.label, e.value);
       } else {
         if (e.label == FINAL_OFFSET_TRANSITION) {
-          //WriteTransition(offset + FINAL_OFFSET_TRANSITION, FINAL_OFFSET_CODE,
-          //                              e.value);
-
           WriteFinalTransition(offset, e.value);
-          //TRACE("Write final marker at %d, value %d", offset, e.value);
+          TRACE("Write final marker at %d, value %d", offset, e.value);
         }
       }
     }
@@ -272,9 +333,6 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       // as all states have this, no need to code it specially
       UpdateWeightIfNeeded(offset, weight);
     }
-
-    // no other state should start at this offset
-    state_start_positions_.Set(offset);
   }
 
   inline void UpdateWeightIfNeeded(const size_t offset,
@@ -293,6 +351,9 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       // it might be, that the slot is not taken yet
       taken_positions_in_sparsearray_.Set(
           offset + INNER_WEIGHT_TRANSITION_COMPACT);
+
+      // block this bucket for the start of a new state
+      state_start_positions_.Set(offset + INNER_WEIGHT_TRANSITION_COMPACT);
     }
   }
 
@@ -318,6 +379,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
   inline void WriteTransition(size_t offset, unsigned char transitionId,
                               uint64_t transitionPointer)
   {
+    TRACE("Write offset: %ld, label: %d", offset, transitionId);
     size_t difference = SIZE_MAX;
 
     if (offset + 512 > transitionPointer) {
@@ -328,13 +390,15 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
       ushort diff_as_short = static_cast<ushort>(difference);
 
-      TRACE("Transition fits in uint16: %d->%d (%d)", offset, transitionPointer, diff_as_short);
+      TRACE("Transition fits in uint16 relative: %d->%d (%d)", offset, transitionPointer, diff_as_short);
 
       persistence_->WriteTransition(offset, transitionId, diff_as_short);
       return;
     }
 
     if (transitionPointer < COMPACT_SIZE_ABSOLUTE_MAX_VALUE) {
+      TRACE("Transition fits in uint16 absolute: %d->%d", offset, transitionPointer);
+
       ushort absolute_compact_coding = static_cast<ushort>(transitionPointer)
           | 0xC000;
       persistence_->WriteTransition(offset, transitionId,
@@ -368,6 +432,8 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
     // find free spots in the sparse array where the pointer fits in
     size_t start_position = offset > 512 ? offset - 512 : 0;
+    size_t zerobyte_scrambling_state = 0;
+    unsigned char zerobyte_scrambling_label = 0xff;
 
     for (;;) {
       start_position = taken_positions_in_sparsearray_.NextFreeSlot(
@@ -391,6 +457,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       }
 
       size_t found_slots = 1;
+
       for (; found_slots < vshort_size; found_slots++) {
 
         if (taken_positions_in_sparsearray_.IsSet(start_position + found_slots)) {
@@ -410,6 +477,30 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
         }
       }
 
+      if (found_slots > 0 && start_position >= NUMBER_OF_STATE_CODINGS) {
+
+        // ensure enough space: if vshort has length 2, label must start from 0xfe
+        zerobyte_scrambling_state = state_start_positions_.NextFreeSlot(start_position + vshort_size - NUMBER_OF_STATE_CODINGS - 1);
+
+        if (zerobyte_scrambling_state >= start_position) {
+		      TRACE("Did not find a state to scramble zero-bytes, no good start position, skipping %d", start_position);
+
+          // we can probable advance more if this happens
+          start_position += found_slots + 1;
+          found_slots = 0;
+        } else {
+          zerobyte_scrambling_label = static_cast<unsigned char> (start_position - zerobyte_scrambling_state);
+
+          if (zerobyte_scrambling_label == FINAL_OFFSET_CODE){
+            TRACE("Did not find a state to scramble zero-bytes, skipping %d", start_position);
+
+            // we can probable advance more if this happens
+            start_position += found_slots + 1;
+            found_slots = 0;
+          }
+        }
+      }
+
       if (found_slots == vshort_size) {
         break;
       }
@@ -417,14 +508,18 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
     TRACE("Write Overflow transition at %d, length %d", start_position, vshort_size);
 
-    // write the values
-    for (auto i = 0; i < vshort_size; ++i) {
+    // block the pseudo state used for zerobyte scrambling
+    // state_start_positions_.Set(zerobyte_scrambling_state);
+    zerobyte_scrambling_state_start_positions_.Set(zerobyte_scrambling_state);
+    // write the overflow pointer using scrambled zerobyte labels
+    for (size_t i = 0; i < vshort_size; ++i) {
       taken_positions_in_sparsearray_.Set(start_position + i);
-      persistence_->WriteTransition(start_position + i, 0, vshort_pointer[i]);
+      persistence_->WriteTransition(start_position + i,
+                                    static_cast<unsigned char>(zerobyte_scrambling_label + i), vshort_pointer[i]);
     }
 
     // encode the pointer to that bucket
-    auto overflow_bucket = (512 + start_position) - offset;
+    size_t overflow_bucket = (512 + start_position) - offset;
     pt_to_overflow_bucket |= overflow_bucket << 4;
 
     // add the lower part (4 bits)
@@ -436,9 +531,6 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
   inline void WriteFinalTransition(size_t offset, uint64_t value)
   {
-    persistence_->WriteTransition(offset + FINAL_OFFSET_TRANSITION,
-                                  FINAL_OFFSET_CODE, 0);
-
     uint16_t vshort_pointer[8];
     size_t vshort_size = 0;
 
@@ -449,7 +541,6 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
                                     static_cast<unsigned char>(FINAL_OFFSET_CODE + i), vshort_pointer[i]);
     }
   }
-
 };
 
 
@@ -655,20 +746,18 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
       }
     }
 #endif
-    // 2nd pass: write the actual values into the buckets
+    // no other state should start at this offset
+    state_start_positions_.Set(offset);
 
-    // index 0 is reserved for control mechanisms in langs, chs start from 0
+    // 2nd pass: write the actual values into the buckets
     for (i = 0; i < len; ++i) {
       typename UnpackedState<SparseArrayPersistence<uint32_t>>::Transition e = unpacked_state[i];
       if (e.label < FINAL_OFFSET_TRANSITION) {
         WriteTransition(offset + e.label, e.label, e.value);
       } else {
         if (e.label == FINAL_OFFSET_TRANSITION) {
-          //WriteTransition(offset + FINAL_OFFSET_TRANSITION, FINAL_OFFSET_CODE,
-          //                              e.value);
-
           WriteFinalTransition(offset, e.value);
-          //TRACE("Write final marker at %d, value %d", offset, e.value);
+          TRACE("Write final marker at %d, value %d", offset, e.value);
         }
       }
     }
@@ -678,9 +767,6 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
       // as all states have this, no need to code it specially
       UpdateWeightIfNeeded(offset, weight);
     }
-
-    // no other state should start at this offset
-    state_start_positions_.Set(offset);
   }
 
   inline void UpdateWeightIfNeeded(const size_t offset,
@@ -694,6 +780,9 @@ class SparseArrayBuilder<SparseArrayPersistence<uint32_t>, OffsetTypeT, HashCode
                       0 /*no INNER_WEIGHT_CODE*/, weight);
       // it might be, that the slot is not taken yet
       taken_positions_in_sparsearray_.Set(offset + INNER_WEIGHT_TRANSITION);
+
+      // no other state should start at this offset
+      state_start_positions_.Set(offset + INNER_WEIGHT_TRANSITION);
     }
   }
 

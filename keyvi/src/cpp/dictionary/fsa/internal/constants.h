@@ -25,6 +25,19 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
+// file format definitions
+
+// file magic
+#define KEYVI_FILE_MAGIC "KEYVIFSA"
+#define KEYVI_FILE_MAGIC_LEN 8
+
+// min version of the file
+static const int KEYVI_FILE_VERSION_MIN = 1;
+
+// min version of the persistence part
+static const int KEYVI_FILE_PERSISTENCE_VERSION_MIN = 1;
+
+
 #define NUMBER_OF_STATE_CODINGS 255
 #define FINAL_OFFSET_TRANSITION 256
 #define FINAL_OFFSET_CODE 1

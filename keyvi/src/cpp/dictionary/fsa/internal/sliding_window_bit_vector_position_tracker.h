@@ -25,6 +25,14 @@
 #ifndef SLIDING_WINDOW_BIT_VECTOR_POSITION_TRACKER_H_
 #define SLIDING_WINDOW_BIT_VECTOR_POSITION_TRACKER_H_
 
+/* some constants for the bit vectors used in the sliding window.
+ * The window must be large enough for the pointer arithmetics you do in the sparse array builder.
+ * All 3 variables must fit to each other
+ */
+#define SLIDING_WINDOW_SIZE 2048
+#define SLIDING_WINDOW_MASK 2047 // bit mask: SLIDING_WINDOW_SIZE - 1
+#define SLIDING_WINDOW_SHIFT 11  // same as /2048
+
 #include <utility>
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/bit_vector.h"
@@ -60,10 +68,10 @@ class SlidingWindowBitArrayPositionTracker final {
 
 
   inline bool IsSet(size_t position) const {
-    // divide by 1024
-    size_t blocker_window = position >> 10;
+    // divide by SLIDING_WINDOW_SIZE
+    size_t blocker_window = position >> SLIDING_WINDOW_SHIFT;
 
-    size_t blocker_offset = position & 1023;
+    size_t blocker_offset = position & SLIDING_WINDOW_MASK;
 
     if (blocker_window == window_start_position_) {
       return current_vector_.Get(blocker_offset);
@@ -77,10 +85,10 @@ class SlidingWindowBitArrayPositionTracker final {
   }
 
   inline size_t NextFreeSlot(size_t position) const {
-    // divide by 1024
-    size_t blocker_window = position >> 10;
+    // divide by SLIDING_WINDOW_SIZE
+    size_t blocker_window = position >> SLIDING_WINDOW_SHIFT;
 
-    size_t blocker_offset = position & 1023;
+    size_t blocker_offset = position & SLIDING_WINDOW_MASK;
 
     if (blocker_window > window_start_position_) {
       return position;
@@ -88,9 +96,8 @@ class SlidingWindowBitArrayPositionTracker final {
 
     if (blocker_window < window_start_position_) {
       size_t offset = previous_vector_.GetNextNonSetBit(blocker_offset);
-      if (offset < 1024) {
-        // offset + (blockerWindow * 1024)
-        return offset + (blocker_window << 10);
+      if (offset < SLIDING_WINDOW_SIZE) {
+        return offset + (blocker_window << SLIDING_WINDOW_SHIFT);
       }
 
       // else: check currentVector
@@ -98,14 +105,14 @@ class SlidingWindowBitArrayPositionTracker final {
       blocker_offset = 0;
     }
 
-    return current_vector_.GetNextNonSetBit(blocker_offset) + (blocker_window << 10);
+    return current_vector_.GetNextNonSetBit(blocker_offset) + (blocker_window << SLIDING_WINDOW_SHIFT);
   }
 
   inline void Set(size_t position) {
-    // divide by 1024
-    size_t blocker_window = position >> 10;
+    // divide by SLIDING_WINDOW_SIZE
+    size_t blocker_window = position >> SLIDING_WINDOW_SHIFT;
 
-    size_t blocker_offset = position & 1023;
+    size_t blocker_offset = position & SLIDING_WINDOW_MASK;
 
     if (blocker_window > window_start_position_) {
       // swap and reset
@@ -126,10 +133,10 @@ class SlidingWindowBitArrayPositionTracker final {
 
   template<std::size_t TsizeOther>
   inline void SetVector(const BitVector<TsizeOther>& requested_positions, size_t position) {
-    // divide by 1024
-    auto blocker_window = position >> 10;
-    auto blocker_window_end = (requested_positions.Size() + position) >> 10;
-    auto blocker_offset = position & 1023;
+    // divide by SLIDING_WINDOW_SIZE
+    auto blocker_window = position >> SLIDING_WINDOW_SHIFT;
+    auto blocker_window_end = (requested_positions.Size() + position) >> SLIDING_WINDOW_SHIFT;
+    auto blocker_offset = position & SLIDING_WINDOW_MASK;
 
     // check if start position is already over the boundary now
     if (blocker_window_end > window_start_position_) {
@@ -147,7 +154,7 @@ class SlidingWindowBitArrayPositionTracker final {
     } else if (window_start_position_ > 0 && blocker_window == window_start_position_ - 1 ) {
       previous_vector_.SetVector(requested_positions, blocker_offset);
       if (blocker_window_end == window_start_position_) {
-        current_vector_.SetVectorAndShiftOther(requested_positions, 1024 - blocker_offset);
+        current_vector_.SetVectorAndShiftOther(requested_positions, SLIDING_WINDOW_SIZE - blocker_offset);
       }
     }
 
@@ -155,10 +162,10 @@ class SlidingWindowBitArrayPositionTracker final {
 
   template<std::size_t TsizeOther>
   inline int IsAvailable(const BitVector<TsizeOther>& requested_positions, size_t position) const {
-    // divide by 1024
-    size_t blocker_window = position >> 10;
+    // divide by SLIDING_WINDOW_SIZE
+    size_t blocker_window = position >> SLIDING_WINDOW_SHIFT;
 
-    size_t blocker_offset = position & 1023;
+    size_t blocker_offset = position & SLIDING_WINDOW_MASK;
 
     TRACE("Sliding Window IsAvailable for window %d(current: %d) offset %d position %d", blocker_window
           , window_start_position_, blocker_offset, position);
@@ -175,9 +182,9 @@ class SlidingWindowBitArrayPositionTracker final {
     size_t shift = previous_vector_.DisjointAndShiftThis(requested_positions,
                                                     blocker_offset);
 
-    if (shift == 0 && (1024 - blocker_offset < MAX_TRANSITIONS_OF_A_STATE)) {
+    if (shift == 0 && (SLIDING_WINDOW_SIZE - blocker_offset < MAX_TRANSITIONS_OF_A_STATE)) {
       return requested_positions.DisjointAndShiftOther(current_vector_,
-                                                      1024 - blocker_offset);
+                                                      SLIDING_WINDOW_SIZE - blocker_offset);
     }
 
     return shift;
@@ -186,8 +193,8 @@ class SlidingWindowBitArrayPositionTracker final {
  private:
   size_t window_start_position_ = 0;
 
-  BitVector<1024> current_vector_;
-  BitVector<1024> previous_vector_;
+  BitVector<SLIDING_WINDOW_SIZE> current_vector_;
+  BitVector<SLIDING_WINDOW_SIZE> previous_vector_;
 };
 
 } /* namespace internal */
