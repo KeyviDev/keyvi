@@ -111,7 +111,7 @@ final {
     SparseArrayPersistence(const SparseArrayPersistence& that) = delete;
 
     void BeginNewState(size_t offset) {
-      if ((offset + COMPACT_SIZE_WINDOW + NUMBER_OF_STATE_CODINGS)
+      while ((offset + COMPACT_SIZE_WINDOW + NUMBER_OF_STATE_CODINGS)
           >= (buffer_size_ + in_memory_buffer_offset_)) {
         FlushBuffers();
       }
@@ -333,9 +333,7 @@ final {
     if (pt & 0x8000){
       // clear the first bit
       pt &= 0x7FFF;
-      size_t overflow_bucket;
-
-      overflow_bucket = (pt >> 4) + offset - 512;
+      size_t overflow_bucket = (pt >> 4) + offset - 512;
 
       if (overflow_bucket >= in_memory_buffer_offset_) {
         resolved_ptr = util::decodeVarshort(transitions_ -in_memory_buffer_offset_ + overflow_bucket);

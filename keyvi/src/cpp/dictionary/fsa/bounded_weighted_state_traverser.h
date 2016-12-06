@@ -67,6 +67,7 @@ final {
           current_state_(other.current_state_),
           current_label_(other.current_label_),
           current_depth_(other.current_depth_),
+          at_end_(other.at_end_),
           state_traversal_stack_(std::move(other.state_traversal_stack_)),
           entry_traversal_stack_(std::move(other.entry_traversal_stack_)),
           priority_queue_ (std::move(other.priority_queue_)){
@@ -74,6 +75,7 @@ final {
       other.current_state_ = 0;
       other.current_label_ = 0;
       other.current_depth_ = 0;
+      other.at_end_ = false;
     }
 
     automata_t GetFsa() const {
@@ -185,6 +187,7 @@ final {
             current_state_ = 0;
             current_depth_ = 0;
             current_label_ = 0;
+            at_end_ = true;
             return;
           }
         }
@@ -201,8 +204,16 @@ final {
       return !(operator==(other));
     }
 
-    unsigned char GetStateLabel() {
+    unsigned char GetStateLabel() const {
       return current_label_;
+    }
+
+    operator bool() const {
+      return !at_end_;
+    }
+
+    bool AtEnd() const {
+      return at_end_;
     }
 
    private:
@@ -212,6 +223,7 @@ final {
     uint64_t current_state_ = 0;
     unsigned char current_label_ = 0;
     int current_depth_ = 0;
+    bool at_end_ = false;
     std::vector<uint64_t> state_traversal_stack_;
     std::vector<traversal_entry_t> entry_traversal_stack_;
     util::BoundedPriorityQueue<uint32_t> priority_queue_;
