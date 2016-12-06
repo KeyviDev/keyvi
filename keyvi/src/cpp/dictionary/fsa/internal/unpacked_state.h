@@ -68,6 +68,8 @@ final {
         hashcode_(other.hashcode_),
         no_minimization_counter_(other.no_minimization_counter_),
         weight_(other.weight_),
+        zerobyte_state_ (other.zerobyte_state_),
+        zerobyte_label_ (other.zerobyte_label_),
         final_(other.final_)
       {
         other.persistence_ = 0;
@@ -75,6 +77,8 @@ final {
         other.hashcode_ = 0;
         other.no_minimization_counter_ = 0;
         other.weight_ = 0;
+        other.zerobyte_state_ = 0;
+        other.zerobyte_label_ = 0xff;
         other.final_ = false;
       }
 
@@ -86,6 +90,8 @@ final {
          hashcode_ = other.hashcode_;
          no_minimization_counter_ = other.no_minimization_counter_;
          weight_ = other.weight_;
+         zerobyte_state_ = other.zerobyte_state_;
+         zerobyte_label_ = other.zerobyte_label_;
          final_ = other.final_;
 
          other.persistence_ = 0;
@@ -93,6 +99,8 @@ final {
          other.hashcode_ = 0;
          other.no_minimization_counter_ = 0;
          other.weight_ = 0;
+         other.zerobyte_state_ = 0;
+         other.zerobyte_label_ = 0xff;
          other.final_ = false;
 
          return *this;
@@ -128,6 +136,8 @@ final {
         bitvector_.Clear();
         no_minimization_counter_ = 0;
         weight_ = 0;
+        zerobyte_state_ = 0;
+        zerobyte_label_ = 0xff;
         final_ = false;
       }
 
@@ -151,6 +161,22 @@ final {
 
       uint32_t GetWeight() const{
         return weight_;
+      }
+
+      void SetZerobyteState(size_t position) {
+        zerobyte_state_ = position;
+      }
+
+      size_t GetZerobyteState() const {
+        return zerobyte_state_;
+      }
+
+      void SetZerobyteLabel(unsigned char label) {
+        zerobyte_label_ = label;
+      }
+
+      unsigned char GetZerobyteLabel() const {
+        return zerobyte_label_;
       }
 
       inline int64_t GetHashcode() {
@@ -267,6 +293,8 @@ final {
       int64_t hashcode_ = -1;
       int no_minimization_counter_ = 0;
       uint32_t weight_ = 0;
+      size_t zerobyte_state_ = 0;
+      unsigned char zerobyte_label_ = 0xff;
       bool final_ = false;
     };
 

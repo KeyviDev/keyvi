@@ -136,7 +136,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
   SlidingWindowBitArrayPositionTracker zerobyte_scrambling_state_start_positions_; //< special construct to mark states already in use for zerobyte handling
 
   OffsetTypeT FindFreeBucket(
-      const UnpackedState<SparseArrayPersistence<uint16_t>>& unpacked_state) const {
+      UnpackedState<SparseArrayPersistence<uint16_t>>& unpacked_state) const {
 
     // states (state ids) start with 1 as 0 is reserved to mark a 'none-state'
     OffsetTypeT start_position =
@@ -186,7 +186,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
         }
 
         if (unpacked_state[0].label != 0 && !taken_positions_in_sparsearray_.IsSet(start_position)) {
-          TRACE("Need special handling for zero-byte state");
+          TRACE("Need special handling for zero-byte state, position %ld", start_position);
 
           // state has no 0-byte, we have to 'scramble' the 0-byte to avoid a ghost state
           if (start_position >= NUMBER_OF_STATE_CODINGS) {
@@ -209,6 +209,10 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
               continue;
             }
 
+            TRACE("Found zero byte label %d ,position %ld", zerobyte_scrambling_label, zerobyte_scrambling_state);
+
+            unpacked_state.SetZerobyteState(zerobyte_scrambling_state);
+            unpacked_state.SetZerobyteLabel(zerobyte_scrambling_label);
           }
         }
 
@@ -248,23 +252,13 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
 
       // check if something is already written there
       if (!taken_positions_in_sparsearray_.IsSet(offset)) {
-
-        // no 0-byte, we have to 'scramble' the 0-byte to avoid a ghost state
-        unsigned char invalid_label = 0xff;
         if (offset >= NUMBER_OF_STATE_CODINGS) {
-          OffsetTypeT next_free_slot = state_start_positions_.NextFreeSlot(offset - NUMBER_OF_STATE_CODINGS);
-
-          invalid_label = static_cast<unsigned char> (offset - next_free_slot);
-
-          TRACE ("Write bogus label %d, and block start state at %d (%d %d)", invalid_label, next_free_slot);
-
           // block the position as a possible start state
-          //state_start_positions_.Set(next_free_slot);
-          zerobyte_scrambling_state_start_positions_.Set(next_free_slot);;
+          zerobyte_scrambling_state_start_positions_.Set(unpacked_state.GetZerobyteState());
         }
 
-        // write the bogus label (it can get overridden later, which is ok)
-        WriteTransition(offset, invalid_label, 0);
+        // write the zerobyte label (it can get overridden later, which is ok)
+        WriteTransition(offset, unpacked_state.GetZerobyteLabel(), 0);
       }
     } else {
       // first bit is a 0 byte, so check [1]
