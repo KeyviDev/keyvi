@@ -195,7 +195,7 @@ with symlink_keyvi():
 
     setup(
         name=PACKAGE_NAME,
-        version='0.1.30',
+        version='0.1.31',
         description='Python bindings for keyvi',
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
@@ -206,7 +206,7 @@ with symlink_keyvi():
         ext_modules=ext_modules,
         zip_safe=False,
         url='https://github.com/cliqz/keyvi',
-        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.30',
+        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.31',
         keywords=['FST'],
         classifiers=[],
         install_requires=install_requires,
