@@ -29,6 +29,7 @@
 
 #include <fstream>
 
+#include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
 
 namespace keyvi {
@@ -38,57 +39,66 @@ class KeyViFile {
     using ptree=boost::property_tree::ptree;
 public:
     explicit KeyViFile(const std::string& filename)
-        : fileStream_(filename, std::ios::binary)
+        : file_stream_(filename, std::ios::binary)
     {
         using namespace ::boost;
         using namespace fsa::internal;
 
-        if (!fileStream_.good()) {
+        if (!file_stream_.good()) {
             throw std::invalid_argument("file not found");
         }
 
-        char magic[8];
-        fileStream_.read(magic, sizeof(magic));
+        char magic[KEYVI_FILE_MAGIC_LEN];
+        file_stream_.read(magic, KEYVI_FILE_MAGIC_LEN);
         // check magic
-        if (std::strncmp(magic, "KEYVIFSA", 8)){
+        if (std::strncmp(magic, KEYVI_FILE_MAGIC, KEYVI_FILE_MAGIC_LEN)){
             throw std::invalid_argument("not a keyvi file");
         }
 
-        automataProperties_ = SerializationUtils::ReadJsonRecord(fileStream_);
-        persistenceOffset_ = fileStream_.tellg();
+        automata_properties_ = SerializationUtils::ReadJsonRecord(file_stream_);
+        persistence_offset_ = file_stream_.tellg();
 
-        // check for file truncation
-        const ptree sparse_array_properties = SerializationUtils::ReadJsonRecord(fileStream_);
+        if (lexical_cast<int> (automata_properties_.get<std::string>("version")) < KEYVI_FILE_VERSION_MIN) {
+          throw std::invalid_argument("this version of keyvi file is unsupported");
+        }
+
+        const ptree sparse_array_properties = SerializationUtils::ReadJsonRecord(file_stream_);
+
+        if (lexical_cast<int> (sparse_array_properties.get<std::string>("version")) < KEYVI_FILE_PERSISTENCE_VERSION_MIN) {
+          throw std::invalid_argument("this versions of keyvi file is unsupported");
+        }
+
         const bool compact_size = lexical_cast<uint32_t> (sparse_array_properties.get<std::string>("version")) == 2;
         const size_t bucket_size = compact_size ? sizeof(uint16_t) : sizeof(uint32_t);
         const size_t array_size = lexical_cast<size_t>(sparse_array_properties.get<std::string>("size"));
 
-        fileStream_.seekg((size_t)fileStream_.tellg() + array_size + bucket_size * array_size - 1);
-        if (fileStream_.peek() == EOF) {
+        // check for file truncation
+        file_stream_.seekg((size_t)file_stream_.tellg() + array_size + bucket_size * array_size - 1);
+        if (file_stream_.peek() == EOF) {
             throw std::invalid_argument("file is corrupt(truncated)");
         }
 
-        fileStream_.get();
-        valueStoreOffset_ = fileStream_.tellg();
+        file_stream_.get();
+        value_store_offset_ = file_stream_.tellg();
     }
 
     ptree automataProperties() const {
-        return automataProperties_;
+        return automata_properties_;
     }
 
     std::istream& persistenceStream() {
-        return fileStream_.seekg(persistenceOffset_);
+        return file_stream_.seekg(persistence_offset_);
     }
 
     std::istream& valueStoreStream() {
-        return fileStream_.seekg(valueStoreOffset_);
+        return file_stream_.seekg(value_store_offset_);
     }
 
 private:
-    std::ifstream   fileStream_;
-    ptree           automataProperties_;
-    std::streampos  persistenceOffset_;
-    std::streampos  valueStoreOffset_;
+    std::ifstream   file_stream_;
+    ptree           automata_properties_;
+    std::streampos  persistence_offset_;
+    std::streampos  value_store_offset_;
 };
 
 } /* namespace dictionary */
