@@ -298,16 +298,6 @@ final {
       bool final_ = false;
     };
 
-
-template<>
-inline void UnpackedState<SparseArrayPersistence<uint32_t>>::AddFinalState(uint64_t transition_value)
-{
-  TRACE("UnpackedState: Adding final state %d", transition_value);
-  outgoing_[used_++].set(FINAL_OFFSET_TRANSITION, transition_value);
-  bitvector_.Set(FINAL_OFFSET_TRANSITION);
-  final_=true;
-}
-
 template<>
 inline void UnpackedState<SparseArrayPersistence<uint16_t>>::AddFinalState(uint64_t transition_value)
 {
@@ -320,15 +310,6 @@ inline void UnpackedState<SparseArrayPersistence<uint16_t>>::AddFinalState(uint6
     bitvector_.Set(FINAL_OFFSET_TRANSITION + i);
   }
   final_ = true;
-}
-
-template<>
-inline void UnpackedState<SparseArrayPersistence<uint32_t>>::UpdateWeightIfHigher(uint32_t weight)
-{
-  if (weight > weight_){
-    weight_ = weight;
-    bitvector_.Set(INNER_WEIGHT_TRANSITION);
-  }
 }
 
 template<>
