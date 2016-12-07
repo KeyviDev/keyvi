@@ -32,10 +32,10 @@
 #define KEYVI_FILE_MAGIC_LEN 8
 
 // min version of the file
-static const int KEYVI_FILE_VERSION_MIN = 1;
+static const int KEYVI_FILE_VERSION_MIN = 2;
 
 // min version of the persistence part
-static const int KEYVI_FILE_PERSISTENCE_VERSION_MIN = 1;
+static const int KEYVI_FILE_PERSISTENCE_VERSION_MIN = 2;
 
 
 #define NUMBER_OF_STATE_CODINGS 255

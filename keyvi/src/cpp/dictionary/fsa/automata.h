@@ -74,8 +74,7 @@ private:
         std::istream& persistenceStream = keyViFile.persistenceStream();
         sparse_array_properties_ = SerializationUtils::ReadJsonRecord(persistenceStream);
 
-        compact_size_ = lexical_cast<uint32_t> (sparse_array_properties_.get<std::string>("version")) == 2;
-        const size_t bucket_size = compact_size_ ? sizeof(uint16_t) : sizeof(uint32_t);
+        const size_t bucket_size = sizeof(uint16_t);
         const size_t array_size = lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
 
         const std::streampos offset = persistenceStream.tellg();
@@ -352,23 +351,10 @@ public:
     }
 
     uint64_t GetStateValue(uint64_t state) const {
-      if (!compact_size_) {
-        return be32toh(transitions_[state + FINAL_OFFSET_TRANSITION]);
-      }
-
-      // compact mode:
       return util::decodeVarshort(transitions_compact_ + state + FINAL_OFFSET_TRANSITION);
     }
 
     uint32_t GetWeightValue(uint64_t state) const {
-      if (!compact_size_) {
-        if (labels_[state + INNER_WEIGHT_TRANSITION] != 0) {
-          return 0;
-        }
-
-        return be32toh(transitions_[state + INNER_WEIGHT_TRANSITION]);
-      }
-
       if (labels_[state + INNER_WEIGHT_TRANSITION_COMPACT] != 0) {
         return 0;
       }
@@ -427,7 +413,6 @@ public:
     unsigned char* labels_;
     uint32_t* transitions_;
     uint16_t* transitions_compact_;
-    bool compact_size_;
     uint64_t start_state_;
     uint64_t number_of_keys_;
     internal::value_store_t value_store_type_;
@@ -441,10 +426,6 @@ public:
     }
 
     inline uint64_t ResolvePointer(uint64_t starting_state, unsigned char c) const {
-      if (!compact_size_) {
-        return be32toh(transitions_[starting_state + c]);
-      }
-
       uint16_t pt = le16toh(transitions_compact_[starting_state + c]);
       uint64_t resolved_ptr;
 
