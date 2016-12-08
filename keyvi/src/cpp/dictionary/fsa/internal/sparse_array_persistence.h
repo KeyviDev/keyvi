@@ -266,18 +266,8 @@ final {
   };
 
   template<>
-  inline uint32_t SparseArrayPersistence<uint32_t>::GetVersion() const {
-    return 1;
-  }
-
-  template<>
   inline uint32_t SparseArrayPersistence<uint16_t>::GetVersion() const {
     return 2;
-  }
-
-  template<>
-  inline uint32_t SparseArrayPersistence<uint32_t>::PersistenceOrderToHostOrder(uint32_t value) const {
-    return be32toh(value);
   }
 
   template<>
@@ -286,20 +276,8 @@ final {
   }
 
   template<>
-  inline uint32_t SparseArrayPersistence<uint32_t>::HostOrderToPesistenceOrder(uint32_t value) const {
-    return htobe32(value);
-  }
-
-  template<>
   inline uint16_t SparseArrayPersistence<uint16_t>::HostOrderToPesistenceOrder(uint16_t value) const {
     return htole16(value);
-  }
-
-  template<>
-  inline void SparseArrayPersistence<uint32_t>::HostOrderToPersistenceOrder(uint32_t* values, size_t length) const {
-    for (size_t i = 0; i < flush_size_; ++i) {
-            values[i] = htobe32(values[i]);
-    }
   }
 
   template<>
@@ -309,12 +287,6 @@ final {
             values[i] = htole16(values[i]);
     }
 #endif
-  }
-
-
-  template<>
-  inline uint64_t SparseArrayPersistence<uint32_t>::ResolveTransitionValue(size_t offset, uint32_t value) const {
-    return value;
   }
 
   template<>
@@ -361,11 +333,6 @@ final {
     }
 
     return resolved_ptr;
-  }
-
-  template<>
-  inline uint64_t SparseArrayPersistence<uint32_t>::ReadFinalValue(size_t offset) const {
-    return ReadTransitionValue(offset + FINAL_OFFSET_TRANSITION);
   }
 
   template<>

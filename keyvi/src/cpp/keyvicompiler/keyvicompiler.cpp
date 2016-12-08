@@ -249,7 +249,6 @@ int main(int argc, char** argv) {
       "dictionary-type,d",
       boost::program_options::value<std::string>()->default_value("integer"),
       "type of dictionary (integer (default), string, key-only, json)");
-  description.add_options()("compact,c", "Compact Mode");
   description.add_options()(
       "value-store-parameter,V",
       boost::program_options::value< std::vector<std::string> >()->default_value(std::vector<std::string>(), "EMPTY")->composing(),
@@ -265,94 +264,81 @@ int main(int argc, char** argv) {
   p.add("input-file", -1);
 
   boost::program_options::variables_map vm;
-  boost::program_options::store(
-      boost::program_options::command_line_parser(argc, argv).options(
-          description).run(),
-      vm);
-  boost::program_options::notify(vm);
 
-  // parse positional options
-  boost::program_options::store(
-      boost::program_options::command_line_parser(argc, argv).options(
-          description).positional(p).run(),
-      vm);
-  boost::program_options::notify(vm);
-  if (vm.count("help")) {
-    std::cout << description;
-    return 0;
-  }
+  try {
+    boost::program_options::store(
+        boost::program_options::command_line_parser(argc, argv).options(
+            description).run(),
+        vm);
 
-  size_t memory_limit = 1073741824;
-  if (vm.count("memory-limit")) {
-    memory_limit = vm["memory-limit"].as<size_t>();
-  }
+    boost::program_options::notify(vm);
 
-  // make compact the default
-  bool compact = true;
-  if (vm.count("compact")) {
-      compact = true;
-  }
+    // parse positional options
+    boost::program_options::store(
+        boost::program_options::command_line_parser(argc, argv).options(
+            description).positional(p).run(),
+        vm);
+    boost::program_options::notify(vm);
 
-  std::string manifest = vm["manifest"].as<std::string>();
-  std::cout << manifest << std::endl;
+    if (vm.count("help")) {
+      std::cout << description;
+      return 0;
+    }
 
-  std::string dictionary_type = vm["dictionary-type"].as<std::string>();
-  vs_param_t value_store_params = extract_value_store_parameters(vm);
+    size_t memory_limit = 1073741824;
+    if (vm.count("memory-limit")) {
+      memory_limit = vm["memory-limit"].as<size_t>();
+    }
 
-  if (value_store_params.size() > 0 && dictionary_type != "json") {
-    std::cout << "WARNING: only the 'json' dictionary type handles "
-              << "value store parameters; -V{"
-              << boost::algorithm::join(
-                  value_store_params | boost::adaptors::map_keys, ", ")
-              << "} are ignored." << std::endl << std::endl;
-  }
+    std::string manifest = vm["manifest"].as<std::string>();
+    std::cout << manifest << std::endl;
 
-  if (vm.count("input-file") && vm.count("output-file")) {
-    input_files = vm["input-file"].as<std::vector<std::string>>();
-    output_file = vm["output-file"].as<std::string>();
+    std::string dictionary_type = vm["dictionary-type"].as<std::string>();
+    vs_param_t value_store_params = extract_value_store_parameters(vm);
 
-    if (dictionary_type == "integer") {
-      if (compact){
+    if (value_store_params.size() > 0 && dictionary_type != "json") {
+      std::cout << "WARNING: only the 'json' dictionary type handles "
+                << "value store parameters; -V{"
+                << boost::algorithm::join(
+                    value_store_params | boost::adaptors::map_keys, ", ")
+                << "} are ignored." << std::endl << std::endl;
+    }
+
+    if (vm.count("input-file") && vm.count("output-file")) {
+      input_files = vm["input-file"].as<std::vector<std::string>>();
+      output_file = vm["output-file"].as<std::string>();
+
+      if (dictionary_type == "integer") {
         compile_integer<uint16_t>(input_files, output_file, memory_limit,
-                                  manifest, value_store_params);
-      } else {
-        compile_integer(input_files, output_file, memory_limit,
-                        manifest, value_store_params);
-      }
-    } else if (dictionary_type == "string") {
-      if (compact){
+                                    manifest, value_store_params);
+      } else if (dictionary_type == "string") {
         compile_strings<uint16_t>(input_files, output_file, memory_limit,
-                                  manifest, value_store_params);
-      } else {
-        compile_strings(input_files, output_file, memory_limit,
-                        manifest, value_store_params);
-      }
-    } else if (dictionary_type == "key-only") {
-      if (compact){
+                                    manifest, value_store_params);
+
+      } else if (dictionary_type == "key-only") {
         compile_key_only<uint16_t>(input_files, output_file, memory_limit,
-                                   manifest, value_store_params);
-      } else {
-        compile_key_only(input_files, output_file, memory_limit,
-                         manifest, value_store_params);
-      }
-    } else if (dictionary_type == "json") {
-      if (compact){
+                                     manifest, value_store_params);
+      } else if (dictionary_type == "json") {
         compile_json<uint16_t>(input_files, output_file, memory_limit,
-                               manifest, value_store_params);
+                                 manifest, value_store_params);
       } else {
-        compile_json(input_files, output_file, memory_limit,
-                     manifest, value_store_params);
+        std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;
+        std::cout << description;
+        return 1;
       }
     } else {
-      std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;
+      std::cout << "ERROR: arguments wrong or missing." << std::endl << std::endl;
       std::cout << description;
       return 1;
     }
-  } else {
-    std::cout << "ERROR: arguments wrong or missing." << std::endl << std::endl;
-    std::cout << description;
-    return 1;
-  }
 
+  } catch(std::exception& e) {
+      std::cout << "ERROR: arguments wrong or missing." << std::endl << std::endl;
+
+      std::cout << e.what() << std::endl << std::endl;
+      std::cout << description;
+
+      return 1;
+  }
   return 0;
 }
