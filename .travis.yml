@@ -25,8 +25,12 @@ env:
     - BUILD_TYPE=linux      CONF=coverage ARCH=x86_64
     - BUILD_TYPE=manylinux  DOCKER_IMAGE=cliqz/keyvi-manylinux-builder
     - BUILD_TYPE=sdist
+    - BUILD_TYPE=doc
   global:
+    - GH_REPO_NAME='keyvi'
+    - DOXYFILE="$TRAVIS_BUILD_DIR/keyvi/keyvi.Doxyfile"
     - GITHUB_REPO='cliqz-oss/keyvi'
+    - GH_REPO_REF='github.com/cliqz-oss/keyvi.git'
     - secure: "cy3LYIeuSxIdDt4GArpStoawmlEXy7oVX/Z72hwcXVj6EgQ8za16GaayQCLbHy9Hlm0K42QmWg4s7iOm/QzKBlZAwvHMktmHIVoovXe+i83bRVclMr/zvzhEeSyCy4xbBEBT8qt4p0dwX4hOF6cfy+rpNsI+CMBbGgMSS/MZHm/FmF5fKqcZBJfZfEPOqOukID4NPirDlZ8Jmg8JR1K722+xXvwbSif0a6wJ3p517JjYJxO8a7AzdXJMXC3sJmpsSCBwp+NG9BrwJ/MgQFHKUEhPoPFOEI7P57rH9Cax8+y9j7ukwlB36Ae5ApddcXYbQMOtpoA+DvR5JbsbYWi4/T6qUntYmpRy5gPVD/IwIAldEt3iERswjWFHgUjN+JaJ6YqQHl5ks++NZbB6W8eqP2Id1Oa669b6uxFn62Ln43TcvY4bapJEscj7goReiQGjwIWjBxphP/eJaPae642HnpBijPjAG+uA8IyO2nuY/+xULMiNXDFGVmBC5VfYp95Y71ZlUpfUv6u96mXc3ruWmDRzGNNgNXmzIGfD5bxn2uxMykOW6ubG4mnxOT/qMia8yrYsPYdBsvc1u2XWHAUUrHPVr9HmFo68y3AfuXwXH2Eb0fGTxNmaihabcqoBdm6HRK3aRLqXweBI2xXyOY8Tf07hUy+G7qkg2ZrsEgwWg+k="  # COVERALLS_REPO_TOKEN
 
 matrix:
@@ -71,6 +75,10 @@ addons:
     - libsnappy-dev
     - zlib1g-dev
     - doxygen
+    - doxygen-doc
+    - doxygen-latex
+    - doxygen-gui
+    - graphviz
     - libstdc++-4.8-dev
 
 script:
@@ -81,6 +89,7 @@ script:
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/coverage.sh ; fi
+  - if [ "$BUILD_TYPE" == "doc" ]; then ./travis/build_doc.sh ; fi
 
 deploy:
   provider: script
