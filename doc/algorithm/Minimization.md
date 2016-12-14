@@ -1,4 +1,4 @@
-## Minimization {#minimization}
+## Minimization
 
 The purpose of minimization is to compress the data by finding equal states which can be re-used instead of writing a
 new state.
@@ -10,8 +10,8 @@ persisting a new state, we try to find a equal state in the hashtable.
 
 Code: 
 
-Entry point of minimization: [sparse_array_builder](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/internal/sparse_array_builder.h)
-Minimization Hashtable: [sparse_array_builder](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/internal/minimization_hash.h)
+Entry point of minimization: [sparse_array_builder](/keyvi/src/cpp/dictionary/fsa/internal/sparse_array_builder.h)
+Minimization Hashtable: [sparse_array_builder](/keyvi/src/cpp/dictionary/fsa/internal/minimization_hash.h)
 
 The Hashtable in keyvi has a very small footprint of 12 bytes per entry.
 

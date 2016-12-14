@@ -1,4 +1,4 @@
-## Scaling of Construction {#scaling_of_construction}
+## Scaling
 
 This page describes a number of performance and scaling tricks to make it possible to store millions of data points.
 
@@ -14,7 +14,7 @@ sorted input.
 But Beware: Sorting can be local dependent, e.g. the Unix 'sort' command behaves differently depending on the locale. Data
 must be sorted on the byte level (Unix 'sort' with 'LC_ALL=C')
 
-Code: [dictionary_compiler](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/dictionary_compiler.h)
+Code: [dictionary_compiler](/keyvi/src/cpp/dictionary/dictionary_compiler.h)
 
 ### Minimization
 
@@ -29,7 +29,7 @@ hashtables reaches the limit the last hashtable is thrown away.
 To keep "good hashes": Each entry of a successful lookup in a lower hashtable will be moved to the top hashtable. Therefore
 states which often minimize will stay in memory, while states which do not minimize will be thrown away over time. 
 
-Code: [LRU Cache](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/internal/lru_generation_cache.h)
+Code: [LRU Cache](/keyvi/src/cpp/dictionary/fsa/internal/lru_generation_cache.h)
 
 ### Compilation/Index Performance
 
@@ -42,7 +42,7 @@ As described in Construction the FSA is build from 'right to left', minimization
 fails it is impossible to minimize the parent state. Therefore we stop minimization of the preceding states once it fails once.
 Note: we still store the fingerprints in the hashtable for later minimizations.
 
-Code: [Unpacked State](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/internal/unpacked_state.h)
+Code: [Unpacked State](/keyvi/src/cpp/dictionary/fsa/internal/unpacked_state.h)
 
 Note: The amount of memory is configurable in the compiler. Increasing the limit might improve compression.
 
@@ -52,7 +52,7 @@ Sparse Array Construction is one of the most demanding parts. To speedup compila
 sliding windows and the [De Bruijn](http://en.wikipedia.org/wiki/De_Bruijn_sequence) sequence to quickly find spots to pack 
 the data, or - if available - intrinsic compiler/CPU functions. 
 
-Code: [BitVector](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/internal/bit_vector.h)
+Code: [BitVector](/keyvi/src/cpp/dictionary/fsa/internal/bit_vector.h)
 
 ### Persistence and Loading
 

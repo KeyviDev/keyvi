@@ -1,4 +1,4 @@
-## Using keyvi in pyspark or mrjob {#keyvi_emr}
+## Using keyvi in pyspark or mrjob
 
 
 Imagine you want to do some lookups in you map-reduce jobs like matching or extracting certain patterns - in fuzzy manner if you like - and your lookup table is huge. 

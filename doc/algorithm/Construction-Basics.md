@@ -1,4 +1,4 @@
-## Construction Basics {#construction_basics}
+## Introduction
 
 “An automaton (plural: automata) is a self-operating machine. The word is sometimes used to describe a robot, more 
 specifically an autonomous robot. Used colloquially, it refers to a mindless follower.”  (Wikipedia)
@@ -74,9 +74,9 @@ real control flows.
             unpacked_state_stack.connect ( highest_stack, state )‏
 
 Code:
- General entry point: [generator](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/generator.h)
+ General entry point: [generator](/keyvi/src/cpp/dictionary/fsa/generator.h)
  
- Unpacked_State_Stack: [unpacked_state_stack](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/internal/unpacked_state_stack.h)
+ Unpacked_State_Stack: [unpacked_state_stack](/keyvi/src/cpp/dictionary/fsa/internal/unpacked_state_stack.h)
  
 #### Illustration
 

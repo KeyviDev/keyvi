@@ -1,4 +1,4 @@
-## Crashcourse {#crashcourse}
+## keyvi Crashcourse
 
 ### Install
 

@@ -1,8 +1,8 @@
-## Persistence {#persistence}
+## Persistence Introduction
 
 The default persistence is implemented as sparse array (sparse table). 
 
-Code: [sparse_array_persistence](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/internal/sparse_array_persistence.h)
+Code: [sparse_array_persistence](/keyvi/src/cpp/dictionary/fsa/internal/sparse_array_persistence.h)
 
 ### Sparse Array in a nutshell
 
@@ -29,5 +29,5 @@ The algorithm tries to find space in the existing sparse array:
 
 ![SparseArrayPacking](/doc/images/sparse_array_packing.png)
 
-Code: [sparse_array_building](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/src/cpp/dictionary/fsa/internal/sparse_array_builder.h)
+Code: [sparse_array_building](/keyvi/src/cpp/dictionary/fsa/internal/sparse_array_builder.h)
 
