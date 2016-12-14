@@ -1,4 +1,4 @@
-## Preparations
+## Building keyvi dictionaries {#keyvi_compilers}
 
 First you need a keyvi installation.
 

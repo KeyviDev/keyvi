@@ -31,31 +31,31 @@ Precompiled binaries for Ubuntu 14.04LTS are available at the [keyvi PPA](https:
 ### From Source
 
 The core part is a C++ header-only library, but the TPIE 3rdparty library needs to be compiled once. The commandline
-tools are also part of the C++ code. For instructions check the [Readme](/keyvi/README.md) file.
+tools are also part of the C++ code. For instructions check the [keyvi Readme](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/) file.
 
-For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
+For the python extension pykeyvi check the [pykeyvi Readme](https://github.com/cliqz-oss/keyvi/blob/master/pykeyvi/) file in the pykeyvi subfolder.
 
 
 ## Usage
 
   * Howtos
-    * [Compiling Dictionaries/Indexes](/doc/usage/Building keyvi dictionaries.md)
+    * [Compiling Dictionaries/Indexes](@ref keyvi_compilers)
     * Pykeyvi
-      * [Compiling](/doc/usage/Building keyvi dictionaries with python.md)
-  * [Crashcourse](/doc/usage/Crashcourse.md)
-  * [Using pykeyvi with EMR (mrjob or pyspark)](/doc/usage/Using pykeyvi in EMR.md)  
+      * [Compiling](@ref pykeyvi_compilers)
+  * [Crashcourse](@ref crashcourse)
+  * [Using pykeyvi with EMR (mrjob or pyspark)](@ref keyvi_emr)  
 
 ## Development
  
-  * [Build/Packaging](/doc/development/Packaging keyvi.md)
+  * [Build/Packaging](@ref packaging_debian)
   
 ## Internals
   
-  * [Construction Basics](/doc/algorithm/Construction-Basics.md)
-  * [Persistence Basics](/doc/algorithm/Persistence-Basics.md)
-  * [Minimization](/doc/algorithm/Minimization.md)
-  * [Scaling](/doc/algorithm/Scaling.md)
-  * [Extensibility](/doc/algorithm/Extensibility.md)
+  * [Construction Basics](@ref construction_basics)
+  * [Persistence Basics](@ref persistence)
+  * [Minimization](@ref minimization)
+  * [Scaling](@ref scaling_of_construction)
+  * [Extensibility](@ref extensibility)
 
 If you like to go deep down in the basics, keyvi is inspired by the following 2 papers:
 
@@ -67,4 +67,4 @@ If you like to go deep down in the basics, keyvi is inspired by the following 2 
 keyvi is licenced under apache license 2.0, see [licence](LICENSE) for details.
 
 In addition keyvi uses 3rdparty libraries which define their own licence. Please check their respective licence. 
-The 3rdparty libraries can be found at [keyvi/3rdparty](/keyvi/3rdparty).
+The 3rdparty libraries can be found at [keyvi/3rdparty](https://github.com/cliqz-oss/keyvi/blob/master/keyvi/3rdparty).

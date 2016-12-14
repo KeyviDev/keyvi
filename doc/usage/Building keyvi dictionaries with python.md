@@ -1,4 +1,4 @@
-## The pykeyvi compilers
+## Building keyvi dictionary with python {#pykeyvi_compilers}
 
 The compiler is also available from pykeyvi:
 

@@ -1,4 +1,4 @@
-## Creating Debian packages
+## Creating Debian packages {#packaging_debian}
 
 ### dictionary cmdline tools
 
