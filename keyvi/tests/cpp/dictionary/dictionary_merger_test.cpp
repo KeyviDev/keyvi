@@ -29,8 +29,10 @@
 
 #include "dictionary/dictionary_merger.h"
 #include "dictionary/fsa/automata.h"
+#include "dictionary/fsa/traverser_types.h"
 #include "dictionary/dictionary.h"
 #include "dictionary/testing/temp_dictionary.h"
+
 
 namespace keyvi {
 namespace dictionary {
@@ -143,7 +145,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   testing::TempDictionary dictionary2 (test_data2);
 
   std::string filename ("merged-dict-int-v1.kv");
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger;
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger;
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -163,7 +165,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v2.kv";
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger2;
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger2;
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary.GetFileName());
@@ -328,6 +330,155 @@ BOOST_AUTO_TEST_CASE ( MergeIncompatible ) {
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger;
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
+}
+
+
+BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+            { "abc", 22 },
+            { "abbc", 24 }
+        };
+  testing::TempDictionary dictionary (test_data);
+
+  std::vector<std::pair<std::string, uint32_t>> test_data2 = {
+             { "abc", 25 },
+             { "abbc", 42 },
+             { "abcd", 21 },
+             { "abbc", 30 },
+         };
+  testing::TempDictionary dictionary2 (test_data2);
+
+  std::string filename ("merged-dict-int-weight-v1.kv");
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger;
+  merger.Add(dictionary.GetFileName());
+  merger.Add(dictionary2.GetFileName());
+
+  merger.Merge(filename);
+
+  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+  dictionary_t d(new Dictionary(fsa));
+
+  BOOST_CHECK(d->Contains("abc"));
+  BOOST_CHECK(d->Contains("abbc"));
+  BOOST_CHECK(d->Contains("abcd"));
+
+  BOOST_CHECK_EQUAL("25", d->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("30", d->operator[]("abbc").GetValueAsString());
+
+  fsa::WeightedStateTraverser s(fsa);
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK_EQUAL(30, s.GetInnerWeight());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK_EQUAL(30, s.GetInnerWeight());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK_EQUAL(30, s.GetInnerWeight());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK_EQUAL(30, s.GetInnerWeight());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK_EQUAL(25, s.GetInnerWeight());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK_EQUAL(21, s.GetInnerWeight());
+  s++;
+
+  // at end
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+
+  std::remove(filename.c_str());
+
+  filename = "merged-dict-int-weight-v2.kv";
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger2;
+  merger2.Add(dictionary.GetFileName());
+  merger2.Add(dictionary2.GetFileName());
+  merger2.Add(dictionary.GetFileName());
+
+  merger2.Merge(filename);
+
+  fsa::automata_t fsa2(new fsa::Automata(filename.c_str()));
+  dictionary_t d2(new Dictionary(fsa2));
+
+  BOOST_CHECK(d2->Contains("abc"));
+  BOOST_CHECK(d2->Contains("abbc"));
+  BOOST_CHECK(d2->Contains("abcd"));
+
+  BOOST_CHECK_EQUAL("22", d2->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd").GetValueAsString());
+
+  // overwritten by 2nd
+  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc").GetValueAsString());
+
+  std::remove(filename.c_str());
+
+  filename = "merged-dict-int-weight-v3.kv";
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger3;
+
+  merger3.Add(dictionary2.GetFileName());
+  merger3.Add(dictionary.GetFileName());
+
+  merger3.Merge(filename);
+
+  fsa::automata_t fsa3(new fsa::Automata(filename.c_str()));
+  dictionary_t d3(new Dictionary(fsa3));
+
+  BOOST_CHECK(d3->Contains("abc"));
+  BOOST_CHECK(d3->Contains("abbc"));
+  BOOST_CHECK(d3->Contains("abcd"));
+
+  BOOST_CHECK_EQUAL("22", d3->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d3->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d3->operator[]("abbc").GetValueAsString());
+
+  fsa::WeightedStateTraverser s3(fsa3);
+  BOOST_CHECK_EQUAL('a', s3.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s3.GetDepth());
+  BOOST_CHECK_EQUAL(24, s3.GetInnerWeight());
+  s3++;
+
+  BOOST_CHECK_EQUAL('b', s3.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s3.GetDepth());
+  BOOST_CHECK_EQUAL(24, s3.GetInnerWeight());
+  s3++;
+
+  BOOST_CHECK_EQUAL('b', s3.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s3.GetDepth());
+  BOOST_CHECK_EQUAL(24, s3.GetInnerWeight());
+  s3++;
+
+  BOOST_CHECK_EQUAL('c', s3.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s3.GetDepth());
+  BOOST_CHECK_EQUAL(24, s3.GetInnerWeight());
+  s3++;
+
+  BOOST_CHECK_EQUAL('c', s3.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s3.GetDepth());
+  BOOST_CHECK_EQUAL(22, s3.GetInnerWeight());
+  s3++;
+
+  BOOST_CHECK_EQUAL('d', s3.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s3.GetDepth());
+  BOOST_CHECK_EQUAL(21, s3.GetInnerWeight());
+  s3++;
+
+  // at end
+  BOOST_CHECK_EQUAL(0, s3.GetStateLabel());
+
+  std::remove(filename.c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -57,6 +57,11 @@ inline void TraversalState<WeightedTransition>::PostProcess(TraversalPayload<Wei
   }
 }
 
+template<>
+inline uint32_t TraversalState<WeightedTransition>::GetNextInnerWeight() const {
+  return traversal_state_payload.transitions[traversal_state_payload.position].weight;
+}
+
 } /* namespace traversal */
 } /* namespace fsa */
 } /* namespace dictionary */

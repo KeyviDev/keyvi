@@ -165,7 +165,6 @@ public:
             while (!pqueue.empty() and pqueue.top().entryIterator().operator==(top_key)) {
 
                 auto to_inc = pqueue.top();
-                TRACE("removing element with prio %d (in favor of %d)", to_inc.priority, entry_it.priority);
 
                 pqueue.pop();
                 if (++to_inc) {
@@ -177,9 +176,8 @@ public:
             fsa::ValueHandle handle;
             handle.no_minimization = false;
 
-            // Todo: if inner weights are used update them
-            //handle.weight = value_store_->GetWeightValue(value);
-            handle.weight = 0;
+            // get the weight value, for now simple: does not require access to the value store itself
+            handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
 
             if (append_merge_) {
                 handle.value_idx = value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());

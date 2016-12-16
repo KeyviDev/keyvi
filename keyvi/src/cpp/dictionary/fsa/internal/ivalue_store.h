@@ -83,18 +83,30 @@ class IValueStoreWriter {
    */
   IValueStoreWriter(const vs_param_t& parameters = vs_param_t()) : parameters_(parameters) {}
 
-    /// TODO: workaround till ValueStore merger classes are separated from ValueStore writer
-    IValueStoreWriter(const std::vector<std::string> &)
-            : IValueStoreWriter()
-    {}
-
-    uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) {
-        return 0;
-    }
+  /// TODO: workaround till ValueStore merger classes are separated from ValueStore writer
+  IValueStoreWriter(const std::vector<std::string> &)
+          : IValueStoreWriter()
+  {}
 
   virtual ~IValueStoreWriter() {
   }
- 
+
+  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) {
+      return 0;
+  }
+
+  /**
+   * Get the weight for merging dictionaries.
+   *
+   * Note: for now only the fsa_value is given, in future this might change, so that also the payload is required.
+   *
+   * @param fsa_value
+   * @return weight to be used as inner weight
+   */
+  uint32_t GetMergeWeight(uint64_t fsa_value){
+    return 0;
+  }
+
  protected:
   vs_param_t parameters_;
 };
