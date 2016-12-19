@@ -166,7 +166,7 @@ public:
                             _mm_loadu_si128(mask_as_m128), 16,
                             _SIDD_UBYTE_OPS|_SIDD_CMP_EQUAL_EACH|_SIDD_MASKED_POSITIVE_POLARITY|_SIDD_BIT_MASK);
 
-        uint64_t mask_int = ((uint64_t*)&mask)[0];
+        uint64_t mask_int = _mm_extract_epi64(mask, 0);
         TRACE ("Bitmask %d", mask_int);
 
         if (mask_int != 0) {
@@ -263,7 +263,7 @@ public:
                             _mm_loadu_si128(mask_as_m128), 16,
                             _SIDD_UBYTE_OPS|_SIDD_CMP_EQUAL_EACH|_SIDD_MASKED_POSITIVE_POLARITY|_SIDD_BIT_MASK);
 
-        uint64_t mask_int = ((uint64_t*)&mask)[0];
+        uint64_t mask_int = _mm_extract_epi64(mask, 0);
         TRACE ("Bitmask %d", mask_int);
 
         if (mask_int != 0) {
