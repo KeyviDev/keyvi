@@ -89,7 +89,7 @@ with symlink_keyvi():
             global linklibraries_static_or_dynamic
             global extra_link_arguments
             global ext_modules
-            print "Building in {} mode".format(self.mode)
+            print ("Building in {0} mode".format(self.mode))
 
             if self.mode == 'debug':
                 additional_compile_flags.append("-O0")
