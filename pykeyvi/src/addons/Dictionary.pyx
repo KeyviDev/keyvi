@@ -74,14 +74,16 @@
     def GetManifest(self):
         cdef libcpp_string _r = self.inst.get().GetManifestAsString()
         cdef bytes py_result = _r
-        import json
-        return json.loads(py_result)
+        py_result_unicode = _r.decode('utf-8')
+
+        return json.loads(py_result_unicode)
 
     def GetStatistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()
         cdef bytes py_result = _r
-        import json
+        py_result_unicode = _r.decode('utf-8')
+
         return {k: json.loads(v) for k, v in filter(
             lambda kv: kv and isinstance(kv, list) and len(kv) > 1 and kv[1],
-            [s.rstrip().split("\n") for s in py_result.split("\n\n")]
+            [s.rstrip().split("\n") for s in py_result_unicode.split("\n\n")]
         )}
