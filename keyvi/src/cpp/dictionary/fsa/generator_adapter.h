@@ -34,6 +34,13 @@ namespace fsa {
 
 template<class PersistenceT, class ValueStoreT>
 class GeneratorAdapterInterface {
+
+public:
+    using AdapterPtr = std::unique_ptr<GeneratorAdapterInterface>;
+
+    static AdapterPtr CreateGenerator(size_t size_of_keys, size_t memory_limit, const generator_param_t& params,
+                                      ValueStoreT *value_store);
+
  public:
   GeneratorAdapterInterface(){}
 
@@ -96,6 +103,35 @@ class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, Val
   Generator<PersistenceT, ValueStoreT, OffsetTypeT, HashCodeTypeT> generator_;
 
 };
+
+template<class PersistenceT, class ValueStoreT>
+typename GeneratorAdapterInterface<PersistenceT, ValueStoreT>::AdapterPtr
+GeneratorAdapterInterface<PersistenceT, ValueStoreT>::CreateGenerator(size_t number_of_keys, size_t memory_limit,
+                                                                      const generator_param_t& params,
+                                                                      ValueStoreT* value_store) {
+    // todo: find good parameters for auto-guessing this
+    if (number_of_keys > UINT32_MAX) {
+        if (memory_limit > 0x280000000UL /* 10 GB */) {
+            return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(memory_limit,
+                                                                                                      params,
+                                                                                                      value_store));
+        } else {
+            return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(memory_limit,
+                                                                                                      params,
+                                                                                                      value_store));
+        }
+    } else {
+        if (memory_limit > 0x140000000UL) /* 5GB */ {
+            return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(memory_limit,
+                                                                                                      params,
+                                                                                                      value_store));
+        } else {
+            return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit,
+                                                                                                      params,
+                                                                                                      value_store));
+        }
+    }
+}
 
 } /* namespace fsa */
 } /* namespace dictionary */
