@@ -29,7 +29,7 @@
 #include <queue>
 #include <memory>
 
-#include "dictionary/fsa/generator.h"
+#include "dictionary/fsa/generator_adapter.h"
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/entry_iterator.h"
 #include "dictionary/fsa/internal/constants.h"
@@ -141,17 +141,21 @@ public:
     }
 
     void Merge(const std::string& filename) {
+        using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+
         std::priority_queue<SegmentIterator> pqueue;
 
         size_t i = 0;
+        size_t number_of_keys = 0;
         for (auto fsa: dicts_to_merge_) {
             fsa::EntryIterator e_it(fsa);
+            number_of_keys += fsa->GetNumberOfKeys();
             pqueue.push(SegmentIterator(e_it, i++));
         }
 
         ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
 
-        fsa::Generator<PersistenceT, ValueStoreT> generator(memory_limit_, params_, value_store);
+        auto generator = GeneratorAdapter::CreateGenerator(number_of_keys, memory_limit_, params_, value_store);
 
         std::string top_key;
 
@@ -180,7 +184,8 @@ public:
             handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
 
             if (append_merge_) {
-                handle.value_idx = value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
+                handle.value_idx = value_store->GetMergeValueId(segment_it.segmentIndex(),
+                                                                segment_it.entryIterator().GetValueId());
             } else {
                 handle.value_idx = value_store->GetValue(
                         segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
@@ -189,7 +194,7 @@ public:
             }
 
             TRACE("Add key: %s", top_key.c_str());
-            generator.Add(std::move(top_key), handle);
+            generator->Add(std::move(top_key), handle);
 
             if (++segment_it) {
                 pqueue.push(segment_it);
@@ -200,10 +205,10 @@ public:
 
         TRACE("finished iterating, do final compile.");
 
-        generator.CloseFeeding();
+        generator->CloseFeeding();
 
-        generator.SetManifestFromString(manifest_);
-        generator.WriteToFile(filename);
+        generator->SetManifestFromString(manifest_);
+        generator->WriteToFile(filename);
     }
 
 private:
