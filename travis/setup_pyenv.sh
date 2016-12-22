@@ -5,6 +5,11 @@ set -ev
 # get pyenv if it isn't there already
 if [ ! -d ~/.pyenv ]; then
   git clone https://github.com/yyuu/pyenv.git ~/.pyenv
+else
+# upgrade pyenv if it comes from the travis image
+  cd ~/.pyenv
+  git pull
+  cd ..
 fi
 
 PYENV_ROOT="$HOME/.pyenv"
