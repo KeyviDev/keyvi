@@ -16,6 +16,9 @@ case "${PYTHON_VERSION}" in
   35)
       PYBIN=/opt/python/cp35-cp35m/bin
       ;;
+  pypy2)
+      echo "pypy2 is not support at the moment, see: https://github.com/pypa/manylinux/issues/38"
+      ;;
   *)
       echo "PYTHON_VERSION not set"
 esac
