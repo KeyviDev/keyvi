@@ -12,7 +12,7 @@ import os
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
 
-from test_tools import tmp_dictionary
+from test_tools import tmp_dictionary, decode_to_unicode
 
 def test_simple():
     c = pykeyvi.JsonDictionaryCompiler()
@@ -22,8 +22,8 @@ def test_simple():
     c["abd"] = '{"a" : 3}'
     with tmp_dictionary(c, 'simple_json.kv') as d:
         assert len(d) == 2
-        assert d["abc"].GetValueAsString() == '{"a":2}'
-        assert d["abd"].GetValueAsString() == '{"a":3}'
+        assert decode_to_unicode(d["abc"].GetValueAsString()) == decode_to_unicode('{"a":2}')
+        assert decode_to_unicode(d["abd"].GetValueAsString()) == decode_to_unicode('{"a":3}')
 
 def test_simple_zlib():
     c = pykeyvi.JsonDictionaryCompiler(50000000, {'compression': 'z', 'compression_threshold': '0'})
@@ -31,11 +31,11 @@ def test_simple_zlib():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'simple_json_z.kv') as d:
         assert len(d) == 2
-        assert d["abc"].GetValueAsString() == '{"a":2}'
-        assert d["abd"].GetValueAsString() == '{"a":3}'
+        assert decode_to_unicode(d["abc"].GetValueAsString()) == decode_to_unicode('{"a":2}')
+        assert decode_to_unicode(d["abd"].GetValueAsString()) == decode_to_unicode('{"a":3}')
         m = d.GetStatistics()['Value Store']
-        assert m['__compression'] == "zlib"
-        assert m['__compression_threshold'] == "0"
+        assert m['__compression'] == decode_to_unicode("zlib")
+        assert m['__compression_threshold'] == decode_to_unicode("0")
 
 def test_simple_snappy():
     c = pykeyvi.JsonDictionaryCompiler(50000000, {'compression': 'snappy', 'compression_threshold': '0'})
@@ -43,8 +43,8 @@ def test_simple_snappy():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'simple_json_snappy.kv') as d:
         assert len(d) == 2
-        assert d["abc"].GetValueAsString() == '{"a":2}'
-        assert d["abd"].GetValueAsString() == '{"a":3}'
+        assert decode_to_unicode(d["abc"].GetValueAsString()) == decode_to_unicode('{"a":2}')
+        assert decode_to_unicode(d["abd"].GetValueAsString()) == decode_to_unicode('{"a":3}')
         m = d.GetStatistics()['Value Store']
         assert m['__compression'] == "snappy"
         assert m['__compression_threshold'] == "0"
@@ -52,15 +52,15 @@ def test_simple_snappy():
 def test_unicode_compile():
     c = pykeyvi.JsonDictionaryCompiler()
     c.Add("üöä", '{"y" : 2}')
-    c.Add("üüüüüüabd".decode('utf-8'), '{"a" : 3}')
+    c.Add(decode_to_unicode("üüüüüüabd"), '{"a" : 3}')
     c.Add(u"ääääädäd", '{"b" : 33}')
 
     with tmp_dictionary(c, 'simple_json.kv') as d:
         assert len(d) == 3
-        assert d["üöä"].GetValueAsString() == '{"y":2}'
-        assert d[u"üöä"].GetValueAsString() == '{"y":2}'
-        assert d["üüüüüüabd"].GetValueAsString() == '{"a":3}'
-        assert d["ääääädäd"].GetValueAsString() == '{"b":33}'
+        assert decode_to_unicode(d["üöä"].GetValueAsString()) == decode_to_unicode('{"y":2}')
+        assert decode_to_unicode(d[u"üöä"].GetValueAsString()) == decode_to_unicode('{"y":2}')
+        assert decode_to_unicode(d["üüüüüüabd"].GetValueAsString()) == decode_to_unicode('{"a":3}')
+        assert decode_to_unicode(d["ääääädäd"].GetValueAsString()) == decode_to_unicode('{"b":33}')
 
 def test_float_compaction():
     cs = pykeyvi.JsonDictionaryCompiler(50000000, {'floating_point_precision': 'single'})

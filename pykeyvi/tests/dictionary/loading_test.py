@@ -36,9 +36,9 @@ def test_truncated_file_json():
     c.WriteToFile(os.path.join(tmp_dir,'truncation_test.kv'))
     size = os.path.getsize(os.path.join(tmp_dir, 'truncation_test.kv'))
 
-    fd_in = open(os.path.join(tmp_dir,'truncation_test.kv'))
-    fd = open(os.path.join(tmp_dir,'truncation_test1.kv'), 'w')
-    fd.write(fd_in.read(size/2))
+    fd_in = open(os.path.join(tmp_dir,'truncation_test.kv'), 'rb')
+    fd = open(os.path.join(tmp_dir,'truncation_test1.kv'), 'wb')
+    fd.write(fd_in.read(int(size/2)))
     fd.close()
 
     exception_caught = False

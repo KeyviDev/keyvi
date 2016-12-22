@@ -20,11 +20,14 @@ services:
 
 env:
   matrix:
-    - BUILD_TYPE=linux      CONF=debug    ARCH=x86_64
-    - BUILD_TYPE=linux      CONF=release  ARCH=x86_64
-    - BUILD_TYPE=linux      CONF=coverage ARCH=x86_64
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=cliqz/keyvi-manylinux-builder
-    - BUILD_TYPE=sdist
+    - BUILD_TYPE=linux      CONF=debug    ARCH=x86_64 PYTHON_VERSION=27
+    - BUILD_TYPE=linux      CONF=debug    ARCH=x86_64 PYTHON_VERSION=34
+    - BUILD_TYPE=linux      CONF=release  ARCH=x86_64 PYTHON_VERSION=27
+    - BUILD_TYPE=linux      CONF=release  ARCH=x86_64 PYTHON_VERSION=34
+    - BUILD_TYPE=linux      CONF=coverage ARCH=x86_64 PYTHON_VERSION=27
+    - BUILD_TYPE=manylinux  DOCKER_IMAGE=cliqz/keyvi-manylinux-builder    PYTHON_VERSION=27
+    - BUILD_TYPE=manylinux  DOCKER_IMAGE=cliqz/keyvi-manylinux-builder    PYTHON_VERSION=34
+    - BUILD_TYPE=sdist      PYTHON_VERSION=27
     - BUILD_TYPE=doc
   global:
     - GH_REPO_NAME='keyvi'
@@ -38,13 +41,15 @@ matrix:
     - os: osx
       osx_image: xcode7.3
       compiler: clang
-      env: BUILD_TYPE=osx
+      env: BUILD_TYPE=osx PYTHON_VERSION=27
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env: BUILD_TYPE=osx PYTHON_VERSION=34
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./travis/setup_osx.sh ; fi
-  - sudo -H pip install --upgrade pip
-  - sudo -H pip install twine pytest msgpack-python
-  - if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then sudo -H pip install coveralls-merge cpp-coveralls ; fi
+  - ./travis/setup_pyenv.sh
 
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi

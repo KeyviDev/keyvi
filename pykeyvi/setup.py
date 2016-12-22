@@ -89,7 +89,7 @@ with symlink_keyvi():
             global linklibraries_static_or_dynamic
             global extra_link_arguments
             global ext_modules
-            print "Building in {} mode".format(self.mode)
+            print ("Building in {0} mode".format(self.mode))
 
             if self.mode == 'debug':
                 additional_compile_flags.append("-O0")
@@ -195,7 +195,7 @@ with symlink_keyvi():
 
     setup(
         name=PACKAGE_NAME,
-        version='0.1.31',
+        version='0.1.32',
         description='Python bindings for keyvi',
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
@@ -206,7 +206,7 @@ with symlink_keyvi():
         ext_modules=ext_modules,
         zip_safe=False,
         url='https://github.com/cliqz/keyvi',
-        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.31',
+        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.32',
         keywords=['FST'],
         classifiers=[],
         install_requires=install_requires,

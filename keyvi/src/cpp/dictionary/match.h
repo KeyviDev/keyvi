@@ -58,7 +58,11 @@ public:
 
   PyObject* operator()(const std::string & str) const
     {
+#if PY_MAJOR_VERSION >= 3
+        return PyUnicode_FromString(str.c_str());
+#else
         return PyString_FromString(str.c_str());
+#endif
     }
 };
 #endif
