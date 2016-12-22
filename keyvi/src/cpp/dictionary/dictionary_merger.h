@@ -146,16 +146,16 @@ public:
         std::priority_queue<SegmentIterator> pqueue;
 
         size_t i = 0;
-        size_t number_of_keys = 0;
+        size_t sparse_array_size_sum = 0;
         for (auto fsa: dicts_to_merge_) {
             fsa::EntryIterator e_it(fsa);
-            number_of_keys += fsa->GetNumberOfKeys();
+            sparse_array_size_sum += fsa->SparseArraySize();
             pqueue.push(SegmentIterator(e_it, i++));
         }
 
         ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
 
-        auto generator = GeneratorAdapter::CreateGenerator(number_of_keys, memory_limit_, params_, value_store);
+        auto generator = GeneratorAdapter::CreateGenerator(sparse_array_size_sum, memory_limit_, params_, value_store);
 
         std::string top_key;
 
