@@ -76,7 +76,7 @@ private:
 
         compact_size_ = lexical_cast<uint32_t> (sparse_array_properties_.get<std::string>("version")) == 2;
         const size_t bucket_size = compact_size_ ? sizeof(uint16_t) : sizeof(uint32_t);
-        const size_t array_size = lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
+        const size_t array_size = SparseArraySize();
 
         const std::streampos offset = persistenceStream.tellg();
 
@@ -125,6 +125,10 @@ public:
 
     uint64_t GetNumberOfKeys() const {
       return number_of_keys_;
+    }
+
+    size_t SparseArraySize() const {
+        return ::boost::lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
     }
 
     internal::value_store_t GetValueStoreType() const {
