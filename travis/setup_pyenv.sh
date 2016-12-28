@@ -35,8 +35,8 @@ case "${PYTHON_VERSION}" in
       pyenv global 3.5.2
       ;;
   pypy2)
-      pyenv install pypy2-5.6.0
-      pyenv global pypy2-5.6.0
+      pyenv install pypy-5.3.1
+      pyenv global pypy-5.3.1
       ;;
   *)
       echo "PYTHON_VERSION not set"
