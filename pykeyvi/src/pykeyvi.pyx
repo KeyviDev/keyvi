@@ -508,7 +508,7 @@ cdef class PrefixCompletion:
         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
         self.inst = shared_ptr[_PrefixCompletion](new _PrefixCompletion(input_in_0))
     
-    def GetCompletions(self,  in_0 ):
+    def _GetCompletions_0(self,  in_0 ):
         assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         if isinstance(in_0, unicode):
             in_0 = in_0.encode('utf-8')
@@ -516,7 +516,27 @@ cdef class PrefixCompletion:
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
-        return py_result 
+        return py_result
+    
+    def _GetCompletions_1(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0), (<int>in_1))
+        cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+        py_result.it = _r.begin()
+        py_result.end = _r.end()
+        return py_result
+    
+    def GetCompletions(self, *args ):
+        if (len(args)==1) and (isinstance(args[0], (bytes, unicode))):
+            return self._GetCompletions_0(*args)
+        elif (len(args)==2) and (isinstance(args[0], (bytes, unicode))) and (isinstance(args[1], (int, long))):
+            return self._GetCompletions_1(*args)
+        else:
+               raise Exception('can not handle type of %s' % (args,)) 
 
 cdef class ForwardBackwardCompletion:
 
