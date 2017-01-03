@@ -7,6 +7,8 @@ if [ ! -d ~/.pyenv ]; then
   git clone https://github.com/yyuu/pyenv.git ~/.pyenv
 fi
 
+pyenv install --list
+
 PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
@@ -31,6 +33,10 @@ case "${PYTHON_VERSION}" in
   35)
       pyenv install 3.5.2
       pyenv global 3.5.2
+      ;;
+  pypy2)
+      pyenv install pypy-5.3.1
+      pyenv global pypy-5.3.1
       ;;
   *)
       echo "PYTHON_VERSION not set"
