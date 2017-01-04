@@ -63,6 +63,10 @@ typedef keyvi::dictionary::DictionaryMerger<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
     keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryMerger;
 
+typedef keyvi::dictionary::DictionaryMerger<
+        keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
+        keyvi::dictionary::fsa::internal::IntValueStoreWithInnerWeights> CompletionDictionaryMerger;
+
 
 } /* namespace dictionary */
 } /* namespace keyvi */
