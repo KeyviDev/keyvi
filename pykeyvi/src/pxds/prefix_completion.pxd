@@ -8,6 +8,7 @@ cdef extern from "dictionary/completion/prefix_completion.h" namespace "keyvi::d
     cdef cppclass PrefixCompletion:
         PrefixCompletion(shared_ptr[Dictionary]) except +
         _MatchIteratorPair GetCompletions(libcpp_utf8_string)
+        _MatchIteratorPair GetCompletions(libcpp_utf8_string, int)
         _MatchIteratorPair GetFuzzyCompletions(libcpp_utf8_string, int max_edit_distance)
 
 

@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import contextlib
-import os
-
 import pykeyvi
 
 import sys
@@ -16,8 +13,9 @@ from test_tools import tmp_dictionary
 
 MULTIWORD_QUERY_SEPARATOR = '\x1b'
 
+
 def test_mw_completion():
-    c=pykeyvi.CompletionDictionaryCompiler()
+    c = pykeyvi.CompletionDictionaryCompiler()
     c.Add("mozilla firefox" + '\x1b' + "mozilla firefox", 80)
     c.Add("mozilla footprint" + '\x1b' + "mozilla footprint", 30)
     c.Add("mozilla fans" + '\x1b' + "mozilla fans", 43)
@@ -34,6 +32,7 @@ def test_mw_completion():
         assert matches[1][1] == b'mozilla fans'
         assert matches[2][1] == b'mozilla footprint'
         assert matches[3][1] == b'mozilla firebird'
+
 
 def test_overlong_completion():
     c = pykeyvi.CompletionDictionaryCompiler()
