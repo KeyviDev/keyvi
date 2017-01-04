@@ -13,3 +13,12 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Add(libcpp_utf8_string) except +
         void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
         void Merge(libcpp_utf8_string) nogil
+
+cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
+    cdef cppclass CompletionDictionaryMerger:
+        CompletionDictionaryMerger() except +
+        CompletionDictionaryMerger(size_t memory_limit) except +
+        CompletionDictionaryMerger(size_t memory_limit, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
+        void Add(libcpp_utf8_string) except +
+        void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
+        void Merge(libcpp_utf8_string) nogil
