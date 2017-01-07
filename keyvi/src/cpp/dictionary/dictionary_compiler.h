@@ -70,6 +70,7 @@ class DictionaryCompiler
   final {
 
    typedef std::function<void (size_t , size_t, void*)> callback_t;
+    using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
 
    public:
     /**
@@ -101,9 +102,7 @@ class DictionaryCompiler
     }
 
     ~DictionaryCompiler(){
-      if (generator_) {
-        delete generator_;
-      } else {
+      if (!generator_) {
         // if generator was not created we have to delete the value store ourselves
         delete value_store_;
       }
@@ -153,7 +152,8 @@ class DictionaryCompiler
 
       value_store_->CloseFeeding();
       sorter_.sort();
-      CreateGenerator();
+      generator_ = GeneratorAdapter::CreateGenerator(size_of_keys_, memory_limit_, params_, value_store_);
+      generator_->SetManifest(manifest_);
 
       if (sorter_.size() > 0)
       {
@@ -267,14 +267,12 @@ class DictionaryCompiler
     size_t memory_limit_;
     fsa::internal::IValueStoreWriter::vs_param_t params_;
     ValueStoreT* value_store_;
-    fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>* generator_ = nullptr;
+    typename GeneratorAdapter::AdapterPtr generator_;
     boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
     size_t count_ = 0;
     size_t size_of_keys_ = 0;
     bool sort_finalized_ = false;
     bool stable_insert_ = false;
-
-    void CreateGenerator();
 
     /**
      * Register a value before inserting the key(for optimization purposes).
@@ -299,35 +297,6 @@ class DictionaryCompiler
       return handle;
     }
 };
-
-/**
- * Initialize generator based on size of keys and configured memory
- *
- * todo: expose, so that it can be overridden from outside.
- */
-template<class PersistenceT, class ValueStoreT, class SorterT>
-inline void DictionaryCompiler<PersistenceT, ValueStoreT, SorterT>::CreateGenerator()
-{
-  // todo: find good parameters for auto-guessing this
-  if (size_of_keys_ > UINT32_MAX){
-    if (memory_limit_ > 0x280000000UL /* 10 GB */)  {
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(memory_limit_, params_, value_store_);
-    } else {
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(memory_limit_, params_, value_store_);
-    }
-  } else {
-    if (memory_limit_ > 0x140000000UL) /* 5GB */ {
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(memory_limit_, params_, value_store_);
-    } else {
-      generator_ = new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit_, params_, value_store_);
-    }
-  }
-
-  // set the manifest
-  generator_->SetManifest(manifest_);
-}
-
-
 
 } /* namespace dictionary */
 } /* namespace keyvi */

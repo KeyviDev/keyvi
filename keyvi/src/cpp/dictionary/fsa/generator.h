@@ -258,7 +258,6 @@ final {
       }
 
       const size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
-      TRACE ("%d key, common prefix %ld", number_of_keys_added_, commonPrefixLength);
 
       // keys are equal, just return
       if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {

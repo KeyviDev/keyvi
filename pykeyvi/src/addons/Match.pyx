@@ -13,11 +13,11 @@
             key = key.encode("utf-8")
 
         t = type(value)
-        if t == str:
+
+        if t == bytes:
             self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value)
-        elif t == unicode:
-            value_utf8 = value.encode("utf-8")
-            self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value_utf8)
+        elif t == str or t == unicode:
+            self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value.encode('utf-8'))
         elif t == float:
             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)
         elif t == int:

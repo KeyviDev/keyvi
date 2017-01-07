@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 
 
 def stats(input_file):
-    print json.dumps(pykeyvi.Dictionary(input_file).GetStatistics(), indent=4, sort_keys=True)
+    print (json.dumps(pykeyvi.Dictionary(input_file).GetStatistics(), indent=4, sort_keys=True))
 
 
 def dump(args):
@@ -41,7 +41,7 @@ def compile(args):
                 else:
                     dictionary.Add(splits[0], splits[1])
             except:
-                print 'Can not parse line: {}'.format(line)
+                print ('Can not parse line: {}'.format(line))
 
     dictionary.Compile()
     dictionary.WriteToFile(args.output_file)
