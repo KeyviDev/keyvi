@@ -17,6 +17,7 @@ cimport cython.operator as co
 from dictionary cimport loading_strategy_types as _loading_strategy_types
 from cluster cimport JumpConsistentHashString as _JumpConsistentHashString_cluster
 from dictionary_compiler cimport CompletionDictionaryCompiler as _CompletionDictionaryCompiler
+from dictionary_merger cimport CompletionDictionaryMerger as _CompletionDictionaryMerger
 from dictionary cimport Dictionary as _Dictionary
 from forward_backward_completion cimport ForwardBackwardCompletion as _ForwardBackwardCompletion
 from normalization cimport FsaTransform as _FsaTransform
@@ -62,11 +63,17 @@ cdef class JsonDictionaryMerger:
     
     def _init_2(self,  memory_limit , dict value_store_params ):
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, (bytes, unicode)) for k in value_store_params.keys()) and all(isinstance(v, (bytes, unicode)) for v in value_store_params.values()), 'arg value_store_params wrong type'
     
-        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
         for key, value in value_store_params.items():
-           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            deref(v1)[ (<libcpp_string>key) ] = (<libcpp_string>value)
+        
+        
         self.inst = shared_ptr[_JsonDictionaryMerger](new _JsonDictionaryMerger((<size_t>memory_limit), deref(v1)))
         del v1
     
@@ -75,7 +82,7 @@ cdef class JsonDictionaryMerger:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
-        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, (bytes, unicode)) for k in args[1].keys()) and all(isinstance(v, (bytes, unicode)) for v in args[1].values())):
              self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
@@ -93,7 +100,7 @@ cdef class JsonDictionaryMerger:
         self.inst.get().Add((<libcpp_string>in_0))
     
     def SetManifest(self, manifest):
-        m = json.dumps(manifest)
+        m = json.dumps(manifest).encode('utf-8')
         self.inst.get().SetManifestFromString(m) 
 
 cdef class StringDictionaryCompiler:
@@ -114,11 +121,17 @@ cdef class StringDictionaryCompiler:
     
     def _init_2(self,  memory_limit , dict value_store_params ):
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, (bytes, unicode)) for k in value_store_params.keys()) and all(isinstance(v, (bytes, unicode)) for v in value_store_params.values()), 'arg value_store_params wrong type'
     
-        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
         for key, value in value_store_params.items():
-           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            deref(v1)[ (<libcpp_string>key) ] = (<libcpp_string>value)
+        
+        
         self.inst = shared_ptr[_StringDictionaryCompiler](new _StringDictionaryCompiler((<size_t>memory_limit), deref(v1)))
         del v1
     
@@ -127,7 +140,7 @@ cdef class StringDictionaryCompiler:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
-        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, (bytes, unicode)) for k in args[1].keys()) and all(isinstance(v, (bytes, unicode)) for v in args[1].values())):
              self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
@@ -176,7 +189,7 @@ cdef class StringDictionaryCompiler:
 
 
     def SetManifest(self, manifest):
-        m = json.dumps(manifest)
+        m = json.dumps(manifest).encode('utf-8')
         self.inst.get().SetManifestFromString(m) 
 
 cdef class JsonDictionaryCompiler:
@@ -206,11 +219,17 @@ cdef class JsonDictionaryCompiler:
     
     def _init_2(self,  memory_limit , dict value_store_params ):
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, (bytes, unicode)) for k in value_store_params.keys()) and all(isinstance(v, (bytes, unicode)) for v in value_store_params.values()), 'arg value_store_params wrong type'
     
-        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
         for key, value in value_store_params.items():
-           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            deref(v1)[ (<libcpp_string>key) ] = (<libcpp_string>value)
+        
+        
         self.inst = shared_ptr[_JsonDictionaryCompiler](new _JsonDictionaryCompiler((<size_t>memory_limit), deref(v1)))
         del v1
     
@@ -219,7 +238,7 @@ cdef class JsonDictionaryCompiler:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
-        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, (bytes, unicode)) for k in args[1].keys()) and all(isinstance(v, (bytes, unicode)) for v in args[1].values())):
              self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
@@ -259,7 +278,7 @@ cdef class JsonDictionaryCompiler:
 
 
     def SetManifest(self, manifest):
-        m = json.dumps(manifest)
+        m = json.dumps(manifest).encode('utf-8')
         self.inst.get().SetManifestFromString(m) 
 
 cdef class Dictionary:
@@ -430,16 +449,18 @@ cdef class Dictionary:
     def GetManifest(self):
         cdef libcpp_string _r = self.inst.get().GetManifestAsString()
         cdef bytes py_result = _r
-        import json
-        return json.loads(py_result)
+        py_result_unicode = _r.decode('utf-8')
+
+        return json.loads(py_result_unicode)
 
     def GetStatistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()
         cdef bytes py_result = _r
-        import json
+        py_result_unicode = _r.decode('utf-8')
+
         return {k: json.loads(v) for k, v in filter(
             lambda kv: kv and isinstance(kv, list) and len(kv) > 1 and kv[1],
-            [s.rstrip().split("\n") for s in py_result.split("\n\n")]
+            [s.rstrip().split("\n") for s in py_result_unicode.split("\n\n")]
         )} 
 
 cdef class FsaTransform:
@@ -488,7 +509,7 @@ cdef class PrefixCompletion:
         cdef shared_ptr[_Dictionary] input_in_0 = in_0.inst
         self.inst = shared_ptr[_PrefixCompletion](new _PrefixCompletion(input_in_0))
     
-    def GetCompletions(self,  in_0 ):
+    def _GetCompletions_0(self,  in_0 ):
         assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
         if isinstance(in_0, unicode):
             in_0 = in_0.encode('utf-8')
@@ -496,7 +517,27 @@ cdef class PrefixCompletion:
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
-        return py_result 
+        return py_result
+    
+    def _GetCompletions_1(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+    
+        cdef _MatchIteratorPair _r = self.inst.get().GetCompletions((<libcpp_string>in_0), (<int>in_1))
+        cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
+        py_result.it = _r.begin()
+        py_result.end = _r.end()
+        return py_result
+    
+    def GetCompletions(self, *args ):
+        if (len(args)==1) and (isinstance(args[0], (bytes, unicode))):
+            return self._GetCompletions_0(*args)
+        elif (len(args)==2) and (isinstance(args[0], (bytes, unicode))) and (isinstance(args[1], (int, long))):
+            return self._GetCompletions_1(*args)
+        else:
+               raise Exception('can not handle type of %s' % (args,)) 
 
 cdef class ForwardBackwardCompletion:
 
@@ -553,37 +594,42 @@ cdef class loading_strategy_types:
     lazy_no_readahead_value_part = 6
     populate_key_part_no_readahead_value_part = 7 
 
-cdef class JsonDictionaryCompilerSmallData:
+cdef class CompletionDictionaryMerger:
 
-    cdef shared_ptr[_JsonDictionaryCompilerSmallData] inst
+    cdef shared_ptr[_CompletionDictionaryMerger] inst
 
     def __dealloc__(self):
          self.inst.reset()
 
     
-    def __setitem__(self, bytes in_0 , bytes in_1 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
-    
-    
-        self.inst.get().__setitem__((<libcpp_string>in_0), (<libcpp_string>in_1))
+    def Merge(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+        self.inst.get().Merge((<libcpp_string>in_0))
     
     def _init_0(self):
-        self.inst = shared_ptr[_JsonDictionaryCompilerSmallData](new _JsonDictionaryCompilerSmallData())
+        self.inst = shared_ptr[_CompletionDictionaryMerger](new _CompletionDictionaryMerger())
     
     def _init_1(self,  memory_limit ):
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
     
-        self.inst = shared_ptr[_JsonDictionaryCompilerSmallData](new _JsonDictionaryCompilerSmallData((<size_t>memory_limit)))
+        self.inst = shared_ptr[_CompletionDictionaryMerger](new _CompletionDictionaryMerger((<size_t>memory_limit)))
     
     def _init_2(self,  memory_limit , dict value_store_params ):
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, (bytes, unicode)) for k in value_store_params.keys()) and all(isinstance(v, (bytes, unicode)) for v in value_store_params.values()), 'arg value_store_params wrong type'
     
-        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
         for key, value in value_store_params.items():
-           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
-        self.inst = shared_ptr[_JsonDictionaryCompilerSmallData](new _JsonDictionaryCompilerSmallData((<size_t>memory_limit), deref(v1)))
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            deref(v1)[ (<libcpp_string>key) ] = (<libcpp_string>value)
+        
+        
+        self.inst = shared_ptr[_CompletionDictionaryMerger](new _CompletionDictionaryMerger((<size_t>memory_limit), deref(v1)))
         del v1
     
     def __init__(self, *args , **kwargs):
@@ -591,14 +637,83 @@ cdef class JsonDictionaryCompilerSmallData:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
-        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, (bytes, unicode)) for k in args[1].keys()) and all(isinstance(v, (bytes, unicode)) for v in args[1].values())):
              self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+    def Add(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+        self.inst.get().Add((<libcpp_string>in_0))
     
+    def SetManifest(self, manifest):
+        m = json.dumps(manifest).encode('utf-8')
+        self.inst.get().SetManifestFromString(m) 
+
+cdef class CompletionDictionaryCompiler:
+
+    cdef shared_ptr[_CompletionDictionaryCompiler] inst
+
+    def __dealloc__(self):
+         self.inst.reset()
+
+    
+    def __setitem__(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+    
+        self.inst.get().__setitem__((<libcpp_string>in_0), (<int>in_1))
+    
+    def Add(self,  in_0 ,  in_1 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+    
+        self.inst.get().Add((<libcpp_string>in_0), (<int>in_1))
+    
+    def _init_0(self):
+        self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
+    
+    def _init_1(self,  memory_limit ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+    
+        self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit)))
+    
+    def _init_2(self,  memory_limit , dict value_store_params ):
+        assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, (bytes, unicode)) for k in value_store_params.keys()) and all(isinstance(v, (bytes, unicode)) for v in value_store_params.values()), 'arg value_store_params wrong type'
+    
+        cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
+        for key, value in value_store_params.items():
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            deref(v1)[ (<libcpp_string>key) ] = (<libcpp_string>value)
+        
+        
+        self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit), deref(v1)))
+        del v1
+    
+    def __init__(self, *args , **kwargs):
+        if not args:
+             self._init_0(*args)
+        elif (len(args)==1) and (isinstance(args[0], (int, long))):
+             self._init_1(*args)
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, (bytes, unicode)) for k in args[1].keys()) and all(isinstance(v, (bytes, unicode)) for v in args[1].values())):
+             self._init_2(*args)
+        else:
+               raise Exception('can not handle type of %s' % (args,))
+    
+    def WriteToFile(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
         self.inst.get().WriteToFile((<libcpp_string>in_0))
     
     def __enter__(self):
@@ -607,21 +722,6 @@ cdef class JsonDictionaryCompilerSmallData:
     
     def __exit__(self, type, value, traceback):
         self.Compile()
-
-
-    def Add(self, key , value ):
-        assert isinstance(key, (bytes, unicode)), 'arg in_0 wrong type'
-        assert isinstance(value, (bytes, unicode)), 'arg in_1 wrong type'
-
-        if isinstance(key, unicode):
-            key = key.encode('UTF-8')
-        cdef libcpp_string input_in_0 = <libcpp_string> key
-
-        if isinstance(value, unicode):
-            value = value.encode('UTF-8')
-        cdef libcpp_string input_in_1 = <libcpp_string> value
-
-        self.inst.get().Add(input_in_0, input_in_1)
 
         
     def Compile(self, *args):
@@ -636,8 +736,13 @@ cdef class JsonDictionaryCompilerSmallData:
 
 
     def SetManifest(self, manifest):
-        m = json.dumps(manifest)
-        self.inst.get().SetManifestFromString(m) 
+        m = json.dumps(manifest).encode('utf-8')
+        self.inst.get().SetManifestFromString(m)
+
+
+# definition for all compilers
+cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:
+    (<object>py_callback)(a, b) 
 
 cdef class MultiWordCompletion:
 
@@ -756,11 +861,17 @@ cdef class KeyOnlyDictionaryCompiler:
     
     def _init_2(self,  memory_limit , dict value_store_params ):
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, (bytes, unicode)) for k in value_store_params.keys()) and all(isinstance(v, (bytes, unicode)) for v in value_store_params.values()), 'arg value_store_params wrong type'
     
-        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
         for key, value in value_store_params.items():
-           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            deref(v1)[ (<libcpp_string>key) ] = (<libcpp_string>value)
+        
+        
         self.inst = shared_ptr[_KeyOnlyDictionaryCompiler](new _KeyOnlyDictionaryCompiler((<size_t>memory_limit), deref(v1)))
         del v1
     
@@ -769,7 +880,7 @@ cdef class KeyOnlyDictionaryCompiler:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
-        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, (bytes, unicode)) for k in args[1].keys()) and all(isinstance(v, (bytes, unicode)) for v in args[1].values())):
              self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
@@ -780,10 +891,11 @@ cdef class KeyOnlyDictionaryCompiler:
             in_0 = in_0.encode('utf-8')
         self.inst.get().Add((<libcpp_string>in_0))
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
+    def WriteToFile(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+        self.inst.get().WriteToFile((<libcpp_string>in_0))
     
     def __enter__(self):
         return self
@@ -805,7 +917,7 @@ cdef class KeyOnlyDictionaryCompiler:
 
 
     def SetManifest(self, manifest):
-        m = json.dumps(manifest)
+        m = json.dumps(manifest).encode('utf-8')
         self.inst.get().SetManifestFromString(m) 
 
 cdef class Match:
@@ -911,11 +1023,11 @@ cdef class Match:
             key = key.encode("utf-8")
 
         t = type(value)
-        if t == str:
+
+        if t == bytes:
             self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value)
-        elif t == unicode:
-            value_utf8 = value.encode("utf-8")
-            self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value_utf8)
+        elif t == str or t == unicode:
+            self.inst.get().SetAttribute(<libcpp_string> key, <libcpp_string> value.encode('utf-8'))
         elif t == float:
             self.inst.get().SetAttribute(<libcpp_string> key, <float> value)
         elif t == int:
@@ -982,46 +1094,43 @@ cdef class Match:
 
         return m 
 
-cdef class CompletionDictionaryCompiler:
+cdef class JsonDictionaryCompilerSmallData:
 
-    cdef shared_ptr[_CompletionDictionaryCompiler] inst
+    cdef shared_ptr[_JsonDictionaryCompilerSmallData] inst
 
     def __dealloc__(self):
          self.inst.reset()
 
     
-    def __setitem__(self,  in_0 ,  in_1 ):
-        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
-        assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-        if isinstance(in_0, unicode):
-            in_0 = in_0.encode('utf-8')
+    def __setitem__(self, bytes in_0 , bytes in_1 ):
+        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
+        assert isinstance(in_1, bytes), 'arg in_1 wrong type'
     
-        self.inst.get().__setitem__((<libcpp_string>in_0), (<int>in_1))
     
-    def Add(self,  in_0 ,  in_1 ):
-        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
-        assert isinstance(in_1, (int, long)), 'arg in_1 wrong type'
-        if isinstance(in_0, unicode):
-            in_0 = in_0.encode('utf-8')
-    
-        self.inst.get().Add((<libcpp_string>in_0), (<int>in_1))
+        self.inst.get().__setitem__((<libcpp_string>in_0), (<libcpp_string>in_1))
     
     def _init_0(self):
-        self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler())
+        self.inst = shared_ptr[_JsonDictionaryCompilerSmallData](new _JsonDictionaryCompilerSmallData())
     
     def _init_1(self,  memory_limit ):
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
     
-        self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit)))
+        self.inst = shared_ptr[_JsonDictionaryCompilerSmallData](new _JsonDictionaryCompilerSmallData((<size_t>memory_limit)))
     
     def _init_2(self,  memory_limit , dict value_store_params ):
         assert isinstance(memory_limit, (int, long)), 'arg memory_limit wrong type'
-        assert isinstance(value_store_params, dict) and all(isinstance(k, bytes) for k in value_store_params.keys()) and all(isinstance(v, bytes) for v in value_store_params.values()), 'arg value_store_params wrong type'
+        assert isinstance(value_store_params, dict) and all(isinstance(k, (bytes, unicode)) for k in value_store_params.keys()) and all(isinstance(v, (bytes, unicode)) for v in value_store_params.values()), 'arg value_store_params wrong type'
     
-        cdef libcpp_map[libcpp_string, libcpp_string] * v1 = new libcpp_map[libcpp_string, libcpp_string]()
+        cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
         for key, value in value_store_params.items():
-           deref(v1)[ <libcpp_string> key ] = <libcpp_string> value
-        self.inst = shared_ptr[_CompletionDictionaryCompiler](new _CompletionDictionaryCompiler((<size_t>memory_limit), deref(v1)))
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            deref(v1)[ (<libcpp_string>key) ] = (<libcpp_string>value)
+        
+        
+        self.inst = shared_ptr[_JsonDictionaryCompilerSmallData](new _JsonDictionaryCompilerSmallData((<size_t>memory_limit), deref(v1)))
         del v1
     
     def __init__(self, *args , **kwargs):
@@ -1029,15 +1138,16 @@ cdef class CompletionDictionaryCompiler:
              self._init_0(*args)
         elif (len(args)==1) and (isinstance(args[0], (int, long))):
              self._init_1(*args)
-        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, bytes) for k in args[1].keys()) and all(isinstance(v, bytes) for v in args[1].values())):
+        elif (len(args)==2) and (isinstance(args[0], (int, long))) and (isinstance(args[1], dict) and all(isinstance(k, (bytes, unicode)) for k in args[1].keys()) and all(isinstance(v, (bytes, unicode)) for v in args[1].values())):
              self._init_2(*args)
         else:
                raise Exception('can not handle type of %s' % (args,))
     
-    def WriteToFile(self, bytes in_0 ):
-        assert isinstance(in_0, bytes), 'arg in_0 wrong type'
-        cdef const_char * input_in_0 = <const_char *> in_0
-        self.inst.get().WriteToFile(input_in_0)
+    def WriteToFile(self,  in_0 ):
+        assert isinstance(in_0, (bytes, unicode)), 'arg in_0 wrong type'
+        if isinstance(in_0, unicode):
+            in_0 = in_0.encode('utf-8')
+        self.inst.get().WriteToFile((<libcpp_string>in_0))
     
     def __enter__(self):
         return self
@@ -1045,6 +1155,21 @@ cdef class CompletionDictionaryCompiler:
     
     def __exit__(self, type, value, traceback):
         self.Compile()
+
+
+    def Add(self, key , value ):
+        assert isinstance(key, (bytes, unicode)), 'arg in_0 wrong type'
+        assert isinstance(value, (bytes, unicode)), 'arg in_1 wrong type'
+
+        if isinstance(key, unicode):
+            key = key.encode('UTF-8')
+        cdef libcpp_string input_in_0 = <libcpp_string> key
+
+        if isinstance(value, unicode):
+            value = value.encode('UTF-8')
+        cdef libcpp_string input_in_1 = <libcpp_string> value
+
+        self.inst.get().Add(input_in_0, input_in_1)
 
         
     def Compile(self, *args):
@@ -1059,13 +1184,8 @@ cdef class CompletionDictionaryCompiler:
 
 
     def SetManifest(self, manifest):
-        m = json.dumps(manifest)
-        self.inst.get().SetManifestFromString(m)
-
-
-# definition for all compilers
-cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:
-    (<object>py_callback)(a, b) 
+        m = json.dumps(manifest).encode('utf-8')
+        self.inst.get().SetManifestFromString(m) 
  
  
  
@@ -1075,6 +1195,7 @@ from libc.stdint cimport uint32_t
 
 import json
 import msgpack 
+ 
  
 # same import style as autowrap
 from match cimport Match as _Match
