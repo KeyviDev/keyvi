@@ -253,7 +253,7 @@ final {
             }
 
             // Does this transition lead to the same target state?
-            int target = persistence_->ReadTransitionValue(l.GetOffset() + label);
+            uint64_t target = persistence_->ReadTransitionValue(l.GetOffset() + label);
             target = persistence_->ResolveTransitionValue(l.GetOffset() + label, target);
             if (t.value != target) {
               return false;
@@ -265,7 +265,7 @@ final {
             }
 
             // check if l has final info
-            int value = persistence_->ReadFinalValue(l.GetOffset());
+            uint64_t value = persistence_->ReadFinalValue(l.GetOffset());
 
             if (t.value != value) {
               return false;
