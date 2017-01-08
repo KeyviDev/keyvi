@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( stableInsert, SorterT, sorter_types )
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<uint16_t>,
       fsa::internal::JsonValueStore,
-      SorterT> compiler(10485760, params);
+      SorterT> compiler(params);
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( addAndDeletes, SorterT, sorter_types )
   keyvi::dictionary::DictionaryCompiler<
           fsa::internal::SparseArrayPersistence<uint16_t>,
           fsa::internal::JsonValueStore,
-          SorterT> compiler(10485760, params);
+          SorterT> compiler(params);
 
   // add, delete, add again
   compiler.Add("aa", "1");
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( DeleteUnsupported, SorterT, sorter_types )
   keyvi::dictionary::DictionaryCompiler<
             fsa::internal::SparseArrayPersistence<uint16_t>,
             fsa::internal::JsonValueStore,
-            SorterT> compiler(10485760, params);
+            SorterT> compiler(params);
 
   // add, delete, add again
   compiler.Add("aa", "1");

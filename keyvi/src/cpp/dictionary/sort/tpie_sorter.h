@@ -105,12 +105,40 @@ class TpieSorter final {
     }
 
   };
+
   /**
    * Instantiate a TPIE sorter (external memory sort).
    *
    * @param memory_limit memory limit for internal memory usage
    */
-  TpieSorter(size_t memory_limit = 1073741824, const sorter_param_t& params = sorter_param_t())
+  TpieSorter(const sorter_param_t& params = sorter_param_t())
+  	  : initializer_(util::TpieIntializer::getInstance()),
+	    sorter_(),
+	    params_(params) {
+
+    size_t memory_limit = DEFAULT_MEMORY_LIMIT;
+
+    if (params_.count(MEMORY_LIMIT_KEY) > 0) {
+      memory_limit = boost::lexical_cast<size_t>(params_[MEMORY_LIMIT_KEY]);
+    }
+
+    sorter_.set_available_memory(memory_limit);
+    sorter_.begin();
+
+    if (params_.count(TEMPORARY_PATH_KEY) == 0) {
+      params_[TEMPORARY_PATH_KEY] = boost::filesystem::temp_directory_path().string();
+	}
+
+    initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
+  }
+
+#ifndef KEYVI_DEPRECATED
+  /**
+   * DEPRECATED Instantiate a TPIE sorter (external memory sort).
+   *
+   * @param memory_limit memory limit for internal memory usage
+   */
+  TpieSorter(size_t memory_limit, const sorter_param_t& params = sorter_param_t())
       : initializer_(util::TpieIntializer::getInstance()),
         sorter_(),
         params_(params) {
@@ -125,6 +153,7 @@ class TpieSorter final {
 
     initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
   }
+#endif
 
   void push_back(const KeyValueT& kv) {
     sorter_.push(kv);

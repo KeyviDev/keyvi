@@ -79,13 +79,17 @@ class DictionaryCompiler
      * Note the memory limit only limits the memory used for internal buffers,
      * memory usage for small short-lived objects and the library itself is part of the limit.
      *
-     * @param memory_limit memory limit for internal memory usage
+     * @param params compiler parameters
      */
-    DictionaryCompiler(size_t memory_limit = 1073741824,
-                       const compiler_param_t& params = compiler_param_t())
-        : sorter_(memory_limit, params),
-          memory_limit_(memory_limit),
+    DictionaryCompiler(const compiler_param_t& params = compiler_param_t())
+        : sorter_(params),
           params_(params) {
+
+      if (params_.count(MEMORY_LIMIT_KEY) > 0) {
+	    memory_limit_ = boost::lexical_cast<size_t>(params_[MEMORY_LIMIT_KEY]);
+	  } else {
+		memory_limit_ = DEFAULT_MEMORY_LIMIT;
+	  }
 
       if (params_.count(TEMPORARY_PATH_KEY) == 0) {
         params_[TEMPORARY_PATH_KEY] =
@@ -100,6 +104,39 @@ class DictionaryCompiler
 
       value_store_= new ValueStoreT(params_);
     }
+
+#ifndef KEYVI_DEPRECATED
+    /**
+	 * DEPRECATED Instantiate a dictionary compiler.
+	 *
+	 * Note the memory limit only limits the memory used for internal buffers,
+	 * memory usage for small short-lived objects and the library itself is part of the limit.
+	 *
+	 * @param memory_limit memory limit for internal memory usage
+	 */
+    DictionaryCompiler(size_t memory_limit,
+					   const compiler_param_t& params = compiler_param_t())
+		: sorter_(memory_limit, params),
+		  memory_limit_(memory_limit),
+		  params_(params) {
+
+        // Note: I can not use delegate constructors as the other would need to call this one
+        // as this one is the deprecated one I do some code duplication for now
+
+        if (params_.count(TEMPORARY_PATH_KEY) == 0) {
+          params_[TEMPORARY_PATH_KEY] =
+              boost::filesystem::temp_directory_path().string();
+        }
+
+        TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
+
+        if (params_.count(STABLE_INSERTS) > 0 && params_[STABLE_INSERTS] == "true") {
+          stable_insert_ = true;
+        }
+
+        value_store_= new ValueStoreT(params_);
+	}
+#endif
 
     ~DictionaryCompiler(){
       if (!generator_) {

@@ -45,9 +45,20 @@ class InMemorySorter final {
    *
    * @param memory_limit ignored, everything is in memory, client has to ensure it fits in memory.
    */
-  InMemorySorter(size_t memory_limit = 1073741824, const sorter_param_t& params = sorter_param_t())
+  InMemorySorter(const sorter_param_t& params = sorter_param_t())
       : params_(params) {
   }
+
+#ifndef KEYVI_DEPRECATED
+  /**
+   * DEPRECATED Instantiate a in memory sorter. This is a simple heap based sorter, everything must fit in memory.
+   *
+   * @param memory_limit ignored, everything is in memory, client has to ensure it fits in memory.
+   */
+  InMemorySorter(size_t memory_limit, const sorter_param_t& params = sorter_param_t())
+      : params_(params) {
+  }
+#endif
 
   void push_back(const KeyValueT& kv) {
     key_values_.push_back(kv);

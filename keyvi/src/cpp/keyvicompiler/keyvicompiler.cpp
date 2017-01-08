@@ -110,13 +110,12 @@ void finalize_compile(CompilerType& compiler, std::string& output, const std::st
 
 template<class BucketT = uint32_t>
 void compile_completion(std::vector<std::string>& input, std::string& output,
-                     size_t memory_limit,
                      const std::string& manifest = "",
                      const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::IntValueStoreWithInnerWeights> compiler(
-      memory_limit, value_store_params);
+      value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
     size_t tab = line.find('\t');
@@ -144,13 +143,12 @@ void compile_completion(std::vector<std::string>& input, std::string& output,
 
 template<class BucketT = uint32_t>
 void compile_integer(std::vector<std::string>& input, std::string& output,
-                     size_t memory_limit,
                      const std::string& manifest = "",
                      const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::IntValueStore> compiler(
-      memory_limit, value_store_params);
+      value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
     size_t tab = line.find('\t');
@@ -197,24 +195,22 @@ void compile_strings_inner(Compiler& compiler,
 
 template<class BucketT = uint32_t>
 void compile_strings(std::vector<std::string>& input, std::string& output,
-                     size_t memory_limit,
                      const std::string& manifest = "",
                      const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::StringValueStore> compiler(
-          memory_limit, value_store_params);
+          value_store_params);
   compile_strings_inner(compiler, input, output, manifest);
 }
 
 template<class BucketT = uint32_t>
 void compile_key_only(std::vector<std::string>& input, std::string& output,
-                      size_t memory_limit,
                       const std::string& manifest = "",
                       const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>> compiler(
-      memory_limit, value_store_params);
+      value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
 
@@ -235,13 +231,12 @@ void compile_key_only(std::vector<std::string>& input, std::string& output,
 
 template<class BucketT = uint32_t>
 void compile_json(std::vector<std::string>& input, std::string& output,
-                  size_t memory_limit,
                   const std::string& manifest = "",
                   const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
       keyvi::dictionary::fsa::internal::JsonValueStore> compiler(
-          memory_limit, value_store_params);
+          value_store_params);
   compile_strings_inner(compiler, input, output, manifest);
 }
 
@@ -320,44 +315,35 @@ int main(int argc, char** argv) {
       return 0;
     }
 
-    size_t memory_limit = 1073741824;
-    if (vm.count("memory-limit")) {
-      memory_limit = vm["memory-limit"].as<size_t>();
-    }
-
     std::string manifest = vm["manifest"].as<std::string>();
     std::cout << manifest << std::endl;
 
     std::string dictionary_type = vm["dictionary-type"].as<std::string>();
     vs_param_t value_store_params = extract_value_store_parameters(vm);
 
-    if (value_store_params.size() > 0 && dictionary_type != "json") {
-      std::cout << "WARNING: only the 'json' dictionary type handles "
-                << "value store parameters; -V{"
-                << boost::algorithm::join(
-                    value_store_params | boost::adaptors::map_keys, ", ")
-                << "} are ignored." << std::endl << std::endl;
-    }
+    if (vm.count("memory-limit")) {
+	  value_store_params[MEMORY_LIMIT_KEY] = vm["memory-limit"].as<std::string>();
+	}
 
     if (vm.count("input-file") && vm.count("output-file")) {
       input_files = vm["input-file"].as<std::vector<std::string>>();
       output_file = vm["output-file"].as<std::string>();
 
       if (dictionary_type == "integer") {
-        compile_integer<uint16_t>(input_files, output_file, memory_limit,
+        compile_integer<uint16_t>(input_files, output_file,
                                     manifest, value_store_params);
       } else if (dictionary_type == "string") {
-        compile_strings<uint16_t>(input_files, output_file, memory_limit,
+        compile_strings<uint16_t>(input_files, output_file,
                                     manifest, value_store_params);
 
       } else if (dictionary_type == "key-only") {
-        compile_key_only<uint16_t>(input_files, output_file, memory_limit,
+        compile_key_only<uint16_t>(input_files, output_file,
                                      manifest, value_store_params);
       } else if (dictionary_type == "json") {
-        compile_json<uint16_t>(input_files, output_file, memory_limit,
+        compile_json<uint16_t>(input_files, output_file,
                                  manifest, value_store_params);
       } else if (dictionary_type == "completion") {
-        compile_integer<uint16_t>(input_files, output_file, memory_limit,
+        compile_integer<uint16_t>(input_files, output_file,
                                       manifest, value_store_params);
       } else {
         std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;

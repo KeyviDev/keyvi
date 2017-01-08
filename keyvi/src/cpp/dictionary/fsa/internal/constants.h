@@ -54,8 +54,10 @@ static const int KEYVI_FILE_PERSISTENCE_VERSION_MIN = 2;
 // how many buckets to go left doing (brute force) search for free buckets in the sparse array where the new state fits in
 #define SPARSE_ARRAY_SEARCH_OFFSET 151
 
-// Value option key names
+#define DEFAULT_MEMORY_LIMIT 1073741824
 
+// option key names
+static const std::string MEMORY_LIMIT_KEY = "memory_limit";
 static const std::string TEMPORARY_PATH_KEY = "temporary_path";
 static const std::string COMPRESSION_KEY = "compression";
 static const std::string COMPRESSION_THRESHOLD_KEY = "compression_threshold";
