@@ -36,6 +36,7 @@
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 
@@ -114,7 +115,7 @@ void compile_completion(std::vector<std::string>& input, std::string& output,
                      const vs_param_t& value_store_params = vs_param_t()) {
   keyvi::dictionary::DictionaryCompiler<
       keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-      keyvi::dictionary::fsa::internal::IntValueStoreWithInnerWeights> compiler(
+      keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore> compiler(
       value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {

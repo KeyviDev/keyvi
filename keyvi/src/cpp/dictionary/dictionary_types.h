@@ -29,6 +29,7 @@
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
 #include "dictionary/dictionary_merger.h"
@@ -41,7 +42,7 @@ typedef keyvi::dictionary::fsa::Generator<
 
 typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-    keyvi::dictionary::fsa::internal::IntValueStoreWithInnerWeights> CompletionDictionaryCompiler;
+    keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore> CompletionDictionaryCompiler;
 
 typedef keyvi::dictionary::DictionaryCompiler<
     keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
@@ -69,7 +70,7 @@ typedef keyvi::dictionary::DictionaryMerger<
 
 typedef keyvi::dictionary::DictionaryMerger<
         keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-        keyvi::dictionary::fsa::internal::IntValueStoreWithInnerWeights> CompletionDictionaryMerger;
+        keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore> CompletionDictionaryMerger;
 
 
 } /* namespace dictionary */

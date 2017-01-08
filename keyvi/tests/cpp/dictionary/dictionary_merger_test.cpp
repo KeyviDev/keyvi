@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDicts) {
   testing::TempDictionary dictionary2 (test_data2);
 
   std::string filename ("merged-dict-int.kv");
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger;
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger;
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
             { "abc", 22 },
             { "abbc", 24 }
         };
-  testing::TempDictionary dictionary (test_data);
+  testing::TempDictionary dictionary (test_data, false);
 
   std::vector<std::pair<std::string, uint32_t>> test_data2 = {
              { "abc", 25 },
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
              { "abcd", 21 },
              { "abbc", 30 },
          };
-  testing::TempDictionary dictionary2 (test_data2);
+  testing::TempDictionary dictionary2 (test_data2, false);
 
   std::string filename ("merged-dict-int-v1.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger;
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v3.kv";
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger3;
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger3;
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE ( MergeIncompatible ) {
 
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
   testing::TempDictionary dictionary (test_data);
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger;
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger;
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
 }
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
   testing::TempDictionary dictionary2 (test_data2);
 
   std::string filename ("merged-dict-int-weight-v1.kv");
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger;
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger;
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -403,7 +403,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-weight-v2.kv";
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger2;
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger2;
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary.GetFileName());
@@ -426,7 +426,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-weight-v3.kv";
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger3;
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger3;
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());

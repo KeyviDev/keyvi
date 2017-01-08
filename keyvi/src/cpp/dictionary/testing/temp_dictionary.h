@@ -46,10 +46,14 @@ final {
       fsa_ = compilation::CompilationUtils::CompileKeyOnly(input, file_name_);
     }
 
-    TempDictionary(std::vector<std::pair<std::string, uint32_t>>& input) {
+    TempDictionary(std::vector<std::pair<std::string, uint32_t>>& input, bool completion_dictionary = true) {
 
       CreateFileName();
-      fsa_ = compilation::CompilationUtils::CompileIntWithInnerWeights(input, file_name_);
+      if (completion_dictionary) {
+        fsa_ = compilation::CompilationUtils::CompileIntWithInnerWeights(input, file_name_);
+      } else {
+        fsa_ = compilation::CompilationUtils::CompileInt(input, file_name_);
+      }
     }
 
     TempDictionary(std::vector<std::pair<std::string, std::string>>& input) {
