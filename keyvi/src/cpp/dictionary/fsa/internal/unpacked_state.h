@@ -265,7 +265,7 @@ final {
             }
 
             // check if l has final info
-            uint64_t value = persistence_->ReadFinalValue(l.GetOffset());
+            const uint64_t value = persistence_->ReadFinalValue(l.GetOffset());
 
             if (t.value != value) {
               return false;

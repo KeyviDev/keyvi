@@ -84,12 +84,12 @@ final {
 
       if (bitPosition == 0)
       {
-        for (size_t i = 0; i<write_length; i++){
+        for (size_t i = 0; i<write_length; ++i){
           bits_[bytePosition + i] |= other.bits_[i];
         }
       } else {
         bits_[bytePosition] |= ((uint64_t) other.bits_[0]<< bitPosition);
-        for (size_t i = 1; i<write_length; i++){
+        for (size_t i = 1; i<write_length; ++i){
           bits_[bytePosition + i] |= ((other.bits_[i]<< bitPosition) | (other.bits_[i-1] >> (64 - bitPosition)));
         }
         bits_[bytePosition + write_length] |= (other.bits_[write_length-1] >> (64 - bitPosition));
@@ -108,7 +108,7 @@ final {
 
       size_t write_length = std::min(bits_.size(), other.bits_.size()) - bytePosition_other;
 
-      for (size_t i = 0; i<write_length; i++){
+      for (size_t i = 0; i<write_length; ++i){
         bits_[i] |= other.GetUnderlyingIntegerAtPosition(bytePosition_other + i, bitPosition_other);
       }
     }
