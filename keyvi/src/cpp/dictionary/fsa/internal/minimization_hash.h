@@ -366,7 +366,7 @@ final {
             entries_[bucket].SetCookie(overflow_count_);
             overflow_entries_[overflow_count_++] = key;
           } else {
-            auto number_of_overflows = 0;
+            size_t number_of_overflows = 0;
             while (overflow_entries_[overflowBucket].GetCookie() != 0 && number_of_overflows < overflow_limit_) {
               overflowBucket = overflow_entries_[overflowBucket].GetCookie();
               ++number_of_overflows;
