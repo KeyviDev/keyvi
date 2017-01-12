@@ -1,0 +1,4 @@
+msgpack-python
+autowrap
+pytest
+twine

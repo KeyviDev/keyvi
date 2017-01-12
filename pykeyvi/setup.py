@@ -6,6 +6,8 @@ import sys
 import subprocess
 import multiprocessing
 import shutil
+import glob
+import autowrap.Main
 
 from contextlib import contextmanager
 from os import path
@@ -22,8 +24,11 @@ def symlink_keyvi():
 
 
 with symlink_keyvi():
-    # workaround for autwrap bug (includes incompatible boost)
+    # workaround for autowrap bug (includes incompatible boost)
     autowrap_data_dir = "autowrap_includes"
+
+    pykeyvi_pyx = 'pykeyvi.pyx'
+    pykeyvi_cpp = 'pykeyvi.cpp'
 
     dictionary_sources = path.abspath('keyvi')
     tpie_build_dir = path.join(dictionary_sources, '3rdparty/tpie/build')
@@ -136,6 +141,15 @@ with symlink_keyvi():
 
     class build_ext(_build_ext.build_ext):
         def run(self):
+            addons = glob.glob('src/addons/*')
+            pxds = glob.glob('src/pxds/*')
+            converters = 'src/converters'
+            converter_files = glob.glob(path.join(converters, '*'))
+            max_modification_time = max([path.getmtime(fn) for fn in addons + pxds + converter_files])
+
+            if not path.exists(pykeyvi_cpp) or max_modification_time > path.getmtime(pykeyvi_cpp):
+                autowrap.Main.run(pxds, addons, [converters], pykeyvi_pyx)
+
             if sys.platform == 'darwin':
                 if not os.path.exists(mac_os_static_libs_dir):
                     os.makedirs(mac_os_static_libs_dir)
@@ -152,7 +166,7 @@ with symlink_keyvi():
                 except:
                     cpu_count = 1
 
-                CMAKE_CXX_FLAGS='-fPIC -std=c++11'
+                CMAKE_CXX_FLAGS = '-fPIC -std=c++11'
                 if sys.platform == 'darwin':
                     CMAKE_CXX_FLAGS += ' -mmacosx-version-min=10.9'
 
@@ -181,7 +195,7 @@ with symlink_keyvi():
                                            path.join(dictionary_sources, '3rdparty/misc'),
                                            path.join(dictionary_sources, '3rdparty/xchange/src')],
                              language='c++',
-                             sources=['src/pykeyvi.cpp'],
+                             sources=[pykeyvi_cpp],
                              extra_compile_args=['-std=c++11', '-msse4.2'] + additional_compile_flags,
                              extra_link_args=extra_link_arguments,
                              library_dirs=link_library_dirs,
@@ -200,7 +214,7 @@ with symlink_keyvi():
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
         license="ASL 2.0",
-        cmdclass={'build_ext': build_ext, 'build': build },
+        cmdclass={'build_ext': build_ext, 'build': build},
         scripts=['bin/keyvi'],
         packages=['keyvicli'],
         ext_modules=ext_modules,
