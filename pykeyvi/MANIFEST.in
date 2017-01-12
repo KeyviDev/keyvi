@@ -1,5 +1,5 @@
 recursive-include autowrap_includes *.hpp
-include src/pykeyvi.cpp
+graft src
 
 recursive-include keyvi/src/cpp *.h
 
