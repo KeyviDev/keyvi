@@ -2,3 +2,4 @@ msgpack-python
 autowrap
 pytest
 twine
+wheel
