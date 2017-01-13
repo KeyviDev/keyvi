@@ -66,11 +66,11 @@ final {
       }
     }
 
-    int Get(int row, int column) const {
+    int Get(size_t row, size_t column) const {
       return distance_matrix_[((row * number_of_columns_) + column)];
     }
 
-    void Set(int row, int column, int value) {
+    void Set(size_t row, size_t column, int value) {
       distance_matrix_[((row * number_of_columns_) + column)] = value;
     }
 
@@ -80,7 +80,7 @@ final {
       TRACE("boundary check %d %d", minimum_rows, number_of_rows_);
       if (minimum_rows > number_of_rows_) {
         // increase to given capacity or at least 120% of old number of rows
-        int new_rows = std::max(minimum_rows, (number_of_rows_ * 6) / 5);
+        size_t new_rows = std::max(minimum_rows, (number_of_rows_ * 6) / 5);
         TRACE("increase capacity to %d", new_rows);
 
         int* newDistanceMatrix = new int[new_rows * number_of_columns_];
