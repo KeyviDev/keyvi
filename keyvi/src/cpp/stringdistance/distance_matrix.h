@@ -80,7 +80,7 @@ final {
       TRACE("boundary check %d %d", minimum_rows, number_of_rows_);
       if (minimum_rows > number_of_rows_) {
         // increase to given capacity or at least 120% of old number of rows
-        size_t new_rows = std::max(minimum_rows, (number_of_rows_ * 6) / 5);
+        const size_t new_rows = std::max(minimum_rows, (number_of_rows_ * 6) / 5);
         TRACE("increase capacity to %d", new_rows);
 
         int* newDistanceMatrix = new int[new_rows * number_of_columns_];
