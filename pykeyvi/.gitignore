@@ -5,3 +5,7 @@
 pykeyvi.egg-info/
 build/
 dist/
+
+# autowrap artifacts
+pykeyvi.pyx
+pykeyvi.cpp
