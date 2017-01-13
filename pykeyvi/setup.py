@@ -1,16 +1,31 @@
 from setuptools import setup, Extension
 import distutils.command.build as _build
 import distutils.command.build_ext as _build_ext
+import distutils.command.sdist as _sdist
 import os
 import sys
 import subprocess
 import multiprocessing
 import shutil
 import glob
-import autowrap.Main
 
 from contextlib import contextmanager
 from os import path
+
+pykeyvi_pyx = 'pykeyvi.pyx'
+pykeyvi_cpp = 'pykeyvi.cpp'
+
+
+def generate_pykeyvi_source():
+    addons = glob.glob('src/addons/*')
+    pxds = glob.glob('src/pxds/*')
+    converters = 'src/converters'
+    converter_files = glob.glob(path.join(converters, '*'))
+    max_modification_time = max([path.getmtime(fn) for fn in addons + pxds + converter_files])
+
+    if not path.exists(pykeyvi_cpp) or max_modification_time > path.getmtime(pykeyvi_cpp):
+        import autowrap.Main
+        autowrap.Main.run(pxds, addons, [converters], pykeyvi_pyx)
 
 
 @contextmanager
@@ -26,9 +41,6 @@ def symlink_keyvi():
 with symlink_keyvi():
     # workaround for autowrap bug (includes incompatible boost)
     autowrap_data_dir = "autowrap_includes"
-
-    pykeyvi_pyx = 'pykeyvi.pyx'
-    pykeyvi_cpp = 'pykeyvi.cpp'
 
     dictionary_sources = path.abspath('keyvi')
     tpie_build_dir = path.join(dictionary_sources, '3rdparty/tpie/build')
@@ -139,16 +151,15 @@ with symlink_keyvi():
         user_options = _build.build.user_options + custom_user_options
 
 
+    class sdist(_sdist.sdist):
+        def run(self):
+            generate_pykeyvi_source()
+            _sdist.sdist.run(self)
+
+
     class build_ext(_build_ext.build_ext):
         def run(self):
-            addons = glob.glob('src/addons/*')
-            pxds = glob.glob('src/pxds/*')
-            converters = 'src/converters'
-            converter_files = glob.glob(path.join(converters, '*'))
-            max_modification_time = max([path.getmtime(fn) for fn in addons + pxds + converter_files])
-
-            if not path.exists(pykeyvi_cpp) or max_modification_time > path.getmtime(pykeyvi_cpp):
-                autowrap.Main.run(pxds, addons, [converters], pykeyvi_pyx)
+            generate_pykeyvi_source()
 
             if sys.platform == 'darwin':
                 if not os.path.exists(mac_os_static_libs_dir):
@@ -175,7 +186,7 @@ with symlink_keyvi():
                 tpie_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=Release ' \
                                   ' -D TPIE_PARALLEL_SORT=1 -D COMPILE_TEST=OFF -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
                                   ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX} ..'.format(
-                                        CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=tpie_install_prefix)
+                    CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=tpie_install_prefix)
                 tpie_build_cmd += ' && make -j {}'.format(cpu_count)
                 tpie_build_cmd += ' && make install'
 
@@ -214,7 +225,7 @@ with symlink_keyvi():
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
         license="ASL 2.0",
-        cmdclass={'build_ext': build_ext, 'build': build},
+        cmdclass={'build_ext': build_ext, 'sdist': sdist, 'build': build},
         scripts=['bin/keyvi'],
         packages=['keyvicli'],
         ext_modules=ext_modules,
