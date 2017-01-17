@@ -36,12 +36,12 @@ After dumping, open the file dump.out in a text editor, it should contain your d
 Check questions:
  * What is the difference to your input file?
  
-#### Open the file in ipython
+#### Open the file in python
 
 Do:
 
     import pykeyvi
-    d = pykeyvi.Dictionary("compiled.keyvi")
+    d = pykeyvi.Dictionary("compiled.kv")
     "keyvi" in d
     
 should return True
