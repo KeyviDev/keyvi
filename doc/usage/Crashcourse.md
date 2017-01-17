@@ -2,12 +2,13 @@
 
 ### Install
 
-After installation you should have:
+After installation you should have `keyvi` executable available:
 
-    keyvicompiler
-    keyviinspector
+Try:
+
+    keyvi -h
     
-Try in ipython:
+Try in python:
     
     import pykeyvi
     
