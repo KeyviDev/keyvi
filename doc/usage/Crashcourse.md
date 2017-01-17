@@ -25,13 +25,13 @@ Open a text editor and put some keys in there, e.g.
     
 Compile:
 
-    keyvicompiler -i in -o compiled.keyvi -d key-only
+    keyvi compile <input_file> compiled.kv key-only
     
 Dump:
     
-    keyviinspector -i compiled.keyvi -o compiled.out
+    keyvi dump compiled.kv dump.out
 
-After dumping, open the file compiled.out in a text editor, it should contain your data. 
+After dumping, open the file dump.out in a text editor, it should contain your data. 
 
 Check questions:
  * What is the difference to your input file?
