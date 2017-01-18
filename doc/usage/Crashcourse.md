@@ -67,24 +67,34 @@ Check questions:
 
 ### Simple Statistics
 
-Both Keyvi Inspector and the Python API provide an easy way to obtain the number of keys and values in a keyvi-compiled file. 
+Both, the `keyvi` executable and the Python API provide an easy way to obtain the number of keys and values in a keyvi file. 
 
-Example: If there is a keyvi file `foobar.keyvi` with key-value pairs, one can get simple count statistics as follows:
+For the just created `compiled.kv` file run:
+
+    keyvi stats compiled.kv
+
+The output should be:
 
 ```
-$ keyviinspector -i foobar.keyvi -s
-
-General
-{"version":"1","start_state":"42613522","number_of_keys":"1768342","value_store_type":"5","number_of_states":"37309831","manifest":""}
-
-Persistence
-{"version":"2","size":"42613783"}
-
-Value Store
-{"size":"5684145126","values":"2100578","unique_values":"2100571","__compression":"raw","__compression_threshold":"32"}
+{
+    "General": {
+        "manifest": "",
+        "number_of_keys": "6",
+        "number_of_states": "14",
+        "start_state": "19",
+        "value_store_type": "1",
+        "version": "2"
+    },
+    "Persistence": {
+        "size": "280",
+        "version": "2"
+    }
+}
 ```
 
-Similarly, With py-keyvi `d.GetStatistics()` on the keyvi dictionary object `d` can output the same information.
+Note: As we have compiled `key-only` dictionary there is no info regarding values.
+
+Similarly with python, on the `pykeyvi.Dictionary` object `d` the call `d.GetStatistics()` will return the same information.
 
 ### Lookup and Extraction
 
