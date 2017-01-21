@@ -122,23 +122,16 @@ class generator_exception final : public std::runtime_error {
  * s      |abe
  *
  * We process key by key (must be in sorted order) and fill the stacks for the
- * non-common suffix
- * when comparing two consecutive keys.
+ * non-common suffix when comparing two consecutive keys.
  * For example in step 1 we compare "aa" with "abc" and put "a" (the second "a"
- * of "aa") into
- * stack 2, step 2 compares "abc" with "abcde", we do nothing except remembering
- * that "c" is a
- * state, in step 3 ( "abe", "abcde" ): "e" into stack 5, "c" into stack 3, "d"
- * into stack
- * 4 ...
+ * of "aa") into stack 2, step 2 compares "abc" with "abcde", we do nothing
+ * except remembering that "c" is a state, in step 3 ( "abe", "abcde" ): "e"
+ * into stack 5, "c" into stack 3, "d" into stack 4 ...
  * In each iteration we check which stacks can be "consumed", that means we
- * collected all
- * outgoing transitions of a state in the state automaton. We pop (take out and
- * delete)
- * these stacks and put the transition vector into the automaton.
- * In our example our first stack we consume stack 5 first, containing "e", than
- * stack 4 with
- * "d", stack 3 with "c", "e" and so on.
+ * collected all outgoing transitions of a state in the state automaton. We
+ * pop (take out and delete) these stacks and put the transition vector into
+ * the automaton. In our example our first stack we consume stack 5 first,
+ * containing "e", than stack 4 with "d", stack 3 with "c", "e" and so on.
  * Note: The input must be sorted according to a user-defined sort order.
  */
 typedef const internal::IValueStoreWriter::vs_param_t generator_param_t;
