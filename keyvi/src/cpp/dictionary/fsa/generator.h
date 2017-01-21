@@ -178,7 +178,7 @@ class Generator final {
 
     params_[TEMPORARY_PATH_KEY] =
         util::mapGet(params_, TEMPORARY_PATH_KEY,
-                     boost::filesystem::temp_directory_path().string());
+                     boost::filesystem::temp_directory_path().native());
 
     minimize_ = util::mapGetBool(params_, MINIMIZATION_KEY, true);
 
