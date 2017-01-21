@@ -39,11 +39,11 @@ def test_tmp_dir():
         os.chdir(os.path.join(tempfile.gettempdir(), "tmp_dir_test"))
         c = pykeyvi.JsonDictionaryCompiler()
         c.Add("abc", "{'a':2}")
-        assert len(os.listdir('.')) == 0
+        assert os.listdir('.') == []
         c.Compile()
-        assert len(os.listdir('.')) == 0
+        assert os.listdir('.') == []
         del c
-        assert len(os.listdir('.')) == 0
+        assert os.listdir('.') == []
     finally:
         os.chdir(cwd)
         os.rmdir(os.path.join(tempfile.gettempdir(), "tmp_dir_test"))
@@ -54,7 +54,7 @@ def test_tmp_dir_defined():
         c = pykeyvi.JsonDictionaryCompiler({"temporary_path": tmpdir})
         c.Add("abc", "{'a':2}")
         c.Compile()
-        assert len(os.listdir(test_dir)) != 0
+        assert os.listdir(test_dir) != []
 
     test_dir = os.path.join(tempfile.gettempdir(), "tmp_dir_test_defined")
     try:
