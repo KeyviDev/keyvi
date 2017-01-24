@@ -4,12 +4,12 @@ Keyvi - the short form for "Key value index" - defines a special subtype of the 
 
 ## Build status
 
-| [Linux][lin-link] | [Coveralls][cov-link] |
-| :---------------: | :-------------------: |
-| ![lin-badge]      | ![cov-badge]          |
+| [Linux][build-link] | [OS X][build-link]  | [Coveralls][cov-link] |
+| :-----------------: | :-----------------: | :-------------------: |
+| ![build-badge]      | ![build-badge]      | ![cov-badge]          |
 
-[lin-badge]: https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master "Travis build status"
-[lin-link]:  https://travis-ci.org/cliqz-oss/keyvi "Travis build status"
+[build-badge]: https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master "Travis build status"
+[build-link]:  https://travis-ci.org/cliqz-oss/keyvi "Travis build status"
 [cov-badge]: https://coveralls.io/repos/cliqz-oss/keyvi/badge.svg?branch=master&service=github
 [cov-link]:  https://coveralls.io/github/cliqz-oss/keyvi?branch=master
 
