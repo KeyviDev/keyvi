@@ -79,7 +79,7 @@ final {
       boost::filesystem::create_directory(temporary_directory_);
 
       // size of external memory chunk: not more than 1 or 4 GB
-      size_t external_memory_chunk_size = std::min(flush_size_ * 10, (size_t)1073741824);
+      size_t external_memory_chunk_size = std::min(flush_size_ * 2, (size_t)1073741824);
 
       // the chunk size must be a multiplier of the flush_size
       external_memory_chunk_size = external_memory_chunk_size - (external_memory_chunk_size % flush_size_);
