@@ -162,7 +162,7 @@ final {
         : memory_limit_(memory_limit), params_(params) {
 
       // use 50% or limit minus 200MB for the memory limit of the hashtable
-      size_t memory_limit_minimization =
+      const size_t memory_limit_minimization =
           memory_limit > (400 * 1024 * 1024) ?
               memory_limit - (200 * 1024 * 1024) :
               memory_limit / 2;
