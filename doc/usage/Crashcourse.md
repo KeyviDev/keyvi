@@ -2,12 +2,13 @@
 
 ### Install
 
-After installation you should have:
+After installation you should have `keyvi` executable available:
 
-    keyvicompiler
-    keyviinspector
+Try:
+
+    keyvi -h
     
-Try in ipython:
+Try in python:
     
     import pykeyvi
     
@@ -24,23 +25,23 @@ Open a text editor and put some keys in there, e.g.
     
 Compile:
 
-    keyvicompiler -i in -o compiled.keyvi -d key-only
+    keyvi compile <input_file> compiled.kv key-only
     
 Dump:
     
-    keyviinspector -i compiled.keyvi -o compiled.out
+    keyvi dump compiled.kv dump.out
 
-After dumping, open the file compiled.out in a text editor, it should contain your data. 
+After dumping, open the file dump.out in a text editor, it should contain your data. 
 
 Check questions:
  * What is the difference to your input file?
  
-#### Open the file in ipython
+#### Open the file in python
 
 Do:
 
     import pykeyvi
-    d = pykeyvi.Dictionary("compiled.keyvi")
+    d = pykeyvi.Dictionary("compiled.kv")
     "keyvi" in d
     
 should return True
@@ -63,6 +64,37 @@ Check questions:
 
  * How fast does it load? Do you have an idea how loading works internally?
  * What happens if you load multiple times (using different processes)?
+
+### Simple Statistics
+
+Both, the `keyvi` executable and the Python API provide an easy way to obtain the number of keys and values in a keyvi file. 
+
+For the just created `compiled.kv` file run:
+
+    keyvi stats compiled.kv
+
+The output should be:
+
+```
+{
+    "General": {
+        "manifest": "",
+        "number_of_keys": "6",
+        "number_of_states": "14",
+        "start_state": "19",
+        "value_store_type": "1",
+        "version": "2"
+    },
+    "Persistence": {
+        "size": "280",
+        "version": "2"
+    }
+}
+```
+
+Note: As we have compiled `key-only` dictionary there is no info regarding values.
+
+Similarly with python, on the `pykeyvi.Dictionary` object `d` the call `d.GetStatistics()` will return the same information.
 
 ### Lookup and Extraction
 
@@ -163,23 +195,3 @@ and try:
 
     cat sample.txt | python normalize.py
     
-### Simple Statistics
-
-Both Keyvi Inspector and the Python API provide an easy way to obtain the number of keys and values in a keyvi-compiled file. 
-
-Example: If there is a keyvi file `foobar.keyvi` with key-value pairs, one can get simple count statistics as follows:
-
-```
-$ keyviinspector -i foobar.keyvi -s
-
-General
-{"version":"1","start_state":"42613522","number_of_keys":"1768342","value_store_type":"5","number_of_states":"37309831","manifest":""}
-
-Persistence
-{"version":"2","size":"42613783"}
-
-Value Store
-{"size":"5684145126","values":"2100578","unique_values":"2100571","__compression":"raw","__compression_threshold":"32"}
-```
-
-Similarly, With py-keyvi `d.GetStatistics()` on the keyvi dictionary object `d` can output the same information.

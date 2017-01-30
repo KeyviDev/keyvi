@@ -38,8 +38,3 @@ In addtion to a working build setup (Xcode) install the following libraries usin
     brew install cmake
 
 Now you should be able to compile as explained above.
-
-For python-keyvi you need cython:
-
-    pip install cython
-

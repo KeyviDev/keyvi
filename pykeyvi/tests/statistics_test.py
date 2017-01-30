@@ -60,12 +60,14 @@ def test_manifest_for_merger():
         c.Compile()
         c.SetManifest({"author": "Zapp Brannigan"})
         c.WriteToFile('manifest_json_merge1.kv')
+        del c
 
         c2 = pykeyvi.JsonDictionaryCompiler()
         c2.Add("abd", '{"a" : 3}')
         c2.Compile()
         c2.SetManifest({"author": "Leela"})
         c2.WriteToFile('manifest_json_merge2.kv')
+        del c2
 
         merger = pykeyvi.JsonDictionaryMerger()
         merger.SetManifest({"author": "Fry"})

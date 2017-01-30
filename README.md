@@ -4,12 +4,12 @@ Keyvi - the short form for "Key value index" - defines a special subtype of the 
 
 ## Build status
 
-| [Linux][lin-link] | [Coveralls][cov-link] |
-| :---------------: | :-------------------: |
-| ![lin-badge]      | ![cov-badge]          |
+| [Linux][build-link] | [OS X][build-link]  | [Coveralls][cov-link] |
+| :-----------------: | :-----------------: | :-------------------: |
+| ![build-badge]      | ![build-badge]      | ![cov-badge]          |
 
-[lin-badge]: https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master "Travis build status"
-[lin-link]:  https://travis-ci.org/cliqz-oss/keyvi "Travis build status"
+[build-badge]: https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master "Travis build status"
+[build-link]:  https://travis-ci.org/cliqz-oss/keyvi "Travis build status"
 [cov-badge]: https://coveralls.io/repos/cliqz-oss/keyvi/badge.svg?branch=master&service=github
 [cov-link]:  https://coveralls.io/github/cliqz-oss/keyvi?branch=master
 
@@ -22,11 +22,9 @@ Keyvi - the short form for "Key value index" - defines a special subtype of the 
 
 ### Quick
 
-Precompiled binaries for Ubuntu 14.04LTS are available at the [keyvi PPA](https://launchpad.net/~hendrik-muhs/+archive/ubuntu/keyvi). To install use: 
+Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pypi.python.org/pypi/pykeyvi). To install use:
 
-    sudo add-apt-repository ppa:hendrik-muhs/keyvi
-    sudo apt-get update
-    sudo apt-get install keyvi python-keyvi
+    pip install pykeyvi
 
 ### From Source
 

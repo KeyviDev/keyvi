@@ -2,23 +2,22 @@
 
 This is the python extension.
 
-## Compile
+## Quick
 
-Ensure you build the C++ extension in release mode. After that just use the setup.py
+Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pypi.python.org/pypi/pykeyvi). To install use:
+
+    pip install pykeyvi
+
+## From source
+
+Ensure you have the C++ dependencies installed along with python packages defined in `requirements.txt`:
+
+Then build/install a python package:
 
     python setup.py build
     python setup.py install
 
-#### Building on Mac
-
-In order to build on Mac you might have to force 64bit only with:
-
-    export ARCHFLAGS="-arch x86_64"
 
 ## Develop
 
-pykeyvi uses cython and [autowrap](https://github.com/uweschmitt/autowrap). All source files can be found in the src 
-folder. The files pykeyvi.cpp and pykeyvi.pyx are generated for autowrap and cython and are checked in for convenience. 
-Cython and autowrap are therefore only required if you plan to make changes in the bindings.
-
-After changing cython code run the autowrap.sh script to regenerate the bindings.
+pykeyvi uses [cython](http://cython.org/) and [autowrap](https://github.com/uweschmitt/autowrap). All source files can be found in the src folder. The files pykeyvi.cpp and pykeyvi.pyx are generated on the fly during build.
