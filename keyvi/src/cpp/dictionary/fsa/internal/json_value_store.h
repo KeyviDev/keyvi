@@ -111,7 +111,7 @@ class JsonValueStore final : public IValueStoreWriter {
         (&compression::CompressionStrategy::Compress),
         raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
-    size_t external_memory_chunk_size = 1073741824;
+    const size_t external_memory_chunk_size = 104857600; // 100 MB
 
     values_extern_.reset(new MemoryMapManager(external_memory_chunk_size, temporary_directory_,
                                                 "json_values_filebuffer"));

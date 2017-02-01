@@ -23,6 +23,8 @@ case "${PYTHON_VERSION}" in
       echo "PYTHON_VERSION not set"
 esac
 
+${PYBIN}/pip install -r requirements.txt
+
 ${PYBIN}/python setup.py bdist_wheel
 
 # Bundle external shared libraries into the wheels
