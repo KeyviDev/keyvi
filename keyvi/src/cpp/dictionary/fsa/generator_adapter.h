@@ -38,7 +38,7 @@ class GeneratorAdapterInterface {
 public:
     using AdapterPtr = std::unique_ptr<GeneratorAdapterInterface>;
 
-    static AdapterPtr CreateGenerator(size_t size_of_keys, size_t memory_limit, const generator_param_t& params,
+    static AdapterPtr CreateGenerator(size_t size_of_keys, const generator_param_t& params,
                                       ValueStoreT *value_store);
 
  public:
@@ -61,9 +61,8 @@ public:
 template<class PersistenceT, class ValueStoreT, class OffsetTypeT, class HashCodeTypeT>
 class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, ValueStoreT> {
  public:
-  GeneratorAdapter(size_t memory_limit = 1073741824,
-                   const generator_param_t& value_store_params = generator_param_t(), ValueStoreT* value_store = NULL):
-                     generator_(memory_limit, value_store_params, value_store)
+  GeneratorAdapter(const generator_param_t& value_store_params = generator_param_t(), ValueStoreT* value_store = NULL):
+                     generator_(value_store_params, value_store)
  {}
 
   void Add(const std::string& input_key, typename ValueStoreT::value_t value =
@@ -106,31 +105,35 @@ class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, Val
 
 template<class PersistenceT, class ValueStoreT>
 typename GeneratorAdapterInterface<PersistenceT, ValueStoreT>::AdapterPtr
-GeneratorAdapterInterface<PersistenceT, ValueStoreT>::CreateGenerator(size_t size_of_keys, size_t memory_limit,
+GeneratorAdapterInterface<PersistenceT, ValueStoreT>::CreateGenerator(size_t size_of_keys,
                                                                       const generator_param_t& params,
                                                                       ValueStoreT* value_store) {
-    // todo: find good parameters for auto-guessing this
-    if (size_of_keys > UINT32_MAX) {
-        if (memory_limit > 0x280000000UL /* 10 GB */) {
-            return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(memory_limit,
-                                                                                                      params,
-                                                                                                      value_store));
-        } else {
-            return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(memory_limit,
-                                                                                                      params,
-                                                                                                      value_store));
-        }
-    } else {
-        if (memory_limit > 0x140000000UL) /* 5GB */ {
-            return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(memory_limit,
-                                                                                                      params,
-                                                                                                      value_store));
-        } else {
-            return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(memory_limit,
-                                                                                                      params,
-                                                                                                      value_store));
-        }
-    }
+  size_t memory_limit;
+
+  if (params.count(MEMORY_LIMIT_KEY) > 0) {
+	memory_limit = boost::lexical_cast<size_t>(params.at(MEMORY_LIMIT_KEY));
+  } else {
+	memory_limit = DEFAULT_MEMORY_LIMIT;
+  }
+
+  // todo: find good parameters for auto-guessing this
+  if (size_of_keys > UINT32_MAX) {
+	if (memory_limit > 0x280000000UL /* 10 GB */) {
+	  return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(params,
+			  value_store));
+	} else {
+	  return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(params,
+			  value_store));
+	}
+  } else {
+	if (memory_limit > 0x140000000UL) /* 5GB */ {
+	  return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(params,
+			  value_store));
+	} else {
+	  return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(params,
+			  value_store));
+	}
+  }
 }
 
 } /* namespace fsa */

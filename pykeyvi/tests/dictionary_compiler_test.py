@@ -51,7 +51,7 @@ def test_tmp_dir():
 
 def test_tmp_dir_defined():
     def run_compile(tmpdir):
-        c = pykeyvi.JsonDictionaryCompiler(1073741824, {"temporary_path": tmpdir})
+        c = pykeyvi.JsonDictionaryCompiler({"temporary_path": tmpdir})
         c.Add("abc", "{'a':2}")
         c.Compile()
         assert len(os.listdir(test_dir)) != 0

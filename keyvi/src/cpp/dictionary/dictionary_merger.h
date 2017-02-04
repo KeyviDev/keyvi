@@ -100,9 +100,29 @@ private:
     };
 
 public:
-    DictionaryMerger(size_t memory_limit = 1073741824, const merger_param_t& params = merger_param_t())
+    /**
+     * Instantiate a dictionary merger.
+     *
+     * @params params merger parameters
+     */
+    DictionaryMerger(const merger_param_t& params = merger_param_t())
+                : dicts_to_merge_(),
+                  params_(params)
+        {
+            if (params_.count(TEMPORARY_PATH_KEY) == 0) {
+                params_[TEMPORARY_PATH_KEY] = boost::filesystem::temp_directory_path().string();
+            }
+            if (params_.count(MERGE_MODE) > 0) {
+                append_merge_ = MERGE_APPEND == params_[MERGE_MODE];
+            }
+        }
+
+#ifndef KEYVI_DEPRECATED
+    /**
+     * DEPRECATED
+     */
+    DictionaryMerger(size_t memory_limit, const merger_param_t& params = merger_param_t())
             : dicts_to_merge_(),
-              memory_limit_(memory_limit),
               params_(params)
     {
         if (params_.count(TEMPORARY_PATH_KEY) == 0) {
@@ -111,7 +131,11 @@ public:
         if (params_.count(MERGE_MODE) > 0) {
             append_merge_ = MERGE_APPEND == params_[MERGE_MODE];
         }
+
+        // ensure backwards compatibility: put memory limit into parameters
+        params_[MEMORY_LIMIT_KEY] = std::to_string(memory_limit);
     }
+#endif
 
     void Add(const std::string& filename) {
         inputFiles_.push_back(filename);
@@ -155,7 +179,7 @@ public:
 
         ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
 
-        auto generator = GeneratorAdapter::CreateGenerator(sparse_array_size_sum, memory_limit_, params_, value_store);
+        auto generator = GeneratorAdapter::CreateGenerator(sparse_array_size_sum, params_, value_store);
 
         std::string top_key;
 
@@ -216,7 +240,6 @@ private:
     std::vector<fsa::automata_t>    dicts_to_merge_;
     std::vector<std::string>        inputFiles_;
 
-    size_t memory_limit_;
     fsa::internal::IValueStoreWriter::vs_param_t params_;
     std::string manifest_ = std::string();
 };

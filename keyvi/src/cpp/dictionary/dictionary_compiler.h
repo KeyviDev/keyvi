@@ -77,19 +77,13 @@ class DictionaryCompiler
      * Instantiate a dictionary compiler.
      *
      * Note the memory limit only limits the memory used for internal buffers,
-     * memory usage for small short-lived objects and the library itself is part of the limit.
+     * memory usage for small short-lived objects and the library itself is not part of the limit.
      *
      * @param params compiler parameters
      */
     DictionaryCompiler(const compiler_param_t& params = compiler_param_t())
         : sorter_(params),
           params_(params) {
-
-      if (params_.count(MEMORY_LIMIT_KEY) > 0) {
-	    memory_limit_ = boost::lexical_cast<size_t>(params_[MEMORY_LIMIT_KEY]);
-	  } else {
-		memory_limit_ = DEFAULT_MEMORY_LIMIT;
-	  }
 
       if (params_.count(TEMPORARY_PATH_KEY) == 0) {
         params_[TEMPORARY_PATH_KEY] =
@@ -117,7 +111,6 @@ class DictionaryCompiler
     DictionaryCompiler(size_t memory_limit,
 					   const compiler_param_t& params = compiler_param_t())
 		: sorter_(memory_limit, params),
-		  memory_limit_(memory_limit),
 		  params_(params) {
 
         // Note: I can not use delegate constructors as the other would need to call this one
@@ -133,6 +126,9 @@ class DictionaryCompiler
         if (params_.count(STABLE_INSERTS) > 0 && params_[STABLE_INSERTS] == "true") {
           stable_insert_ = true;
         }
+
+        // ensure backwards compatibility: put memory limit into parameters
+        params_[MEMORY_LIMIT_KEY] = std::to_string(memory_limit);
 
         value_store_= new ValueStoreT(params_);
 	}
@@ -189,7 +185,7 @@ class DictionaryCompiler
 
       value_store_->CloseFeeding();
       sorter_.sort();
-      generator_ = GeneratorAdapter::CreateGenerator(size_of_keys_, memory_limit_, params_, value_store_);
+      generator_ = GeneratorAdapter::CreateGenerator(size_of_keys_, params_, value_store_);
       generator_->SetManifest(manifest_);
 
       if (sorter_.size() > 0)
@@ -301,7 +297,6 @@ class DictionaryCompiler
 
    private:
     SorterT sorter_;
-    size_t memory_limit_;
     fsa::internal::IValueStoreWriter::vs_param_t params_;
     ValueStoreT* value_store_;
     typename GeneratorAdapter::AdapterPtr generator_;

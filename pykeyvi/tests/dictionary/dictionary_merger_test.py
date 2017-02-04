@@ -54,8 +54,8 @@ def generate_keyvi(key_values, filename):
     dictionary_compiler.Compile()
     dictionary_compiler.WriteToFile(filename)
 
-@pytest.mark.parametrize('merger', [pykeyvi.JsonDictionaryMerger(256 * MB),
-                                    pykeyvi.JsonDictionaryMerger(256 * MB, {'merge_mode': 'append'})])
+@pytest.mark.parametrize('merger', [pykeyvi.JsonDictionaryMerger(),
+                                    pykeyvi.JsonDictionaryMerger({'merge_mode': 'append'})])
 def test_merge(merger):
 
     tmp_dir = tempfile.mkdtemp()
