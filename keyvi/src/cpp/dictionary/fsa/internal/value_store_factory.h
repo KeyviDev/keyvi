@@ -28,6 +28,7 @@
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/null_value_store.h"
 #include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 
@@ -51,6 +52,8 @@ class ValueStoreFactory final {
         throw std::invalid_argument("Deprecated Value Storage type");
       case JSON_VALUE_STORE:
         return new JsonValueStoreReader(stream, file_mapping, loading_strategy);
+      case INT_INNER_WEIGHTS_VALUE_STORE:
+        return new IntInnerWeightsValueStoreReader(stream, file_mapping);
       default:
         throw std::invalid_argument("Unknown Value Storage type");
     }

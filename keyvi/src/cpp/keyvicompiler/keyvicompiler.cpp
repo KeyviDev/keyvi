@@ -109,7 +109,7 @@ void finalize_compile(CompilerType& compiler, std::string& output, const std::st
 }
 
 template<class BucketT = uint32_t>
-void compile_integer(std::vector<std::string>& input, std::string& output,
+void compile_completion(std::vector<std::string>& input, std::string& output,
                      size_t memory_limit,
                      const std::string& manifest = "",
                      const vs_param_t& value_store_params = vs_param_t()) {
@@ -140,6 +140,41 @@ void compile_integer(std::vector<std::string>& input, std::string& output,
 
   finalize_compile(compiler, output, manifest);
 }
+
+
+template<class BucketT = uint32_t>
+void compile_integer(std::vector<std::string>& input, std::string& output,
+                     size_t memory_limit,
+                     const std::string& manifest = "",
+                     const vs_param_t& value_store_params = vs_param_t()) {
+  keyvi::dictionary::DictionaryCompiler<
+      keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
+      keyvi::dictionary::fsa::internal::IntValueStore> compiler(
+      memory_limit, value_store_params);
+
+  std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
+    size_t tab = line.find('\t');
+
+    if (tab == std::string::npos)
+      return std::pair<std::string, uint32_t>();
+
+    std::string key = line.substr(0, tab);
+    std::string value_as_string = line.substr(tab + 1);
+    uint32_t value;
+
+    try {
+      value = boost::lexical_cast<uint32_t>(value_as_string);
+    } catch (boost::bad_lexical_cast const&) {
+      std::cout << "Error: value was not valid: " << line << std::endl;
+      return std::pair<std::string, uint32_t>();
+    }
+      return std::pair<std::string, uint32_t>(key, value);
+  };
+  compile_multiple(compiler, parser, input);
+
+  finalize_compile(compiler, output, manifest);
+}
+
 
 template<class Compiler>
 void compile_strings_inner(Compiler& compiler,
@@ -248,7 +283,7 @@ int main(int argc, char** argv) {
   description.add_options()(
       "dictionary-type,d",
       boost::program_options::value<std::string>()->default_value("integer"),
-      "type of dictionary (integer (default), string, key-only, json)");
+      "type of dictionary (integer (default), string, key-only, json, completion)");
   description.add_options()(
       "value-store-parameter,V",
       boost::program_options::value< std::vector<std::string> >()->default_value(std::vector<std::string>(), "EMPTY")->composing(),
@@ -321,6 +356,9 @@ int main(int argc, char** argv) {
       } else if (dictionary_type == "json") {
         compile_json<uint16_t>(input_files, output_file, memory_limit,
                                  manifest, value_store_params);
+      } else if (dictionary_type == "completion") {
+        compile_integer<uint16_t>(input_files, output_file, memory_limit,
+                                      manifest, value_store_params);
       } else {
         std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;
         std::cout << description;

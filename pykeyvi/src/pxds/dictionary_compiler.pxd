@@ -15,6 +15,18 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
         void WriteToFile(libcpp_utf8_string)
+
+    cdef cppclass IntDictionaryCompiler:
+        IntDictionaryCompiler() except +
+        IntDictionaryCompiler(size_t memory_limit) except +
+        IntDictionaryCompiler(size_t memory_limit, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
+        void Add(libcpp_utf8_string, int) except +
+        void __setitem__ (libcpp_utf8_string, int) except +
+        void Compile() nogil # wrap-ignore
+        void Compile(callback_t, void*) nogil # wrap-ignore
+        void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
+        void WriteToFile(libcpp_utf8_string)
+
         
     cdef cppclass KeyOnlyDictionaryCompiler:
         KeyOnlyDictionaryCompiler() except +
