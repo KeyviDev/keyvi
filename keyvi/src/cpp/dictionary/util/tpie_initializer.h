@@ -25,6 +25,9 @@
 #ifndef TPIE_INITIALIZER_H_
 #define TPIE_INITIALIZER_H_
 
+#include <string>
+
+#include "tpie/tempname.h"
 #include "tpie/tpie.h"
 
 namespace keyvi {
@@ -34,36 +37,32 @@ namespace util {
 /**
  * Helper (singleton) class to handle Tpie intialization
  */
-class TpieIntializer
-final
-{
-   public:
-    static TpieIntializer& getInstance() {
-      static TpieIntializer instance;
-      return instance;
-    }
+class TpieIntializer final {
+ public:
+  static TpieIntializer& getInstance() {
+    static TpieIntializer instance;
+    return instance;
+  }
 
-    ~TpieIntializer() {
-      tpie::tpie_finish();
-    }
+  ~TpieIntializer() { tpie::tpie_finish(); }
 
-    void SetTempDirectory(const std::string& temp_path) const {
-      tpie::tempname::set_default_path(temp_path);
-    }
+  void SetTempDirectory(const std::string& temp_path) const {
+    tpie::tempname::set_default_path(temp_path);
+  }
 
-   private:
-    // todo: only init whats needed tpie::flags<subsystem> tpie_systems_ = tpie::subsystem::ALL; // crashes, probably miss a service?: tpie::subsystem::MEMORY_MANAGER | tpie::subsystem::DEFAULT_LOGGING;
+ private:
+  // todo: only init whats needed tpie::flags<subsystem> tpie_systems_ =
+  // tpie::subsystem::ALL; // crashes, probably miss a service?:
+  // tpie::subsystem::MEMORY_MANAGER | tpie::subsystem::DEFAULT_LOGGING;
 
-    TpieIntializer() {
-      tpie::tpie_init();
-    }
+  TpieIntializer() { tpie::tpie_init(); }
 
-    TpieIntializer(TpieIntializer const&) = delete;
-    void operator=(TpieIntializer const&) = delete;
-  };
+  TpieIntializer(TpieIntializer const&) = delete;
+  void operator=(TpieIntializer const&) = delete;
+};
 
-  } /* namespace util */
-  } /* namespace dictionary */
-  } /* namespace keyvi */
+} /* namespace util */
+} /* namespace dictionary */
+} /* namespace keyvi */
 
 #endif /* TPIE_INITIALIZER_H_ */

@@ -18,7 +18,8 @@
 /*
  * generator_adapter.h
  *
- * Interface to abstract away compile time(template) parameters of the generator.
+ * Interface to abstract away compile time(template) parameters of the
+ * generator.
  *  Created on: Oct 28, 2015
  *      Author: hendrik
  */
@@ -26,47 +27,55 @@
 #ifndef GENERATOR_PIMPL_H_
 #define GENERATOR_PIMPL_H_
 
+#include <string>
+
 #include "dictionary/fsa/generator.h"
+#include "dictionary/util/map_util.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-template<class PersistenceT, class ValueStoreT>
+template <class PersistenceT, class ValueStoreT>
 class GeneratorAdapterInterface {
+ public:
+  using AdapterPtr = std::unique_ptr<GeneratorAdapterInterface>;
 
-public:
-    using AdapterPtr = std::unique_ptr<GeneratorAdapterInterface>;
-
-    static AdapterPtr CreateGenerator(size_t size_of_keys, const generator_param_t& params,
-                                      ValueStoreT *value_store);
+  static AdapterPtr CreateGenerator(size_t size_of_keys,
+                                    const generator_param_t& params,
+                                    ValueStoreT* value_store);
 
  public:
-  GeneratorAdapterInterface(){}
+  GeneratorAdapterInterface() {}
 
-  virtual void Add(const std::string& input_key, typename ValueStoreT::value_t value =
-               ValueStoreT::no_value) {}
-  virtual void Add(const std::string& input_key, const fsa::ValueHandle& value) {}
+  virtual void Add(
+      const std::string& input_key,
+      typename ValueStoreT::value_t value = ValueStoreT::no_value) {}
+  virtual void Add(const std::string& input_key,
+                   const fsa::ValueHandle& value) {}
 
-  virtual size_t GetFsaSize() const {return 0;}
+  virtual size_t GetFsaSize() const { return 0; }
   virtual void CloseFeeding() {}
   virtual void Write(std::ostream& stream) {}
   virtual void WriteToFile(const std::string& filename) {}
   virtual void SetManifestFromString(const std::string& manifest) {}
   virtual void SetManifest(const boost::property_tree::ptree& manifest) {}
 
-  virtual ~GeneratorAdapterInterface(){}
+  virtual ~GeneratorAdapterInterface() {}
 };
 
-template<class PersistenceT, class ValueStoreT, class OffsetTypeT, class HashCodeTypeT>
-class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, ValueStoreT> {
+template <class PersistenceT, class ValueStoreT, class OffsetTypeT,
+          class HashCodeTypeT>
+class GeneratorAdapter final
+    : public GeneratorAdapterInterface<PersistenceT, ValueStoreT> {
  public:
-  GeneratorAdapter(const generator_param_t& value_store_params = generator_param_t(), ValueStoreT* value_store = NULL):
-                     generator_(value_store_params, value_store)
- {}
+  GeneratorAdapter(
+      const generator_param_t& value_store_params = generator_param_t(),
+      ValueStoreT* value_store = NULL)
+      : generator_(value_store_params, value_store) {}
 
-  void Add(const std::string& input_key, typename ValueStoreT::value_t value =
-                 ValueStoreT::no_value) {
+  void Add(const std::string& input_key,
+           typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     generator_.Add(std::move(input_key), value);
   }
 
@@ -74,17 +83,11 @@ class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, Val
     generator_.Add(std::move(input_key), value);
   }
 
-  size_t GetFsaSize() const {
-    return generator_.GetFsaSize();
-  }
+  size_t GetFsaSize() const { return generator_.GetFsaSize(); }
 
-  void CloseFeeding(){
-    generator_.CloseFeeding();
-  }
+  void CloseFeeding() { generator_.CloseFeeding(); }
 
-  void Write(std::ostream& stream) {
-    generator_.Write(stream);
-  }
+  void Write(std::ostream& stream) { generator_.Write(stream); }
 
   void WriteToFile(const std::string& filename) {
     generator_.WriteToFile(filename);
@@ -100,39 +103,37 @@ class GeneratorAdapter final: public GeneratorAdapterInterface<PersistenceT, Val
 
  private:
   Generator<PersistenceT, ValueStoreT, OffsetTypeT, HashCodeTypeT> generator_;
-
 };
 
-template<class PersistenceT, class ValueStoreT>
+template <class PersistenceT, class ValueStoreT>
 typename GeneratorAdapterInterface<PersistenceT, ValueStoreT>::AdapterPtr
-GeneratorAdapterInterface<PersistenceT, ValueStoreT>::CreateGenerator(size_t size_of_keys,
-                                                                      const generator_param_t& params,
-                                                                      ValueStoreT* value_store) {
-  size_t memory_limit;
-
-  if (params.count(MEMORY_LIMIT_KEY) > 0) {
-	memory_limit = boost::lexical_cast<size_t>(params.at(MEMORY_LIMIT_KEY));
-  } else {
-	memory_limit = DEFAULT_MEMORY_LIMIT;
-  }
+GeneratorAdapterInterface<PersistenceT, ValueStoreT>::CreateGenerator(
+    size_t size_of_keys, const generator_param_t& params,
+    ValueStoreT* value_store) {
+  size_t memory_limit =
+      util::mapGetMemory(params, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT);
 
   // todo: find good parameters for auto-guessing this
   if (size_of_keys > UINT32_MAX) {
-	if (memory_limit > 0x280000000UL /* 10 GB */) {
-	  return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int64_t>(params,
-			  value_store));
-	} else {
-	  return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t, int32_t>(params,
-			  value_store));
-	}
+    if (memory_limit > 0x280000000UL /* 10 GB */) {
+      return AdapterPtr(
+          new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t,
+                                    int64_t>(params, value_store));
+    } else {
+      return AdapterPtr(
+          new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint64_t,
+                                    int32_t>(params, value_store));
+    }
   } else {
-	if (memory_limit > 0x140000000UL) /* 5GB */ {
-	  return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int64_t>(params,
-			  value_store));
-	} else {
-	  return AdapterPtr(new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t, int32_t>(params,
-			  value_store));
-	}
+    if (memory_limit > 0x140000000UL) /* 5GB */ {
+      return AdapterPtr(
+          new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t,
+                                    int64_t>(params, value_store));
+    } else {
+      return AdapterPtr(
+          new fsa::GeneratorAdapter<PersistenceT, ValueStoreT, uint32_t,
+                                    int32_t>(params, value_store));
+    }
   }
 }
 
