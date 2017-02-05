@@ -26,11 +26,10 @@
 
 #ifndef GENERATOR_PIMPL_H_
 #define GENERATOR_PIMPL_H_
-
 #include <string>
 
 #include "dictionary/fsa/generator.h"
-#include "dictionary/util/map_util.h"
+#include "dictionary/util/config_util.h"
 
 namespace keyvi {
 namespace dictionary {

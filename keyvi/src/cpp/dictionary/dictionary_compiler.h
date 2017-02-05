@@ -37,7 +37,7 @@
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/sort/in_memory_sorter.h"
 #include "dictionary/sort/sorter_common.h"
-#include "dictionary/util/map_util.h"
+#include "dictionary/util/config_util.h"
 
 #if !defined(KEYVI_DISABLE_TPIE)
 #include "dictionary/sort/tpie_sorter.h"
@@ -88,9 +88,7 @@ class DictionaryCompiler final {
   explicit DictionaryCompiler(
       const compiler_param_t& params = compiler_param_t())
       : sorter_(params), params_(params) {
-    params_[TEMPORARY_PATH_KEY] =
-        util::mapGet(params_, TEMPORARY_PATH_KEY,
-                     boost::filesystem::temp_directory_path().native());
+    params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
@@ -116,9 +114,7 @@ class DictionaryCompiler final {
     // this one
     // as this one is the deprecated one I do some code duplication for now
 
-    params_[TEMPORARY_PATH_KEY] =
-        util::mapGet(params_, TEMPORARY_PATH_KEY,
-                     boost::filesystem::temp_directory_path().native());
+    params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 

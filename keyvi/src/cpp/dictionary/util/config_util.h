@@ -30,6 +30,9 @@
 #include <string>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
+
+#include "dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -46,9 +49,9 @@ OutType mapGet(const std::map<std::string, std::string>& map,
                const std::string& key, const OutType& default_value) {
   if (map.count(key) > 0) {
     return boost::lexical_cast<OutType>(map.at(key));
-  } else {
-    return default_value;
   }
+
+  return default_value;
 }
 
 inline bool mapGetBool(const std::map<std::string, std::string>& map,
@@ -79,6 +82,15 @@ inline size_t mapGetMemory(const std::map<std::string, std::string>& map,
   }
 
   return default_value;
+}
+
+inline std::string mapGetTemporaryPath(
+    const std::map<std::string, std::string>& map) {
+  if (map.count(TEMPORARY_PATH_KEY) > 0) {
+    return map.at(TEMPORARY_PATH_KEY);
+  }
+
+  return boost::filesystem::temp_directory_path().string();
 }
 
 } /* namespace util */

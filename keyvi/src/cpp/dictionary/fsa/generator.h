@@ -40,9 +40,7 @@
 #include "dictionary/fsa/internal/sparse_array_builder.h"
 #include "dictionary/fsa/internal/unpacked_state.h"
 #include "dictionary/fsa/internal/unpacked_state_stack.h"
-#include "dictionary/util/map_util.h"
-
-// #define ENABLE_TRACING
+#include "dictionary/util/config_util.h"
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -165,14 +163,11 @@ class Generator final {
 
     // use 50% or limit minus 200MB for the memory limit of the hashtable
       const size_t memory_limit_minimization =
-          memory_limit > (400 * 1024 * 1024) ?
-              memory_limit - (200 * 1024 * 1024) :
-              memory_limit / 2;
+          memory_limit_ > (400 * 1024 * 1024) ?
+              memory_limit_ - (200 * 1024 * 1024) :
+              memory_limit_ / 2;
 
-    params_[TEMPORARY_PATH_KEY] =
-        util::mapGet(params_, TEMPORARY_PATH_KEY,
-                     boost::filesystem::temp_directory_path().native());
-
+    params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
     minimize_ = util::mapGetBool(params_, MINIMIZATION_KEY, true);
 
     persistence_ = new PersistenceT(memory_limit_ - memory_limit_minimization,

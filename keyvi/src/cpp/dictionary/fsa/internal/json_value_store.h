@@ -46,7 +46,7 @@
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
 #include "dictionary/keyvi_file.h"
-#include "dictionary/util/map_util.h"
+#include "dictionary/util/config_util.h"
 
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
