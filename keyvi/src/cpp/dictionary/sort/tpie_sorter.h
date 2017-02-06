@@ -29,10 +29,12 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/iterator/iterator_facade.hpp>
-#include "dictionary/util/config_util.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/sort/sorter_common.h"
+#include "dictionary/util/configuration.h"
+
 #include "dictionary/util/tpie_initializer.h"
+
 #include "tpie/serialization_sorter.h"
 
 // #define ENABLE_TRACING

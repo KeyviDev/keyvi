@@ -33,7 +33,9 @@
 #include "dictionary/fsa/entry_iterator.h"
 #include "dictionary/fsa/generator_adapter.h"
 #include "dictionary/fsa/internal/constants.h"
-#include "dictionary/util/config_util.h"
+#include "dictionary/util/configuration.h"
+
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {

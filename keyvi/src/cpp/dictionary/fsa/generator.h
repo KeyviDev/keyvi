@@ -40,7 +40,9 @@
 #include "dictionary/fsa/internal/sparse_array_builder.h"
 #include "dictionary/fsa/internal/unpacked_state.h"
 #include "dictionary/fsa/internal/unpacked_state_stack.h"
-#include "dictionary/util/config_util.h"
+#include "dictionary/util/configuration.h"
+
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {

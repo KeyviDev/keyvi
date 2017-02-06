@@ -37,7 +37,7 @@
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/sort/in_memory_sorter.h"
 #include "dictionary/sort/sorter_common.h"
-#include "dictionary/util/config_util.h"
+#include "dictionary/util/configuration.h"
 
 #if !defined(KEYVI_DISABLE_TPIE)
 #include "dictionary/sort/tpie_sorter.h"

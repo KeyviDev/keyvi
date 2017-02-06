@@ -29,7 +29,7 @@
 #include <string>
 
 #include "dictionary/fsa/generator.h"
-#include "dictionary/util/config_util.h"
+#include "dictionary/util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {

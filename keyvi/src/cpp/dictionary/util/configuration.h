@@ -23,15 +23,15 @@
  *      Author: hendrik
  */
 
-#ifndef KEYVI_DICTIONARY_UTIL_MAP_UTIL_H_
-#define KEYVI_DICTIONARY_UTIL_MAP_UTIL_H_
+#ifndef KEYVI_DICTIONARY_UTIL_CONFIGURATION_H_
+#define KEYVI_DICTIONARY_UTIL_CONFIGURATION_H_
 
 #include <map>
 #include <string>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-
+#include <boost/lexical_cast.hpp>
 #include "dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
@@ -74,11 +74,11 @@ inline size_t mapGetMemory(const std::map<std::string, std::string>& map,
   if (map.count(key) > 0) {
     return boost::lexical_cast<size_t>(map.at(key));
   } else if (map.count(key + "_kb") > 0) {
-    return 1024 * boost::lexical_cast<size_t>(map.at(key + "_mb"));
+    return 1024 * boost::lexical_cast<size_t>(map.at(key + "_kb"));
   } else if (map.count(key + "_mb") > 0) {
     return 1048576 * boost::lexical_cast<size_t>(map.at(key + "_mb"));
   } else if (map.count(key + "_gb") > 0) {
-    return 1073741824 * boost::lexical_cast<size_t>(map.at(key + "_mb"));
+    return 1073741824 * boost::lexical_cast<size_t>(map.at(key + "_gb"));
   }
 
   return default_value;
@@ -97,4 +97,4 @@ inline std::string mapGetTemporaryPath(
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* KEYVI_DICTIONARY_UTIL_MAP_UTIL_H_ */
+#endif /* KEYVI_DICTIONARY_UTIL_CONFIGURATION_H_ */
