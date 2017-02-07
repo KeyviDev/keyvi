@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( minimizationIntInnerWeights, SorterT, sorter_type
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<>,
       fsa::internal::IntInnerWeightsValueStore,
-      SorterT> compiler;
+      SorterT> compiler(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( sortOrder, SorterT, sorter_types )
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<>,
       fsa::internal::IntInnerWeightsValueStore,
-      SorterT> compiler;
+      SorterT> compiler(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( compactSize, SorterT, sorter_types )
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<uint16_t>,
       fsa::internal::IntInnerWeightsValueStore,
-      SorterT> compiler;
+      SorterT> compiler(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -281,7 +281,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( stableInsert, SorterT, sorter_types )
     { "aa", "\"{3:24}\"" },
   };
 
-  keyvi::dictionary::compiler_param_t params = {{STABLE_INSERTS, "true"}};
+  keyvi::dictionary::compiler_param_t params = {{"memory_limit_mb","10"}, {STABLE_INSERTS, "true"}};
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<uint16_t>,
@@ -330,7 +330,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( stableInsert, SorterT, sorter_types )
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( addAndDeletes, SorterT, sorter_types )
 {
-  keyvi::dictionary::compiler_param_t params = {{STABLE_INSERTS, "true"}};
+  keyvi::dictionary::compiler_param_t params = {{"memory_limit_mb","10"}, {STABLE_INSERTS, "true"}};
 
   keyvi::dictionary::DictionaryCompiler<
           fsa::internal::SparseArrayPersistence<uint16_t>,
@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( addAndDeletes, SorterT, sorter_types )
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( DeleteUnsupported, SorterT, sorter_types )
 {
-  keyvi::dictionary::compiler_param_t params = {};
+  keyvi::dictionary::compiler_param_t params = {{"memory_limit_mb","10"}};
 
   keyvi::dictionary::DictionaryCompiler<
             fsa::internal::SparseArrayPersistence<uint16_t>,
