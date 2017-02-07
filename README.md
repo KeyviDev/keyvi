@@ -1,17 +1,14 @@
+[![Travis](https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master  "Travis build status")](https://travis-ci.org/cliqz-oss/keyvi)
+[![PythonVersions](https://img.shields.io/pypi/pyversions/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
+[![PythonImpl](https://img.shields.io/pypi/implementation/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
+[![PythonFormat](https://img.shields.io/pypi/format/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
+[![PyPIVersion](https://img.shields.io/pypi/v/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
+[![Coveralls](https://coveralls.io/repos/cliqz-oss/keyvi/badge.svg?branch=master&service=github)](https://coveralls.io/github/cliqz-oss/keyvi?branch=master)
+
+##
 ![Keyvi](/doc/images/keyvi-small.png)
 
 Keyvi - the short form for "Key value index" - defines a special subtype of the popular key value store (KVS) technologies. As you can imagine from the name, keyvi is an immutable key value store, therefore an index not a store. Keyvi's strengths: high compression ratio and extreme scalability. So if you need online read/writes keyvi is not for you, however, if your use case is mostly reads and infrequent writes you might be interested in checking keyvi out.
-
-## Build status
-
-| [Linux][build-link] | [OS X][build-link]  | [Coveralls][cov-link] |
-| :-----------------: | :-----------------: | :-------------------: |
-| ![build-badge]      | ![build-badge]      | ![cov-badge]          |
-
-[build-badge]: https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master "Travis build status"
-[build-link]:  https://travis-ci.org/cliqz-oss/keyvi "Travis build status"
-[cov-badge]: https://coveralls.io/repos/cliqz-oss/keyvi/badge.svg?branch=master&service=github
-[cov-link]:  https://coveralls.io/github/cliqz-oss/keyvi?branch=master
 
 ## Introduction
   * [BBuzz2016 talk](https://www.youtube.com/watch?v=GBjisdmHe4g)
