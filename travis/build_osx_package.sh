@@ -3,6 +3,7 @@ set -ev
 
 cd keyvi
 scons -j 4 mode=release
+release/dictionaryfsa_unittests/dictionaryfsa_unittests
 cd ..
 
 # use python from pyenv
