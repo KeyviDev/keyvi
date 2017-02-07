@@ -16,7 +16,7 @@ def test_serialization():
 
 
 def test_raw_serialization():
-    c = pykeyvi.JsonDictionaryCompiler()
+    c = pykeyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
@@ -44,7 +44,7 @@ def test_bytes_attributes():
     assert decode_to_unicode(m.GetAttribute("k2")) == decode_to_unicode("äöüöäü")
 
 def test_get_value():
-    c = pykeyvi.JsonDictionaryCompiler()
+    c = pykeyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
@@ -54,7 +54,7 @@ def test_get_value():
         assert decode_to_unicode(m.GetValue()) == decode_to_unicode({"a":3})
 
 def test_get_value_int():
-    c = pykeyvi.CompletionDictionaryCompiler()
+    c = pykeyvi.CompletionDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", 42)
     c.Add("abd", 21)
     with tmp_dictionary(c, 'match_object_int.kv') as d:
@@ -64,7 +64,7 @@ def test_get_value_int():
         assert m.GetValue() == 21
 
 def test_get_value_key_only():
-    c = pykeyvi.KeyOnlyDictionaryCompiler()
+    c = pykeyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc")
     c.Add("abd")
     with tmp_dictionary(c, 'match_object_key_only.kv') as d:
@@ -74,7 +74,7 @@ def test_get_value_key_only():
         assert decode_to_unicode(m.GetValue()) == decode_to_unicode('')
 
 def test_get_value_string():
-    c = pykeyvi.StringDictionaryCompiler()
+    c = pykeyvi.StringDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", "aaaaa")
     c.Add("abd", "bbbbb")
     with tmp_dictionary(c, 'match_object_string.kv') as d:

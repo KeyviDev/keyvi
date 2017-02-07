@@ -26,7 +26,7 @@ def test_invalid_filemagic():
     os.remove(os.path.join(tmp_dir, 'broken_file'))
 
 def test_truncated_file_json():
-    c=pykeyvi.JsonDictionaryCompiler()
+    c=pykeyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add('a', '{1:2}')
     c.Add('b', '{2:4}')
     c.Add('c', '{4:4}')
