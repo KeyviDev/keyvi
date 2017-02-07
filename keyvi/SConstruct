@@ -37,7 +37,12 @@ AddOption('--boost-dir',
                   action='store',
                   help='location of custom boost library')
 
-
+# add a option to see what happens if deprecated methods are taken out
+AddOption('--disable-deprecated',
+                  action='store_true',
+                  default=False,
+                  dest="deprecated",
+                  help='disable deprecated APIs')
 
 debugcompilerflags = ['-ggdb3']   #extra compile flags for debug
 coveragecompilerflags = debugcompilerflags + ['-O0' ,'--coverage'] 
@@ -74,6 +79,10 @@ env.Append(CPPPATH=[launch_dir + '/3rdparty/rapidjson/include',
                     launch_dir + '/3rdparty/tpie/build/install/include',
                     launch_dir + '/3rdparty/xchange/src'
                     ])
+
+# disable deprecated methods
+if GetOption('deprecated'):
+    env.Append(CPPFLAGS = ['-DKEYVI_DEPRECATED'])
 
 # Mac buid
 if env['PLATFORM'] == 'darwin':

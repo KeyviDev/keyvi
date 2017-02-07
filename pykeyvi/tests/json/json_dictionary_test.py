@@ -26,7 +26,7 @@ def test_simple():
         assert decode_to_unicode(d["abd"].GetValueAsString()) == decode_to_unicode('{"a":3}')
 
 def test_simple_zlib():
-    c = pykeyvi.JsonDictionaryCompiler(50000000, {'compression': 'z', 'compression_threshold': '0'})
+    c = pykeyvi.JsonDictionaryCompiler({'compression': 'z', 'compression_threshold': '0'})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'simple_json_z.kv') as d:
@@ -38,7 +38,7 @@ def test_simple_zlib():
         assert m['__compression_threshold'] == decode_to_unicode("0")
 
 def test_simple_snappy():
-    c = pykeyvi.JsonDictionaryCompiler(50000000, {'compression': 'snappy', 'compression_threshold': '0'})
+    c = pykeyvi.JsonDictionaryCompiler({'compression': 'snappy', 'compression_threshold': '0'})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'simple_json_snappy.kv') as d:
@@ -63,8 +63,8 @@ def test_unicode_compile():
         assert decode_to_unicode(d["ääääädäd"].GetValueAsString()) == decode_to_unicode('{"b":33}')
 
 def test_float_compaction():
-    cs = pykeyvi.JsonDictionaryCompiler(50000000, {'floating_point_precision': 'single'})
-    cd = pykeyvi.JsonDictionaryCompiler(50000000)
+    cs = pykeyvi.JsonDictionaryCompiler({'floating_point_precision': 'single'})
+    cd = pykeyvi.JsonDictionaryCompiler()
 
     # add a couple of floats to both
     cs.Add('aa', '[1.7008715758978892, 1.8094465532317732, 1.6098250864350536, 1.6369107966501981, 1.7736887965234107, 1.606682751740542, 1.6186427703265525, 1.7939763843449683, 1.5973550162469434, 1.6799721708726192, 1.8199786239525833, 1.7956178070065245, 1.7269879953863045]')

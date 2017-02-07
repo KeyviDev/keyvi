@@ -53,6 +53,7 @@ enum value_store_t {
   STRING_VALUE_STORE = 3, //!< StringValueStore
   JSON_VALUE_STORE_DEPRECATED = 4, // !< JsonValueStoreDeprecated
   JSON_VALUE_STORE = 5, // !< JsonValueStore
+  INT_INNER_WEIGHTS_VALUE_STORE = 6, // !< IntInnerWeightsValueStore
 };
 
 /* Writing value stores is based on template (duck-typing).

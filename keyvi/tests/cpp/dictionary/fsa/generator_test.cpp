@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
   internal::SparseArrayPersistence<> p(2048,
                                      boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>, internal::IntValueStoreWithInnerWeights> g;
+  Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore> g;
   g.Add("eads", 576);
 
   g.Add("facebook", 4368451);
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
 BOOST_AUTO_TEST_CASE( feedwithoutclose ) {
   // test that just triggers the case (if) generato is created but FSA creation is not finalized
 
-  auto g = new   Generator<internal::SparseArrayPersistence<>, internal::IntValueStoreWithInnerWeights>;
+  auto g = new   Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore>;
   g->Add("eads", 576);
 
   g->Add("facebook", 4368451);
