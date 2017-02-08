@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( basic )
   BOOST_CHECK_EQUAL(p.ReadTransitionValue(200), 45);
 
   // enforce flush in persistence
-  p.BeginNewState(memoryLimit * 200);
+  p.BeginNewState(memoryLimit * 20);
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1), 42);
   BOOST_CHECK_EQUAL(p.ReadTransitionValue(1), 43);
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(200), 44);
