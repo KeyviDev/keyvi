@@ -42,9 +42,11 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestLazy ) {
   auto key_advise_flags = MemoryMapFlags::FSAGetMemoryMapAdvices(strategy);
   auto value_advise_flags = MemoryMapFlags::ValuesGetMemoryMapAdvices(strategy);
 
+#if not defined(OS_MACOSX)
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
+#endif
 
   BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
@@ -57,9 +59,11 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate ) {
   auto key_advise_flags = MemoryMapFlags::FSAGetMemoryMapAdvices(strategy);
   auto value_advise_flags = MemoryMapFlags::ValuesGetMemoryMapAdvices(strategy);
 
+#if not defined(OS_MACOSX)
   // map populate
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE));
+#endif
 
   BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
@@ -72,9 +76,11 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_key_part ) {
   auto key_advise_flags = MemoryMapFlags::FSAGetMemoryMapAdvices(strategy);
   auto value_advise_flags = MemoryMapFlags::ValuesGetMemoryMapAdvices(strategy);
 
+#if not defined(OS_MACOSX)
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
+#endif
 
   BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
@@ -87,9 +93,11 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_lazy ) {
   auto key_advise_flags = MemoryMapFlags::FSAGetMemoryMapAdvices(strategy);
   auto value_advise_flags = MemoryMapFlags::ValuesGetMemoryMapAdvices(strategy);
 
+#if not defined(OS_MACOSX)
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
+#endif
 
   BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_willneed);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_willneed);
@@ -102,9 +110,11 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestlazy_no_readahead ) {
   auto key_advise_flags = MemoryMapFlags::FSAGetMemoryMapAdvices(strategy);
   auto value_advise_flags = MemoryMapFlags::ValuesGetMemoryMapAdvices(strategy);
 
+#if not defined(OS_MACOSX)
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
+#endif
 
   BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_random);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_random);
@@ -117,9 +127,11 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestlazy_no_readahead_value_part ) {
   auto key_advise_flags = MemoryMapFlags::FSAGetMemoryMapAdvices(strategy);
   auto value_advise_flags = MemoryMapFlags::ValuesGetMemoryMapAdvices(strategy);
 
+#if not defined(OS_MACOSX)
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
+#endif
 
   BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_random);
@@ -132,9 +144,11 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestpopulate_key_part_no_readahead_value_par
   auto key_advise_flags = MemoryMapFlags::FSAGetMemoryMapAdvices(strategy);
   auto value_advise_flags = MemoryMapFlags::ValuesGetMemoryMapAdvices(strategy);
 
+#if not defined(OS_MACOSX)
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
+#endif
 
   BOOST_CHECK(key_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_random);
