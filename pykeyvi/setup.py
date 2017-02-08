@@ -220,8 +220,8 @@ with symlink_keyvi():
 
     setup(
         name=PACKAGE_NAME,
-        version='0.1.35',
-        description='Python bindings for keyvi',
+        version='0.1.36',
+        description='Python package for keyvi',
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
         license="ASL 2.0",
@@ -231,8 +231,19 @@ with symlink_keyvi():
         ext_modules=ext_modules,
         zip_safe=False,
         url='https://github.com/cliqz/keyvi',
-        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.35',
+        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.36',
         keywords=['FST'],
-        classifiers=[],
+        classifiers=[
+            'Programming Language :: C++',
+            'Programming Language :: Cython',
+            'Programming Language :: Python',
+            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3.4',
+            'Programming Language :: Python :: 3.5',
+            'Programming Language :: Python :: Implementation :: CPython',
+            'Programming Language :: Python :: Implementation :: PyPy',
+            'Operating System :: MacOS :: MacOS X',
+            'Operating System :: Unix',
+        ],
         install_requires=install_requires,
     )
