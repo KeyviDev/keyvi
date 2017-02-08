@@ -21,7 +21,7 @@ key_values = [
 
 def generate_dictionary_compiler():
 
-    dictionary_compiler = pykeyvi.JsonDictionaryCompiler()
+    dictionary_compiler = pykeyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
     for key, value in key_values:
         dictionary_compiler.Add(key, json.dumps(value))
 

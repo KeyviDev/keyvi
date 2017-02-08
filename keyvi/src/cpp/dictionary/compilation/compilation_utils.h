@@ -48,7 +48,7 @@ class CompilationUtils {
     fsa::internal::SparseArrayPersistence<> p(2048,
                                          boost::filesystem::temp_directory_path());
 
-    fsa::Generator<fsa::internal::SparseArrayPersistence<>> g;
+    fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
     for(auto key : input){
       g.Add(key);
@@ -69,7 +69,7 @@ class CompilationUtils {
       fsa::internal::SparseArrayPersistence<> p(2048,
                                            boost::filesystem::temp_directory_path());
 
-      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> g;
+      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
       for(auto pair : input){
         g.Add(pair.first, pair.second);
@@ -90,7 +90,7 @@ class CompilationUtils {
         fsa::internal::SparseArrayPersistence<> p(2048,
                                              boost::filesystem::temp_directory_path());
 
-        fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> g;
+        fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
         for(auto pair : input){
           g.Add(pair.first, pair.second);
@@ -111,7 +111,7 @@ class CompilationUtils {
       fsa::internal::SparseArrayPersistence<> p(2048,
                                            boost::filesystem::temp_directory_path());
 
-      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> g;
+      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
       for(auto pair : input){
         g.Add(pair.first, pair.second);
@@ -132,7 +132,7 @@ class CompilationUtils {
       fsa::internal::SparseArrayPersistence<> p(2048,
                                            boost::filesystem::temp_directory_path());
 
-      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> g;
+      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
       for(auto pair : input){
         g.Add(pair.first, pair.second);

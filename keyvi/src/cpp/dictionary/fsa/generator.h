@@ -157,7 +157,7 @@ template <class PersistenceT, class ValueStoreT = internal::NullValueStore,
           class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
 class Generator final {
  public:
-  Generator(const generator_param_t& params = generator_param_t(),
+  explicit Generator(const generator_param_t& params = generator_param_t(),
             ValueStoreT* value_store = NULL)
       : params_(params) {
     memory_limit_ =

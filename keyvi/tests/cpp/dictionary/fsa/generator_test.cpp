@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( simple ) {
   internal::SparseArrayPersistence<> p(2048,
                                      boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add("aaaa");
   g.Add("aabb");
   g.Add("aabc");
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( simple2 ) {
   internal::SparseArrayPersistence<> p(2048,
                                      boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add("aaa");
   g.Add("abcde");
   g.Add("bar");
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE( simple2 ) {
 }
 
 BOOST_AUTO_TEST_CASE( stringtest ) {
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add(std::string("aaa"));
   g.Add(std::string("abcde"));
   g.Add("bar");
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
   internal::SparseArrayPersistence<> p(2048,
                                      boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore> g;
+  Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add("eads", 576);
 
   g.Add("facebook", 4368451);
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
 BOOST_AUTO_TEST_CASE( feedwithoutclose ) {
   // test that just triggers the case (if) generato is created but FSA creation is not finalized
 
-  auto g = new   Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore>;
+  auto g = new   Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore>(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g->Add("eads", 576);
 
   g->Add("facebook", 4368451);
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE( feedwithoutclose ) {
 }
 
 BOOST_AUTO_TEST_CASE( manifesttest ) {
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add(std::string("aaa"));
   g.Add(std::string("abcde"));
   g.Add("bar");
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE( zeroBytes ) {
                                      boost::filesystem::temp_directory_path());
 
   TRACE("test zerobyte");
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add(std::string("\0bbcd", 5));
   g.Add(std::string("a\0abc", 5));
   g.Add("aaaa");
@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE( state_exception_handling ) {
   internal::SparseArrayPersistence<> p(2048,
                                        boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
   BOOST_CHECK_THROW( g.WriteToFile("somefile"), generator_exception );
 
