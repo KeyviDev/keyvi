@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -ev
 
-cd keyvi
-scons -j 4 mode=release
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=release ..
+make -j 4
 cd ..
 
 # use python from pyenv
