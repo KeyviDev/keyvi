@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -ev
 
-cd keyvi
-scons -j 4 mode=release
-release/dictionaryfsa_unittests/dictionaryfsa_unittests
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=release ..
+make -j 4
+./units_test_all
 cd ..
 
 # use python from pyenv
