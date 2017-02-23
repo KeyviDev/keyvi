@@ -40,10 +40,6 @@ For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in 
   * [Crashcourse](/doc/usage/Crashcourse.md)
   * [Using pykeyvi with EMR (mrjob or pyspark)](/doc/usage/Using pykeyvi in EMR.md)  
 
-## Development
- 
-  * [Build/Packaging](/doc/development/Packaging keyvi.md)
-  
 ## Internals
   
   * [Construction Basics](/doc/algorithm/Construction-Basics.md)
