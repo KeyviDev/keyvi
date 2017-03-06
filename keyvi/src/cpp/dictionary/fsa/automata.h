@@ -127,7 +127,7 @@ public:
       return number_of_keys_;
     }
 
-    bool empty() const {
+    bool Empty() const {
         return 0 == GetNumberOfKeys();
     }
 

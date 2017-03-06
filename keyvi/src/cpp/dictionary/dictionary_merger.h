@@ -125,7 +125,7 @@ public:
             throw std::invalid_argument("Dictionaries must have the same type.");
         }
 
-        if (fsa->empty()) {
+        if (fsa->Empty()) {
             return;
         }
 

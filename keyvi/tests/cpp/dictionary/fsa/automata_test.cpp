@@ -85,6 +85,13 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsWeightTest ) {
   BOOST_CHECK_EQUAL(444, stack.GetStates().traversal_state_payload.transitions[0].weight);
 }
 
+BOOST_AUTO_TEST_CASE(EmptyTest) {
+    std::vector<std::pair<std::string, uint32_t>> test_data = {};
+    testing::TempDictionary dictionary(test_data);
+
+    BOOST_CHECK(dictionary.GetFsa()->Empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */
