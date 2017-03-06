@@ -114,10 +114,7 @@ public:
     }
 
     void Add(const std::string& filename) {
-        inputFiles_.push_back(filename);
-
         fsa::automata_t fsa;
-
         if (append_merge_) {
             fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
         } else {
@@ -128,6 +125,11 @@ public:
             throw std::invalid_argument("Dictionaries must have the same type.");
         }
 
+        if (fsa->empty()) {
+            return;
+        }
+
+        inputFiles_.push_back(filename);
         dicts_to_merge_.push_back(fsa);
     }
 
