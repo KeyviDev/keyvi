@@ -18,7 +18,7 @@ def dump(args):
             if value:
                 if args.json_dumps:
                     value = json.dumps(value)
-                file_out.write('\t' + value)
+                file_out.write('\t{}'.format(value))
             file_out.write('\n')
 
 

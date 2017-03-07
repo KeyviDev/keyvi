@@ -32,13 +32,15 @@ def generate_pykeyvi_source():
 def symlink_keyvi():
     if not path.exists('keyvi'):
         os.symlink('../keyvi', 'keyvi')
-        yield
+        keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), "../keyvi"))
+        pykeyvi_source_path = os.path.join(os.getcwd(),"keyvi")
+        yield (pykeyvi_source_path, keyvi_source_path)
         os.unlink('keyvi')
     else:
-        yield
+        yield None, None
 
 
-with symlink_keyvi():
+with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     # workaround for autowrap bug (includes incompatible boost)
     autowrap_data_dir = "autowrap_includes"
 
@@ -49,6 +51,11 @@ with symlink_keyvi():
     tpie_lib_dir = path.join(tpie_build_dir, tpie_install_prefix, 'lib')
 
     additional_compile_flags = []
+
+    # re-map the source files in the debug symbol tables to there original location so that stepping in a debugger works
+    if pykeyvi_source_path is not None:
+        additional_compile_flags.append('-fdebug-prefix-map={}={}'.format(pykeyvi_source_path, keyvi_source_path))
+
 
     linklibraries_static_or_dynamic = [
         "boost_program_options",
@@ -220,7 +227,7 @@ with symlink_keyvi():
 
     setup(
         name=PACKAGE_NAME,
-        version='0.1.36',
+        version='0.1.37',
         description='Python package for keyvi',
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
@@ -231,7 +238,7 @@ with symlink_keyvi():
         ext_modules=ext_modules,
         zip_safe=False,
         url='https://github.com/cliqz/keyvi',
-        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.36',
+        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.37',
         keywords=['FST'],
         classifiers=[
             'Programming Language :: C++',
