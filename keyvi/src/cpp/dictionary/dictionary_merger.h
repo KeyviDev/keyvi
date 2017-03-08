@@ -125,10 +125,12 @@ public:
             throw std::invalid_argument("Dictionaries must have the same type.");
         }
 
-        if (fsa->Empty()) {
+        const auto segment_iterator = SegmentIterator(fsa::EntryIterator(fsa), segments_pqueue_.size());
+        if (!segment_iterator) {
             return;
         }
 
+        segments_pqueue_.push(segment_iterator);
         inputFiles_.push_back(filename);
         dicts_to_merge_.push_back(fsa);
     }
@@ -145,14 +147,9 @@ public:
     void Merge(const std::string& filename) {
         using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
 
-        std::priority_queue<SegmentIterator> pqueue;
-
-        size_t i = 0;
         size_t sparse_array_size_sum = 0;
         for (auto fsa: dicts_to_merge_) {
-            fsa::EntryIterator e_it(fsa);
             sparse_array_size_sum += fsa->SparseArraySize();
-            pqueue.push(SegmentIterator(e_it, i++));
         }
 
         ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
@@ -161,21 +158,21 @@ public:
 
         std::string top_key;
 
-        while (!pqueue.empty()) {
-            auto segment_it = pqueue.top();
-            pqueue.pop();
+        while (!segments_pqueue_.empty()) {
+            auto segment_it = segments_pqueue_.top();
+            segments_pqueue_.pop();
 
             top_key = segment_it.entryIterator().GetKey();
 
             // check for same keys and merge only the most recent one
-            while (!pqueue.empty() and pqueue.top().entryIterator().operator==(top_key)) {
+            while (!segments_pqueue_.empty() and segments_pqueue_.top().entryIterator().operator==(top_key)) {
 
-                auto to_inc = pqueue.top();
+                auto to_inc = segments_pqueue_.top();
 
-                pqueue.pop();
+                segments_pqueue_.pop();
                 if (++to_inc) {
                     TRACE("push iterator");
-                    pqueue.push(to_inc);
+                    segments_pqueue_.push(to_inc);
                 }
             }
 
@@ -199,7 +196,7 @@ public:
             generator->Add(std::move(top_key), handle);
 
             if (++segment_it) {
-                pqueue.push(segment_it);
+                segments_pqueue_.push(segment_it);
             }
         }
 
@@ -217,6 +214,7 @@ private:
     bool                            append_merge_ = false;
     std::vector<fsa::automata_t>    dicts_to_merge_;
     std::vector<std::string>        inputFiles_;
+    std::priority_queue<SegmentIterator>    segments_pqueue_;
 
     size_t memory_limit_;
     fsa::internal::IValueStoreWriter::vs_param_t params_;
