@@ -165,10 +165,11 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v2.kv";
+  testing::TempDictionary dictionary3(test_data);
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger2;
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
-  merger2.Add(dictionary.GetFileName());
+  merger2.Add(dictionary3.GetFileName());
 
   merger2.Merge(filename);
 
@@ -403,10 +404,11 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-weight-v2.kv";
+  testing::TempDictionary dictionary3(test_data);
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger2;
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
-  merger2.Add(dictionary.GetFileName());
+  merger2.Add(dictionary3.GetFileName());
 
   merger2.Merge(filename);
 
@@ -505,6 +507,19 @@ BOOST_AUTO_TEST_CASE (MergeToEmptyDict) {
     BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
 
     std::remove(filename.c_str());
+}
+
+BOOST_AUTO_TEST_CASE ( MergeDuplicateAdd) {
+      std::vector<std::pair<std::string, std::string>> test_data = {
+              { "abbe", "{d:4}" },
+              { "abbc", "{b:3}" },
+      };
+      testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(test_data);
+
+      JsonDictionaryMerger merger;
+      merger.Add(dictionary.GetFileName());
+
+      BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
 }
 
 

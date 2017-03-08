@@ -114,6 +114,11 @@ public:
     }
 
     void Add(const std::string& filename) {
+
+        if (std::count(inputFiles_.begin(), inputFiles_.end(), filename)) {
+            throw std::invalid_argument("File is added already: " + filename);
+        }
+
         fsa::automata_t fsa;
         if (append_merge_) {
             fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
