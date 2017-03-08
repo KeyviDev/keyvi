@@ -28,10 +28,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include "dictionary/dictionary_merger.h"
-#include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/traverser_types.h"
 #include "dictionary/dictionary.h"
 #include "dictionary/testing/temp_dictionary.h"
+#include "dictionary/dictionary_types.h"
 
 
 namespace keyvi {
@@ -165,10 +165,11 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v2.kv";
+  testing::TempDictionary dictionary3(test_data);
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger2;
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
-  merger2.Add(dictionary.GetFileName());
+  merger2.Add(dictionary3.GetFileName());
 
   merger2.Merge(filename);
 
@@ -403,10 +404,11 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-weight-v2.kv";
+  testing::TempDictionary dictionary3(test_data);
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger2;
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
-  merger2.Add(dictionary.GetFileName());
+  merger2.Add(dictionary3.GetFileName());
 
   merger2.Merge(filename);
 
@@ -480,6 +482,46 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
 
   std::remove(filename.c_str());
 }
+
+BOOST_AUTO_TEST_CASE (MergeToEmptyDict) {
+    std::vector<std::pair<std::string, std::string>> test_data = {};
+    testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(test_data);
+
+    std::vector<std::pair<std::string, std::string>> test_data2 = {
+            { "abbe", "{d:4}" },
+            { "abbc", "{b:3}" },
+    };
+    testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(test_data2);
+
+    std::string filename("merge-to-empty-dict.kv");
+    JsonDictionaryMerger merger;
+    merger.Add(dictionary.GetFileName());
+    merger.Add(dictionary2.GetFileName());
+    merger.Merge(filename);
+
+    dictionary_t d(new Dictionary(filename));
+
+    BOOST_CHECK(d->Contains("abbc"));
+    BOOST_CHECK(d->Contains("abbe"));
+    BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
+
+    std::remove(filename.c_str());
+}
+
+BOOST_AUTO_TEST_CASE ( MergeDuplicateAdd) {
+      std::vector<std::pair<std::string, std::string>> test_data = {
+              { "abbe", "{d:4}" },
+              { "abbc", "{b:3}" },
+      };
+      testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(test_data);
+
+      JsonDictionaryMerger merger;
+      merger.Add(dictionary.GetFileName());
+
+      BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 
