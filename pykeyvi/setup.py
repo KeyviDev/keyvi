@@ -227,7 +227,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     setup(
         name=PACKAGE_NAME,
-        version='0.1.37',
+        version='0.1.38',
         description='Python package for keyvi',
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
@@ -238,7 +238,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         ext_modules=ext_modules,
         zip_safe=False,
         url='https://github.com/cliqz/keyvi',
-        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.37',
+        download_url='https://github.com/cliqz/keyvi/tarball/v0.1.38',
         keywords=['FST'],
         classifiers=[
             'Programming Language :: C++',
