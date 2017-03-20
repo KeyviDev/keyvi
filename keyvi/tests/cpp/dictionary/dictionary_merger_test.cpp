@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   testing::TempDictionary dictionary2 (test_data2, false);
 
   std::string filename ("merged-dict-int-v1.kv");
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger(merger_param_t({{"memory_limit_mb","10"}}));
+  IntDictionaryMerger merger(merger_param_t({{"memory_limit_mb","10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -165,8 +165,8 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v2.kv";
-  testing::TempDictionary dictionary3(test_data);
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger2(merger_param_t({{"memory_limit_mb","10"}}));
+  testing::TempDictionary dictionary3(test_data, false);
+  IntDictionaryMerger merger2(merger_param_t({{"memory_limit_mb","10"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -189,7 +189,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v3.kv";
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> merger3(merger_param_t({{"memory_limit_mb","10"}}));
+  IntDictionaryMerger merger3(merger_param_t({{"memory_limit_mb","10"}}));
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
@@ -405,7 +405,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
 
   filename = "merged-dict-int-weight-v2.kv";
   testing::TempDictionary dictionary3(test_data);
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> merger2(merger_param_t({{"memory_limit_mb","10"}}));
+  CompletionDictionaryMerger merger2(merger_param_t({{"memory_limit_mb","10"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-weight-v3.kv";
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger3(merger_param_t({{"memory_limit_mb","10"}}));
+  CompletionDictionaryMerger merger3(merger_param_t({{"memory_limit_mb","10"}}));
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
