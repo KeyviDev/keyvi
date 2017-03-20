@@ -14,7 +14,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
-        void WriteToFile(libcpp_utf8_string)
+        void WriteToFile(libcpp_utf8_string) except +
         
     cdef cppclass KeyOnlyDictionaryCompiler:
         KeyOnlyDictionaryCompiler() except +
@@ -24,7 +24,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
-        void WriteToFile(libcpp_utf8_string)
+        void WriteToFile(libcpp_utf8_string) except +
         
     cdef cppclass JsonDictionaryCompiler:
         JsonDictionaryCompiler() except +
@@ -35,7 +35,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifestFromString(libcpp_utf8_string) except + # wrap-ignore
-        void WriteToFile(libcpp_utf8_string)
+        void WriteToFile(libcpp_utf8_string) except +
     
     cdef cppclass JsonDictionaryCompilerSmallData:
         JsonDictionaryCompilerSmallData() except +
@@ -46,7 +46,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifestFromString(libcpp_utf8_string) except + # wrap-ignore
-        void WriteToFile(libcpp_utf8_string)
+        void WriteToFile(libcpp_utf8_string) except +
         
     cdef cppclass StringDictionaryCompiler:
         StringDictionaryCompiler() except +
@@ -57,5 +57,5 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
-        void WriteToFile(libcpp_utf8_string)
+        void WriteToFile(libcpp_utf8_string) except +
 

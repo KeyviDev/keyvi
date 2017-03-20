@@ -6,7 +6,7 @@ import pykeyvi
 import shutil
 import tempfile
 import test_tools
-
+from pytest import raises
 
 def test_compiler_no_compile_edge_case():
     c = pykeyvi.KeyOnlyDictionaryCompiler()
@@ -63,3 +63,11 @@ def test_tmp_dir_defined():
     finally:
         pykeyvi.JsonDictionaryCompiler()
         shutil.rmtree(test_dir)
+
+
+def test_compile_step_missing():
+    c = pykeyvi.KeyOnlyDictionaryCompiler()
+    c.Add("abc")
+    c.Add("abd")
+    with raises(RuntimeError):
+        c.WriteToFile("compile_step_missing.kv")
