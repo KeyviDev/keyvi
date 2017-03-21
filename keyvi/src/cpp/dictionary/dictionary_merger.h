@@ -127,24 +127,32 @@ class DictionaryMerger final {
   }
 #endif
 
-  void Add(const std::string& filename) {
-    inputFiles_.push_back(filename);
+    void Add(const std::string& filename) {
 
-    fsa::automata_t fsa;
+        if (std::count(inputFiles_.begin(), inputFiles_.end(), filename)) {
+            throw std::invalid_argument("File is added already: " + filename);
+        }
 
-    if (append_merge_) {
-      fsa.reset(
-          new fsa::Automata(filename, loading_strategy_types::lazy, false));
-    } else {
-      fsa.reset(new fsa::Automata(filename));
+        fsa::automata_t fsa;
+        if (append_merge_) {
+            fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
+        } else {
+            fsa.reset(new fsa::Automata(filename));
+        }
+
+        if (fsa->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
+            throw std::invalid_argument("Dictionaries must have the same type.");
+        }
+
+        const auto segment_iterator = SegmentIterator(fsa::EntryIterator(fsa), segments_pqueue_.size());
+        if (!segment_iterator) {
+            return;
+        }
+
+        segments_pqueue_.push(segment_iterator);
+        inputFiles_.push_back(filename);
+        dicts_to_merge_.push_back(fsa);
     }
-
-    if (fsa->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
-      throw std::invalid_argument("Dictionaries must have the same type.");
-    }
-
-    dicts_to_merge_.push_back(fsa);
-  }
 
   /**
    * Set a custom manifest to be embedded into the index file.
@@ -159,14 +167,9 @@ class DictionaryMerger final {
     using GeneratorAdapter =
         fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
 
-    std::priority_queue<SegmentIterator> pqueue;
-
-    size_t i = 0;
     size_t sparse_array_size_sum = 0;
-    for (auto fsa : dicts_to_merge_) {
-      fsa::EntryIterator e_it(fsa);
-      sparse_array_size_sum += fsa->SparseArraySize();
-      pqueue.push(SegmentIterator(e_it, i++));
+    for (auto fsa: dicts_to_merge_) {
+        sparse_array_size_sum += fsa->SparseArraySize();
     }
 
     ValueStoreT* value_store =
@@ -177,22 +180,22 @@ class DictionaryMerger final {
 
     std::string top_key;
 
-    while (!pqueue.empty()) {
-      auto segment_it = pqueue.top();
-      pqueue.pop();
+    while (!segments_pqueue_.empty()) {
+      auto segment_it = segments_pqueue_.top();
+      segments_pqueue_.pop();
 
       top_key = segment_it.entryIterator().GetKey();
 
       // check for same keys and merge only the most recent one
-      while (!pqueue.empty() and
-             pqueue.top().entryIterator().operator==(top_key)) {
-        auto to_inc = pqueue.top();
+      while (!segments_pqueue_.empty() and segments_pqueue_.top().entryIterator().operator==(top_key)) {
 
-        pqueue.pop();
-        if (++to_inc) {
-          TRACE("push iterator");
-          pqueue.push(to_inc);
-        }
+          auto to_inc = segments_pqueue_.top();
+
+          segments_pqueue_.pop();
+          if (++to_inc) {
+              TRACE("push iterator");
+              segments_pqueue_.push(to_inc);
+          }
       }
 
       fsa::ValueHandle handle;
@@ -219,7 +222,7 @@ class DictionaryMerger final {
       generator->Add(std::move(top_key), handle);
 
       if (++segment_it) {
-        pqueue.push(segment_it);
+        segments_pqueue_.push(segment_it);
       }
     }
 
@@ -233,10 +236,11 @@ class DictionaryMerger final {
     generator->WriteToFile(filename);
   }
 
- private:
-  bool append_merge_ = false;
-  std::vector<fsa::automata_t> dicts_to_merge_;
-  std::vector<std::string> inputFiles_;
+private:
+    bool                            append_merge_ = false;
+    std::vector<fsa::automata_t>    dicts_to_merge_;
+    std::vector<std::string>        inputFiles_;
+    std::priority_queue<SegmentIterator>    segments_pqueue_;
 
   fsa::internal::IValueStoreWriter::vs_param_t params_;
   std::string manifest_ = std::string();

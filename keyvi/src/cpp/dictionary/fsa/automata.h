@@ -126,6 +126,10 @@ public:
       return number_of_keys_;
     }
 
+    bool Empty() const {
+        return 0 == GetNumberOfKeys();
+    }
+
     size_t SparseArraySize() const {
         return ::boost::lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
     }

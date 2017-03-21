@@ -72,6 +72,11 @@ typedef keyvi::dictionary::DictionaryMerger<
         keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
         keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore> CompletionDictionaryMerger;
 
+typedef keyvi::dictionary::DictionaryMerger<
+        keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
+        keyvi::dictionary::fsa::internal::IntValueStore> IntDictionaryMerger;
+
+
 
 } /* namespace dictionary */
 } /* namespace keyvi */
