@@ -140,9 +140,9 @@ class DictionaryMerger final {
             fsa.reset(new fsa::Automata(filename));
         }
 
-    if (fsa->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
-      throw std::invalid_argument("Dictionaries must have the same type.");
-    }
+        if (fsa->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
+            throw std::invalid_argument("Dictionaries must have the same type.");
+        }
 
         const auto segment_iterator = SegmentIterator(fsa::EntryIterator(fsa), segments_pqueue_.size());
         if (!segment_iterator) {
@@ -167,10 +167,10 @@ class DictionaryMerger final {
     using GeneratorAdapter =
         fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
 
-        size_t sparse_array_size_sum = 0;
-        for (auto fsa: dicts_to_merge_) {
-            sparse_array_size_sum += fsa->SparseArraySize();
-        }
+    size_t sparse_array_size_sum = 0;
+    for (auto fsa: dicts_to_merge_) {
+        sparse_array_size_sum += fsa->SparseArraySize();
+    }
 
     ValueStoreT* value_store =
         append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
@@ -180,23 +180,23 @@ class DictionaryMerger final {
 
     std::string top_key;
 
-        while (!segments_pqueue_.empty()) {
-            auto segment_it = segments_pqueue_.top();
-            segments_pqueue_.pop();
+    while (!segments_pqueue_.empty()) {
+      auto segment_it = segments_pqueue_.top();
+      segments_pqueue_.pop();
 
       top_key = segment_it.entryIterator().GetKey();
 
-            // check for same keys and merge only the most recent one
-            while (!segments_pqueue_.empty() and segments_pqueue_.top().entryIterator().operator==(top_key)) {
+      // check for same keys and merge only the most recent one
+      while (!segments_pqueue_.empty() and segments_pqueue_.top().entryIterator().operator==(top_key)) {
 
-                auto to_inc = segments_pqueue_.top();
+          auto to_inc = segments_pqueue_.top();
 
-                segments_pqueue_.pop();
-                if (++to_inc) {
-                    TRACE("push iterator");
-                    segments_pqueue_.push(to_inc);
-                }
-            }
+          segments_pqueue_.pop();
+          if (++to_inc) {
+              TRACE("push iterator");
+              segments_pqueue_.push(to_inc);
+          }
+      }
 
       fsa::ValueHandle handle;
       handle.no_minimization = false;
@@ -221,10 +221,10 @@ class DictionaryMerger final {
       TRACE("Add key: %s", top_key.c_str());
       generator->Add(std::move(top_key), handle);
 
-            if (++segment_it) {
-                segments_pqueue_.push(segment_it);
-            }
-        }
+      if (++segment_it) {
+        segments_pqueue_.push(segment_it);
+      }
+    }
 
     dicts_to_merge_.clear();
 

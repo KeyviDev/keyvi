@@ -280,24 +280,24 @@ class DictionaryCompiler final {
     }
   }
 
-    void Write(std::ostream& stream) {
-      if (!generator_) {
-        throw compiler_exception("not compiled yet");
-      }
-
-      generator_->Write(stream);
+  void Write(std::ostream& stream) {
+    if (!generator_) {
+      throw compiler_exception("not compiled yet");
     }
 
-    template<typename StringType>
-    void WriteToFile(StringType filename) {
-      if (!generator_) {
-        throw compiler_exception("not compiled yet");
-      }
+    generator_->Write(stream);
+  }
 
-      std::ofstream out_stream(filename, std::ios::binary);
-      generator_->Write(out_stream);
-      out_stream.close();
+  template<typename StringType>
+  void WriteToFile(StringType filename) {
+    if (!generator_) {
+      throw compiler_exception("not compiled yet");
     }
+
+    std::ofstream out_stream(filename, std::ios::binary);
+    generator_->Write(out_stream);
+    out_stream.close();
+  }
 
  private:
   SorterT sorter_;
