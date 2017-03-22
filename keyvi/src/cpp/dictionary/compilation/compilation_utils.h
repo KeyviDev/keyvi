@@ -29,6 +29,7 @@
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 
@@ -47,7 +48,7 @@ class CompilationUtils {
     fsa::internal::SparseArrayPersistence<> p(2048,
                                          boost::filesystem::temp_directory_path());
 
-    fsa::Generator<fsa::internal::SparseArrayPersistence<>> g;
+    fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
     for(auto key : input){
       g.Add(key);
@@ -68,7 +69,7 @@ class CompilationUtils {
       fsa::internal::SparseArrayPersistence<> p(2048,
                                            boost::filesystem::temp_directory_path());
 
-      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> g;
+      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
       for(auto pair : input){
         g.Add(pair.first, pair.second);
@@ -89,7 +90,7 @@ class CompilationUtils {
         fsa::internal::SparseArrayPersistence<> p(2048,
                                              boost::filesystem::temp_directory_path());
 
-        fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> g;
+        fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
         for(auto pair : input){
           g.Add(pair.first, pair.second);
@@ -110,7 +111,28 @@ class CompilationUtils {
       fsa::internal::SparseArrayPersistence<> p(2048,
                                            boost::filesystem::temp_directory_path());
 
-      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStoreWithInnerWeights> g;
+      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+
+      for(auto pair : input){
+        g.Add(pair.first, pair.second);
+      }
+
+      g.CloseFeeding();
+      std::ofstream out_stream(file_name, std::ios::binary);
+      g.Write(out_stream);
+      out_stream.close();
+
+      fsa::automata_t f(new fsa::Automata(file_name.c_str()));
+      return f;
+    }
+
+  static fsa::automata_t CompileInt(std::vector<std::pair<std::string, uint32_t>>& input, std::string& file_name){
+      std::sort(input.begin(), input.end());
+
+      fsa::internal::SparseArrayPersistence<> p(2048,
+                                           boost::filesystem::temp_directory_path());
+
+      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
       for(auto pair : input){
         g.Add(pair.first, pair.second);

@@ -30,6 +30,7 @@
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/entry_iterator.h"
 
@@ -86,8 +87,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( minimizationIntInnerWeights, SorterT, sorter_type
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<>,
-      fsa::internal::IntValueStoreWithInnerWeights,
-      SorterT> compiler;
+      fsa::internal::IntInnerWeightsValueStore,
+      SorterT> compiler(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -141,8 +142,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( sortOrder, SorterT, sorter_types )
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<>,
-      fsa::internal::IntValueStoreWithInnerWeights,
-      SorterT> compiler;
+      fsa::internal::IntInnerWeightsValueStore,
+      SorterT> compiler(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -227,8 +228,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( compactSize, SorterT, sorter_types )
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<uint16_t>,
-      fsa::internal::IntValueStoreWithInnerWeights,
-      SorterT> compiler;
+      fsa::internal::IntInnerWeightsValueStore,
+      SorterT> compiler(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -280,12 +281,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( stableInsert, SorterT, sorter_types )
     { "aa", "\"{3:24}\"" },
   };
 
-  keyvi::dictionary::compiler_param_t params = {{STABLE_INSERTS, "true"}};
+  keyvi::dictionary::compiler_param_t params = {{"memory_limit_mb","10"}, {STABLE_INSERTS, "true"}};
 
   keyvi::dictionary::DictionaryCompiler<
       fsa::internal::SparseArrayPersistence<uint16_t>,
       fsa::internal::JsonValueStore,
-      SorterT> compiler(10485760, params);
+      SorterT> compiler(params);
 
   for (auto p: test_data){
     compiler.Add(p.first, p.second);
@@ -329,12 +330,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( stableInsert, SorterT, sorter_types )
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( addAndDeletes, SorterT, sorter_types )
 {
-  keyvi::dictionary::compiler_param_t params = {{STABLE_INSERTS, "true"}};
+  keyvi::dictionary::compiler_param_t params = {{"memory_limit_mb","10"}, {STABLE_INSERTS, "true"}};
 
   keyvi::dictionary::DictionaryCompiler<
           fsa::internal::SparseArrayPersistence<uint16_t>,
           fsa::internal::JsonValueStore,
-          SorterT> compiler(10485760, params);
+          SorterT> compiler(params);
 
   // add, delete, add again
   compiler.Add("aa", "1");
@@ -383,12 +384,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( addAndDeletes, SorterT, sorter_types )
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( DeleteUnsupported, SorterT, sorter_types )
 {
-  keyvi::dictionary::compiler_param_t params = {};
+  keyvi::dictionary::compiler_param_t params = {{"memory_limit_mb","10"}};
 
   keyvi::dictionary::DictionaryCompiler<
             fsa::internal::SparseArrayPersistence<uint16_t>,
             fsa::internal::JsonValueStore,
-            SorterT> compiler(10485760, params);
+            SorterT> compiler(params);
 
   // add, delete, add again
   compiler.Add("aa", "1");

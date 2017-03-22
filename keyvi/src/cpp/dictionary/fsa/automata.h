@@ -74,9 +74,8 @@ private:
         std::istream& persistenceStream = keyViFile.persistenceStream();
         sparse_array_properties_ = SerializationUtils::ReadJsonRecord(persistenceStream);
 
-        compact_size_ = lexical_cast<uint32_t> (sparse_array_properties_.get<std::string>("version")) == 2;
-        const size_t bucket_size = compact_size_ ? sizeof(uint16_t) : sizeof(uint32_t);
-        const size_t array_size = SparseArraySize();
+        const size_t bucket_size = sizeof(uint16_t);
+        const size_t array_size = lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
 
         const std::streampos offset = persistenceStream.tellg();
 
@@ -178,24 +177,12 @@ public:
         TRACE ("Bitmask %d", mask_int);
 
         if (mask_int != 0) {
-          if (offset == 0) {
-            // in this case we have to ignore the first bit, so start counting from 1
-            mask_int = mask_int >> 1;
-            for (auto i=1; i<16; ++i) {
-              if ((mask_int & 1) == 1) {
-                TRACE("push symbol+%d", symbol + i);
-                traversal_state.Add(ResolvePointer(starting_state, symbol + i), symbol + i, payload);
-              }
-              mask_int = mask_int >> 1;
-            }
-          } else {
             for (auto i=0; i<16; ++i) {
               if ((mask_int & 1) == 1) {
                 TRACE("push symbol+%d", symbol + i);
                 traversal_state.Add(ResolvePointer(starting_state, symbol + i), symbol + i, payload);
               }
               mask_int = mask_int >> 1;
-            }
           }
         }
 
@@ -213,7 +200,7 @@ public:
 
         uint64_t xor_labels_with_mask = *labels_as_ll^*mask_as_ll;
 
-        if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0) && offset > 0){
+        if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0)){
           traversal_state.Add(ResolvePointer(starting_state, symbol), symbol, payload);
         }
         if ((xor_labels_with_mask & 0x000000000000ff00ULL)== 0){
@@ -275,20 +262,6 @@ public:
         TRACE ("Bitmask %d", mask_int);
 
         if (mask_int != 0) {
-          if (offset == 0) {
-            // in this case we have to ignore the first bit, so start counting from 1
-            mask_int = mask_int >> 1;
-            for (auto i=1; i<16; ++i) {
-              if ((mask_int & 1) == 1) {
-                TRACE("push symbol+%d", symbol + i);
-                uint64_t child_state = ResolvePointer(starting_state, symbol + i);
-                uint32_t weight = GetWeightValue(child_state);
-                weight = weight != 0 ? weight : parent_weight;
-                traversal_state.Add(child_state, weight, symbol + i, payload);
-              }
-              mask_int = mask_int >> 1;
-            }
-          } else {
             for (auto i=0; i<16; ++i) {
               if ((mask_int & 1) == 1) {
                 TRACE("push symbol+%d", symbol + i);
@@ -299,7 +272,6 @@ public:
               }
               mask_int = mask_int >> 1;
             }
-          }
         }
 
         ++labels_as_m128;
@@ -316,7 +288,7 @@ public:
 
         uint64_t xor_labels_with_mask = *labels_as_ll^*mask_as_ll;
 
-        if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0) && offset > 0){
+        if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0)){
           uint64_t child_state = ResolvePointer(starting_state, symbol);
           uint32_t weight = GetWeightValue(child_state);
           weight = weight != 0 ? weight : parent_weight;
@@ -387,23 +359,10 @@ public:
     }
 
     uint64_t GetStateValue(uint64_t state) const {
-      if (!compact_size_) {
-        return be32toh(transitions_[state + FINAL_OFFSET_TRANSITION]);
-      }
-
-      // compact mode:
       return util::decodeVarshort(transitions_compact_ + state + FINAL_OFFSET_TRANSITION);
     }
 
     uint32_t GetWeightValue(uint64_t state) const {
-      if (!compact_size_) {
-        if (labels_[state + INNER_WEIGHT_TRANSITION] != 0) {
-          return 0;
-        }
-
-        return be32toh(transitions_[state + INNER_WEIGHT_TRANSITION]);
-      }
-
       if (labels_[state + INNER_WEIGHT_TRANSITION_COMPACT] != 0) {
         return 0;
       }
@@ -462,7 +421,6 @@ public:
     unsigned char* labels_;
     uint32_t* transitions_;
     uint16_t* transitions_compact_;
-    bool compact_size_;
     uint64_t start_state_;
     uint64_t number_of_keys_;
     internal::value_store_t value_store_type_;
@@ -476,10 +434,6 @@ public:
     }
 
     inline uint64_t ResolvePointer(uint64_t starting_state, unsigned char c) const {
-      if (!compact_size_) {
-        return be32toh(transitions_[starting_state + c]);
-      }
-
       uint16_t pt = le16toh(transitions_compact_[starting_state + c]);
       uint64_t resolved_ptr;
 

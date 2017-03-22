@@ -3,8 +3,6 @@ import pykeyvi
 
 from argparse import ArgumentParser
 
-GB = 1024 * 1024 * 1024
-
 
 def stats(input_file):
     print (json.dumps(pykeyvi.Dictionary(input_file).GetStatistics(), indent=4, sort_keys=True))
@@ -29,9 +27,9 @@ def compile(args):
 
     dict_type = args.dict_type
     if dict_type == 'json':
-        dictionary = pykeyvi.JsonDictionaryCompiler(GB, params)
+        dictionary = pykeyvi.JsonDictionaryCompiler(params)
     elif dict_type == 'key-only':
-        dictionary = pykeyvi.KeyOnlyDictionaryCompiler(GB, params)
+        dictionary = pykeyvi.KeyOnlyDictionaryCompiler(params)
     else:
         return 'Must never reach here'
 

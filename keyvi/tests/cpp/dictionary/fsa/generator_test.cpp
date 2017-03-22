@@ -31,6 +31,9 @@
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/int_value_store.h"
 
+//#define ENABLE_TRACING
+#include "dictionary/util/trace.h"
+
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
@@ -41,7 +44,7 @@ BOOST_AUTO_TEST_CASE( simple ) {
   internal::SparseArrayPersistence<> p(2048,
                                      boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add("aaaa");
   g.Add("aabb");
   g.Add("aabc");
@@ -76,7 +79,7 @@ BOOST_AUTO_TEST_CASE( simple2 ) {
   internal::SparseArrayPersistence<> p(2048,
                                      boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add("aaa");
   g.Add("abcde");
   g.Add("bar");
@@ -107,7 +110,7 @@ BOOST_AUTO_TEST_CASE( simple2 ) {
 }
 
 BOOST_AUTO_TEST_CASE( stringtest ) {
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add(std::string("aaa"));
   g.Add(std::string("abcde"));
   g.Add("bar");
@@ -141,7 +144,7 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
   internal::SparseArrayPersistence<> p(2048,
                                      boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>, internal::IntValueStoreWithInnerWeights> g;
+  Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
   g.Add("eads", 576);
 
   g.Add("facebook", 4368451);
@@ -172,11 +175,86 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
   BOOST_CHECK(it == end_it);
 }
 
+BOOST_AUTO_TEST_CASE( feedwithoutclose ) {
+  // test that just triggers the case (if) generato is created but FSA creation is not finalized
+
+  auto g = new   Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore>(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  g->Add("eads", 576);
+
+  g->Add("facebook", 4368451);
+  g->Add("youtube", 2622207);
+  delete g;
+}
+
+BOOST_AUTO_TEST_CASE( manifesttest ) {
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  g.Add(std::string("aaa"));
+  g.Add(std::string("abcde"));
+  g.Add("bar");
+  g.Add("foo");
+  g.Add("zar");
+
+  g.CloseFeeding();
+
+  g.SetManifestFromString("{\"version\":\"42\"}");
+
+  std::ofstream out_stream("testFile3", std::ios::binary);
+  g.Write(out_stream);
+  out_stream.close();
+
+  automata_t f(new Automata("testFile3"));
+  BOOST_CHECK_EQUAL("{\"version\":\"42\"}\n", f->GetManifestAsString());
+}
+
+
+BOOST_AUTO_TEST_CASE( zeroBytes ) {
+  internal::SparseArrayPersistence<> p(2048,
+                                     boost::filesystem::temp_directory_path());
+
+  TRACE("test zerobyte");
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  g.Add(std::string("\0bbcd", 5));
+  g.Add(std::string("a\0abc", 5));
+  g.Add("aaaa");
+  g.Add(std::string("aabb\0", 5));
+  g.Add("aacd");
+  g.Add("bbcd");
+
+  g.CloseFeeding();
+
+  std::ofstream out_stream("testFileZB", std::ios::binary);
+  g.Write(out_stream);
+  out_stream.close();
+
+  TRACE("test zerobyte: load FSA");
+  automata_t f(new Automata("testFileZB"));
+
+  auto zero_state_walk = f->TryWalkTransition(f->GetStartState(), 0);
+  BOOST_CHECK(zero_state_walk != 0);
+  TRACE("test zerobyte: tested zb FSA");
+  EntryIterator it(f);
+  EntryIterator end_it;
+
+  BOOST_CHECK_EQUAL(std::string("\0bbcd", 5), it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL(std::string("a\0abc", 5), it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL("aaaa", it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL(std::string("aabb\0",5), it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL("aacd", it.GetKey());
+  ++it;
+  BOOST_CHECK_EQUAL("bbcd", it.GetKey());
+  ++it;
+  BOOST_CHECK(it == end_it);
+}
+
 BOOST_AUTO_TEST_CASE( state_exception_handling ) {
   internal::SparseArrayPersistence<> p(2048,
                                        boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g;
+  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
 
   BOOST_CHECK_THROW( g.WriteToFile("somefile"), generator_exception );
 

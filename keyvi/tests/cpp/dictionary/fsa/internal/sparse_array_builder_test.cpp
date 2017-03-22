@@ -37,30 +37,6 @@ namespace internal {
 
 BOOST_AUTO_TEST_SUITE( SparseArrayBuilderTests )
 
-BOOST_AUTO_TEST_CASE( writeState ) {
-  SparseArrayPersistence<uint32_t> p(2048, boost::filesystem::temp_directory_path());
-  int64_t limit = 1024 * 1024;
-  SparseArrayBuilder<SparseArrayPersistence<uint32_t>> b(limit, &p, false);
-  UnpackedState<SparseArrayPersistence<uint32_t>> u1(&p);
-  u1.Add(65, 100);
-  u1.Add(66, 101);
-  u1.Add(233, 102);
-
-  // final state
-  u1.Add(256, 1000);
-  b.WriteState(10,u1);
-
-  BOOST_CHECK_EQUAL(p.ReadTransitionLabel(75), 65);
-  BOOST_CHECK_EQUAL(p.ReadTransitionValue(75), 100);
-  BOOST_CHECK_EQUAL(p.ReadTransitionLabel(76), 66);
-  BOOST_CHECK_EQUAL(p.ReadTransitionValue(76), 101);
-  BOOST_CHECK_EQUAL(p.ReadTransitionLabel(243), 233);
-  BOOST_CHECK_EQUAL(p.ReadTransitionValue(243), 102);
-
-  BOOST_CHECK_EQUAL(p.ReadTransitionLabel(266), 1);
-  BOOST_CHECK_EQUAL(p.ReadTransitionValue(266), 1000);
-}
-
 BOOST_AUTO_TEST_CASE( writeFinalStateCompact ) {
   SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
@@ -78,7 +54,7 @@ BOOST_AUTO_TEST_CASE( writeFinalStateCompact ) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionAbsoluteMaxValue ) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -94,7 +70,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionAbsoluteMaxValue ) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflow ) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -110,7 +86,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflow ) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteGhostState ) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -146,7 +122,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteGhostState ) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte ) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -176,7 +152,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte ) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte2 ) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -209,7 +185,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte2 ) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte3 ) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -252,7 +228,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte3 ) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecase ) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -297,7 +273,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecase ) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecaseStartPositions ) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -330,7 +306,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecaseStartPositi
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionZerobyteWeightCase) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
@@ -348,7 +324,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionZerobyteWeightCase) {
 }
 
 BOOST_AUTO_TEST_CASE( writeTransitionFinalStateTransition) {
-  SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
+  SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
