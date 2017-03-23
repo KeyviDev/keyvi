@@ -14,6 +14,8 @@ def dump(args):
         for key, value in dictionary.GetAllItems():
             if args.json_dumps:
                 key = json.dumps(key)
+            if isinstance(key, bytes):
+                key = key.decode()
             file_out.write(key)
             if value:
                 if args.json_dumps:
