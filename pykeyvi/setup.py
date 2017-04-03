@@ -221,13 +221,15 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     PACKAGE_NAME = 'pykeyvi'
 
+    version = '0.2.2'
+
     install_requires = [
         'msgpack-python',
     ]
 
     setup(
         name=PACKAGE_NAME,
-        version='0.2.1',
+        version=version,
         description='Python package for keyvi',
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
@@ -238,7 +240,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         ext_modules=ext_modules,
         zip_safe=False,
         url='https://github.com/cliqz/keyvi',
-        download_url='https://github.com/cliqz/keyvi/tarball/v0.2.1',
+        download_url='https://github.com/cliqz/keyvi/tarball/v{}'.format(version),
         keywords=['FST'],
         classifiers=[
             'Programming Language :: C++',

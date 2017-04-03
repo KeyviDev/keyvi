@@ -49,6 +49,9 @@ final {
         : fsa_(f),
           priority_queue_(top_number_of_results) {
       current_state_ = start_state;
+      if (0 == current_state_) {
+        at_end_ = true;
+      }
 
       TRACE("BoundedWeightedStateTraverser starting with Start state %d", current_state_);
       GetNextTransitionsInSortedOrder(0);
@@ -123,7 +126,7 @@ final {
     void operator++(int) {
 
       // ignore cases where we are already at the end
-      if (current_state_ == 0) {
+      if (at_end_) {
         TRACE("end of traversal");
         return;
       }
