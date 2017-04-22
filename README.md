@@ -1,4 +1,5 @@
 [![Travis](https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master  "Travis build status")](https://travis-ci.org/cliqz-oss/keyvi)
+[![C++](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](/keyvi/README.md)
 [![PythonVersions](https://img.shields.io/pypi/pyversions/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
 [![PythonImpl](https://img.shields.io/pypi/implementation/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
 [![PythonFormat](https://img.shields.io/pypi/format/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
