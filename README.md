@@ -35,11 +35,11 @@ For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in 
 ## Usage
 
   * Howtos
-    * [Compiling Dictionaries/Indexes](/doc/usage/Building keyvi dictionaries.md)
+    * [Compiling Dictionaries/Indexes](/doc/usage/Building%20keyvi%20dictionaries.md)
     * Pykeyvi
-      * [Compiling](/doc/usage/Building keyvi dictionaries with python.md)
+      * [Compiling](/doc/usage/Building%20keyvi%20dictionaries%20with%20python.md)
   * [Crashcourse](/doc/usage/Crashcourse.md)
-  * [Using pykeyvi with EMR (mrjob or pyspark)](/doc/usage/Using pykeyvi in EMR.md)  
+  * [Using pykeyvi with EMR (mrjob or pyspark)](/doc/usage/Using%20pykeyvi%20in%20EMR.md)  
 
 ## Internals
   
