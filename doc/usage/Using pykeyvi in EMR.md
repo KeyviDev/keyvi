@@ -10,24 +10,100 @@ In the end all calls will be local and do not entail any networking.
 
 ### Bootstrapping keyvi
 
-All we need is to install keyvi at bootstraping time. 
-You need a package that can be installed on the OS you are using. 
-For Amazons EMR '4.3.0' - the latest at time of writing - a package is available for download at
+All we need is to install keyvi at bootstraping time.
 
-https://github.com/cliqz-oss/keyvi-package/tree/master/bin/amazon-linux-2015.09
+The precompiled packages support all supported versions of Amazons EMR. Therefore just install pykeyvi during bootstrap:
 
-and add the following to your bootstrap:
-
-    sudo pip install msgpack-python
-    wget https://github.com/cliqz-oss/keyvi-package/blob/master/bin/amazon-linux-2015.09/python-keyvi-{latest_version}-1.x86_64.rpm?raw=true -O python-keyvi.rpm
-    sudo rpm -i python-keyvi.rpm
-    
-Change the latest_version accordingly.
-    
-Note: mspack-python is a dependency which needs to be installed manually.
+```
+sudo pip install pykeyvi
+```
 
 ### Using keyvi
 
-The rest is simply, get your keyvi files on the machines, e.g. download them during bootstrap from S3 or at runtime in your init function.
+The rest is simply, get your keyvi files on the machines. You can download them during bootstrap from S3 or more convenient in pyspark, put them on hdfs:
+
+```
+sc = SparkContext.getOrCreate()
+sc.addFile(s3_filename)
+```
 
 Ensure you initialize the Dictionary e.g. in mapper_init (mrjob) or using a singleton pattern (pyspark) and not for every mapper call.
+
+See this example loader for pyspark:
+
+```
+import pykeyvi
+
+try:
+    # only works if in spark
+    from pyspark import SparkFiles
+    from pyspark import SparkContext
+
+    class Spark_KeyviLoader(object):
+        # this is a singleton
+        _instance = None
+
+        def __init__(self):
+            globals()[self.__class__.__name__] = self
+            self.loaded_keyvi_dicts = {}
+
+        def __call__(self, *args, **kwargs):
+            return self
+
+        def get(self, name):
+            d = self.loaded_keyvi_dicts.get(name)
+
+            if d is None:
+                hdfs_filename = SparkFiles.get(name)
+                if hdfs_filename is None:
+                    raise Exception("Could not find dictionary with name {} in HDFS, Did you loaded it?".format(name))
+
+                if type(hdfs_filename):
+                    hdfs_filename = hdfs_filename.encode('utf-8')
+
+                try:
+                    d=pykeyvi.Dictionary(hdfs_filename)
+                except Exception, e:
+                    raise Exception("Failed to load keyvi dictionary {}: {}".format(name, e.message))
+
+                self.loaded_keyvi_dicts[name] = d
+
+            return d
+
+        @staticmethod
+        def load_into_spark(s3_filename):
+            sc = SparkContext.getOrCreate()
+            sc.addFile(s3_filename)
+
+    KeyviLoader = Spark_KeyviLoader
+
+except:
+    # fallback for standalone use and testing
+    import os
+
+    class Local_KeyviLoader(object):
+        # this is a singleton
+        _instance = None
+
+        def __init__(self):
+            globals()[self.__class__.__name__] = self
+            self.loaded_keyvi_dicts = {}
+
+        def __call__(self, *args, **kwargs):
+            return self
+
+        def get(self, name):
+            d = self.loaded_keyvi_dicts.get(name)
+
+            if d is None:
+                d = pykeyvi.Dictionary(os.path.join("my_keyvi_files_folder", name))
+                self.loaded_keyvi_dicts[name] = d
+
+            return d
+
+    KeyviLoader = Local_KeyviLoader
+
+def get_keyvi_dictionary(name):
+    return KeyviLoader().get(name)
+
+```
