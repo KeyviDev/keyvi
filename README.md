@@ -64,3 +64,12 @@ keyvi is licenced under apache license 2.0, see [licence](LICENSE) for details.
 
 In addition keyvi uses 3rdparty libraries which define their own licence. Please check their respective licence. 
 The 3rdparty libraries can be found at [keyvi/3rdparty](/keyvi/3rdparty).
+
+
+## Contributing
+
+* Bug reports, feature requests and general question can be added as an Issue. 
+
+* PRs are welcome. 
+
+* Questions? Concerns? Feel free to [contact us](mailto:cliqz-oss@cliqz.com?subject=keyvi).
