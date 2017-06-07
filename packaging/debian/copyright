@@ -1,0 +1,12 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: keyvi
+
+Files: *
+Copyright: Hendrik Muhs <hendrik.muhs@gmail.com>
+
+License: Apache License 2.0
+    http://www.apache.org/licenses/LICENSE-2.0
+    On a Debian system, the license can be found at
+        /usr/share/common-licenses/Apache-2.0
+    .
+    License Notice for 3rdparty libraries: check individual licenses
