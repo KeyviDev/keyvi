@@ -1,5 +1,4 @@
-> Made by Cliqz, a provider of innovative, privacy-focused browser technologies with integrated quick-search functionality and anti-tracking. 
-  Cliqz is a German company owned by Mozilla and Hubert Burda Media. Visit https://cliqz.com for more information.
+> Keyvi is developed and maintained by Cliqz Engineering Team and Hendrik Muhs. Cliqz is a provider of innovative, privacy-focused browser technologies with integrated quick-search functionality and anti-tracking.
 
 ##
 [![Travis](https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master  "Travis build status")](https://travis-ci.org/cliqz-oss/keyvi)
