@@ -239,8 +239,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         packages=['keyvicli'],
         ext_modules=ext_modules,
         zip_safe=False,
-        url='https://github.com/cliqz/keyvi',
-        download_url='https://github.com/cliqz/keyvi/tarball/v{}'.format(version),
+        url='https://github.com/cliqz-oss/keyvi',
+        download_url='https://github.com/cliqz-oss/keyvi/tarball/v{}'.format(version),
         keywords=['FST'],
         classifiers=[
             'Programming Language :: C++',
