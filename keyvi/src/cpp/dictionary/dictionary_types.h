@@ -81,6 +81,9 @@ typedef keyvi::dictionary::DictionaryMerger<
         keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
         keyvi::dictionary::fsa::internal::StringValueStore> StringDictionaryMerger;
 
+typedef keyvi::dictionary::DictionaryMerger<
+        keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>> KeyOnlyDictionaryMerger;
+
 
 } /* namespace dictionary */
 } /* namespace keyvi */
