@@ -30,6 +30,8 @@ def compile(args):
     dict_type = args.dict_type
     if dict_type == 'json':
         dictionary = pykeyvi.JsonDictionaryCompiler(params)
+    elif dict_type == 'string':
+        dictionary = pykeyvi.StringDictionaryCompiler(params)
     elif dict_type == 'key-only':
         dictionary = pykeyvi.KeyOnlyDictionaryCompiler(params)
     else:
@@ -67,7 +69,7 @@ def main():
     compile_parser = subparsers.add_parser('compile')
     compile_parser.add_argument('input_file', type=str, metavar='FILE')
     compile_parser.add_argument('output_file', type=str, metavar='OUT_FILE')
-    compile_parser.add_argument('dict_type', type=str, choices=['json', 'key-only'],
+    compile_parser.add_argument('dict_type', type=str, choices=['json', 'string', 'key-only'],
                                 help='dictionary type')
     compile_parser.add_argument('--param', action='append', default=[], dest='compiler_params',
                                 type=lambda kv: kv.split("="),
