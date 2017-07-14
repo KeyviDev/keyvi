@@ -210,6 +210,87 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 }
 
+BOOST_AUTO_TEST_CASE ( MergeIntegerDictsAppendMerge) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+          { "abc", 22 },
+          { "abbc", 24 }
+  };
+  testing::TempDictionary dictionary (test_data, false);
+
+  std::vector<std::pair<std::string, uint32_t>> test_data2 = {
+          { "abc", 25 },
+          { "abbc", 42 },
+          { "abcd", 21 },
+          { "abbc", 30 },
+  };
+  testing::TempDictionary dictionary2 (test_data2, false);
+
+  std::string filename ("merged-dict-int-v1.kv");
+  IntDictionaryMerger merger(merger_param_t({{"memory_limit_mb","10"}, {"merge_mode","append"}}));
+  merger.Add(dictionary.GetFileName());
+  merger.Add(dictionary2.GetFileName());
+
+  merger.Merge(filename);
+
+  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+  dictionary_t d(new Dictionary(fsa));
+
+  BOOST_CHECK(d->Contains("abc"));
+  BOOST_CHECK(d->Contains("abbc"));
+  BOOST_CHECK(d->Contains("abcd"));
+
+  BOOST_CHECK_EQUAL("25", d->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("30", d->operator[]("abbc").GetValueAsString());
+
+  std::remove(filename.c_str());
+
+  filename = "merged-dict-int-v2.kv";
+  testing::TempDictionary dictionary3(test_data, false);
+  IntDictionaryMerger merger2(merger_param_t({{"memory_limit_mb","10"}, {"merge_mode","append"}}));
+  merger2.Add(dictionary.GetFileName());
+  merger2.Add(dictionary2.GetFileName());
+  merger2.Add(dictionary3.GetFileName());
+
+  merger2.Merge(filename);
+
+  fsa::automata_t fsa2(new fsa::Automata(filename.c_str()));
+  dictionary_t d2(new Dictionary(fsa2));
+
+  BOOST_CHECK(d2->Contains("abc"));
+  BOOST_CHECK(d2->Contains("abbc"));
+  BOOST_CHECK(d2->Contains("abcd"));
+
+  BOOST_CHECK_EQUAL("22", d2->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd").GetValueAsString());
+
+  // overwritten by 2nd
+  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc").GetValueAsString());
+
+  std::remove(filename.c_str());
+
+  filename = "merged-dict-int-v3.kv";
+  IntDictionaryMerger merger3(merger_param_t({{"memory_limit_mb","10"}, {"merge_mode","append"}}));
+
+  merger3.Add(dictionary2.GetFileName());
+  merger3.Add(dictionary.GetFileName());
+
+  merger3.Merge(filename);
+
+  fsa::automata_t fsa3(new fsa::Automata(filename.c_str()));
+  dictionary_t d3(new Dictionary(fsa3));
+
+  BOOST_CHECK(d3->Contains("abc"));
+  BOOST_CHECK(d3->Contains("abbc"));
+  BOOST_CHECK(d3->Contains("abcd"));
+
+  BOOST_CHECK_EQUAL("22", d3->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d3->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d3->operator[]("abbc").GetValueAsString());
+
+  std::remove(filename.c_str());
+}
+
 
 BOOST_AUTO_TEST_CASE ( MergeStringDicts) {
   std::vector<std::pair<std::string, std::string>> test_data = {
@@ -482,6 +563,48 @@ BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsValueMerge) {
 
   std::remove(filename.c_str());
 }
+
+
+BOOST_AUTO_TEST_CASE ( MergeIntegerWeightDictsAppendMerge) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+          { "abc", 22 },
+          { "abbc", 24 }
+  };
+  testing::TempDictionary dictionary (test_data);
+
+  std::vector<std::pair<std::string, uint32_t>> test_data2 = {
+          { "abc", 25 },
+          { "abbc", 42 },
+          { "abcd", 21 },
+          { "abbc", 30 },
+  };
+  testing::TempDictionary dictionary2 (test_data2);
+
+  std::string filename = "merged-dict-int-weight-v2.kv";
+  testing::TempDictionary dictionary3(test_data);
+  CompletionDictionaryMerger merger2(merger_param_t({{"memory_limit_mb","10"}, {"merge_mode", "append"}}));
+  merger2.Add(dictionary.GetFileName());
+  merger2.Add(dictionary2.GetFileName());
+  merger2.Add(dictionary3.GetFileName());
+
+  merger2.Merge(filename);
+
+  fsa::automata_t fsa2(new fsa::Automata(filename.c_str()));
+  dictionary_t d2(new Dictionary(fsa2));
+
+  BOOST_CHECK(d2->Contains("abc"));
+  BOOST_CHECK(d2->Contains("abbc"));
+  BOOST_CHECK(d2->Contains("abcd"));
+
+  BOOST_CHECK_EQUAL("22", d2->operator[]("abc").GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd").GetValueAsString());
+
+  // overwritten by 2nd
+  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc").GetValueAsString());
+
+  std::remove(filename.c_str());
+}
+
 
 BOOST_AUTO_TEST_CASE (MergeToEmptyDict) {
     std::vector<std::pair<std::string, std::string>> test_data = {};

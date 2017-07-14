@@ -63,6 +63,10 @@ class IntInnerWeightsValueStore final : public IValueStoreWriter {
     return value;
   }
 
+  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) {
+    return oldIndex;
+  }
+
   uint32_t GetMergeWeight(uint64_t fsa_value){
     return fsa_value;
   }
