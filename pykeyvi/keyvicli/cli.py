@@ -32,6 +32,10 @@ def compile(args):
         dictionary = pykeyvi.JsonDictionaryCompiler(params)
     elif dict_type == 'string':
         dictionary = pykeyvi.StringDictionaryCompiler(params)
+    elif dict_type == 'int':
+        dictionary = pykeyvi.IntDictionaryCompiler(params)
+    elif dict_type == 'completion':
+        dictionary = pykeyvi.CompletionDictionaryCompiler(params)
     elif dict_type == 'key-only':
         dictionary = pykeyvi.KeyOnlyDictionaryCompiler(params)
     else:
@@ -44,6 +48,8 @@ def compile(args):
                 splits = line.split('\t')
                 if dict_type == 'key-only':
                     dictionary.Add(splits[0])
+                elif dict_type == 'int' or dict_type == 'completion':
+                    dictionary.Add(splits[0], int(splits[1]))
                 else:
                     dictionary.Add(splits[0], splits[1])
             except:
@@ -61,6 +67,10 @@ def merge(args):
         merger = pykeyvi.JsonDictionaryMerger(params)
     elif dict_type == 'string':
         merger = pykeyvi.StringDictionaryMerger(params)
+    elif dict_type == 'int':
+        merger = pykeyvi.IntDictionaryMerger(params)
+    elif dict_type == 'completion':
+        merger = pykeyvi.CompletionDictionaryMerger(params)
     elif dict_type == 'key-only':
         merger = pykeyvi.KeyOnlyDictionaryMerger(params)
     else:
@@ -88,7 +98,7 @@ def main():
     compile_parser = subparsers.add_parser('compile')
     compile_parser.add_argument('input_file', type=str, metavar='FILE')
     compile_parser.add_argument('output_file', type=str, metavar='OUT_FILE')
-    compile_parser.add_argument('dict_type', type=str, choices=['json', 'string', 'key-only'],
+    compile_parser.add_argument('dict_type', type=str, choices=['json', 'string', 'int', 'completion', 'key-only'],
                                 help='dictionary type')
     compile_parser.add_argument('--param', action='append', default=[], dest='compiler_params',
                                 type=lambda kv: kv.split("="),
@@ -97,7 +107,7 @@ def main():
     merge_parser = subparsers.add_parser('merge')
     merge_parser.add_argument('-i', '--input-files', nargs='+', dest='input_files', required=True)
     merge_parser.add_argument('-o', '--output-file', type=str, required=True)
-    merge_parser.add_argument('dict_type', type=str, choices=['json', 'string', 'key-only'],
+    merge_parser.add_argument('dict_type', type=str, choices=['json', 'string', 'int', 'completion', 'key-only'],
                               help='dictionary type')
     merge_parser.add_argument('--param', action='append', default=[], dest='merger_params',
                               type=lambda kv: kv.split("="),
