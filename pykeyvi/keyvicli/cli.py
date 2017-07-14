@@ -53,6 +53,25 @@ def compile(args):
     dictionary.WriteToFile(args.output_file)
 
 
+def merge(args):
+    params = {key: value for key, value in args.merger_params}
+
+    dict_type = args.dict_type
+    if dict_type == 'json':
+        merger = pykeyvi.JsonDictionaryMerger(params)
+    elif dict_type == 'string':
+        merger = pykeyvi.StringDictionaryMerger(params)
+    elif dict_type == 'key-only':
+        merger = pykeyvi.KeyOnlyDictionaryMerger(params)
+    else:
+        return 'Must never reach here'
+
+    for file in args.input_files:
+        merger.Add(file)
+
+    merger.Merge(args.output_file)
+
+
 def main():
     argument_parser = ArgumentParser(description='keyvi')
     subparsers = argument_parser.add_subparsers(dest='command')
@@ -75,6 +94,15 @@ def main():
                                 type=lambda kv: kv.split("="),
                                 help='parameters for keyvi compiler in format param=value')
 
+    merge_parser = subparsers.add_parser('merge')
+    merge_parser.add_argument('-i', '--input-files', nargs='+', dest='input_files', required=True)
+    merge_parser.add_argument('-o', '--output-file', type=str, required=True)
+    merge_parser.add_argument('dict_type', type=str, choices=['json', 'string', 'key-only'],
+                              help='dictionary type')
+    merge_parser.add_argument('--param', action='append', default=[], dest='merger_params',
+                              type=lambda kv: kv.split("="),
+                              help='parameters for keyvi merger in format param=value')
+
     args = argument_parser.parse_args()
 
     if args.command == 'stats':
@@ -83,6 +111,10 @@ def main():
         dump(args)
     elif args.command == 'compile':
         compile(args)
+    elif args.command == 'merge':
+        if len(args.input_files) < 2:
+            merge_parser.error('Expecting at least 2 input files, got {}'.format(len(args.input_files)))
+        merge(args)
     else:
         return 'Must never reach here'
 
