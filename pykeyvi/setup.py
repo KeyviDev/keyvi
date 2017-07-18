@@ -173,6 +173,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                     os.makedirs(mac_os_static_libs_dir)
 
                 for lib in linklibraries_static_or_dynamic:
+                    # workaround: temp disabled static link with snappy:
+                    # see: https://github.com/Homebrew/homebrew-core/issues/15722
+                    if lib == 'snappy':
+                        continue
                     lib_file_name = 'lib{}.a'.format(lib)
                     src_file = path.join('/usr/local/lib', lib_file_name)
                     dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
