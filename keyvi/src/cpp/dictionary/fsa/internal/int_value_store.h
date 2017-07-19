@@ -59,6 +59,10 @@ class IntValueStore final : public IValueStoreWriter {
     return value;
   }
 
+  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) {
+    return oldIndex;
+  }
+
   uint32_t GetWeightValue(value_t value) const {
     return 0;
   }
