@@ -55,10 +55,12 @@ matrix:
       osx_image: xcode7.3
       compiler: clang
       env: BUILD_TYPE=osx PYTHON_VERSION=35
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=pypy2
+# temporarily disabled pypy builds on osx
+# till https://bitbucket.org/pypy/pypy/issues/2626/invalid-conversion-from-const-char-to-char is released
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=pypy2
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./travis/setup_osx.sh ; fi
