@@ -52,6 +52,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     additional_compile_flags = []
 
+    # workaround for https://bitbucket.org/pypy/pypy/issues/2626/invalid-conversion-from-const-char-to-char
+    if os.environ['PYTHON_VERSION'] == 'pypy2':
+        additional_compile_flags.append('-fpermissive')
+
     # re-map the source files in the debug symbol tables to there original location so that stepping in a debugger works
     if pykeyvi_source_path is not None:
         additional_compile_flags.append('-fdebug-prefix-map={}={}'.format(pykeyvi_source_path, keyvi_source_path))
@@ -173,10 +177,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                     os.makedirs(mac_os_static_libs_dir)
 
                 for lib in linklibraries_static_or_dynamic:
-                    # workaround: temp disabled static link with snappy:
-                    # see: https://github.com/Homebrew/homebrew-core/issues/15722
-                    if lib == 'snappy':
-                        continue
                     lib_file_name = 'lib{}.a'.format(lib)
                     src_file = path.join('/usr/local/lib', lib_file_name)
                     dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
@@ -225,7 +225,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     PACKAGE_NAME = 'pykeyvi'
 
-    version = '0.2.2'
+    version = '0.2.3'
 
     install_requires = [
         'msgpack-python',
