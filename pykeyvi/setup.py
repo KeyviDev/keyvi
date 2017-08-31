@@ -53,7 +53,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     additional_compile_flags = []
 
     # workaround for https://bitbucket.org/pypy/pypy/issues/2626/invalid-conversion-from-const-char-to-char
-    if os.environ['PYTHON_VERSION'] == 'pypy2':
+    if os.environ.get('PYTHON_VERSION', '') == 'pypy2':
         additional_compile_flags.append('-fpermissive')
 
     # re-map the source files in the debug symbol tables to there original location so that stepping in a debugger works
@@ -225,7 +225,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     PACKAGE_NAME = 'pykeyvi'
 
-    version = '0.2.3'
+    version = '0.2.4'
 
     install_requires = [
         'msgpack-python',
