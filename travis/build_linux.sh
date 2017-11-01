@@ -5,7 +5,7 @@ mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=$CONF ..
 make -j 4
-./units_test_all
+./unit_test_all
 
 cd ../pykeyvi
 python setup.py build --mode $CONF

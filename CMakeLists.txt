@@ -36,7 +36,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif ()
 
 
-include_directories(keyvi/src/cpp)
+include_directories(keyvi/include/keyvi)
 include_directories(keyvi/3rdparty/tpie)
 include_directories(keyvi/3rdparty/utf8)
 include_directories(keyvi/3rdparty/misc)
@@ -46,14 +46,14 @@ include_directories(keyvi/3rdparty/xchange/src)
 include_directories(${CMAKE_BINARY_DIR}/keyvi/3rdparty/tpie)
 
 
-FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/cpp/*.cpp)
+FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
 
-add_executable(keyvicompiler keyvi/src/cpp/keyvicompiler/keyvicompiler.cpp)
-add_executable(keyviinspector keyvi/src/cpp/keyviinspector/keyviinspector.cpp)
-add_executable(keyvimerger keyvi/src/cpp/keyvimerger/keyvimerger.cpp)
-add_executable(units_test_all ${UNIT_TEST_SOURCES})
+add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
+add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
+add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
+add_executable(unit_test_all ${UNIT_TEST_SOURCES})
 
 target_link_libraries(keyvicompiler tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyviinspector tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyvimerger tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
-target_link_libraries(units_test_all tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(unit_test_all tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})

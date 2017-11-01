@@ -210,7 +210,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     ext_modules = [Extension('keyvi',
                              include_dirs=[autowrap_data_dir,
                                            tpie_include_dir,
-                                           path.join(dictionary_sources, 'src/cpp'),
+                                           path.join(dictionary_sources, 'include/keyvi'),
                                            path.join(dictionary_sources, '3rdparty/rapidjson/include'),
                                            path.join(dictionary_sources, '3rdparty/msgpack-c/include'),
                                            path.join(dictionary_sources, '3rdparty/utf8'),

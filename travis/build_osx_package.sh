@@ -5,7 +5,7 @@ mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=release ..
 make -j 4
-./units_test_all
+./unit_test_all
 cd ..
 
 # use python from pyenv
