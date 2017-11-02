@@ -20,7 +20,7 @@ coveralls   -r . -b pykeyvi/ -i pykeyvi \
             -e pykeyvi/keyvi/3rdparty -e build \
             -E '.*/autowrap_includes/autowrap_tools.hpp' \
             -E '.*/src/extra/attributes_converter.h' \
-            -E '.*/pykeyvi.cpp' \
+            -E '.*/keyvi.cpp' \
             --dump pykeyvi.cov_report_tmp > /dev/null
 
 # workaround: remove 'pykeyvi' from source path before merge

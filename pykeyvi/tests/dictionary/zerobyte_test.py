@@ -4,7 +4,7 @@
 import contextlib
 import os
 
-import pykeyvi
+import keyvi
 
 import sys
 import os
@@ -15,7 +15,7 @@ sys.path.append(os.path.join(root, "../"))
 from test_tools import tmp_dictionary, decode_to_unicode
 
 def test_zerobyte():
-    c=pykeyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("\x00abc", '["a" : 2]')
     c.Add("abc\x00def", '["a" : 3]')
     c.Add("cd\x00", '["a" : 4]')

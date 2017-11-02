@@ -1,13 +1,11 @@
-> Keyvi is developed and maintained by Cliqz Engineering Team and Hendrik Muhs. Cliqz is a provider of innovative, privacy-focused browser technologies with integrated quick-search functionality and anti-tracking.
-
 ##
-[![Travis](https://travis-ci.org/cliqz-oss/keyvi.svg?branch=master  "Travis build status")](https://travis-ci.org/cliqz-oss/keyvi)
+[![Travis](https://travis-ci.org/KeyviDev/keyvi.svg?branch=master  "Travis build status")](https://travis-ci.org/KeyviDev/keyvi)
 [![C++](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](/keyvi/README.md)
-[![PythonVersions](https://img.shields.io/pypi/pyversions/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
-[![PythonImpl](https://img.shields.io/pypi/implementation/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
-[![PythonFormat](https://img.shields.io/pypi/format/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
-[![PyPIVersion](https://img.shields.io/pypi/v/pykeyvi.svg)](https://pypi.python.org/pypi/pykeyvi/)
-[![Coveralls](https://coveralls.io/repos/cliqz-oss/keyvi/badge.svg?branch=master&service=github)](https://coveralls.io/github/cliqz-oss/keyvi?branch=master)
+[![PythonVersions](https://img.shields.io/pypi/pyversions/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
+[![PythonImpl](https://img.shields.io/pypi/implementation/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
+[![PythonFormat](https://img.shields.io/pypi/format/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
+[![PyPIVersion](https://img.shields.io/pypi/v/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
+[![Coveralls](https://coveralls.io/repos/KeyviDev/keyvi/badge.svg?branch=master&service=github)](https://coveralls.io/github/KeyviDev/keyvi?branch=master)
 
 ##
 ![Keyvi](/doc/images/keyvi-small.png)
@@ -23,26 +21,26 @@ Keyvi - the short form for "Key value index" - defines a special subtype of the 
 
 ### Quick
 
-Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pypi.python.org/pypi/pykeyvi). To install use:
+Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pypi.python.org/pypi/keyvi). To install use:
 
-    pip install pykeyvi
+    pip install keyvi
 
 ### From Source
 
 The core part is a C++ header-only library, but the TPIE 3rdparty library needs to be compiled once. The commandline
 tools are also part of the C++ code. For instructions check the [Readme](/keyvi/README.md) file.
 
-For the python extension pykeyvi check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
+For the python extension of keyvi check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
 
 
 ## Usage
 
   * Howtos
     * [Compiling Dictionaries/Indexes](/doc/usage/Building%20keyvi%20dictionaries.md)
-    * Pykeyvi
+    * Python version of keyvi
       * [Compiling](/doc/usage/Building%20keyvi%20dictionaries%20with%20python.md)
   * [Crashcourse](/doc/usage/Crashcourse.md)
-  * [Using pykeyvi with EMR (mrjob or pyspark)](/doc/usage/Using%20pykeyvi%20in%20EMR.md)  
+  * [Using python keyvi with EMR (mrjob or pyspark)](/doc/usage/Using%20pykeyvi%20in%20EMR.md)  
 
 ## Internals
   
@@ -63,12 +61,3 @@ keyvi is licenced under apache license 2.0, see [licence](LICENSE) for details.
 
 In addition keyvi uses 3rdparty libraries which define their own licence. Please check their respective licence. 
 The 3rdparty libraries can be found at [keyvi/3rdparty](/keyvi/3rdparty).
-
-
-## Contributing
-
-* Bug reports, feature requests and general question can be added as an Issue. 
-
-* PRs are welcome. 
-
-* Questions? Concerns? Feel free to [contact us](mailto:cliqz-oss@cliqz.com?subject=keyvi).

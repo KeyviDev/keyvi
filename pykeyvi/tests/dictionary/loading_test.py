@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import pykeyvi
+import keyvi
 
 import sys
 import os
@@ -18,7 +18,7 @@ def test_invalid_filemagic():
     fd.close()
     exception_caught = False
     try:
-        d=pykeyvi.Dictionary(os.path.join(tmp_dir, 'broken_file'))
+        d=keyvi.Dictionary(os.path.join(tmp_dir, 'broken_file'))
     except ValueError:
         exception_caught = True
 
@@ -26,7 +26,7 @@ def test_invalid_filemagic():
     os.remove(os.path.join(tmp_dir, 'broken_file'))
 
 def test_truncated_file_json():
-    c=pykeyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add('a', '{1:2}')
     c.Add('b', '{2:4}')
     c.Add('c', '{4:4}')
@@ -43,7 +43,7 @@ def test_truncated_file_json():
 
     exception_caught = False
     try:
-        d=pykeyvi.Dictionary(os.path.join(tmp_dir, 'truncation_test1.kv'))
+        d=keyvi.Dictionary(os.path.join(tmp_dir, 'truncation_test1.kv'))
     except ValueError:
         exception_caught = True
 

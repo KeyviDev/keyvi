@@ -1,8 +1,8 @@
 import sys
-import pykeyvi
+import keyvi
 
-d=pykeyvi.Dictionary("normalization.keyvi")
-n=pykeyvi.FsaTransform(d)
+d=keyvi.Dictionary("normalization.keyvi")
+n=keyvi.FsaTransform(d)
 
 
 for line in sys.stdin:

@@ -3,12 +3,12 @@
 
 import os
 import tempfile
-import pykeyvi
+import keyvi
 from test_tools import tmp_dictionary
 
 
 def test_manifest():
-    c = pykeyvi.IntDictionaryCompiler({"memory_limit_mb":"10"})
+    c = keyvi.IntDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("Leela", 20)
     c.Add("Kif", 2)
     c.SetManifest({"drink": "slurm"})

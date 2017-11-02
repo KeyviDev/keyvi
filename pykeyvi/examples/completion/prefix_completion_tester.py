@@ -1,9 +1,9 @@
-import pykeyvi
+import keyvi
 
 query = ""
 
-d=pykeyvi.Dictionary("prefix-completion.keyvi")
-c=pykeyvi.PrefixCompletion(d)
+d=keyvi.Dictionary("prefix-completion.keyvi")
+c=keyvi.PrefixCompletion(d)
 
 def get_lookup_key(query):
     return query

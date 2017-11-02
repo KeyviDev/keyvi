@@ -1,15 +1,15 @@
 import json
-import pykeyvi
+import keyvi
 
 from argparse import ArgumentParser
 
 
 def stats(input_file):
-    print (json.dumps(pykeyvi.Dictionary(input_file).GetStatistics(), indent=4, sort_keys=True))
+    print (json.dumps(keyvi.Dictionary(input_file).GetStatistics(), indent=4, sort_keys=True))
 
 
 def dump(args):
-    dictionary = pykeyvi.Dictionary(args.input_file)
+    dictionary = keyvi.Dictionary(args.input_file)
     with open(args.output_file, 'w') as file_out:
         for key, value in dictionary.GetAllItems():
             if args.json_dumps:
@@ -29,15 +29,15 @@ def compile(args):
 
     dict_type = args.dict_type
     if dict_type == 'json':
-        dictionary = pykeyvi.JsonDictionaryCompiler(params)
+        dictionary = keyvi.JsonDictionaryCompiler(params)
     elif dict_type == 'string':
-        dictionary = pykeyvi.StringDictionaryCompiler(params)
+        dictionary = keyvi.StringDictionaryCompiler(params)
     elif dict_type == 'int':
-        dictionary = pykeyvi.IntDictionaryCompiler(params)
+        dictionary = keyvi.IntDictionaryCompiler(params)
     elif dict_type == 'completion':
-        dictionary = pykeyvi.CompletionDictionaryCompiler(params)
+        dictionary = keyvi.CompletionDictionaryCompiler(params)
     elif dict_type == 'key-only':
-        dictionary = pykeyvi.KeyOnlyDictionaryCompiler(params)
+        dictionary = keyvi.KeyOnlyDictionaryCompiler(params)
     else:
         return 'Must never reach here'
 
@@ -64,15 +64,15 @@ def merge(args):
 
     dict_type = args.dict_type
     if dict_type == 'json':
-        merger = pykeyvi.JsonDictionaryMerger(params)
+        merger = keyvi.JsonDictionaryMerger(params)
     elif dict_type == 'string':
-        merger = pykeyvi.StringDictionaryMerger(params)
+        merger = keyvi.StringDictionaryMerger(params)
     elif dict_type == 'int':
-        merger = pykeyvi.IntDictionaryMerger(params)
+        merger = keyvi.IntDictionaryMerger(params)
     elif dict_type == 'completion':
-        merger = pykeyvi.CompletionDictionaryMerger(params)
+        merger = keyvi.CompletionDictionaryMerger(params)
     elif dict_type == 'key-only':
-        merger = pykeyvi.KeyOnlyDictionaryMerger(params)
+        merger = keyvi.KeyOnlyDictionaryMerger(params)
     else:
         return 'Must never reach here'
 

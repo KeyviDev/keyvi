@@ -3,7 +3,7 @@
 import sys
 import Queue
 import threading
-import pykeyvi
+import keyvi
 import argparse
 import os
 import gzip
@@ -31,7 +31,7 @@ def compile_file(input, output, jobs, shards):
 
     compilers = {}
     for i in range (0, shards):
-        compilers[i] = pykeyvi.JsonDictionaryCompiler()
+        compilers[i] = keyvi.JsonDictionaryCompiler()
 
     if os.path.isdir(input):
         input_files = [os.path.join(input,d) for d in os.listdir(input)]
@@ -55,7 +55,7 @@ def compile_file(input, output, jobs, shards):
 
                 value = parts[1]
 
-                shard = pykeyvi.JumpConsistentHashString(key, shards)
+                shard = keyvi.JumpConsistentHashString(key, shards)
                 compilers[shard].Add(key, value)
             except:
                 print "failed to add: " + line

@@ -3,7 +3,7 @@
 
 Imagine you want to do some lookups in you map-reduce jobs like matching or extracting certain patterns - in fuzzy manner if you like - and your lookup table is huge. 
 You could call a database or key value store remotely, but that kills performance and introduces a single point of failure in the otherwise distributed processing.
-With pykeyvi you can easily do that, given you are using a python based framework like mrjob or pyspark. 
+With keyvi you can easily do that, given you are using a python based framework like mrjob or pyspark. 
 Due to the shared memory model keyvi indexes are just loaded once in memory, independent on the number of mappers on one machine.
 It works even if keyvi files are bigger than the main memory, for the price of some IO of course. 
 In the end all calls will be local and do not entail any networking.
@@ -12,10 +12,10 @@ In the end all calls will be local and do not entail any networking.
 
 All we need is to install keyvi at bootstraping time.
 
-The precompiled packages support all supported versions of Amazons EMR. Therefore just install pykeyvi during bootstrap:
+The precompiled packages support all supported versions of Amazons EMR. Therefore just install the python version of keyvi during bootstrap:
 
 ```
-sudo pip install pykeyvi
+sudo pip install keyvi
 ```
 
 ### Using keyvi
@@ -32,7 +32,7 @@ Ensure you initialize the Dictionary e.g. in mapper_init (mrjob) or using a sing
 See this example loader for pyspark:
 
 ```
-import pykeyvi
+import keyvi
 
 try:
     # only works if in spark
@@ -62,7 +62,7 @@ try:
                     hdfs_filename = hdfs_filename.encode('utf-8')
 
                 try:
-                    d=pykeyvi.Dictionary(hdfs_filename)
+                    d=keyvi.Dictionary(hdfs_filename)
                 except Exception, e:
                     raise Exception("Failed to load keyvi dictionary {}: {}".format(name, e.message))
 
@@ -96,7 +96,7 @@ except:
             d = self.loaded_keyvi_dicts.get(name)
 
             if d is None:
-                d = pykeyvi.Dictionary(os.path.join("my_keyvi_files_folder", name))
+                d = keyvi.Dictionary(os.path.join("my_keyvi_files_folder", name))
                 self.loaded_keyvi_dicts[name] = d
 
             return d

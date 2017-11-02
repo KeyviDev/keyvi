@@ -1,9 +1,9 @@
-## The pykeyvi compilers
+## The python keyvi compilers
 
-The compiler is also available from pykeyvi:
+The compiler is also available from python keyvi:
 
-    import pykeyvi
-    compiler = pykeyvi.KeyOnlyDictionaryCompiler()
+    import keyvi
+    compiler = keyvi.KeyOnlyDictionaryCompiler()
 
     # repeat for every key
     compiler.Add("foo")
@@ -12,7 +12,7 @@ The compiler is also available from pykeyvi:
     compiler.Compile()
     compiler.WriteToFile("/tmp/test.keyvi")
 
-Other available Compiler in pykeyvi
+Other available Compiler in keyvi
 
 type              | details
 ----------------- | --------------------------------------------------------------------------------------------- 

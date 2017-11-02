@@ -1,11 +1,11 @@
-import pykeyvi
+import keyvi
 
 MULTIWORD_QUERY_SEPARATOR = '\x1b'
 
 query = ""
 
-d=pykeyvi.Dictionary("mw-completion.keyvi")
-c=pykeyvi.MultiWordCompletion(d)
+d=keyvi.Dictionary("mw-completion.keyvi")
+c=keyvi.MultiWordCompletion(d)
 
 def get_lookup_key(query):
     l = query.split(" ")

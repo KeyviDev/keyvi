@@ -1,12 +1,12 @@
-# pykeyvi
+# python version of keyvi
 
 This is the python extension.
 
 ## Quick
 
-Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pypi.python.org/pypi/pykeyvi). To install use:
+Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pypi.python.org/pypi/keyvi). To install use:
 
-    pip install pykeyvi
+    pip install keyvi
 
 ## From source
 
@@ -20,4 +20,4 @@ Then build/install a python package:
 
 ## Develop
 
-pykeyvi uses [cython](http://cython.org/) and [autowrap](https://github.com/uweschmitt/autowrap). All source files can be found in the src folder. The files pykeyvi.cpp and pykeyvi.pyx are generated on the fly during build.
+The python binding uses [cython](http://cython.org/) and [autowrap](https://github.com/uweschmitt/autowrap). All source files can be found in the src folder. The files keyvi.cpp and keyvi.pyx are generated on the fly during build.

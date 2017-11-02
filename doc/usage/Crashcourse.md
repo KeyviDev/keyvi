@@ -10,7 +10,7 @@ Try:
     
 Try in python:
     
-    import pykeyvi
+    import keyvi
     
 ### First compile and decompile
 
@@ -40,8 +40,8 @@ Check questions:
 
 Do:
 
-    import pykeyvi
-    d = pykeyvi.Dictionary("compiled.kv")
+    import keyvi
+    d = keyvi.Dictionary("compiled.kv")
     "keyvi" in d
     
 should return True
@@ -94,7 +94,7 @@ The output should be:
 
 Note: As we have compiled `key-only` dictionary there is no info regarding values.
 
-Similarly with python, on the `pykeyvi.Dictionary` object `d` the call `d.GetStatistics()` will return the same information.
+Similarly with python, on the `keyvi.Dictionary` object `d` the call `d.GetStatistics()` will return the same information.
 
 ### Lookup and Extraction
 

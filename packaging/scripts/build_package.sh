@@ -8,7 +8,7 @@
 VERSION="$1"
 DISTRIBUTION="trusty"
 
-URL_REPO=https://github.com/cliqz/keyvi
+URL_REPO=https://github.com/KeyviDev/keyvi
 PACKAGE_NAME=keyvi
 
 # Setting umask

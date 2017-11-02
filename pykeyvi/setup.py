@@ -12,8 +12,8 @@ import glob
 from contextlib import contextmanager
 from os import path
 
-pykeyvi_pyx = 'pykeyvi.pyx'
-pykeyvi_cpp = 'pykeyvi.cpp'
+pykeyvi_pyx = 'keyvi.pyx'
+pykeyvi_cpp = 'keyvi.cpp'
 
 
 def generate_pykeyvi_source():
@@ -207,7 +207,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             _build_ext.build_ext.run(self)
 
 
-    ext_modules = [Extension('pykeyvi',
+    ext_modules = [Extension('keyvi',
                              include_dirs=[autowrap_data_dir,
                                            tpie_include_dir,
                                            path.join(dictionary_sources, 'src/cpp'),
@@ -223,7 +223,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                              library_dirs=link_library_dirs,
                              libraries=linklibraries)]
 
-    PACKAGE_NAME = 'pykeyvi'
+    PACKAGE_NAME = 'keyvi'
 
     version = '0.2.4'
 
@@ -243,8 +243,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         packages=['keyvicli'],
         ext_modules=ext_modules,
         zip_safe=False,
-        url='https://github.com/cliqz-oss/keyvi',
-        download_url='https://github.com/cliqz-oss/keyvi/tarball/v{}'.format(version),
+        url='http://keyvi.org',
+        download_url='https://github.com/KeyviDev/keyvi/tarball/v{}'.format(version),
         keywords=['FST'],
         classifiers=[
             'Programming Language :: C++',

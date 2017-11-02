@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import pykeyvi
+import keyvi
 
 import sys
 import os
@@ -12,7 +12,7 @@ sys.path.append(os.path.join(root, "../"))
 from test_tools import tmp_dictionary, decode_to_unicode
 
 def test_unicode():
-    c = pykeyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("öäü", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     # use python syntax ala __setitem__
@@ -26,7 +26,7 @@ def test_unicode():
         assert decode_to_unicode(d.get(key).GetValue()) == decode_to_unicode({"a" : 2})
 
 def test_unicode_lookup():
-    c = pykeyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("Los Angeles", '{"country" : "USA"}')
     c.Add("Frankfurt am Main", '{"country" : "Germany"}')
     c.Add(decode_to_unicode("Kirchheim bei München"), '{"country" : "Germany"}')

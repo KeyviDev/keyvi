@@ -1,8 +1,8 @@
-import pykeyvi
+import keyvi
 
 query = ""
 
-d=pykeyvi.Dictionary("your-own.keyvi")
+d=keyvi.Dictionary("your-own.keyvi")
 
 def get_lookup_key(query):
     return query

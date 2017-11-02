@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import pykeyvi
+import keyvi
 
 import sys
 import os
@@ -45,7 +45,7 @@ key_values_3 = {
 
 
 def generate_keyvi(key_values, filename):
-    dictionary_compiler = pykeyvi.StringDictionaryCompiler({"memory_limit_mb": "10"})
+    dictionary_compiler = keyvi.StringDictionaryCompiler({"memory_limit_mb": "10"})
     for key, value in key_values.items():
         dictionary_compiler.Add(key, json.dumps(value))
 
@@ -53,8 +53,8 @@ def generate_keyvi(key_values, filename):
     dictionary_compiler.WriteToFile(filename)
 
 
-@pytest.mark.parametrize('merger', [pykeyvi.StringDictionaryMerger({"memory_limit_mb": "10"}),
-                                    # pykeyvi.StringDictionaryMerger({"memory_limit_mb": "10", 'merge_mode': 'append'})
+@pytest.mark.parametrize('merger', [keyvi.StringDictionaryMerger({"memory_limit_mb": "10"}),
+                                    # keyvi.StringDictionaryMerger({"memory_limit_mb": "10", 'merge_mode': 'append'})
                                     ])
 def test_merge(merger):
     tmp_dir = tempfile.mkdtemp()
@@ -73,7 +73,7 @@ def test_merge(merger):
         merger.Add(file_3)
         merger.Merge(merge_file)
 
-        merged_dictionary = pykeyvi.Dictionary(merge_file)
+        merged_dictionary = keyvi.Dictionary(merge_file)
 
         key_values = {}
         key_values.update(key_values_1)

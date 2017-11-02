@@ -2,10 +2,10 @@
 .cache/v/cache/lastfailed
 
 # build artifacts
-pykeyvi.egg-info/
+keyvi.egg-info/
 build/
 dist/
 
 # autowrap artifacts
-pykeyvi.pyx
-pykeyvi.cpp
+keyvi.pyx
+keyvi.cpp
