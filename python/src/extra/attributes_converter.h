@@ -12,7 +12,7 @@
 #include <boost/variant.hpp>
 
 namespace keyvi {
-namespace pykeyvitionary {
+namespace python {
 
 class attributes_visitor : public boost::static_visitor<PyObject*>
 {
@@ -33,7 +33,7 @@ inline PyObject* Convert (dictionary::Match& m,  const std::string& key) {
     return boost::apply_visitor( attributes_visitor(), result );
   }
 
-} /* namespace pykeyvitionary */
+} /* namespace python */
 } /* namespace keyvi */
 
 #endif /* ATTRIBUTES_CONVERTER_H_ */
