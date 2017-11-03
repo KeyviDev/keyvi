@@ -8,6 +8,11 @@ make -j 4
 ./units_test_all
 
 cd ../pykeyvi
+
+which python
+which pip
+
+
 python setup.py build --mode $CONF
 python setup.py install --user
 py.test tests
