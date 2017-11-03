@@ -53,5 +53,5 @@ python -c "import distutils.util; print(distutils.util.get_platform())"
 
 # install other python deps
 pip install --upgrade pip
-pip install -r pykeyvi/requirements.txt
+pip install --user -r pykeyvi/requirements.txt
 if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install coveralls-merge cpp-coveralls ; fi
