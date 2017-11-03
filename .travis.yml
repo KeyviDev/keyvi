@@ -5,6 +5,8 @@
 
 
 language: cpp
+dist: trusty
+group: edge
 
 compiler:
 # disable, does not build with current msgpack - clang

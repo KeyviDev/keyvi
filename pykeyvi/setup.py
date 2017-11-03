@@ -9,6 +9,10 @@ import multiprocessing
 import shutil
 import glob
 
+#testing
+import msgpack
+import autowrap
+
 from contextlib import contextmanager
 from os import path
 
