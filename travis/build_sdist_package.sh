@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ev
 
-cd pykeyvi
+cd python
 python setup.py sdist -d wheelhouse
 
 pip uninstall -y autowrap

@@ -14,7 +14,7 @@ PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
 export TMPDIR=/Volumes/ram-disk
 
-cd pykeyvi
+cd python
 python setup.py bdist_wheel -d wheelhouse
 sudo -H pip install wheelhouse/*.whl
 py.test tests

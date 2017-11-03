@@ -5,7 +5,7 @@ set -ev
 PYENV_ROOT="$HOME/.pyenv"
 PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
-cd pykeyvi
+cd python
 if [ -n "$(ls -A wheelhouse)" ]; then
     twine upload --config-file ../travis/pypirc -u $PYPI_USERNAME -p $PYPI_PASSWORD wheelhouse/*
 fi

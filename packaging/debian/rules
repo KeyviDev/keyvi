@@ -9,11 +9,11 @@ DEB_DESTDIR=$(PWD)/debian/tmp
 
 override_dh_auto_build:
 	cd keyvi && $(SCONS) mode=release
-	cd pykeyvi && python setup.py build
+	cd python && python setup.py build
 override_dh_auto_clean:
 	dh_auto_clean
 	cd keyvi && $(SCONS) mode=release -c && rm -f .sconsign.dblite
-	cd pykeyvi && rm -rf build && rm -rf keyvi.egg-info
+	cd python && rm -rf build && rm -rf keyvi.egg-info
 	rm -rf $(DEB_DESTDIR)
 	rm -f debian/*.substvars
 	rm -f debian/files
@@ -21,4 +21,4 @@ override_dh_auto_clean:
 
 override_dh_auto_install:
 	cd keyvi && $(SCONS) mode=release install --prefix=$(DEB_DESTDIR)/usr
-	cd pykeyvi && python setup.py install --install-layout=deb --root $(DEB_DESTDIR)
+	cd python && python setup.py install --install-layout=deb --root $(DEB_DESTDIR)

@@ -30,7 +30,7 @@ Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pyp
 The core part is a C++ header-only library, but the TPIE 3rdparty library needs to be compiled once. The commandline
 tools are also part of the C++ code. For instructions check the [Readme](/keyvi/README.md) file.
 
-For the python extension of keyvi check the [Readme](/pykeyvi/README.md) file in the pykeyvi subfolder.
+For the python extension of keyvi check the [Readme](/python/README.md) file in the python subfolder.
 
 
 ## Usage
