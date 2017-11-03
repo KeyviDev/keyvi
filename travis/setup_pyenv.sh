@@ -58,5 +58,5 @@ pip install --upgrade pip
 pip install -v -r pykeyvi/requirements.txt
 if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install coveralls-merge cpp-coveralls ; fi
 
-python -c "import msgpack"
+python -c "import msgpack;msgpack.version"
 

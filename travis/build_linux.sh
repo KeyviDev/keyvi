@@ -11,7 +11,11 @@ cd ../pykeyvi
 
 which python
 which pip
+env
 
+PYENV_ROOT="$HOME/.pyenv"
+PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
 
 python setup.py build --mode $CONF
 python setup.py install --user
