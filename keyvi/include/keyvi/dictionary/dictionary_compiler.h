@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef DICTIONARY_COMPILER_H_
-#define DICTIONARY_COMPILER_H_
+#ifndef KEYVI_DICTIONARY_DICTIONARY_COMPILER_H_
+#define KEYVI_DICTIONARY_DICTIONARY_COMPILER_H_
 
 #include <algorithm>
 #include <functional>
@@ -72,8 +72,7 @@ template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore,
 #endif
 class DictionaryCompiler final {
   typedef std::function<void(size_t, size_t, void*)> callback_t;
-  using GeneratorAdapter =
-      fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+  using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
 
  public:
   /**
@@ -85,9 +84,7 @@ class DictionaryCompiler final {
    *
    * @param params compiler parameters
    */
-  explicit DictionaryCompiler(
-      const compiler_param_t& params = compiler_param_t())
-      : sorter_(params), params_(params) {
+  explicit DictionaryCompiler(const compiler_param_t& params = compiler_param_t()) : sorter_(params), params_(params) {
     params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
@@ -107,8 +104,7 @@ class DictionaryCompiler final {
    *
    * @param memory_limit memory limit for internal memory usage
    */
-  DictionaryCompiler(size_t memory_limit,
-                     const compiler_param_t& params = compiler_param_t())
+  explicit DictionaryCompiler(size_t memory_limit, const compiler_param_t& params = compiler_param_t())
       : sorter_(memory_limit, params), params_(params) {
     // Note: I can not use delegate constructors as the other would need to call
     // this one
@@ -138,24 +134,21 @@ class DictionaryCompiler final {
   DictionaryCompiler& operator=(DictionaryCompiler const&) = delete;
   DictionaryCompiler(const DictionaryCompiler& that) = delete;
 
-  void Add(const std::string& input_key,
-           typename ValueStoreT::value_t value = ValueStoreT::no_value) {
+  void Add(const std::string& input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     size_of_keys_ += input_key.size();
     sorter_.push_back(key_value_t(std::move(input_key), RegisterValue(value)));
   }
 
 #ifdef Py_PYTHON_H
   template <typename StringType>
-  void __setitem__(StringType input_key, typename ValueStoreT::value_t value =
-                                             ValueStoreT::no_value) {
+  void __setitem__(StringType input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     return Add(input_key, value);
   }
 #endif
 
   void Delete(const std::string& input_key) {
     if (!stable_insert_) {
-      throw compiler_exception(
-          "delete only available when using stable_inserts option");
+      throw compiler_exception("delete only available when using stable_inserts option");
     }
 
     fsa::ValueHandle handle = {
@@ -172,15 +165,13 @@ class DictionaryCompiler final {
   /**
    * Do the final compilation
    */
-  void Compile(callback_t progress_callback = nullptr,
-               void* user_data = nullptr) {
+  void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
     size_t added_key_values = 0;
     size_t callback_trigger = 0;
 
     value_store_->CloseFeeding();
     sorter_.sort();
-    generator_ =
-        GeneratorAdapter::CreateGenerator(size_of_keys_, params_, value_store_);
+    generator_ = GeneratorAdapter::CreateGenerator(size_of_keys_, params_, value_store_);
     generator_->SetManifest(manifest_);
 
     if (sorter_.size() > 0) {
@@ -228,11 +219,9 @@ class DictionaryCompiler final {
 
           if (!last_key_value.value.deleted) {
             TRACE("adding to generator: %s", last_key_value.key.c_str());
-            generator_->Add(std::move(last_key_value.key),
-                            last_key_value.value);
+            generator_->Add(std::move(last_key_value.key), last_key_value.value);
             ++added_key_values;
-            if (progress_callback &&
-                (added_key_values % callback_trigger == 0)) {
+            if (progress_callback && (added_key_values % callback_trigger == 0)) {
               progress_callback(added_key_values, number_of_items, user_data);
             }
           } else {
@@ -288,7 +277,7 @@ class DictionaryCompiler final {
     generator_->Write(stream);
   }
 
-  template<typename StringType>
+  template <typename StringType>
   void WriteToFile(StringType filename) {
     if (!generator_) {
       throw compiler_exception("not compiled yet");
@@ -316,8 +305,7 @@ class DictionaryCompiler final {
    * @param value The Value
    * @return a handle that later needs to be passed to Add()
    */
-  fsa::ValueHandle RegisterValue(
-      typename ValueStoreT::value_t value = ValueStoreT::no_value) {
+  fsa::ValueHandle RegisterValue(typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     bool no_minimization = false;
     uint64_t value_idx = value_store_->GetValue(value, no_minimization);
 
@@ -336,4 +324,4 @@ class DictionaryCompiler final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* DICTIONARY_COMPILER_H_ */
+#endif  // KEYVI_DICTIONARY_DICTIONARY_COMPILER_H_
