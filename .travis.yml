@@ -98,7 +98,7 @@ addons:
     - doxygen-gui
     - graphviz
     - libstdc++-4.8-dev
-    - clang-format
+    - clang-format-3.8
 
 script:
   - if [ "$BUILD_TYPE" == "linux" ]; then source ./travis/build_linux.sh ; fi
