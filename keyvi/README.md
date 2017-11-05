@@ -34,4 +34,4 @@ Example:
 
 `<BUILD_TYPE>` can be `release`, `debug`, `coverage` or any other available by default in `cmake`
 
-To run cpp unit tests just execute `units_test_all` executable.
+To run cpp unit tests just execute `unit_test_all` executable.
