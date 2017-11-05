@@ -5,7 +5,7 @@ mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=release ..
 make -j 4
-./units_test_all
+./unit_test_all
 cd ..
 
 # use python from pyenv
@@ -14,7 +14,7 @@ PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
 export TMPDIR=/Volumes/ram-disk
 
-cd pykeyvi
+cd python
 python setup.py bdist_wheel -d wheelhouse
 sudo -H pip install wheelhouse/*.whl
 py.test tests

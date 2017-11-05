@@ -98,7 +98,7 @@ Similarly with python, on the `keyvi.Dictionary` object `d` the call `d.GetStati
 
 ### Lookup and Extraction
 
-Go to [lookup examples](/pykeyvi/examples/lookup)
+Go to [lookup examples](/python/examples/lookup)
 
 Compile cities.tsv and run the tester:
     
@@ -109,7 +109,7 @@ Try queries like: "Fahrradwerkstatt München", "Berlin Alexanderplatz", "San Fra
 
 #### Build your own index
 
-Try pykeyvi/scripts/compile_json.py and compile your own JSON. The format should be:
+Try python/scripts/compile_json.py and compile your own JSON. The format should be:
 
     key {"city": "Munich", "state": "Germany"}
 
@@ -133,7 +133,7 @@ With sharding (for distributed data indexes):
 ### Completion
 
 
-Go to [completion examples](/pykeyvi/examples/completion)
+Go to [completion examples](/python/examples/completion)
 
 #### Prefix completion
 
@@ -185,7 +185,7 @@ Check questions:
 
 ### Normalization
 
-Go to [normalization examples](/pykeyvi/examples/normalization)
+Go to [normalization examples](/python/examples/normalization)
 
 Compile with:
 

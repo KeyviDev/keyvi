@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ev
 
-cd /keyvi/pykeyvi/
+cd /keyvi/python/
 
 case "${PYTHON_VERSION}" in
   27)
