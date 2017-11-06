@@ -22,16 +22,20 @@
  *      Author: hendrik
  */
 
-#ifndef DICTIONARY_H_
-#define DICTIONARY_H_
+#ifndef KEYVI_DICTIONARY_DICTIONARY_H_
+#define KEYVI_DICTIONARY_DICTIONARY_H_
+
 #include <queue>
+#include <string>
+#include <vector>
+
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/state_traverser.h"
 #include "dictionary/fsa/traverser_types.h"
 #include "dictionary/match.h"
 #include "dictionary/match_iterator.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -51,7 +55,7 @@ class Dictionary final {
     TRACE("Dictionary from file %s", filename.c_str());
   }
 
-  Dictionary(fsa::automata_t f) : fsa_(f) {}
+  explicit Dictionary(fsa::automata_t f) : fsa_(f) {}
 
   fsa::automata_t GetFsa() const { return fsa_; }
 
@@ -136,7 +140,6 @@ class Dictionary final {
     m = Match(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
 
     auto func = [m, has_run]() mutable {
-
       if (!has_run) {
         has_run = true;
         return m;
@@ -162,7 +165,7 @@ class Dictionary final {
 
     // data which is required for the callback as well
     struct delegate_payload {
-      delegate_payload(fsa::StateTraverser<>&& t, std::vector<unsigned char>& stack)
+      delegate_payload(fsa::StateTraverser<>&& t, const std::vector<unsigned char>& stack)
           : traverser(std::move(t)), traversal_stack(std::move(stack)) {}
 
       fsa::StateTraverser<> traverser;
@@ -237,7 +240,6 @@ class Dictionary final {
     }
 
     auto func = [m, has_run]() mutable {
-
       if (!has_run) {
         has_run = true;
         return m;
@@ -324,7 +326,7 @@ class Dictionary final {
 
     // data which is required for the callback as well
     struct delegate_payload {
-      delegate_payload(fsa::NearStateTraverser&& t, std::vector<unsigned char>& stack)
+      delegate_payload(fsa::NearStateTraverser&& t, const std::vector<unsigned char>& stack)
           : traverser(std::move(t)), traversal_stack(std::move(stack)) {}
 
       fsa::NearStateTraverser traverser;
@@ -392,4 +394,4 @@ typedef boost::shared_ptr<Dictionary> dictionary_t;
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* STRING_DICTIONARY_H_ */
+#endif  //  KEYVI_DICTIONARY_DICTIONARY_H_
