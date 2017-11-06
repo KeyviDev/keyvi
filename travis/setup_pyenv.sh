@@ -54,4 +54,8 @@ python -c "import distutils.util; print(distutils.util.get_platform())"
 # install other python deps
 pip install --upgrade pip
 pip install --user -r python/requirements.txt
+
 if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install coveralls-merge cpp-coveralls ; fi
+
+# do style check together with coverage
+if [ "$CC" = "gcc" ] && [ "$CONF" = "coverage" ]; then pip install cpplint ; fi

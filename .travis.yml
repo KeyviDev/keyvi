@@ -98,6 +98,7 @@ addons:
     - doxygen-gui
     - graphviz
     - libstdc++-4.8-dev
+    - clang-format-3.8
 
 script:
   - if [ "$BUILD_TYPE" == "linux" ]; then source ./travis/build_linux.sh ; fi
@@ -107,6 +108,7 @@ script:
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/coverage.sh ; fi
+  - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/style.sh ; fi
   - if [ "$BUILD_TYPE" == "doc" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then source ./travis/build_doc.sh ; fi
 
 deploy:
