@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /*
  * near_traversal.h
  *
@@ -23,12 +22,15 @@
  *      Author: hendrik
  */
 
-#ifndef NEAR_TRAVERSAL_H_
-#define NEAR_TRAVERSAL_H_
+#ifndef KEYVI_DICTIONARY_FSA_TRAVERSAL_NEAR_TRAVERSAL_H_
+#define KEYVI_DICTIONARY_FSA_TRAVERSAL_NEAR_TRAVERSAL_H_
+
+#include <string>
+#include <vector>
 
 #include "dictionary/fsa/traversal/traversal_base.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -36,53 +38,50 @@ namespace dictionary {
 namespace fsa {
 namespace traversal {
 
-
-struct NearTransition: public Transition {
+struct NearTransition : public Transition {
   using Transition::Transition;
 };
 
-
-template<>
+template <>
 struct TraversalPayload<NearTransition> {
-  TraversalPayload(): current_depth(0), lookup_key(){}
-  TraversalPayload(const std::string& lookup_key): current_depth(0), lookup_key(lookup_key){}
+  TraversalPayload() : current_depth(0), lookup_key() {}
+  explicit TraversalPayload(const std::string& lookup_key) : current_depth(0), lookup_key(lookup_key) {}
 
   size_t current_depth;
   std::string lookup_key;
   size_t exact_depth = 0;
   bool exact = true;
-
 };
 
-template<>
+template <>
 struct TraversalStatePayload<NearTransition> {
   std::vector<NearTransition> transitions;
   size_t position = 0;
 };
 
-
-template<>
-inline void TraversalState<NearTransition>::PostProcess(TraversalPayload<NearTransition>& payload) {
+template <>
+inline void TraversalState<NearTransition>::PostProcess(TraversalPayload<NearTransition>* payload) {
   // check if we are still matching exact, if not mark it
-  if (payload.exact) {
-    TRACE("exact match at %d", payload.current_depth);
+  if (payload->exact) {
+    TRACE("exact match at %d", payload->current_depth);
 
-    payload.exact_depth = payload.current_depth;
+    payload->exact_depth = payload->current_depth;
 
     if (traversal_state_payload.position != 0) {
-      TRACE("Stop exact match at %d", payload.current_depth);
-      payload.exact = false;
+      TRACE("Stop exact match at %d", payload->current_depth);
+      payload->exact = false;
     }
   }
 }
 
-
-template<>
-inline void TraversalState<NearTransition>::Add(uint64_t s, unsigned char l, TraversalPayload<NearTransition>& payload) {
+template <>
+inline void TraversalState<NearTransition>::Add(uint64_t s, unsigned char l,
+                                                TraversalPayload<NearTransition>* payload) {
   // check exact match
-  TRACE("Add %c depth %d, exact %c", l, payload.current_depth, payload.lookup_key[payload.current_depth]);
+  TRACE("Add %c depth %d, exact %c", l, payload->current_depth, payload->lookup_key[payload->current_depth]);
 
-  if (payload.exact && payload.current_depth < payload.lookup_key.size() && payload.lookup_key[payload.current_depth] == l) {
+  if (payload->exact && payload->current_depth < payload->lookup_key.size() &&
+      payload->lookup_key[payload->current_depth] == l) {
     // fill in and set position 0, so that we start traversal there
     TRACE("Found exact match");
     traversal_state_payload.position = 0;
@@ -92,8 +91,7 @@ inline void TraversalState<NearTransition>::Add(uint64_t s, unsigned char l, Tra
   traversal_state_payload.transitions.push_back(NearTransition(s, l));
 }
 
-
-template<>
+template <>
 inline void TraversalState<NearTransition>::Clear() {
   // keep the 1st bucket empty for an exact match
   traversal_state_payload.position = 1;
@@ -101,8 +99,8 @@ inline void TraversalState<NearTransition>::Clear() {
   traversal_state_payload.transitions.push_back(NearTransition(0, 0));
 }
 
-template<>
-inline size_t& TraversalStack<NearTransition>::operator-- (){
+template <>
+inline size_t& TraversalStack<NearTransition>::operator--() {
   if (traversal_stack_payload.exact_depth == traversal_stack_payload.current_depth) {
     TRACE("reduce exact match to %d", traversal_stack_payload.current_depth - 1);
     --traversal_stack_payload.exact_depth;
@@ -111,8 +109,8 @@ inline size_t& TraversalStack<NearTransition>::operator-- (){
   return --traversal_stack_payload.current_depth;
 }
 
-template<>
-inline size_t TraversalStack<NearTransition>::operator-- (int){
+template <>
+inline size_t TraversalStack<NearTransition>::operator--(int) {
   if (traversal_stack_payload.exact_depth == traversal_stack_payload.current_depth) {
     TRACE("reduce exact match to %d", traversal_stack_payload.current_depth - 1);
     --traversal_stack_payload.exact_depth;
@@ -126,5 +124,4 @@ inline size_t TraversalStack<NearTransition>::operator-- (int){
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-
-#endif /* NEAR_TRAVERSAL_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_TRAVERSAL_NEAR_TRAVERSAL_H_

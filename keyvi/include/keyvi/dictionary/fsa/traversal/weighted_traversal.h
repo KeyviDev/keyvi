@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /*
  * weighted_traversal.h
  *
@@ -23,12 +22,15 @@
  *      Author: hendrik
  */
 
-#ifndef WEIGHTED_TRAVERSAL_H_
-#define WEIGHTED_TRAVERSAL_H_
+#ifndef KEYVI_DICTIONARY_FSA_TRAVERSAL_WEIGHTED_TRAVERSAL_H_
+#define KEYVI_DICTIONARY_FSA_TRAVERSAL_WEIGHTED_TRAVERSAL_H_
+
+#include <algorithm>
+#include <cstdint>
 
 #include "dictionary/fsa/traversal/traversal_base.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -37,7 +39,7 @@ namespace fsa {
 namespace traversal {
 
 struct WeightedTransition {
-  WeightedTransition(uint64_t s, uint32_t w, unsigned char l): state(s), weight(w), label(l) {}
+  WeightedTransition(uint64_t s, uint32_t w, unsigned char l) : state(s), weight(w), label(l) {}
 
   uint64_t state;
   uint32_t weight;
@@ -48,16 +50,17 @@ static bool WeightedTransitionCompare(const WeightedTransition& a, const Weighte
   TRACE("compare %d %d", a.weight, b.weight);
 
   return a.weight > b.weight;
-};
+}
 
-template<>
-inline void TraversalState<WeightedTransition>::PostProcess(TraversalPayload<WeightedTransition>& payload) {
+template <>
+inline void TraversalState<WeightedTransition>::PostProcess(TraversalPayload<WeightedTransition>* payload) {
   if (traversal_state_payload.transitions.size() > 0) {
-    std::sort(traversal_state_payload.transitions.begin(), traversal_state_payload.transitions.end(), WeightedTransitionCompare);
+    std::sort(traversal_state_payload.transitions.begin(), traversal_state_payload.transitions.end(),
+              WeightedTransitionCompare);
   }
 }
 
-template<>
+template <>
 inline uint32_t TraversalState<WeightedTransition>::GetNextInnerWeight() const {
   return traversal_state_payload.transitions[traversal_state_payload.position].weight;
 }
@@ -67,5 +70,4 @@ inline uint32_t TraversalState<WeightedTransition>::GetNextInnerWeight() const {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-
-#endif /* WEIGHTED_TRAVERSAL_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_TRAVERSAL_WEIGHTED_TRAVERSAL_H_

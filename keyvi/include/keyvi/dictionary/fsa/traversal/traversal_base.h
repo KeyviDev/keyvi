@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /*
  * traversal_base.h
  *
@@ -23,10 +22,13 @@
  *      Author: hendrik
  */
 
-#ifndef TRAVERSAL_BASE_H_
-#define TRAVERSAL_BASE_H_
+#ifndef KEYVI_DICTIONARY_FSA_TRAVERSAL_TRAVERSAL_BASE_H_
+#define KEYVI_DICTIONARY_FSA_TRAVERSAL_TRAVERSAL_BASE_H_
 
-//#define ENABLE_TRACING
+#include <cstdint>
+#include <vector>
+
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -35,20 +37,20 @@ namespace fsa {
 namespace traversal {
 
 struct Transition {
-  Transition(uint64_t s, unsigned char l): state(s), label(l) {}
+  Transition(uint64_t s, unsigned char l) : state(s), label(l) {}
 
   uint64_t state;
   unsigned char label;
 };
 
-template<class TransitionT = Transition>
+template <class TransitionT = Transition>
 struct TraversalPayload {
-  TraversalPayload(): current_depth(0){}
+  TraversalPayload() : current_depth(0) {}
 
   size_t current_depth;
 };
 
-template<class TransitionT = Transition>
+template <class TransitionT = Transition>
 struct TraversalStatePayload {
   std::vector<TransitionT> transitions;
   size_t position = 0;
@@ -57,14 +59,13 @@ struct TraversalStatePayload {
 /**
  * A helper data structure to hold a state in graph traversal
  */
-template<class TransitionT = Transition>
+template <class TransitionT = Transition>
 struct TraversalState {
-
-  void Add(uint64_t s, unsigned char l, TraversalPayload<TransitionT>& payload) {
+  void Add(uint64_t s, unsigned char l, TraversalPayload<TransitionT>* payload) {
     traversal_state_payload.transitions.push_back(TransitionT(s, l));
   }
 
-  void Add(uint64_t s, uint32_t weight, unsigned char l, TraversalPayload<TransitionT>& payload) {
+  void Add(uint64_t s, uint32_t weight, unsigned char l, TraversalPayload<TransitionT>* payload) {
     traversal_state_payload.transitions.push_back(TransitionT(s, weight, l));
   }
 
@@ -81,29 +82,20 @@ struct TraversalState {
     return traversal_state_payload.transitions[traversal_state_payload.position].label;
   }
 
-  uint32_t GetNextInnerWeight() const {
-    return 0;
-  }
+  uint32_t GetNextInnerWeight() const { return 0; }
 
-  size_t size() const {
-    return traversal_state_payload.transitions.size();
-  }
+  size_t size() const { return traversal_state_payload.transitions.size(); }
 
-  size_t& operator++ (){
-    return ++traversal_state_payload.position;
-  }
+  size_t& operator++() { return ++traversal_state_payload.position; }
 
-  size_t operator++ (int){
-    return traversal_state_payload.position++;
-  }
+  size_t operator++(int) { return traversal_state_payload.position++; }
 
-  void Clear(){
+  void Clear() {
     traversal_state_payload.position = 0;
     traversal_state_payload.transitions.clear();
   }
 
-  void PostProcess(TraversalPayload<TransitionT>& payload){
-  }
+  void PostProcess(TraversalPayload<TransitionT>* payload) {}
 
   TraversalStatePayload<TransitionT> traversal_state_payload;
 };
@@ -111,25 +103,20 @@ struct TraversalState {
 /**
  * A helper data structure memorize the path of a graph traversal.
  */
-template<class TransitionT = Transition>
+template <class TransitionT = Transition>
 struct TraversalStack {
-  TraversalStack():traversal_states(), traversal_stack_payload() {
+  TraversalStack() : traversal_states(), traversal_stack_payload() { traversal_states.resize(20); }
+
+  explicit TraversalStack(TraversalPayload<TransitionT>& payload)
+      : traversal_states(), traversal_stack_payload(payload) {
     traversal_states.resize(20);
   }
 
-  TraversalStack(TraversalPayload<TransitionT>& payload):traversal_states(), traversal_stack_payload(payload) {
-    traversal_states.resize(20);
-  }
+  TraversalState<TransitionT>& GetStates() { return traversal_states[traversal_stack_payload.current_depth]; }
 
-  TraversalState<TransitionT>& GetStates() {
-    return traversal_states[traversal_stack_payload.current_depth];
-  }
+  size_t GetDepth() const { return traversal_stack_payload.current_depth; }
 
-  size_t GetDepth() const {
-    return traversal_stack_payload.current_depth;
-  }
-
-  size_t& operator++ (){
+  size_t& operator++() {
     // resize if needed
     if (traversal_states.size() < traversal_stack_payload.current_depth + 2) {
       traversal_states.resize(traversal_stack_payload.current_depth + 10);
@@ -137,7 +124,7 @@ struct TraversalStack {
     return ++traversal_stack_payload.current_depth;
   }
 
-  size_t operator++ (int){
+  size_t operator++(int) {
     traversal_stack_payload.current_depth++;
     // resize if needed
     if (traversal_states.size() < traversal_stack_payload.current_depth + 1) {
@@ -147,22 +134,17 @@ struct TraversalStack {
     return traversal_stack_payload.current_depth;
   }
 
-  size_t& operator-- (){
-    return --traversal_stack_payload.current_depth;
-  }
+  size_t& operator--() { return --traversal_stack_payload.current_depth; }
 
-  size_t operator-- (int){
-    return traversal_stack_payload.current_depth--;
-  }
+  size_t operator--(int) { return traversal_stack_payload.current_depth--; }
 
   std::vector<TraversalState<TransitionT>> traversal_states;
   TraversalPayload<TransitionT> traversal_stack_payload;
 };
-
 
 } /* namespace traversal */
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* TRAVERSAL_BASE_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_TRAVERSAL_TRAVERSAL_BASE_H_

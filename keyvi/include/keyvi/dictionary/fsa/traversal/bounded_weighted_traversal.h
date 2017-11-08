@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /*
  * bounded_weighted_traversal.h
  *
@@ -23,13 +22,15 @@
  *      Author: hendrik
  */
 
-#ifndef BOUNDED_WEIGHTED_TRAVERSAL_H_
-#define BOUNDED_WEIGHTED_TRAVERSAL_H_
+#ifndef KEYVI_DICTIONARY_FSA_TRAVERSAL_BOUNDED_WEIGHTED_TRAVERSAL_H_
+#define KEYVI_DICTIONARY_FSA_TRAVERSAL_BOUNDED_WEIGHTED_TRAVERSAL_H_
+
+#include <algorithm>
 
 #include "dictionary/fsa/traversal/weighted_traversal.h"
 #include "dictionary/util/bounded_priority_queue.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -37,29 +38,30 @@ namespace dictionary {
 namespace fsa {
 namespace traversal {
 
-struct BoundedWeightedTransition: public WeightedTransition {
+struct BoundedWeightedTransition : public WeightedTransition {
   using WeightedTransition::WeightedTransition;
 };
 
-template<>
+template <>
 struct TraversalPayload<BoundedWeightedTransition> {
-  TraversalPayload(): current_depth(0), priority_queue(10){}
+  TraversalPayload() : current_depth(0), priority_queue(10) {}
 
   size_t current_depth;
   util::BoundedPriorityQueue<uint32_t> priority_queue;
 };
 
-template<>
-inline void TraversalState<BoundedWeightedTransition>::PostProcess(TraversalPayload<BoundedWeightedTransition>& payload) {
+template <>
+inline void TraversalState<BoundedWeightedTransition>::PostProcess(
+    TraversalPayload<BoundedWeightedTransition>* payload) {
   if (traversal_state_payload.transitions.size() > 0) {
-    std::sort(traversal_state_payload.transitions.begin(), traversal_state_payload.transitions.end(), WeightedTransitionCompare);
+    std::sort(traversal_state_payload.transitions.begin(), traversal_state_payload.transitions.end(),
+              WeightedTransitionCompare);
   }
 }
-
 
 } /* namespace traversal */
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* BOUNDED_WEIGHTED_TRAVERSAL_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_TRAVERSAL_BOUNDED_WEIGHTED_TRAVERSAL_H_
