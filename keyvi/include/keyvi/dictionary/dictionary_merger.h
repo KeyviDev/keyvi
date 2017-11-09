@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef DICTIONARY_MERGER_H_
-#define DICTIONARY_MERGER_H_
+#ifndef KEYVI_DICTIONARY_DICTIONARY_MERGER_H_
+#define KEYVI_DICTIONARY_DICTIONARY_MERGER_H_
 #include <memory>
 #include <queue>
 #include <string>
@@ -57,8 +57,7 @@ class DictionaryMerger final {
      *                          when comparing two keys with the same value.
      */
     SegmentIterator(const fsa::EntryIterator& e, size_t segment_index)
-        : entry_iterator_ptr_(std::make_shared<fsa::EntryIterator>(e)),
-          segment_index_(segment_index) {}
+        : entry_iterator_ptr_(std::make_shared<fsa::EntryIterator>(e)), segment_index_(segment_index) {}
 
     bool operator<(const SegmentIterator& rhs) const {
       // very important difference in semantics: we have to ensure that in case
@@ -79,9 +78,7 @@ class DictionaryMerger final {
       return *this;
     }
 
-    const fsa::EntryIterator& entryIterator() const {
-      return *entry_iterator_ptr_;
-    }
+    const fsa::EntryIterator& entryIterator() const { return *entry_iterator_ptr_; }
 
     const size_t segmentIndex() const { return segment_index_; }
 
@@ -102,81 +99,71 @@ class DictionaryMerger final {
    *
    * @params params merger parameters
    */
-  explicit DictionaryMerger(const merger_param_t& params = merger_param_t())
-      : dicts_to_merge_(), params_(params) {
+  explicit DictionaryMerger(const merger_param_t& params = merger_param_t()) : dicts_to_merge_(), params_(params) {
     params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
 
-    append_merge_ =
-        MERGE_APPEND == util::mapGet<std::string>(params_, MERGE_MODE, "");
+    append_merge_ = MERGE_APPEND == util::mapGet<std::string>(params_, MERGE_MODE, "");
   }
 
 #ifndef KEYVI_DEPRECATED
   /**
    * DEPRECATED
    */
-  DictionaryMerger(size_t memory_limit,
-                   const merger_param_t& params = merger_param_t())
+  explicit DictionaryMerger(size_t memory_limit, const merger_param_t& params = merger_param_t())
       : dicts_to_merge_(), params_(params) {
     params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
 
-    append_merge_ =
-        MERGE_APPEND == util::mapGet<std::string>(params_, MERGE_MODE, "");
+    append_merge_ = MERGE_APPEND == util::mapGet<std::string>(params_, MERGE_MODE, "");
 
     // ensure backwards compatibility: put memory limit into parameters
     params_[MEMORY_LIMIT_KEY] = std::to_string(memory_limit);
   }
 #endif
 
-    void Add(const std::string& filename) {
-
-        if (std::count(inputFiles_.begin(), inputFiles_.end(), filename)) {
-            throw std::invalid_argument("File is added already: " + filename);
-        }
-
-        fsa::automata_t fsa;
-        if (append_merge_) {
-            fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
-        } else {
-            fsa.reset(new fsa::Automata(filename));
-        }
-
-        if (fsa->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
-            throw std::invalid_argument("Dictionaries must have the same type.");
-        }
-
-        const auto segment_iterator = SegmentIterator(fsa::EntryIterator(fsa), segments_pqueue_.size());
-        if (!segment_iterator) {
-            return;
-        }
-
-        segments_pqueue_.push(segment_iterator);
-        inputFiles_.push_back(filename);
-        dicts_to_merge_.push_back(fsa);
+  void Add(const std::string& filename) {
+    if (std::count(inputFiles_.begin(), inputFiles_.end(), filename)) {
+      throw std::invalid_argument("File is added already: " + filename);
     }
+
+    fsa::automata_t fsa;
+    if (append_merge_) {
+      fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
+    } else {
+      fsa.reset(new fsa::Automata(filename));
+    }
+
+    if (fsa->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
+      throw std::invalid_argument("Dictionaries must have the same type.");
+    }
+
+    const auto segment_iterator = SegmentIterator(fsa::EntryIterator(fsa), segments_pqueue_.size());
+    if (!segment_iterator) {
+      return;
+    }
+
+    segments_pqueue_.push(segment_iterator);
+    inputFiles_.push_back(filename);
+    dicts_to_merge_.push_back(fsa);
+  }
 
   /**
    * Set a custom manifest to be embedded into the index file.
    *
    * @param manifest as JSON string
    */
-  void SetManifestFromString(const std::string& manifest) {
-    manifest_ = manifest;
-  }
+  void SetManifestFromString(const std::string& manifest) { manifest_ = manifest; }
 
   void Merge(const std::string& filename) {
-    using GeneratorAdapter =
-        fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+    using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
 
     size_t sparse_array_size_sum = 0;
-    for (auto fsa: dicts_to_merge_) {
-        sparse_array_size_sum += fsa->SparseArraySize();
+    for (auto fsa : dicts_to_merge_) {
+      sparse_array_size_sum += fsa->SparseArraySize();
     }
 
-    ValueStoreT* value_store =
-        append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
+    ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
 
-    auto generator = GeneratorAdapter::CreateGenerator(sparse_array_size_sum,
-                                                       params_, value_store);
+    auto generator = GeneratorAdapter::CreateGenerator(sparse_array_size_sum, params_, value_store);
 
     std::string top_key;
 
@@ -187,15 +174,14 @@ class DictionaryMerger final {
       top_key = segment_it.entryIterator().GetKey();
 
       // check for same keys and merge only the most recent one
-      while (!segments_pqueue_.empty() and segments_pqueue_.top().entryIterator().operator==(top_key)) {
+      while (!segments_pqueue_.empty() && segments_pqueue_.top().entryIterator().operator==(top_key)) {
+        auto to_inc = segments_pqueue_.top();
 
-          auto to_inc = segments_pqueue_.top();
-
-          segments_pqueue_.pop();
-          if (++to_inc) {
-              TRACE("push iterator");
-              segments_pqueue_.push(to_inc);
-          }
+        segments_pqueue_.pop();
+        if (++to_inc) {
+          TRACE("push iterator");
+          segments_pqueue_.push(to_inc);
+        }
       }
 
       fsa::ValueHandle handle;
@@ -203,19 +189,15 @@ class DictionaryMerger final {
 
       // get the weight value, for now simple: does not require access to the
       // value store itself
-      handle.weight =
-          value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
+      handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
 
       if (append_merge_) {
-        handle.value_idx = value_store->GetMergeValueId(
-            segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
+        handle.value_idx =
+            value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
       } else {
-        handle.value_idx = value_store->GetValue(
-            segment_it.entryIterator()
-                .GetFsa()
-                ->GetValueStore()
-                ->GetValueStorePayload(),
-            segment_it.entryIterator().GetValueId(), handle.no_minimization);
+        handle.value_idx =
+            value_store->GetValue(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
+                                  segment_it.entryIterator().GetValueId(), handle.no_minimization);
       }
 
       TRACE("Add key: %s", top_key.c_str());
@@ -236,11 +218,11 @@ class DictionaryMerger final {
     generator->WriteToFile(filename);
   }
 
-private:
-    bool                            append_merge_ = false;
-    std::vector<fsa::automata_t>    dicts_to_merge_;
-    std::vector<std::string>        inputFiles_;
-    std::priority_queue<SegmentIterator>    segments_pqueue_;
+ private:
+  bool append_merge_ = false;
+  std::vector<fsa::automata_t> dicts_to_merge_;
+  std::vector<std::string> inputFiles_;
+  std::priority_queue<SegmentIterator> segments_pqueue_;
 
   fsa::internal::IValueStoreWriter::vs_param_t params_;
   std::string manifest_ = std::string();
@@ -249,4 +231,4 @@ private:
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* SRC_CPP_DICTIONARY_DICTIONARY_MERGER_H_ */
+#endif  // KEYVI_DICTIONARY_DICTIONARY_MERGER_H_

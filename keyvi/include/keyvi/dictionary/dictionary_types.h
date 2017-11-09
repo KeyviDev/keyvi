@@ -22,70 +22,68 @@
  *      Author: hendrik
  */
 
-#ifndef DICTIONARY_TYPES_H_
-#define DICTIONARY_TYPES_H_
+#ifndef KEYVI_DICTIONARY_DICTIONARY_TYPES_H_
+#define KEYVI_DICTIONARY_DICTIONARY_TYPES_H_
 
-#include "dictionary/fsa/generator.h"
 #include "dictionary/dictionary_compiler.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/fsa/internal/int_value_store.h"
-#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "dictionary/fsa/internal/json_value_store.h"
-#include "dictionary/fsa/internal/string_value_store.h"
 #include "dictionary/dictionary_merger.h"
+#include "dictionary/fsa/generator.h"
+#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
+#include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "dictionary/fsa/internal/string_value_store.h"
 
 namespace keyvi {
 namespace dictionary {
 
-typedef keyvi::dictionary::fsa::Generator<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<>> KeyOnlyDictionaryGenerator;
+typedef keyvi::dictionary::fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>>
+    KeyOnlyDictionaryGenerator;
 
-typedef keyvi::dictionary::DictionaryCompiler<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-    keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore> CompletionDictionaryCompiler;
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
+                                              keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
+    CompletionDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryCompiler<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-    keyvi::dictionary::fsa::internal::IntValueStore> IntDictionaryCompiler;
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
+                                              keyvi::dictionary::fsa::internal::IntValueStore>
+    IntDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryCompiler<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<>> KeyOnlyDictionaryCompiler;
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>>
+    KeyOnlyDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryCompiler<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-    keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryCompiler;
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
+                                              keyvi::dictionary::fsa::internal::JsonValueStore>
+    JsonDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryCompiler<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-    keyvi::dictionary::fsa::internal::JsonValueStore,
-    keyvi::dictionary::sort::InMemorySorter<key_value_t>> JsonDictionaryCompilerSmallData;
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
+                                              keyvi::dictionary::fsa::internal::JsonValueStore,
+                                              keyvi::dictionary::sort::InMemorySorter<key_value_t>>
+    JsonDictionaryCompilerSmallData;
 
-typedef keyvi::dictionary::DictionaryCompiler<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-    keyvi::dictionary::fsa::internal::StringValueStore> StringDictionaryCompiler;
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
+                                              keyvi::dictionary::fsa::internal::StringValueStore>
+    StringDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryMerger<
-    keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-    keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryMerger;
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
+                                            keyvi::dictionary::fsa::internal::JsonValueStore>
+    JsonDictionaryMerger;
 
-typedef keyvi::dictionary::DictionaryMerger<
-        keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-        keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore> CompletionDictionaryMerger;
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
+                                            keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
+    CompletionDictionaryMerger;
 
-typedef keyvi::dictionary::DictionaryMerger<
-        keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-        keyvi::dictionary::fsa::internal::IntValueStore> IntDictionaryMerger;
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
+                                            keyvi::dictionary::fsa::internal::IntValueStore>
+    IntDictionaryMerger;
 
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
+                                            keyvi::dictionary::fsa::internal::StringValueStore>
+    StringDictionaryMerger;
 
-typedef keyvi::dictionary::DictionaryMerger<
-        keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-        keyvi::dictionary::fsa::internal::StringValueStore> StringDictionaryMerger;
-
-typedef keyvi::dictionary::DictionaryMerger<
-        keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>> KeyOnlyDictionaryMerger;
-
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>
+    KeyOnlyDictionaryMerger;
 
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* DICTIONARY_TYPES_H_ */
+#endif  // KEYVI_DICTIONARY_DICTIONARY_TYPES_H_
