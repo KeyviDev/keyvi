@@ -5,7 +5,7 @@
 [![PythonImpl](https://img.shields.io/pypi/implementation/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PythonFormat](https://img.shields.io/pypi/format/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PyPIVersion](https://img.shields.io/pypi/v/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
-[![Coveralls](https://coveralls.io/repos/KeyviDev/keyvi/badge.svg?branch=master&service=github)](https://coveralls.io/github/KeyviDev/keyvi?branch=master)
+[![Coveralls](https://coveralls.io/repos/github/KeyviDev/keyvi/badge.svg?branch=master)](https://coveralls.io/github/KeyviDev/keyvi?branch=master)
 
 ##
 ![Keyvi](/doc/images/keyvi-small.png)
