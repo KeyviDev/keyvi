@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /*
  * dictionary_merger_fwd.h
  *
@@ -25,12 +24,11 @@
  *      Author: hendrik
  */
 
-#ifndef DICTIONARY_MERGER_FWD_H_
-#define DICTIONARY_MERGER_FWD_H_
+#ifndef KEYVI_DICTIONARY_DICTIONARY_MERGER_FWD_H_
+#define KEYVI_DICTIONARY_DICTIONARY_MERGER_FWD_H_
 
 namespace keyvi {
 namespace dictionary {
-
 
 template <class PersistenceT, class ValueStoreT>
 class DictionaryMerger;
@@ -38,6 +36,4 @@ class DictionaryMerger;
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-
-
-#endif /* DICTIONARY_MERGER_FWD_H_ */
+#endif  // KEYVI_DICTIONARY_DICTIONARY_MERGER_FWD_H_

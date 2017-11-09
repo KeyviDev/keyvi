@@ -24,20 +24,19 @@
  */
 
 #include <boost/test/unit_test.hpp>
-#include "dictionary/fsa/state_traverser.h"
+
 #include "dictionary/fsa/codepoint_state_traverser.h"
+#include "dictionary/fsa/state_traverser.h"
 #include "dictionary/testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-BOOST_AUTO_TEST_SUITE( CodePointStateTraverserTests )
+BOOST_AUTO_TEST_SUITE(CodePointStateTraverserTests)
 
-BOOST_AUTO_TEST_CASE( someASCIITraversalNoPrune ) {
-
-  std::vector<std::string> test_data =
-      { "aaaa", "aabb", "aabc", "aacd", "bbcd" };
+BOOST_AUTO_TEST_CASE(someASCIITraversalNoPrune) {
+  std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
   testing::TempDictionary dictionary(test_data);
   automata_t f = dictionary.GetFsa();
 
@@ -91,10 +90,8 @@ BOOST_AUTO_TEST_CASE( someASCIITraversalNoPrune ) {
   BOOST_CHECK_EQUAL(0, c.GetDepth());
 }
 
-BOOST_AUTO_TEST_CASE( someNonASCIITraversalNoPrune ) {
-
-  std::vector<std::string> test_data =
-      { "aüöß", "öäöö", "öäüaöc" };
+BOOST_AUTO_TEST_CASE(someNonASCIITraversalNoPrune) {
+  std::vector<std::string> test_data = {"aüöß", "öäöö", "öäüaöc", "条件指定", "🤓🤘"};
   testing::TempDictionary dictionary(test_data);
   automata_t f = dictionary.GetFsa();
 
@@ -135,6 +132,24 @@ BOOST_AUTO_TEST_CASE( someNonASCIITraversalNoPrune ) {
   c++;
   BOOST_CHECK_EQUAL('c', c.GetStateLabel());
   BOOST_CHECK_EQUAL(6, c.GetDepth());
+  c++;
+  BOOST_CHECK_EQUAL(0x6761 /*条*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, c.GetDepth());
+  c++;
+  BOOST_CHECK_EQUAL(0x4ef6 /*件*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, c.GetDepth());
+  c++;
+  BOOST_CHECK_EQUAL(0x6307 /*指*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, c.GetDepth());
+  c++;
+  BOOST_CHECK_EQUAL(0x5b9a /*定*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, c.GetDepth());
+  c++;
+  BOOST_CHECK_EQUAL(0x1f913 /*🤓*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, c.GetDepth());
+  c++;
+  BOOST_CHECK_EQUAL(0x1f918 /*🤘*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, c.GetDepth());
 
   // traverser shall be exhausted
   c++;
@@ -145,6 +160,32 @@ BOOST_AUTO_TEST_CASE( someNonASCIITraversalNoPrune ) {
   BOOST_CHECK_EQUAL(0, c.GetDepth());
 }
 
+BOOST_AUTO_TEST_CASE(someNonASCIITraversalPrune) {
+  std::vector<std::string> test_data = {"条件指定", "🤓🤘"};
+  testing::TempDictionary dictionary(test_data);
+  automata_t f = dictionary.GetFsa();
+
+  CodePointStateTraverser<StateTraverser<>> c(f);
+
+  BOOST_CHECK_EQUAL(0x6761 /*条*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, c.GetDepth());
+  c++;
+  BOOST_CHECK_EQUAL(0x4ef6 /*件*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, c.GetDepth());
+
+  c.Prune();
+  c++;
+  BOOST_CHECK_EQUAL(0x1f913 /*🤓*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, c.GetDepth());
+  c++;
+  BOOST_CHECK_EQUAL(0x1f918 /*🤘*/, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, c.GetDepth());
+
+  // traverser shall be exhausted
+  c++;
+  BOOST_CHECK_EQUAL(0, c.GetStateLabel());
+  BOOST_CHECK_EQUAL(0, c.GetDepth());
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

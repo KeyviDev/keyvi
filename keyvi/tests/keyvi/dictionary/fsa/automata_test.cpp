@@ -24,6 +24,7 @@
  */
 
 #include <boost/test/unit_test.hpp>
+
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/traverser_types.h"
 #include "dictionary/testing/temp_dictionary.h"
@@ -32,28 +33,29 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-BOOST_AUTO_TEST_SUITE( AutomataTests )
+BOOST_AUTO_TEST_SUITE(AutomataTests)
 
-BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
-  std::vector<std::string> test_data =
-        { "\01cd", "aaaa", "aabb", "agbc", "ajcd", "azcd" };
+BOOST_AUTO_TEST_CASE(GetOutGoingTransitionsTest) {
+  std::vector<std::string> test_data = {"\01cd", "aaaa", "aabb", "agbc", "ajcd", "azcd"};
   testing::TempDictionary dictionary(test_data);
   automata_t f = dictionary.GetFsa();
 
   traversal::TraversalStack<> stack;
 
-  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates(), stack.traversal_stack_payload);
+  f->GetOutGoingTransitions(f->GetStartState(), &stack.GetStates(), &stack.traversal_stack_payload);
 
   BOOST_CHECK_EQUAL(2, stack.GetStates().traversal_state_payload.transitions.size());
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), '\01'), stack.GetStates().traversal_state_payload.transitions[0].state);
-  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), 'a'), stack.GetStates().traversal_state_payload.transitions[1].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), '\01'),
+                    stack.GetStates().traversal_state_payload.transitions[0].state);
+  BOOST_CHECK_EQUAL(f->TryWalkTransition(f->GetStartState(), 'a'),
+                    stack.GetStates().traversal_state_payload.transitions[1].state);
   BOOST_CHECK_EQUAL('\01', stack.GetStates().traversal_state_payload.transitions[0].label);
   BOOST_CHECK_EQUAL('a', stack.GetStates().traversal_state_payload.transitions[1].label);
 
   // check all outgoings for 'a'
   uint32_t state_a = f->TryWalkTransition(f->GetStartState(), 'a');
 
-  f->GetOutGoingTransitions(state_a, stack.GetStates(), stack.traversal_stack_payload);
+  f->GetOutGoingTransitions(state_a, &stack.GetStates(), &stack.traversal_stack_payload);
 
   BOOST_CHECK_EQUAL(4, stack.GetStates().traversal_state_payload.transitions.size());
   BOOST_CHECK_EQUAL(f->TryWalkTransition(state_a, 'a'), stack.GetStates().traversal_state_payload.transitions[0].state);
@@ -67,29 +69,29 @@ BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsTest ) {
   BOOST_CHECK_EQUAL('z', stack.GetStates().traversal_state_payload.transitions[3].label);
 }
 
-BOOST_AUTO_TEST_CASE( GetOutGoingTransitionsWeightTest ) {
+BOOST_AUTO_TEST_CASE(GetOutGoingTransitionsWeightTest) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
-            { "the fox jumped over the fence and broke his nose", 22 },
-            { "the fox jumped over the fence and broke his feet", 24 },
-            { "the fox jumped over the fence and broke his tongue", 444 },
-            { "the fox jumped over the fence and broke his arm", 2 },
-        };
+      {"the fox jumped over the fence and broke his nose", 22},
+      {"the fox jumped over the fence and broke his feet", 24},
+      {"the fox jumped over the fence and broke his tongue", 444},
+      {"the fox jumped over the fence and broke his arm", 2},
+  };
   testing::TempDictionary dictionary(test_data);
   automata_t f = dictionary.GetFsa();
 
   traversal::TraversalStack<traversal::WeightedTransition> stack;
 
-  f->GetOutGoingTransitions(f->GetStartState(), stack.GetStates(), stack.traversal_stack_payload);
+  f->GetOutGoingTransitions(f->GetStartState(), &stack.GetStates(), &stack.traversal_stack_payload);
 
   BOOST_CHECK_EQUAL(1, stack.GetStates().traversal_state_payload.transitions.size());
   BOOST_CHECK_EQUAL(444, stack.GetStates().traversal_state_payload.transitions[0].weight);
 }
 
 BOOST_AUTO_TEST_CASE(EmptyTest) {
-    std::vector<std::pair<std::string, uint32_t>> test_data = {};
-    testing::TempDictionary dictionary(test_data);
+  std::vector<std::pair<std::string, uint32_t>> test_data = {};
+  testing::TempDictionary dictionary(test_data);
 
-    BOOST_CHECK(dictionary.GetFsa()->Empty());
+  BOOST_CHECK(dictionary.GetFsa()->Empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

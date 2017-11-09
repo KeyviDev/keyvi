@@ -4,7 +4,6 @@
 import keyvi
 from test_tools import tmp_dictionary, decode_to_unicode
 
-
 def test_serialization():
     m = keyvi.Match()
     m.SetStart(22)
@@ -13,7 +12,6 @@ def test_serialization():
     m2 = keyvi.Match.loads(d)
     assert m2.GetStart() == 22
     assert m2.GetEnd() == 30
-
 
 def test_raw_serialization():
     c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
@@ -26,13 +24,14 @@ def test_raw_serialization():
         m2 = keyvi.Match.loads(d)
         assert decode_to_unicode(m2.GetValueAsString()) == decode_to_unicode('{"a":2}')
 
-
 def test_unicode_attributes():
     m = keyvi.Match()
     m.SetAttribute(decode_to_unicode("küy"), 22)
     assert m.GetAttribute("küy") == 22
     m.SetAttribute("k2", decode_to_unicode(" 吃饭了吗"))
+    m.SetScore(99)
     assert decode_to_unicode(m.GetAttribute("k2")) == decode_to_unicode(" 吃饭了吗")
+    assert m.GetScore() == 99.0
 
 def test_bytes_attributes():
     m = keyvi.Match()
@@ -42,6 +41,18 @@ def test_bytes_attributes():
     assert m.GetAttribute(bytes_key) == 22
     m.SetAttribute("k2", bytes_value)
     assert decode_to_unicode(m.GetAttribute("k2")) == decode_to_unicode("äöüöäü")
+
+def test_double_attributes():
+    m = keyvi.Match()
+    bytes_key = bytes(decode_to_unicode("abc").encode('utf-8'))
+    m.SetAttribute(bytes_key, 42.0)
+    assert m.GetAttribute(bytes_key) == 42.0
+
+def test_boolean_attributes():
+    m = keyvi.Match()
+    bytes_key = bytes(decode_to_unicode("def").encode('utf-8'))
+    m.SetAttribute(bytes_key, True)
+    assert m.GetAttribute(bytes_key) == True
 
 def test_get_value():
     c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})

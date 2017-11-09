@@ -22,15 +22,15 @@
  *      Author: hendrik
  */
 
-#ifndef MATCH_ITERATOR_H_
-#define MATCH_ITERATOR_H_
+#ifndef KEYVI_DICTIONARY_MATCH_ITERATOR_H_
+#define KEYVI_DICTIONARY_MATCH_ITERATOR_H_
 
 #include <boost/iterator/iterator_facade.hpp>
 
 #include "dictionary/match.h"
 #include "dictionary/util/iterator_utils.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -51,18 +51,14 @@ namespace dictionary {
  *  http://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates
  *  http://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11
  */
-class MatchIterator : public boost::iterator_facade<MatchIterator  // CRTP, just use the Iterator name
-    , Match const  // Value type of what is iterated over (contained element type)
-    , boost::single_pass_traversal_tag  // type of traversal allowed
-    >// Reference and Difference can be omitted
-{
+class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, boost::single_pass_traversal_tag> {
  public:
   typedef util::iterator_pair<MatchIterator> MatchIteratorPair;
 
-  MatchIterator(std::function<Match()> match_functor, const Match& first_match = Match())
+  explicit MatchIterator(std::function<Match()> match_functor, const Match& first_match = Match())
       : match_functor_(match_functor) {
     current_match_ = first_match;
-    if (first_match.IsEmpty()){
+    if (first_match.IsEmpty()) {
       increment();
     }
   }
@@ -71,13 +67,9 @@ class MatchIterator : public boost::iterator_facade<MatchIterator  // CRTP, just
     return MatchIteratorPair(MatchIterator(f, first_match), MatchIterator());
   }
 
-  static MatchIteratorPair EmptyIteratorPair() {
-      return MatchIteratorPair(MatchIterator(), MatchIterator());
-  }
+  static MatchIteratorPair EmptyIteratorPair() { return MatchIteratorPair(MatchIterator(), MatchIterator()); }
 
-  MatchIterator()
-      : match_functor_(0) {
-  }
+  MatchIterator() : match_functor_(0) {}
   // What we implement is determined by the boost::forward_traversal_tag
   // template parameter
  private:
@@ -98,29 +90,24 @@ class MatchIterator : public boost::iterator_facade<MatchIterator  // CRTP, just
   }
 
   bool equal(MatchIterator const& other) const {
-
     // usual case for comparing with end()
     if (this->current_match_.IsEmpty() && other.current_match_.IsEmpty()) {
-
       TRACE("Match Iterator: equal true");
       return true;
     }
 
     TRACE("Match Iterator: equal false");
-    return false;  //return this->current_match_ == other.current_match_;
+    return false;  // return this->current_match_ == other.current_match_;
   }
 
-  Match const & dereference() const {
-    return current_match_;
-  }
+  Match const& dereference() const { return current_match_; }
 
  private:
   std::function<Match()> match_functor_;
   Match current_match_;
 };
 
-
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* MATCH_ITERATOR_H_ */
+#endif  // KEYVI_DICTIONARY_MATCH_ITERATOR_H_

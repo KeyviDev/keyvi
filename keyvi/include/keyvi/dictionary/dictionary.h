@@ -336,7 +336,7 @@ class Dictionary final {
 
     auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(key.substr(minimum_prefix_length));
     std::shared_ptr<delegate_payload> data(
-        new delegate_payload(fsa::NearStateTraverser(fsa_, state, payload), traversal_stack));
+        new delegate_payload(fsa::NearStateTraverser(fsa_, state, &payload), traversal_stack));
 
     auto tfunc = [data, key, minimum_prefix_length, greedy]() {
       TRACE("prefix completion callback called");
