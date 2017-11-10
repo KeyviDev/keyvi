@@ -76,6 +76,8 @@ class IValueStoreWriter {
   /** Parameter map type. */
   typedef std::map<std::string, std::string> vs_param_t;
 
+  IValueStoreWriter() : IValueStoreWriter(vs_param_t()) {}
+
   /**
    * Default constructor. Override if the value store implementation requires
    * extra data.
@@ -83,10 +85,10 @@ class IValueStoreWriter {
    * @param parameters a map of string parameter values. It is up to the
    *                   value store what parameters it wants to use (if any).
    */
-  explicit IValueStoreWriter(const vs_param_t& parameters = vs_param_t()) : parameters_(parameters) {}
+  explicit IValueStoreWriter(const vs_param_t& parameters) : parameters_(parameters) {}
 
   /// TODO: workaround till ValueStore merger classes are separated from ValueStore writer
-  explicit IValueStoreWriter(const std::vector<std::string>&) : IValueStoreWriter() {}
+  explicit IValueStoreWriter(const std::vector<std::string>&) : IValueStoreWriter(vs_param_t()) {}
 
   virtual ~IValueStoreWriter() {}
 
