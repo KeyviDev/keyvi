@@ -22,13 +22,14 @@
  *      Author: hendrik
  */
 
-#ifndef TPIE_SORTER_H_
-#define TPIE_SORTER_H_
+#ifndef KEYVI_DICTIONARY_SORT_TPIE_SORTER_H_
+#define KEYVI_DICTIONARY_SORT_TPIE_SORTER_H_
 
 #include <string>
 
 #include <boost/filesystem.hpp>
 #include <boost/iterator/iterator_facade.hpp>
+
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/sort/sorter_common.h"
 #include "dictionary/util/configuration.h"
@@ -48,13 +49,13 @@ namespace sort {
  * Tpie serialization and deserialization for sorting.
  */
 template <typename Dst, typename KeyValueT>
-void serialize(Dst& d, const KeyValueT& pt) {
+void serialize(Dst& d, const KeyValueT& pt) {  // NOLINT
   using tpie::serialize;
   serialize(d, pt.key);
   serialize(d, pt.value);
 }
 template <typename Src, typename KeyValueT>
-void unserialize(Src& s, KeyValueT& pt) {
+void unserialize(Src& s, KeyValueT& pt) {  // NOLINT
   using tpie::unserialize;
   unserialize(s, pt.key);
   unserialize(s, pt.value);
@@ -66,22 +67,11 @@ class TpieSorter final {
   typedef tpie::serialization_sorter<KeyValueT> tpie_sorter_t;
 
   class TpieSortIterator final
-      : public boost::iterator_facade<
-            TpieSortIterator  // CRTP, just use the Iterator name
-            ,
-            KeyValueT const  // Value type of what is iterated over (contained
-                             // element type)
-            ,
-            boost::single_pass_traversal_tag  // type of traversal allowed
-            >  // Reference and Difference can be omitted
-  {
+      : public boost::iterator_facade<TpieSortIterator, KeyValueT const, boost::single_pass_traversal_tag> {
    public:
     TpieSortIterator() : sorter_(), at_end_(true) {}
 
-    explicit TpieSortIterator(tpie_sorter_t* sorter)
-        : sorter_(sorter), at_end_(false) {
-      increment();
-    }
+    explicit TpieSortIterator(tpie_sorter_t* sorter) : sorter_(sorter), at_end_(false) { increment(); }
 
    private:
     friend class boost::iterator_core_access;
@@ -116,18 +106,14 @@ class TpieSorter final {
    * @param memory_limit memory limit for internal memory usage
    */
   explicit TpieSorter(const sorter_param_t& params = sorter_param_t())
-      : initializer_(util::TpieIntializer::getInstance()),
-        sorter_(),
-        params_(params) {
-    size_t memory_limit =
-        util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT);
+      : initializer_(util::TpieIntializer::getInstance()), sorter_(), params_(params) {
+    size_t memory_limit = util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT);
 
     sorter_.set_available_memory(memory_limit);
     sorter_.begin();
 
     params_[TEMPORARY_PATH_KEY] =
-        util::mapGet(params_, TEMPORARY_PATH_KEY,
-                     boost::filesystem::temp_directory_path().string());
+        util::mapGet(params_, TEMPORARY_PATH_KEY, boost::filesystem::temp_directory_path().string());
 
     initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
   }
@@ -138,17 +124,13 @@ class TpieSorter final {
    *
    * @param memory_limit memory limit for internal memory usage
    */
-  TpieSorter(size_t memory_limit,
-             const sorter_param_t& params = sorter_param_t())
-      : initializer_(util::TpieIntializer::getInstance()),
-        sorter_(),
-        params_(params) {
+  explicit TpieSorter(size_t memory_limit, const sorter_param_t& params = sorter_param_t())
+      : initializer_(util::TpieIntializer::getInstance()), sorter_(), params_(params) {
     sorter_.set_available_memory(memory_limit);
     sorter_.begin();
 
     params_[TEMPORARY_PATH_KEY] =
-        util::mapGet(params_, TEMPORARY_PATH_KEY,
-                     boost::filesystem::temp_directory_path().string());
+        util::mapGet(params_, TEMPORARY_PATH_KEY, boost::filesystem::temp_directory_path().string());
 
     initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
   }
@@ -179,4 +161,4 @@ class TpieSorter final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* TPIE_SORTER_H_ */
+#endif  // KEYVI_DICTIONARY_SORT_TPIE_SORTER_H_
