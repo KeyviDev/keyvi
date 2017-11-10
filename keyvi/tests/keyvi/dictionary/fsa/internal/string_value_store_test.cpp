@@ -23,9 +23,9 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include "dictionary/fsa/internal/string_value_store.h"
+#include <boost/filesystem.hpp>
+#include <boost/test/unit_test.hpp>
 
 namespace keyvi {
 namespace dictionary {
@@ -33,23 +33,22 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( StringValueTest )
+BOOST_AUTO_TEST_SUITE(StringValueTest)
 
-BOOST_AUTO_TEST_CASE( minimization )
-{
-  IValueStoreWriter ivsw1(IValueStoreWriter::vs_param_t {{"hello", "bello"}});
+BOOST_AUTO_TEST_CASE(minimization) {
+  IValueStoreWriter ivsw1(IValueStoreWriter::vs_param_t{{"hello", "bello"}});
   IValueStoreWriter ivsw2;
   StringValueStore strings;
 
   bool no_minimization = false;
 
-  uint64_t v = strings.GetValue("mytestvalue", no_minimization);
-  BOOST_CHECK_EQUAL(v,0);
-  uint64_t w = strings.GetValue("othervalue", no_minimization);
+  uint64_t v = strings.GetValue("mytestvalue", &no_minimization);
+  BOOST_CHECK_EQUAL(v, 0);
+  uint64_t w = strings.GetValue("othervalue", &no_minimization);
 
-  BOOST_CHECK(w>0);
-  BOOST_CHECK_EQUAL(v,strings.GetValue("mytestvalue", no_minimization));
-  BOOST_CHECK_EQUAL(w,strings.GetValue("othervalue", no_minimization));
+  BOOST_CHECK(w > 0);
+  BOOST_CHECK_EQUAL(v, strings.GetValue("mytestvalue", &no_minimization));
+  BOOST_CHECK_EQUAL(w, strings.GetValue("othervalue", &no_minimization));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -58,4 +57,3 @@ BOOST_AUTO_TEST_SUITE_END()
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
-

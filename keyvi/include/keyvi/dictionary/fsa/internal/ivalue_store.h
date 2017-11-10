@@ -22,16 +22,17 @@
  *      Author: hendrik
  */
 
-#ifndef IVALUE_STORE_H_
-#define IVALUE_STORE_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_
 
 #include <map>
-#include <vector>
 #include <string>
+#include <vector>
+
+#include <boost/container/flat_map.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
-#include <boost/container/flat_map.hpp>
 #include <boost/variant.hpp>
 
 #include "dictionary/dictionary_merger_fwd.h"
@@ -48,12 +49,12 @@ namespace internal {
  * Do not forget to add the new value store to ValueStoreFactory
  */
 enum value_store_t {
-  NULL_VALUE_STORE = 1,  //!< NullValueStore
-  INT_VALUE_STORE = 2,  //!< IntValueStore
-  STRING_VALUE_STORE = 3, //!< StringValueStore
-  JSON_VALUE_STORE_DEPRECATED = 4, // !< JsonValueStoreDeprecated
-  JSON_VALUE_STORE = 5, // !< JsonValueStore
-  INT_INNER_WEIGHTS_VALUE_STORE = 6, // !< IntInnerWeightsValueStore
+  NULL_VALUE_STORE = 1,               //!< NullValueStore
+  INT_VALUE_STORE = 2,                //!< IntValueStore
+  STRING_VALUE_STORE = 3,             //!< StringValueStore
+  JSON_VALUE_STORE_DEPRECATED = 4,    // !< JsonValueStoreDeprecated
+  JSON_VALUE_STORE = 5,               // !< JsonValueStore
+  INT_INNER_WEIGHTS_VALUE_STORE = 6,  // !< IntInnerWeightsValueStore
 };
 
 /* Writing value stores is based on template (duck-typing).
@@ -64,7 +65,7 @@ enum value_store_t {
  * typedef {type} value_t;
  * static const {type} no_value = 0;
  *
- * uint64_t GetValue(value_t value)
+ * uint64_t GetValue(value_t value, bool* no_minimization)
  *
  * value_store_t GetValueStoreType
  *
@@ -82,19 +83,14 @@ class IValueStoreWriter {
    * @param parameters a map of string parameter values. It is up to the
    *                   value store what parameters it wants to use (if any).
    */
-  IValueStoreWriter(const vs_param_t& parameters = vs_param_t()) : parameters_(parameters) {}
+  explicit IValueStoreWriter(const vs_param_t& parameters = vs_param_t()) : parameters_(parameters) {}
 
   /// TODO: workaround till ValueStore merger classes are separated from ValueStore writer
-  IValueStoreWriter(const std::vector<std::string> &)
-          : IValueStoreWriter()
-  {}
+  explicit IValueStoreWriter(const std::vector<std::string>&) : IValueStoreWriter() {}
 
-  virtual ~IValueStoreWriter() {
-  }
+  virtual ~IValueStoreWriter() {}
 
-  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) {
-      return 0;
-  }
+  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) { return 0; }
 
   /**
    * Get the weight for merging dictionaries.
@@ -104,9 +100,7 @@ class IValueStoreWriter {
    * @param fsa_value
    * @return weight to be used as inner weight
    */
-  uint32_t GetMergeWeight(uint64_t fsa_value){
-    return 0;
-  }
+  uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
  protected:
   vs_param_t parameters_;
@@ -130,12 +124,9 @@ class IValueStoreReader {
    * @param stream The stream to read from
    * @param file_mapping The file_mapping instance of the loader to use memory mapping
    */
-  IValueStoreReader(std::istream& stream,
-                    boost::interprocess::file_mapping* file_mapping) {
-  }
+  IValueStoreReader(std::istream& stream, boost::interprocess::file_mapping* file_mapping) {}
 
-  virtual ~IValueStoreReader() {
-  }
+  virtual ~IValueStoreReader() {}
 
   virtual value_store_t GetValueStoreType() const = 0;
 
@@ -172,18 +163,13 @@ class IValueStoreReader {
    * Get statistical information about the storage.
    */
 
-  virtual std::string GetStatistics() const {
-    return "";
-  }
+  virtual std::string GetStatistics() const { return ""; }
 
-  private:
-
-  template<typename , typename>
+ private:
+  template <typename, typename>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
-  virtual const char* GetValueStorePayload() const {
-    return 0;
-  }
+  virtual const char* GetValueStorePayload() const { return 0; }
 };
 
 } /* namespace internal */
@@ -191,4 +177,4 @@ class IValueStoreReader {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* IVALUE_STORE_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_

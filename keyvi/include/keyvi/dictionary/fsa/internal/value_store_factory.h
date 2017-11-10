@@ -22,15 +22,15 @@
  *      Author: hendrik
  */
 
-#ifndef VALUE_STORE_FACTORY_H_
-#define VALUE_STORE_FACTORY_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_FACTORY_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_FACTORY_H_
 
+#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
+#include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/fsa/internal/int_value_store.h"
-#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
-#include "dictionary/fsa/internal/json_value_store.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -40,8 +40,9 @@ namespace internal {
 class ValueStoreFactory final {
  public:
   static IValueStoreReader* MakeReader(value_store_t type, std::istream& stream,
-                                boost::interprocess::file_mapping* file_mapping, loading_strategy_types loading_strategy = loading_strategy_types::lazy){
-    switch (type){
+                                       boost::interprocess::file_mapping* file_mapping,
+                                       loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
+    switch (type) {
       case NULL_VALUE_STORE:
         return new NullValueStoreReader(stream, file_mapping);
       case INT_VALUE_STORE:
@@ -65,4 +66,4 @@ class ValueStoreFactory final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* VALUE_STORE_FACTORY_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_FACTORY_H_

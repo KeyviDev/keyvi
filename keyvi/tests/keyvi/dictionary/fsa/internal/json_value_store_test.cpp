@@ -23,11 +23,12 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
-#include "dictionary/fsa/internal/json_value_store.h"
+#include <boost/test/unit_test.hpp>
+
 #include "dictionary/fsa/internal/constants.h"
+#include "dictionary/fsa/internal/json_value_store.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -35,71 +36,65 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( JsonValueTest )
+BOOST_AUTO_TEST_SUITE(JsonValueTest)
 
-BOOST_AUTO_TEST_CASE( minimization )
-{
-  JsonValueStore strings(
-      IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
+BOOST_AUTO_TEST_CASE(minimization) {
+  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
-  uint32_t v = strings.GetValue("{\"mytestvalue\":25, \"mytestvalue2\":23}", no_minimization);
-  BOOST_CHECK_EQUAL(v,0);
-  uint32_t w = strings.GetValue("othervalue", no_minimization);
-  uint32_t x = strings.GetValue("{\"mytestvalue3\":55, \"mytestvalue4\":773}", no_minimization);
+  uint32_t v = strings.GetValue("{\"mytestvalue\":25, \"mytestvalue2\":23}", &no_minimization);
+  BOOST_CHECK_EQUAL(v, 0);
+  uint32_t w = strings.GetValue("othervalue", &no_minimization);
+  uint32_t x = strings.GetValue("{\"mytestvalue3\":55, \"mytestvalue4\":773}", &no_minimization);
 
-  BOOST_CHECK(w>0);
-  BOOST_CHECK_EQUAL(v,strings.GetValue("{\"mytestvalue\": 25, \"mytestvalue2\": 23}", no_minimization));
-  BOOST_CHECK_EQUAL(x,strings.GetValue("{\"mytestvalue3\":55, \"mytestvalue4\":773}", no_minimization));
-  BOOST_CHECK_EQUAL(w,strings.GetValue("othervalue", no_minimization));
+  BOOST_CHECK(w > 0);
+  BOOST_CHECK_EQUAL(v, strings.GetValue("{\"mytestvalue\": 25, \"mytestvalue2\": 23}", &no_minimization));
+  BOOST_CHECK_EQUAL(x, strings.GetValue("{\"mytestvalue3\":55, \"mytestvalue4\":773}", &no_minimization));
+  BOOST_CHECK_EQUAL(w, strings.GetValue("othervalue", &no_minimization));
 }
 
-BOOST_AUTO_TEST_CASE( minimization_longvalues )
-{
-  JsonValueStore strings(
-      IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
+BOOST_AUTO_TEST_CASE(minimization_longvalues) {
+  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
   std::string value = "{\"";
   value += std::string(60000, 'a');
   value += "\":42}";
 
-  uint32_t v = strings.GetValue(value, no_minimization);
-  BOOST_CHECK_EQUAL(v,0);
-  uint32_t w = strings.GetValue("othervalue", no_minimization);
+  uint32_t v = strings.GetValue(value, &no_minimization);
+  BOOST_CHECK_EQUAL(v, 0);
+  uint32_t w = strings.GetValue("othervalue", &no_minimization);
   BOOST_CHECK(v != w);
 
-  BOOST_CHECK(w>0);
-  BOOST_CHECK_EQUAL(v,strings.GetValue(value, no_minimization));
-  BOOST_CHECK_EQUAL(w,strings.GetValue("othervalue", no_minimization));
+  BOOST_CHECK(w > 0);
+  BOOST_CHECK_EQUAL(v, strings.GetValue(value, &no_minimization));
+  BOOST_CHECK_EQUAL(w, strings.GetValue("othervalue", &no_minimization));
 }
 
-BOOST_AUTO_TEST_CASE( minimization2 )
-{
-  JsonValueStore strings(
-      IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
+BOOST_AUTO_TEST_CASE(minimization2) {
+  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
 
-  uint64_t v = strings.GetValue("{\"f\": 5571575, \"df\": 1362790, \"uqf\": 2129086, \"tf1df\": 99838, \"tf2df\": 274586, \"tf3df\": 481278, \"tf5df\": 811157}", no_minimization);
-  uint64_t w = strings.GetValue("{\"f\": 3, \"df\": 1, \"uqf\": 1, \"tf1df\": 0, \"tf2df\": 0, \"tf3df\": 0, \"tf5df\": 0}", no_minimization);
+  uint64_t v = strings.GetValue(
+      "{\"f\": 5571575, \"df\": 1362790, \"uqf\": 2129086, \"tf1df\": 99838, \"tf2df\": 274586, \"tf3df\": 481278, "
+      "\"tf5df\": 811157}",
+      &no_minimization);
+  uint64_t w = strings.GetValue(
+      "{\"f\": 3, \"df\": 1, \"uqf\": 1, \"tf1df\": 0, \"tf2df\": 0, \"tf3df\": 0, \"tf5df\": 0}", &no_minimization);
   BOOST_CHECK(v != w);
 }
 
-BOOST_AUTO_TEST_CASE( persistence )
-{
-  JsonValueStore json_value_store(
-      IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
+BOOST_AUTO_TEST_CASE(persistence) {
+  JsonValueStore json_value_store(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
   bool no_minimization = false;
   std::string value = "{\"";
   value += std::string(60000, 'a');
   value += "\":42}";
 
-  uint32_t v = json_value_store.GetValue(value, no_minimization);
-  uint32_t w = json_value_store.GetValue("{\"mytestvalue2\":23}", no_minimization);
+  uint32_t v = json_value_store.GetValue(value, &no_minimization);
+  uint32_t w = json_value_store.GetValue("{\"mytestvalue2\":23}", &no_minimization);
 
-  boost::filesystem::path temp_path =
-            boost::filesystem::temp_directory_path();
+  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
-  temp_path /= boost::filesystem::unique_path(
-      "dictionary-unit-test-temp-dictionary-%%%%-%%%%-%%%%-%%%%");
+  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-temp-dictionary-%%%%-%%%%-%%%%-%%%%");
 
   std::string filename = temp_path.native();
 
@@ -108,8 +103,7 @@ BOOST_AUTO_TEST_CASE( persistence )
   out_stream.close();
 
   std::ifstream in_stream(filename, std::ios::binary);
-  auto file_mapping = new boost::interprocess::file_mapping(
-            filename.c_str(), boost::interprocess::read_only);
+  auto file_mapping = new boost::interprocess::file_mapping(filename.c_str(), boost::interprocess::read_only);
 
   JsonValueStoreReader reader(in_stream, file_mapping, loading_strategy_types::lazy);
 
@@ -118,7 +112,6 @@ BOOST_AUTO_TEST_CASE( persistence )
 
   std::remove(filename.c_str());
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -22,22 +22,22 @@
  *      Author: hendrik
  */
 
-#ifndef SLIDING_WINDOW_BIT_VECTOR_POSITION_TRACKER_H_
-#define SLIDING_WINDOW_BIT_VECTOR_POSITION_TRACKER_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_SLIDING_WINDOW_BIT_VECTOR_POSITION_TRACKER_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_SLIDING_WINDOW_BIT_VECTOR_POSITION_TRACKER_H_
 
 /* some constants for the bit vectors used in the sliding window.
  * The window must be large enough for the pointer arithmetics you do in the sparse array builder.
  * All 3 variables must fit to each other
  */
 #define SLIDING_WINDOW_SIZE 2048
-#define SLIDING_WINDOW_MASK 2047 // bit mask: SLIDING_WINDOW_SIZE - 1
-#define SLIDING_WINDOW_SHIFT 11  // same as /2048
+#define SLIDING_WINDOW_MASK 2047  // bit mask: SLIDING_WINDOW_SIZE - 1
+#define SLIDING_WINDOW_SHIFT 11   // same as /2048
 
 #include <utility>
-#include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/bit_vector.h"
+#include "dictionary/fsa/internal/constants.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -50,12 +50,10 @@ namespace internal {
  */
 class SlidingWindowBitArrayPositionTracker final {
  public:
-  SlidingWindowBitArrayPositionTracker(): window_start_position_(0), current_vector_(), previous_vector_() {}
+  SlidingWindowBitArrayPositionTracker() : window_start_position_(0), current_vector_(), previous_vector_() {}
 
-  SlidingWindowBitArrayPositionTracker(SlidingWindowBitArrayPositionTracker&& other):
-    current_vector_(std::move(other.current_vector_)),
-    previous_vector_(std::move(other.previous_vector_))
-  {
+  SlidingWindowBitArrayPositionTracker(SlidingWindowBitArrayPositionTracker&& other)
+      : current_vector_(std::move(other.current_vector_)), previous_vector_(std::move(other.previous_vector_)) {
     window_start_position_ = other.window_start_position_;
   }
 
@@ -65,7 +63,6 @@ class SlidingWindowBitArrayPositionTracker final {
     window_start_position_ = other.window_start_position_;
     return *this;
   }
-
 
   inline bool IsSet(size_t position) const {
     // divide by SLIDING_WINDOW_SIZE
@@ -116,22 +113,22 @@ class SlidingWindowBitArrayPositionTracker final {
 
     if (blocker_window > window_start_position_) {
       // swap and reset
-      std::swap(previous_vector_,current_vector_);
+      std::swap(previous_vector_, current_vector_);
 
       current_vector_.Clear();
       window_start_position_ = blocker_window;
 
-      TRACE ("Sliding Window slide:   new start position %d", window_start_position_);
+      TRACE("Sliding Window slide:   new start position %d", window_start_position_);
     }
 
     if (blocker_window == window_start_position_) {
       current_vector_.Set(blocker_offset);
-    } else if (window_start_position_ > 0 && blocker_window == window_start_position_ - 1 ) {
+    } else if (window_start_position_ > 0 && blocker_window == window_start_position_ - 1) {
       previous_vector_.Set(blocker_offset);
     }
   }
 
-  template<std::size_t TsizeOther>
+  template <std::size_t TsizeOther>
   inline void SetVector(const BitVector<TsizeOther>& requested_positions, size_t position) {
     // divide by SLIDING_WINDOW_SIZE
     auto blocker_window = position >> SLIDING_WINDOW_SHIFT;
@@ -141,50 +138,46 @@ class SlidingWindowBitArrayPositionTracker final {
     // check if start position is already over the boundary now
     if (blocker_window_end > window_start_position_) {
       // swap and reset
-      std::swap(previous_vector_,current_vector_);
+      std::swap(previous_vector_, current_vector_);
 
       current_vector_.Clear();
       window_start_position_ = blocker_window_end;
 
-      TRACE ("Sliding Window slide:   new start position %d", window_start_position_);
+      TRACE("Sliding Window slide:   new start position %d", window_start_position_);
     }
 
     if (blocker_window == window_start_position_) {
       current_vector_.SetVector(requested_positions, blocker_offset);
-    } else if (window_start_position_ > 0 && blocker_window == window_start_position_ - 1 ) {
+    } else if (window_start_position_ > 0 && blocker_window == window_start_position_ - 1) {
       previous_vector_.SetVector(requested_positions, blocker_offset);
       if (blocker_window_end == window_start_position_) {
         current_vector_.SetVectorAndShiftOther(requested_positions, SLIDING_WINDOW_SIZE - blocker_offset);
       }
     }
-
   }
 
-  template<std::size_t TsizeOther>
+  template <std::size_t TsizeOther>
   inline int IsAvailable(const BitVector<TsizeOther>& requested_positions, size_t position) const {
     // divide by SLIDING_WINDOW_SIZE
     size_t blocker_window = position >> SLIDING_WINDOW_SHIFT;
 
     size_t blocker_offset = position & SLIDING_WINDOW_MASK;
 
-    TRACE("Sliding Window IsAvailable for window %d(current: %d) offset %d position %d", blocker_window
-          , window_start_position_, blocker_offset, position);
+    TRACE("Sliding Window IsAvailable for window %d(current: %d) offset %d position %d", blocker_window,
+          window_start_position_, blocker_offset, position);
 
     if (blocker_window == window_start_position_) {
-      return current_vector_.DisjointAndShiftThis(requested_positions,
-                                                blocker_offset);
+      return current_vector_.DisjointAndShiftThis(requested_positions, blocker_offset);
     }
 
     if (blocker_window > window_start_position_) {
       return 0;
     }
 
-    size_t shift = previous_vector_.DisjointAndShiftThis(requested_positions,
-                                                    blocker_offset);
+    size_t shift = previous_vector_.DisjointAndShiftThis(requested_positions, blocker_offset);
 
     if (shift == 0 && (SLIDING_WINDOW_SIZE - blocker_offset < MAX_TRANSITIONS_OF_A_STATE)) {
-      return requested_positions.DisjointAndShiftOther(current_vector_,
-                                                      SLIDING_WINDOW_SIZE - blocker_offset);
+      return requested_positions.DisjointAndShiftOther(current_vector_, SLIDING_WINDOW_SIZE - blocker_offset);
     }
 
     return shift;
@@ -202,4 +195,4 @@ class SlidingWindowBitArrayPositionTracker final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* SLIDING_WINDOW_BIT_VECTOR_POSITION_TRACKER_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_SLIDING_WINDOW_BIT_VECTOR_POSITION_TRACKER_H_

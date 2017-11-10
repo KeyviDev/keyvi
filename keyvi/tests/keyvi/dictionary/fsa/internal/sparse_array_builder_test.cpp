@@ -25,9 +25,9 @@
 
 #define SPARSE_ARRAY_BUILDER_UNIT_TEST
 
-#include <boost/test/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include "dictionary/fsa/internal/sparse_array_builder.h"
+#include <boost/filesystem.hpp>
+#include <boost/test/unit_test.hpp>
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 
 namespace keyvi {
@@ -35,25 +35,24 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-BOOST_AUTO_TEST_SUITE( SparseArrayBuilderTests )
+BOOST_AUTO_TEST_SUITE(SparseArrayBuilderTests)
 
-BOOST_AUTO_TEST_CASE( writeFinalStateCompact ) {
+BOOST_AUTO_TEST_CASE(writeFinalStateCompact) {
   SparseArrayPersistence<uint16_t> p(16000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
 
-  b.WriteFinalTransition(25,55);
+  b.WriteFinalTransition(25, 55);
   BOOST_CHECK_EQUAL(55, p.ReadFinalValue(25));
 
-  b.WriteFinalTransition(42,0);
+  b.WriteFinalTransition(42, 0);
   BOOST_CHECK_EQUAL(0, p.ReadFinalValue(42));
 
-  b.WriteFinalTransition(2048,23);
+  b.WriteFinalTransition(2048, 23);
   BOOST_CHECK_EQUAL(23, p.ReadFinalValue(2048));
-
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionAbsoluteMaxValue ) {
+BOOST_AUTO_TEST_CASE(writeTransitionAbsoluteMaxValue) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -69,7 +68,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionAbsoluteMaxValue ) {
   BOOST_CHECK_EQUAL(p.ResolveTransitionValue(1000000, p.ReadTransitionValue(1000000)), 20);
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflow ) {
+BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflow) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -85,7 +84,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflow ) {
   BOOST_CHECK_EQUAL(p.ResolveTransitionValue(1000001, p.ReadTransitionValue(1000001)), 34000);
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteGhostState ) {
+BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteGhostState) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -96,7 +95,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteGhostState ) {
   u1.Add(66, 101);
   u1.Add(233, 102);
 
-  b.WriteState(0,u1);
+  b.WriteState(0, u1);
 
   // it should be allowed to put something at position 255
   BOOST_CHECK(!b.state_start_positions_.IsSet(0xff));
@@ -114,14 +113,14 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteGhostState ) {
     b.taken_positions_in_sparsearray_.Set(i);
   }
 
-  b.FindFreeBucket(u2);
-  b.WriteState(0xff,u2);
+  b.FindFreeBucket(&u2);
+  b.WriteState(0xff, u2);
 
   // 0 + 255 -> 255 should not exist as it would mean u1 has a transition 255
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(255), 0xfe);
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte ) {
+BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyte) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -151,7 +150,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte ) {
   BOOST_CHECK(p.ReadTransitionLabel(1000001) != 0);
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte2 ) {
+BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyte2) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -184,7 +183,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte2 ) {
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000003), 70);
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte3 ) {
+BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyte3) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -227,7 +226,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyte3 ) {
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000003), 70);
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecase ) {
+BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteEdgecase) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -237,7 +236,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecase ) {
 
   p.BeginNewState(1000000);
 
-  for (int i = 0xff; i>1; i--) {
+  for (int i = 0xff; i > 1; i--) {
     // mark some state beginnings that could lead to zombie states
     b.state_start_positions_.Set(1000001 - i);
   }
@@ -272,7 +271,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecase ) {
   BOOST_CHECK(p.ReadTransitionLabel(1000005) != 0);
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecaseStartPositions ) {
+BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteEdgecaseStartPositions) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -299,13 +298,13 @@ BOOST_AUTO_TEST_CASE( writeTransitionRelativeOverflowZerobyteEdgecaseStartPositi
   BOOST_CHECK_EQUAL(p.ResolveTransitionValue(1001000, p.ReadTransitionValue(1001000)), 333336);
 
   for (int i = 0; i < 1000; ++i) {
-      // mark some state beginnings that could lead to zombie states
-      b.state_start_positions_.Set(1000000 + i);
-      BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000000 + i), 70);
+    // mark some state beginnings that could lead to zombie states
+    b.state_start_positions_.Set(1000000 + i);
+    BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000000 + i), 70);
   }
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionZerobyteWeightCase) {
+BOOST_AUTO_TEST_CASE(writeTransitionZerobyteWeightCase) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -323,7 +322,7 @@ BOOST_AUTO_TEST_CASE( writeTransitionZerobyteWeightCase) {
   BOOST_CHECK(b.state_start_positions_.IsSet(1000000 + INNER_WEIGHT_TRANSITION_COMPACT));
 }
 
-BOOST_AUTO_TEST_CASE( writeTransitionFinalStateTransition) {
+BOOST_AUTO_TEST_CASE(writeTransitionFinalStateTransition) {
   SparseArrayPersistence<uint16_t> p(64000, boost::filesystem::temp_directory_path());
   int64_t limit = 1024 * 1024;
   SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
@@ -344,8 +343,6 @@ BOOST_AUTO_TEST_CASE( writeTransitionFinalStateTransition) {
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000000 + FINAL_OFFSET_TRANSITION), 1);
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000000 + FINAL_OFFSET_TRANSITION + 1), 2);
 }
-
-
 
 BOOST_AUTO_TEST_SUITE_END()
 

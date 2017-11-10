@@ -22,13 +22,16 @@
  *      Author: hendrik
  */
 
-#ifndef SERIALIZATION_UTILS_H_
-#define SERIALIZATION_UTILS_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_SERIALIZATION_UTILS_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_SERIALIZATION_UTILS_H_
 
 #include <arpa/inet.h>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+
+#include <string>
+
 #include <boost/lexical_cast.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace keyvi {
 namespace dictionary {
@@ -37,8 +40,7 @@ namespace internal {
 
 class SerializationUtils {
  public:
-  static void WriteJsonRecord(std::ostream& stream,
-                       boost::property_tree::ptree& properties) {
+  static void WriteJsonRecord(std::ostream& stream, const boost::property_tree::ptree& properties) {
     std::stringstream string_buffer;
 
     boost::property_tree::write_json(string_buffer, properties, false);
@@ -54,7 +56,7 @@ class SerializationUtils {
     uint32_t header_size;
     stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
     header_size = htonl(header_size);
-    char * buffer = new char[header_size];
+    char* buffer = new char[header_size];
     stream.read(buffer, header_size);
     std::string buffer_as_string(buffer, header_size);
     delete[] buffer;
@@ -65,29 +67,29 @@ class SerializationUtils {
     return properties;
   }
 
-    static boost::property_tree::ptree ReadValueStoreProperties(std::istream &stream) {
-        const auto properties = ReadJsonRecord(stream);
-        const auto offset = stream.tellg();
+  static boost::property_tree::ptree ReadValueStoreProperties(std::istream& stream) {
+    const auto properties = ReadJsonRecord(stream);
+    const auto offset = stream.tellg();
 
-        // check for file truncation
-        const size_t vsSize = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
-        if (vsSize > 0) {
-            stream.seekg(vsSize - 1, stream.cur);
-            if (stream.peek() == EOF) {
-                throw std::invalid_argument("file is corrupt(truncated)");
-            }
-        }
-
-        stream.seekg(offset);
-        return properties;
+    // check for file truncation
+    const size_t vsSize = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
+    if (vsSize > 0) {
+      stream.seekg(vsSize - 1, stream.cur);
+      if (stream.peek() == EOF) {
+        throw std::invalid_argument("file is corrupt(truncated)");
+      }
     }
+
+    stream.seekg(offset);
+    return properties;
+  }
 
   /**
    * Utility method to return a property tree from a JSON string.
    * @param record a string containing a JSON
    * @return the parsed property tree
    */
-  static boost::property_tree::ptree ReadJsonRecord(const std::string& record){
+  static boost::property_tree::ptree ReadJsonRecord(const std::string& record) {
     boost::property_tree::ptree properties;
 
     // sending an empty string clears the manifest
@@ -105,4 +107,4 @@ class SerializationUtils {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* SERIALIZATION_UTILS_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_SERIALIZATION_UTILS_H_

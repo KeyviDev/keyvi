@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef GENERATOR_H_
-#define GENERATOR_H_
+#ifndef KEYVI_DICTIONARY_FSA_GENERATOR_H_
+#define KEYVI_DICTIONARY_FSA_GENERATOR_H_
 
 #include <arpa/inet.h>
 
@@ -58,12 +58,10 @@ namespace fsa {
  * @returns length of the longest common prefix of given strings
  */
 
-inline size_t get_common_prefix_length(const std::string& first,
-                                       const std::string& second) {
+inline size_t get_common_prefix_length(const std::string& first, const std::string& second) {
   size_t common_prefix_length = 0;
 
-  while (first[common_prefix_length] == second[common_prefix_length] &&
-         common_prefix_length < first.size()) {
+  while (first[common_prefix_length] == second[common_prefix_length] && common_prefix_length < first.size()) {
     ++common_prefix_length;
   }
   return common_prefix_length;
@@ -138,10 +136,8 @@ typedef const internal::IValueStoreWriter::vs_param_t generator_param_t;
 
 struct ValueHandle final {
   bool operator==(const ValueHandle other) const {
-    return (value_idx == other.value_idx) && (count == other.count) &&
-           (weight == other.weight) &&
-           (no_minimization == other.no_minimization) &&
-           (deleted == other.deleted);
+    return (value_idx == other.value_idx) && (count == other.count) && (weight == other.weight) &&
+           (no_minimization == other.no_minimization) && (deleted == other.deleted);
   }
 
   bool operator!=(const ValueHandle other) const { return !(*this == other); }
@@ -153,33 +149,26 @@ struct ValueHandle final {
   bool deleted;
 };
 
-template <class PersistenceT, class ValueStoreT = internal::NullValueStore,
-          class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
+template <class PersistenceT, class ValueStoreT = internal::NullValueStore, class OffsetTypeT = uint32_t,
+          class HashCodeTypeT = int32_t>
 class Generator final {
  public:
-  explicit Generator(const generator_param_t& params = generator_param_t(),
-            ValueStoreT* value_store = NULL)
+  explicit Generator(const generator_param_t& params = generator_param_t(), ValueStoreT* value_store = NULL)
       : params_(params) {
-    memory_limit_ =
-        util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT);
+    memory_limit_ = util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT);
 
     // use 50% or limit minus 200MB for the memory limit of the hashtable
-      const size_t memory_limit_minimization =
-          memory_limit_ > (400 * 1024 * 1024) ?
-              memory_limit_ - (200 * 1024 * 1024) :
-              memory_limit_ / 2;
+    const size_t memory_limit_minimization =
+        memory_limit_ > (400 * 1024 * 1024) ? memory_limit_ - (200 * 1024 * 1024) : memory_limit_ / 2;
 
     params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
     minimize_ = util::mapGetBool(params_, MINIMIZATION_KEY, true);
 
-    persistence_ = new PersistenceT(memory_limit_ - memory_limit_minimization,
-                                    params_[TEMPORARY_PATH_KEY]);
+    persistence_ = new PersistenceT(memory_limit_ - memory_limit_minimization, params_[TEMPORARY_PATH_KEY]);
 
     stack_ = new internal::UnpackedStateStack<PersistenceT>(persistence_, 30);
-    builder_ = new internal::SparseArrayBuilder<PersistenceT, OffsetTypeT,
-                                                HashCodeTypeT>(
-        memory_limit_minimization, persistence_, ValueStoreT::inner_weight,
-        minimize_);
+    builder_ = new internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>(
+        memory_limit_minimization, persistence_, ValueStoreT::inner_weight, minimize_);
 
     if (value_store != NULL) {
       value_store_ = value_store;
@@ -208,17 +197,14 @@ class Generator final {
    * @param input_key The input key.
    * @param value A value (depending on the Valuestore implementation).
    */
-  void Add(const std::string& input_key,
-           typename ValueStoreT::value_t value = ValueStoreT::no_value) {
+  void Add(const std::string& input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     if (state_ != generator_state::FEEDING) {
       throw generator_exception("not in feeding state");
     }
-    const size_t commonPrefixLength =
-        get_common_prefix_length(last_key_, input_key);
+    const size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
 
     // keys are equal, just return
-    if (commonPrefixLength == input_key.size() &&
-        last_key_.size() == input_key.size()) {
+    if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {
       return;
     }
 
@@ -231,7 +217,7 @@ class Generator final {
 
     // get value and mark final state
     bool no_minimization = false;
-    uint64_t value_idx = value_store_->GetValue(value, no_minimization);
+    uint64_t value_idx = value_store_->GetValue(value, &no_minimization);
 
     stack_->InsertFinalState(input_key.size(), value_idx, no_minimization);
 
@@ -258,12 +244,10 @@ class Generator final {
       throw generator_exception("not in feeding state");
     }
 
-    const size_t commonPrefixLength =
-        get_common_prefix_length(last_key_, input_key);
+    const size_t commonPrefixLength = get_common_prefix_length(last_key_, input_key);
 
     // keys are equal, just return
-    if (commonPrefixLength == input_key.size() &&
-        last_key_.size() == input_key.size()) {
+    if (commonPrefixLength == input_key.size() && last_key_.size() == input_key.size()) {
       return;
     }
 
@@ -274,8 +258,7 @@ class Generator final {
     // into the stack
     FeedStack(commonPrefixLength, input_key);
 
-    stack_->InsertFinalState(input_key.size(), handle.value_idx,
-                             handle.no_minimization);
+    stack_->InsertFinalState(input_key.size(), handle.value_idx, handle.no_minimization);
 
     // count number of entries
     ++number_of_keys_added_;
@@ -302,15 +285,12 @@ class Generator final {
     // handling of last State.
     internal::UnpackedState<PersistenceT>* unpackedState = stack_->Get(0);
 
-    start_state_ = builder_->PersistState(*unpackedState);
+    start_state_ = builder_->PersistState(unpackedState);
 
     TRACE("wrote start state at %d", start_state_);
     TRACE("Check first transition: %d/%d %s", (*unpackedState)[0].label,
-          persistence_->ReadTransitionLabel(start_state_ +
-                                            (*unpackedState)[0].label),
-          (*unpackedState)[0].label ==
-                  persistence_->ReadTransitionLabel(start_state_ +
-                                                    (*unpackedState)[0].label)
+          persistence_->ReadTransitionLabel(start_state_ + (*unpackedState)[0].label),
+          (*unpackedState)[0].label == persistence_->ReadTransitionLabel(start_state_ + (*unpackedState)[0].label)
               ? "OK"
               : "BROKEN");
 
@@ -367,17 +347,14 @@ class Generator final {
    *
    * @param manifest
    */
-  inline void SetManifest(const boost::property_tree::ptree& manifest) {
-    manifest_ = manifest;
-  }
+  inline void SetManifest(const boost::property_tree::ptree& manifest) { manifest_ = manifest; }
 
  private:
   size_t memory_limit_;
   internal::IValueStoreWriter::vs_param_t params_;
   PersistenceT* persistence_;
   ValueStoreT* value_store_;
-  internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>*
-      builder_;
+  internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>* builder_;
   internal::UnpackedStateStack<PersistenceT>* stack_;
   std::string last_key_ = std::string();
   size_t highest_stack_ = 0;
@@ -393,8 +370,7 @@ class Generator final {
     pt.put("version", "2");
     pt.put("start_state", std::to_string(start_state_));
     pt.put("number_of_keys", std::to_string(number_of_keys_added_));
-    pt.put("value_store_type",
-           std::to_string(value_store_->GetValueStoreType()));
+    pt.put("value_store_type", std::to_string(value_store_->GetValueStoreType()));
     pt.put("number_of_states", std::to_string(number_of_states_));
     pt.add_child("manifest", manifest_);
 
@@ -416,15 +392,13 @@ class Generator final {
   inline void ConsumeStack(const size_t end) {
     while (highest_stack_ > end) {
       // Get outgoing transitions from the stack.
-      internal::UnpackedState<PersistenceT>* unpackedState =
-          stack_->Get(highest_stack_);
+      internal::UnpackedState<PersistenceT>* unpackedState = stack_->Get(highest_stack_);
 
-      OffsetTypeT transitionPointer = builder_->PersistState(*unpackedState);
+      OffsetTypeT transitionPointer = builder_->PersistState(unpackedState);
 
       // Save transition_pointer in previous stack, indicate whether it makes
       // sense continuing minimization
-      stack_->PushTransitionPointer(highest_stack_ - 1, transitionPointer,
-                                    unpackedState->GetNoMinimizationCounter());
+      stack_->PushTransitionPointer(highest_stack_ - 1, transitionPointer, unpackedState->GetNoMinimizationCounter());
 
       // Delete state
       stack_->Erase(highest_stack_);
@@ -438,4 +412,4 @@ class Generator final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* GENERATOR_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_GENERATOR_H_

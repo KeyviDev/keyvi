@@ -22,18 +22,21 @@
  *      Author: hendrik
  */
 
-#ifndef STRING_VALUE_STORE_H_
-#define STRING_VALUE_STORE_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_STRING_VALUE_STORE_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_STRING_VALUE_STORE_H_
+
+#include <string>
+#include <vector>
 
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "dictionary/fsa/internal/ivalue_store.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/minimization_hash.h"
+#include "dictionary/fsa/internal/serialization_utils.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -45,265 +48,218 @@ namespace internal {
  * Value store where the value consists of a string.
  */
 class StringValueStore final : public IValueStoreWriter {
+ public:
+  struct StringPointer final {
    public:
+    StringPointer() : StringPointer(0, 0, 0) {}
 
-    struct StringPointer
-    final {
-       public:
-        StringPointer()
-            : StringPointer(0, 0, 0) {
+    StringPointer(uint64_t offset, int hashcode, ushort length)
+        : offset_(offset), hashcode_(hashcode), length_(length) {}
+
+    int GetHashcode() const { return hashcode_; }
+
+    uint64_t GetOffset() const { return offset_; }
+
+    ushort GetLength() const { return length_; }
+
+    int GetCookie() const { return cookie_; }
+
+    void SetCookie(int value) { cookie_ = static_cast<ushort>(value); }
+
+    bool IsEmpty() const { return offset_ == 0 && hashcode_ == 0 && length_ == 0; }
+
+    bool operator==(const StringPointer& l) { return offset_ == l.offset_; }
+
+    static size_t GetMaxCookieSize() { return MaxCookieSize; }
+
+   private:
+    static const size_t MaxCookieSize = 0xFFFF;
+
+    uint64_t offset_;
+    int32_t hashcode_;
+    ushort length_;
+    ushort cookie_ = 0;
+  };
+
+  template <class PersistenceT>
+  struct StringPointerForCompare final {
+   public:
+    StringPointerForCompare(const std::string& value, PersistenceT* persistence)
+        : value_(value), persistence_(persistence) {
+      hashcode_ = std::hash<value_t>()(value);
+      length_ = value.size();
+    }
+
+    int GetHashcode() const { return hashcode_; }
+
+    bool operator==(const StringPointer& l) const {
+      // First filter - check if hash code  is the same
+      if (l.GetHashcode() != hashcode_) {
+        return false;
+      }
+
+      size_t length_l = l.GetLength();
+
+      if (length_l < USHRT_MAX && length_l != length_) {
+        return false;
+      }
+
+      size_t offset = l.GetOffset();
+
+      // ensure not to go over memory boundaries
+      if (persistence_->size() < offset + length_) {
+        return false;
+      }
+
+      for (size_t i = 0; i < length_; ++i) {
+        char c = persistence_->operator[](offset + i);
+        if (c != value_[i]) {
+          return false;
         }
+      }
 
-        StringPointer(uint64_t offset, int hashcode, ushort length)
-            : offset_(offset),
-              hashcode_(hashcode),
-              length_(length) {
-        }
-
-        int GetHashcode() const {
-          return hashcode_;
-        }
-
-        uint64_t GetOffset() const {
-          return offset_;
-        }
-
-        ushort GetLength() const {
-          return length_;
-        }
-
-        int GetCookie() const {
-          return cookie_;
-        }
-
-        void SetCookie(int value) {
-          cookie_ = static_cast<ushort>(value);
-        }
-
-        bool IsEmpty() const {
-          return offset_ == 0 && hashcode_ == 0 && length_ == 0;
-        }
-
-        bool operator==(const StringPointer& l) {
-          return offset_ == l.offset_;
-        }
-
-        static size_t GetMaxCookieSize(){
-          return MaxCookieSize;
-        }
-
-       private:
-        static const size_t MaxCookieSize = 0xFFFF;
-
-        uint64_t offset_;
-        int32_t hashcode_;
-        ushort length_;
-        ushort cookie_ = 0;
-      };
-
-      template<class PersistenceT>
-      struct StringPointerForCompare
-      final
-      {
-         public:
-          StringPointerForCompare(const std::string& value,
-                                  PersistenceT* persistence)
-              : value_(value),
-                persistence_(persistence)
-         {
-            hashcode_ = std::hash<value_t>()(value);
-            length_ = value.size();
-          }
-
-          int GetHashcode() const {
-            return hashcode_;
-          }
-
-          bool operator==(const StringPointer& l) const {
-            // First filter - check if hash code  is the same
-            if (l.GetHashcode() != hashcode_) {
-              return false;
-            }
-
-            size_t length_l = l.GetLength();
-
-            if (length_l < USHRT_MAX && length_l != length_) {
-              return false;
-            }
-
-            size_t offset = l.GetOffset();
-
-            // ensure not to go over memory boundaries
-            if (persistence_->size() < offset + length_ ) {
-              return false;
-            }
-
-            for (size_t i = 0; i < length_; ++i) {
-              char c = persistence_->operator[](offset+i);
-              if (c != value_[i]) {
-                return false;
-              }
-            }
-
-            // strings must be equal
-            return true;
-          }
-
-         private:
-          std::string value_;
-          PersistenceT* persistence_;
-          int32_t hashcode_;
-          size_t length_;
-        };
+      // strings must be equal
+      return true;
+    }
 
-        typedef std::string value_t;
-        static const uint64_t no_value = 0;
-        static const bool inner_weight = false;
+   private:
+    std::string value_;
+    PersistenceT* persistence_;
+    int32_t hashcode_;
+    size_t length_;
+  };
 
-        using IValueStoreWriter::IValueStoreWriter;
+  typedef std::string value_t;
+  static const uint64_t no_value = 0;
+  static const bool inner_weight = false;
 
-        // Because the copy ctor is "user declared", the default ctor is not
-        // generated by the compiler
-        StringValueStore() = default;
-        StringValueStore& operator=(StringValueStore const&) = delete;
-        StringValueStore(const StringValueStore& that) = delete;
+  using IValueStoreWriter::IValueStoreWriter;
 
-        /**
-         * Simple implementation of a value store for strings:
-         * todo: performance improvements / port stuff from json_value_store
-         */
-        uint64_t GetValue(const value_t& value, bool& no_minimization) {
-          const StringPointerForCompare<std::vector<char>> stp(value, &string_values_);
+  // Because the copy ctor is "user declared", the default ctor is not
+  // generated by the compiler
+  StringValueStore() = default;
+  StringValueStore& operator=(StringValueStore const&) = delete;
+  StringValueStore(const StringValueStore& that) = delete;
 
-          const StringPointer p = hash_.Get(stp);
+  /**
+   * Simple implementation of a value store for strings:
+   * todo: performance improvements / port stuff from json_value_store
+   */
+  uint64_t GetValue(const value_t& value, bool* no_minimization) {
+    const StringPointerForCompare<std::vector<char>> stp(value, &string_values_);
 
-          if (!p.IsEmpty()){
-            // found the same value again, minimize
-            return p.GetOffset();
-          }
+    const StringPointer p = hash_.Get(stp);
 
-          no_minimization = true;
+    if (!p.IsEmpty()) {
+      // found the same value again, minimize
+      return p.GetOffset();
+    }
 
-          // else persist string value
-          uint64_t pt = static_cast<uint64_t>(string_values_.size());
+    *no_minimization = true;
 
-          for (size_t i = 0; i < value.size(); ++i) {
-            string_values_.push_back(value.c_str()[i]);
-          }
+    // else persist string value
+    uint64_t pt = static_cast<uint64_t>(string_values_.size());
 
-          // add zero termination
-          string_values_.push_back(0);
+    for (size_t i = 0; i < value.size(); ++i) {
+      string_values_.push_back(value.c_str()[i]);
+    }
 
-          hash_.Add(StringPointer(pt,stp.GetHashcode(),value.size()));
+    // add zero termination
+    string_values_.push_back(0);
 
-          return pt;
-        }
+    hash_.Add(StringPointer(pt, stp.GetHashcode(), value.size()));
 
-        uint32_t GetWeightValue(value_t value) const {
-          return 0;
-        }
+    return pt;
+  }
 
-        static value_store_t GetValueStoreType() {
-          return STRING_VALUE_STORE;
-        }
+  uint32_t GetWeightValue(value_t value) const { return 0; }
 
-        void Write(std::ostream& stream) const {
+  static value_store_t GetValueStoreType() { return STRING_VALUE_STORE; }
 
-          boost::property_tree::ptree pt;
-          pt.put("size", std::to_string(string_values_.size()));
+  void Write(std::ostream& stream) const {
+    boost::property_tree::ptree pt;
+    pt.put("size", std::to_string(string_values_.size()));
 
-          internal::SerializationUtils::WriteJsonRecord(stream, pt);
-          TRACE("Wrote JSON header, stream at %d", stream.tellp());
+    internal::SerializationUtils::WriteJsonRecord(stream, pt);
+    TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
-          stream.write((const char*) &string_values_[0], string_values_.size());
-        }
+    stream.write((const char*)&string_values_[0], string_values_.size());
+  }
 
-        /**
-         * Close the value store, so no more updates;
-         */
-        void CloseFeeding() {
-          // free up memory from hashtable
-          hash_.Clear();
-        }
+  /**
+   * Close the value store, so no more updates;
+   */
+  void CloseFeeding() {
+    // free up memory from hashtable
+    hash_.Clear();
+  }
 
-       private:
-        std::vector<char> string_values_;
-        MinimizationHash<StringPointer> hash_;
+ private:
+  std::vector<char> string_values_;
+  MinimizationHash<StringPointer> hash_;
 
+  template <typename, typename>
+  friend class ::keyvi::dictionary::DictionaryMerger;
 
-        template<typename , typename>
-        friend class ::keyvi::dictionary::DictionaryMerger;
+  uint64_t GetValue(const char* p, uint64_t fsa_value, bool* no_minimization) {
+    // simple, not optimized version
 
-        uint64_t GetValue(const char*p, uint64_t fsa_value, bool& no_minimization){
-          // simple, not optimized version
+    std::string value(p + fsa_value);
 
-          std::string value(p + fsa_value);
+    return GetValue(value, no_minimization);
+  }
+};
 
-          return GetValue(value, no_minimization);
-        }
-      };
+class StringValueStoreReader final : public IValueStoreReader {
+ public:
+  using IValueStoreReader::IValueStoreReader;
 
-      class StringValueStoreReader final: public IValueStoreReader {
-       public:
-        using IValueStoreReader::IValueStoreReader;
+  StringValueStoreReader(std::istream& stream, boost::interprocess::file_mapping* file_mapping,
+                         loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+      : IValueStoreReader(stream, file_mapping) {
+    const boost::property_tree::ptree properties = internal::SerializationUtils::ReadValueStoreProperties(stream);
 
-        StringValueStoreReader(std::istream& stream,
-                               boost::interprocess::file_mapping* file_mapping, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
-            : IValueStoreReader(stream, file_mapping) {
+    const size_t offset = stream.tellg();
+    const size_t strings_size = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
 
-          const boost::property_tree::ptree properties = internal::SerializationUtils::ReadValueStoreProperties(stream);
+    const boost::interprocess::map_options_t map_options =
+        internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 
-          const size_t offset = stream.tellg();
-          const size_t strings_size = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
+    strings_region_ = new boost::interprocess::mapped_region(*file_mapping, boost::interprocess::read_only, offset,
+                                                             strings_size, 0, map_options);
 
+    const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
 
-          const boost::interprocess::map_options_t map_options = internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
+    strings_region_->advise(advise);
 
-          strings_region_ = new boost::interprocess::mapped_region(
-              *file_mapping, boost::interprocess::read_only, offset,
-              strings_size, 0, map_options);
+    strings_ = (const char*)strings_region_->get_address();
+  }
 
-          const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
+  ~StringValueStoreReader() { delete strings_region_; }
 
-          strings_region_->advise(advise);
+  value_store_t GetValueStoreType() const override { return STRING_VALUE_STORE; }
 
-          strings_ = (const char*) strings_region_->get_address();
-        }
+  attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
+    attributes_t attributes(new attributes_raw_t());
 
-        ~StringValueStoreReader() {
-          delete strings_region_;
-        }
+    std::string raw_value(strings_ + fsa_value);
 
-        virtual value_store_t GetValueStoreType() const override {
-          return STRING_VALUE_STORE;
-        }
+    (*attributes)["value"] = raw_value;
+    return attributes;
+  }
 
+  std::string GetValueAsString(uint64_t fsa_value) const override { return std::string(strings_ + fsa_value); }
 
-        virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
-          attributes_t attributes(new attributes_raw_t());
+ private:
+  boost::interprocess::mapped_region* strings_region_;
+  const char* strings_;
 
-          std::string raw_value(strings_ + fsa_value);
-
-          (*attributes)["value"] = raw_value;
-          return attributes;
-        }
-
-        virtual std::string GetValueAsString(uint64_t fsa_value) const override {
-          return std::string(strings_ + fsa_value);
-        }
-
-       private:
-        boost::interprocess::mapped_region* strings_region_;
-        const char* strings_;
-
-        virtual const char* GetValueStorePayload() const override {
-          return strings_;
-        }
-      };
+  const char* GetValueStorePayload() const override { return strings_; }
+};
 
 } /* namespace internal */
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* STRING_VALUE_STORE_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_STRING_VALUE_STORE_H_
