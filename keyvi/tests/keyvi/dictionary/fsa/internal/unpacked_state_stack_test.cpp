@@ -24,18 +24,18 @@
  */
 
 #include <boost/test/unit_test.hpp>
-#include "dictionary/fsa/internal/unpacked_state_stack.h"
+
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "dictionary/fsa/internal/unpacked_state_stack.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
 namespace internal {
 
-BOOST_AUTO_TEST_SUITE (UnpackedStateStackTests)
+BOOST_AUTO_TEST_SUITE(UnpackedStateStackTests)
 
-BOOST_AUTO_TEST_CASE( basic ) {
-
+BOOST_AUTO_TEST_CASE(basic) {
   SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
   UnpackedStateStack<SparseArrayPersistence<>> s(&p, 20);
 

@@ -23,8 +23,9 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/test/unit_test.hpp>
+
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/unpacked_state.h"
 
@@ -33,9 +34,9 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-BOOST_AUTO_TEST_SUITE (UnpackedStateTests)
+BOOST_AUTO_TEST_SUITE(UnpackedStateTests)
 
-BOOST_AUTO_TEST_CASE( simple ) {
+BOOST_AUTO_TEST_CASE(simple) {
   SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
   UnpackedState<SparseArrayPersistence<>> u1(&p);
   u1.Add(65, 100);
@@ -59,7 +60,7 @@ BOOST_AUTO_TEST_CASE( simple ) {
   BOOST_CHECK(hashcode != u1.GetHashcode());
 }
 
-BOOST_AUTO_TEST_CASE( clear ) {
+BOOST_AUTO_TEST_CASE(clear) {
   SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
   UnpackedState<SparseArrayPersistence<>> u1(&p);
   u1.Add(65, 100);
@@ -78,7 +79,7 @@ BOOST_AUTO_TEST_CASE( clear ) {
   BOOST_CHECK(!u1.get_BitVector().Get(68));
 }
 
-BOOST_AUTO_TEST_CASE( hash_with_weights ) {
+BOOST_AUTO_TEST_CASE(hash_with_weights) {
   SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
   UnpackedState<SparseArrayPersistence<>> u1(&p);
   u1.Add(65, 100);

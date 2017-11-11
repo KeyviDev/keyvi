@@ -25,9 +25,10 @@
 
 #define SPARSE_ARRAY_BUILDER_UNIT_TEST
 
-#include "dictionary/fsa/internal/sparse_array_builder.h"
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
+
+#include "dictionary/fsa/internal/sparse_array_builder.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 
 namespace keyvi {

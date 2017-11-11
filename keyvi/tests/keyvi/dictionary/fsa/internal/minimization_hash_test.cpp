@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <string>
+
 #include <boost/test/unit_test.hpp>
 
 #include "dictionary/fsa/internal/minimization_hash.h"
@@ -29,30 +30,28 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( MinimizationHashTests )
+BOOST_AUTO_TEST_SUITE(MinimizationHashTests)
 
-BOOST_AUTO_TEST_CASE( insert )
-{
-	MinimizationHash<PackedState<>> *hash = new MinimizationHash<PackedState<>>();
-	PackedState<> p1 = {10, 25, 2};
-	hash->Add(p1);
-	PackedState<> p2 = {12, 25, 3};
-	hash->Add(p2);
-	PackedState<> p3 = {13, 25, 5};
-	hash->Add(p3);
-	PackedState<> p4 = {15, 25, 6};
-	hash->Add(p4);
+BOOST_AUTO_TEST_CASE(insert) {
+  MinimizationHash<PackedState<>> *hash = new MinimizationHash<PackedState<>>();
+  PackedState<> p1 = {10, 25, 2};
+  hash->Add(p1);
+  PackedState<> p2 = {12, 25, 3};
+  hash->Add(p2);
+  PackedState<> p3 = {13, 25, 5};
+  hash->Add(p3);
+  PackedState<> p4 = {15, 25, 6};
+  hash->Add(p4);
 
-	BOOST_CHECK(hash->Get(p1) == p1);
-	BOOST_CHECK(hash->Get(p2) == p2);
-	BOOST_CHECK(hash->Get(p3) == p3);
-	BOOST_CHECK(hash->Get(p4) == p4);
+  BOOST_CHECK(hash->Get(p1) == p1);
+  BOOST_CHECK(hash->Get(p2) == p2);
+  BOOST_CHECK(hash->Get(p3) == p3);
+  BOOST_CHECK(hash->Get(p4) == p4);
 
-	delete hash;
+  delete hash;
 }
 
-BOOST_AUTO_TEST_CASE( reset )
-{
+BOOST_AUTO_TEST_CASE(reset) {
   MinimizationHash<PackedState<>> *hash = new MinimizationHash<PackedState<>>();
   PackedState<> p1 = {10, 25, 2};
   hash->Add(p1);
@@ -76,4 +75,3 @@ BOOST_AUTO_TEST_SUITE_END()
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
-

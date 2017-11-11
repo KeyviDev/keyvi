@@ -23,9 +23,10 @@
  *      Author: hendrik
  */
 
-#include "dictionary/fsa/internal/string_value_store.h"
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
+
+#include "dictionary/fsa/internal/string_value_store.h"
 
 namespace keyvi {
 namespace dictionary {

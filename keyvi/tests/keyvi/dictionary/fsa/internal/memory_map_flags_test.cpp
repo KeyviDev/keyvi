@@ -23,8 +23,9 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
 #include <boost/interprocess/mapped_region.hpp>
+#include <boost/test/unit_test.hpp>
+
 #include "dictionary/fsa/internal/memory_map_flags.h"
 
 namespace keyvi {
@@ -33,9 +34,9 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( MemoryMapFlagsTests )
+BOOST_AUTO_TEST_SUITE(MemoryMapFlagsTests)
 
-BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestLazy ) {
+BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestLazy) {
   loading_strategy_types strategy = loading_strategy_types::lazy;
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestLazy ) {
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
 }
 
-BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate ) {
+BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestPopulate) {
   loading_strategy_types strategy = loading_strategy_types::populate;
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
@@ -69,7 +70,7 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate ) {
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
 }
 
-BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_key_part ) {
+BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestPopulate_key_part) {
   loading_strategy_types strategy = loading_strategy_types::populate_key_part;
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
@@ -86,7 +87,7 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_key_part ) {
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_normal);
 }
 
-BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_lazy ) {
+BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestPopulate_lazy) {
   loading_strategy_types strategy = loading_strategy_types::populate_lazy;
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
@@ -103,7 +104,7 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestPopulate_lazy ) {
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_willneed);
 }
 
-BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestlazy_no_readahead ) {
+BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestlazy_no_readahead) {
   loading_strategy_types strategy = loading_strategy_types::lazy_no_readahead;
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
@@ -120,7 +121,7 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestlazy_no_readahead ) {
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_random);
 }
 
-BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestlazy_no_readahead_value_part ) {
+BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestlazy_no_readahead_value_part) {
   loading_strategy_types strategy = loading_strategy_types::lazy_no_readahead_value_part;
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
@@ -137,7 +138,7 @@ BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestlazy_no_readahead_value_part ) {
   BOOST_CHECK(value_advise_flags == boost::interprocess::mapped_region::advice_types::advice_random);
 }
 
-BOOST_AUTO_TEST_CASE( MemoryMapFlagsTestpopulate_key_part_no_readahead_value_part ) {
+BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestpopulate_key_part_no_readahead_value_part) {
   loading_strategy_types strategy = loading_strategy_types::populate_key_part_no_readahead_value_part;
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
@@ -160,5 +161,3 @@ BOOST_AUTO_TEST_SUITE_END()
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
-
-
