@@ -6,3 +6,4 @@ git remote add rapidjson    https://github.com/miloyip/rapidjson.git
 git remote add msgpack-c    https://github.com/msgpack/msgpack-c.git
 git remote add tpie         https://github.com/thomasmoelhave/tpie.git
 git remote add xchange      https://github.com/xpol/xchange.git
+git remote add tiny-process-library https://github.com/eidheim/tiny-process-library.git
