@@ -307,7 +307,7 @@ class DictionaryCompiler final {
    */
   fsa::ValueHandle RegisterValue(typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     bool no_minimization = false;
-    uint64_t value_idx = value_store_->GetValue(value, no_minimization);
+    uint64_t value_idx = value_store_->GetValue(value, &no_minimization);
 
     fsa::ValueHandle handle = {
         value_idx,                            // offset of value

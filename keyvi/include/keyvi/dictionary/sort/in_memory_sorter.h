@@ -22,21 +22,24 @@
  *      Author: hendrik
  */
 
-#ifndef IN_MEMORY_SORTER_H_
-#define IN_MEMORY_SORTER_H_
+#ifndef KEYVI_DICTIONARY_SORT_IN_MEMORY_SORTER_H_
+#define KEYVI_DICTIONARY_SORT_IN_MEMORY_SORTER_H_
 
-#include "dictionary/sort/sorter_common.h"
+#include <algorithm>
+#include <vector>
+
 #include "dictionary/fsa/internal/constants.h"
-//#define ENABLE_TRACING
+#include "dictionary/sort/sorter_common.h"
+
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace sort {
 
-template<typename KeyValueT>
+template <typename KeyValueT>
 class InMemorySorter final {
-
  public:
   typedef typename std::vector<KeyValueT>::iterator iterator;
 
@@ -45,9 +48,7 @@ class InMemorySorter final {
    *
    * @param memory_limit ignored, everything is in memory, client has to ensure it fits in memory.
    */
-  InMemorySorter(const sorter_param_t& params = sorter_param_t())
-      : params_(params) {
-  }
+  explicit InMemorySorter(const sorter_param_t& params = sorter_param_t()) : params_(params) {}
 
 #ifndef KEYVI_DEPRECATED
   /**
@@ -55,34 +56,20 @@ class InMemorySorter final {
    *
    * @param memory_limit ignored, everything is in memory, client has to ensure it fits in memory.
    */
-  InMemorySorter(size_t memory_limit, const sorter_param_t& params = sorter_param_t())
-      : params_(params) {
-  }
+  explicit InMemorySorter(size_t memory_limit, const sorter_param_t& params = sorter_param_t()) : params_(params) {}
 #endif
 
-  void push_back(const KeyValueT& kv) {
-    key_values_.push_back(kv);
-  }
+  void push_back(const KeyValueT& kv) { key_values_.push_back(kv); }
 
-  void sort() {
-    std::sort(key_values_.begin(), key_values_.end());
-  }
+  void sort() { std::sort(key_values_.begin(), key_values_.end()); }
 
-  size_t size() {
-    return key_values_.size();
-  }
+  size_t size() { return key_values_.size(); }
 
-  iterator begin() {
-    return key_values_.begin();
-  }
+  iterator begin() { return key_values_.begin(); }
 
-  iterator end() {
-    return key_values_.end();
-  }
+  iterator end() { return key_values_.end(); }
 
-  void clear() {
-    key_values_.clear();
-  }
+  void clear() { key_values_.clear(); }
 
  private:
   std::vector<KeyValueT> key_values_;
@@ -93,4 +80,4 @@ class InMemorySorter final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* IN_MEMORY_SORTER_H_ */
+#endif  // KEYVI_DICTIONARY_SORT_IN_MEMORY_SORTER_H_

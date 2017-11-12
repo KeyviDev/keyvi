@@ -197,7 +197,7 @@ class DictionaryMerger final {
       } else {
         handle.value_idx =
             value_store->GetValue(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
-                                  segment_it.entryIterator().GetValueId(), handle.no_minimization);
+                                  segment_it.entryIterator().GetValueId(), &handle.no_minimization);
       }
 
       TRACE("Add key: %s", top_key.c_str());

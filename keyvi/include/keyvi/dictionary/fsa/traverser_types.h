@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /*
  * traverser_types.h
  *
@@ -23,27 +22,25 @@
  *      Author: hendrik
  */
 
-#ifndef TRAVERSER_TYPES_H_
-#define TRAVERSER_TYPES_H_
+#ifndef KEYVI_DICTIONARY_FSA_TRAVERSER_TYPES_H_
+#define KEYVI_DICTIONARY_FSA_TRAVERSER_TYPES_H_
 
 #include "dictionary/fsa/state_traverser.h"
-#include "dictionary/fsa/traversal/weighted_traversal.h"
 #include "dictionary/fsa/traversal/bounded_weighted_traversal.h"
 #include "dictionary/fsa/traversal/near_traversal.h"
+#include "dictionary/fsa/traversal/weighted_traversal.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
 // weighted state traverser
-typedef  StateTraverser<traversal::WeightedTransition> WeightedStateTraverser;
-typedef  StateTraverser<traversal::BoundedWeightedTransition> BoundedWeightedStateTraverser2;
-typedef  StateTraverser<traversal::NearTransition> NearStateTraverser;
+typedef StateTraverser<traversal::WeightedTransition> WeightedStateTraverser;
+typedef StateTraverser<traversal::BoundedWeightedTransition> BoundedWeightedStateTraverser2;
+typedef StateTraverser<traversal::NearTransition> NearStateTraverser;
 
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-
-
-#endif /* TRAVERSER_TYPES_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_TRAVERSER_TYPES_H_

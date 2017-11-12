@@ -34,10 +34,9 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( SlidingWindowBitVectorPositionTrackerTests )
+BOOST_AUTO_TEST_SUITE(SlidingWindowBitVectorPositionTrackerTests)
 
-BOOST_AUTO_TEST_CASE( nextfreeslot )
-{
+BOOST_AUTO_TEST_CASE(nextfreeslot) {
   SlidingWindowBitArrayPositionTracker positions;
 
   positions.Set(8);
@@ -47,8 +46,7 @@ BOOST_AUTO_TEST_CASE( nextfreeslot )
   BOOST_CHECK_EQUAL(12, positions.NextFreeSlot(12));
 }
 
-BOOST_AUTO_TEST_CASE( sliding )
-{
+BOOST_AUTO_TEST_CASE(sliding) {
   SlidingWindowBitArrayPositionTracker positions;
 
   positions.Set(8);
@@ -78,8 +76,7 @@ BOOST_AUTO_TEST_CASE( sliding )
   positions.Set(4095);
 }
 
-BOOST_AUTO_TEST_CASE( no_integer_overflow )
-{
+BOOST_AUTO_TEST_CASE(no_integer_overflow) {
   SlidingWindowBitArrayPositionTracker positions;
 
   positions.Set(8);
@@ -87,14 +84,13 @@ BOOST_AUTO_TEST_CASE( no_integer_overflow )
   positions.Set(10);
 
   // trigger switch of the bit vectors
-  uint32_t t= uint32_t(INT_MAX) + 10;
+  uint32_t t = uint32_t(INT_MAX) + 10;
   positions.Set(t);
 
   BOOST_CHECK(positions.IsSet(t));
 }
 
-BOOST_AUTO_TEST_CASE( set_vector )
-{
+BOOST_AUTO_TEST_CASE(set_vector) {
   SlidingWindowBitArrayPositionTracker positions;
 
   positions.Set(8);
@@ -114,8 +110,7 @@ BOOST_AUTO_TEST_CASE( set_vector )
   BOOST_CHECK(positions.IsSet(27));
 }
 
-BOOST_AUTO_TEST_CASE( set_vector_overlap )
-{
+BOOST_AUTO_TEST_CASE(set_vector_overlap) {
   SlidingWindowBitArrayPositionTracker positions;
 
   positions.Set(8);
@@ -137,8 +132,7 @@ BOOST_AUTO_TEST_CASE( set_vector_overlap )
   BOOST_CHECK(positions.IsSet(1051));
 }
 
-BOOST_AUTO_TEST_CASE( set_vector_overlap2 )
-{
+BOOST_AUTO_TEST_CASE(set_vector_overlap2) {
   SlidingWindowBitArrayPositionTracker positions;
 
   positions.Set(8);
@@ -162,8 +156,7 @@ BOOST_AUTO_TEST_CASE( set_vector_overlap2 )
   BOOST_CHECK(positions.IsSet(924 + 100));
 }
 
-BOOST_AUTO_TEST_CASE( set_vector_overlap3 )
-{
+BOOST_AUTO_TEST_CASE(set_vector_overlap3) {
   SlidingWindowBitArrayPositionTracker positions;
 
   positions.Set(8);
@@ -181,10 +174,7 @@ BOOST_AUTO_TEST_CASE( set_vector_overlap3 )
   positions.Set(5311 + 257);
 
   BOOST_CHECK(positions.IsSet(5311 + 257));
-
 }
-
-
 
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -192,6 +182,3 @@ BOOST_AUTO_TEST_SUITE_END()
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
-
-
-

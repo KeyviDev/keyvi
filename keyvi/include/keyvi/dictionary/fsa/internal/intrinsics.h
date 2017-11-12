@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef INTRINSICS_H_
-#define INTRINSICS_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_INTRINSICS_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_INTRINSICS_H_
 
 #if !defined(KEYVI_DISABLE_OPTIMIZATIONS) && defined(__SSE4_2__)
 #define KEYVI_SSE42
@@ -33,4 +33,4 @@
 #include <nmmintrin.h>
 #endif
 
-#endif /* INTRINSICS_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_INTRINSICS_H_

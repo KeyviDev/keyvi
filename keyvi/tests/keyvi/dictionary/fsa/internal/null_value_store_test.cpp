@@ -16,17 +16,13 @@
 // limitations under the License.
 //
 
-/*
- * string_value_store_test.cpp
- *
- *  Created on: Jul 30, 2014
- *      Author: hendrik
- */
+#include <sstream>
 
 #include <boost/filesystem.hpp>
+#include <boost/interprocess/file_mapping.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/string_value_store.h"
+#include "dictionary/fsa/internal/null_value_store.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -34,22 +30,29 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE(StringValueTest)
+BOOST_AUTO_TEST_SUITE(NullValueTest)
 
-BOOST_AUTO_TEST_CASE(minimization) {
-  IValueStoreWriter ivsw1(IValueStoreWriter::vs_param_t{{"hello", "bello"}});
-  IValueStoreWriter ivsw2;
-  StringValueStore strings;
+BOOST_AUTO_TEST_CASE(basic) {
+  NullValueStore nvs;
 
   bool no_minimization = false;
 
-  uint64_t v = strings.GetValue("mytestvalue", &no_minimization);
-  BOOST_CHECK_EQUAL(v, 0);
-  uint64_t w = strings.GetValue("othervalue", &no_minimization);
+  BOOST_CHECK_EQUAL(nvs.GetValue(42, &no_minimization), 0);
+  BOOST_CHECK(no_minimization == false);
+  BOOST_CHECK_EQUAL(nvs.GetValue(3535, &no_minimization), 0);
+  BOOST_CHECK(no_minimization == false);
+  BOOST_CHECK_EQUAL(nvs.GetValue(0, &no_minimization), 0);
+  BOOST_CHECK(no_minimization == false);
+}
 
-  BOOST_CHECK(w > 0);
-  BOOST_CHECK_EQUAL(v, strings.GetValue("mytestvalue", &no_minimization));
-  BOOST_CHECK_EQUAL(w, strings.GetValue("othervalue", &no_minimization));
+BOOST_AUTO_TEST_CASE(reader) {
+  std::istringstream string_stream;
+  boost::interprocess::file_mapping file_mapping;
+
+  NullValueStoreReader nvsr(string_stream, &file_mapping);
+
+  BOOST_CHECK_EQUAL(nvsr.GetValueStoreType(), NULL_VALUE_STORE);
+  BOOST_CHECK_EQUAL(nvsr.GetValueAsAttributeVector(42), IValueStoreReader::attributes_t());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

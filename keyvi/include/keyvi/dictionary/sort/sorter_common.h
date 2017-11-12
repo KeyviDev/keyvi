@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef SORTER_COMMON_H_
-#define SORTER_COMMON_H_
+#ifndef KEYVI_DICTIONARY_SORT_SORTER_COMMON_H_
+#define KEYVI_DICTIONARY_SORT_SORTER_COMMON_H_
 
 #include <map>
 #include <string>
@@ -36,16 +36,13 @@ namespace sort {
  * structure for internal processing
  * Note: Not using std::pair because it did not compile with Tpie
  */
-template<typename KeyT, typename ValueT>
+template <typename KeyT, typename ValueT>
 struct key_value_pair {
-  key_value_pair() : key(), value() {
-  }
+  key_value_pair() : key(), value() {}
 
-  key_value_pair(const KeyT& k, const ValueT& v): key(k), value(v) {}
+  key_value_pair(const KeyT& k, const ValueT& v) : key(k), value(v) {}
 
-  bool operator<(const key_value_pair kv) const {
-    return key < kv.key;
-  }
+  bool operator<(const key_value_pair kv) const { return key < kv.key; }
 
   bool operator==(const key_value_pair other) const {
     if (key != other.key) {
@@ -65,4 +62,4 @@ typedef std::map<std::string, std::string> sorter_param_t;
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* SORTER_COMMON_H_ */
+#endif  // KEYVI_DICTIONARY_SORT_SORTER_COMMON_H_

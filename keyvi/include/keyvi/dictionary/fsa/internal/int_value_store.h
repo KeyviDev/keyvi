@@ -22,13 +22,15 @@
  *      Author: hendrik
  */
 
-#ifndef INT_VALUE_STORE_H_
-#define INT_VALUE_STORE_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_INT_VALUE_STORE_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_INT_VALUE_STORE_H_
 
-#include "dictionary/fsa/internal/ivalue_store.h"
+#include <string>
+
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/fsa/internal/ivalue_store.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -53,60 +55,46 @@ class IntValueStore final : public IValueStoreWriter {
   IntValueStore(const IntValueStore& that) = delete;
   IntValueStore& operator=(IntValueStore const&) = delete;
 
-  uint64_t GetValue(value_t value, bool& no_minimization) const {
+  uint64_t GetValue(value_t value, bool* no_minimization) const {
     TRACE("Value store value: %d", value);
 
     return value;
   }
 
-  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) {
-    return oldIndex;
-  }
+  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) { return oldIndex; }
 
-  uint32_t GetWeightValue(value_t value) const {
-    return 0;
-  }
+  uint32_t GetWeightValue(value_t value) const { return 0; }
 
-  static value_store_t GetValueStoreType() {
-    return INT_VALUE_STORE;
-  }
+  static value_store_t GetValueStoreType() { return INT_VALUE_STORE; }
 
   void Write(std::ostream& stream) const {}
 
   /**
    * Close the value store, so no more updates;
    */
-  void CloseFeeding() {
-  }
+  void CloseFeeding() {}
 
-  private:
-
-  template<typename , typename>
+ private:
+  template <typename, typename>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
-  uint64_t GetValue(const char*p, uint64_t v, bool& no_minimization){
-    return v;
-  }
+  uint64_t GetValue(const char* p, uint64_t v, bool* no_minimization) { return v; }
 };
 
-class IntValueStoreReader final: public IValueStoreReader{
+class IntValueStoreReader final : public IValueStoreReader {
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  virtual value_store_t GetValueStoreType() const override {
-        return INT_VALUE_STORE;
-  }
+  value_store_t GetValueStoreType() const override { return INT_VALUE_STORE; }
 
-  virtual attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
+  attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());
 
     (*attributes)["weight"] = std::to_string(fsa_value);
     return attributes;
   }
 
-  virtual std::string GetValueAsString(uint64_t fsa_value) const override {
-    return std::to_string(fsa_value);
-  }
+  std::string GetValueAsString(uint64_t fsa_value) const override { return std::to_string(fsa_value); }
 };
 
 } /* namespace internal */
@@ -114,6 +102,4 @@ class IntValueStoreReader final: public IValueStoreReader{
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-
-
-#endif /* INT_VALUE_STORE_H_ */
+#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_INT_VALUE_STORE_H_

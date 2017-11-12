@@ -35,9 +35,9 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( BitVectorTests )
+BOOST_AUTO_TEST_SUITE(BitVectorTests)
 
-BOOST_AUTO_TEST_CASE( size ) {
+BOOST_AUTO_TEST_CASE(size) {
   BitVector<1> a;
 
   BOOST_CHECK(a.bits_.size() == 1);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( size ) {
   }
 }
 
-BOOST_AUTO_TEST_CASE( reset ) {
+BOOST_AUTO_TEST_CASE(reset) {
   BitVector<100> a;
 
   a.Set(42);
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE( reset ) {
   BOOST_CHECK(a.bits_[1] == 0);
 }
 
-BOOST_AUTO_TEST_CASE( getByte ) {
+BOOST_AUTO_TEST_CASE(getByte) {
   BitVector<16> origin;
 
   // 0000 0010 1010 0100
@@ -102,15 +102,14 @@ BOOST_AUTO_TEST_CASE( getByte ) {
   // 0000 0000
   BitVector<15> e;
 
-  BOOST_CHECK_EQUAL(a.bits_[0], origin.GetUnderlyingIntegerAtPosition(0,0));
-  BOOST_CHECK_EQUAL(b.bits_[0], origin.GetUnderlyingIntegerAtPosition(0,5));
-  BOOST_CHECK_EQUAL(c.bits_[0], origin.GetUnderlyingIntegerAtPosition(0,6));
-  BOOST_CHECK_EQUAL(d.bits_[0], origin.GetUnderlyingIntegerAtPosition(0,10));
-  BOOST_CHECK_EQUAL(e.bits_[0], origin.GetUnderlyingIntegerAtPosition(0,15));
+  BOOST_CHECK_EQUAL(a.bits_[0], origin.GetUnderlyingIntegerAtPosition(0, 0));
+  BOOST_CHECK_EQUAL(b.bits_[0], origin.GetUnderlyingIntegerAtPosition(0, 5));
+  BOOST_CHECK_EQUAL(c.bits_[0], origin.GetUnderlyingIntegerAtPosition(0, 6));
+  BOOST_CHECK_EQUAL(d.bits_[0], origin.GetUnderlyingIntegerAtPosition(0, 10));
+  BOOST_CHECK_EQUAL(e.bits_[0], origin.GetUnderlyingIntegerAtPosition(0, 15));
 }
 
-BOOST_AUTO_TEST_CASE( disjoint ) {
-
+BOOST_AUTO_TEST_CASE(disjoint) {
   BitVector<16> origin;
 
   // 0000 0010 1010 0100
@@ -169,9 +168,9 @@ BOOST_AUTO_TEST_CASE( disjoint ) {
   BOOST_CHECK(!origin.Disjoint(c, 4));
 }
 
-BOOST_AUTO_TEST_CASE( unsignedBitShiftConsistency ) {
-
-  // tests that bit shifting works for bit usually used for signed/unsigned (fails if underlying buffer uses a signed type)
+BOOST_AUTO_TEST_CASE(unsignedBitShiftConsistency) {
+  // tests that bit shifting works for bit usually used for signed/unsigned (fails if underlying buffer uses a signed
+  // type)
 
   // 0000 0000 0000 0000 0000 0000 0000 0001
   BitVector<32> f;
@@ -191,7 +190,7 @@ BOOST_AUTO_TEST_CASE( unsignedBitShiftConsistency ) {
   BOOST_CHECK(g.Get(6));
 }
 
-BOOST_AUTO_TEST_CASE( nextZeroBit ) {
+BOOST_AUTO_TEST_CASE(nextZeroBit) {
   // 1010 0000
   BitVector<32> a;
   BOOST_CHECK_EQUAL(0, a.GetNextNonSetBit(0));
@@ -236,8 +235,7 @@ BOOST_AUTO_TEST_CASE( nextZeroBit ) {
   BOOST_CHECK_EQUAL(39, b.GetNextNonSetBit(32));
 }
 
-BOOST_AUTO_TEST_CASE( setVector ) {
-
+BOOST_AUTO_TEST_CASE(setVector) {
   BitVector<64> origin;
 
   // 0000 0010 1010 0000 0000 0000 0000 0000 0000 0000 0000 0000
@@ -304,7 +302,7 @@ BOOST_AUTO_TEST_CASE( setVector ) {
   BOOST_CHECK(origin.Get(52));
 }
 
-BOOST_AUTO_TEST_CASE( setVector_overlap ) {
+BOOST_AUTO_TEST_CASE(setVector_overlap) {
   BitVector<64> origin;
   origin.Set(6);
   origin.Set(8);
@@ -327,7 +325,7 @@ BOOST_AUTO_TEST_CASE( setVector_overlap ) {
   BOOST_CHECK(origin.Get(52));
 }
 
-BOOST_AUTO_TEST_CASE( SetVectorAndShiftOther ) {
+BOOST_AUTO_TEST_CASE(SetVectorAndShiftOther) {
   BitVector<64> origin;
   origin.Set(6);
   origin.Set(8);

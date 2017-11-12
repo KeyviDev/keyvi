@@ -23,8 +23,9 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/test/unit_test.hpp>
+
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 
 namespace keyvi {
@@ -33,15 +34,14 @@ namespace fsa {
 namespace internal {
 
 // The name of the suite must be a different name to your class
-BOOST_AUTO_TEST_SUITE( SparseArrayPersistenceTests )
+BOOST_AUTO_TEST_SUITE(SparseArrayPersistenceTests)
 
-BOOST_AUTO_TEST_CASE( basic )
-{
-  size_t memoryLimit = 1024*1024;
+BOOST_AUTO_TEST_CASE(basic) {
+  size_t memoryLimit = 1024 * 1024;
 
   SparseArrayPersistence<> p(memoryLimit, boost::filesystem::temp_directory_path());
-  p.WriteTransition(1,42,43);
-  p.WriteTransition(200,44,45);
+  p.WriteTransition(1, 42, 43);
+  p.WriteTransition(200, 44, 45);
 
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1), 42);
   BOOST_CHECK_EQUAL(p.ReadTransitionValue(1), 43);
