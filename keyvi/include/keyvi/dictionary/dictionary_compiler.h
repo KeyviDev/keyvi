@@ -94,35 +94,6 @@ class DictionaryCompiler final {
     value_store_ = new ValueStoreT(params_);
   }
 
-#ifndef KEYVI_DEPRECATED
-  /**
-   * DEPRECATED Instantiate a dictionary compiler.
-   *
-   * Note the memory limit only limits the memory used for internal buffers,
-   * memory usage for small short-lived objects and the library itself is
-   * part of the limit.
-   *
-   * @param memory_limit memory limit for internal memory usage
-   */
-  explicit DictionaryCompiler(size_t memory_limit, const compiler_param_t& params = compiler_param_t())
-      : sorter_(memory_limit, params), params_(params) {
-    // Note: I can not use delegate constructors as the other would need to call
-    // this one
-    // as this one is the deprecated one I do some code duplication for now
-
-    params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
-
-    TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
-
-    stable_insert_ = util::mapGetBool(params_, STABLE_INSERTS, false);
-
-    // ensure backwards compatibility: put memory limit into parameters
-    params_[MEMORY_LIMIT_KEY] = std::to_string(memory_limit);
-
-    value_store_ = new ValueStoreT(params_);
-  }
-#endif
-
   ~DictionaryCompiler() {
     if (!generator_) {
       // if generator was not created we have to delete the value store

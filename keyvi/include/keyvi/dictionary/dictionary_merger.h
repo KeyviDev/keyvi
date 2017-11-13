@@ -105,21 +105,6 @@ class DictionaryMerger final {
     append_merge_ = MERGE_APPEND == util::mapGet<std::string>(params_, MERGE_MODE, "");
   }
 
-#ifndef KEYVI_DEPRECATED
-  /**
-   * DEPRECATED
-   */
-  explicit DictionaryMerger(size_t memory_limit, const merger_param_t& params = merger_param_t())
-      : dicts_to_merge_(), params_(params) {
-    params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
-
-    append_merge_ = MERGE_APPEND == util::mapGet<std::string>(params_, MERGE_MODE, "");
-
-    // ensure backwards compatibility: put memory limit into parameters
-    params_[MEMORY_LIMIT_KEY] = std::to_string(memory_limit);
-  }
-#endif
-
   void Add(const std::string& filename) {
     if (std::count(inputFiles_.begin(), inputFiles_.end(), filename)) {
       throw std::invalid_argument("File is added already: " + filename);
