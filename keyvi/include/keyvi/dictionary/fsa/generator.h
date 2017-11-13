@@ -155,7 +155,7 @@ class Generator final {
  public:
   explicit Generator(const generator_param_t& params = generator_param_t(), ValueStoreT* value_store = NULL)
       : params_(params) {
-    memory_limit_ = util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT);
+    memory_limit_ = util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
 
     // use 50% or limit minus 200MB for the memory limit of the hashtable
     const size_t memory_limit_minimization =

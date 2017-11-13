@@ -54,8 +54,14 @@ static const int KEYVI_FILE_PERSISTENCE_VERSION_MIN = 2;
 // the sparse array where the new state fits in
 #define SPARSE_ARRAY_SEARCH_OFFSET 151
 
-// 1 GB default memory usage
-#define DEFAULT_MEMORY_LIMIT 1073741824
+// 1 GB default memory limit for the sorter (tpie)
+#define DEFAULT_MEMORY_LIMIT_TPIE_SORT 1073741824
+
+// 1 GB default memory limit for the generator
+#define DEFAULT_MEMORY_LIMIT_GENERATOR 1073741824
+
+// 500MB default memory limit for value stores
+#define DEFAULT_MEMORY_LIMIT_VALUE_STORE 524288000
 
 // option key names
 static const char MEMORY_LIMIT_KEY[] = "memory_limit";

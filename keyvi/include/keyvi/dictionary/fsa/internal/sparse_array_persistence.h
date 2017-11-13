@@ -75,11 +75,13 @@ class SparseArrayPersistence final {
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-%%%%-%%%%-%%%%-%%%%");
     boost::filesystem::create_directory(temporary_directory_);
 
-    // size of external memory chunk: not more than 1 or 4 GB
+    // size of external memory chunk: not more than 1GB + 2GB
     size_t external_memory_chunk_size = std::min(flush_size_ * 2, (size_t)1073741824);
 
     // the chunk size must be a multiplier of the flush_size
     external_memory_chunk_size = external_memory_chunk_size - (external_memory_chunk_size % flush_size_);
+
+    TRACE("External Memory chunk size: %d", external_memory_chunk_size);
 
     labels_extern_ = new MemoryMapManager(external_memory_chunk_size, temporary_directory_, "characterTableFileBuffer");
 
