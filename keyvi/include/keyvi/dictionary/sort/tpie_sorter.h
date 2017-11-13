@@ -118,24 +118,6 @@ class TpieSorter final {
     initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
   }
 
-#ifndef KEYVI_DEPRECATED
-  /**
-   * DEPRECATED Instantiate a TPIE sorter (external memory sort).
-   *
-   * @param memory_limit memory limit for internal memory usage
-   */
-  explicit TpieSorter(size_t memory_limit, const sorter_param_t& params = sorter_param_t())
-      : initializer_(util::TpieIntializer::getInstance()), sorter_(), params_(params) {
-    sorter_.set_available_memory(memory_limit);
-    sorter_.begin();
-
-    params_[TEMPORARY_PATH_KEY] =
-        util::mapGet(params_, TEMPORARY_PATH_KEY, boost::filesystem::temp_directory_path().string());
-
-    initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
-  }
-#endif
-
   void push_back(const KeyValueT& kv) { sorter_.push(kv); }
 
   void sort() {
