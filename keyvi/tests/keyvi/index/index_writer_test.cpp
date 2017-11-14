@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(simple) {
   writer.Flush();
   // std::this_thread::sleep_for(std::chrono::seconds(1));
 }
-
+/*
 BOOST_AUTO_TEST_CASE(bigger_feed) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
     writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
   }
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace index */
