@@ -107,7 +107,7 @@ class TpieSorter final {
    */
   explicit TpieSorter(const sorter_param_t& params = sorter_param_t())
       : initializer_(util::TpieIntializer::getInstance()), sorter_(), params_(params) {
-    size_t memory_limit = util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT);
+    size_t memory_limit = util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_TPIE_SORT);
 
     sorter_.set_available_memory(memory_limit);
     sorter_.begin();

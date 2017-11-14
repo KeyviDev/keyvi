@@ -39,7 +39,7 @@ namespace internal {
 BOOST_AUTO_TEST_SUITE(JsonValueTest)
 
 BOOST_AUTO_TEST_CASE(minimization) {
-  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
+  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
   bool no_minimization = false;
   uint32_t v = strings.GetValue("{\"mytestvalue\":25, \"mytestvalue2\":23}", &no_minimization);
   BOOST_CHECK_EQUAL(v, 0);
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(minimization) {
 }
 
 BOOST_AUTO_TEST_CASE(minimization_longvalues) {
-  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
+  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
   bool no_minimization = false;
   std::string value = "{\"";
   value += std::string(60000, 'a');
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(minimization_longvalues) {
 }
 
 BOOST_AUTO_TEST_CASE(minimization2) {
-  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
+  JsonValueStore strings(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
   bool no_minimization = false;
 
   uint64_t v = strings.GetValue(
@@ -83,7 +83,8 @@ BOOST_AUTO_TEST_CASE(minimization2) {
 }
 
 BOOST_AUTO_TEST_CASE(persistence) {
-  JsonValueStore json_value_store(IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}});
+  JsonValueStore json_value_store(
+      IValueStoreWriter::vs_param_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
   bool no_minimization = false;
   std::string value = "{\"";
   value += std::string(60000, 'a');

@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 
+#include <map>
+
 #include <boost/test/unit_test.hpp>
 
 #include "dictionary/util/configuration.h"
@@ -35,36 +37,25 @@ BOOST_AUTO_TEST_SUITE(ConfigurationTests)
 
 BOOST_AUTO_TEST_CASE(memory) {
   std::map<std::string, std::string> memory_default({});
-  BOOST_CHECK_EQUAL(DEFAULT_MEMORY_LIMIT,
-                     util::mapGetMemory(memory_default,
-                                        MEMORY_LIMIT_KEY,
-                                        DEFAULT_MEMORY_LIMIT));
+  BOOST_CHECK_EQUAL(DEFAULT_MEMORY_LIMIT_GENERATOR,
+                    util::mapGetMemory(memory_default, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR));
 
-  std::map<std::string, std::string> memory_bytes({{"memory_limit",
-    "52428800"}});
+  std::map<std::string, std::string> memory_bytes({{"memory_limit", "52428800"}});
 
   BOOST_CHECK_EQUAL(std::size_t(52428800),
-                       util::mapGetMemory(memory_bytes,
-                                          MEMORY_LIMIT_KEY,
-                                          DEFAULT_MEMORY_LIMIT));
+                    util::mapGetMemory(memory_bytes, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR));
 
   std::map<std::string, std::string> memory_kb({{"memory_limit_kb", "61440"}});
   BOOST_CHECK_EQUAL(std::size_t(62914560),
-                         util::mapGetMemory(memory_kb,
-                                            MEMORY_LIMIT_KEY,
-                                            DEFAULT_MEMORY_LIMIT));
+                    util::mapGetMemory(memory_kb, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR));
 
   std::map<std::string, std::string> memory_mb({{"memory_limit_mb", "70"}});
   BOOST_CHECK_EQUAL(std::size_t(73400320),
-                           util::mapGetMemory(memory_mb,
-                                              MEMORY_LIMIT_KEY,
-                                              DEFAULT_MEMORY_LIMIT));
+                    util::mapGetMemory(memory_mb, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR));
 
   std::map<std::string, std::string> memory_gb({{"memory_limit_gb", "2"}});
   BOOST_CHECK_EQUAL(std::size_t(2147483648),
-                             util::mapGetMemory(memory_gb,
-                                                MEMORY_LIMIT_KEY,
-                                                DEFAULT_MEMORY_LIMIT));
+                    util::mapGetMemory(memory_gb, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR));
 }
 
 BOOST_AUTO_TEST_CASE(boolean) {

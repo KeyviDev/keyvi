@@ -77,8 +77,9 @@ class JsonValueStore final : public IValueStoreWriter {
   static const uint64_t no_value = 0;
   static const bool inner_weight = false;
 
-  explicit JsonValueStore(const vs_param_t& parameters = vs_param_t(), size_t memory_limit = 104857600)
-      : IValueStoreWriter(parameters), hash_(memory_limit) {
+  explicit JsonValueStore(const vs_param_t& parameters = vs_param_t())
+      : IValueStoreWriter(parameters),
+        hash_(util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
     temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
 
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
@@ -106,7 +107,11 @@ class JsonValueStore final : public IValueStoreWriter {
         std::bind(static_cast<compression::compress_mem_fn_t>(&compression::CompressionStrategy::Compress),
                   raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
-    const size_t external_memory_chunk_size = 104857600;  // 100 MB
+    // use memory limit as an indicator for the external memory chunksize
+    const size_t external_memory_chunk_size =
+        util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE);
+
+    TRACE("External Memory chunk size: %d", external_memory_chunk_size);
 
     values_extern_.reset(
         new MemoryMapManager(external_memory_chunk_size, temporary_directory_, "json_values_filebuffer"));

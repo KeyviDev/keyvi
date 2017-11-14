@@ -26,6 +26,8 @@
 #define KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_PERSISTENCE_H_
 
 #include <limits.h>
+
+#include <cstdint>
 #include <functional>
 
 #include "dictionary/util/vint.h"
