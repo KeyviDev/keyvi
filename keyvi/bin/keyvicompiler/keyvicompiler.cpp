@@ -23,42 +23,44 @@
  *      Author: hendrik
  */
 
-#include <boost/program_options.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/filesystem.hpp>
+#include <functional>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/program_options.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/iterator_range.hpp>
+
 #include "dictionary/dictionary_compiler.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "dictionary/fsa/internal/string_value_store.h"
+#include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "dictionary/fsa/internal/string_value_store.h"
 
 typedef keyvi::dictionary::fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
 
-void callback (size_t added, size_t overall, void*) {
-  std::cout << "Processed " << added << "/" << overall << "(" << ((100 * added) / overall) <<  "%)." << std::endl;
+void callback(size_t added, size_t overall, void*) {
+  std::cout << "Processed " << added << "/" << overall << "(" << ((100 * added) / overall) << "%)." << std::endl;
 }
 
-template<typename CompilerType, typename ValueType>
-void compile_multiple(CompilerType& compiler, std::function<std::pair<std::string, ValueType>(std::string)> parser,
-                      std::vector<std::string>& inputs)
-{
+template <typename CompilerType, typename ValueType>
+void compile_multiple(CompilerType* compiler, std::function<std::pair<std::string, ValueType>(std::string)> parser,
+                      const std::vector<std::string>& inputs) {
   boost::iostreams::filtering_istream input_stream;
   std::string line;
 
   for (auto input_as_string : inputs) {
     auto input = boost::filesystem::path(input_as_string);
 
-    if(boost::filesystem::is_directory(input)) {
+    if (boost::filesystem::is_directory(input)) {
       int files_added = 0;
-      for(auto& entry : boost::make_iterator_range(boost::filesystem::directory_iterator(input), {})) {
+      for (auto& entry : boost::make_iterator_range(boost::filesystem::directory_iterator(input), {})) {
         if (entry.path().extension() == ".gz") {
           input_stream.push(boost::iostreams::gzip_decompressor());
         }
@@ -67,19 +69,18 @@ void compile_multiple(CompilerType& compiler, std::function<std::pair<std::strin
         input_stream.push(file);
         ++files_added;
         while (std::getline(input_stream, line)) {
-
           auto parse_result = parser(line);
           if (parse_result.first.size() == 0) {
             continue;
           }
 
-          compiler.Add(parse_result.first, parse_result.second);
+          compiler->Add(parse_result.first, parse_result.second);
         }
         input_stream.reset();
       }
 
     } else {
-      if (input.extension() == ".gz"){
+      if (input.extension() == ".gz") {
         input_stream.push(boost::iostreams::gzip_decompressor());
       }
 
@@ -88,41 +89,38 @@ void compile_multiple(CompilerType& compiler, std::function<std::pair<std::strin
       input_stream.push(file);
       while (std::getline(input_stream, line)) {
         auto parse_result = parser(line);
-        compiler.Add(parse_result.first, parse_result.second);
+        compiler->Add(parse_result.first, parse_result.second);
       }
       input_stream.reset();
     }
   }
 }
 
-template<typename CompilerType>
-void finalize_compile(CompilerType& compiler, std::string& output, const std::string& manifest = "") {
+template <typename CompilerType>
+void finalize_compile(CompilerType* compiler, const std::string& output, const std::string& manifest = "") {
   std::ofstream out_stream(output, std::ios::binary);
-  compiler.Compile(callback);
+  compiler->Compile(callback);
   try {
-    compiler.SetManifestFromString(manifest);
-  } catch(boost::property_tree::json_parser::json_parser_error const& error) {
+    compiler->SetManifestFromString(manifest);
+  } catch (boost::property_tree::json_parser::json_parser_error const& error) {
     std::cout << "Failed to set manifest: " << manifest << std::endl;
     std::cout << error.what() << std::endl;
   }
-  compiler.Write(out_stream);
+  compiler->Write(out_stream);
   out_stream.close();
 }
 
-template<class BucketT = uint32_t>
-void compile_completion(std::vector<std::string>& input, std::string& output,
-                     const std::string& manifest = "",
-                     const vs_param_t& value_store_params = vs_param_t()) {
-  keyvi::dictionary::DictionaryCompiler<
-      keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-      keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore> compiler(
-      value_store_params);
+template <class BucketT = uint32_t>
+void compile_completion(const std::vector<std::string>& input, const std::string& output,
+                        const std::string& manifest = "", const vs_param_t& value_store_params = vs_param_t()) {
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
+                                        keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
+      compiler(value_store_params);
 
-  std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
+  std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
 
-    if (tab == std::string::npos)
-      return std::pair<std::string, uint32_t>();
+    if (tab == std::string::npos) return std::pair<std::string, uint32_t>();
 
     std::string key = line.substr(0, tab);
     std::string value_as_string = line.substr(tab + 1);
@@ -134,28 +132,24 @@ void compile_completion(std::vector<std::string>& input, std::string& output,
       std::cout << "Error: value was not valid: " << line << std::endl;
       return std::pair<std::string, uint32_t>();
     }
-      return std::pair<std::string, uint32_t>(key, value);
+    return std::pair<std::string, uint32_t>(key, value);
   };
-  compile_multiple(compiler, parser, input);
+  compile_multiple(&compiler, parser, input);
 
-  finalize_compile(compiler, output, manifest);
+  finalize_compile(&compiler, output, manifest);
 }
 
-
-template<class BucketT = uint32_t>
-void compile_integer(std::vector<std::string>& input, std::string& output,
-                     const std::string& manifest = "",
+template <class BucketT = uint32_t>
+void compile_integer(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const vs_param_t& value_store_params = vs_param_t()) {
-  keyvi::dictionary::DictionaryCompiler<
-      keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-      keyvi::dictionary::fsa::internal::IntValueStore> compiler(
-      value_store_params);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
+                                        keyvi::dictionary::fsa::internal::IntValueStore>
+      compiler(value_store_params);
 
-  std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
+  std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
 
-    if (tab == std::string::npos)
-      return std::pair<std::string, uint32_t>();
+    if (tab == std::string::npos) return std::pair<std::string, uint32_t>();
 
     std::string key = line.substr(0, tab);
     std::string value_as_string = line.substr(tab + 1);
@@ -167,22 +161,19 @@ void compile_integer(std::vector<std::string>& input, std::string& output,
       std::cout << "Error: value was not valid: " << line << std::endl;
       return std::pair<std::string, uint32_t>();
     }
-      return std::pair<std::string, uint32_t>(key, value);
+    return std::pair<std::string, uint32_t>(key, value);
   };
-  compile_multiple(compiler, parser, input);
+  compile_multiple(&compiler, parser, input);
 
-  finalize_compile(compiler, output, manifest);
+  finalize_compile(&compiler, output, manifest);
 }
 
-
-template<class Compiler>
-void compile_strings_inner(Compiler& compiler,
-                           std::vector<std::string>& input, std::string& output,
+template <class Compiler>
+void compile_strings_inner(Compiler* compiler, const std::vector<std::string>& input, const std::string& output,
                            const std::string& manifest = "") {
-  std::function<std::pair<std::string, std::string>(std::string)> parser = [] (std::string line) {
+  std::function<std::pair<std::string, std::string>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
-    if (tab == std::string::npos)
-      return std::pair<std::string, std::string>();
+    if (tab == std::string::npos) return std::pair<std::string, std::string>();
     std::string key = line.substr(0, tab);
     std::string value = line.substr(tab + 1);
 
@@ -194,27 +185,22 @@ void compile_strings_inner(Compiler& compiler,
   finalize_compile(compiler, output, manifest);
 }
 
-template<class BucketT = uint32_t>
-void compile_strings(std::vector<std::string>& input, std::string& output,
-                     const std::string& manifest = "",
+template <class BucketT = uint32_t>
+void compile_strings(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const vs_param_t& value_store_params = vs_param_t()) {
-  keyvi::dictionary::DictionaryCompiler<
-      keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-      keyvi::dictionary::fsa::internal::StringValueStore> compiler(
-          value_store_params);
-  compile_strings_inner(compiler, input, output, manifest);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
+                                        keyvi::dictionary::fsa::internal::StringValueStore>
+      compiler(value_store_params);
+  compile_strings_inner(&compiler, input, output, manifest);
 }
 
-template<class BucketT = uint32_t>
-void compile_key_only(std::vector<std::string>& input, std::string& output,
-                      const std::string& manifest = "",
-                      const vs_param_t& value_store_params = vs_param_t()) {
-  keyvi::dictionary::DictionaryCompiler<
-      keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>> compiler(
+template <class BucketT = uint32_t>
+void compile_key_only(const std::vector<std::string>& input, const std::string& output,
+                      const std::string& manifest = "", const vs_param_t& value_store_params = vs_param_t()) {
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>> compiler(
       value_store_params);
 
-  std::function<std::pair<std::string, uint32_t>(std::string)> parser = [] (std::string line) {
-
+  std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     std::string key = line;
     size_t tab = line.find('\t');
 
@@ -225,27 +211,24 @@ void compile_key_only(std::vector<std::string>& input, std::string& output,
     return std::pair<std::string, uint32_t>(key, 0);
   };
 
-  compile_multiple(compiler, parser, input);
+  compile_multiple(&compiler, parser, input);
 
-  finalize_compile(compiler, output, manifest);
+  finalize_compile(&compiler, output, manifest);
 }
 
-template<class BucketT = uint32_t>
-void compile_json(std::vector<std::string>& input, std::string& output,
-                  const std::string& manifest = "",
+template <class BucketT = uint32_t>
+void compile_json(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                   const vs_param_t& value_store_params = vs_param_t()) {
-  keyvi::dictionary::DictionaryCompiler<
-      keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-      keyvi::dictionary::fsa::internal::JsonValueStore> compiler(
-          value_store_params);
-  compile_strings_inner(compiler, input, output, manifest);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
+                                        keyvi::dictionary::fsa::internal::JsonValueStore>
+      compiler(value_store_params);
+  compile_strings_inner(&compiler, input, output, manifest);
 }
 
-/** Extracts the value store parameters. */
-vs_param_t extract_value_store_parameters(
-    const boost::program_options::variables_map& vm) {
+/** Extracts the parameters. */
+vs_param_t extract_parameters(const boost::program_options::variables_map& vm) {
   vs_param_t ret;
-  for (auto& v : vm["value-store-parameter"].as<std::vector <std::string> >()) {
+  for (auto& v : vm["parameter"].as<std::vector<std::string>>()) {
     std::vector<std::string> key_value;
     boost::split(key_value, v, std::bind1st(std::equal_to<char>(), '='));
     if (key_value.size() == 2) {
@@ -261,34 +244,22 @@ int main(int argc, char** argv) {
   std::vector<std::string> input_files;
   std::string output_file;
 
-  boost::program_options::options_description description(
-      "keyvi compiler options:");
+  boost::program_options::options_description description("keyvi compiler options:");
 
-  description.add_options()("help,h", "Display this help message")(
-                            "version,v", "Display the version number");
+  description.add_options()("help,h", "Display this help message")("version,v", "Display the version number");
 
-  description.add_options()("input-file,i",
-                            boost::program_options::value<std::vector<std::string>>(),
-                            "input file");
-  description.add_options()("output-file,o",
-                            boost::program_options::value<std::string>(),
-                            "output file");
-  description.add_options()("memory-limit,m",
-                            boost::program_options::value<size_t>(),
-                            "amount of main memory to use");
-  description.add_options()(
-      "dictionary-type,d",
-      boost::program_options::value<std::string>()->default_value("integer"),
-      "type of dictionary (integer (default), string, key-only, json, completion)");
-  description.add_options()(
-      "value-store-parameter,V",
-      boost::program_options::value< std::vector<std::string> >()->default_value(std::vector<std::string>(), "EMPTY")->composing(),
-      "A value store option; format is -V xxx=yyy");
+  description.add_options()("input-file,i", boost::program_options::value<std::vector<std::string>>(), "input file");
+  description.add_options()("output-file,o", boost::program_options::value<std::string>(), "output file");
+  description.add_options()("memory-limit,m", boost::program_options::value<size_t>(), "amount of main memory to use");
+  description.add_options()("dictionary-type,d", boost::program_options::value<std::string>()->default_value("integer"),
+                            "type of dictionary (integer (default), string, key-only, json, completion)");
+  description.add_options()("parameter,p", boost::program_options::value<std::vector<std::string>>()
+                                               ->default_value(std::vector<std::string>(), "EMPTY")
+                                               ->composing(),
+                            "An option; format is -p xxx=yyy");
 
-  description.add_options()(
-        "manifest",
-        boost::program_options::value<std::string>()->default_value(""),
-        "manifest to be embedded");
+  description.add_options()("manifest", boost::program_options::value<std::string>()->default_value(""),
+                            "manifest to be embedded");
 
   // Declare which options are positional
   boost::program_options::positional_options_description p;
@@ -297,18 +268,14 @@ int main(int argc, char** argv) {
   boost::program_options::variables_map vm;
 
   try {
-    boost::program_options::store(
-        boost::program_options::command_line_parser(argc, argv).options(
-            description).run(),
-        vm);
+    boost::program_options::store(boost::program_options::command_line_parser(argc, argv).options(description).run(),
+                                  vm);
 
     boost::program_options::notify(vm);
 
     // parse positional options
     boost::program_options::store(
-        boost::program_options::command_line_parser(argc, argv).options(
-            description).positional(p).run(),
-        vm);
+        boost::program_options::command_line_parser(argc, argv).options(description).positional(p).run(), vm);
     boost::program_options::notify(vm);
 
     if (vm.count("help")) {
@@ -320,32 +287,27 @@ int main(int argc, char** argv) {
     std::cout << manifest << std::endl;
 
     std::string dictionary_type = vm["dictionary-type"].as<std::string>();
-    vs_param_t value_store_params = extract_value_store_parameters(vm);
+    vs_param_t value_store_params = extract_parameters(vm);
 
     if (vm.count("memory-limit")) {
-	  value_store_params[MEMORY_LIMIT_KEY] = vm["memory-limit"].as<std::string>();
-	}
+      value_store_params[MEMORY_LIMIT_KEY] = vm["memory-limit"].as<std::string>();
+    }
 
     if (vm.count("input-file") && vm.count("output-file")) {
       input_files = vm["input-file"].as<std::vector<std::string>>();
       output_file = vm["output-file"].as<std::string>();
 
       if (dictionary_type == "integer") {
-        compile_integer<uint16_t>(input_files, output_file,
-                                    manifest, value_store_params);
+        compile_integer<uint16_t>(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "string") {
-        compile_strings<uint16_t>(input_files, output_file,
-                                    manifest, value_store_params);
+        compile_strings<uint16_t>(input_files, output_file, manifest, value_store_params);
 
       } else if (dictionary_type == "key-only") {
-        compile_key_only<uint16_t>(input_files, output_file,
-                                     manifest, value_store_params);
+        compile_key_only<uint16_t>(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "json") {
-        compile_json<uint16_t>(input_files, output_file,
-                                 manifest, value_store_params);
+        compile_json<uint16_t>(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "completion") {
-        compile_integer<uint16_t>(input_files, output_file,
-                                      manifest, value_store_params);
+        compile_integer<uint16_t>(input_files, output_file, manifest, value_store_params);
       } else {
         std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;
         std::cout << description;
@@ -356,14 +318,13 @@ int main(int argc, char** argv) {
       std::cout << description;
       return 1;
     }
+  } catch (std::exception& e) {
+    std::cout << "ERROR: arguments wrong or missing." << std::endl << std::endl;
 
-  } catch(std::exception& e) {
-      std::cout << "ERROR: arguments wrong or missing." << std::endl << std::endl;
+    std::cout << e.what() << std::endl << std::endl;
+    std::cout << description;
 
-      std::cout << e.what() << std::endl << std::endl;
-      std::cout << description;
-
-      return 1;
+    return 1;
   }
   return 0;
 }
