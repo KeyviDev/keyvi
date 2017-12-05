@@ -33,7 +33,22 @@
 
 typedef keyvi::dictionary::fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
 
-int main(int argc, char **argv) {
+/** Extracts the parameters. */
+vs_param_t extract_parameters(const boost::program_options::variables_map& vm) {
+  vs_param_t ret;
+  for (auto& v : vm["parameter"].as<std::vector<std::string>>()) {
+    std::vector<std::string> key_value;
+    boost::split(key_value, v, std::bind1st(std::equal_to<char>(), '='));
+    if (key_value.size() == 2) {
+      ret[key_value[0]] = key_value[1];
+    } else {
+      throw std::invalid_argument("Invalid value store parameter format: " + v);
+    }
+  }
+  return ret;
+}
+
+int main(int argc, char** argv) {
   std::vector<std::string> input_files;
   std::string output_file;
 
@@ -43,6 +58,11 @@ int main(int argc, char **argv) {
 
   description.add_options()("input-file,i", boost::program_options::value<std::vector<std::string>>(), "input file");
   description.add_options()("output-file,o", boost::program_options::value<std::string>(), "output file");
+  description.add_options()("memory-limit,m", boost::program_options::value<size_t>(), "amount of main memory to use");
+  description.add_options()("parameter,p", boost::program_options::value<std::vector<std::string>>()
+                                               ->default_value(std::vector<std::string>(), "EMPTY")
+                                               ->composing(),
+                            "An option; format is -p xxx=yyy");
 
   // Declare which options are positional
   boost::program_options::positional_options_description p;
@@ -61,8 +81,6 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  size_t memory_limit = 1073741824;
-
   if (vm.count("input-file") && vm.count("output-file")) {
     input_files = vm["input-file"].as<std::vector<std::string>>();
     output_file = vm["output-file"].as<std::string>();
@@ -72,7 +90,7 @@ int main(int argc, char **argv) {
     for (auto f : input_files) {
       if (boost::filesystem::is_directory(f)) {
         int files_added = 0;
-        for (auto &entry : boost::make_iterator_range(boost::filesystem::directory_iterator(f), {})) {
+        for (auto& entry : boost::make_iterator_range(boost::filesystem::directory_iterator(f), {})) {
           if (entry.path().extension() == ".kv") {
             inputs.push_back(entry.path().string());
           }
@@ -84,9 +102,10 @@ int main(int argc, char **argv) {
 
     typedef keyvi::dictionary::fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
 
-    vs_param_t params;
-    params["merge_mode"] = "append";
-    params["memory-limit"] = std::to_string(memory_limit);
+    vs_param_t params = extract_parameters(vm);
+    if (vm.count("memory-limit")) {
+      params[MEMORY_LIMIT_KEY] = vm["memory-limit"].as<std::string>();
+    }
 
     keyvi::dictionary::JsonDictionaryMerger jsonDictionaryMerger(params);
     for (auto f : inputs) {
