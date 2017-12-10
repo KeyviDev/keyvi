@@ -105,7 +105,7 @@ class IndexWriterWorker final {
 
     if (c == nullptr) {
       TRACE("re-create compiler");
-      dictionary::compiler_param_t params = dictionary::compiler_param_t{{STABLE_INSERTS, "true"}, {MEMORY_LIMIT_KEY, "5242880"}};
+      dictionary::compiler_param_t params = dictionary::compiler_param_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
 
       compiler_.reset(new compiler_t(params));
       c = compiler_.get();

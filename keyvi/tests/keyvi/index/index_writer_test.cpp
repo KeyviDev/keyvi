@@ -35,7 +35,7 @@ namespace keyvi {
 namespace index {
 BOOST_AUTO_TEST_SUITE(IndexWriterTests)
 
-BOOST_AUTO_TEST_CASE(simple) {
+BOOST_AUTO_TEST_CASE(basic_writer) {
 
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
