@@ -38,7 +38,7 @@ namespace internal {
 
 BOOST_AUTO_TEST_SUITE(MergeJobTests)
 
-BOOST_AUTO_TEST_CASE(simple) {
+BOOST_AUTO_TEST_CASE(basic_merge) {
   std::vector<std::pair<std::string, std::string>> test_data = {
       {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"abbcd", "{c:3}"}, {"abcde", "{a:1}"}, {"abdd", "{b:2}"}, {"bba", "{c:3}"},
   };
@@ -59,10 +59,10 @@ BOOST_AUTO_TEST_CASE(simple) {
   MergeJob m({w1, w2}, 0, p);
   m.Run();
 
-  int retry = 10;
+  int retry = 100;
   while (retry > 0) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    if (!m.isRunning()) {
+    if (m.TryFinalize()) {
       break;
     }
     --retry;

@@ -19,9 +19,11 @@
 #define KEYVI_INDEX_INTERNAL_MERGE_JOB_H_
 
 #include <atomic>
+#include <chrono>
 #include <functional>
+#include <memory>
 #include <string>
-#include <thread>
+#include <thread>  // NOLINT
 #include <vector>
 
 #include "process.hpp"
@@ -59,58 +61,25 @@ class MergeJob final {
  public:
   // todo: add ability to stop merging for shutdown
   explicit MergeJob(std::vector<segment_t> segments, size_t id, const boost::filesystem::path& output_filename)
-      : payload_(segments, output_filename), id_(id), job_thread_() {}
+      : payload_(segments, output_filename), id_(id), external_process_() {}
+
+  ~MergeJob() {
+    if (payload_.process_finished_ == false) {
+      EndProcess();
+    }
+  }
 
   MergeJob(MergeJob&&) = default;
   MergeJob& operator=(MergeJob&&) = default;
 
-  void Run() {
-    MergeJobPayload* job = &payload_;
-    job_thread_ = std::thread([job]() {
-      job->start_time_ = std::chrono::system_clock::now();
-
-      TinyProcessLib::Process merge_process([job] {
-        try {
-          dictionary::DictionaryMerger<dictionary::fsa::internal::SparseArrayPersistence<>,
-                                       dictionary::fsa::internal::JsonValueStore>
-              m(dictionary::merger_param_t({{"memory_limit_mb", "10"}}));
-
-          for (auto s : job->segments_) {
-            m.Add(s->GetPath().string());
-          }
-
-          TRACE("merge done");
-          m.Merge(job->output_filename_.string());
-          exit(0);
-        } catch (std::exception& e) {
-          exit(1);
-        }
-      });
-
-      job->exit_code_ = merge_process.get_exit_status();
-      job->end_time_ = std::chrono::system_clock::now();
-      job->process_finished_ = true;
-      TRACE("Merge finished with %ld", job->exit_code_);
-    });
-  }
-
-  bool isRunning() const {
-    TRACE("Process finished %s", payload_.process_finished_ ? "yes" : "no");
-    return !payload_.process_finished_;
-  }
+  void Run() { DoMerge(); }
 
   bool TryFinalize() {
-    // already joined
-    if (!job_thread_.joinable()) {
+    // already finished?
+    if (payload_.process_finished_ == true) {
       return true;
     }
-
-    if (payload_.process_finished_) {
-      job_thread_.join();
-      return true;
-    }
-
-    return false;
+    return TryEndProcess();
   }
 
   bool Successful() {
@@ -126,14 +95,47 @@ class MergeJob final {
 
   const bool Merged() const { return payload_.merge_done; }
 
-  void Wait() { job_thread_.join(); }
+  void Wait() {
+    if (payload_.process_finished_ == false) {
+      TryEndProcess();
+    }
+  }
 
   // todo: ability to kill job/process
 
  private:
   MergeJobPayload payload_;
   size_t id_;
-  std::thread job_thread_;
+  std::shared_ptr<TinyProcessLib::Process> external_process_;
+
+  void DoMerge() {
+    // MergeJobPayload* job = &payload_;
+    payload_.start_time_ = std::chrono::system_clock::now();
+
+    std::stringstream command;
+    command << "keyvimerger -m 5242880";
+    for (auto s : payload_.segments_) {
+      command << " -i " << s->GetPath().string();
+    }
+
+    command << " -o " << payload_.output_filename_.string();
+    external_process_.reset(new TinyProcessLib::Process(command.str()));
+  }
+
+  bool TryEndProcess() {
+    if (external_process_->try_get_exit_status(payload_.exit_code_)) {
+      payload_.end_time_ = std::chrono::system_clock::now();
+      payload_.process_finished_ = true;
+      return true;
+    }
+    return false;
+  }
+
+  void EndProcess() {
+    payload_.exit_code_ = external_process_->get_exit_status();
+    payload_.end_time_ = std::chrono::system_clock::now();
+    payload_.process_finished_ = true;
+  }
 };
 
 } /* namespace internal */
