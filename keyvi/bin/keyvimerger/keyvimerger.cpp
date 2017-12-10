@@ -58,7 +58,8 @@ int main(int argc, char** argv) {
 
   description.add_options()("input-file,i", boost::program_options::value<std::vector<std::string>>(), "input file");
   description.add_options()("output-file,o", boost::program_options::value<std::string>(), "output file");
-  description.add_options()("memory-limit,m", boost::program_options::value<size_t>(), "amount of main memory to use");
+  description.add_options()("memory-limit,m", boost::program_options::value<std::string>(),
+                            "amount of main memory to use");
   description.add_options()("parameter,p", boost::program_options::value<std::vector<std::string>>()
                                                ->default_value(std::vector<std::string>(), "EMPTY")
                                                ->composing(),
