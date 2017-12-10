@@ -17,7 +17,7 @@ set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -O0 --coverage")
 
 set(COMPILE_TEST OFF CACHE BOOL "")
 set(TPIE_PARALLEL_SORT 1 CACHE BOOL "")
-add_subdirectory(keyvi/3rdparty/tpie)
+add_subdirectory(keyvi/3rdparty/tpie EXCLUDE_FROM_ALL)
 
 
 set(Boost_USE_STATIC_LIBS OFF)
@@ -65,3 +65,7 @@ target_link_libraries(keyvicompiler tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyviinspector tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyvimerger tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(unit_test_all tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+
+install (TARGETS keyvicompiler DESTINATION bin)
+install (TARGETS keyviinspector DESTINATION bin)
+install (TARGETS keyvimerger DESTINATION bin)
