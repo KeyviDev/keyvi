@@ -93,14 +93,14 @@ class IndexReaderWorker final {
 
   void Reload() { ReloadIndex(); }
 
-  const std::vector<Segment>& Segments() const { return segments_; }
+  const std::vector<segment_t>& Segments() const { return segments_; }
 
  private:
   boost::filesystem::path index_directory_;
   boost::filesystem::path index_toc_file_;
   std::time_t last_modification_time_;
   boost::property_tree::ptree index_toc_;
-  std::vector<internal::Segment> segments_;
+  std::vector<segment_t> segments_;
   std::thread update_thread_;
   std::atomic_bool stop_update_thread_;
 
@@ -139,12 +139,13 @@ class IndexReaderWorker final {
 
     TRACE("reading segments");
 
-    std::vector<internal::Segment> new_segments;
+    std::vector<segment_t> new_segments;
 
     for (boost::property_tree::ptree::value_type& f : index_toc_.get_child("files")) {
       boost::filesystem::path p(index_directory_);
       p /= f.second.data();
-      new_segments.push_back(internal::Segment(p));
+      segment_t w(new Segment(p));
+      new_segments.push_back(w);
     }
 
     // reverse the list

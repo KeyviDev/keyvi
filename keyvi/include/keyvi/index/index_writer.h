@@ -55,7 +55,7 @@
 namespace keyvi {
 namespace index {
 
-class IndexWriter final : internal::BaseIndexReader<internal::IndexWriterWorker> {
+class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriterWorker> {
  public:
   explicit IndexWriter(const std::string& index_directory)
       : index_finalizer_(index_directory), BaseIndexReader(index_finalizer_) {

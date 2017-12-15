@@ -29,6 +29,7 @@
 #include <string>
 
 #include "dictionary/match.h"
+#include "index/internal/segment.h"
 
 namespace keyvi {
 namespace index {
@@ -42,8 +43,8 @@ class BaseIndexReader {
   dictionary::Match operator[](const std::string& key) const {
     dictionary::Match m;
 
-    for (auto s : holder_.Segments()) {
-      m = (*s)->operator[](key);
+    for (const auto s : holder_.Segments()) {
+      m = s->GetDictionary()->operator[](key);
       if (!m.IsEmpty()) {
         return m;
       }
@@ -53,8 +54,8 @@ class BaseIndexReader {
   }
 
   bool Contains(const std::string& key) const {
-    for (auto s : holder_.Segments()) {
-      if ((*s)->Contains(key)) {
+    for (const segment_t& s : holder_.Segments()) {
+      if (s->GetDictionary()->Contains(key)) {
         return true;
       }
     }

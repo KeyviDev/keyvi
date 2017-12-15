@@ -49,6 +49,14 @@ class Segment final {
     return dictionary_;
   }
 
+  dictionary::dictionary_t& GetDictionary() {
+    if (!dictionary_) {
+      Load();
+    }
+
+    return dictionary_;
+  }
+
   const boost::filesystem::path& GetPath() const { return path_; }
 
   const std::string& GetFilename() const { return filename_; }
