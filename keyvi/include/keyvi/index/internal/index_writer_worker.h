@@ -17,7 +17,7 @@
 //
 
 /*
- * index_finalizer.h
+ * index_writer_worker.h
  *
  *  Created on: Jan 18, 2017
  *      Author: hendrik
@@ -62,6 +62,7 @@ class IndexWriterWorker final {
         index_mutex_(),
         flush_cond_mutex_(),
         flush_cond_(),
+        sync_flush_cond_(),
         finalizer_thread_(),
         stop_finalizer_thread_(true),
         write_counter_(0),
@@ -105,7 +106,8 @@ class IndexWriterWorker final {
 
     if (c == nullptr) {
       TRACE("re-create compiler");
-      dictionary::compiler_param_t params = dictionary::compiler_param_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
+      dictionary::compiler_param_t params =
+          dictionary::compiler_param_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
 
       compiler_.reset(new compiler_t(params));
       c = compiler_.get();
@@ -161,6 +163,8 @@ class IndexWriterWorker final {
   std::recursive_mutex index_mutex_;
   std::mutex flush_cond_mutex_;
   std::condition_variable flush_cond_;
+  std::condition_variable sync_flush_cond_;
+
   std::thread finalizer_thread_;
   std::atomic_bool stop_finalizer_thread_;
   std::atomic_size_t write_counter_;
@@ -181,18 +185,21 @@ class IndexWriterWorker final {
     compiler_.swap(compiler_to_flush_);
     // std::atomic_store(&compiler_, compiler_to_flush_);
 
+    do_flush_ = true;
+    flush_cond_.notify_one();
+
     if (async) {
-      do_flush_ = true;
-      flush_cond_.notify_one();
       return true;
     }  //  else
 
-    // TODO: blocking implementation
+    std::unique_lock<std::mutex> lock(flush_cond_mutex_);
+    sync_flush_cond_.wait(lock);
+
     return true;
   }
 
   void Finalizer() {
-    std::unique_lock<std::mutex> l(flush_cond_mutex_);
+    std::unique_lock<std::mutex> lock(flush_cond_mutex_);
     TRACE("Finalizer loop");
     while (!stop_finalizer_thread_) {
       TRACE("Finalizer, check for finalization.");
@@ -200,15 +207,20 @@ class IndexWriterWorker final {
       RunMerge();
 
       // sleep for some time or until woken up
-      flush_cond_.wait_for(l, finalizer_poll_interval_);
+      if (do_flush_ == false) {
+        flush_cond_.wait_for(lock, finalizer_poll_interval_);
+      }
       auto tp = std::chrono::system_clock::now();
-      TRACE("wakeup finalizer %s %ld ***", l.owns_lock() ? "true" : "false", tp.time_since_epoch());
+      TRACE("wakeup finalizer %s %ld ***", lock.owns_lock() ? "true" : "false", tp.time_since_epoch());
 
       if (do_flush_ == true || tp - last_flush_ > flush_interval_) {
         Compile();
         do_flush_ = false;
 
         last_flush_ = tp;
+        if (do_flush_ == false) {
+          sync_flush_cond_.notify_all();
+        }
       }
     }
 
@@ -313,7 +325,6 @@ class IndexWriterWorker final {
 
           std::copy_if(segments_.begin(), segments_.end(), std::back_inserter(new_segments),
                        [&new_segments, &merged_new_segment, &p](const segment_t& s) {
-
                          TRACE("checking %s", s->GetFilename().c_str());
                          if (std::count_if(p.Segments().begin(), p.Segments().end(), [s](const segment_t& s2) {
                                return s2->GetFilename() == s->GetFilename();
