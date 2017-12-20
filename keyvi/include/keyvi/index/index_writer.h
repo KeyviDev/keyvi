@@ -49,7 +49,7 @@
 #include "index/internal/base_index_reader.h"
 #include "index/internal/index_writer_worker.h"
 
-// #define ENABLE_TRACING
+#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -78,38 +78,35 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
 
     index_lock_ = boost::interprocess::file_lock(index_lock_file.string().c_str());
     index_lock_.lock();
-
-    TRACE("Start Finalizer thread");
-    index_finalizer_.StartWorkerThread();
   }
 
   ~IndexWriter() {
-    TRACE("Stop Finalizer thread");
-    index_finalizer_.StopWorkerThread();
     TRACE("Unlock Index");
-    index_lock_.unlock();
+    try {
+      index_lock_.unlock();
+    } catch (std::exception& e) {
+      TRACE("exception %s", e.what());
+    }
   }
 
-  void Set(const std::string& key, const std::string& value) {
-    index_finalizer_.AcquireCompiler()->Add(key, value);
-    index_finalizer_.ReleaseCompiler();
-  }
+  void Set(const std::string& key, const std::string& value) { index_finalizer_.Add(key, value); }
 
   void Delete(const std::string& key) {
-    index_finalizer_.AcquireCompiler();
+    /*
+  index_finalizer_.AcquireCompiler();
 
-    internal::segment_t last_segment_with_key;
-    for (const internal::segment_t s : index_finalizer_.Segments()) {
-      if (s->operator*()->Contains(key)) {
-        last_segment_with_key = s;
-      }
+  internal::segment_t last_segment_with_key;
+  for (const internal::segment_t s : index_finalizer_.Segments()) {
+    if (s->operator*()->Contains(key)) {
+      last_segment_with_key = s;
     }
+  }
 
-    if (last_segment_with_key.get() != nullptr) {
-      last_segment_with_key->DeleteKey(key);
-    }
+  if (last_segment_with_key.get() != nullptr) {
+    last_segment_with_key->DeleteKey(key);
+  }
 
-    index_finalizer_.ReleaseCompiler();
+  index_finalizer_.ReleaseCompiler();*/
   }
 
   void Flush(bool async = true) {

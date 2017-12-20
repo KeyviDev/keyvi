@@ -21,6 +21,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <vector>
 
 #include <boost/filesystem.hpp>
 
@@ -93,6 +94,8 @@ class Segment final {
 };
 
 typedef std::shared_ptr<Segment> segment_t;
+typedef std::vector<segment_t> segment_vec_t;
+typedef std::shared_ptr<std::vector<segment_t>> segments_t;
 
 } /* namespace internal */
 } /* namespace index */

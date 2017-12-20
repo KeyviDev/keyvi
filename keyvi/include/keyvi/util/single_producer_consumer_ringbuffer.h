@@ -22,15 +22,15 @@
  *      Author: hendrik
  */
 
-#ifndef SINGLE_PRODUCER_CONSUMER_RINGBUFFER_H_
-#define SINGLE_PRODUCER_CONSUMER_RINGBUFFER_H_
+#ifndef KEYVI_UTIL_SINGLE_PRODUCER_CONSUMER_RINGBUFFER_H_
+#define KEYVI_UTIL_SINGLE_PRODUCER_CONSUMER_RINGBUFFER_H_
+
+#include <chrono>  //NOLINT
+#include <thread>  //NOLINT
 
 #include <boost/atomic.hpp>
-#include <chrono>
-#include <thread>
 
 namespace keyvi {
-namespace dictionary {
 namespace util {
 
 #define SPINLOCK_WAIT_IN_MS 1
@@ -38,73 +38,61 @@ namespace util {
 /**
  * Simple lock-free single producer, single consumer queue
  */
-template<typename T, size_t Size>
+template <typename T, size_t Tsize>
 class SingeProducerSingleConsumerRingBuffer {
-public:
-  SingeProducerSingleConsumerRingBuffer() : head_(0), tail_(0), done_(false) {}
+ public:
+  explicit SingeProducerSingleConsumerRingBuffer(
+      const std::chrono::duration<double>& return_interval = std::chrono::milliseconds(1000))
+      : head_(0), tail_(0), last_pop_(), return_interval_(return_interval) {}
 
-  bool Push(T & value, bool block = false)
-  {
+  void Push(const T& value) {
     size_t head = head_.load(boost::memory_order_relaxed);
     size_t next_head = next(head);
-    if (next_head == tail_.load(boost::memory_order_acquire))
-    {
-      if (!block) {
-        return false;
-      }
+    if (next_head == tail_.load(boost::memory_order_acquire)) {
       // spin-lock
-      while (next_head == tail_.load(boost::memory_order_acquire))
-      {
+      while (next_head == tail_.load(boost::memory_order_acquire)) {
         std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_IN_MS));
       }
     }
     ring_[head] = std::move(value);
     head_.store(next_head, boost::memory_order_release);
-    return true;
+    return;
   }
 
-  bool Pop(T & value, bool block = false)
-  {
+  bool Pop(T* value) {
     size_t tail = tail_.load(boost::memory_order_relaxed);
-    if (tail == head_.load(boost::memory_order_acquire))
-    {
-      if (!block) {
+    while (tail == head_.load(boost::memory_order_acquire)) {
+      auto tp = std::chrono::system_clock::now();
+      if (tp - last_pop_ > return_interval_) {
+        last_pop_ = tp;
         return false;
       }
-      while (tail == head_.load(boost::memory_order_acquire))
-      {
-        // exit if work is done
-        if (done_) {
-          return false;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_IN_MS));
-      }
+
+      std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_IN_MS));
     }
-    value = std::move(ring_[tail]);
+    *value = std::move(ring_[tail]);
     tail_.store(next(tail), boost::memory_order_release);
+    last_pop_ = std::chrono::system_clock::now();
     return true;
   }
 
-  void SetDone(){
-    done_ = true;
+  size_t Size() const {
+    if (head_ >= tail_) {
+      return head_ - tail_;
+    }
+
+    return Tsize - tail_ + head_;
   }
 
-  bool IsDone(){
-    return done_;
-  }
-
-private:
-  size_t next(size_t current)
-  {
-    return (current + 1) % Size;
-  }
-  T ring_[Size];
+ private:
+  size_t next(size_t current) { return (current + 1) % Tsize; }
+  T ring_[Tsize];
   boost::atomic<size_t> head_, tail_;
-  boost::atomic<bool> done_;
+  std::chrono::system_clock::time_point last_pop_;
+  std::chrono::duration<double> return_interval_;
 };
 
 } /* namespace util */
-} /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* SINGLE_PRODUCER_CONSUMER_RINGBUFFER_H_ */
+#endif  // KEYVI_UTIL_SINGLE_PRODUCER_CONSUMER_RINGBUFFER_H_

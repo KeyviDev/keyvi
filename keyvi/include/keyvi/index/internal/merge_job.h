@@ -19,7 +19,7 @@
 #define KEYVI_INDEX_INTERNAL_MERGE_JOB_H_
 
 #include <atomic>
-#include <chrono>
+#include <chrono>  //NOLINT
 #include <functional>
 #include <memory>
 #include <string>
@@ -65,21 +65,27 @@ class MergeJob final {
 
   ~MergeJob() {
     if (payload_.process_finished_ == false) {
-      EndProcess();
+      EndExternalProcess();
     }
   }
 
   MergeJob(MergeJob&&) = default;
   MergeJob& operator=(MergeJob&&) = default;
 
-  void Run() { DoMerge(); }
+  void Run() { DoExternalProcessMerge(); }
 
   bool TryFinalize() {
     // already finished?
     if (payload_.process_finished_ == true) {
       return true;
     }
-    return TryEndProcess();
+    return TryEndExternalProcess();
+  }
+
+  void Finalize() {
+    if (payload_.process_finished_ == false) {
+      EndExternalProcess();
+    }
   }
 
   bool Successful() {
@@ -95,12 +101,6 @@ class MergeJob final {
 
   const bool Merged() const { return payload_.merge_done; }
 
-  void Wait() {
-    if (payload_.process_finished_ == false) {
-      TryEndProcess();
-    }
-  }
-
   // todo: ability to kill job/process
 
  private:
@@ -108,7 +108,7 @@ class MergeJob final {
   size_t id_;
   std::shared_ptr<TinyProcessLib::Process> external_process_;
 
-  void DoMerge() {
+  void DoExternalProcessMerge() {
     // MergeJobPayload* job = &payload_;
     payload_.start_time_ = std::chrono::system_clock::now();
 
@@ -122,7 +122,7 @@ class MergeJob final {
     external_process_.reset(new TinyProcessLib::Process(command.str()));
   }
 
-  bool TryEndProcess() {
+  bool TryEndExternalProcess() {
     if (external_process_->try_get_exit_status(payload_.exit_code_)) {
       payload_.end_time_ = std::chrono::system_clock::now();
       payload_.process_finished_ = true;
@@ -131,7 +131,7 @@ class MergeJob final {
     return false;
   }
 
-  void EndProcess() {
+  void EndExternalProcess() {
     payload_.exit_code_ = external_process_->get_exit_status();
     payload_.end_time_ = std::chrono::system_clock::now();
     payload_.process_finished_ = true;

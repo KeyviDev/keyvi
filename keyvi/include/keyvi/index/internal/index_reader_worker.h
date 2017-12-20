@@ -28,10 +28,11 @@
 
 #include <algorithm>
 #include <atomic>
-#include <chrono>
+#include <chrono>  //NOLINT
 #include <ctime>
+#include <memory>
 #include <string>
-#include <thread>
+#include <thread>  //NOLINT
 #include <vector>
 
 #include <boost/filesystem.hpp>
@@ -93,14 +94,19 @@ class IndexReaderWorker final {
 
   void Reload() { ReloadIndex(); }
 
-  const std::vector<segment_t>& Segments() const { return segments_; }
+  std::vector<segment_t>::const_reverse_iterator crbegin() const { return segments_->crbegin(); }
+
+  // Required
+  std::vector<segment_t>::const_reverse_iterator crend() const { return segments_->crend(); }
+
+  segments_t Segments() const { return segments_; }
 
  private:
   boost::filesystem::path index_directory_;
   boost::filesystem::path index_toc_file_;
   std::time_t last_modification_time_;
   boost::property_tree::ptree index_toc_;
-  std::vector<segment_t> segments_;
+  segments_t segments_;
   std::thread update_thread_;
   std::atomic_bool stop_update_thread_;
 
@@ -139,19 +145,16 @@ class IndexReaderWorker final {
 
     TRACE("reading segments");
 
-    std::vector<segment_t> new_segments;
+    segments_t new_segments = std::make_shared<segment_vec_t>();
 
     for (boost::property_tree::ptree::value_type& f : index_toc_.get_child("files")) {
       boost::filesystem::path p(index_directory_);
       p /= f.second.data();
       segment_t w(new Segment(p));
-      new_segments.push_back(w);
+      new_segments->push_back(w);
     }
 
-    // reverse the list
-    std::reverse(new_segments.begin(), new_segments.end());
-
-    segments_.swap(new_segments);
+    segments_ = new_segments;
     TRACE("Loaded new segments");
   }
 
@@ -171,4 +174,4 @@ class IndexReaderWorker final {
 } /* namespace index */
 } /* namespace keyvi */
 
-#endif /* KEYVI_INDEX_INTERNAL_INDEX_READER_WORKER_H_ */
+#endif  // KEYVI_INDEX_INTERNAL_INDEX_READER_WORKER_H_

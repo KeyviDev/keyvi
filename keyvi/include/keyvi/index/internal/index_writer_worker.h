@@ -32,6 +32,7 @@
 #include <ctime>
 #include <list>
 #include <memory>
+#include <mutex>  //NOLINT
 #include <string>
 #include <thread>  //NOLINT
 #include <vector>
@@ -40,8 +41,9 @@
 #include "dictionary/dictionary_types.h"
 #include "index/internal/merge_job.h"
 #include "index/internal/segment.h"
+#include "util/active_object.h"
 
-// #define ENABLE_TRACING
+#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -49,259 +51,120 @@ namespace index {
 namespace internal {
 
 class IndexWriterWorker final {
-  typedef std::function<void(const std::string&)> finalizer_callback_t;
-  typedef dictionary::JsonDictionaryCompilerSmallData compiler_t;
-  typedef std::shared_ptr<compiler_t> compiler_t_ptr;
+  typedef std::shared_ptr<dictionary::JsonDictionaryCompilerSmallData> compiler_t;
+  struct IndexPayload {
+    explicit IndexPayload(const std::string& index_directory, const std::chrono::duration<double>& flush_interval)
+        : compiler_(),
+          write_counter_(0),
+          segments_(),
+          index_directory_(index_directory),
+          merge_jobs_(),
+          last_flush_(),
+          flush_interval_(flush_interval) {
+      segments_ = std::make_shared<segment_vec_t>();
+    }
+
+    compiler_t compiler_;
+    std::atomic_size_t write_counter_;
+    segments_t segments_;
+    boost::filesystem::path index_directory_;
+    std::list<MergeJob> merge_jobs_;
+    std::chrono::system_clock::time_point last_flush_;
+    std::chrono::duration<double> flush_interval_;
+    size_t max_concurrent_merges = 2;
+  };
 
  public:
   explicit IndexWriterWorker(const std::string& index_directory,
                              const std::chrono::duration<double>& flush_interval = std::chrono::milliseconds(1000))
-      : compiler_(),
-        compiler_to_flush_(),
-        do_flush_(false),
-        index_mutex_(),
-        flush_cond_mutex_(),
-        flush_cond_(),
-        sync_flush_cond_(),
-        finalizer_thread_(),
-        stop_finalizer_thread_(true),
-        write_counter_(0),
-        segments_(),
-        index_directory_(index_directory),
-        merge_jobs_(),
-        last_flush_(),
-        flush_interval_(flush_interval) {}
-
-  void StartWorkerThread() {
-    if (stop_finalizer_thread_ == false) {
-      // already runs
-      return;
-    }
-
-    stop_finalizer_thread_ = false;
-    TRACE("Start Finalizer thread");
-    finalizer_thread_ = std::thread(&IndexWriterWorker::Finalizer, this);
+      : payload_(index_directory, flush_interval),
+        compiler_active_object_(&payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
+                                flush_interval) {
+    TRACE("d1: %s", payload_.index_directory_.c_str());
   }
 
-  void StopWorkerThread() {
-    stop_finalizer_thread_ = true;
+  IndexWriterWorker& operator=(IndexWriterWorker const&) = delete;
+  IndexWriterWorker(const IndexWriterWorker& that) = delete;
 
-    // todo: joinable blocks
-    if (finalizer_thread_.joinable()) {
-      finalizer_thread_.join();
-      TRACE("worker thread joined");
-      TRACE("Open merges: %ld", merge_jobs_.size());
+  ~IndexWriterWorker() {
+    TRACE("d3: %s", payload_.index_directory_.c_str());
+    for (MergeJob& p : payload_.merge_jobs_) {
+      p.Finalize();
     }
 
-    for (MergeJob& p : merge_jobs_) {
-      p.Wait();
-    }
     FinalizeMerge();
   }
 
-  compiler_t* AcquireCompiler() {
-    compiler_in_use_ = true;
+  std::vector<segment_t>::const_reverse_iterator crbegin() const { return payload_.segments_->crbegin(); }
 
-    compiler_t* c = compiler_.get();
+  std::vector<segment_t>::const_reverse_iterator crend() const { return payload_.segments_->crend(); }
 
-    if (c == nullptr) {
-      TRACE("re-create compiler");
-      dictionary::compiler_param_t params =
-          dictionary::compiler_param_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
+  segments_t Segments() const { return payload_.segments_; }
 
-      compiler_.reset(new compiler_t(params));
-      c = compiler_.get();
-    }
+  void Add(const std::string& key, const std::string& value) {
+    // push function
+    compiler_active_object_([&key, &value](IndexPayload& payload) {
+      // todo non-lazy?
+      if (!payload.compiler_) {
+        TRACE("recreate compiler");
+        dictionary::compiler_param_t params =
+            dictionary::compiler_param_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
 
-    return c;
-  }
-
-  void ReleaseCompiler() {
-    // while the current compiler was in use, check whether the
-    // background worker tried to flush
-    if (compiler_bg_dirty_ && compiler_to_flush_bg_.get() != nullptr) {
-      CompileAndRegister(&compiler_to_flush_bg_);
-    }
-
-    if (++write_counter_ > 1000) {
-      if (DoFlush()) {
-        write_counter_ = 0;
-        // todo: throttle needed if the background compile cannot catch up
-      } else if (write_counter_ > 10000) {
-        std::this_thread::yield();
+        payload.compiler_.reset(new dictionary::JsonDictionaryCompilerSmallData(params));
       }
-    }
+      TRACE("add key %s", key.c_str());
+      payload.compiler_->Add(key, value);
+    });
 
-    compiler_in_use_ = false;
+    if (++payload_.write_counter_ > 1000) {
+      compiler_active_object_([](IndexPayload& payload) { Compile(payload); });
+    }
   }
 
-  const std::vector<segment_t>& Segments() const { return segments_; }
+  template <typename F>
+  void operator()(F f) {
+    compiler_active_object_(f);
+  }
 
   /**
    * Flush for external use.
    */
   void Flush(bool async = true) {
-    // ensure that background flush does not kick in
-    compiler_in_use_ = true;
-    if (compiler_bg_dirty_ && compiler_to_flush_bg_.get() != nullptr) {
-      CompileAndRegister(&compiler_to_flush_bg_);
-    }
+    compiler_active_object_([](IndexPayload& payload) { Compile(payload); });
 
-    DoFlush(async);
-    compiler_in_use_ = false;
+    if (async == false) {
+      std::mutex m;
+      std::condition_variable c;
+      std::unique_lock<std::mutex> lock(m);
+
+      compiler_active_object_([&m, &c](IndexPayload& payload) {
+        std::unique_lock<std::mutex> waitLock(m);
+        c.notify_all();
+      });
+
+      c.wait(lock);
+    }
   }
 
  private:
-  compiler_t_ptr compiler_;
-  compiler_t_ptr compiler_to_flush_;
-  compiler_t_ptr compiler_to_flush_bg_;
-
-  std::atomic_bool compiler_in_use_;
-  std::atomic_bool compiler_bg_dirty_;
-
-  std::atomic_bool do_flush_;
-  std::recursive_mutex index_mutex_;
-  std::mutex flush_cond_mutex_;
-  std::condition_variable flush_cond_;
-  std::condition_variable sync_flush_cond_;
-
-  std::thread finalizer_thread_;
-  std::atomic_bool stop_finalizer_thread_;
-  std::atomic_size_t write_counter_;
-  std::vector<segment_t> segments_;
-  boost::filesystem::path index_directory_;
-  std::list<MergeJob> merge_jobs_;
-  std::chrono::system_clock::time_point last_flush_;
-  std::chrono::duration<double> flush_interval_;
-  std::chrono::duration<double> finalizer_poll_interval_ = std::chrono::milliseconds(10);
+  IndexPayload payload_;
+  util::ActiveObject<IndexPayload> compiler_active_object_;
   size_t max_concurrent_merges = 2;
 
-  bool DoFlush(bool async = true) {
-    if (do_flush_ || compiler_.get() == nullptr) {
-      return false;
-    }
+  void ScheduledTask() {
+    TRACE("Scheduled task");
+    FinalizeMerge();
+    RunMerge();
 
-    // no need for making it atomic??
-    compiler_.swap(compiler_to_flush_);
-    // std::atomic_store(&compiler_, compiler_to_flush_);
-
-    do_flush_ = true;
-    flush_cond_.notify_one();
-
-    if (async) {
-      return true;
-    }  //  else
-
-    std::unique_lock<std::mutex> lock(flush_cond_mutex_);
-    sync_flush_cond_.wait(lock);
-
-    return true;
-  }
-
-  void Finalizer() {
-    std::unique_lock<std::mutex> lock(flush_cond_mutex_);
-    TRACE("Finalizer loop");
-    while (!stop_finalizer_thread_) {
-      TRACE("Finalizer, check for finalization.");
-      FinalizeMerge();
-      RunMerge();
-
-      // sleep for some time or until woken up
-      if (do_flush_ == false) {
-        flush_cond_.wait_for(lock, finalizer_poll_interval_);
-      }
-      auto tp = std::chrono::system_clock::now();
-      TRACE("wakeup finalizer %s %ld ***", lock.owns_lock() ? "true" : "false", tp.time_since_epoch());
-
-      if (do_flush_ == true || tp - last_flush_ > flush_interval_) {
-        Compile();
-        do_flush_ = false;
-
-        last_flush_ = tp;
-        if (do_flush_ == false) {
-          sync_flush_cond_.notify_all();
-        }
-      }
-    }
-
-    // check that there are no open compilers
-    if (compiler_to_flush_bg_.get() != nullptr) {
-      CompileAndRegister(&compiler_to_flush_bg_);
-    }
-
-    if (compiler_to_flush_.get() != nullptr) {
-      CompileAndRegister(&compiler_to_flush_);
-    }
-
-    if (compiler_.get() != nullptr) {
-      CompileAndRegister(&compiler_);
-    }
-
-    TRACE("Finalizer loop stop");
-  }
-
-  void Compile() {
-    TRACE("compile");
-    // [1] check if there is already a compiler waiting to get finalized
-    // while there is no compiler running at the moment
-    if (compiler_in_use_ == false && compiler_to_flush_bg_.get() != nullptr) {
-      compiler_bg_dirty_ = false;
-      CompileAndRegister(&compiler_to_flush_bg_);
-    }
-
-    if (compiler_to_flush_.get() == nullptr) {
-      // nothing to flush, check if triggered by flush interval
-      if (do_flush_ == false) {
-        // check if there is something to compile
-        if (compiler_.get() != nullptr) {
-          // get the state  before swapping
-          bool compiler_in_use = compiler_in_use_;
-          compiler_bg_dirty_ = false;
-
-          // not atomic, mitigated by the atomic_bool
-          compiler_to_flush_bg_.swap(compiler_);
-
-          // reset the counter
-          write_counter_ = 0;
-
-          // it's possible that the compiler got null while  swapping
-          if (compiler_to_flush_bg_.get() == nullptr) {
-            return;
-          }
-
-          // note: compiler might be in use
-          // in the low likely event that while swapping a compiler was
-          // returned and in_use changed to false, compile will finish at [1],
-          // at the next flush
-          if (compiler_in_use) {
-            compiler_bg_dirty_ = true;
-          } else {
-            CompileAndRegister(&compiler_to_flush_bg_);
-          }
-        }
-      }
+    if (!payload_.compiler_) {
       return;
     }
-    CompileAndRegister(&compiler_to_flush_);
-  }
 
-  void CompileAndRegister(compiler_t_ptr* compiler) {
-    compiler->get()->Compile();
-
-    boost::filesystem::path p(index_directory_);
-    p /= boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.kv");
-
-    TRACE("write to file %s %s", p.string().c_str(), p.filename().string().c_str());
-
-    compiler->get()->WriteToFile(p.string());
-
-    // free up resources
-    compiler->reset();
-    segment_t w(new Segment(p));
-    // register segment
-    RegisterSegment(w);
-
-    TRACE("Segment compiled and registered");
+    auto tp = std::chrono::system_clock::now();
+    if (tp - payload_.last_flush_ > payload_.flush_interval_) {
+      Compile(payload_);
+      payload_.last_flush_ = tp;
+    }
   }
 
   /**
@@ -311,26 +174,25 @@ class IndexWriterWorker final {
     bool any_merge_finalized = false;
 
     TRACE("Finalize Merge");
-    for (MergeJob& p : merge_jobs_) {
+    for (MergeJob& p : payload_.merge_jobs_) {
       if (p.TryFinalize()) {
         if (p.Successful()) {
           TRACE("rewriting segment list");
           any_merge_finalized = true;
 
-          std::lock_guard<std::recursive_mutex> lock(index_mutex_);
-
           // remove old segments and replace it with new one
-          std::vector<segment_t> new_segments;
+          segments_t new_segments = std::make_shared<segment_vec_t>();
+
           bool merged_new_segment = false;
 
-          std::copy_if(segments_.begin(), segments_.end(), std::back_inserter(new_segments),
+          std::copy_if(payload_.segments_->begin(), payload_.segments_->end(), std::back_inserter(*new_segments),
                        [&new_segments, &merged_new_segment, &p](const segment_t& s) {
                          TRACE("checking %s", s->GetFilename().c_str());
                          if (std::count_if(p.Segments().begin(), p.Segments().end(), [s](const segment_t& s2) {
                                return s2->GetFilename() == s->GetFilename();
                              })) {
                            if (!merged_new_segment) {
-                             new_segments.push_back(p.MergedSegment());
+                             new_segments->push_back(p.MergedSegment());
                              merged_new_segment = true;
                            }
                            return false;
@@ -338,10 +200,10 @@ class IndexWriterWorker final {
                          return true;
                        });
           TRACE("merged segment %s", p.MergedSegment()->GetFilename().c_str());
-          TRACE("1st segment after merge: %s", new_segments[0]->GetFilename().c_str());
+          TRACE("1st segment after merge: %s", (*new_segments)[0]->GetFilename().c_str());
 
-          segments_.swap(new_segments);
-          WriteToc();
+          payload_.segments_ = new_segments;
+          WriteToc(payload_);
 
           // delete old segment files
           for (const segment_t& s : p.Segments()) {
@@ -368,7 +230,7 @@ class IndexWriterWorker final {
     if (any_merge_finalized) {
       TRACE("delete merge job");
 
-      merge_jobs_.remove_if([](const MergeJob& j) { return j.Merged(); });
+      payload_.merge_jobs_.remove_if([](const MergeJob& j) { return j.Merged(); });
     }
   }
 
@@ -377,17 +239,17 @@ class IndexWriterWorker final {
    */
   void RunMerge() {
     // to few segments, return
-    if (segments_.size() <= 1) {
+    if (payload_.segments_->size() <= 1) {
       return;
     }
 
-    if (merge_jobs_.size() == max_concurrent_merges) {
+    if (payload_.merge_jobs_.size() == max_concurrent_merges) {
       // to many merges already running, so throttle
       return;
     }
 
     std::vector<segment_t> to_merge;
-    for (segment_t& s : segments_) {
+    for (segment_t& s : (*payload_.segments_)) {
       if (!s->MarkedForMerge()) {
         TRACE("Add to merge list %s", s->GetFilename().c_str());
         to_merge.push_back(s);
@@ -399,7 +261,7 @@ class IndexWriterWorker final {
     }
 
     TRACE("enough segments found for merging");
-    boost::filesystem::path p(index_directory_);
+    boost::filesystem::path p(payload_.index_directory_);
     p /= boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.kv");
 
     for (segment_t& s : to_merge) {
@@ -407,27 +269,43 @@ class IndexWriterWorker final {
     }
 
     // todo: add id
-    merge_jobs_.emplace_back(to_merge, 0, p);
-    merge_jobs_.back().Run();
+    payload_.merge_jobs_.emplace_back(to_merge, 0, p);
+    payload_.merge_jobs_.back().Run();
   }
 
-  void RegisterSegment(segment_t segment) {
-    std::lock_guard<std::recursive_mutex> lock(index_mutex_);
-    TRACE("add segment %s", segment->GetFilename().c_str());
-    segments_.push_back(segment);
-    WriteToc();
+  static inline void Compile(IndexPayload& payload) {
+    if (!payload.compiler_) {
+      TRACE("no compiler found");
+      return;
+    }
+
+    boost::filesystem::path p(payload.index_directory_);
+    p /= boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.kv");
+
+    TRACE("compiling");
+    payload.compiler_->Compile();
+    TRACE("write to file [%s] [%s]", p.string().c_str(), p.filename().string().c_str());
+
+    payload.compiler_->WriteToFile(p.string());
+
+    // free resources
+    payload.compiler_.reset();
+
+    segment_t w(new Segment(p));
+    // register segment
+    payload.segments_->push_back(w);
+    WriteToc(payload);
   }
 
-  void WriteToc() {
-    std::lock_guard<std::recursive_mutex> lock(index_mutex_);
+  static void WriteToc(const IndexPayload& payload) {
     TRACE("write new TOC");
 
     boost::property_tree::ptree ptree;
     boost::property_tree::ptree files;
 
-    TRACE("Number of segments: %ld", segments_.size());
+    TRACE("Number of segments: %ld", payload.segments_->size());
 
-    for (auto s : segments_) {
+    for (auto s : (*payload.segments_)) {
       TRACE("put %s", s->GetFilename().c_str());
       boost::property_tree::ptree sp;
       sp.put("", s->GetFilename());
@@ -435,10 +313,10 @@ class IndexWriterWorker final {
     }
 
     ptree.add_child("files", files);
-    boost::filesystem::path p(index_directory_);
+    boost::filesystem::path p(payload.index_directory_);
     p /= "index.toc.part";
 
-    boost::filesystem::path p2(index_directory_);
+    boost::filesystem::path p2(payload.index_directory_);
     p2 /= "index.toc";
 
     boost::property_tree::write_json(p.string(), ptree);
