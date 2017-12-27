@@ -42,8 +42,9 @@ class BaseIndexReader {
 
   dictionary::Match operator[](const std::string& key) const {
     dictionary::Match m;
+    segments_t segments = holder_.Segments();
 
-    for (auto it = holder_.crbegin(); it != holder_.crend(); ++it) {
+    for (auto it = segments->crbegin(); it != segments->crend(); ++it) {
       m = (*it)->GetDictionary()->operator[](key);
       if (!m.IsEmpty()) {
         return m;
@@ -54,7 +55,8 @@ class BaseIndexReader {
   }
 
   bool Contains(const std::string& key) const {
-    for (auto it = holder_.crbegin(); it != holder_.crend(); it++) {
+    segments_t segments = holder_.Segments();
+    for (auto it = segments->crbegin(); it != segments->crend(); it++) {
       if ((*it)->GetDictionary()->Contains(key)) {
         return true;
       }

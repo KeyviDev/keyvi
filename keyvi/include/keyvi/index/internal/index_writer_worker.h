@@ -30,6 +30,7 @@
 #include <atomic>
 #include <condition_variable>  //NOLINT
 #include <ctime>
+#include <functional>
 #include <list>
 #include <memory>
 #include <mutex>  //NOLINT
@@ -76,7 +77,7 @@ class IndexWriterWorker final {
 
  public:
   explicit IndexWriterWorker(const std::string& index_directory,
-                             const std::chrono::duration<double>& flush_interval = std::chrono::milliseconds(1000))
+                             const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
       : payload_(index_directory, flush_interval),
         compiler_active_object_(&payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
                                 flush_interval) {
@@ -94,10 +95,6 @@ class IndexWriterWorker final {
 
     FinalizeMerge();
   }
-
-  std::vector<segment_t>::const_reverse_iterator crbegin() const { return payload_.segments_->crbegin(); }
-
-  std::vector<segment_t>::const_reverse_iterator crend() const { return payload_.segments_->crend(); }
 
   segments_t Segments() const { return payload_.segments_; }
 
@@ -117,7 +114,7 @@ class IndexWriterWorker final {
     });
 
     if (++payload_.write_counter_ > 1000) {
-      compiler_active_object_([](IndexPayload& payload) { Compile(payload); });
+      compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
     }
   }
 
@@ -130,7 +127,7 @@ class IndexWriterWorker final {
    * Flush for external use.
    */
   void Flush(bool async = true) {
-    compiler_active_object_([](IndexPayload& payload) { Compile(payload); });
+    compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
 
     if (async == false) {
       std::mutex m;
@@ -162,7 +159,7 @@ class IndexWriterWorker final {
 
     auto tp = std::chrono::system_clock::now();
     if (tp - payload_.last_flush_ > payload_.flush_interval_) {
-      Compile(payload_);
+      Compile(&payload_);
       payload_.last_flush_ = tp;
     }
   }
@@ -203,7 +200,7 @@ class IndexWriterWorker final {
           TRACE("1st segment after merge: %s", (*new_segments)[0]->GetFilename().c_str());
 
           payload_.segments_ = new_segments;
-          WriteToc(payload_);
+          WriteToc(&payload_);
 
           // delete old segment files
           for (const segment_t& s : p.Segments()) {
@@ -273,39 +270,39 @@ class IndexWriterWorker final {
     payload_.merge_jobs_.back().Run();
   }
 
-  static inline void Compile(IndexPayload& payload) {
-    if (!payload.compiler_) {
+  static inline void Compile(IndexPayload* payload) {
+    if (!payload->compiler_) {
       TRACE("no compiler found");
       return;
     }
 
-    boost::filesystem::path p(payload.index_directory_);
+    boost::filesystem::path p(payload->index_directory_);
     p /= boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.kv");
 
     TRACE("compiling");
-    payload.compiler_->Compile();
+    payload->compiler_->Compile();
     TRACE("write to file [%s] [%s]", p.string().c_str(), p.filename().string().c_str());
 
-    payload.compiler_->WriteToFile(p.string());
+    payload->compiler_->WriteToFile(p.string());
 
     // free resources
-    payload.compiler_.reset();
+    payload->compiler_.reset();
 
     segment_t w(new Segment(p));
     // register segment
-    payload.segments_->push_back(w);
+    payload->segments_->push_back(w);
     WriteToc(payload);
   }
 
-  static void WriteToc(const IndexPayload& payload) {
+  static void WriteToc(const IndexPayload* payload) {
     TRACE("write new TOC");
 
     boost::property_tree::ptree ptree;
     boost::property_tree::ptree files;
 
-    TRACE("Number of segments: %ld", payload.segments_->size());
+    TRACE("Number of segments: %ld", payload->segments_->size());
 
-    for (auto s : (*payload.segments_)) {
+    for (const auto s : *(payload->segments_)) {
       TRACE("put %s", s->GetFilename().c_str());
       boost::property_tree::ptree sp;
       sp.put("", s->GetFilename());
@@ -313,10 +310,10 @@ class IndexWriterWorker final {
     }
 
     ptree.add_child("files", files);
-    boost::filesystem::path p(payload.index_directory_);
+    boost::filesystem::path p(payload->index_directory_);
     p /= "index.toc.part";
 
-    boost::filesystem::path p2(payload.index_directory_);
+    boost::filesystem::path p2(payload->index_directory_);
     p2 /= "index.toc";
 
     boost::property_tree::write_json(p.string(), ptree);

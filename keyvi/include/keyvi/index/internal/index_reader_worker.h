@@ -94,11 +94,6 @@ class IndexReaderWorker final {
 
   void Reload() { ReloadIndex(); }
 
-  std::vector<segment_t>::const_reverse_iterator crbegin() const { return segments_->crbegin(); }
-
-  // Required
-  std::vector<segment_t>::const_reverse_iterator crend() const { return segments_->crend(); }
-
   segments_t Segments() const { return segments_; }
 
  private:

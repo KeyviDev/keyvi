@@ -22,13 +22,14 @@
  *  Created on: Jan 13, 2017
  *      Author: hendrik
  */
-#include <chrono>
-#include <thread>
+#include <chrono>  //NOLINT
+#include <thread>  //NOLINT
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 #include "index/index_reader.h"
-#include "index_mock.h"
+
+#include "./index_mock.h"
 
 namespace keyvi {
 namespace index {
@@ -38,15 +39,13 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
   testing::IndexMock index;
 
   std::vector<std::pair<std::string, std::string>> test_data = {
-      {"abc", "{a:1}"},   {"abbc", "{b:2}"}, {"abbcd", "{c:3}"},
-      {"abcde", "{a:1}"}, {"abdd", "{b:2}"},
+      {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"abbcd", "{c:3}"}, {"abcde", "{a:1}"}, {"abdd", "{b:2}"},
   };
 
   index.AddSegment(test_data);
 
   std::vector<std::pair<std::string, std::string>> test_data_2 = {
-      {"abbcd", "{c:6}"},  {"babc", "{a:1}"},  {"babbc", "{b:2}"},
-      {"babcde", "{a:1}"}, {"babdd", "{b:2}"},
+      {"abbcd", "{c:6}"}, {"babc", "{a:1}"}, {"babbc", "{b:2}"}, {"babcde", "{a:1}"}, {"babdd", "{b:2}"},
   };
 
   index.AddSegment(test_data_2);
@@ -61,8 +60,7 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
   BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:6}\"");
 
   std::vector<std::pair<std::string, std::string>> test_data_3 = {
-      {"abbcd", "{c:8}"},  {"cabc", "{a:1}"},  {"cabbc", "{b:2}"},
-      {"cabcde", "{a:1}"}, {"cabdd", "{b:2}"},
+      {"abbcd", "{c:8}"}, {"cabc", "{a:1}"}, {"cabbc", "{b:2}"}, {"cabcde", "{a:1}"}, {"cabdd", "{b:2}"},
   };
 
   // sleep for 1s to ensure modification is visible
@@ -79,15 +77,13 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
 
   BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:8}\"");
   std::this_thread::sleep_for(std::chrono::seconds(1));
-  std::vector<std::pair<std::string, std::string>> test_data_4 = {
-      {"abbcd", "{c:10}"}};
+  std::vector<std::pair<std::string, std::string>> test_data_4 = {{"abbcd", "{c:10}"}};
   index.AddSegment(test_data_4);
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:10}\"");
 
-  std::vector<std::pair<std::string, std::string>> test_data_5 = {
-      {"abbcd", "{c:12}"}};
+  std::vector<std::pair<std::string, std::string>> test_data_5 = {{"abbcd", "{c:12}"}};
   index.AddSegment(test_data_5);
   std::this_thread::sleep_for(std::chrono::seconds(1));
   BOOST_CHECK(reader.Contains("abc"));

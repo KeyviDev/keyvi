@@ -42,8 +42,10 @@ template <typename T, size_t Tsize>
 class SingeProducerSingleConsumerRingBuffer {
  public:
   explicit SingeProducerSingleConsumerRingBuffer(
-      const std::chrono::duration<double>& return_interval = std::chrono::milliseconds(1000))
-      : head_(0), tail_(0), last_pop_(), return_interval_(return_interval) {}
+      const std::chrono::milliseconds& return_interval = std::chrono::milliseconds(1000))
+      : head_(0), tail_(0), return_interval_(return_interval) {
+    next_pop_ = std::chrono::system_clock::now() + return_interval_;
+  }
 
   void Push(const T& value) {
     size_t head = head_.load(boost::memory_order_relaxed);
@@ -63,8 +65,8 @@ class SingeProducerSingleConsumerRingBuffer {
     size_t tail = tail_.load(boost::memory_order_relaxed);
     while (tail == head_.load(boost::memory_order_acquire)) {
       auto tp = std::chrono::system_clock::now();
-      if (tp - last_pop_ > return_interval_) {
-        last_pop_ = tp;
+      if (tp > next_pop_) {
+        next_pop_ = tp + return_interval_;
         return false;
       }
 
@@ -72,7 +74,7 @@ class SingeProducerSingleConsumerRingBuffer {
     }
     *value = std::move(ring_[tail]);
     tail_.store(next(tail), boost::memory_order_release);
-    last_pop_ = std::chrono::system_clock::now();
+    next_pop_ = std::chrono::system_clock::now() + return_interval_;
     return true;
   }
 
@@ -88,8 +90,8 @@ class SingeProducerSingleConsumerRingBuffer {
   size_t next(size_t current) { return (current + 1) % Tsize; }
   T ring_[Tsize];
   boost::atomic<size_t> head_, tail_;
-  std::chrono::system_clock::time_point last_pop_;
-  std::chrono::duration<double> return_interval_;
+  std::chrono::time_point<std::chrono::system_clock> next_pop_;
+  std::chrono::milliseconds return_interval_;
 };
 
 } /* namespace util */

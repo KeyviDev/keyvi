@@ -23,8 +23,8 @@
  *      Author: hendrik
  */
 
-#include <chrono>
-#include <thread>
+#include <chrono>  //NOLINT
+#include <thread>  //NOLINT
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
