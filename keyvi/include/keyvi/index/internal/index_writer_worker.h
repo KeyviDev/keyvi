@@ -106,7 +106,7 @@ class IndexWriterWorker final {
   void Add(const std::string& key, const std::string& value) {
     // push function
     // todo: per ref??
-    compiler_active_object_([&key, &value](IndexPayload& payload) {
+    compiler_active_object_([key, value](IndexPayload& payload) {
       // todo non-lazy?
       if (!payload.compiler_) {
         TRACE("recreate compiler");
