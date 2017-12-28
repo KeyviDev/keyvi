@@ -109,7 +109,6 @@ class MergeJob final {
   std::shared_ptr<TinyProcessLib::Process> external_process_;
 
   void DoExternalProcessMerge() {
-    // MergeJobPayload* job = &payload_;
     payload_.start_time_ = std::chrono::system_clock::now();
 
     std::stringstream command;
