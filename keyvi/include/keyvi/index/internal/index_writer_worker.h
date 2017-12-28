@@ -54,7 +54,7 @@ namespace internal {
 class IndexWriterWorker final {
   typedef std::shared_ptr<dictionary::JsonDictionaryCompilerSmallData> compiler_t;
   struct IndexPayload {
-    explicit IndexPayload(const std::string& index_directory, const std::chrono::duration<double>& flush_interval)
+    explicit IndexPayload(const std::string& index_directory, const std::chrono::milliseconds& flush_interval)
         : compiler_(),
           write_counter_(0),
           segments_(),
@@ -103,9 +103,9 @@ class IndexWriterWorker final {
 
   segments_t Segments() const { return payload_.segments_; }
 
+  // todo: rvalue version??
   void Add(const std::string& key, const std::string& value) {
     // push function
-    // todo: per ref??
     compiler_active_object_([key, value](IndexPayload& payload) {
       // todo non-lazy?
       if (!payload.compiler_) {
@@ -121,6 +121,7 @@ class IndexWriterWorker final {
 
     if (++payload_.write_counter_ > 1000) {
       compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
+      payload_.write_counter_ = 0;
     }
   }
 
@@ -144,6 +145,7 @@ class IndexWriterWorker final {
 
     if (++payload_.write_counter_ > 1000) {
       compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
+      payload_.write_counter_ = 0;
     }
   }
 

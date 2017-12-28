@@ -57,8 +57,9 @@ namespace index {
 
 class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriterWorker> {
  public:
-  explicit IndexWriter(const std::string& index_directory)
-      : index_finalizer_(index_directory), BaseIndexReader(index_finalizer_) {
+  explicit IndexWriter(const std::string& index_directory,
+                       const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
+      : index_writer_worker_(index_directory, flush_interval), BaseIndexReader(index_writer_worker_) {
     index_directory_ = index_directory;
 
     index_toc_file_ = index_directory_;
@@ -90,20 +91,20 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
     }
   }
 
-  void Set(const std::string& key, const std::string& value) { index_finalizer_.Add(key, value); }
+  void Set(const std::string& key, const std::string& value) { index_writer_worker_.Add(key, value); }
 
-  void Delete(const std::string& key) { index_finalizer_.Delete(key); }
+  void Delete(const std::string& key) { index_writer_worker_.Delete(key); }
 
   void Flush(bool async = true) {
     TRACE("Flush (manually)");
-    index_finalizer_.Flush(async);
+    index_writer_worker_.Flush(async);
   }
 
  private:
   boost::filesystem::path index_directory_;
   boost::filesystem::path index_toc_file_;
   boost::interprocess::file_lock index_lock_;
-  internal::IndexWriterWorker index_finalizer_;
+  internal::IndexWriterWorker index_writer_worker_;
 };
 
 } /* namespace index */

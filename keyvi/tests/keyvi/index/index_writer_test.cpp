@@ -59,16 +59,19 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path();
-  IndexWriter writer(tmp_path.string());
+  IndexWriter writer(tmp_path.string(), std::chrono::milliseconds(100));
 
-  for (int i = 0; i < 1000; ++i) {
+  for (int i = 0; i < 10000; ++i) {
     writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
+    if (i % 50 == 0) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
   }
   writer.Flush(false);
   BOOST_CHECK(writer.Contains("a"));
   dictionary::Match m = writer["a"];
 
-  BOOST_CHECK_EQUAL("{\"id\":999}", m.GetValueAsString());
+  BOOST_CHECK_EQUAL("{\"id\":9999}", m.GetValueAsString());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
