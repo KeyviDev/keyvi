@@ -44,7 +44,7 @@
 #include "index/internal/segment.h"
 #include "util/active_object.h"
 
-#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -118,9 +118,27 @@ class IndexWriterWorker final {
     }
   }
 
-  template <typename F>
-  void operator()(F f) {
-    compiler_active_object_(f);
+  void Delete(const std::string& key) {
+    compiler_active_object_([&key](IndexPayload& payload) {
+      TRACE("delete key %s", key.c_str());
+
+      if (payload.compiler_) {
+        payload.compiler_->Delete(key);
+      }
+
+      if (payload.segments_) {
+        for (const segment_t& s : *payload.segments_) {
+          if (s->operator*()->Contains(key)) {
+            // todo: what if segment is in merge? -> delete also for the merge job
+            s->DeleteKey(key);
+          }
+        }
+      }
+    });
+
+    if (++payload_.write_counter_ > 1000) {
+      compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
+    }
   }
 
   /**
