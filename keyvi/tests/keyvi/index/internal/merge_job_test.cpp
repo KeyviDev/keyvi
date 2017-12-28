@@ -46,7 +46,10 @@ BOOST_AUTO_TEST_CASE(basic_merge) {
       dictionary::testing::TempDictionary::makeTempDictionaryFromJson(test_data);
 
   std::vector<std::pair<std::string, std::string>> test_data2 = {
-      {"abbe", "{d:4}"}, {"abbc", "{b:3}"}, {"abcd", "{a:1}"}, {"bbacd", "{f:5}"},
+      {"abbe", "{d:4}"},
+      {"abbc", "{b:3}"},
+      {"abcd", "{a:1}"},
+      {"bbacd", "{f:5}"},
   };
   dictionary::testing::TempDictionary dictionary2 =
       dictionary::testing::TempDictionary::makeTempDictionaryFromJson(test_data2);
