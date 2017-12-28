@@ -72,8 +72,9 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingfullqueue) {
   auto end_time = std::chrono::high_resolution_clock::now();
 
   size_t duration = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+  size_t expected_min_calls = (duration / 8) > 4 ? (duration / 8) - 4 : 0;
 
-  BOOST_CHECK(calls > (duration / 8) - 3);
+  BOOST_CHECK(calls > expected_min_calls);
   BOOST_CHECK(calls < (duration / 8) + 1 + 1);
 }
 
