@@ -54,7 +54,13 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
 
   BOOST_CHECK(reader.Contains("abc"));
   BOOST_CHECK(reader.Contains("babdd"));
+  BOOST_CHECK(!reader.Contains("ab"));
+  BOOST_CHECK(!reader.Contains("bbc"));
+  BOOST_CHECK(!reader.Contains(""));
   BOOST_CHECK_EQUAL(reader["abc"].GetValueAsString(), "\"{a:1}\"");
+
+  BOOST_CHECK(reader[""].IsEmpty());
+  BOOST_CHECK(reader["ab"].IsEmpty());
 
   // test priority, last one should be returned
   BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:6}\"");
