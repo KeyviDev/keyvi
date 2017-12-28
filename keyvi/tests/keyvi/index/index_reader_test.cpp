@@ -42,13 +42,13 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
       {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"abbcd", "{c:3}"}, {"abcde", "{a:1}"}, {"abdd", "{b:2}"},
   };
 
-  index.AddSegment(test_data);
+  index.AddSegment(&test_data);
 
   std::vector<std::pair<std::string, std::string>> test_data_2 = {
       {"abbcd", "{c:6}"}, {"babc", "{a:1}"}, {"babbc", "{b:2}"}, {"babcde", "{a:1}"}, {"babdd", "{b:2}"},
   };
 
-  index.AddSegment(test_data_2);
+  index.AddSegment(&test_data_2);
 
   IndexReader reader(index.GetIndexFolder());
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
   // sleep for 1s to ensure modification is visible
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  index.AddSegment(test_data_3);
+  index.AddSegment(&test_data_3);
   BOOST_CHECK(reader.Contains("abc"));
 
   BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:6}\"");
@@ -78,13 +78,13 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
   BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:8}\"");
   std::this_thread::sleep_for(std::chrono::seconds(1));
   std::vector<std::pair<std::string, std::string>> test_data_4 = {{"abbcd", "{c:10}"}};
-  index.AddSegment(test_data_4);
+  index.AddSegment(&test_data_4);
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
   BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:10}\"");
 
   std::vector<std::pair<std::string, std::string>> test_data_5 = {{"abbcd", "{c:12}"}};
-  index.AddSegment(test_data_5);
+  index.AddSegment(&test_data_5);
   std::this_thread::sleep_for(std::chrono::seconds(1));
   BOOST_CHECK(reader.Contains("abc"));
 

@@ -23,8 +23,8 @@
  *      Author: hendrik
  */
 
-#ifndef KEYVI_TEST_INDEX_INDEX_MOCK_H_
-#define KEYVI_TEST_INDEX_INDEX_MOCK_H_
+#ifndef KEYVI_TESTS_KEYVI_INDEX_INDEX_MOCK_H_
+#define KEYVI_TESTS_KEYVI_INDEX_INDEX_MOCK_H_
 
 #include <fstream>
 #include <sstream>
@@ -50,7 +50,7 @@ class IndexMock final {
     create_directories(mock_index_);
   }
 
-  void AddSegment(std::vector<std::pair<std::string, std::string>>& input) {
+  void AddSegment(std::vector<std::pair<std::string, std::string>>* input) {
     using boost::filesystem::path;
 
     path filename(mock_index_);
@@ -60,7 +60,7 @@ class IndexMock final {
 
     std::string filename_str = filename.string();
 
-    dictionary::compilation::CompilationUtils::CompileJson(input, filename_str);
+    dictionary::compilation::CompilationUtils::CompileJson(*input, filename_str);
 
     WriteToc();
   }
@@ -98,4 +98,4 @@ class IndexMock final {
 } /* namespace testing */
 } /* namespace keyvi */
 
-#endif /* KEYVI_TEST_INDEX_INDEX_MOCK_H_ */
+#endif  // KEYVI_TESTS_KEYVI_INDEX_INDEX_MOCK_H_
