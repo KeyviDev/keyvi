@@ -1,5 +1,7 @@
 #!/bin/bash
 
+clang-format -version
+
 infiles=`git diff --name-only --diff-filter=ACMRT $(echo $TRAVIS_COMMIT_RANGE | sed 's/\.//') | grep -v "3rdparty" | grep -E "\.(cpp|h)$"`
 
 clang_format_files=()
