@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingemptyqueue) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
-  BOOST_CHECK(calls > 8);
+  BOOST_CHECK(calls > 7);
   BOOST_CHECK(calls < 11 + 1);
 }
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingfullqueue) {
   auto end_time = std::chrono::high_resolution_clock::now();
 
   size_t duration = std::chrono::duration<double, std::milli>(end_time - start_time).count();
-  size_t expected_min_calls = (duration / 8) > 5 ? (duration / 8) - 5 : 0;
+  size_t expected_min_calls = (duration / 8) > 5 ? ((duration - duration / 10) / 8) - 5 : 0;
 
   BOOST_CHECK(expected_min_calls > 0);
   BOOST_CHECK(calls > expected_min_calls);
