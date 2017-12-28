@@ -63,6 +63,9 @@ class ActiveObject final {
           scheduled_task_();
         }
       }
+
+      // run scheduled task a last time before finishing
+      scheduled_task_();
     });
   }
 

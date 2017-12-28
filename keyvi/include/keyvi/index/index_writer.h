@@ -81,6 +81,7 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
   }
 
   ~IndexWriter() {
+    // todo: happens to early, move into own class, destruct after worker is destructed
     TRACE("Unlock Index");
     try {
       index_lock_.unlock();

@@ -61,7 +61,8 @@ class IndexWriterWorker final {
           index_directory_(index_directory),
           merge_jobs_(),
           last_flush_(),
-          flush_interval_(flush_interval) {
+          flush_interval_(flush_interval),
+          merge_enabled_(true) {
       segments_ = std::make_shared<segment_vec_t>();
     }
 
@@ -72,7 +73,8 @@ class IndexWriterWorker final {
     std::list<MergeJob> merge_jobs_;
     std::chrono::system_clock::time_point last_flush_;
     std::chrono::duration<double> flush_interval_;
-    size_t max_concurrent_merges = 2;
+    size_t max_concurrent_merges_ = 2;
+    std::atomic_bool merge_enabled_;
   };
 
  public:
@@ -89,11 +91,14 @@ class IndexWriterWorker final {
 
   ~IndexWriterWorker() {
     TRACE("destruct worker: %s", payload_.index_directory_.c_str());
-    for (MergeJob& p : payload_.merge_jobs_) {
-      p.Finalize();
-    }
+    payload_.merge_enabled_ = false;
 
-    FinalizeMerge();
+    // push a function to finish all pending merges
+    compiler_active_object_([](IndexPayload& payload) {
+      for (MergeJob& p : payload.merge_jobs_) {
+        p.Finalize();
+      }
+    });
   }
 
   segments_t Segments() const { return payload_.segments_; }
@@ -166,12 +171,13 @@ class IndexWriterWorker final {
  private:
   IndexPayload payload_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
-  size_t max_concurrent_merges = 2;
 
   void ScheduledTask() {
     TRACE("Scheduled task");
     FinalizeMerge();
-    RunMerge();
+    if (payload_.merge_enabled_) {
+      RunMerge();
+    }
 
     if (!payload_.compiler_) {
       return;
@@ -260,7 +266,7 @@ class IndexWriterWorker final {
       return;
     }
 
-    if (payload_.merge_jobs_.size() == max_concurrent_merges) {
+    if (payload_.merge_jobs_.size() == payload_.max_concurrent_merges_) {
       // to many merges already running, so throttle
       return;
     }
