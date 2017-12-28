@@ -44,7 +44,7 @@
 #include "index/internal/segment.h"
 #include "util/active_object.h"
 
-// #define ENABLE_TRACING
+#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -81,14 +81,14 @@ class IndexWriterWorker final {
       : payload_(index_directory, flush_interval),
         compiler_active_object_(&payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
                                 flush_interval) {
-    TRACE("d1: %s", payload_.index_directory_.c_str());
+    TRACE("construct worker: %s", payload_.index_directory_.c_str());
   }
 
   IndexWriterWorker& operator=(IndexWriterWorker const&) = delete;
   IndexWriterWorker(const IndexWriterWorker& that) = delete;
 
   ~IndexWriterWorker() {
-    TRACE("d3: %s", payload_.index_directory_.c_str());
+    TRACE("destruct worker: %s", payload_.index_directory_.c_str());
     for (MergeJob& p : payload_.merge_jobs_) {
       p.Finalize();
     }
@@ -100,6 +100,7 @@ class IndexWriterWorker final {
 
   void Add(const std::string& key, const std::string& value) {
     // push function
+    // todo: per ref??
     compiler_active_object_([&key, &value](IndexPayload& payload) {
       // todo non-lazy?
       if (!payload.compiler_) {
@@ -145,6 +146,7 @@ class IndexWriterWorker final {
    * Flush for external use.
    */
   void Flush(bool async = true) {
+    TRACE("flush");
     compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
 
     if (async == false) {

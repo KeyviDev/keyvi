@@ -40,7 +40,7 @@ void ScheduledTask(size_t* calls) { ++*calls; }
 
 BOOST_AUTO_TEST_CASE(scheduledtasktimingemptyqueue) {
   std::ostringstream string_stream;
-  std::chrono::system_clock::time_point last_call();
+  std::chrono::system_clock::time_point last_call;
   size_t calls = 0;
 
   {
@@ -49,13 +49,13 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingemptyqueue) {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
-  BOOST_CHECK(calls > 9);
+  BOOST_CHECK(calls > 8);
   BOOST_CHECK(calls < 11);
 }
 
 BOOST_AUTO_TEST_CASE(scheduledtasktimingfullqueue) {
   std::ostringstream string_stream;
-  std::chrono::system_clock::time_point last_call();
+  std::chrono::system_clock::time_point last_call;
   size_t calls = 0;
   auto start_time = std::chrono::high_resolution_clock::now();
   {
@@ -73,8 +73,8 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingfullqueue) {
 
   size_t duration = std::chrono::duration<double, std::milli>(end_time - start_time).count();
 
-  BOOST_CHECK(calls > duration / 8 - 2);
-  BOOST_CHECK(calls < duration / 8 + 1);
+  BOOST_CHECK(calls > (duration / 8) - 3);
+  BOOST_CHECK(calls < (duration / 8) + 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
