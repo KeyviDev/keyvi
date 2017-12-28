@@ -44,7 +44,7 @@
 #include "index/internal/segment.h"
 #include "util/active_object.h"
 
-#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
