@@ -35,14 +35,15 @@ namespace keyvi {
 namespace index {
 namespace internal {
 
-template <class SegmentHolderT>
+template <class PayloadT>
 class BaseIndexReader {
  public:
-  explicit BaseIndexReader(const SegmentHolderT& segementHolder) : holder_(segementHolder) {}
+  template <typename... Args>
+  explicit BaseIndexReader(Args... args) : payload_(args...) {}
 
   dictionary::Match operator[](const std::string& key) const {
     dictionary::Match m;
-    segments_t segments = holder_.Segments();
+    segments_t segments = payload_.Segments();
 
     for (auto it = segments->crbegin(); it != segments->crend(); ++it) {
       m = (*it)->GetDictionary()->operator[](key);
@@ -55,7 +56,7 @@ class BaseIndexReader {
   }
 
   bool Contains(const std::string& key) const {
-    segments_t segments = holder_.Segments();
+    segments_t segments = payload_.Segments();
     for (auto it = segments->crbegin(); it != segments->crend(); it++) {
       if ((*it)->GetDictionary()->Contains(key)) {
         return true;
@@ -65,8 +66,10 @@ class BaseIndexReader {
     return false;
   }
 
+  PayloadT& Payload() { return payload_; }
+
  private:
-  const SegmentHolderT& holder_;
+  PayloadT payload_;
 };
 
 } /* namespace internal */

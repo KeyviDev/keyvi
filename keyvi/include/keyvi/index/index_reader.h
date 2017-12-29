@@ -40,16 +40,13 @@ namespace index {
 class IndexReader final : public internal::BaseIndexReader<internal::IndexReaderWorker> {
  public:
   explicit IndexReader(const std::string index_directory, size_t refresh_interval = 1 /*, optional external logger*/)
-      : worker_(index_directory, refresh_interval), BaseIndexReader(worker_) {
-    worker_.StartWorkerThread();
+      : BaseIndexReader(index_directory, refresh_interval) {
+    Payload().StartWorkerThread();
   }
 
-  ~IndexReader() { worker_.StopWorkerThread(); }
+  ~IndexReader() { Payload().StopWorkerThread(); }
 
-  void Reload() { worker_.Reload(); }
-
- private:
-  internal::IndexReaderWorker worker_;
+  void Reload() { Payload().Reload(); }
 };
 } /* namespace index */
 } /* namespace keyvi */

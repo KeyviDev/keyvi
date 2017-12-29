@@ -43,11 +43,11 @@ class ActiveObject final {
  public:
   explicit ActiveObject(T* resource, const std::function<void()>& scheduled_task,
                         const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
-      : resource_(resource),
+      : queue_(std::min(std::chrono::milliseconds(5), flush_interval_)),
+        resource_(resource),
         flush_interval_(flush_interval),
         scheduled_task_(scheduled_task),
         scheduled_task_next_run_(std::chrono::system_clock::now() + flush_interval_),
-        queue_(std::min(std::chrono::milliseconds(5), flush_interval_)),
         done_(false) {
     worker_ = std::thread([this] {
       std::function<void()> item;
