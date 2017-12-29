@@ -22,18 +22,23 @@
  *      Author: hendrik
  */
 
-#ifndef COMPILATION_UTILS_H_
-#define COMPILATION_UTILS_H_
+#ifndef KEYVI_DICTIONARY_COMPILATION_COMPILATION_UTILS_H_
+#define KEYVI_DICTIONARY_COMPILATION_COMPILATION_UTILS_H_
+
+#include <algorithm>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/generator.h"
-#include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "dictionary/fsa/internal/string_value_store.h"
+#include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "dictionary/fsa/internal/string_value_store.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -42,15 +47,14 @@ namespace compilation {
 
 class CompilationUtils {
  public:
-  static fsa::automata_t CompileKeyOnly(std::vector<std::string>& input, std::string& file_name){
-    std::sort(input.begin(), input.end());
+  static fsa::automata_t CompileKeyOnly(std::vector<std::string>* input, const std::string& file_name) {
+    std::sort(input->begin(), input->end());
 
-    fsa::internal::SparseArrayPersistence<> p(2048,
-                                         boost::filesystem::temp_directory_path());
+    fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-    fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+    fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb", "10"}}));
 
-    for(auto key : input){
+    for (const auto& key : *input) {
       g.Add(key);
     }
 
@@ -63,95 +67,97 @@ class CompilationUtils {
     return f;
   }
 
-  static fsa::automata_t CompileString(std::vector<std::pair<std::string, std::string>>& input, std::string& file_name){
-      std::sort(input.begin(), input.end());
+  static fsa::automata_t CompileString(std::vector<std::pair<std::string, std::string>>* input,
+                                       const std::string& file_name) {
+    std::sort(input->begin(), input->end());
 
-      fsa::internal::SparseArrayPersistence<> p(2048,
-                                           boost::filesystem::temp_directory_path());
+    fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+    fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> g(
+        fsa::generator_param_t({{"memory_limit_mb", "10"}}));
 
-      for(auto pair : input){
-        g.Add(pair.first, pair.second);
-      }
-
-      g.CloseFeeding();
-      std::ofstream out_stream(file_name, std::ios::binary);
-      g.Write(out_stream);
-      out_stream.close();
-
-      fsa::automata_t f(new fsa::Automata(file_name.c_str()));
-      return f;
+    for (const auto& pair : *input) {
+      g.Add(pair.first, pair.second);
     }
 
-  static fsa::automata_t CompileJson(std::vector<std::pair<std::string, std::string>>& input, std::string& file_name){
-        std::sort(input.begin(), input.end());
+    g.CloseFeeding();
+    std::ofstream out_stream(file_name, std::ios::binary);
+    g.Write(out_stream);
+    out_stream.close();
 
-        fsa::internal::SparseArrayPersistence<> p(2048,
-                                             boost::filesystem::temp_directory_path());
+    fsa::automata_t f(new fsa::Automata(file_name.c_str()));
+    return f;
+  }
 
-        fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  static fsa::automata_t CompileJson(std::vector<std::pair<std::string, std::string>>* input,
+                                     const std::string& file_name) {
+    std::sort(input->begin(), input->end());
 
-        for(auto pair : input){
-          g.Add(pair.first, pair.second);
-        }
+    fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-        g.CloseFeeding();
-        std::ofstream out_stream(file_name, std::ios::binary);
-        g.Write(out_stream);
-        out_stream.close();
+    fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> g(
+        fsa::generator_param_t({{"memory_limit_mb", "10"}}));
 
-        fsa::automata_t f(new fsa::Automata(file_name.c_str()));
-        return f;
-      }
-
-  static fsa::automata_t CompileIntWithInnerWeights(std::vector<std::pair<std::string, uint32_t>>& input, std::string& file_name){
-      std::sort(input.begin(), input.end());
-
-      fsa::internal::SparseArrayPersistence<> p(2048,
-                                           boost::filesystem::temp_directory_path());
-
-      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
-
-      for(auto pair : input){
-        g.Add(pair.first, pair.second);
-      }
-
-      g.CloseFeeding();
-      std::ofstream out_stream(file_name, std::ios::binary);
-      g.Write(out_stream);
-      out_stream.close();
-
-      fsa::automata_t f(new fsa::Automata(file_name.c_str()));
-      return f;
+    for (const auto& pair : *input) {
+      g.Add(pair.first, pair.second);
     }
 
-  static fsa::automata_t CompileInt(std::vector<std::pair<std::string, uint32_t>>& input, std::string& file_name){
-      std::sort(input.begin(), input.end());
+    g.CloseFeeding();
+    std::ofstream out_stream(file_name, std::ios::binary);
+    g.Write(out_stream);
+    out_stream.close();
 
-      fsa::internal::SparseArrayPersistence<> p(2048,
-                                           boost::filesystem::temp_directory_path());
+    fsa::automata_t f(new fsa::Automata(file_name.c_str()));
+    return f;
+  }
 
-      fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  static fsa::automata_t CompileIntWithInnerWeights(std::vector<std::pair<std::string, uint32_t>>* input,
+                                                    const std::string& file_name) {
+    std::sort(input->begin(), input->end());
 
-      for(auto pair : input){
-        g.Add(pair.first, pair.second);
-      }
+    fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-      g.CloseFeeding();
-      std::ofstream out_stream(file_name, std::ios::binary);
-      g.Write(out_stream);
-      out_stream.close();
+    fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> g(
+        fsa::generator_param_t({{"memory_limit_mb", "10"}}));
 
-      fsa::automata_t f(new fsa::Automata(file_name.c_str()));
-      return f;
+    for (const auto& pair : *input) {
+      g.Add(pair.first, pair.second);
     }
 
+    g.CloseFeeding();
+    std::ofstream out_stream(file_name, std::ios::binary);
+    g.Write(out_stream);
+    out_stream.close();
+
+    fsa::automata_t f(new fsa::Automata(file_name.c_str()));
+    return f;
+  }
+
+  static fsa::automata_t CompileInt(std::vector<std::pair<std::string, uint32_t>>* input,
+                                    const std::string& file_name) {
+    std::sort(input->begin(), input->end());
+
+    fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
+
+    fsa::Generator<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntValueStore> g(
+        fsa::generator_param_t({{"memory_limit_mb", "10"}}));
+
+    for (const auto& pair : *input) {
+      g.Add(pair.first, pair.second);
+    }
+
+    g.CloseFeeding();
+    std::ofstream out_stream(file_name, std::ios::binary);
+    g.Write(out_stream);
+    out_stream.close();
+
+    fsa::automata_t f(new fsa::Automata(file_name.c_str()));
+    return f;
+  }
 };
 
 } /* namespace compilation */
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-
-#endif /* COMPILATION_UTILS_H_ */
+#endif  // KEYVI_DICTIONARY_COMPILATION_COMPILATION_UTILS_H_

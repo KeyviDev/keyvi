@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE(NearTraversalTests)
 
 BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   auto payload = traversal::TraversalPayload<traversal::NearTransition>("aace");

@@ -22,12 +22,16 @@
  *      Author: hendrik
  */
 
-#ifndef TEMP_DICTIONARY_H_
-#define TEMP_DICTIONARY_H_
+#ifndef KEYVI_DICTIONARY_TESTING_TEMP_DICTIONARY_H_
+#define KEYVI_DICTIONARY_TESTING_TEMP_DICTIONARY_H_
 
-#include <stdio.h>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <boost/filesystem.hpp>
-#include <dictionary/compilation/compilation_utils.h>
+
+#include "dictionary/compilation/compilation_utils.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -37,69 +41,56 @@ namespace testing {
  * Utility class for creating dictionaries for unit testing.
  * Ensures proper deletion after test completion.
  */
-class TempDictionary
-final {
-   public:
-    TempDictionary(std::vector<std::string>& input) {
+class TempDictionary final {
+ public:
+  explicit TempDictionary(std::vector<std::string>* input) {
+    CreateFileName();
+    fsa_ = compilation::CompilationUtils::CompileKeyOnly(input, file_name_);
+  }
 
-      CreateFileName();
-      fsa_ = compilation::CompilationUtils::CompileKeyOnly(input, file_name_);
+  explicit TempDictionary(std::vector<std::pair<std::string, uint32_t>>* input, bool completion_dictionary = true) {
+    CreateFileName();
+    if (completion_dictionary) {
+      fsa_ = compilation::CompilationUtils::CompileIntWithInnerWeights(input, file_name_);
+    } else {
+      fsa_ = compilation::CompilationUtils::CompileInt(input, file_name_);
     }
+  }
 
-    TempDictionary(std::vector<std::pair<std::string, uint32_t>>& input, bool completion_dictionary = true) {
+  explicit TempDictionary(std::vector<std::pair<std::string, std::string>>* input) {
+    CreateFileName();
+    fsa_ = compilation::CompilationUtils::CompileString(input, file_name_);
+  }
 
-      CreateFileName();
-      if (completion_dictionary) {
-        fsa_ = compilation::CompilationUtils::CompileIntWithInnerWeights(input, file_name_);
-      } else {
-        fsa_ = compilation::CompilationUtils::CompileInt(input, file_name_);
-      }
-    }
+  static TempDictionary makeTempDictionaryFromJson(std::vector<std::pair<std::string, std::string>>* input) {
+    TempDictionary t;
+    t.CreateFileName();
+    t.fsa_ = compilation::CompilationUtils::CompileJson(input, t.file_name_);
+    return t;
+  }
 
-    TempDictionary(std::vector<std::pair<std::string, std::string>>& input) {
+  fsa::automata_t GetFsa() const { return fsa_; }
 
-      CreateFileName();
-      fsa_ = compilation::CompilationUtils::CompileString(input, file_name_);
-    }
+  const std::string& GetFileName() const { return file_name_; }
 
-    static TempDictionary makeTempDictionaryFromJson(std::vector<std::pair<std::string, std::string>>& input) {
-      TempDictionary t;
-      t.CreateFileName();
-      t.fsa_ = compilation::CompilationUtils::CompileJson(input, t.file_name_);
-      return t;
-    }
+  ~TempDictionary() { std::remove(file_name_.c_str()); }
 
-    fsa::automata_t GetFsa() const {
-      return fsa_;
-    }
+ private:
+  fsa::automata_t fsa_;
+  std::string file_name_;
 
-    const std::string& GetFileName() const {
-      return file_name_;
-    }
+  TempDictionary() {}
 
-    ~TempDictionary() {
-      std::remove(file_name_.c_str());
-    }
+  void CreateFileName() {
+    boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
-   private:
-    fsa::automata_t fsa_;
-    std::string file_name_;
+    temp_path /= boost::filesystem::unique_path("dictionary-unit-test-temp-dictionary-%%%%-%%%%-%%%%-%%%%");
+    file_name_ = temp_path.native();
+  }
+};
 
-    TempDictionary(){}
+} /* namespace testing */
+} /* namespace dictionary */
+} /* namespace keyvi */
 
-    void CreateFileName() {
-      boost::filesystem::path temp_path =
-          boost::filesystem::temp_directory_path();
-
-      temp_path /= boost::filesystem::unique_path(
-          "dictionary-unit-test-temp-dictionary-%%%%-%%%%-%%%%-%%%%");
-      file_name_ = temp_path.native();
-    }
-
-  };
-
-  } /* namespace testing */
-  } /* namespace dictionary */
-  } /* namespace keyvi */
-
-#endif /* TEMP_DICTIONARY_H_ */
+#endif  // KEYVI_DICTIONARY_TESTING_TEMP_DICTIONARY_H_

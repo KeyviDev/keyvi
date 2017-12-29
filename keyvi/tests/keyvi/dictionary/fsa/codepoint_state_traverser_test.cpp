@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE(CodePointStateTraverserTests)
 
 BOOST_AUTO_TEST_CASE(someASCIITraversalNoPrune) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   CodePointStateTraverser<StateTraverser<>> c(f);
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(someASCIITraversalNoPrune) {
 
 BOOST_AUTO_TEST_CASE(someNonASCIITraversalNoPrune) {
   std::vector<std::string> test_data = {"aüöß", "öäöö", "öäüaöc", "条件指定", "🤓🤘"};
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   CodePointStateTraverser<StateTraverser<>> c(f);
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(someNonASCIITraversalNoPrune) {
 
 BOOST_AUTO_TEST_CASE(someNonASCIITraversalPrune) {
   std::vector<std::string> test_data = {"条件指定", "🤓🤘"};
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   CodePointStateTraverser<StateTraverser<>> c(f);

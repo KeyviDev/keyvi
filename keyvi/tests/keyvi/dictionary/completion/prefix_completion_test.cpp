@@ -23,29 +23,28 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/test/unit_test.hpp>
+
+#include "dictionary/completion/prefix_completion.h"
+#include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/fsa/automata.h"
-#include "dictionary/completion/prefix_completion.h"
 #include "dictionary/testing/temp_dictionary.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace completion {
 
-BOOST_AUTO_TEST_SUITE( PrefixCompletionTests )
+BOOST_AUTO_TEST_SUITE(PrefixCompletionTests)
 
-BOOST_AUTO_TEST_CASE( simple ) {
-  fsa::internal::SparseArrayPersistence<> p(
-      2048, boost::filesystem::temp_directory_path());
+BOOST_AUTO_TEST_CASE(simple) {
+  fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-  fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(
-      fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb", "10"}}));
 
   g.Add("aaaa");
   g.Add("aabb");
@@ -60,7 +59,7 @@ BOOST_AUTO_TEST_CASE( simple ) {
   out_stream.close();
 
   fsa::automata_t f(new fsa::Automata("testFile_completion"));
-  dictionary_t d (new Dictionary(f));
+  dictionary_t d(new Dictionary(f));
 
   PrefixCompletion prefix_completion(d);
 
@@ -71,7 +70,7 @@ BOOST_AUTO_TEST_CASE( simple ) {
   expected_output.push_back("aacd");
 
   auto expected_it = expected_output.begin();
-  for (auto m : prefix_completion.GetCompletions("aa")){
+  for (auto m : prefix_completion.GetCompletions("aa")) {
     BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
   }
 
@@ -84,17 +83,13 @@ BOOST_AUTO_TEST_CASE( simple ) {
   BOOST_CHECK(prefix == prefix_match_pair.end());
 }
 
-BOOST_AUTO_TEST_CASE( limit ) {
+BOOST_AUTO_TEST_CASE(limit) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
-          { "angel", 22 },
-          { "angeli", 24 },
-          { "angelina", 444 },
-          { "angela merkel", 200 },
-          { "angela merk", 180 },
-          { "angelo merk", 10 },
-      };
-  testing::TempDictionary dictionary(test_data);
-  dictionary_t d (new Dictionary(dictionary.GetFsa()));
+      {"angel", 22},          {"angeli", 24},       {"angelina", 444},
+      {"angela merkel", 200}, {"angela merk", 180}, {"angelo merk", 10},
+  };
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   std::vector<std::string> expected_output;
   expected_output.push_back("angel");
@@ -107,27 +102,21 @@ BOOST_AUTO_TEST_CASE( limit ) {
   PrefixCompletion prefix_completion(d);
 
   auto expected_it = expected_output.begin();
-  for (auto m : prefix_completion.GetCompletions("angel")){
+  for (auto m : prefix_completion.GetCompletions("angel")) {
     BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
   }
 
   BOOST_CHECK(expected_it == expected_output.end());
 }
 
-BOOST_AUTO_TEST_CASE( approx1 ) {
+BOOST_AUTO_TEST_CASE(approx1) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
-          { "aabc", 22 },
-          { "aabcdefghijklmnop", 45 },
-          { "aabcül", 55 },
-          { "bbbc", 22 },
-          { "bbbd", 444 },
-          { "cdabc", 22 },
-          { "efdffd", 444 },
-          { "xfdebc", 23 },
-      };
+      {"aabc", 22},  {"aabcdefghijklmnop", 45}, {"aabcül", 55}, {"bbbc", 22}, {"bbbd", 444},
+      {"cdabc", 22}, {"efdffd", 444},           {"xfdebc", 23},
+  };
 
-  testing::TempDictionary dictionary(test_data);
-  dictionary_t d (new Dictionary(dictionary.GetFsa()));
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
   PrefixCompletion prefix_completion(d);
 
   std::vector<std::string> expected_output;
@@ -135,14 +124,14 @@ BOOST_AUTO_TEST_CASE( approx1 ) {
   expected_output.push_back("aabcdefghijklmnop");
   expected_output.push_back("aabcül");
 
-  for (auto m : prefix_completion.GetFuzzyCompletions("aabd", 2)){
-      //BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  for (auto m : prefix_completion.GetFuzzyCompletions("aabd", 2)) {
+    // BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
     TRACE("1 match: %s", m.GetMatchedString().c_str());
   }
 
-  for (auto m : prefix_completion.GetFuzzyCompletions("aabc", 2)){
-        //BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-      TRACE("2 match: %s", m.GetMatchedString().c_str());
+  for (auto m : prefix_completion.GetFuzzyCompletions("aabc", 2)) {
+    // BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    TRACE("2 match: %s", m.GetMatchedString().c_str());
   }
 }
 
