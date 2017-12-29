@@ -22,28 +22,26 @@
  *      Author: hendrik
  */
 
-#ifndef FSA_TRANSFORM_H_
-#define FSA_TRANSFORM_H_
+#ifndef KEYVI_TRANSFORM_FSA_TRANSFORM_H_
+#define KEYVI_TRANSFORM_FSA_TRANSFORM_H_
 
 #include <sstream>
-#include "dictionary/fsa/automata.h"
-#include "dictionary/dictionary.h"
+#include <string>
 
-//#define ENABLE_TRACING
+#include "dictionary/dictionary.h"
+#include "dictionary/fsa/automata.h"
+
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace transform {
 
 class FsaTransform final {
-
  public:
-  FsaTransform(dictionary::fsa::automata_t fsa): fsa_(fsa){
-  }
+  explicit FsaTransform(dictionary::fsa::automata_t fsa) : fsa_(fsa) {}
 
-  FsaTransform(dictionary::dictionary_t d) {
-      fsa_ = d->GetFsa();
-  }
+  explicit FsaTransform(dictionary::dictionary_t d) { fsa_ = d->GetFsa(); }
 
   std::string Normalize(const std::string& input) const {
     std::ostringstream output_buffer;
@@ -56,11 +54,10 @@ class FsaTransform final {
     size_t offset = 0;
 
     TRACE("Normalizing %s", input.c_str());
-    while ( offset < input_length ) {
-
+    while (offset < input_length) {
       state = fsa_->TryWalkTransition(state, input[offset]);
 
-      if (state){
+      if (state) {
         // got a match
         TRACE("Matched at %d", offset);
 
@@ -74,8 +71,7 @@ class FsaTransform final {
       } else {
         // no match
 
-        if (last_final_state){
-
+        if (last_final_state) {
           TRACE("Write normalization");
 
           output_buffer << fsa_->GetValueAsString(fsa_->GetStateValue(last_final_state));
@@ -83,9 +79,8 @@ class FsaTransform final {
 
           // calculate the offset in the input buffer, that's the offset
           // before traversal plus the offset till the last final match
-          offset -= ( current_matching_depth - last_final_state_position + 1 );
+          offset -= (current_matching_depth - last_final_state_position + 1);
         } else {
-
           // just write the plain input
           output_buffer.put(input[offset]);
           offset -= current_matching_depth;
@@ -98,14 +93,12 @@ class FsaTransform final {
       ++offset;
     }
 
-    if (last_final_state){
-      TRACE("write pending match");
+    if (last_final_state) {
       output_buffer << fsa_->GetValueAsString(fsa_->GetStateValue(last_final_state));
-
       // if we had a partial match and a partial traversal, add the original strings at the end
       while (current_matching_depth > last_final_state_position) {
-        output_buffer.put(input[offset + current_matching_depth - last_final_state_position]);
-        ++ last_final_state_position;
+        output_buffer.put(input[offset + last_final_state_position - current_matching_depth]);
+        ++last_final_state_position;
       }
     }
     TRACE("Normalization result: %s", output_buffer.str().c_str());
@@ -114,14 +107,9 @@ class FsaTransform final {
 
  private:
   dictionary::fsa::automata_t fsa_;
-
 };
-
 
 } /* namespace transform */
 } /* namespace keyvi */
 
-
-
-
-#endif /* FSA_TRANSFORM_H_ */
+#endif  // KEYVI_TRANSFORM_FSA_TRANSFORM_H_
