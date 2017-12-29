@@ -28,9 +28,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/testing/temp_dictionary.h"
 #include "index/internal/merge_job.h"
 #include "index/internal/segment.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace index {
@@ -42,8 +42,7 @@ BOOST_AUTO_TEST_CASE(basic_merge) {
   std::vector<std::pair<std::string, std::string>> test_data = {
       {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"abbcd", "{c:3}"}, {"abcde", "{a:1}"}, {"abdd", "{b:2}"}, {"bba", "{c:3}"},
   };
-  dictionary::testing::TempDictionary dictionary =
-      dictionary::testing::TempDictionary::makeTempDictionaryFromJson(test_data);
+  testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
 
   std::vector<std::pair<std::string, std::string>> test_data2 = {
       {"abbe", "{d:4}"},
@@ -51,8 +50,7 @@ BOOST_AUTO_TEST_CASE(basic_merge) {
       {"abcd", "{a:1}"},
       {"bbacd", "{f:5}"},
   };
-  dictionary::testing::TempDictionary dictionary2 =
-      dictionary::testing::TempDictionary::makeTempDictionaryFromJson(test_data2);
+  testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data2);
 
   segment_t w1(new Segment(dictionary.GetFileName()));
   segment_t w2(new Segment(dictionary2.GetFileName()));

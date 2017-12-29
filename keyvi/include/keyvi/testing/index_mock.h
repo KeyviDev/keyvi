@@ -23,8 +23,8 @@
  *      Author: hendrik
  */
 
-#ifndef KEYVI_TESTS_KEYVI_INDEX_INDEX_MOCK_H_
-#define KEYVI_TESTS_KEYVI_INDEX_INDEX_MOCK_H_
+#ifndef KEYVI_TESTING_INDEX_MOCK_H_
+#define KEYVI_TESTING_INDEX_MOCK_H_
 
 #include <fstream>
 #include <sstream>
@@ -32,8 +32,8 @@
 #include <utility>
 #include <vector>
 
-#include "dictionary/compilation/compilation_utils.h"
 #include "dictionary/fsa/automata.h"
+#include "testing/compilation_utils.h"
 
 namespace keyvi {
 namespace testing {
@@ -60,7 +60,7 @@ class IndexMock final {
 
     std::string filename_str = filename.string();
 
-    dictionary::compilation::CompilationUtils::CompileJson(*input, filename_str);
+    CompilationUtils::CompileJson(input, filename_str);
 
     WriteToc();
   }
@@ -98,4 +98,4 @@ class IndexMock final {
 } /* namespace testing */
 } /* namespace keyvi */
 
-#endif  // KEYVI_TESTS_KEYVI_INDEX_INDEX_MOCK_H_
+#endif  // KEYVI_TESTING_INDEX_MOCK_H_

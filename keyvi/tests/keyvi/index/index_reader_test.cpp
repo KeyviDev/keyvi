@@ -27,9 +27,9 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
-#include "index/index_reader.h"
 
-#include "./index_mock.h"
+#include "index/index_reader.h"
+#include "testing/index_mock.h"
 
 namespace keyvi {
 namespace index {

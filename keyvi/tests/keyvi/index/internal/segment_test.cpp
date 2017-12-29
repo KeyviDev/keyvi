@@ -18,8 +18,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/testing/temp_dictionary.h"
 #include "index/internal/segment.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace index {
@@ -29,8 +29,7 @@ BOOST_AUTO_TEST_SUITE(SegmentTests)
 
 BOOST_AUTO_TEST_CASE(deletekey) {
   std::vector<std::pair<std::string, std::string>> test_data = {{"abc", "{a:1}"}, {"abbc", "{b:2}"}};
-  dictionary::testing::TempDictionary dictionary =
-      dictionary::testing::TempDictionary::makeTempDictionaryFromJson(test_data);
+  testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
 
   segment_t segment(new Segment(dictionary.GetFileName()));
 
