@@ -75,3 +75,4 @@ target_link_libraries(unit_test_all tiny-process-library tpie ${Boost_LIBRARIES}
 install (TARGETS keyvicompiler DESTINATION bin)
 install (TARGETS keyviinspector DESTINATION bin)
 install (TARGETS keyvimerger DESTINATION bin)
+install  (FILES $<TARGET_FILE:tpie> DESTINATION lib CONFIGURATIONS py)
