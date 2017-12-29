@@ -80,6 +80,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     ]
 
     linklibraries = [
+        "tiny-process-library",
         "tpie",
         "z"
     ]
@@ -246,6 +247,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                                            path.join(dictionary_sources, 'include/keyvi'),
                                            path.join(dictionary_sources, '3rdparty/rapidjson/include'),
                                            path.join(dictionary_sources, '3rdparty/msgpack-c/include'),
+                                           path.join(dictionary_sources, '3rdparty/tiny-process-library'),
                                            path.join(dictionary_sources, '3rdparty/utf8'),
                                            path.join(dictionary_sources, '3rdparty/misc'),
                                            path.join(dictionary_sources, '3rdparty/xchange/src')],
