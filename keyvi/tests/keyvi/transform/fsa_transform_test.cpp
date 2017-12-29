@@ -23,47 +23,58 @@
  *      Author: hendrik
  */
 
+#include <boost/make_shared.hpp>
 #include <boost/test/unit_test.hpp>
-#include "dictionary/testing/temp_dictionary.h"
+
+#include "testing/temp_dictionary.h"
 #include "transform/fsa_transform.h"
 
 namespace keyvi {
 namespace transform {
 
-BOOST_AUTO_TEST_SUITE( FSATransformTests )
+BOOST_AUTO_TEST_SUITE(FSATransformTests)
 
-BOOST_AUTO_TEST_CASE( Normalize ) {
-  std::vector<std::pair<std::string, std::string>> test_data = { { "aa", "b" }, {
-      "c", "d" }, {"caa", "ef"}, {"a", "g"}, };
+BOOST_AUTO_TEST_CASE(Normalize) {
+  std::vector<std::pair<std::string, std::string>> test_data = {
+      {"aa", "b"},
+      {"c", "d"},
+      {"caa", "ef"},
+      {"a", "g"},
+  };
 
-  dictionary::testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
 
   auto transformer = FsaTransform(dictionary.GetFsa());
 
   std::string input = "aa ";
 
   BOOST_CHECK_EQUAL("b ", transformer.Normalize(input));
-
   input = "aa";
   BOOST_CHECK_EQUAL("b", transformer.Normalize(input));
-
   input = "caaa";
   BOOST_CHECK_EQUAL("efg", transformer.Normalize(input));
-
   input = "aaa";
   BOOST_CHECK_EQUAL("bg", transformer.Normalize(input));
-
   input = "cac";
   BOOST_CHECK_EQUAL("dgd", transformer.Normalize(input));
-
   input = "dcac";
   BOOST_CHECK_EQUAL("ddgd", transformer.Normalize(input));
+}
 
-  }
+BOOST_AUTO_TEST_CASE(NormalizePartialAtEnd) {
+  std::vector<std::pair<std::string, std::string>> test_data = {{"aa", "x"}, {"aabc", "y"}};
+
+  testing::TempDictionary dictionary(&test_data);
+
+  boost::shared_ptr<dictionary::Dictionary> d = boost::make_shared<dictionary::Dictionary>(dictionary.GetFsa());
+  auto transformer = FsaTransform(d);
+
+  std::string input = "aab";
+
+  BOOST_CHECK_EQUAL("xb", transformer.Normalize(input));
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
-}
-}
-
-
+}  // namespace transform
+}  // namespace keyvi

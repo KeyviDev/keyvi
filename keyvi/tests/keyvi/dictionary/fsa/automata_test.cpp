@@ -27,7 +27,7 @@
 
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/traverser_types.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE(AutomataTests)
 
 BOOST_AUTO_TEST_CASE(GetOutGoingTransitionsTest) {
   std::vector<std::string> test_data = {"\01cd", "aaaa", "aabb", "agbc", "ajcd", "azcd"};
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   traversal::TraversalStack<> stack;
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(GetOutGoingTransitionsWeightTest) {
       {"the fox jumped over the fence and broke his tongue", 444},
       {"the fox jumped over the fence and broke his arm", 2},
   };
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   traversal::TraversalStack<traversal::WeightedTransition> stack;
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(GetOutGoingTransitionsWeightTest) {
 
 BOOST_AUTO_TEST_CASE(EmptyTest) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {};
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
 
   BOOST_CHECK(dictionary.GetFsa()->Empty());
 }

@@ -23,22 +23,22 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/test/unit_test.hpp>
+
+#include "dictionary/dictionary.h"
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/dictionary.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
+
 namespace keyvi {
 namespace dictionary {
-BOOST_AUTO_TEST_SUITE( DictionaryTests )
+BOOST_AUTO_TEST_SUITE(DictionaryTests)
 
-BOOST_AUTO_TEST_CASE( loadDict ) {
+BOOST_AUTO_TEST_CASE(loadDict) {
+  fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-  fsa::internal::SparseArrayPersistence<> p(
-      2048, boost::filesystem::temp_directory_path());
-
-  fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb", "10"}}));
   g.Add("aaaa");
   g.Add("aabb");
   g.Add("aabc");
@@ -55,24 +55,28 @@ BOOST_AUTO_TEST_CASE( loadDict ) {
   dictionary_t d(new Dictionary(f));
 }
 
-BOOST_AUTO_TEST_CASE( DictGet ) {
-  std::vector<std::pair<std::string, uint32_t>> test_data = { { "test", 22 }, {
-      "otherkey", 24 }, { "other", 444 }, { "bar", 200 }, };
+BOOST_AUTO_TEST_CASE(DictGet) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"test", 22},
+      {"otherkey", 24},
+      {"other", 444},
+      {"bar", 200},
+  };
 
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   bool matched = false;
-  for (auto m : d->Get("test")){
-      BOOST_CHECK_EQUAL("test", m.GetMatchedString());
-      BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m.GetAttribute("weight")));
-      matched=true;
+  for (auto m : d->Get("test")) {
+    BOOST_CHECK_EQUAL("test", m.GetMatchedString());
+    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m.GetAttribute("weight")));
+    matched = true;
   }
   BOOST_CHECK(matched);
 
   matched = false;
-  for (auto m : d->Get("test2")){
-      matched=true;
+  for (auto m : d->Get("test2")) {
+    matched = true;
   }
 
   BOOST_CHECK(!matched);
@@ -81,59 +85,62 @@ BOOST_AUTO_TEST_CASE( DictGet ) {
   BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
 }
 
-BOOST_AUTO_TEST_CASE( DictLookup ) {
-  std::vector<std::pair<std::string, uint32_t>> test_data = { { "nude", 22 }, {
-      "nude-party", 24 }, };
+BOOST_AUTO_TEST_CASE(DictLookup) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"nude", 22},
+      {"nude-party", 24},
+  };
 
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   bool matched = false;
-  for (auto m : d->Lookup("nude")){
-      BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
-      BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
-      matched=true;
+  for (auto m : d->Lookup("nude")) {
+    BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
+    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+    matched = true;
   }
   BOOST_CHECK(matched);
 
   matched = false;
-  for (auto m : d->Lookup("nude ")){
-      BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
-      BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
-      matched=true;
+  for (auto m : d->Lookup("nude ")) {
+    BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
+    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+    matched = true;
   }
   BOOST_CHECK(matched);
 
   matched = false;
-  for (auto m : d->Lookup("nude at work")){
-      BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
-      BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
-      matched=true;
+  for (auto m : d->Lookup("nude at work")) {
+    BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
+    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+    matched = true;
   }
   BOOST_CHECK(matched);
 
   matched = false;
-  for (auto m : d->Lookup("nudelsalat")){
-      matched=true;
+  for (auto m : d->Lookup("nudelsalat")) {
+    matched = true;
   }
   BOOST_CHECK(!matched);
 }
 
-BOOST_AUTO_TEST_CASE( DictGetNear ) {
-  std::vector<std::pair<std::string, std::string>> test_data = { { "pizzeria:u281z7hfvzq9", "pizzeria in Munich" },
-      { "pizzeria:u0vu7uqfyqkg", "pizzeria in Mainz" }, {          "pizzeria:u33db8mmzj1t", "pizzeria in Berlin" },
-      { "pizzeria:u0yjjd65eqy0", "pizzeria in Frankfurt" }, {      "pizzeria:u28db8mmzj1t", "pizzeria in Munich" },
-      { "pizzeria:u2817uqfyqkg", "pizzeria in Munich" }, {         "pizzeria:u281wu8bmmzq", "pizzeria in Munich" }};
+BOOST_AUTO_TEST_CASE(DictGetNear) {
+  std::vector<std::pair<std::string, std::string>> test_data = {
+      {"pizzeria:u281z7hfvzq9", "pizzeria in Munich"}, {"pizzeria:u0vu7uqfyqkg", "pizzeria in Mainz"},
+      {"pizzeria:u33db8mmzj1t", "pizzeria in Berlin"}, {"pizzeria:u0yjjd65eqy0", "pizzeria in Frankfurt"},
+      {"pizzeria:u28db8mmzj1t", "pizzeria in Munich"}, {"pizzeria:u2817uqfyqkg", "pizzeria in Munich"},
+      {"pizzeria:u281wu8bmmzq", "pizzeria in Munich"}};
 
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  std::vector<std::string> expected_matches = { "pizzeria:u281wu8bmmzq" };
+  std::vector<std::string> expected_matches = {"pizzeria:u281wu8bmmzq"};
 
   int i = 0;
 
   // check near match for pizzeria:u28, it should only return 1 match "281wu" is the closest
-  for (auto m : d->GetNear("pizzeria:u281wu88kekq", 12)){
+  for (auto m : d->GetNear("pizzeria:u281wu88kekq", 12)) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
@@ -142,12 +149,12 @@ BOOST_AUTO_TEST_CASE( DictGetNear ) {
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
 
-  expected_matches = { "pizzeria:u2817uqfyqkg", "pizzeria:u281wu8bmmzq", "pizzeria:u281z7hfvzq9" };
+  expected_matches = {"pizzeria:u2817uqfyqkg", "pizzeria:u281wu8bmmzq", "pizzeria:u281z7hfvzq9"};
 
   i = 0;
 
   // check near match for pizzeria:u28, it should only return 2 matches u2817 and u281w are equally good
-  for (auto m : d->GetNear("pizzeria:u2815u88kekq", 12)){
+  for (auto m : d->GetNear("pizzeria:u2815u88kekq", 12)) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
@@ -157,24 +164,28 @@ BOOST_AUTO_TEST_CASE( DictGetNear ) {
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
 }
 
-BOOST_AUTO_TEST_CASE( DictGetZerobyte ) {
-  std::vector<std::pair<std::string, uint32_t>> test_data = { { std::string("\0test", 5), 22 }, {
-      "otherkey", 24 }, { std::string("ot\0her",6), 444 }, { "bar\0", 200 }, };
+BOOST_AUTO_TEST_CASE(DictGetZerobyte) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {std::string("\0test", 5), 22},
+      {"otherkey", 24},
+      {std::string("ot\0her", 6), 444},
+      {"bar\0", 200},
+  };
 
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   bool matched = false;
-  for (auto m : d->Get(std::string("\0test", 5))){
-      BOOST_CHECK_EQUAL(std::string("\0test", 5), m.GetMatchedString());
-      BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m.GetAttribute("weight")));
-      matched=true;
+  for (auto m : d->Get(std::string("\0test", 5))) {
+    BOOST_CHECK_EQUAL(std::string("\0test", 5), m.GetMatchedString());
+    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m.GetAttribute("weight")));
+    matched = true;
   }
   BOOST_CHECK(matched);
 
   matched = false;
-  for (auto m : d->Get("test2")){
-      matched=true;
+  for (auto m : d->Get("test2")) {
+    matched = true;
   }
 
   BOOST_CHECK(!matched);
@@ -182,7 +193,6 @@ BOOST_AUTO_TEST_CASE( DictGetZerobyte ) {
   auto m = (*d)[std::string("\0test", 5)];
   BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
 

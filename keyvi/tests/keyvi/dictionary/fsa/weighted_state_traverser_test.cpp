@@ -24,10 +24,11 @@
  */
 
 #include <boost/test/unit_test.hpp>
-#include "dictionary/fsa/generator.h"
+
 #include "dictionary/fsa/automata.h"
+#include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/traverser_types.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
 
 #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -36,19 +37,14 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-BOOST_AUTO_TEST_SUITE( WeightedStateTraverserTests )
+BOOST_AUTO_TEST_SUITE(WeightedStateTraverserTests)
 
-BOOST_AUTO_TEST_CASE( minimizationoninnerWeights ) {
+BOOST_AUTO_TEST_CASE(minimizationoninnerWeights) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
-        { "aabc", 22 },
-        { "bbbc", 22 },
-        { "bbbd", 444 },
-        { "cdabc", 22 },
-        { "efdffd", 444 },
-        { "xfdebc", 23 },
-    };
+      {"aabc", 22}, {"bbbc", 22}, {"bbbd", 444}, {"cdabc", 22}, {"efdffd", 444}, {"xfdebc", 23},
+  };
 
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   WeightedStateTraverser s(f);
@@ -172,19 +168,12 @@ BOOST_AUTO_TEST_CASE( minimizationoninnerWeights ) {
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
 }
 
-
-BOOST_AUTO_TEST_CASE( weightedTraversal ) {
-
+BOOST_AUTO_TEST_CASE(weightedTraversal) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
-      { "aabc", 412 },
-      { "aabde", 22 },
-      { "cdbde", 444 },
-      { "cdef", 34 },
-      { "cdzzz", 56 },
-      { "efde", 23 },
+      {"aabc", 412}, {"aabde", 22}, {"cdbde", 444}, {"cdef", 34}, {"cdzzz", 56}, {"efde", 23},
   };
 
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   WeightedStateTraverser s(f);
@@ -274,22 +263,16 @@ BOOST_AUTO_TEST_CASE( weightedTraversal ) {
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
 }
 
-BOOST_AUTO_TEST_CASE( weightedTraversalWithPrune ) {
-
+BOOST_AUTO_TEST_CASE(weightedTraversalWithPrune) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
-      { "aabc", 412 },
-      { "aabde", 22 },
-      { "cdbde", 444 },
-      { "cdef", 34 },
-      { "cdzzz", 56 },
-      { "efde", 23 },
+      {"aabc", 412}, {"aabde", 22}, {"cdbde", 444}, {"cdef", 34}, {"cdzzz", 56}, {"efde", 23},
   };
 
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   WeightedStateTraverser s(f);
-  //WeightedStateTraverser end;
+  // WeightedStateTraverser end;
 
   // we should get 'c' first
   BOOST_CHECK_EQUAL('c', s.GetStateLabel());
@@ -360,7 +343,7 @@ BOOST_AUTO_TEST_CASE( weightedTraversalWithPrune ) {
   s.Prune();
   s++;
 
-  //BOOST_CHECK(s==end);
+  // BOOST_CHECK(s==end);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -29,7 +29,7 @@
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/state_traverser.h"
 #include "dictionary/fsa/traversal/near_traversal.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_SUITE(NearTraversalTests)
 
 BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
-  testing::TempDictionary dictionary(test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   auto payload = traversal::TraversalPayload<traversal::NearTransition>("aace");

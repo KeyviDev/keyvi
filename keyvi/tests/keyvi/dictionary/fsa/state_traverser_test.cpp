@@ -24,21 +24,21 @@
  */
 
 #include <boost/test/unit_test.hpp>
-#include "dictionary/fsa/generator.h"
+
 #include "dictionary/fsa/automata.h"
+#include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/state_traverser.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-BOOST_AUTO_TEST_SUITE( StateTraverserTests )
+BOOST_AUTO_TEST_SUITE(StateTraverserTests)
 
-BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
-
+BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary (test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   StateTraverser<> s(f);
@@ -114,10 +114,9 @@ BOOST_AUTO_TEST_CASE( someTraversalNoPrune ) {
   BOOST_CHECK_EQUAL(0, s.GetDepth());
 }
 
-BOOST_AUTO_TEST_CASE( someTraversalWithPrune ) {
-
+BOOST_AUTO_TEST_CASE(someTraversalWithPrune) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary (test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   StateTraverser<> s(f);
@@ -170,26 +169,24 @@ BOOST_AUTO_TEST_CASE( someTraversalWithPrune ) {
   BOOST_CHECK_EQUAL(0, s.GetDepth());
 }
 
-BOOST_AUTO_TEST_CASE( longkeys ) {
-
+BOOST_AUTO_TEST_CASE(longkeys) {
   std::string a(1000, 'a');
   std::string b(1000, 'b');
 
   std::vector<std::string> test_data = {a, b};
-  testing::TempDictionary dictionary (test_data);
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   StateTraverser<> s(f);
 
-  for (int i = 1; i<=1000; ++ i){
+  for (int i = 1; i <= 1000; ++i) {
     BOOST_CHECK_EQUAL('a', s.GetStateLabel());
     BOOST_CHECK_EQUAL(i, s.GetDepth());
     s++;
     BOOST_CHECK(!s.AtEnd());
   }
 
-
-  for (int i = 1; i<=1000; ++ i){
+  for (int i = 1; i <= 1000; ++i) {
     BOOST_CHECK_EQUAL('b', s.GetStateLabel());
     BOOST_CHECK_EQUAL(i, s.GetDepth());
     s++;
@@ -212,15 +209,10 @@ BOOST_AUTO_TEST_CASE( longkeys ) {
   BOOST_CHECK_EQUAL(0, s.GetDepth());
 }
 
-
-BOOST_AUTO_TEST_CASE( zeroByte ) {
-
-  std::vector<std::string> test_data = {
-      std::string("\0aaaa", 5),
-      std::string("aa\0bb", 5),
-      "aabc", "aacd",
-      std::string("bbcd\0", 5)};
-  testing::TempDictionary dictionary (test_data);
+BOOST_AUTO_TEST_CASE(zeroByte) {
+  std::vector<std::string> test_data = {std::string("\0aaaa", 5), std::string("aa\0bb", 5), "aabc", "aacd",
+                                        std::string("bbcd\0", 5)};
+  testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
   StateTraverser<> s(f);
@@ -275,7 +267,6 @@ BOOST_AUTO_TEST_CASE( zeroByte ) {
   BOOST_CHECK_EQUAL(3, s.GetDepth());
   BOOST_CHECK(!s.IsFinalState());
 
-
   s++;
   BOOST_CHECK_EQUAL('c', s.GetStateLabel());
   BOOST_CHECK_EQUAL(4, s.GetDepth());
@@ -322,8 +313,6 @@ BOOST_AUTO_TEST_CASE( zeroByte ) {
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
   BOOST_CHECK_EQUAL(0, s.GetDepth());
   BOOST_CHECK(s.AtEnd());
-
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()
