@@ -111,9 +111,9 @@ after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/style.sh ; fi
   - if [ "$BUILD_TYPE" == "doc" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then source ./travis/build_doc.sh ; fi
 
-deploy:
-  provider: script
-  script: travis/upload_packages.sh
-  skip_cleanup: true
-  on:
-    tags: true
+#deploy:
+#  provider: script
+#  script: travis/upload_packages.sh
+#  skip_cleanup: true
+#  on:
+#    tags: true
