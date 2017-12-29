@@ -23,9 +23,10 @@
  *      Author: hendrik
  */
 
-#include "dictionary/fsa/entry_iterator.h"
 #include <boost/test/unit_test.hpp>
-#include "dictionary/testing/temp_dictionary.h"
+
+#include "dictionary/fsa/entry_iterator.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {

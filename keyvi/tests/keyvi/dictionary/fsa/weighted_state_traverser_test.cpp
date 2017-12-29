@@ -24,10 +24,11 @@
  */
 
 #include <boost/test/unit_test.hpp>
+
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/traverser_types.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
 
 #define ENABLE_TRACING
 #include "dictionary/util/trace.h"

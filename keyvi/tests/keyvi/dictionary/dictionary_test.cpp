@@ -29,7 +29,7 @@
 #include "dictionary/dictionary.h"
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {

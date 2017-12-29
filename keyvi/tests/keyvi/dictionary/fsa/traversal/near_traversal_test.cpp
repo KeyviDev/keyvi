@@ -29,7 +29,7 @@
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/state_traverser.h"
 #include "dictionary/fsa/traversal/near_traversal.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {

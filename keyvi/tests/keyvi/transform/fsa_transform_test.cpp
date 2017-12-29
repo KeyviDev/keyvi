@@ -23,9 +23,10 @@
  *      Author: hendrik
  */
 
-#include "transform/fsa_transform.h"
 #include <boost/test/unit_test.hpp>
-#include "dictionary/testing/temp_dictionary.h"
+
+#include "testing/temp_dictionary.h"
+#include "transform/fsa_transform.h"
 
 namespace keyvi {
 namespace transform {
@@ -40,7 +41,7 @@ BOOST_AUTO_TEST_CASE(Normalize) {
       {"a", "g"},
   };
 
-  dictionary::testing::TempDictionary dictionary(&test_data);
+  testing::TempDictionary dictionary(&test_data);
 
   auto transformer = FsaTransform(dictionary.GetFsa());
 

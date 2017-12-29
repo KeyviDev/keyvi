@@ -23,20 +23,28 @@
  *      Author: hendrik
  */
 
-
 #include <sstream>
+#include <string>
+
 #include <boost/test/unit_test.hpp>
-#include "dictionary/testing/temp_dictionary.h"
+
 #include "compression/predictive_compression.h"
 
 namespace keyvi {
 namespace compression {
 
-BOOST_AUTO_TEST_SUITE( PredictiveCompressionTests )
+BOOST_AUTO_TEST_SUITE(PredictiveCompressionTests)
 
-BOOST_AUTO_TEST_CASE( CompressAndUncompress ) {
+BOOST_AUTO_TEST_CASE(CompressAndUncompress) {
   std::istringstream corpus(
-      "ht\x05""tp://" "tt\x05""ps://" "//\x04""www." "th\x01""e");
+      "ht\x05"
+      "tp://"
+      "tt\x05"
+      "ps://"
+      "//\x04"
+      "www."
+      "th\x01"
+      "e");
 
   auto compressor = PredictiveCompression(corpus);
 
@@ -58,24 +66,33 @@ BOOST_AUTO_TEST_CASE( CompressAndUncompress ) {
   BOOST_CHECK_EQUAL(26, uncompressed.size());
 }
 
-BOOST_AUTO_TEST_CASE( CompressTooLongValue ) {
+BOOST_AUTO_TEST_CASE(CompressTooLongValue) {
   std::istringstream corpus(
-      "ht\x05""tp://" "tt\x05""ps://" "//\x04""www." "th\x14""too_long_value");
+      "ht\x05"
+      "tp://"
+      "tt\x05"
+      "ps://"
+      "//\x04"
+      "www."
+      "th\x14"
+      "too_long_value");
 
-  BOOST_CHECK_THROW(PredictiveCompression compressor(corpus),
-                    std::invalid_argument);
+  BOOST_CHECK_THROW(PredictiveCompression compressor(corpus), std::invalid_argument);
 }
 
-BOOST_AUTO_TEST_CASE( CompressIncomplete ) {
+BOOST_AUTO_TEST_CASE(CompressIncomplete) {
   std::istringstream corpus(
-      "ht\x05""tp://" "tt\x05""ps://" "//\x04""www");
+      "ht\x05"
+      "tp://"
+      "tt\x05"
+      "ps://"
+      "//\x04"
+      "www");
 
-  BOOST_CHECK_THROW(PredictiveCompression compressor(corpus),
-                    std::istream::failure);
+  BOOST_CHECK_THROW(PredictiveCompression compressor(corpus), std::istream::failure);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-}
-}
-
+}  // namespace compression
+}  // namespace keyvi

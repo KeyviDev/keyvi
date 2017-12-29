@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef KEYVI_DICTIONARY_TESTING_TEMP_DICTIONARY_H_
-#define KEYVI_DICTIONARY_TESTING_TEMP_DICTIONARY_H_
+#ifndef KEYVI_TESTING_TEMP_DICTIONARY_H_
+#define KEYVI_TESTING_TEMP_DICTIONARY_H_
 
 #include <string>
 #include <utility>
@@ -31,10 +31,9 @@
 
 #include <boost/filesystem.hpp>
 
-#include "dictionary/compilation/compilation_utils.h"
+#include "testing/compilation_utils.h"
 
 namespace keyvi {
-namespace dictionary {
 namespace testing {
 
 /***
@@ -45,38 +44,38 @@ class TempDictionary final {
  public:
   explicit TempDictionary(std::vector<std::string>* input) {
     CreateFileName();
-    fsa_ = compilation::CompilationUtils::CompileKeyOnly(input, file_name_);
+    fsa_ = CompilationUtils::CompileKeyOnly(input, file_name_);
   }
 
   explicit TempDictionary(std::vector<std::pair<std::string, uint32_t>>* input, bool completion_dictionary = true) {
     CreateFileName();
     if (completion_dictionary) {
-      fsa_ = compilation::CompilationUtils::CompileIntWithInnerWeights(input, file_name_);
+      fsa_ = CompilationUtils::CompileIntWithInnerWeights(input, file_name_);
     } else {
-      fsa_ = compilation::CompilationUtils::CompileInt(input, file_name_);
+      fsa_ = CompilationUtils::CompileInt(input, file_name_);
     }
   }
 
   explicit TempDictionary(std::vector<std::pair<std::string, std::string>>* input) {
     CreateFileName();
-    fsa_ = compilation::CompilationUtils::CompileString(input, file_name_);
+    fsa_ = CompilationUtils::CompileString(input, file_name_);
   }
 
   static TempDictionary makeTempDictionaryFromJson(std::vector<std::pair<std::string, std::string>>* input) {
     TempDictionary t;
     t.CreateFileName();
-    t.fsa_ = compilation::CompilationUtils::CompileJson(input, t.file_name_);
+    t.fsa_ = CompilationUtils::CompileJson(input, t.file_name_);
     return t;
   }
 
-  fsa::automata_t GetFsa() const { return fsa_; }
+  dictionary::fsa::automata_t GetFsa() const { return fsa_; }
 
   const std::string& GetFileName() const { return file_name_; }
 
   ~TempDictionary() { std::remove(file_name_.c_str()); }
 
  private:
-  fsa::automata_t fsa_;
+  dictionary::fsa::automata_t fsa_;
   std::string file_name_;
 
   TempDictionary() {}
@@ -90,7 +89,6 @@ class TempDictionary final {
 };
 
 } /* namespace testing */
-} /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif  // KEYVI_DICTIONARY_TESTING_TEMP_DICTIONARY_H_
+#endif  // KEYVI_TESTING_TEMP_DICTIONARY_H_

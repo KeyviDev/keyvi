@@ -29,7 +29,7 @@
 #include "dictionary/dictionary_merger.h"
 #include "dictionary/dictionary_types.h"
 #include "dictionary/fsa/traverser_types.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {

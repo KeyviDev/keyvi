@@ -23,11 +23,12 @@
  *      Author: hendrik
  */
 
-#include "dictionary/fsa/state_traverser.h"
 #include <boost/test/unit_test.hpp>
+
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/generator.h"
-#include "dictionary/testing/temp_dictionary.h"
+#include "dictionary/fsa/state_traverser.h"
+#include "testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {
