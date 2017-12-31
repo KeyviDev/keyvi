@@ -16,6 +16,11 @@ from os import path
 pykeyvi_pyx = 'keyvi.pyx'
 pykeyvi_cpp = 'keyvi.cpp'
 
+try:
+    cpu_count = multiprocessing.cpu_count()
+except:
+    cpu_count = 1
+
 
 def generate_pykeyvi_source():
     addons = glob.glob('src/addons/*')
@@ -33,10 +38,12 @@ def generate_pykeyvi_source():
 def symlink_keyvi():
     if not path.exists('keyvi'):
         os.symlink('../keyvi', 'keyvi')
+        os.symlink('../CMakeLists.txt', 'CMakeLists.txt')
         keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), "../keyvi"))
         pykeyvi_source_path = os.path.join(os.getcwd(),"keyvi")
         yield (pykeyvi_source_path, keyvi_source_path)
         os.unlink('keyvi')
+        os.unlink('CMakeLists.txt')
     else:
         yield None, None
 
@@ -46,10 +53,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     autowrap_data_dir = "autowrap_includes"
 
     dictionary_sources = path.abspath('keyvi')
-    tpie_build_dir = path.join(dictionary_sources, '3rdparty/tpie/build')
-    tpie_install_prefix = 'install'
-    tpie_include_dir = path.join(tpie_build_dir, tpie_install_prefix, 'include')
-    tpie_lib_dir = path.join(tpie_build_dir, tpie_install_prefix, 'lib')
+    keyvi_build_dir = path.join('keyvi-build')
+    keyvi_install_prefix = 'install'
+    #keyvi_include_dir = path.join(tpie_build_dir, tpie_install_prefix, 'include')
+    keyvi_lib_dir = path.join(keyvi_build_dir, keyvi_install_prefix, 'lib')
 
     additional_compile_flags = []
 
@@ -80,7 +87,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     mac_os_static_libs_dir = 'mac_os_static_libs'
 
     extra_link_arguments = []
-    link_library_dirs = [tpie_lib_dir]
+    link_library_dirs = [keyvi_lib_dir]
 
     if sys.platform == 'darwin':
         additional_compile_flags.append("-DOS_MACOSX")
@@ -214,26 +221,20 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                     dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
                     shutil.copyfile(src_file, dst_file)
 
-            if not path.exists(path.join(tpie_lib_dir, 'libtpie.a')):
-                try:
-                    cpu_count = multiprocessing.cpu_count()
-                except:
-                    cpu_count = 1
+            CMAKE_CXX_FLAGS = '-fPIC -std=c++11'
+            if sys.platform == 'darwin':
+                CMAKE_CXX_FLAGS += ' -mmacosx-version-min=10.9'
 
-                CMAKE_CXX_FLAGS = '-fPIC -std=c++11'
-                if sys.platform == 'darwin':
-                    CMAKE_CXX_FLAGS += ' -mmacosx-version-min=10.9'
+            keyvi_build_cmd = 'mkdir -p {}'.format(keyvi_build_dir)
+            keyvi_build_cmd += ' && cd {}'.format(keyvi_build_dir)
+            keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=python ' \
+                                ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
+                                ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX} ..'.format(
+                CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=keyvi_install_prefix)
+            keyvi_build_cmd += ' && make -j {}'.format(cpu_count)
+            keyvi_build_cmd += ' && make install'
 
-                tpie_build_cmd = 'mkdir -p {}'.format(tpie_build_dir)
-                tpie_build_cmd += ' && cd {}'.format(tpie_build_dir)
-                tpie_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=Release ' \
-                                  ' -D TPIE_PARALLEL_SORT=1 -D COMPILE_TEST=OFF -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
-                                  ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX} ..'.format(
-                    CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=tpie_install_prefix)
-                tpie_build_cmd += ' && make -j {}'.format(cpu_count)
-                tpie_build_cmd += ' && make install'
-
-                subprocess.call(tpie_build_cmd, shell=True)
+            subprocess.call(keyvi_build_cmd, shell=True)
 
             os.environ['ARCHFLAGS'] = '-arch x86_64'
             _build_ext.build_ext.run(self)
@@ -241,7 +242,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     ext_modules = [Extension('keyvi',
                              include_dirs=[autowrap_data_dir,
-                                           tpie_include_dir,
+                                           path.join(dictionary_sources, '3rdparty/tpie/build/install/include'),
                                            path.join(dictionary_sources, 'include/keyvi'),
                                            path.join(dictionary_sources, '3rdparty/rapidjson/include'),
                                            path.join(dictionary_sources, '3rdparty/msgpack-c/include'),

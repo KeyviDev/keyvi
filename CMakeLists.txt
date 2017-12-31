@@ -13,6 +13,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_PYTHON "${CMAKE_CXX_FLAGS_PYTHON} ${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -O0 --coverage")
 
 set(COMPILE_TEST OFF CACHE BOOL "")
@@ -75,4 +76,6 @@ target_link_libraries(unit_test_all tiny-process-library tpie ${Boost_LIBRARIES}
 install (TARGETS keyvicompiler DESTINATION bin)
 install (TARGETS keyviinspector DESTINATION bin)
 install (TARGETS keyvimerger DESTINATION bin)
-install  (FILES $<TARGET_FILE:tpie> DESTINATION lib CONFIGURATIONS py)
+
+install  (FILES $<TARGET_FILE:tpie> DESTINATION lib CONFIGURATIONS python)
+install  (FILES $<TARGET_FILE:tiny-process-library> DESTINATION lib CONFIGURATIONS python)
