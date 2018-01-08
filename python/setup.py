@@ -38,12 +38,12 @@ def generate_pykeyvi_source():
 def symlink_keyvi():
     if not path.exists('keyvi'):
         os.symlink('../keyvi', 'keyvi')
-        os.symlink('../CMakeLists.txt', 'CMakeLists.txt')
+        shutil.copy('../CMakeLists.txt', 'CMakeLists.txt')
         keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), "../keyvi"))
         pykeyvi_source_path = os.path.join(os.getcwd(),"keyvi")
         yield (pykeyvi_source_path, keyvi_source_path)
         os.unlink('keyvi')
-        os.unlink('CMakeLists.txt')
+        os.remove('CMakeLists.txt')
     else:
         yield None, None
 
