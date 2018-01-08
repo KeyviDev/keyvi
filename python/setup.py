@@ -55,7 +55,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     dictionary_sources = path.abspath('keyvi')
     keyvi_build_dir = path.join('keyvi-build')
     keyvi_install_prefix = 'install'
-    #keyvi_include_dir = path.join(tpie_build_dir, tpie_install_prefix, 'include')
     keyvi_lib_dir = path.join(keyvi_build_dir, keyvi_install_prefix, 'lib')
 
     additional_compile_flags = []
@@ -243,7 +242,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     ext_modules = [Extension('keyvi',
                              include_dirs=[autowrap_data_dir,
-                                           path.join(dictionary_sources, '3rdparty/tpie/build/install/include'),
+                                           path.join(dictionary_sources, '3rdparty/tpie'),
+                                           path.join(os.path.join(keyvi_build_dir,'keyvi/3rdparty/tpie')),
                                            path.join(dictionary_sources, 'include/keyvi'),
                                            path.join(dictionary_sources, '3rdparty/rapidjson/include'),
                                            path.join(dictionary_sources, '3rdparty/msgpack-c/include'),
