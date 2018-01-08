@@ -2,6 +2,7 @@ recursive-include autowrap_includes *.hpp
 graft src
 include keyvi.cpp
 
+recursive-include keyvi/bin *.cpp
 recursive-include keyvi/include/keyvi *.h
 
 recursive-include keyvi/3rdparty *.h
