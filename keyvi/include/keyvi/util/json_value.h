@@ -33,9 +33,10 @@
 
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
+#include "msgpack/type/rapidjson.hpp"
+
 #include "compression/compression_selector.h"
 #include "util/msgpack_util.h"
-#include "msgpack/type/rapidjson.hpp"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
