@@ -59,7 +59,7 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
  public:
   explicit IndexWriter(const std::string& index_directory,
                        const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
-      : BaseIndexReader(index_directory, flush_interval) {
+      : BaseIndexReader(index_directory, flush_interval), lock_file_() {
     index_directory_ = index_directory;
 
     index_toc_file_ = index_directory_;
@@ -75,7 +75,7 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
 
     TRACE("locking index %s", index_lock_file.string().c_str());
 
-    lock_file_ = std::ofstream(index_lock_file.string(), std::ios_base::app);
+    lock_file_.open(index_lock_file.string(), std::ios_base::app);
 
     index_lock_ = boost::interprocess::file_lock(index_lock_file.string().c_str());
     index_lock_.lock();
