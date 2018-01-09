@@ -22,33 +22,33 @@
  *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
  */
 
-#ifndef COMPRESSION_SELECTOR_H_
-#define COMPRESSION_SELECTOR_H_
+#ifndef KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_
+#define KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_
 
 #include <string>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include "compression/compression_strategy.h"
-#include "compression/zlib_compression_strategy.h"
 #include "compression/snappy_compression_strategy.h"
+#include "compression/zlib_compression_strategy.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace compression {
 
 /** Returns an instance of a compression strategy by name. */
-inline CompressionStrategy* compression_strategy(const std::string& name = "")
-    throw (std::invalid_argument) {
+inline CompressionStrategy* compression_strategy(const std::string& name = "") throw(std::invalid_argument) {
   // inline to avoid "multiple definition of" errors that come from defining
   // the function in a header file
   auto lower_name = name;
   // NOTE: this does not work for non-ASCII strings
   boost::algorithm::to_lower(lower_name);
   if (lower_name == "zip" || lower_name == "zlib" || lower_name == "z") {
-    return new ZlibCompressionStrategy();  // TODO: compression level?
+    return new ZlibCompressionStrategy();  // compression level?
   } else if (lower_name == "snappy") {
     return new SnappyCompressionStrategy();
   } else if (lower_name == "" || lower_name == "none" || lower_name == "raw") {
@@ -58,9 +58,8 @@ inline CompressionStrategy* compression_strategy(const std::string& name = "")
   }
 }
 
-typedef std::string (*decompress_func_t) (const std::string&);
-typedef void (CompressionStrategy::*compress_mem_fn_t) (buffer_t&, const char*, size_t);
-
+typedef std::string (*decompress_func_t)(const std::string&);
+typedef void (CompressionStrategy::*compress_mem_fn_t)(buffer_t*, const char*, size_t);
 
 inline decompress_func_t decompressor_by_code(const std::string& s) {
   switch (s[0]) {
@@ -75,11 +74,11 @@ inline decompress_func_t decompressor_by_code(const std::string& s) {
       return SnappyCompressionStrategy::DoDecompress;
     default:
       throw std::invalid_argument("Invalid compression code " +
-          boost::lexical_cast<std::string>(static_cast<int>(s[0])));
+                                  boost::lexical_cast<std::string>(static_cast<int>(s[0])));
   }
 }
 
 } /* namespace compression */
 } /* namespace keyvi */
 
-#endif  // COMPRESSION_SELECTOR_H_
+#endif  // KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_

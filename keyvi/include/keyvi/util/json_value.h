@@ -65,26 +65,26 @@ inline std::string DecodeJsonValue(const std::string& encoded_value) {
  * Encodes @p raw_value with msgpack and compresses it, if it is longer than
  * the specified threshold.
  */
-inline void EncodeJsonValue(std::function<void(compression::buffer_t&, const char*, size_t)> long_compress,
-                            std::function<void(compression::buffer_t&, const char*, size_t)> short_compress,
-                            msgpack_buffer& msgpack_buffer, compression::buffer_t& buffer, const std::string& raw_value,
+inline void EncodeJsonValue(std::function<void(compression::buffer_t*, const char*, size_t)> long_compress,
+                            std::function<void(compression::buffer_t*, const char*, size_t)> short_compress,
+                            msgpack_buffer* msgpack_buffer, compression::buffer_t* buffer, const std::string& raw_value,
                             size_t compression_threshold = 32) {
   rapidjson::Document json_document;
   json_document.Parse(raw_value.c_str());
 
   if (!json_document.HasParseError()) {
     TRACE("Got json");
-    msgpack::pack(&msgpack_buffer, json_document);
+    msgpack::pack(msgpack_buffer, json_document);
   } else {
     TRACE("Got a normal string");
-    msgpack::pack(&msgpack_buffer, raw_value);
+    msgpack::pack(msgpack_buffer, raw_value);
   }
 
   // compression
-  if (msgpack_buffer.size() > compression_threshold) {
-    long_compress(buffer, msgpack_buffer.data(), msgpack_buffer.size());
+  if (msgpack_buffer->size() > compression_threshold) {
+    long_compress(buffer, msgpack_buffer->data(), msgpack_buffer->size());
   } else {
-    short_compress(buffer, msgpack_buffer.data(), msgpack_buffer.size());
+    short_compress(buffer, msgpack_buffer->data(), msgpack_buffer->size());
   }
 }
 
@@ -99,11 +99,11 @@ inline std::string EncodeJsonValue(const std::string& raw_value, size_t compress
   msgpack_buffer msgpack_buffer;
   compression::buffer_t buffer;
 
-  EncodeJsonValue(static_cast<void (*)(compression::buffer_t&, const char*, size_t)>(
+  EncodeJsonValue(static_cast<void (*)(compression::buffer_t*, const char*, size_t)>(
                       &compression::SnappyCompressionStrategy::DoCompress),
-                  static_cast<void (*)(compression::buffer_t&, const char*, size_t)>(
+                  static_cast<void (*)(compression::buffer_t*, const char*, size_t)>(
                       &compression::RawCompressionStrategy::DoCompress),
-                  msgpack_buffer, buffer, raw_value, compression_threshold);
+                  &msgpack_buffer, &buffer, raw_value, compression_threshold);
   return std::string(reinterpret_cast<char*>(buffer.data()), buffer.size());
 }
 

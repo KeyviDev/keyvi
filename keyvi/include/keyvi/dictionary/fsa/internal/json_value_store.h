@@ -148,8 +148,8 @@ class JsonValueStore final : public IValueStoreWriter {
   uint64_t GetValue(const value_t& value, bool* no_minimization) {
     msgpack_buffer_.clear();
 
-    keyvi::util::EncodeJsonValue(long_compress_, short_compress_, msgpack_buffer_, string_buffer_, value,
-                          compression_threshold_);
+    keyvi::util::EncodeJsonValue(long_compress_, short_compress_, &msgpack_buffer_, &string_buffer_, value,
+                                 compression_threshold_);
 
     ++number_of_values_;
 
@@ -232,8 +232,8 @@ class JsonValueStore final : public IValueStoreWriter {
    */
   std::unique_ptr<compression::CompressionStrategy> compressor_;
   std::unique_ptr<compression::CompressionStrategy> raw_compressor_;
-  std::function<void(compression::buffer_t&, const char*, size_t)> long_compress_;
-  std::function<void(compression::buffer_t&, const char*, size_t)> short_compress_;
+  std::function<void(compression::buffer_t*, const char*, size_t)> long_compress_;
+  std::function<void(compression::buffer_t*, const char*, size_t)> short_compress_;
   size_t compression_threshold_;
   bool minimize_ = true;
 

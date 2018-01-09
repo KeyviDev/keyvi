@@ -22,15 +22,17 @@
  *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
  */
 
-#ifndef ZLIB_COMPRESSION_STRATEGY_H_
-#define ZLIB_COMPRESSION_STRATEGY_H_
+#ifndef KEYVI_COMPRESSION_ZLIB_COMPRESSION_STRATEGY_H_
+#define KEYVI_COMPRESSION_ZLIB_COMPRESSION_STRATEGY_H_
 
-#include <string>
+#define ZLIB_CONST
+
 #include <zlib.h>
+#include <string>
 
 #include "compression/compression_strategy.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -38,8 +40,7 @@ namespace compression {
 
 /** A compression strategy that wraps zlib. */
 struct ZlibCompressionStrategy final : public CompressionStrategy {
-  ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION) {
-
+  explicit ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION) {
     // init zlib structure for compression
 
     zstream_compress_.zalloc = Z_NULL;
@@ -49,65 +50,56 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     // see zlib.h level 9 means more speed for the price of memory
     const int mem_level = 9;
 
-    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, MAX_WBITS, mem_level, Z_DEFAULT_STRATEGY) != Z_OK) {
+    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, MAX_WBITS, mem_level, Z_DEFAULT_STRATEGY) !=
+        Z_OK) {
       throw std::bad_alloc();
     }
   }
 
-  ~ZlibCompressionStrategy(){
-    deflateEnd(&zstream_compress_);
-  }
+  ~ZlibCompressionStrategy() { deflateEnd(&zstream_compress_); }
 
-  inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
-      DoCompress(buffer, raw, raw_size);
-    }
+  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
 
-
-  inline void DoCompress(buffer_t& buffer, const char* raw, size_t raw_size) {
-
+  inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
     TRACE("Zlib compress length %d", raw_size);
 
-    zstream_compress_.next_in = (Bytef*)raw;
-    zstream_compress_.avail_in = raw_size;           // set the z_stream's input
+    zstream_compress_.next_in = reinterpret_cast<z_const Bytef*>(raw);
+    zstream_compress_.avail_in = raw_size;  // set the z_stream's input
     size_t output_length = deflateBound(&zstream_compress_, raw_size);
-    buffer.resize(output_length + 1);
-
+    buffer->resize(output_length + 1);
 
     TRACE("Zlib compress output length %d", output_length);
 
-    buffer[0] = static_cast<char>(ZLIB_COMPRESSION);
+    buffer->data()[0] = static_cast<char>(ZLIB_COMPRESSION);
 
     int ret;
 
     // compress bytes
-    zstream_compress_.next_out = reinterpret_cast<Bytef*>(buffer.data() + 1);
-    zstream_compress_.avail_out = buffer.size() - 1;
+    zstream_compress_.next_out = reinterpret_cast<Bytef*>(buffer->data() + 1);
+    zstream_compress_.avail_out = buffer->size() - 1;
 
     ret = deflate(&zstream_compress_, Z_FINISH);
 
     output_length = zstream_compress_.total_out;
 
-    if (ret != Z_STREAM_END) {          // an error occurred that was not EOF
+    if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
       std::ostringstream oss;
       oss << "Exception during zlib compression: (" << ret << ") " << zstream_compress_.msg;
       throw(std::runtime_error(oss.str()));
     }
     deflateReset(&zstream_compress_);
-    buffer.resize(output_length + 1);
+    buffer->resize(output_length + 1);
   }
 
-  inline std::string Decompress(const std::string& compressed) {
-    return DoDecompress(compressed);
-  }
+  inline std::string Decompress(const std::string& compressed) { return DoDecompress(compressed); }
 
   static std::string DoDecompress(const std::string& compressed) {
-    z_stream zs;                        // z_stream is zlib's control structure
+    z_stream zs;  // z_stream is zlib's control structure
     memset(&zs, 0, sizeof(zs));
 
-    if (inflateInit(&zs) != Z_OK)
-      throw(std::runtime_error("inflateInit failed while decompressing."));
+    if (inflateInit(&zs) != Z_OK) throw(std::runtime_error("inflateInit failed while decompressing."));
 
-    zs.next_in = (Bytef*)compressed.data() + 1;
+    zs.next_in = reinterpret_cast<z_const Bytef*>(compressed.data()) + 1;
     zs.avail_in = compressed.size() - 1;
 
     int ret;
@@ -124,15 +116,13 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
       if (outstring.size() < zs.total_out) {
         outstring.append(outbuffer, zs.total_out - outstring.size());
       }
-
     } while (ret == Z_OK);
 
     inflateEnd(&zs);
 
-    if (ret != Z_STREAM_END) {          // an error occurred that was not EOF
+    if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
       std::ostringstream oss;
-      oss << "Exception during zlib decompression: (" << ret << ") "
-        << zs.msg;
+      oss << "Exception during zlib decompression: (" << ret << ") " << zs.msg;
       throw(std::runtime_error(oss.str()));
     }
 
@@ -143,10 +133,9 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
  private:
   z_stream zstream_compress_;
-  //char outbuffer_[32768];
 };
 
 } /* namespace compression */
 } /* namespace keyvi */
 
-#endif  // ZLIB_COMPRESSION_STRATEGY_H_
+#endif  // KEYVI_COMPRESSION_ZLIB_COMPRESSION_STRATEGY_H_
