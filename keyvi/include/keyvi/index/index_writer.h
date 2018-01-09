@@ -75,7 +75,7 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
 
     TRACE("locking index %s", index_lock_file.string().c_str());
 
-    std::ofstream o(index_lock_file.string(), std::ios_base::app);
+    lock_file_ = std::ofstream(index_lock_file.string(), std::ios_base::app);
 
     index_lock_ = boost::interprocess::file_lock(index_lock_file.string().c_str());
     index_lock_.lock();
@@ -103,6 +103,7 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
  private:
   boost::filesystem::path index_directory_;
   boost::filesystem::path index_toc_file_;
+  std::ofstream lock_file_;
   boost::interprocess::file_lock index_lock_;
 };
 
