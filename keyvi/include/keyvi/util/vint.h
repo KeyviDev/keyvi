@@ -26,8 +26,10 @@
  *      Author: hendrik
  */
 
-#ifndef VINT_H_
-#define VINT_H_
+#ifndef KEYVI_UTIL_VINT_H_
+#define KEYVI_UTIL_VINT_H_
+
+#include <string>
 
 namespace keyvi {
 namespace util {
@@ -69,7 +71,7 @@ void encodeVarshort(int_t value, uint16_t* output, size_t* outputSizePtr) {
   // While more than 15 bits of data are left, occupy the last output byte
   // and set the next byte flag
   while (value > 32767) {
-    //|32768: Set the next byte flag
+    // |32768: Set the next byte flag
     output[outputSize] = ((uint16_t)(value & 32767)) | 32768;
 
     // Remove the 15 bits we just wrote
@@ -113,18 +115,18 @@ size_t getVarshortLength(int_t value) {
  * @param output the buffer to write to
  */
 template <typename int_t = uint64_t, typename buffer_t>
-void encodeVarint(int_t value, buffer_t& output, size_t* written_bytes) {
+void encodeVarint(int_t value, buffer_t* output, size_t* written_bytes) {
   // While more than 7 bits of data are left, occupy the last output byte
   // and set the next byte flag
   size_t length = 0;
   while (value > 127) {
-    //|128: Set the next byte flag
-    output.push_back(((uint8_t)(value & 127)) | 128);
+    // |128: Set the next byte flag
+    output->push_back(((uint8_t)(value & 127)) | 128);
     // Remove the seven bits we just wrote
     value >>= 7;
     ++length;
   }
-  output.push_back(((uint8_t)value) & 127);
+  output->push_back(((uint8_t)value) & 127);
   *written_bytes = ++length;
 }
 
@@ -211,4 +213,4 @@ inline const char* decodeVarintString(const char* input, size_t* length_ptr) {
 
 } /* namespace util */
 } /* namespace keyvi */
-#endif /* VINT_H_ */
+#endif  // KEYVI_UTIL_VINT_H_

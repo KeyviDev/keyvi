@@ -287,7 +287,7 @@ class JsonValueStore final : public IValueStoreWriter {
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
     size_t length;
 
-    keyvi::util::encodeVarint(string_buffer_.size(), *values_extern_, &length);
+    keyvi::util::encodeVarint(string_buffer_.size(), values_extern_.get(), &length);
     values_buffer_size_ += length;
     values_extern_->Append(reinterpret_cast<const void*>(string_buffer_.data()), string_buffer_.size());
     values_buffer_size_ += string_buffer_.size();
