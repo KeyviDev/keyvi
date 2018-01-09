@@ -1,13 +1,25 @@
 FROM quay.io/pypa/manylinux1_x86_64
 
+RUN yum -y update; yum clean all
+
 RUN yum -y install  zlib-devel \
                     bzip2-devel \
                     snappy-devel \
                     python-devel && \
                     yum clean all
 
-RUN wget http://sourceforge.net/projects/boost/files/boost/1.60.0/boost_1_60_0.tar.bz2 --no-check-certificate \
-    && tar xvfj boost_1_60_0.tar.bz2 && cd boost_1_60_0 && ./bootstrap.sh && ./b2 install -j 8 && cd ../ \
-    && rm -rf boost_1_60_0  boost_1_60_0.tar.bz2
+RUN yum remove cmake28 -y
 
-RUN ln -s /usr/bin/cmake28 /usr/bin/cmake
+ENV BOOST_MAJOR=1 BOOST_MINOR=66 BOOST_PATCH=0
+RUN curl -s -SL http://sourceforge.net/projects/boost/files/boost/${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH}/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz | tar xz && \
+    cd boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH} && \
+    ./bootstrap.sh --without-libraries=graph_parallel,python, && \
+    ./b2 -d0 --prefix=/usr/local/ install && \
+    cd .. && \
+rm -rf boost_*
+
+ENV CMAKE_MAJOR=3 CMAKE_MINOR=10 CMAKE_PATCH=1
+
+RUN curl -sSL https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}.tar.gz | tar -xz && \
+    cd cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH} && ./bootstrap && make -j4 && make install && \
+    cd .. && rm -rf cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}
