@@ -27,10 +27,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/util/configuration.h"
+#include "util/configuration.h"
 
 namespace keyvi {
-namespace dictionary {
 namespace util {
 
 BOOST_AUTO_TEST_SUITE(ConfigurationTests)
@@ -79,5 +78,4 @@ BOOST_AUTO_TEST_CASE(boolean) {
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace util */
-} /* namespace dictionary */
 } /* namespace keyvi */

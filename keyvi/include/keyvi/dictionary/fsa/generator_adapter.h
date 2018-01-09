@@ -30,7 +30,7 @@
 #include <string>
 
 #include "dictionary/fsa/generator.h"
-#include "dictionary/util/configuration.h"
+#include "util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -93,7 +93,7 @@ typename GeneratorAdapterInterface<PersistenceT, ValueStoreT>::AdapterPtr
 GeneratorAdapterInterface<PersistenceT, ValueStoreT>::CreateGenerator(size_t size_of_keys,
                                                                       const generator_param_t& params,
                                                                       ValueStoreT* value_store) {
-  size_t memory_limit = util::mapGetMemory(params, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
+  size_t memory_limit = keyvi::util::mapGetMemory(params, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
 
   // todo: find good parameters for auto-guessing this
   if (size_of_keys > UINT32_MAX) {

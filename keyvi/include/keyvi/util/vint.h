@@ -30,52 +30,53 @@
 #define VINT_H_
 
 namespace keyvi {
-namespace dictionary {
 namespace util {
 
 /**
  * Encodes an unsigned variable-length integer using the MSB algorithm.
  * @param value The input value. Any standard integer type is allowed.
- * @param output A pointer to a piece of reserved memory. Should have a minimum size dependent on the input size (32 bit = 5 bytes, 64 bit = 10 bytes).
+ * @param output A pointer to a piece of reserved memory. Should have a minimum size dependent on the input size (32 bit
+ * = 5 bytes, 64 bit = 10 bytes).
  * @parma outputSizePtr A pointer to a single integer that is set to the number of bytes used in the output memory.
  */
-template<typename int_t = uint64_t>
+template <typename int_t = uint64_t>
 void encodeVarint(int_t value, uint8_t* output, size_t* outputSizePtr) {
   size_t outputSize = 0;
-  //While more than 7 bits of data are left, occupy the last output byte
+  // While more than 7 bits of data are left, occupy the last output byte
   // and set the next byte flag
   while (value > 127) {
-    //|128: Set the next byte flag
-    output[outputSize] = ((uint8_t) (value & 127)) | 128;
+    // |128: Set the next byte flag
+    output[outputSize] = ((uint8_t)(value & 127)) | 128;
 
-    //Remove the seven bits we just wrote
+    // Remove the seven bits we just wrote
     value >>= 7;
     outputSize++;
   }
-  output[outputSize++] = ((uint8_t) value) & 127;
+  output[outputSize++] = ((uint8_t)value) & 127;
   *outputSizePtr = outputSize;
 }
 
 /**
  * Encodes an unsigned variable-length integer using the MSB algorithm.
  * @param value The input value. Any standard integer type is allowed.
- * @param output A pointer to a piece of reserved memory. Should have a minimum size dependent on the input size (32 bit = 5 bytes, 64 bit = 10 bytes).
+ * @param output A pointer to a piece of reserved memory. Should have a minimum size dependent on the input size (32 bit
+ * = 5 bytes, 64 bit = 10 bytes).
  * @parma outputSizePtr A pointer to a single integer that is set to the number of bytes used in the output memory.
  */
-template<typename int_t = uint64_t>
+template <typename int_t = uint64_t>
 void encodeVarshort(int_t value, uint16_t* output, size_t* outputSizePtr) {
   size_t outputSize = 0;
-  //While more than 15 bits of data are left, occupy the last output byte
+  // While more than 15 bits of data are left, occupy the last output byte
   // and set the next byte flag
   while (value > 32767) {
     //|32768: Set the next byte flag
-    output[outputSize] = ((uint16_t) (value & 32767)) | 32768;
+    output[outputSize] = ((uint16_t)(value & 32767)) | 32768;
 
-    //Remove the 15 bits we just wrote
+    // Remove the 15 bits we just wrote
     value >>= 15;
     outputSize++;
   }
-  output[outputSize++] = ((uint16_t) value) & 32767;
+  output[outputSize++] = ((uint16_t)value) & 32767;
   *outputSizePtr = outputSize;
 }
 
@@ -84,12 +85,12 @@ void encodeVarshort(int_t value, uint16_t* output, size_t* outputSizePtr) {
  * @param value
  * @return required size
  */
-template<typename int_t = uint64_t>
-size_t getVarintLength(int_t value){
+template <typename int_t = uint64_t>
+size_t getVarintLength(int_t value) {
   size_t length = 1;
   while (value > 127) {
     ++length;
-    //Remove the seven bits we just checked
+    // Remove the seven bits we just checked
     value >>= 7;
   }
 
@@ -101,12 +102,9 @@ size_t getVarintLength(int_t value){
  * @param value
  * @return required size
  */
-template<typename int_t = uint64_t>
-size_t getVarshortLength(int_t value){
-  return (value > 0x1fffffffffff) ?
-      4 : (value < 0x3fffffff) ?
-          (value < 0x7fff) ?
-              1 : 2 : 3;
+template <typename int_t = uint64_t>
+size_t getVarshortLength(int_t value) {
+  return (value > 0x1fffffffffff) ? 4 : (value < 0x3fffffff) ? (value < 0x7fff) ? 1 : 2 : 3;
 }
 
 /**
@@ -114,19 +112,19 @@ size_t getVarshortLength(int_t value){
  * @param value the integer
  * @param output the buffer to write to
  */
-template<typename int_t = uint64_t, typename buffer_t>
+template <typename int_t = uint64_t, typename buffer_t>
 void encodeVarint(int_t value, buffer_t& output, size_t* written_bytes) {
-  //While more than 7 bits of data are left, occupy the last output byte
+  // While more than 7 bits of data are left, occupy the last output byte
   // and set the next byte flag
   size_t length = 0;
   while (value > 127) {
     //|128: Set the next byte flag
-    output.push_back(((uint8_t) (value & 127)) | 128);
-    //Remove the seven bits we just wrote
+    output.push_back(((uint8_t)(value & 127)) | 128);
+    // Remove the seven bits we just wrote
     value >>= 7;
     ++length;
   }
-  output.push_back(((uint8_t) value) & 127);
+  output.push_back(((uint8_t)value) & 127);
   *written_bytes = ++length;
 }
 
@@ -134,13 +132,13 @@ void encodeVarint(int_t value, buffer_t& output, size_t* written_bytes) {
  * Decodes an unsigned variable-length integer using the MSB algorithm.
  * @param value The input value. Any standard integer type is allowed.
  */
-template<typename int_t = uint64_t>
+template <typename int_t = uint64_t>
 int_t decodeVarint(const uint8_t* input) {
   int_t ret = 0;
   for (uint8_t i = 0;; i++) {
     ret |= (int_t)(input[i] & 127) << (7 * i);
 
-    //If the next-byte flag is set
+    // If the next-byte flag is set
     if (!(input[i] & 128)) {
       break;
     }
@@ -152,13 +150,13 @@ int_t decodeVarint(const uint8_t* input) {
  * Decodes an unsigned variable-length integer using the MSB algorithm.
  * @param value The input value. Any standard integer type is allowed.
  */
-template<typename int_t = uint64_t>
+template <typename int_t = uint64_t>
 int_t decodeVarshort(const uint16_t* input) {
   int_t ret = 0;
   for (uint8_t i = 0;; i++) {
     ret |= (int_t)(input[i] & 32767) << (15 * i);
 
-    //If the next-byte flag is set
+    // If the next-byte flag is set
     if (!(input[i] & 32768)) {
       break;
     }
@@ -166,12 +164,11 @@ int_t decodeVarshort(const uint16_t* input) {
   return ret;
 }
 
-
 inline size_t skipVarint(const char* input) {
   size_t i = 0;
 
-  for (;;i++) {
-    //If the next-byte flag is set
+  for (;; i++) {
+    // If the next-byte flag is set
     if (!(input[i] & 128)) {
       break;
     }
@@ -179,14 +176,14 @@ inline size_t skipVarint(const char* input) {
   return i + 1;
 }
 
-inline std::string decodeVarintString(const char* input){
+inline std::string decodeVarintString(const char* input) {
   uint64_t length = 0;
   size_t i = 0;
 
   for (;; i++) {
     length |= (input[i] & 127) << (7 * i);
 
-    //If the next-byte flag is set
+    // If the next-byte flag is set
     if (!(input[i] & 128)) {
       break;
     }
@@ -199,22 +196,19 @@ inline const char* decodeVarintString(const char* input, size_t* length_ptr) {
   size_t length = 0;
   size_t i = 0;
 
-    for (;; i++) {
-      length |= (input[i] & 127) << (7 * i);
+  for (;; i++) {
+    length |= (input[i] & 127) << (7 * i);
 
-      //If the next-byte flag is set
-      if (!(input[i] & 128)) {
-        break;
-      }
+    // If the next-byte flag is set
+    if (!(input[i] & 128)) {
+      break;
     }
+  }
 
-    *length_ptr = length;
-    return input + i + 1;
-
+  *length_ptr = length;
+  return input + i + 1;
 }
 
-
 } /* namespace util */
-} /* namespace dictionary */
 } /* namespace keyvi */
 #endif /* VINT_H_ */

@@ -23,8 +23,8 @@
  *      Author: hendrik
  */
 
-#ifndef KEYVI_DICTIONARY_UTIL_CONFIGURATION_H_
-#define KEYVI_DICTIONARY_UTIL_CONFIGURATION_H_
+#ifndef KEYVI_UTIL_CONFIGURATION_H_
+#define KEYVI_UTIL_CONFIGURATION_H_
 
 #include <map>
 #include <string>
@@ -35,18 +35,15 @@
 #include "dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
-namespace dictionary {
 namespace util {
 
 template <typename OutType>
-OutType mapGet(const std::map<std::string, std::string>& map,
-               const std::string& key) {
+OutType mapGet(const std::map<std::string, std::string>& map, const std::string& key) {
   return boost::lexical_cast<OutType>(map.at(key));
 }
 
 template <typename OutType>
-OutType mapGet(const std::map<std::string, std::string>& map,
-               const std::string& key, const OutType& default_value) {
+OutType mapGet(const std::map<std::string, std::string>& map, const std::string& key, const OutType& default_value) {
   if (map.count(key) > 0) {
     return boost::lexical_cast<OutType>(map.at(key));
   }
@@ -54,8 +51,8 @@ OutType mapGet(const std::map<std::string, std::string>& map,
   return default_value;
 }
 
-inline bool mapGetBool(const std::map<std::string, std::string>& map,
-                       const std::string& key, const bool default_value) {
+inline bool mapGetBool(const std::map<std::string, std::string>& map, const std::string& key,
+                       const bool default_value) {
   if (map.count(key) > 0) {
     auto v = map.at(key);
     boost::algorithm::to_lower(v);
@@ -69,8 +66,8 @@ inline bool mapGetBool(const std::map<std::string, std::string>& map,
   return default_value;
 }
 
-inline size_t mapGetMemory(const std::map<std::string, std::string>& map,
-                           const std::string& key, const size_t default_value) {
+inline size_t mapGetMemory(const std::map<std::string, std::string>& map, const std::string& key,
+                           const size_t default_value) {
   if (map.count(key) > 0) {
     return boost::lexical_cast<size_t>(map.at(key));
   } else if (map.count(key + "_kb") > 0) {
@@ -84,8 +81,7 @@ inline size_t mapGetMemory(const std::map<std::string, std::string>& map,
   return default_value;
 }
 
-inline std::string mapGetTemporaryPath(
-    const std::map<std::string, std::string>& map) {
+inline std::string mapGetTemporaryPath(const std::map<std::string, std::string>& map) {
   if (map.count(TEMPORARY_PATH_KEY) > 0) {
     return map.at(TEMPORARY_PATH_KEY);
   }
@@ -94,7 +90,6 @@ inline std::string mapGetTemporaryPath(
 }
 
 } /* namespace util */
-} /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* KEYVI_DICTIONARY_UTIL_CONFIGURATION_H_ */
+#endif  // KEYVI_UTIL_CONFIGURATION_H_
