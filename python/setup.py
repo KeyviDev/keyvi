@@ -189,14 +189,14 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     class bdist(custom_opts, _bdist.bdist):
         parent = _bdist.bdist
-        user_options = _build.build.user_options + custom_user_options
+        user_options = _bdist.bdist.user_options + custom_user_options
 
     have_wheel = False
     try:
         import wheel.bdist_wheel as _bdist_wheel
         class bdist_wheel(custom_opts, _bdist_wheel.bdist_wheel):
             parent = _bdist_wheel.bdist_wheel
-            user_options = _build.build.user_options + custom_user_options
+            user_options = _bdist_wheel.bdist_wheel.user_options + custom_user_options
         have_wheel = True
     except: None
 
