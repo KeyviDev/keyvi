@@ -25,7 +25,8 @@
 #ifndef DISTANCE_MATRIX_H_
 #define DISTANCE_MATRIX_H_
 
-#include<cstring>
+#include <cstring>
+#include <algorithm>
 
 //#define ENABLE_TRACING
 #include "dictionary/util/trace.h"
