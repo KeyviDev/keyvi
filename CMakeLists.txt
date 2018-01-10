@@ -33,9 +33,12 @@ endif ()
 
 find_package(ZLIB REQUIRED)
 if (ZLIB_FOUND)
+    IF(ZLIB_VERSION_STRING VERSION_LESS "1.2.8")
+        message(FATAL_ERROR "-- ZLIB version too old, please install at least v1.2.8")
+    ENDIF(ZLIB_VERSION_STRING VERSION_LESS "1.2.8")
     include_directories(${ZLIB_INCLUDE_DIRS})
 else ()
-    message(FATAL_ERROR "Can not fing ZLib")
+    message(FATAL_ERROR "Can not find ZLib")
 endif (ZLIB_FOUND)
 
 
