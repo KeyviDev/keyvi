@@ -1,0 +1,14 @@
+[package]
+name = "keyvi"
+version = "0.0.1"
+build = "build.rs"
+authors = ["Narek Gharibyan <narekgharibyan@gmail.com>", "Subu <subu@cliqz.com>"]
+
+[build-dependencies]
+bindgen = "0.30.0"
+cmake = "*"
+
+[dependencies]
+serde_json = "1.0"
+rayon = "0.9"
+rand = "*"
