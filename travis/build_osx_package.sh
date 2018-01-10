@@ -3,7 +3,7 @@ set -ev
 
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=release ..
+cmake -DCMAKE_BUILD_TYPE=release -DZLIB_ROOT=/usr/local/opt/zlib ..
 make -j 4
 ./unit_test_all
 cd ..
