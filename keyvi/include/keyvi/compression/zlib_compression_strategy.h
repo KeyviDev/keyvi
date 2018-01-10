@@ -27,7 +27,6 @@
 
 #define ZLIB_CONST
 
-#include <zconf.h>
 #include <zlib.h>
 #include <string>
 
@@ -35,6 +34,11 @@
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
+
+// backwards compat with older versions of zlib
+#if !defined(z_const)
+#define z_const
+#endif
 
 namespace keyvi {
 namespace compression {
