@@ -1,5 +1,6 @@
 from setuptools import setup, Extension
 import distutils.command.build as _build
+import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
 import distutils.command.sdist as _sdist
 import os
@@ -99,6 +100,9 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                            ('staticlinkboost',
                             None,
                             "special mode to statically link boost."),
+                           ('zlib-root=',
+                            None,
+                            "zlib installation root"),
                            ]
 
 
@@ -110,6 +114,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             self.parent.initialize_options(self)
             self.mode = 'release'
             self.staticlinkboost = False
+            self.zlib_root = None
 
         def run(self):
             global additional_compile_flags
@@ -154,6 +159,21 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                 args = getattr(ext_m, 'extra_link_args') + extra_link_arguments
                 setattr(ext_m, 'extra_link_args', args)
 
+            # custom zlib location
+            if self.zlib_root:
+                for ext_m in ext_modules:
+                    include_dirs = [path.join(self.zlib_root, "include")] + getattr(ext_m, 'include_dirs')
+                    setattr(ext_m, 'include_dirs', include_dirs)
+                    if sys.platform == 'darwin':
+                        if not os.path.exists(mac_os_static_libs_dir):
+                            os.makedirs(mac_os_static_libs_dir)
+                        src_file = path.join(self.zlib_root, "lib", "libz.a")
+                        dst_file = path.join(mac_os_static_libs_dir, "libz.a")
+                        shutil.copyfile(src_file, dst_file)
+                    else:
+                        library_dirs = [path.join(self.zlib_root, "lib")] + getattr(ext_m, 'library_dirs')
+                        setattr(ext_m, 'library_dirs', library_dirs)
+
             self.parent.run(self)
 
 
@@ -167,6 +187,18 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             generate_pykeyvi_source()
             _sdist.sdist.run(self)
 
+    class bdist(custom_opts, _bdist.bdist):
+        parent = _bdist.bdist
+        user_options = _build.build.user_options + custom_user_options
+
+    have_wheel = False
+    try:
+        import wheel.bdist_wheel as _bdist_wheel
+        class bdist_wheel(custom_opts, _bdist_wheel.bdist_wheel):
+            parent = _bdist_wheel.bdist_wheel
+            user_options = _build.build.user_options + custom_user_options
+        have_wheel = True
+    except: None
 
     class build_ext(_build_ext.build_ext):
         def run(self):
@@ -231,6 +263,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         'msgpack-python',
     ]
 
+    commands = {'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist}
+    if have_wheel:
+        commands['bdist_wheel'] = bdist_wheel
+
     setup(
         name=PACKAGE_NAME,
         version=version,
@@ -238,7 +274,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
         license="ASL 2.0",
-        cmdclass={'build_ext': build_ext, 'sdist': sdist, 'build': build},
+        cmdclass=commands,
         scripts=['bin/keyvi'],
         packages=['keyvicli'],
         ext_modules=ext_modules,
