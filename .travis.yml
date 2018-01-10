@@ -34,6 +34,8 @@ env:
     - BUILD_TYPE=manylinux  PYTHON_VERSION=35     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
     - BUILD_TYPE=sdist      PYTHON_VERSION=27
     - BUILD_TYPE=doc
+    - BUILD_TYPE=rust
+
   global:
     - GH_REPO_NAME='keyvi'
     - DOXYFILE="$TRAVIS_BUILD_DIR/keyvi/keyvi.Doxyfile"
@@ -63,7 +65,8 @@ matrix:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./travis/setup_osx.sh ; fi
-  - source ./travis/setup_pyenv.sh
+  - if [ "PYTHON_VERSION" != "" ]; then source ./travis/setup_pyenv.sh ; fi
+  - if [ "$BUILD_TYPE" == "rust" ]; then ./travis/setup_rust.sh ; fi
 
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
@@ -105,6 +108,7 @@ script:
   - if [ "$BUILD_TYPE" == "manylinux" ]; then source ./travis/build_manylinux_package.sh ; fi
   - if [ "$BUILD_TYPE" == "sdist" ]; then source ./travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
+  - if [ "$BUILD_TYPE" == "rust" ]; then source ./travis/build_rust.sh ; fi
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/coverage.sh ; fi
