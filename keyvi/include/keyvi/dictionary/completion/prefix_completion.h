@@ -50,7 +50,7 @@ final {
     }
 
     MatchIterator::MatchIteratorPair GetCompletions(
-        const std::string& query, int number_of_results = 10) {
+        const std::string& query, size_t number_of_results = 10) {
 
       uint64_t state = fsa_->GetStartState();
       const size_t query_length = query.size();
