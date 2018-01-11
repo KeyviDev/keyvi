@@ -31,7 +31,7 @@
 #include <boost/variant.hpp>
 
 #include "dictionary/fsa/automata.h"
-#include "dictionary/util/json_value.h"
+#include "util/json_value.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -132,7 +132,7 @@ struct Match {
   std::string GetValueAsString() const {
     if (!fsa_) {
       if (raw_value_.size() != 0) {
-        return util::DecodeJsonValue(raw_value_);
+        return keyvi::util::DecodeJsonValue(raw_value_);
       } else {
         return "";
       }

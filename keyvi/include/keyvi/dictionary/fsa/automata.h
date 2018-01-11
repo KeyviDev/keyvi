@@ -45,7 +45,7 @@
 #include "dictionary/fsa/traversal/weighted_traversal.h"
 #include "dictionary/keyvi_file.h"
 #include "dictionary/util/endian.h"
-#include "dictionary/util/vint.h"
+#include "util/vint.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -350,7 +350,7 @@ class Automata final {
   }
 
   uint64_t GetStateValue(uint64_t state) const {
-    return util::decodeVarshort(transitions_compact_ + state + FINAL_OFFSET_TRANSITION);
+    return keyvi::util::decodeVarshort(transitions_compact_ + state + FINAL_OFFSET_TRANSITION);
   }
 
   uint32_t GetWeightValue(uint64_t state) const {
@@ -449,7 +449,7 @@ class Automata final {
 
       TRACE("Compact Transition found overflow bucket %d", overflow_bucket);
 
-      resolved_ptr = util::decodeVarshort(transitions_compact_ + overflow_bucket);
+      resolved_ptr = keyvi::util::decodeVarshort(transitions_compact_ + overflow_bucket);
       resolved_ptr = (resolved_ptr << 3) + (pt & 0x7);
 
       if (pt & 0x8) {

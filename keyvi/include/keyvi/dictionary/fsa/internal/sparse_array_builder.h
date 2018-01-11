@@ -31,7 +31,7 @@
 #include "dictionary/fsa/internal/sliding_window_bit_vector_position_tracker.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/unpacked_state.h"
-#include "dictionary/util/vint.h"
+#include "util/vint.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -399,7 +399,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     uint16_t vshort_pointer[8];
     size_t vshort_size = 0;
 
-    util::encodeVarshort(transitionPointer_high, vshort_pointer, &vshort_size);
+    keyvi::util::encodeVarshort(transitionPointer_high, vshort_pointer, &vshort_size);
 
     // find free spots in the sparse array where the pointer fits in
     size_t start_position = offset > 512 ? offset - 512 : 0;
@@ -498,7 +498,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     uint16_t vshort_pointer[8];
     size_t vshort_size = 0;
 
-    util::encodeVarshort(value, vshort_pointer, &vshort_size);
+    keyvi::util::encodeVarshort(value, vshort_pointer, &vshort_size);
 
     for (size_t i = 0; i < vshort_size; ++i) {
       persistence_->WriteTransition(offset + FINAL_OFFSET_TRANSITION + i,

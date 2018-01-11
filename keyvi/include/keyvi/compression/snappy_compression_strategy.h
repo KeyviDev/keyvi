@@ -22,12 +22,12 @@
  *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
  */
 
-#ifndef SNAPPY_COMPRESSION_STRATEGY_H_
-#define SNAPPY_COMPRESSION_STRATEGY_H_
+#ifndef KEYVI_COMPRESSION_SNAPPY_COMPRESSION_STRATEGY_H_
+#define KEYVI_COMPRESSION_SNAPPY_COMPRESSION_STRATEGY_H_
 
-#include <string>
-#include <sstream>
 #include <snappy.h>
+#include <sstream>
+#include <string>
 
 #include "compression/compression_strategy.h"
 
@@ -36,33 +36,27 @@ namespace compression {
 
 /** A compression strategy that wraps snappy. */
 struct SnappyCompressionStrategy final : public CompressionStrategy {
-  inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
-    DoCompress(buffer, raw, raw_size);
-  }
+  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
 
-  static inline void DoCompress (buffer_t& buffer, const char* raw, size_t raw_size)
-  {
-      size_t output_length = snappy::MaxCompressedLength(raw_size);
-      buffer.resize(output_length + 1);
-      buffer[0] = static_cast<char>(SNAPPY_COMPRESSION);
-      snappy::RawCompress(raw, raw_size, buffer.data() + 1, &output_length);
-      buffer.resize(output_length + 1);
+  static inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
+    size_t output_length = snappy::MaxCompressedLength(raw_size);
+    buffer->resize(output_length + 1);
+    buffer->data()[0] = static_cast<char>(SNAPPY_COMPRESSION);
+    snappy::RawCompress(raw, raw_size, buffer->data() + 1, &output_length);
+    buffer->resize(output_length + 1);
   }
 
   static inline std::string DoCompress(const char* raw, size_t raw_size) {
     buffer_t buf;
-    DoCompress(buf, raw, raw_size);
+    DoCompress(&buf, raw, raw_size);
     return std::string(buf.data(), buf.size());
   }
 
-  inline std::string Decompress(const std::string& compressed) {
-    return DoDecompress(compressed);
-  }
+  inline std::string Decompress(const std::string& compressed) { return DoDecompress(compressed); }
 
   static std::string DoDecompress(const std::string& compressed) {
     std::string uncompressed;
-    snappy::Uncompress(&compressed.data()[1], compressed.size() - 1,
-                       &uncompressed);
+    snappy::Uncompress(&compressed.data()[1], compressed.size() - 1, &uncompressed);
     return uncompressed;
   }
 
@@ -72,4 +66,4 @@ struct SnappyCompressionStrategy final : public CompressionStrategy {
 } /* namespace compression */
 } /* namespace keyvi */
 
-#endif  // SNAPPY_COMPRESSION_STRATEGY_H_
+#endif  // KEYVI_COMPRESSION_SNAPPY_COMPRESSION_STRATEGY_H_

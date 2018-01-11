@@ -32,9 +32,8 @@
 
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/sort/sorter_common.h"
-#include "dictionary/util/configuration.h"
-
-#include "dictionary/util/tpie_initializer.h"
+#include "dictionary/sort/tpie_initializer.h"
+#include "util/configuration.h"
 
 #include "tpie/serialization_sorter.h"
 
@@ -106,14 +105,14 @@ class TpieSorter final {
    * @param memory_limit memory limit for internal memory usage
    */
   explicit TpieSorter(const sorter_param_t& params = sorter_param_t())
-      : initializer_(util::TpieIntializer::getInstance()), sorter_(), params_(params) {
-    size_t memory_limit = util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_TPIE_SORT);
+      : initializer_(TpieIntializer::getInstance()), sorter_(), params_(params) {
+    size_t memory_limit = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_TPIE_SORT);
 
     sorter_.set_available_memory(memory_limit);
     sorter_.begin();
 
     params_[TEMPORARY_PATH_KEY] =
-        util::mapGet(params_, TEMPORARY_PATH_KEY, boost::filesystem::temp_directory_path().string());
+        keyvi::util::mapGet(params_, TEMPORARY_PATH_KEY, boost::filesystem::temp_directory_path().string());
 
     initializer_.SetTempDirectory(params_[TEMPORARY_PATH_KEY]);
   }
@@ -134,7 +133,7 @@ class TpieSorter final {
   void clear() { sorter_.evacuate(); }
 
  private:
-  util::TpieIntializer& initializer_;
+  TpieIntializer& initializer_;
   tpie_sorter_t sorter_;
   sorter_param_t params_;
 };

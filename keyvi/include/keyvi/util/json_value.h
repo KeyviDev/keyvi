@@ -22,30 +22,31 @@
  *      Author: hendrik
  */
 
-#ifndef UTIL_JSON_VALUE_H_
-#define UTIL_JSON_VALUE_H_
+#ifndef KEYVI_UTIL_JSON_VALUE_H_
+#define KEYVI_UTIL_JSON_VALUE_H_
+
+#include <string>
 
 #include "rapidjson/document.h"
-#include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
 #include "msgpack/type/rapidjson.hpp"
-#include "compression/compression_selector.h"
-#include "dictionary/util/msgpack_util.h"
 
-//#define ENABLE_TRACING
+#include "compression/compression_selector.h"
+#include "util/msgpack_util.h"
+
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
-namespace dictionary {
 namespace util {
 
 /** Decompresses (if needed) and decodes a json value stored in a JsonValueStore. */
 inline std::string DecodeJsonValue(const std::string& encoded_value) {
-  compression::decompress_func_t decompressor =
-      compression::decompressor_by_code(encoded_value);
+  compression::decompress_func_t decompressor = compression::decompressor_by_code(encoded_value);
   std::string packed_string = decompressor(encoded_value);
   TRACE("unpacking %s", packed_string.c_str());
 
@@ -65,30 +66,26 @@ inline std::string DecodeJsonValue(const std::string& encoded_value) {
  * Encodes @p raw_value with msgpack and compresses it, if it is longer than
  * the specified threshold.
  */
-inline void EncodeJsonValue(
-    std::function<void (compression::buffer_t&, const char*, size_t)> long_compress,
-    std::function<void (compression::buffer_t&, const char*, size_t)> short_compress,
-    msgpack_buffer& msgpack_buffer,
-    compression::buffer_t& buffer,
-    const std::string& raw_value, size_t compression_threshold=32) {
+inline void EncodeJsonValue(std::function<void(compression::buffer_t*, const char*, size_t)> long_compress,
+                            std::function<void(compression::buffer_t*, const char*, size_t)> short_compress,
+                            msgpack_buffer* msgpack_buffer, compression::buffer_t* buffer, const std::string& raw_value,
+                            size_t compression_threshold = 32) {
   rapidjson::Document json_document;
   json_document.Parse(raw_value.c_str());
 
   if (!json_document.HasParseError()) {
     TRACE("Got json");
-    msgpack::pack(&msgpack_buffer, json_document);
+    msgpack::pack(msgpack_buffer, json_document);
   } else {
     TRACE("Got a normal string");
-    msgpack::pack(&msgpack_buffer, raw_value);
+    msgpack::pack(msgpack_buffer, raw_value);
   }
 
   // compression
-  if (msgpack_buffer.size() > compression_threshold) {
-    long_compress(buffer,
-        msgpack_buffer.data(), msgpack_buffer.size());
+  if (msgpack_buffer->size() > compression_threshold) {
+    long_compress(buffer, msgpack_buffer->data(), msgpack_buffer->size());
   } else {
-    short_compress(buffer,
-        msgpack_buffer.data(), msgpack_buffer.size());
+    short_compress(buffer, msgpack_buffer->data(), msgpack_buffer->size());
   }
 }
 
@@ -99,21 +96,19 @@ inline void EncodeJsonValue(
  * @note This is a default implementation that uses snappy for string longer
  *       than 32 characters.
  */
-inline std::string EncodeJsonValue(const std::string& raw_value,
-                                   size_t compression_threshold=32) {
+inline std::string EncodeJsonValue(const std::string& raw_value, size_t compression_threshold = 32) {
   msgpack_buffer msgpack_buffer;
   compression::buffer_t buffer;
 
-  EncodeJsonValue(static_cast<void(*) (compression::buffer_t&, const char*, size_t)>(
-                          &compression::SnappyCompressionStrategy::DoCompress),
-                          static_cast<void(*) (compression::buffer_t&, const char*, size_t)>(
-                           &compression::RawCompressionStrategy::DoCompress),
-                         msgpack_buffer, buffer, raw_value, compression_threshold);
-  return std::string(reinterpret_cast<char*> (buffer.data()), buffer.size());
+  EncodeJsonValue(static_cast<void (*)(compression::buffer_t*, const char*, size_t)>(
+                      &compression::SnappyCompressionStrategy::DoCompress),
+                  static_cast<void (*)(compression::buffer_t*, const char*, size_t)>(
+                      &compression::RawCompressionStrategy::DoCompress),
+                  &msgpack_buffer, &buffer, raw_value, compression_threshold);
+  return std::string(reinterpret_cast<char*>(buffer.data()), buffer.size());
 }
 
 } /* namespace util */
-} /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* UTIL_JSON_VALUE_H_ */
+#endif  // KEYVI_UTIL_JSON_VALUE_H_

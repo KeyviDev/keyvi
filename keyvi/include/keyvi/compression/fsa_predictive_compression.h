@@ -22,15 +22,17 @@
  *      Author: hendrik
  */
 
-#ifndef FSA_PREDICTIVE_COMPRESSION_H_
-#define FSA_PREDICTIVE_COMPRESSION_H_
+#ifndef KEYVI_COMPRESSION_FSA_PREDICTIVE_COMPRESSION_H_
+#define KEYVI_COMPRESSION_FSA_PREDICTIVE_COMPRESSION_H_
 
 #include <bitset>
 #include <sstream>
+#include <string>
+
 #include "dictionary/dictionary.h"
 #include "dictionary/fsa/automata.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -40,27 +42,22 @@ namespace compression {
  * Short string compression inspired by RFC 1978 (Predictor Compression Protocol)
  */
 class FsaPredictiveCompression final {
-
  public:
-  FsaPredictiveCompression(dictionary::fsa::automata_t fsa): fsa_(fsa){
-  }
+  explicit FsaPredictiveCompression(dictionary::fsa::automata_t fsa) : fsa_(fsa) {}
 
-  FsaPredictiveCompression(dictionary::dictionary_t d) {
-    fsa_ = d->GetFsa();
-  }
+  explicit FsaPredictiveCompression(dictionary::dictionary_t d) { fsa_ = d->GetFsa(); }
 
   // highly inefficient for now
-  std::string LookupBigram(const unsigned char* bigram){
-
+  std::string LookupBigram(const unsigned char* bigram) {
     // skip for null bytes
-    if (bigram[0] == 0 || bigram[1] == 0){
+    if (bigram[0] == 0 || bigram[1] == 0) {
       return "";
     }
 
     uint64_t state = fsa_->GetStartState();
     state = fsa_->TryWalkTransition(state, bigram[0]);
     if (!state) {
-      TRACE ("LookupBigram: %c%c failed.", bigram[0], bigram[1]);
+      TRACE("LookupBigram: %c%c failed.", bigram[0], bigram[1]);
 
       return "";
     }
@@ -73,7 +70,7 @@ class FsaPredictiveCompression final {
     return fsa_->GetValueAsString(fsa_->GetStateValue(state));
   }
 
-  std::string Compress(const std::string& input){
+  std::string Compress(const std::string& input) {
     std::ostringstream output_buffer;
 
     size_t input_length = input.size();
@@ -82,7 +79,7 @@ class FsaPredictiveCompression final {
     char uncompressed_buf[8];
     unsigned char bigram[2];
     size_t bitset_position = 0;
-    size_t uncompressed_position  = 0;
+    size_t uncompressed_position = 0;
 
     TRACE("Compressing %s", input.c_str());
 
@@ -99,12 +96,11 @@ class FsaPredictiveCompression final {
     uncompressed_position = 2;
 
     offset = 2;
-    while ( offset < input_length ) {
-
+    while (offset < input_length) {
       std::string prediction = LookupBigram(bigram);
       if (prediction.size() > 0 && prediction == input.substr(offset, prediction.size())) {
         // prediction succeeded
-        TRACE ("Prediction success: %s", prediction.c_str());
+        TRACE("Prediction success: %s", prediction.c_str());
         current_bitset.set(bitset_position++);
         offset += prediction.size();
 
@@ -118,7 +114,7 @@ class FsaPredictiveCompression final {
 
       } else {
         // prediction failed
-        TRACE ("Prediction failed: %s", prediction.c_str());
+        TRACE("Prediction failed: %s", prediction.c_str());
 
         current_bitset.set(bitset_position++, 0);
         uncompressed_buf[uncompressed_position++] = input[offset];
@@ -132,9 +128,9 @@ class FsaPredictiveCompression final {
         TRACE("Flush bitset:%s data: '%s' ", current_bitset.to_string().c_str(),
               std::string(uncompressed_buf, uncompressed_position).c_str());
 
-        output_buffer.put(static_cast<unsigned char>( current_bitset.to_ulong() ));
+        output_buffer.put(static_cast<unsigned char>(current_bitset.to_ulong()));
         output_buffer.write(uncompressed_buf, uncompressed_position);
-        bitset_position =0;
+        bitset_position = 0;
         current_bitset.reset();
         uncompressed_position = 0;
       }
@@ -143,9 +139,9 @@ class FsaPredictiveCompression final {
     // write remainder
     if (bitset_position != 0) {
       TRACE("Last chunk bitset:%s data: '%s' ", current_bitset.to_string().c_str(),
-                    std::string(uncompressed_buf, uncompressed_position).c_str());
+            std::string(uncompressed_buf, uncompressed_position).c_str());
 
-      output_buffer.put(static_cast<unsigned char>( current_bitset.to_ulong() ));
+      output_buffer.put(static_cast<unsigned char>(current_bitset.to_ulong()));
       output_buffer.write(uncompressed_buf, uncompressed_position);
     }
 
@@ -154,7 +150,7 @@ class FsaPredictiveCompression final {
     return output_buffer.str();
   }
 
-  std::string Uncompress(const std::string & input) {
+  std::string Uncompress(const std::string& input) {
     if (input.size() < 2) {
       return input;
     }
@@ -164,21 +160,21 @@ class FsaPredictiveCompression final {
     size_t input_length = input.size();
     size_t offset = 0;
     std::bitset<8> current_bitset;
-    //char uncompressed_buf[8];
+    // char uncompressed_buf[8];
     unsigned char bigram[2];
     size_t bitset_position = 0;
 
     // setup first character
     bigram[0] = input[1];
     bigram[1] = input[2];
-    current_bitset = static_cast<unsigned long> (input[0]);
+    current_bitset = static_cast<std::bitset<8>>(input[0]);
     bitset_position = 2;
     output_buffer.put(input[1]);
     output_buffer.put(input[2]);
 
     offset = 3;
 
-    while ( offset < input_length ) {
+    while (offset < input_length) {
       if (current_bitset[bitset_position++]) {
         TRACE("Bit is set, do lookup ");
         std::string prediction = LookupBigram(bigram);
@@ -201,7 +197,7 @@ class FsaPredictiveCompression final {
       if (bitset_position == 8) {
         TRACE("Read next chunk");
 
-        current_bitset = static_cast<unsigned long> (input[offset++]);
+        current_bitset = static_cast<std::bitset<8>>(input[offset++]);
         bitset_position = 0;
       }
     }
@@ -212,14 +208,9 @@ class FsaPredictiveCompression final {
 
  private:
   dictionary::fsa::automata_t fsa_;
-
 };
-
 
 } /* namespace compression */
 } /* namespace keyvi */
 
-
-
-#endif /* FSA_PREDICTIVE_COMPRESSION_H_ */
-
+#endif  // KEYVI_COMPRESSION_FSA_PREDICTIVE_COMPRESSION_H_

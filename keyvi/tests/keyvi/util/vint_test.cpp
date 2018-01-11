@@ -25,16 +25,14 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/util/vint.h"
+#include "util/vint.h"
 
 namespace keyvi {
-namespace dictionary {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE( VariableLengthIntegerCodingTests )
+BOOST_AUTO_TEST_SUITE(VariableLengthIntegerCodingTests)
 
-BOOST_AUTO_TEST_CASE( VShortSimple ) {
-
+BOOST_AUTO_TEST_CASE(VShortSimple) {
   uint16_t buffer[8];
   size_t size;
 
@@ -51,8 +49,7 @@ BOOST_AUTO_TEST_CASE( VShortSimple ) {
   BOOST_CHECK_EQUAL(55, decodeVarshort(buffer));
 }
 
-BOOST_AUTO_TEST_CASE( VShortLength) {
-
+BOOST_AUTO_TEST_CASE(VShortLength) {
   uint16_t buffer[16];
   size_t size;
 
@@ -79,15 +76,14 @@ BOOST_AUTO_TEST_CASE( VShortLength) {
   BOOST_CHECK_EQUAL(1, size);
 }
 
-BOOST_AUTO_TEST_CASE( VShortSimple2) {
-
+BOOST_AUTO_TEST_CASE(VShortSimple2) {
   uint16_t buffer[16];
   size_t size;
 
   uint64_t pointer = 380108;
 
-  auto pointer_low = pointer & 0x7; // get the lower part
-  auto pointer_high = pointer >> 3; // the higher part
+  auto pointer_low = pointer & 0x7;  // get the lower part
+  auto pointer_high = pointer >> 3;  // the higher part
   BOOST_CHECK_EQUAL(47513, pointer_high);
   encodeVarshort(pointer_high, buffer, &size);
   BOOST_CHECK_EQUAL(2, size);
@@ -104,7 +100,7 @@ BOOST_AUTO_TEST_CASE( VShortSimple2) {
   BOOST_CHECK_EQUAL(pointer, resolved_ptr);
 }
 
-BOOST_AUTO_TEST_CASE( VIntLength) {
+BOOST_AUTO_TEST_CASE(VIntLength) {
   uint8_t buffer[32];
   size_t size;
 
@@ -131,7 +127,7 @@ BOOST_AUTO_TEST_CASE( VIntLength) {
   BOOST_CHECK_EQUAL(2, size);
 }
 
-BOOST_AUTO_TEST_CASE( VIntDecode) {
+BOOST_AUTO_TEST_CASE(VIntDecode) {
   uint8_t buffer[32];
   size_t size;
   encodeVarint(15, buffer, &size);
@@ -155,14 +151,7 @@ BOOST_AUTO_TEST_CASE( VIntDecode) {
   BOOST_CHECK_EQUAL(800, size);
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace util */
-} /* namespace dictionary */
 } /* namespace keyvi */
-
-
-
-
-

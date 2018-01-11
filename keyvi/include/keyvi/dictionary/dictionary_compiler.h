@@ -37,7 +37,7 @@
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/sort/in_memory_sorter.h"
 #include "dictionary/sort/sorter_common.h"
-#include "dictionary/util/configuration.h"
+#include "util/configuration.h"
 
 #if !defined(KEYVI_DISABLE_TPIE)
 #include "dictionary/sort/tpie_sorter.h"
@@ -85,11 +85,11 @@ class DictionaryCompiler final {
    * @param params compiler parameters
    */
   explicit DictionaryCompiler(const compiler_param_t& params = compiler_param_t()) : sorter_(params), params_(params) {
-    params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
+    params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
-    stable_insert_ = util::mapGetBool(params_, STABLE_INSERTS, false);
+    stable_insert_ = keyvi::util::mapGetBool(params_, STABLE_INSERTS, false);
 
     value_store_ = new ValueStoreT(params_);
   }

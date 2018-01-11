@@ -40,7 +40,7 @@
 #include "dictionary/fsa/internal/sparse_array_builder.h"
 #include "dictionary/fsa/internal/unpacked_state.h"
 #include "dictionary/fsa/internal/unpacked_state_stack.h"
-#include "dictionary/util/configuration.h"
+#include "util/configuration.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -155,14 +155,14 @@ class Generator final {
  public:
   explicit Generator(const generator_param_t& params = generator_param_t(), ValueStoreT* value_store = NULL)
       : params_(params) {
-    memory_limit_ = util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
+    memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
 
     // use 50% or limit minus 200MB for the memory limit of the hashtable
     const size_t memory_limit_minimization =
         memory_limit_ > (400 * 1024 * 1024) ? memory_limit_ - (200 * 1024 * 1024) : memory_limit_ / 2;
 
-    params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
-    minimize_ = util::mapGetBool(params_, MINIMIZATION_KEY, true);
+    params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
+    minimize_ = keyvi::util::mapGetBool(params_, MINIMIZATION_KEY, true);
 
     persistence_ = new PersistenceT(memory_limit_ - memory_limit_minimization, params_[TEMPORARY_PATH_KEY]);
 

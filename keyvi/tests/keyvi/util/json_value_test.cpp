@@ -23,18 +23,16 @@
  *      Author: hendrik
  */
 
-
 #include <boost/test/unit_test.hpp>
-#include "dictionary/util/json_value.h"
+
+#include "util/json_value.h"
 
 namespace keyvi {
-namespace dictionary {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE( JsonValueTests )
+BOOST_AUTO_TEST_SUITE(JsonValueTests)
 
-BOOST_AUTO_TEST_CASE( EncodeDecodeTest ) {
-
+BOOST_AUTO_TEST_CASE(EncodeDecodeTest) {
   std::string input = "{'auto':'car','price':344,'features':[1,2,3]}";
   std::string encoded = EncodeJsonValue(input);
 
@@ -43,9 +41,7 @@ BOOST_AUTO_TEST_CASE( EncodeDecodeTest ) {
   BOOST_CHECK_EQUAL('"' + input + '"', output);
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace util */
-} /* namespace dictionary */
 } /* namespace keyvi */

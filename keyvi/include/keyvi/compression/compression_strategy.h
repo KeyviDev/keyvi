@@ -22,11 +22,12 @@
  *      Author: David Mark Nemeskey<nemeskey.david@gmail.com>
  */
 
-#ifndef COMPRESSION_STRATEGY_H_
-#define COMPRESSION_STRATEGY_H_
+#ifndef KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_
+#define KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_
 
-#include <string>
 #include <cstring>
+#include <string>
+#include <vector>
 
 namespace keyvi {
 namespace compression {
@@ -50,15 +51,13 @@ typedef std::vector<char> buffer_t;
 struct CompressionStrategy {
   virtual ~CompressionStrategy() = default;
 
-  virtual void Compress(buffer_t& buffer, const char* raw, size_t raw_size) = 0;
+  virtual void Compress(buffer_t* buffer, const char* raw, size_t raw_size) = 0;
 
-  inline std::string Compress(const std::string& raw) {
-    return Compress(raw.data(), raw.size());
-  }
+  inline std::string Compress(const std::string& raw) { return Compress(raw.data(), raw.size()); }
 
   inline std::string Compress(const char* raw, size_t raw_size) {
     buffer_t buf;
-    Compress(buf, raw, raw_size);
+    Compress(&buf, raw, raw_size);
     return std::string(buf.data(), buf.size());
   }
 
@@ -77,30 +76,23 @@ struct CompressionStrategy {
  * the length field.
  */
 struct RawCompressionStrategy final : public CompressionStrategy {
-  inline void Compress(buffer_t& buffer, const char* raw, size_t raw_size) {
-      DoCompress(buffer, raw, raw_size);
-    }
+  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
 
-
-  static inline void DoCompress(buffer_t& buffer, const char* raw, size_t raw_size) {
-    buffer.resize(raw_size + 1);
-    buffer[0] = static_cast<char>(NO_COMPRESSION);
-    std::memcpy(buffer.data() + 1, raw, raw_size);
+  static inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
+    buffer->resize(raw_size + 1);
+    buffer->data()[0] = static_cast<char>(NO_COMPRESSION);
+    std::memcpy(buffer->data() + 1, raw, raw_size);
   }
 
   static inline std::string DoCompress(const char* raw, size_t raw_size) {
     buffer_t buf;
-    DoCompress(buf, raw, raw_size);
+    DoCompress(&buf, raw, raw_size);
     return std::string(buf.data(), buf.size());
   }
 
-  inline std::string Decompress(const std::string& compressed) {
-    return DoDecompress(compressed);
-  }
+  inline std::string Decompress(const std::string& compressed) { return DoDecompress(compressed); }
 
-  static inline std::string DoDecompress(const std::string& compressed) {
-    return compressed.substr(1);
-  }
+  static inline std::string DoDecompress(const std::string& compressed) { return compressed.substr(1); }
 
   std::string name() const { return "raw"; }
 };
@@ -108,4 +100,4 @@ struct RawCompressionStrategy final : public CompressionStrategy {
 } /* namespace compression */
 } /* namespace keyvi */
 
-#endif  // COMPRESSION_STRATEGY_H_
+#endif  // KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_

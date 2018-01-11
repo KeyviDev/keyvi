@@ -2,13 +2,18 @@ FROM quay.io/pypa/manylinux1_x86_64
 
 RUN yum -y update; yum clean all
 
-RUN yum -y install  zlib-devel \
-                    bzip2-devel \
+RUN yum -y install  bzip2-devel \
                     snappy-devel \
                     python-devel && \
                     yum clean all
 
 RUN yum remove cmake28 -y
+
+ENV ZLIB_MAJOR=1 ZLIB_MINOR=2 ZLIB_PATCH=11
+
+RUN curl -sSL https://zlib.net/zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz | tar -xz && \
+    cd zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} && ./configure && make -j4 && make install && \
+    cd .. && rm -rf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}
 
 ENV BOOST_MAJOR=1 BOOST_MINOR=66 BOOST_PATCH=0
 RUN curl -s -SL http://sourceforge.net/projects/boost/files/boost/${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH}/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz | tar xz && \

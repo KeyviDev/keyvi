@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef TPIE_INITIALIZER_H_
-#define TPIE_INITIALIZER_H_
+#ifndef KEYVI_DICTIONARY_SORT_TPIE_INITIALIZER_H_
+#define KEYVI_DICTIONARY_SORT_TPIE_INITIALIZER_H_
 
 #include <string>
 
@@ -32,7 +32,7 @@
 
 namespace keyvi {
 namespace dictionary {
-namespace util {
+namespace sort {
 
 /**
  * Helper (singleton) class to handle Tpie intialization
@@ -46,9 +46,7 @@ class TpieIntializer final {
 
   ~TpieIntializer() { tpie::tpie_finish(); }
 
-  void SetTempDirectory(const std::string& temp_path) const {
-    tpie::tempname::set_default_path(temp_path);
-  }
+  void SetTempDirectory(const std::string& temp_path) const { tpie::tempname::set_default_path(temp_path); }
 
  private:
   // todo: only init whats needed tpie::flags<subsystem> tpie_systems_ =
@@ -61,8 +59,8 @@ class TpieIntializer final {
   void operator=(TpieIntializer const&) = delete;
 };
 
-} /* namespace util */
+} /* namespace sort */
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* TPIE_INITIALIZER_H_ */
+#endif  // KEYVI_DICTIONARY_SORT_TPIE_INITIALIZER_H_
