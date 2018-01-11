@@ -17,14 +17,14 @@
 //
 
 /*
- * index_writer.h
+ * index.h
  *
  *  Created on: Jan 11, 2017
  *      Author: hendrik
  */
 
-#ifndef KEYVI_INDEX_INDEX_WRITER_H_
-#define KEYVI_INDEX_INDEX_WRITER_H_
+#ifndef KEYVI_INDEX_INDEX_H_
+#define KEYVI_INDEX_INDEX_H_
 
 #include <algorithm>
 #include <atomic>
@@ -55,10 +55,10 @@
 namespace keyvi {
 namespace index {
 
-class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriterWorker> {
+class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker> {
  public:
-  explicit IndexWriter(const std::string& index_directory,
-                       const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
+  explicit Index(const std::string& index_directory,
+                 const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
       : BaseIndexReader(index_directory, flush_interval), lock_file_() {
     index_directory_ = index_directory;
 
@@ -81,7 +81,7 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
     index_lock_.lock();
   }
 
-  ~IndexWriter() {
+  ~Index() {
     // todo: happens to early, move into own class, destruct after worker is destructed
     TRACE("Unlock Index");
     try {
@@ -110,4 +110,4 @@ class IndexWriter final : public internal::BaseIndexReader<internal::IndexWriter
 } /* namespace index */
 } /* namespace keyvi */
 
-#endif  // KEYVI_INDEX_INDEX_WRITER_H_
+#endif  // KEYVI_INDEX_INDEX_H_

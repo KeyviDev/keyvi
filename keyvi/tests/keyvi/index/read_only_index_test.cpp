@@ -28,12 +28,12 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "index/index_reader.h"
+#include "index/read_only_index.h"
 #include "testing/index_mock.h"
 
 namespace keyvi {
 namespace index {
-BOOST_AUTO_TEST_SUITE(IndexTests)
+BOOST_AUTO_TEST_SUITE(ReadOnlyIndexTests)
 
 BOOST_AUTO_TEST_CASE(loadIndex) {
   testing::IndexMock index;
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
 
   index.AddSegment(&test_data_2);
 
-  IndexReader reader(index.GetIndexFolder());
+  ReadOnlyIndex reader(index.GetIndexFolder());
 
   BOOST_CHECK(reader.Contains("abc"));
   BOOST_CHECK(reader.Contains("babdd"));
