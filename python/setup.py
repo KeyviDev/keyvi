@@ -88,6 +88,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     extra_link_arguments = []
     link_library_dirs = [keyvi_lib_dir]
+    zlib_root = None
 
     if sys.platform == 'darwin':
         additional_compile_flags.append("-DOS_MACOSX")
@@ -129,6 +130,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             global linklibraries_static_or_dynamic
             global extra_link_arguments
             global ext_modules
+            global zlib_root
             print ("Building in {0} mode".format(self.mode))
 
             if self.mode == 'debug':
@@ -168,6 +170,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             # custom zlib location
             if self.zlib_root:
+                zlib_root = self.zlib_root
                 for ext_m in ext_modules:
                     include_dirs = [path.join(self.zlib_root, "include")] + getattr(ext_m, 'include_dirs')
                     setattr(ext_m, 'include_dirs', include_dirs)
@@ -229,11 +232,15 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             keyvi_build_cmd += ' && cd {}'.format(keyvi_build_dir)
             keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=python ' \
                                 ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
-                                ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX} ..'.format(
+                                ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX}'.format(
                 CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=keyvi_install_prefix)
+            if zlib_root is not None:
+                 keyvi_build_cmd += ' -D ZLIB_ROOT={ZLIB_ROOT}'.format(ZLIB_ROOT=zlib_root)
+            keyvi_build_cmd += ' ..'
             keyvi_build_cmd += ' && make -j {}'.format(cpu_count)
             keyvi_build_cmd += ' && make install'
 
+            print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
 
             os.environ['ARCHFLAGS'] = '-arch x86_64'
