@@ -17,14 +17,14 @@
 //
 
 /*
- * index_reader.h
+ * read_only_index.h
  *
  *  Created on: Jan 11, 2017
  *      Author: hendrik
  */
 
-#ifndef KEYVI_INDEX_INDEX_READER_H_
-#define KEYVI_INDEX_INDEX_READER_H_
+#ifndef KEYVI_INDEX_READ_ONLY_INDEX_H_
+#define KEYVI_INDEX_READ_ONLY_INDEX_H_
 
 #include <string>
 
@@ -37,18 +37,18 @@
 namespace keyvi {
 namespace index {
 
-class IndexReader final : public internal::BaseIndexReader<internal::IndexReaderWorker> {
+class ReadOnlyIndex final : public internal::BaseIndexReader<internal::IndexReaderWorker> {
  public:
-  explicit IndexReader(const std::string index_directory, size_t refresh_interval = 1 /*, optional external logger*/)
+  explicit ReadOnlyIndex(const std::string index_directory, size_t refresh_interval = 1 /*, optional external logger*/)
       : BaseIndexReader(index_directory, refresh_interval) {
     Payload().StartWorkerThread();
   }
 
-  ~IndexReader() { Payload().StopWorkerThread(); }
+  ~ReadOnlyIndex() { Payload().StopWorkerThread(); }
 
   void Reload() { Payload().Reload(); }
 };
 } /* namespace index */
 } /* namespace keyvi */
 
-#endif  // KEYVI_INDEX_INDEX_READER_H_
+#endif  // KEYVI_INDEX_READ_ONLY_INDEX_H_

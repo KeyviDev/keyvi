@@ -29,11 +29,11 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "index/index_writer.h"
+#include "index/index.h"
 
 namespace keyvi {
 namespace index {
-BOOST_AUTO_TEST_SUITE(IndexWriterTests)
+BOOST_AUTO_TEST_SUITE(IndexTests)
 
 BOOST_AUTO_TEST_CASE(basic_writer) {
   using boost::filesystem::temp_directory_path;
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(basic_writer) {
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path();
-  IndexWriter writer(tmp_path.string());
+  Index writer(tmp_path.string());
 
   writer.Set("a", "{\"id\":3}");
 
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path();
-  IndexWriter writer(tmp_path.string(), std::chrono::milliseconds(100));
+  Index writer(tmp_path.string(), std::chrono::milliseconds(100));
 
   for (int i = 0; i < 10000; ++i) {
     writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
