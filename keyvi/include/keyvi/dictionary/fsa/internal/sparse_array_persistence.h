@@ -39,7 +39,7 @@
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/util/endian.h"
-#include "dictionary/util/vint.h"
+#include "util/vint.h"
 
 // #define PERSISTENCE_DEBUG
 #ifdef PERSISTENCE_DEBUG
@@ -293,10 +293,10 @@ inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t 
     size_t overflow_bucket = (pt >> 4) + offset - 512;
 
     if (overflow_bucket >= in_memory_buffer_offset_) {
-      resolved_ptr = util::decodeVarshort(transitions_ - in_memory_buffer_offset_ + overflow_bucket);
+      resolved_ptr = keyvi::util::decodeVarshort(transitions_ - in_memory_buffer_offset_ + overflow_bucket);
     } else {
       if (transitions_extern_->GetAddressQuickTestOk(overflow_bucket * sizeof(uint16_t), 5)) {
-        resolved_ptr = util::decodeVarshort(
+        resolved_ptr = keyvi::util::decodeVarshort(
             reinterpret_cast<uint16_t*>(transitions_extern_->GetAddress(overflow_bucket * sizeof(uint16_t))));
       } else {
         // value might be on the chunk border, take a secure approach
@@ -304,7 +304,7 @@ inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t 
         transitions_extern_->GetBuffer((offset + FINAL_OFFSET_TRANSITION) * sizeof(uint16_t), buffer,
                                        10 * sizeof(uint16_t));
 
-        resolved_ptr = util::decodeVarshort(buffer);
+        resolved_ptr = keyvi::util::decodeVarshort(buffer);
       }
     }
 
@@ -325,20 +325,20 @@ inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t 
 template <>
 inline uint64_t SparseArrayPersistence<uint16_t>::ReadFinalValue(size_t offset) const {
   if (offset + FINAL_OFFSET_TRANSITION >= in_memory_buffer_offset_) {
-    return util::decodeVarshort(transitions_ + offset - in_memory_buffer_offset_ + FINAL_OFFSET_TRANSITION);
+    return keyvi::util::decodeVarshort(transitions_ + offset - in_memory_buffer_offset_ + FINAL_OFFSET_TRANSITION);
   }
 
   if (transitions_extern_->GetAddressQuickTestOk((offset + FINAL_OFFSET_TRANSITION) * sizeof(uint16_t), 5)) {
     uint16_t* ptr = reinterpret_cast<uint16_t*>(
         transitions_extern_->GetAddress((offset + FINAL_OFFSET_TRANSITION) * sizeof(uint16_t)));
-    return util::decodeVarshort(ptr);
+    return keyvi::util::decodeVarshort(ptr);
   }
 
   // value might be on the chunk border, take a secure approach
   uint16_t buffer[10];
   transitions_extern_->GetBuffer((offset + FINAL_OFFSET_TRANSITION) * sizeof(uint16_t), buffer, 10 * sizeof(uint16_t));
 
-  return util::decodeVarshort(buffer);
+  return keyvi::util::decodeVarshort(buffer);
 }
 
 } /* namespace internal */

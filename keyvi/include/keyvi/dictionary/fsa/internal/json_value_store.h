@@ -48,7 +48,7 @@
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
 #include "dictionary/keyvi_file.h"
-#include "dictionary/util/configuration.h"
+#include "util/configuration.h"
 
 #include "msgpack.hpp"
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
@@ -57,7 +57,7 @@
 
 #include "compression/compression_selector.h"
 #include "dictionary/fsa/internal/constants.h"
-#include "dictionary/util/json_value.h"
+#include "util/json_value.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -79,19 +79,19 @@ class JsonValueStore final : public IValueStoreWriter {
 
   explicit JsonValueStore(const vs_param_t& parameters = vs_param_t())
       : IValueStoreWriter(parameters),
-        hash_(util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
+        hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
     temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
 
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
     boost::filesystem::create_directory(temporary_directory_);
 
-    compression_threshold_ = util::mapGet(parameters_, COMPRESSION_THRESHOLD_KEY, 32);
+    compression_threshold_ = keyvi::util::mapGet(parameters_, COMPRESSION_THRESHOLD_KEY, 32);
 
-    std::string compressor = util::mapGet<std::string>(parameters_, COMPRESSION_KEY, "");
+    std::string compressor = keyvi::util::mapGet<std::string>(parameters_, COMPRESSION_KEY, "");
 
-    minimize_ = util::mapGetBool(parameters_, MINIMIZATION_KEY, true);
+    minimize_ = keyvi::util::mapGetBool(parameters_, MINIMIZATION_KEY, true);
 
-    std::string float_mode = util::mapGet<std::string>(parameters_, SINGLE_PRECISION_FLOAT_KEY, "");
+    std::string float_mode = keyvi::util::mapGet<std::string>(parameters_, SINGLE_PRECISION_FLOAT_KEY, "");
 
     if (float_mode == "single") {
       // set single precision float mode
@@ -109,7 +109,7 @@ class JsonValueStore final : public IValueStoreWriter {
 
     // use memory limit as an indicator for the external memory chunksize
     const size_t external_memory_chunk_size =
-        util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE);
+        keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE);
 
     TRACE("External Memory chunk size: %d", external_memory_chunk_size);
 
@@ -148,8 +148,8 @@ class JsonValueStore final : public IValueStoreWriter {
   uint64_t GetValue(const value_t& value, bool* no_minimization) {
     msgpack_buffer_.clear();
 
-    util::EncodeJsonValue(long_compress_, short_compress_, msgpack_buffer_, string_buffer_, value,
-                          compression_threshold_);
+    keyvi::util::EncodeJsonValue(long_compress_, short_compress_, &msgpack_buffer_, &string_buffer_, value,
+                                 compression_threshold_);
 
     ++number_of_values_;
 
@@ -232,14 +232,14 @@ class JsonValueStore final : public IValueStoreWriter {
    */
   std::unique_ptr<compression::CompressionStrategy> compressor_;
   std::unique_ptr<compression::CompressionStrategy> raw_compressor_;
-  std::function<void(compression::buffer_t&, const char*, size_t)> long_compress_;
-  std::function<void(compression::buffer_t&, const char*, size_t)> short_compress_;
+  std::function<void(compression::buffer_t*, const char*, size_t)> long_compress_;
+  std::function<void(compression::buffer_t*, const char*, size_t)> short_compress_;
   size_t compression_threshold_;
   bool minimize_ = true;
 
   LeastRecentlyUsedGenerationsCache<RawPointer<>> hash_;
   compression::buffer_t string_buffer_;
-  util::msgpack_buffer msgpack_buffer_;
+  keyvi::util::msgpack_buffer msgpack_buffer_;
   size_t number_of_values_ = 0;
   size_t number_of_unique_values_ = 0;
   size_t values_buffer_size_ = 0;
@@ -257,7 +257,7 @@ class JsonValueStore final : public IValueStoreWriter {
     size_t buffer_size;
 
     const char* full_buf = payload + fsa_value;
-    const char* buf_ptr = util::decodeVarintString(full_buf, &buffer_size);
+    const char* buf_ptr = keyvi::util::decodeVarintString(full_buf, &buffer_size);
 
     const RawPointerForCompare<MemoryMapManager> stp(buf_ptr, buffer_size, values_extern_.get());
     const RawPointer<> p = hash_.Get(stp);
@@ -287,7 +287,7 @@ class JsonValueStore final : public IValueStoreWriter {
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
     size_t length;
 
-    dictionary::util::encodeVarint(string_buffer_.size(), *values_extern_, &length);
+    keyvi::util::encodeVarint(string_buffer_.size(), values_extern_.get(), &length);
     values_buffer_size_ += length;
     values_extern_->Append(reinterpret_cast<const void*>(string_buffer_.data()), string_buffer_.size());
     values_buffer_size_ += string_buffer_.size();
@@ -330,9 +330,9 @@ class JsonValueStoreReader final : public IValueStoreReader {
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());
 
-    std::string raw_value = util::decodeVarintString(strings_ + fsa_value);
+    std::string raw_value = keyvi::util::decodeVarintString(strings_ + fsa_value);
 
-    // auto length = util::decodeVarint((uint8_t*) strings_ + fsa_value);
+    // auto length = keyvi::util::decodeVarint((uint8_t*) strings_ + fsa_value);
     // std::string raw_value(strings_ + fsa_value, length);
 
     (*attributes)["value"] = raw_value;
@@ -340,14 +340,14 @@ class JsonValueStoreReader final : public IValueStoreReader {
   }
 
   std::string GetRawValueAsString(uint64_t fsa_value) const override {
-    return util::decodeVarintString(strings_ + fsa_value);
+    return keyvi::util::decodeVarintString(strings_ + fsa_value);
   }
 
   std::string GetValueAsString(uint64_t fsa_value) const override {
     TRACE("JsonValueStoreReader GetValueAsString");
-    std::string packed_string = util::decodeVarintString(strings_ + fsa_value);
+    std::string packed_string = keyvi::util::decodeVarintString(strings_ + fsa_value);
 
-    return util::DecodeJsonValue(packed_string);
+    return keyvi::util::DecodeJsonValue(packed_string);
   }
 
   std::string GetStatistics() const override {

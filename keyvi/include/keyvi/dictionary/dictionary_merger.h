@@ -33,7 +33,7 @@
 #include "dictionary/fsa/entry_iterator.h"
 #include "dictionary/fsa/generator_adapter.h"
 #include "dictionary/fsa/internal/constants.h"
-#include "dictionary/util/configuration.h"
+#include "util/configuration.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -100,9 +100,9 @@ class DictionaryMerger final {
    * @params params merger parameters
    */
   explicit DictionaryMerger(const merger_param_t& params = merger_param_t()) : dicts_to_merge_(), params_(params) {
-    params_[TEMPORARY_PATH_KEY] = util::mapGetTemporaryPath(params);
+    params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
-    append_merge_ = MERGE_APPEND == util::mapGet<std::string>(params_, MERGE_MODE, "");
+    append_merge_ = MERGE_APPEND == keyvi::util::mapGet<std::string>(params_, MERGE_MODE, "");
   }
 
   void Add(const std::string& filename) {

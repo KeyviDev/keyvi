@@ -30,7 +30,7 @@
 #include <cstdint>
 #include <functional>
 
-#include "dictionary/util/vint.h"
+#include "util/vint.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -43,7 +43,7 @@ namespace internal {
 template <class HashCodeTypeT = int32_t>
 struct RawPointer final {
  public:
-  RawPointer() : RawPointer(0, 0, 0) {}
+  RawPointer() : offset_(0), hashcode_(0), length_(0) {}
 
   RawPointer(uint64_t offset, HashCodeTypeT hashcode, size_t length)
       : offset_(offset), hashcode_(hashcode), length_(length) {
@@ -114,7 +114,7 @@ struct RawPointerForCompare final {
 
       TRACE("check equality, 3rd buffer %d %d %d", l.GetOffset(), value_size_, util::getVarintLength(length_l));
       // we know the length, skip the length byte and compare the value
-      return persistence_->Compare(l.GetOffset() + util::getVarintLength(length_l),
+      return persistence_->Compare(l.GetOffset() + keyvi::util::getVarintLength(length_l),
                                    reinterpret_cast<const void*>(value_), value_size_);
     }
 
@@ -122,11 +122,11 @@ struct RawPointerForCompare final {
     char buf[8];
     persistence_->GetBuffer(l.GetOffset(), buf, 8);
 
-    length_l = util::decodeVarint(reinterpret_cast<uint8_t*>(buf));
+    length_l = keyvi::util::decodeVarint(reinterpret_cast<uint8_t*>(buf));
 
     TRACE("check equality, 3rd buffer %d %d", l.GetOffset(), value_size_);
-    return persistence_->Compare(l.GetOffset() + util::getVarintLength(length_l), reinterpret_cast<const void*>(value_),
-                                 value_size_);
+    return persistence_->Compare(l.GetOffset() + keyvi::util::getVarintLength(length_l),
+                                 reinterpret_cast<const void*>(value_), value_size_);
   }
 
  private:
