@@ -13,8 +13,11 @@ import glob
 from contextlib import contextmanager
 from os import path
 
-pykeyvi_pyx = 'keyvi.pyx'
-pykeyvi_cpp = 'keyvi.cpp'
+pykeyvi_pyx = '_core.pyx'
+pykeyvi_cpp = '_core.cpp'
+keyvi_cpp_source = '../keyvi'
+keyvi_cpp = 'src/cpp'
+keyvi_cpp_link = path.join(keyvi_cpp, 'keyvi')
 
 try:
     cpu_count = multiprocessing.cpu_count()
@@ -36,14 +39,16 @@ def generate_pykeyvi_source():
 
 @contextmanager
 def symlink_keyvi():
-    if not path.exists('keyvi'):
-        os.symlink('../keyvi', 'keyvi')
-        shutil.copy('../CMakeLists.txt', 'CMakeLists.txt')
-        keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), "../keyvi"))
-        pykeyvi_source_path = os.path.join(os.getcwd(),"keyvi")
+    if not path.exists(keyvi_cpp_link):
+        if not path.exists(keyvi_cpp):
+            os.makedirs(keyvi_cpp)
+        os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
+        shutil.copy('../CMakeLists.txt', path.join(keyvi_cpp, 'CMakeLists.txt'))
+        keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
+        pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
         yield (pykeyvi_source_path, keyvi_source_path)
-        os.unlink('keyvi')
-        os.remove('CMakeLists.txt')
+        os.unlink(keyvi_cpp_link)
+        os.remove(path.join(keyvi_cpp, 'CMakeLists.txt'))
     else:
         yield None, None
 
@@ -52,8 +57,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     # workaround for autowrap bug (includes incompatible boost)
     autowrap_data_dir = "autowrap_includes"
 
-    dictionary_sources = path.abspath('keyvi')
-    keyvi_build_dir = path.join('keyvi-build')
+    dictionary_sources = path.abspath(keyvi_cpp_link)
+    keyvi_build_dir = path.join(keyvi_cpp, 'build')
     keyvi_install_prefix = 'install'
     keyvi_lib_dir = path.join(keyvi_build_dir, keyvi_install_prefix, 'lib')
 
@@ -66,7 +71,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     # re-map the source files in the debug symbol tables to there original location so that stepping in a debugger works
     if pykeyvi_source_path is not None:
         additional_compile_flags.append('-fdebug-prefix-map={}={}'.format(pykeyvi_source_path, keyvi_source_path))
-
 
     linklibraries_static_or_dynamic = [
         "boost_program_options",
@@ -112,7 +116,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                             None,
                             "zlib installation root"),
                            ]
-
 
     class custom_opts:
 
@@ -186,13 +189,12 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             self.parent.run(self)
 
-
     class build(custom_opts, _build.build):
         parent = _build.build
         user_options = _build.build.user_options + custom_user_options
 
-
     class sdist(_sdist.sdist):
+
         def run(self):
             generate_pykeyvi_source()
             _sdist.sdist.run(self)
@@ -204,13 +206,16 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     have_wheel = False
     try:
         import wheel.bdist_wheel as _bdist_wheel
+
         class bdist_wheel(custom_opts, _bdist_wheel.bdist_wheel):
             parent = _bdist_wheel.bdist_wheel
             user_options = _bdist_wheel.bdist_wheel.user_options + custom_user_options
+
         have_wheel = True
     except: None
 
     class build_ext(_build_ext.build_ext):
+
         def run(self):
             generate_pykeyvi_source()
 
@@ -246,11 +251,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             os.environ['ARCHFLAGS'] = '-arch x86_64'
             _build_ext.build_ext.run(self)
 
-
-    ext_modules = [Extension('keyvi',
+    ext_modules = [Extension('keyvi._core',
                              include_dirs=[autowrap_data_dir,
                                            path.join(dictionary_sources, '3rdparty/tpie'),
-                                           path.join(os.path.join(keyvi_build_dir,'keyvi/3rdparty/tpie')),
+                                           path.join(os.path.join(keyvi_build_dir, 'keyvi/3rdparty/tpie')),
                                            path.join(dictionary_sources, 'include/keyvi'),
                                            path.join(dictionary_sources, '3rdparty/rapidjson/include'),
                                            path.join(dictionary_sources, '3rdparty/msgpack-c/include'),
@@ -286,7 +290,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         license="ASL 2.0",
         cmdclass=commands,
         scripts=['bin/keyvi'],
-        packages=['keyvicli'],
+        packages=['keyvi', 'keyvicli'],
+        package_dir = {'': 'src/py'},
         ext_modules=ext_modules,
         zip_safe=False,
         url='http://keyvi.org',
