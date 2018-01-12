@@ -5,7 +5,13 @@
 keyvi.egg-info/
 build/
 dist/
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info
+MANIFEST
+.cache
 
 # autowrap artifacts
-keyvi.pyx
-keyvi.cpp
+_core.pyx
+_core.cpp
