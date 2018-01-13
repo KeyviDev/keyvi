@@ -30,6 +30,7 @@
 #include "dictionary/dictionary_types.h"
 #include "dictionary/fsa/traverser_types.h"
 #include "testing/temp_dictionary.h"
+#include "util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -43,7 +44,8 @@ BOOST_AUTO_TEST_CASE(MergeKeyOnlyDicts) {
   std::vector<std::string> test_data2 = {"aaaaz", "aabbe", "cdddefgh"};
   testing::TempDictionary dictionary2(&test_data2);
 
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>> merger(merger_param_t({{"memory_limit_mb", "10"}}));
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>> merger(
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   std::string filename("merged-dict-key-only.kv");
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
@@ -87,7 +89,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDicts) {
 
   std::string filename("merged-dict-int.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -134,7 +136,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
   testing::TempDictionary dictionary2(&test_data2, false);
 
   std::string filename("merged-dict-int-v1.kv");
-  IntDictionaryMerger merger(merger_param_t({{"memory_limit_mb", "10"}}));
+  IntDictionaryMerger merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -155,7 +157,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
 
   filename = "merged-dict-int-v2.kv";
   testing::TempDictionary dictionary3(&test_data, false);
-  IntDictionaryMerger merger2(merger_param_t({{"memory_limit_mb", "10"}}));
+  IntDictionaryMerger merger2(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -178,7 +180,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v3.kv";
-  IntDictionaryMerger merger3(merger_param_t({{"memory_limit_mb", "10"}}));
+  IntDictionaryMerger merger3(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
@@ -212,7 +214,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
   testing::TempDictionary dictionary2(&test_data2, false);
 
   std::string filename("merged-dict-int-v1.kv");
-  IntDictionaryMerger merger(merger_param_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
+  IntDictionaryMerger merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -233,7 +235,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
 
   filename = "merged-dict-int-v2.kv";
   testing::TempDictionary dictionary3(&test_data, false);
-  IntDictionaryMerger merger2(merger_param_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
+  IntDictionaryMerger merger2(keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -256,7 +258,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v3.kv";
-  IntDictionaryMerger merger3(merger_param_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
+  IntDictionaryMerger merger3(keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
@@ -293,7 +295,7 @@ BOOST_AUTO_TEST_CASE(MergeStringDicts) {
 
   std::string filename("merged-dict-string.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -345,7 +347,7 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
 
   std::string filename("merged-dict-json.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -385,7 +387,7 @@ BOOST_AUTO_TEST_CASE(MergeIncompatible) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
   testing::TempDictionary dictionary(&test_data);
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
 }
@@ -404,7 +406,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
 
   std::string filename("merged-dict-int-weight-v1.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -459,7 +461,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
 
   filename = "merged-dict-int-weight-v2.kv";
   testing::TempDictionary dictionary3(&test_data);
-  CompletionDictionaryMerger merger2(merger_param_t({{"memory_limit_mb", "10"}}));
+  CompletionDictionaryMerger merger2(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -482,7 +484,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-weight-v3.kv";
-  CompletionDictionaryMerger merger3(merger_param_t({{"memory_limit_mb", "10"}}));
+  CompletionDictionaryMerger merger3(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
@@ -551,7 +553,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsAppendMerge) {
 
   std::string filename = "merged-dict-int-weight-v2.kv";
   testing::TempDictionary dictionary3(&test_data);
-  CompletionDictionaryMerger merger2(merger_param_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
+  CompletionDictionaryMerger merger2(keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());

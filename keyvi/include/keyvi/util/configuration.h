@@ -37,13 +37,15 @@
 namespace keyvi {
 namespace util {
 
+typedef std::map<std::string, std::string> parameters_t;
+
 template <typename OutType>
-OutType mapGet(const std::map<std::string, std::string>& map, const std::string& key) {
+OutType mapGet(const parameters_t& map, const std::string& key) {
   return boost::lexical_cast<OutType>(map.at(key));
 }
 
 template <typename OutType>
-OutType mapGet(const std::map<std::string, std::string>& map, const std::string& key, const OutType& default_value) {
+OutType mapGet(const parameters_t& map, const std::string& key, const OutType& default_value) {
   if (map.count(key) > 0) {
     return boost::lexical_cast<OutType>(map.at(key));
   }
@@ -51,8 +53,7 @@ OutType mapGet(const std::map<std::string, std::string>& map, const std::string&
   return default_value;
 }
 
-inline bool mapGetBool(const std::map<std::string, std::string>& map, const std::string& key,
-                       const bool default_value) {
+inline bool mapGetBool(const parameters_t& map, const std::string& key, const bool default_value) {
   if (map.count(key) > 0) {
     auto v = map.at(key);
     boost::algorithm::to_lower(v);
@@ -66,8 +67,7 @@ inline bool mapGetBool(const std::map<std::string, std::string>& map, const std:
   return default_value;
 }
 
-inline size_t mapGetMemory(const std::map<std::string, std::string>& map, const std::string& key,
-                           const size_t default_value) {
+inline size_t mapGetMemory(const parameters_t& map, const std::string& key, const size_t default_value) {
   if (map.count(key) > 0) {
     return boost::lexical_cast<size_t>(map.at(key));
   } else if (map.count(key + "_kb") > 0) {
@@ -81,7 +81,7 @@ inline size_t mapGetMemory(const std::map<std::string, std::string>& map, const 
   return default_value;
 }
 
-inline std::string mapGetTemporaryPath(const std::map<std::string, std::string>& map) {
+inline std::string mapGetTemporaryPath(const parameters_t& map) {
   if (map.count(TEMPORARY_PATH_KEY) > 0) {
     return map.at(TEMPORARY_PATH_KEY);
   }

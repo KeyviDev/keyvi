@@ -43,6 +43,7 @@
 #include "index/internal/merge_job.h"
 #include "index/internal/segment.h"
 #include "util/active_object.h"
+#include "util/configuration.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -110,8 +111,8 @@ class IndexWriterWorker final {
       // todo non-lazy?
       if (!payload.compiler_) {
         TRACE("recreate compiler");
-        dictionary::compiler_param_t params =
-            dictionary::compiler_param_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
+        keyvi::util::parameters_t params =
+            keyvi::util::parameters_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
 
         payload.compiler_.reset(new dictionary::JsonDictionaryCompilerSmallData(params));
       }

@@ -29,13 +29,13 @@
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/program_options.hpp>
-#include "dictionary/dictionary_types.h"
 
-typedef keyvi::dictionary::fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
+#include "dictionary/dictionary_types.h"
+#include "util/configuration.h"
 
 /** Extracts the parameters. */
-vs_param_t extract_parameters(const boost::program_options::variables_map& vm) {
-  vs_param_t ret;
+keyvi::util::parameters_t extract_parameters(const boost::program_options::variables_map& vm) {
+  keyvi::util::parameters_t ret;
   for (auto& v : vm["parameter"].as<std::vector<std::string>>()) {
     std::vector<std::string> key_value;
     boost::split(key_value, v, std::bind1st(std::equal_to<char>(), '='));
@@ -60,9 +60,10 @@ int main(int argc, char** argv) {
   description.add_options()("output-file,o", boost::program_options::value<std::string>(), "output file");
   description.add_options()("memory-limit,m", boost::program_options::value<std::string>(),
                             "amount of main memory to use");
-  description.add_options()("parameter,p", boost::program_options::value<std::vector<std::string>>()
-                                               ->default_value(std::vector<std::string>(), "EMPTY")
-                                               ->composing(),
+  description.add_options()("parameter,p",
+                            boost::program_options::value<std::vector<std::string>>()
+                                ->default_value(std::vector<std::string>(), "EMPTY")
+                                ->composing(),
                             "An option; format is -p xxx=yyy");
 
   // Declare which options are positional
@@ -101,9 +102,7 @@ int main(int argc, char** argv) {
       }
     }
 
-    typedef keyvi::dictionary::fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
-
-    vs_param_t params = extract_parameters(vm);
+    keyvi::util::parameters_t params = extract_parameters(vm);
     if (vm.count("memory-limit")) {
       params[MEMORY_LIMIT_KEY] = vm["memory-limit"].as<std::string>();
     }

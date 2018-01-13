@@ -132,8 +132,6 @@ class generator_exception final : public std::runtime_error {
  * containing "e", than stack 4 with "d", stack 3 with "c", "e" and so on.
  * Note: The input must be sorted according to a user-defined sort order.
  */
-typedef const internal::IValueStoreWriter::vs_param_t generator_param_t;
-
 struct ValueHandle final {
   bool operator==(const ValueHandle other) const {
     return (value_idx == other.value_idx) && (count == other.count) && (weight == other.weight) &&
@@ -153,7 +151,8 @@ template <class PersistenceT, class ValueStoreT = internal::NullValueStore, clas
           class HashCodeTypeT = int32_t>
 class Generator final {
  public:
-  explicit Generator(const generator_param_t& params = generator_param_t(), ValueStoreT* value_store = NULL)
+  explicit Generator(const keyvi::util::parameters_t& params = keyvi::util::parameters_t(),
+                     ValueStoreT* value_store = NULL)
       : params_(params) {
     memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
 
@@ -351,7 +350,7 @@ class Generator final {
 
  private:
   size_t memory_limit_;
-  internal::IValueStoreWriter::vs_param_t params_;
+  keyvi::util::parameters_t params_;
   PersistenceT* persistence_;
   ValueStoreT* value_store_;
   internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>* builder_;

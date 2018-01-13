@@ -41,8 +41,6 @@
 namespace keyvi {
 namespace dictionary {
 
-typedef const fsa::internal::IValueStoreWriter::vs_param_t merger_param_t;
-
 template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryMerger final {
  private:
@@ -99,7 +97,8 @@ class DictionaryMerger final {
    *
    * @params params merger parameters
    */
-  explicit DictionaryMerger(const merger_param_t& params = merger_param_t()) : dicts_to_merge_(), params_(params) {
+  explicit DictionaryMerger(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
+      : dicts_to_merge_(), params_(params) {
     params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
     append_merge_ = MERGE_APPEND == keyvi::util::mapGet<std::string>(params_, MERGE_MODE, "");
@@ -209,7 +208,7 @@ class DictionaryMerger final {
   std::vector<std::string> inputFiles_;
   std::priority_queue<SegmentIterator> segments_pqueue_;
 
-  fsa::internal::IValueStoreWriter::vs_param_t params_;
+  keyvi::util::parameters_t params_;
   std::string manifest_ = std::string();
 };
 

@@ -41,7 +41,8 @@ class GeneratorAdapterInterface {
  public:
   using AdapterPtr = std::unique_ptr<GeneratorAdapterInterface>;
 
-  static AdapterPtr CreateGenerator(size_t size_of_keys, const generator_param_t& params, ValueStoreT* value_store);
+  static AdapterPtr CreateGenerator(size_t size_of_keys, const keyvi::util::parameters_t& params,
+                                    ValueStoreT* value_store);
 
  public:
   GeneratorAdapterInterface() {}
@@ -62,9 +63,9 @@ class GeneratorAdapterInterface {
 template <class PersistenceT, class ValueStoreT, class OffsetTypeT, class HashCodeTypeT>
 class GeneratorAdapter final : public GeneratorAdapterInterface<PersistenceT, ValueStoreT> {
  public:
-  explicit GeneratorAdapter(const generator_param_t& value_store_params = generator_param_t(),
+  explicit GeneratorAdapter(const keyvi::util::parameters_t& params = keyvi::util::parameters_t(),
                             ValueStoreT* value_store = NULL)
-      : generator_(value_store_params, value_store) {}
+      : generator_(params, value_store) {}
 
   void Add(const std::string& input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     generator_.Add(std::move(input_key), value);
@@ -91,7 +92,7 @@ class GeneratorAdapter final : public GeneratorAdapterInterface<PersistenceT, Va
 template <class PersistenceT, class ValueStoreT>
 typename GeneratorAdapterInterface<PersistenceT, ValueStoreT>::AdapterPtr
 GeneratorAdapterInterface<PersistenceT, ValueStoreT>::CreateGenerator(size_t size_of_keys,
-                                                                      const generator_param_t& params,
+                                                                      const keyvi::util::parameters_t& params,
                                                                       ValueStoreT* value_store) {
   size_t memory_limit = keyvi::util::mapGetMemory(params, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
 
