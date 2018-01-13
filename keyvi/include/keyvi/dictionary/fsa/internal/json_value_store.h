@@ -40,7 +40,13 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
+#include "msgpack.hpp"
+// from 3rdparty/xchange: msgpack <-> rapidjson converter
+#include "msgpack/type/rapidjson.hpp"
+
+#include "compression/compression_selector.h"
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/ivalue_store.h"
 #include "dictionary/fsa/internal/lru_generation_cache.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
@@ -49,14 +55,6 @@
 #include "dictionary/fsa/internal/value_store_persistence.h"
 #include "dictionary/keyvi_file.h"
 #include "util/configuration.h"
-
-#include "msgpack.hpp"
-// from 3rdparty/xchange: msgpack <-> rapidjson converter
-#include "msgpack/type/rapidjson.hpp"
-#include "msgpack/zbuffer.hpp"
-
-#include "compression/compression_selector.h"
-#include "dictionary/fsa/internal/constants.h"
 #include "util/json_value.h"
 
 // #define ENABLE_TRACING
@@ -77,7 +75,7 @@ class JsonValueStore final : public IValueStoreWriter {
   static const uint64_t no_value = 0;
   static const bool inner_weight = false;
 
-  explicit JsonValueStore(const vs_param_t& parameters = vs_param_t())
+  explicit JsonValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : IValueStoreWriter(parameters),
         hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
     temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];

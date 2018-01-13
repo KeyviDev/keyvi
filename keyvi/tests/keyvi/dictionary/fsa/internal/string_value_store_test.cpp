@@ -27,6 +27,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "dictionary/fsa/internal/string_value_store.h"
+#include "util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -37,7 +38,7 @@ namespace internal {
 BOOST_AUTO_TEST_SUITE(StringValueTest)
 
 BOOST_AUTO_TEST_CASE(minimization) {
-  IValueStoreWriter ivsw1(IValueStoreWriter::vs_param_t{{"hello", "bello"}});
+  IValueStoreWriter ivsw1(keyvi::util::parameters_t{{"hello", "bello"}});
   IValueStoreWriter ivsw2;
   StringValueStore strings;
 

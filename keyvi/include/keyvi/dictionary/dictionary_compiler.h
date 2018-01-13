@@ -49,7 +49,6 @@
 namespace keyvi {
 namespace dictionary {
 
-typedef const fsa::internal::IValueStoreWriter::vs_param_t compiler_param_t;
 typedef sort::key_value_pair<std::string, fsa::ValueHandle> key_value_t;
 
 /**
@@ -84,7 +83,8 @@ class DictionaryCompiler final {
    *
    * @param params compiler parameters
    */
-  explicit DictionaryCompiler(const compiler_param_t& params = compiler_param_t()) : sorter_(params), params_(params) {
+  explicit DictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
+      : sorter_(params), params_(params) {
     params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
@@ -261,7 +261,7 @@ class DictionaryCompiler final {
 
  private:
   SorterT sorter_;
-  fsa::internal::IValueStoreWriter::vs_param_t params_;
+  keyvi::util::parameters_t params_;
   ValueStoreT* value_store_;
   typename GeneratorAdapter::AdapterPtr generator_;
   boost::property_tree::ptree manifest_ = boost::property_tree::ptree();

@@ -31,6 +31,7 @@
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "testing/temp_dictionary.h"
+#include "util/configuration.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -44,7 +45,7 @@ BOOST_AUTO_TEST_SUITE(PrefixCompletionTests)
 BOOST_AUTO_TEST_CASE(simple) {
   fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-  fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb", "10"}}));
+  fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   g.Add("aaaa");
   g.Add("aabb");
