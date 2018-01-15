@@ -2,6 +2,7 @@ from setuptools import setup, Extension
 import distutils.command.build as _build
 import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
+import distutils.command.build_py as _build_py
 import distutils.command.sdist as _sdist
 import os
 import sys
@@ -215,7 +216,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         have_wheel = True
     except: None
 
-    class build_ext(_build_ext.build_ext):
+    class build_py(_build_py.build_py):
 
         def run(self):
             generate_pykeyvi_source()
@@ -249,6 +250,11 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
 
+            _build_py.build_py.run(self)
+
+    class build_ext(_build_ext.build_ext):
+
+        def run(self):
             os.environ['ARCHFLAGS'] = '-arch x86_64'
             _build_ext.build_ext.run(self)
 
@@ -278,7 +284,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         'msgpack-python',
     ]
 
-    commands = {'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist}
+    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist}
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
 
@@ -292,7 +298,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         cmdclass=commands,
         scripts=['src/py/bin/keyvi'],
         packages=['keyvi', 'keyvi.cli', 'keyvi.index', 'keyvi._pycore', 'keyvi._bin'],
-        package_dir = {'': 'src/py', 'keyvi._bin': keyvi_install_dir},
+        package_dir={'': 'src/py', 'keyvi._bin': keyvi_install_dir},
         package_data={'keyvi._bin': [path.join('bin', 'keyvimerger')]},
         ext_modules=ext_modules,
         zip_safe=False,
