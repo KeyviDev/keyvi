@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path();
-  Index writer(tmp_path.string(), std::chrono::milliseconds(100));
+  Index writer(tmp_path.string(), {{"refresh_interval", "100"}});
 
   for (int i = 0; i < 10000; ++i) {
     writer.Set("a", "{\"id\":" + std::to_string(i) + "}");

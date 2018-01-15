@@ -60,7 +60,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     dictionary_sources = path.abspath(keyvi_cpp_link)
     keyvi_build_dir = path.join(keyvi_cpp, 'build')
     keyvi_install_prefix = 'install'
-    keyvi_lib_dir = path.join(keyvi_build_dir, keyvi_install_prefix, 'lib')
+    keyvi_install_dir = path.join(keyvi_build_dir, keyvi_install_prefix)
+    keyvi_lib_dir = path.join(keyvi_install_dir, 'lib')
 
     additional_compile_flags = []
 
@@ -290,8 +291,9 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         license="ASL 2.0",
         cmdclass=commands,
         scripts=['src/py/bin/keyvi'],
-        packages=['keyvi', 'keyvi.cli', 'keyvi.index'],
-        package_dir = {'': 'src/py'},
+        packages=['keyvi', 'keyvi.cli', 'keyvi.index', 'keyvi._pycore', 'keyvi._bin'],
+        package_dir = {'': 'src/py', 'keyvi._bin': keyvi_install_dir},
+        package_data={'keyvi._bin': [path.join('bin', 'keyvimerger')]},
         ext_modules=ext_modules,
         zip_safe=False,
         url='http://keyvi.org',

@@ -40,7 +40,9 @@
 
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/dictionary_types.h"
+#include "index/internal/constants.h"
 #include "index/internal/merge_job.h"
+#include "index/internal/merge_policy_selector.h"
 #include "index/internal/segment.h"
 #include "util/active_object.h"
 #include "util/configuration.h"
@@ -55,14 +57,14 @@ namespace internal {
 class IndexWriterWorker final {
   typedef std::shared_ptr<dictionary::JsonDictionaryCompilerSmallData> compiler_t;
   struct IndexPayload {
-    explicit IndexPayload(const std::string& index_directory, const std::chrono::milliseconds& flush_interval)
+    explicit IndexPayload(const std::string& index_directory, const std::chrono::milliseconds& refresh_interval)
         : compiler_(),
           write_counter_(0),
           segments_(),
           index_directory_(index_directory),
           merge_jobs_(),
           last_flush_(),
-          flush_interval_(flush_interval),
+          refresh_interval_(refresh_interval),
           merge_enabled_(true) {
       segments_ = std::make_shared<segment_vec_t>();
     }
@@ -73,18 +75,21 @@ class IndexWriterWorker final {
     boost::filesystem::path index_directory_;
     std::list<MergeJob> merge_jobs_;
     std::chrono::system_clock::time_point last_flush_;
-    std::chrono::duration<double> flush_interval_;
+    std::chrono::milliseconds refresh_interval_;
     size_t max_concurrent_merges_ = 2;
     std::atomic_bool merge_enabled_;
   };
 
  public:
-  explicit IndexWriterWorker(const std::string& index_directory,
-                             const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
-      : payload_(index_directory, flush_interval),
-        compiler_active_object_(&payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
-                                flush_interval) {
+  explicit IndexWriterWorker(const std::string& index_directory, const keyvi::util::parameters_t& params)
+      : payload_(index_directory,
+                 std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))),
+        compiler_active_object_(
+            &payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
+            std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))) {
     TRACE("construct worker: %s", payload_.index_directory_.c_str());
+
+    merge_policy_.reset(merge_policy(keyvi::util::mapGet<std::string>(params, MERGE_POLICY, DEFAULT_MERGE_POLICY)));
   }
 
   IndexWriterWorker& operator=(IndexWriterWorker const&) = delete;
@@ -174,6 +179,7 @@ class IndexWriterWorker final {
  private:
   IndexPayload payload_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
+  std::unique_ptr<MergePolicy> merge_policy_;
 
   void ScheduledTask() {
     TRACE("Scheduled task");
@@ -187,7 +193,7 @@ class IndexWriterWorker final {
     }
 
     auto tp = std::chrono::system_clock::now();
-    if (tp - payload_.last_flush_ > payload_.flush_interval_) {
+    if (tp - payload_.last_flush_ > payload_.refresh_interval_) {
       Compile(&payload_);
       payload_.last_flush_ = tp;
     }
@@ -274,13 +280,7 @@ class IndexWriterWorker final {
       return;
     }
 
-    std::vector<segment_t> to_merge;
-    for (segment_t& s : (*payload_.segments_)) {
-      if (!s->MarkedForMerge()) {
-        TRACE("Add to merge list %s", s->GetFilename().c_str());
-        to_merge.push_back(s);
-      }
-    }
+    std::vector<segment_t> to_merge = merge_policy_->SelectMergeSegments(payload_.segments_, 0);
 
     if (to_merge.size() < 1) {
       return;

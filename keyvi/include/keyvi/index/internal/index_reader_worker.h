@@ -43,7 +43,9 @@
 #include "dictionary/dictionary.h"
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/match.h"
+#include "index/internal/constants.h"
 #include "index/internal/segment.h"
+#include "util/configuration.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -54,9 +56,12 @@ namespace internal {
 
 class IndexReaderWorker final {
  public:
-  explicit IndexReaderWorker(const std::string index_directory,
-                             size_t refresh_interval = 1 /*, optional external logger*/)
-      : index_toc_(), segments_(), stop_update_thread_(true) {
+  explicit IndexReaderWorker(const std::string index_directory, const keyvi::util::parameters_t& params)
+      : index_toc_(),
+        segments_(),
+        refresh_interval_(
+            std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))),
+        stop_update_thread_(true) {
     index_directory_ = index_directory;
 
     index_toc_file_ = index_directory_;
@@ -102,6 +107,7 @@ class IndexReaderWorker final {
   std::time_t last_modification_time_;
   boost::property_tree::ptree index_toc_;
   segments_t segments_;
+  std::chrono::milliseconds refresh_interval_;
   std::thread update_thread_;
   std::atomic_bool stop_update_thread_;
 
@@ -159,8 +165,8 @@ class IndexReaderWorker final {
       // reload
       ReloadIndex();
 
-      // sleep for some time
-      std::this_thread::sleep_for(std::chrono::milliseconds(500));
+      // sleep for next refresh
+      std::this_thread::sleep_for(refresh_interval_);
     }
   }
 };

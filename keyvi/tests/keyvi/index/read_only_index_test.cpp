@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(loadIndex) {
 
   index.AddSegment(&test_data_2);
 
-  ReadOnlyIndex reader(index.GetIndexFolder());
+  ReadOnlyIndex reader(index.GetIndexFolder(), {{"refresh_interval", "400"}});
 
   BOOST_CHECK(reader.Contains("abc"));
   BOOST_CHECK(reader.Contains("babdd"));
