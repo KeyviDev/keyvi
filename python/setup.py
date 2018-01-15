@@ -250,6 +250,11 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
 
+            # patch keyvimerger into the package
+            # note: package_data does not work for this as it would break sdist
+            build_dir = os.path.join(*([self.build_lib] + ['keyvi', '_bin']))
+            self.data_files.append(("keyvi._bin", keyvi_install_dir + "/bin", build_dir, ['keyvimerger']))
+
             _build_py.build_py.run(self)
 
     class build_ext(_build_ext.build_ext):
@@ -297,9 +302,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         license="ASL 2.0",
         cmdclass=commands,
         scripts=['src/py/bin/keyvi'],
-        packages=['keyvi', 'keyvi.cli', 'keyvi.index', 'keyvi._pycore', 'keyvi._bin'],
-        package_dir={'': 'src/py', 'keyvi._bin': keyvi_install_dir},
-        package_data={'keyvi._bin': [path.join('bin', 'keyvimerger')]},
+        packages=['keyvi', 'keyvi.cli', 'keyvi.index', 'keyvi._pycore'],
+        package_dir={'': 'src/py'},
         ext_modules=ext_modules,
         zip_safe=False,
         url='http://keyvi.org',

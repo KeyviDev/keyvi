@@ -10,9 +10,12 @@
         else:
             raise Exception('can not handle type of %s' % (args,))
 
+        if isinstance(directory, unicode):
+            directory = directory.encode('UTF-8')
+
         # inject keyvimerger
-        if not "keyvimerger_bin" in params:
-            params["keyvimerger_bin"] = os.path.join(get_bin_folder(), "bin", "keyvimerger")
+        if not b"keyvimerger_bin" in params:
+            params[b"keyvimerger_bin"] = os.path.join(get_bin_folder(), b"keyvimerger")
 
         cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
         for key, value in params.items():
