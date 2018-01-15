@@ -36,7 +36,12 @@ namespace internal {
 class Segment final {
  public:
   explicit Segment(const boost::filesystem::path& path, const bool load = true)
-      : path_(path), filename_(path.filename().string()), deleted_keys_(), dictionary_(), in_merge_(false) {
+      : path_(path),
+        filename_(path.filename().string()),
+        deleted_keys_(),
+        dictionary_(),
+        in_merge_(false),
+        new_delete_(false) {
     if (load) {
       Load();
     }
@@ -62,33 +67,56 @@ class Segment final {
 
   const std::string& GetFilename() const { return filename_; }
 
-  void MarkMerge() { in_merge_ = true; }
+  void MarkMerge() {
+    in_merge_ = true;
+    Persist();
+  }
 
-  void UnMarkMerge() { in_merge_ = false; }
+  void UnMarkMerge() {
+    in_merge_ = false;
+    deleted_keys_.insert(deleted_keys_during_merge_.begin(), deleted_keys_during_merge_.end());
+    deleted_keys_during_merge_.clear();
+  }
 
   bool MarkedForMerge() const { return in_merge_; }
 
   void DeleteKey(const std::string& key) {
-    deleted_keys_.insert(key);
-    dirty_ = true;
+    if (in_merge_) {
+      deleted_keys_during_merge_.insert(key);
+    } else {
+      deleted_keys_.insert(key);
+    }
+    new_delete_ = true;
   }
 
   // persist deleted keys
   void Persist() {
-    boost::filesystem::path deleted_keys_file = path_;
-    deleted_keys_file += ".dk";
+    if (!new_delete_) {
+      return;
+    }
 
-    std::ofstream out_stream(deleted_keys_file.string(), std::ios::binary);
-    msgpack::pack(out_stream, deleted_keys_);
+    boost::filesystem::path deleted_keys_file = path_;
+
+    // its ensured that before merge persis is called, so we have to persist only one or the other file
+    if (in_merge_) {
+      deleted_keys_file += ".dkm";
+      std::ofstream out_stream(deleted_keys_file.string(), std::ios::binary);
+      msgpack::pack(out_stream, deleted_keys_during_merge_);
+    } else {
+      deleted_keys_file += ".dk";
+      std::ofstream out_stream(deleted_keys_file.string(), std::ios::binary);
+      msgpack::pack(out_stream, deleted_keys_);
+    }
   }
 
  private:
   boost::filesystem::path path_;
   std::string filename_;
   std::set<std::string> deleted_keys_;
+  std::set<std::string> deleted_keys_during_merge_;
   dictionary::dictionary_t dictionary_;
   bool in_merge_;
-  bool dirty_;
+  bool new_delete_;
 
   void Load() { dictionary_.reset(new dictionary::Dictionary(path_.string())); }
 };

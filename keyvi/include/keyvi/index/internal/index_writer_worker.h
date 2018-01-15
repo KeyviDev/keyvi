@@ -65,6 +65,7 @@ class IndexWriterWorker final {
           merge_jobs_(),
           last_flush_(),
           refresh_interval_(refresh_interval),
+          any_delete_(false),
           merge_enabled_(true) {
       segments_ = std::make_shared<segment_vec_t>();
     }
@@ -77,6 +78,7 @@ class IndexWriterWorker final {
     std::chrono::system_clock::time_point last_flush_;
     std::chrono::milliseconds refresh_interval_;
     size_t max_concurrent_merges_ = 2;
+    bool any_delete_;
     std::atomic_bool merge_enabled_;
   };
 
@@ -133,6 +135,7 @@ class IndexWriterWorker final {
 
   void Delete(const std::string& key) {
     compiler_active_object_([&key](IndexPayload& payload) {
+      payload.any_delete_ = true;
       TRACE("delete key %s", key.c_str());
 
       if (payload.compiler_) {
@@ -160,7 +163,11 @@ class IndexWriterWorker final {
    */
   void Flush(bool async = true) {
     TRACE("flush");
-    compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
+
+    compiler_active_object_([](IndexPayload& payload) {
+      PersistDeletes(&payload);
+      Compile(&payload);
+    });
 
     if (async == false) {
       std::mutex m;
@@ -178,8 +185,8 @@ class IndexWriterWorker final {
 
  private:
   IndexPayload payload_;
-  util::ActiveObject<IndexPayload> compiler_active_object_;
   std::unique_ptr<MergePolicy> merge_policy_;
+  util::ActiveObject<IndexPayload> compiler_active_object_;
 
   void ScheduledTask() {
     TRACE("Scheduled task");
@@ -300,6 +307,18 @@ class IndexWriterWorker final {
 
     payload_.merge_jobs_.emplace_back(to_merge, merge_policy_id, p);
     payload_.merge_jobs_.back().Run();
+  }
+
+  static inline void PersistDeletes(IndexPayload* payload) {
+    // only loop through segments if any delete has happened
+    if (payload->any_delete_) {
+      for (segment_t& s : *payload->segments_) {
+        s->Persist();
+      }
+    }
+
+    // clear delete flag
+    payload->any_delete_ = false;
   }
 
   static inline void Compile(IndexPayload* payload) {
