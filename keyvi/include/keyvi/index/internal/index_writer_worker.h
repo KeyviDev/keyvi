@@ -209,6 +209,9 @@ class IndexWriterWorker final {
     for (MergeJob& p : payload_.merge_jobs_) {
       if (p.TryFinalize()) {
         if (p.Successful()) {
+          // let the merge policy know that id is done
+          merge_policy_->MergeFinished(p.GetId());
+
           TRACE("rewriting segment list");
           any_merge_finalized = true;
 
@@ -280,7 +283,8 @@ class IndexWriterWorker final {
       return;
     }
 
-    std::vector<segment_t> to_merge = merge_policy_->SelectMergeSegments(payload_.segments_, 0);
+    size_t merge_policy_id = 0;
+    std::vector<segment_t> to_merge = merge_policy_->SelectMergeSegments(payload_.segments_, &merge_policy_id);
 
     if (to_merge.size() < 1) {
       return;
@@ -294,8 +298,7 @@ class IndexWriterWorker final {
       s->MarkMerge();
     }
 
-    // todo: add id
-    payload_.merge_jobs_.emplace_back(to_merge, 0, p);
+    payload_.merge_jobs_.emplace_back(to_merge, merge_policy_id, p);
     payload_.merge_jobs_.back().Run();
   }
 

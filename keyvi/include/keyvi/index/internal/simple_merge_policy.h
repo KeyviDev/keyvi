@@ -46,7 +46,7 @@ class SimpleMergePolicy final : public MergePolicy {
       }
     }
 
-    //*id = 0;
+    *id = 0;
     return to_merge;
   }
 };

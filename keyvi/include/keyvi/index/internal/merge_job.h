@@ -101,6 +101,8 @@ class MergeJob final {
 
   const bool Merged() const { return payload_.merge_done; }
 
+  size_t GetId() const { return id_; }
+
   // todo: ability to kill job/process
 
  private:
