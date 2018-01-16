@@ -30,6 +30,7 @@
 
 #include "index/internal/base_index_reader.h"
 #include "index/internal/index_reader_worker.h"
+#include "util/configuration.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -39,8 +40,9 @@ namespace index {
 
 class ReadOnlyIndex final : public internal::BaseIndexReader<internal::IndexReaderWorker> {
  public:
-  explicit ReadOnlyIndex(const std::string index_directory, size_t refresh_interval = 1 /*, optional external logger*/)
-      : BaseIndexReader(index_directory, refresh_interval) {
+  explicit ReadOnlyIndex(const std::string index_directory,
+                         const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
+      : BaseIndexReader(index_directory, params) {
     Payload().StartWorkerThread();
   }
 

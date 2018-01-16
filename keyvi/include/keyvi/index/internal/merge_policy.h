@@ -21,7 +21,6 @@
 
 #include <vector>
 
-#include "index/internal/merge_job.h"
 #include "index/internal/segment.h"
 
 namespace keyvi {
@@ -36,7 +35,7 @@ class MergePolicy {
 
   virtual void MergeFinished(const size_t id) = 0;
 
-  virtual std::vector<segment_t> SelectMergeSegments(const std::vector<segment_t>& segments, size_t* id) = 0;
+  virtual std::vector<segment_t> SelectMergeSegments(const segments_t& segments, size_t* id) = 0;
 };
 
 } /* namespace internal */

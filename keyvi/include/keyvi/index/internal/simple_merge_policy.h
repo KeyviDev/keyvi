@@ -16,12 +16,16 @@
 // limitations under the License.
 //
 
+#ifndef KEYVI_INDEX_INTERNAL_SIMPLE_MERGE_POLICY_H_
+#define KEYVI_INDEX_INTERNAL_SIMPLE_MERGE_POLICY_H_
+
 #include <vector>
 
 #include "index/internal/merge_policy.h"
+#include "index/internal/segment.h"
 
-#ifndef KEYVI_INDEX_INTERNAL_SIMPLE_MERGE_POLICY_H_
-#define KEYVI_INDEX_INTERNAL_SIMPLE_MERGE_POLICY_H_
+// #define ENABLE_TRACING
+#include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {
@@ -31,11 +35,11 @@ class SimpleMergePolicy final : public MergePolicy {
  public:
   SimpleMergePolicy() {}
 
-  void MergeFinished(const size_t id) {}
+  inline void MergeFinished(const size_t id) {}
 
-  std::vector<segment_t> SelectMergeSegments(const std::vector<segment_t>& segments, size_t* id) {
+  inline std::vector<segment_t> SelectMergeSegments(const segments_t& segments, size_t* id) {
     std::vector<segment_t> to_merge;
-    for (segment_t& s : segments) {
+    for (segment_t& s : *segments) {
       if (!s->MarkedForMerge()) {
         TRACE("Add to merge list %s", s->GetFilename().c_str());
         to_merge.push_back(s);

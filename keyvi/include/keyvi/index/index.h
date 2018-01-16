@@ -58,8 +58,8 @@ namespace index {
 class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker> {
  public:
   explicit Index(const std::string& index_directory,
-                 const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
-      : BaseIndexReader(index_directory, flush_interval), lock_file_() {
+                 const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
+      : BaseIndexReader(index_directory, params), lock_file_() {
     index_directory_ = index_directory;
 
     index_toc_file_ = index_directory_;
