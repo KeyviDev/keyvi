@@ -27,3 +27,11 @@
 
         self.inst = shared_ptr[_Index](new _Index((<libcpp_string>directory), deref(v1)))
         del v1
+
+    def __del__(self, key):
+        if isinstance(key, unicode):
+            key = key.encode('utf-8')
+
+        assert isinstance(key, bytes), 'arg in_0 wrong type'
+
+        return self.inst.get().Delete(key)
