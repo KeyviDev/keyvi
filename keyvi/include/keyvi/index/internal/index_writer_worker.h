@@ -134,7 +134,7 @@ class IndexWriterWorker final {
   }
 
   void Delete(const std::string& key) {
-    compiler_active_object_([&key](IndexPayload& payload) {
+    compiler_active_object_([key](IndexPayload& payload) {
       payload.any_delete_ = true;
       TRACE("delete key %s", key.c_str());
 
@@ -145,7 +145,6 @@ class IndexWriterWorker final {
       if (payload.segments_) {
         for (const segment_t& s : *payload.segments_) {
           if (s->operator*()->Contains(key)) {
-            // todo: what if segment is in merge? -> delete also for the merge job
             s->DeleteKey(key);
           }
         }
@@ -195,12 +194,13 @@ class IndexWriterWorker final {
       RunMerge();
     }
 
-    if (!payload_.compiler_) {
+    if (!payload_.compiler_ && !payload_.any_delete_) {
       return;
     }
 
     auto tp = std::chrono::system_clock::now();
     if (tp - payload_.last_flush_ > payload_.refresh_interval_) {
+      PersistDeletes(&payload_);
       Compile(&payload_);
       payload_.last_flush_ = tp;
     }

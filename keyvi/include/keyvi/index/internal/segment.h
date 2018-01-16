@@ -29,6 +29,9 @@
 
 #include "dictionary/dictionary.h"
 
+// #define ENABLE_TRACING
+#include "dictionary/util/trace.h"
+
 namespace keyvi {
 namespace index {
 namespace internal {
@@ -68,8 +71,8 @@ class Segment final {
   const std::string& GetFilename() const { return filename_; }
 
   void MarkMerge() {
-    in_merge_ = true;
     Persist();
+    in_merge_ = true;
   }
 
   void UnMarkMerge() {
@@ -82,8 +85,10 @@ class Segment final {
 
   void DeleteKey(const std::string& key) {
     if (in_merge_) {
+      TRACE("delete key (in merge) %s", key.c_str());
       deleted_keys_during_merge_.insert(key);
     } else {
+      TRACE("delete key (no merge) %s", key.c_str());
       deleted_keys_.insert(key);
     }
     new_delete_ = true;
@@ -94,10 +99,10 @@ class Segment final {
     if (!new_delete_) {
       return;
     }
-
+    TRACE("persist deleted keys");
     boost::filesystem::path deleted_keys_file = path_;
 
-    // its ensured that before merge persis is called, so we have to persist only one or the other file
+    // its ensured that before merge persist is called, so we have to persist only one or the other file
     if (in_merge_) {
       deleted_keys_file += ".dkm";
       std::ofstream out_stream(deleted_keys_file.string(), std::ios::binary);
