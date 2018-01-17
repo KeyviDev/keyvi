@@ -70,15 +70,16 @@ class Segment final {
 
   const std::string& GetFilename() const { return filename_; }
 
-  void MarkMerge() {
+  void ElectedForMerge() {
     Persist();
     in_merge_ = true;
   }
 
-  void UnMarkMerge() {
+  void MergeFailed() {
     in_merge_ = false;
     deleted_keys_.insert(deleted_keys_during_merge_.begin(), deleted_keys_during_merge_.end());
     deleted_keys_during_merge_.clear();
+    // todo: remove dkm file
   }
 
   bool MarkedForMerge() const { return in_merge_; }

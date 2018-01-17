@@ -260,7 +260,7 @@ class IndexWriterWorker final {
           TRACE("merge failed, reset markers");
           // mark all segments as mergeable again
           for (const segment_t& s : p.Segments()) {
-            s->UnMarkMerge();
+            s->MergeFailed();
           }
 
           // todo throttle strategy?
@@ -302,7 +302,7 @@ class IndexWriterWorker final {
     p /= boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.kv");
 
     for (segment_t& s : to_merge) {
-      s->MarkMerge();
+      s->ElectedForMerge();
     }
 
     payload_.merge_jobs_.emplace_back(to_merge, merge_policy_id, p);
