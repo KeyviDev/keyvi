@@ -24,6 +24,7 @@
  */
 
 
+#include <cstring>
 #include <iostream>
 
 #include "c_api/c_api.h"
@@ -37,8 +38,9 @@ using namespace keyvi::dictionary;
 namespace {
     char *
     std_2_c_string(const std::string &str) {
-        auto result = static_cast<char *>(malloc(str.size() + 1));
-        strcpy(result, str.c_str());
+        const size_t c_str_length = str.size() + 1;
+        auto result = static_cast<char *>(malloc(c_str_length));
+        strncpy(result, str.c_str(), c_str_length);
         return result;
     }
 }
