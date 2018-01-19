@@ -131,6 +131,7 @@ class Segment final {
 typedef std::shared_ptr<Segment> segment_t;
 typedef std::vector<segment_t> segment_vec_t;
 typedef std::shared_ptr<std::vector<segment_t>> segments_t;
+typedef const std::shared_ptr<std::vector<segment_t>> const_segments_t;
 
 } /* namespace internal */
 } /* namespace index */

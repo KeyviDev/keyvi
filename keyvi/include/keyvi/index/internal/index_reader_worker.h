@@ -99,7 +99,7 @@ class IndexReaderWorker final {
 
   void Reload() { ReloadIndex(); }
 
-  segments_t Segments() const { return segments_; }
+  const_segments_t Segments() const { return segments_; }
 
  private:
   boost::filesystem::path index_directory_;

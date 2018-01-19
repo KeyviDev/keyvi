@@ -109,7 +109,7 @@ class IndexWriterWorker final {
     });
   }
 
-  segments_t Segments() const { return payload_.segments_; }
+  const_segments_t Segments() const { return payload_.segments_; }
 
   // todo: rvalue version??
   void Add(const std::string& key, const std::string& value) {
