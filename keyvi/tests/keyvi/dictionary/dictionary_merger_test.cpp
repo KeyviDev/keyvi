@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 
+#include <unordered_set>
+
 #include <boost/test/unit_test.hpp>
 
 #include "dictionary/dictionary.h"
@@ -613,6 +615,35 @@ BOOST_AUTO_TEST_CASE(MergeDuplicateAdd) {
   merger.Add(dictionary.GetFileName());
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(Delete) {
+  std::vector<std::pair<std::string, std::string>> test_data = {
+      {"abcd", "{g:5}"},
+      {"xyz", "{t:4}"},
+  };
+  testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
+
+  JsonDictionaryMerger merger;
+  {
+    std::unordered_set<std::string> deleted_keys_{"xyz"};
+    boost::filesystem::path deleted_keys_file{dictionary.GetFileName()};
+    deleted_keys_file += ".dk";
+    std::ofstream out_stream(deleted_keys_file.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys_);
+  }
+
+  merger.Add(dictionary.GetFileName());
+
+  std::string filename("merge-delete-key-dict.kv");
+  merger.Merge(filename);
+
+  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+  dictionary_t d(new Dictionary(fsa));
+
+  BOOST_CHECK(d->Contains("abcd"));
+  BOOST_CHECK(!d->Contains("xyz"));
+  std::remove(filename.c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
