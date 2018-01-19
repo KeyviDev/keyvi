@@ -24,10 +24,18 @@
 
 #ifndef KEYVI_DICTIONARY_DICTIONARY_MERGER_H_
 #define KEYVI_DICTIONARY_DICTIONARY_MERGER_H_
+
+#include <algorithm>
+#include <fstream>
+#include <functional>
 #include <memory>
 #include <queue>
 #include <string>
 #include <vector>
+
+#include <boost/filesystem.hpp>
+
+#include <msgpack.hpp>
 
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/entry_iterator.h"
@@ -120,10 +128,14 @@ class DictionaryMerger final {
       throw std::invalid_argument("Dictionaries must have the same type.");
     }
 
+    // check whether dictionary is completely empty
     const auto segment_iterator = SegmentIterator(fsa::EntryIterator(fsa), segments_pqueue_.size());
     if (!segment_iterator) {
       return;
     }
+
+    // push back deleted keys (list might be empty)
+    deleted_keys_.push_back(TryLoadDeletedKeys(filename));
 
     segments_pqueue_.push(segment_iterator);
     inputFiles_.push_back(filename);
@@ -168,25 +180,30 @@ class DictionaryMerger final {
         }
       }
 
-      fsa::ValueHandle handle;
-      handle.no_minimization = false;
-
-      // get the weight value, for now simple: does not require access to the
-      // value store itself
-      handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
-
-      if (append_merge_) {
-        handle.value_idx =
-            value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
+      if (!deleted_keys_[segment_it.segmentIndex()].empty() &&
+          top_key == deleted_keys_[segment_it.segmentIndex()].back()) {
+        // check the other deleted_keys,
+        deleted_keys_[segment_it.segmentIndex()].pop_back();
       } else {
-        handle.value_idx =
-            value_store->GetValue(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
-                                  segment_it.entryIterator().GetValueId(), &handle.no_minimization);
+        fsa::ValueHandle handle;
+        handle.no_minimization = false;
+
+        // get the weight value, for now simple: does not require access to the
+        // value store itself
+        handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
+
+        if (append_merge_) {
+          handle.value_idx =
+              value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
+        } else {
+          handle.value_idx =
+              value_store->GetValue(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
+                                    segment_it.entryIterator().GetValueId(), &handle.no_minimization);
+        }
+
+        TRACE("Add key: %s", top_key.c_str());
+        generator->Add(std::move(top_key), handle);
       }
-
-      TRACE("Add key: %s", top_key.c_str());
-      generator->Add(std::move(top_key), handle);
-
       if (++segment_it) {
         segments_pqueue_.push(segment_it);
       }
@@ -205,11 +222,45 @@ class DictionaryMerger final {
  private:
   bool append_merge_ = false;
   std::vector<fsa::automata_t> dicts_to_merge_;
+  std::vector<std::vector<std::string>> deleted_keys_;
   std::vector<std::string> inputFiles_;
   std::priority_queue<SegmentIterator> segments_pqueue_;
 
   keyvi::util::parameters_t params_;
   std::string manifest_ = std::string();
+
+  /**
+   * Load a file with deleted keys if it exists
+   */
+  std::vector<std::string> TryLoadDeletedKeys(const std::string& filename) {
+    std::vector<std::string> deleted_keys;
+    boost::filesystem::path deleted_keys_file{filename};
+    deleted_keys_file += ".dk";
+
+    TRACE("check for deleted keys file: %s", deleted_keys_file.string().c_str());
+    std::ifstream deleted_keys_stream(deleted_keys_file.string(), std::ios::binary);
+
+    if (deleted_keys_stream.good()) {
+      TRACE("found deleted keys file");
+
+      {
+        // reads the buffer as 1 big checker, could be improved
+        // msgpack v2.x provides a better interface (visitor)
+        std::stringstream buffer;
+        buffer << deleted_keys_stream.rdbuf();
+
+        msgpack::unpacked unpacked_object;
+        msgpack::unpack(unpacked_object, buffer.str().data(), buffer.str().size());
+
+        unpacked_object.get().convert(deleted_keys);
+      }
+
+      // sort in reverse order
+      std::sort(deleted_keys.begin(), deleted_keys.end(), std::greater<std::string>());
+    }
+
+    return deleted_keys;
+  }
 };
 
 } /* namespace dictionary */
