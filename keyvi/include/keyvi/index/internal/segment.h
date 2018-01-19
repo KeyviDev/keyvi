@@ -43,11 +43,31 @@ class Segment final {
       : path_(path),
         filename_(path.filename().string()),
         deleted_keys_(),
+        deleted_keys_during_merge_(),
         dictionary_(),
         in_merge_(false),
         new_delete_(false) {
     if (load) {
       Load();
+    }
+  }
+
+  explicit Segment(const boost::filesystem::path& path, const std::vector<std::shared_ptr<Segment>> parent_segments,
+                   const bool load = true)
+      : path_(path),
+        filename_(path.filename().string()),
+        deleted_keys_(),
+        deleted_keys_during_merge_(),
+        dictionary_(),
+        in_merge_(false),
+        new_delete_(false) {
+    if (load) {
+      Load();
+    }
+
+    // move deletions that happened during merge into the list of deleted keys
+    for (const auto& p_segment : parent_segments) {
+      deleted_keys_.insert(p_segment->deleted_keys_during_merge_.begin(), p_segment->deleted_keys_during_merge_.end());
     }
   }
 
