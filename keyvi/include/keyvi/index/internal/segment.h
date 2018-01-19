@@ -21,6 +21,7 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include <boost/filesystem.hpp>
@@ -118,8 +119,8 @@ class Segment final {
  private:
   boost::filesystem::path path_;
   std::string filename_;
-  std::set<std::string> deleted_keys_;
-  std::set<std::string> deleted_keys_during_merge_;
+  std::unordered_set<std::string> deleted_keys_;
+  std::unordered_set<std::string> deleted_keys_during_merge_;
   dictionary::dictionary_t dictionary_;
   bool in_merge_;
   bool new_delete_;
