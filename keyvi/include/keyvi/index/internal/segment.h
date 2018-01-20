@@ -69,6 +69,12 @@ class Segment final {
     for (const auto& p_segment : parent_segments) {
       deleted_keys_.insert(p_segment->deleted_keys_during_merge_.begin(), p_segment->deleted_keys_during_merge_.end());
     }
+
+    // persist the current list of deleted keys
+    if (deleted_keys_.size()) {
+      new_delete_ = true;
+      Persist();
+    }
   }
 
   dictionary::dictionary_t& operator*() {
