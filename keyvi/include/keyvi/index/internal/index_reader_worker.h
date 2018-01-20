@@ -44,7 +44,7 @@
 #include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/match.h"
 #include "index/internal/constants.h"
-#include "index/internal/segment.h"
+#include "index/internal/read_only_segment.h"
 #include "util/configuration.h"
 
 // #define ENABLE_TRACING
@@ -99,14 +99,14 @@ class IndexReaderWorker final {
 
   void Reload() { ReloadIndex(); }
 
-  const_segments_t Segments() const { return segments_; }
+  const_read_only_segments_t Segments() const { return segments_; }
 
  private:
   boost::filesystem::path index_directory_;
   boost::filesystem::path index_toc_file_;
   std::time_t last_modification_time_;
   boost::property_tree::ptree index_toc_;
-  segments_t segments_;
+  read_only_segments_t segments_;
   std::chrono::milliseconds refresh_interval_;
   std::thread update_thread_;
   std::atomic_bool stop_update_thread_;
@@ -146,12 +146,12 @@ class IndexReaderWorker final {
 
     TRACE("reading segments");
 
-    segments_t new_segments = std::make_shared<segment_vec_t>();
+    read_only_segments_t new_segments = std::make_shared<read_only_segment_vec_t>();
 
     for (boost::property_tree::ptree::value_type& f : index_toc_.get_child("files")) {
       boost::filesystem::path p(index_directory_);
       p /= f.second.data();
-      segment_t w(new Segment(p));
+      read_only_segment_t w(new ReadOnlySegment(p));
       new_segments->push_back(w);
     }
 

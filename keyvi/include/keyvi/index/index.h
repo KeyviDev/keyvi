@@ -48,6 +48,7 @@
 #include "dictionary/match.h"
 #include "index/internal/base_index_reader.h"
 #include "index/internal/index_writer_worker.h"
+#include "index/internal/segment.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -55,7 +56,7 @@
 namespace keyvi {
 namespace index {
 
-class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker> {
+class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker, internal::Segment> {
  public:
   explicit Index(const std::string& index_directory,
                  const keyvi::util::parameters_t& params = keyvi::util::parameters_t())

@@ -27,17 +27,20 @@
 #define KEYVI_INDEX_INTERNAL_BASE_INDEX_READER_H_
 
 #include <string>
+#include <vector>
 
 #include "dictionary/match.h"
-#include "index/internal/segment.h"
+#include "index/internal/read_only_segment.h"
 
 namespace keyvi {
 namespace index {
 namespace internal {
 
-template <class PayloadT>
+template <class PayloadT, class SegmentT = ReadOnlySegment>
 class BaseIndexReader {
  public:
+  using const_segments_t = const std::shared_ptr<std::vector<std::shared_ptr<SegmentT>>>;
+
   template <typename... Args>
   explicit BaseIndexReader(Args... args) : payload_(args...) {}
 
