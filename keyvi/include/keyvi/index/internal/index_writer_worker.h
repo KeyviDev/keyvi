@@ -144,9 +144,7 @@ class IndexWriterWorker final {
 
       if (payload.segments_) {
         for (const segment_t& s : *payload.segments_) {
-          if (s->operator*()->Contains(key)) {
-            s->DeleteKey(key);
-          }
+          s->DeleteKey(key);
         }
       }
     });

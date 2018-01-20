@@ -104,14 +104,23 @@ class Segment final {
 
   void MergeFailed() {
     in_merge_ = false;
-    deleted_keys_.insert(deleted_keys_during_merge_.begin(), deleted_keys_during_merge_.end());
-    deleted_keys_during_merge_.clear();
-    // todo: remove dkm file
+    if (deleted_keys_during_merge_.size() > 0) {
+      deleted_keys_.insert(deleted_keys_during_merge_.begin(), deleted_keys_during_merge_.end());
+
+      new_delete_ = true;
+      Persist();
+      deleted_keys_during_merge_.clear();
+      // todo: remove dkm file
+    }
   }
 
   bool MarkedForMerge() const { return in_merge_; }
 
   void DeleteKey(const std::string& key) {
+    if (!GetDictionary()->Contains(key)) {
+      return;
+    }
+
     if (in_merge_) {
       TRACE("delete key (in merge) %s", key.c_str());
       deleted_keys_during_merge_.insert(key);
