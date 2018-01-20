@@ -25,6 +25,7 @@
 #ifndef KEYVI_TESTING_TEMP_DICTIONARY_H_
 #define KEYVI_TESTING_TEMP_DICTIONARY_H_
 
+#include <cstdio>
 #include <string>
 #include <utility>
 #include <vector>

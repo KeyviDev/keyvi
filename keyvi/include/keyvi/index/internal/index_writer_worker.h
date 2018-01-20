@@ -248,7 +248,7 @@ class IndexWriterWorker final {
           // delete old segment files
           for (const segment_t& s : p.Segments()) {
             TRACE("delete old file: %s", s->GetFilename().c_str());
-            std::remove(s->GetPath().string().c_str());
+            s->RemoveFiles();
           }
 
           p.SetMerged();

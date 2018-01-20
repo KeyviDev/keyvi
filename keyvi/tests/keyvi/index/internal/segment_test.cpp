@@ -17,6 +17,8 @@
 //
 
 #include <algorithm>
+
+#include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <msgpack.hpp>
@@ -50,7 +52,8 @@ BOOST_AUTO_TEST_CASE(deletekey) {
       {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"cde", "{c:2}"}, {"fgh", "{g:6}"}, {"tyc", "{o:2}"}};
   testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
 
-  segment_t segment(new Segment(dictionary.GetFileName()));
+  // do with lazy load
+  segment_t segment(new Segment(dictionary.GetFileName(), false));
 
   // delete a key
   segment->DeleteKey("abc");
@@ -99,6 +102,9 @@ BOOST_AUTO_TEST_CASE(deletekey) {
   BOOST_CHECK_EQUAL("abc", deleted_keys[0]);
   BOOST_CHECK_EQUAL("fgh", deleted_keys[1]);
   BOOST_CHECK_EQUAL("tyc", deleted_keys[2]);
+
+  segment->RemoveFiles();
+  BOOST_CHECK(!boost::filesystem::exists(dictionary.GetFileName() + ".dk"));
 }
 
 BOOST_AUTO_TEST_CASE(deletekeyDuringMerge) {
@@ -139,11 +145,17 @@ BOOST_AUTO_TEST_CASE(deletekeyDuringMerge) {
   // simulate a merge failure
   segment->MergeFailed();
 
+  // the "dkm" file should be gone
+  BOOST_CHECK(!boost::filesystem::exists(dictionary.GetFileName() + ".dkm"));
   LoadDeletedKeys(dictionary.GetFileName() + ".dk", &deleted_keys);
 
   BOOST_CHECK_EQUAL(2, deleted_keys.size());
   BOOST_CHECK_EQUAL("abc", deleted_keys[0]);
   BOOST_CHECK_EQUAL("tyc", deleted_keys[1]);
+
+  segment->RemoveFiles();
+  BOOST_CHECK(!boost::filesystem::exists(dictionary.GetFileName() + ".dk"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary.GetFileName() + ".dkm"));
 }
 
 BOOST_AUTO_TEST_CASE(deletekeyMerging) {
@@ -161,7 +173,8 @@ BOOST_AUTO_TEST_CASE(deletekeyMerging) {
       {"efg", "{g:1}"}, {"hij", "{b:2}"}, {"lmn", "{c:2}"}, {"q", "{w:6}"}};
   testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data_segment2);
 
-  segment_t segment2(new Segment(dictionary2.GetFileName()));
+  // mixin lazy load
+  segment_t segment2(new Segment(dictionary2.GetFileName(), false));
 
   // simulate a merge operation
   segment1->ElectedForMerge();
@@ -174,7 +187,7 @@ BOOST_AUTO_TEST_CASE(deletekeyMerging) {
   std::vector<std::pair<std::string, std::string>> test_data_segment_merged = test_data_segment1;
   test_data_segment_merged.insert(test_data_segment_merged.end(), test_data_segment2.begin(), test_data_segment2.end());
 
-  // erase "abc", has been deleted before merge and create the merged dictionary
+  // erase "abc", because it has been deleted before merge and create the merged dictionary
   test_data_segment_merged.erase(test_data_segment_merged.begin());
   testing::TempDictionary dictionary3 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data_segment_merged);
 
@@ -187,6 +200,21 @@ BOOST_AUTO_TEST_CASE(deletekeyMerging) {
   BOOST_CHECK_EQUAL(2, deleted_keys.size());
   BOOST_CHECK_EQUAL("cde", deleted_keys[0]);
   BOOST_CHECK_EQUAL("lmn", deleted_keys[1]);
+
+  segment1->RemoveFiles();
+  BOOST_CHECK(!boost::filesystem::exists(dictionary1.GetFileName() + ".dk"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary1.GetFileName() + ".dkm"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary1.GetFileName()));
+
+  segment2->RemoveFiles();
+  BOOST_CHECK(!boost::filesystem::exists(dictionary2.GetFileName() + ".dk"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary2.GetFileName() + ".dkm"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary2.GetFileName()));
+
+  segment_merged->RemoveFiles();
+  BOOST_CHECK(!boost::filesystem::exists(dictionary3.GetFileName() + ".dk"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary3.GetFileName() + ".dkm"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary3.GetFileName()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

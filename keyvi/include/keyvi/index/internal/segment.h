@@ -18,6 +18,7 @@
 #ifndef KEYVI_INDEX_INTERNAL_SEGMENT_H_
 #define KEYVI_INDEX_INTERNAL_SEGMENT_H_
 
+#include <cstdio>
 #include <memory>
 #include <set>
 #include <string>
@@ -110,11 +111,24 @@ class Segment final {
       new_delete_ = true;
       Persist();
       deleted_keys_during_merge_.clear();
-      // todo: remove dkm file
+      // remove dkm file
+      std::string deleted_keys_file_merge{GetPath().string() + ".dkm"};
+      std::remove(deleted_keys_file_merge.c_str());
     }
   }
 
   bool MarkedForMerge() const { return in_merge_; }
+
+  void RemoveFiles() {
+    // delete files, not all files might exist, therefore ignore the output
+    std::remove(GetPath().c_str());
+
+    std::string deleted_keys_file_merge{GetPath().string() + ".dkm"};
+    std::remove(deleted_keys_file_merge.c_str());
+
+    std::string deleted_keys_file{GetPath().string() + ".dk"};
+    std::remove(deleted_keys_file.c_str());
+  }
 
   void DeleteKey(const std::string& key) {
     if (!GetDictionary()->Contains(key)) {
