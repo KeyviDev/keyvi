@@ -51,6 +51,9 @@ class BaseIndexReader {
     for (auto it = segments->crbegin(); it != segments->crend(); ++it) {
       m = (*it)->GetDictionary()->operator[](key);
       if (!m.IsEmpty()) {
+        if ((*it)->IsDeleted(key)) {
+          return dictionary::Match();
+        }
         return m;
       }
     }
@@ -62,7 +65,7 @@ class BaseIndexReader {
     const_segments_t segments = payload_.Segments();
     for (auto it = segments->crbegin(); it != segments->crend(); it++) {
       if ((*it)->GetDictionary()->Contains(key)) {
-        return true;
+        return !(*it)->IsDeleted(key);
       }
     }
 

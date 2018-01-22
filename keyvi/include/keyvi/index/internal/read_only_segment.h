@@ -81,7 +81,7 @@ class ReadOnlySegment {
     return dictionary_;
   }
 
-  void ReloadDeletedKeys() {}
+  void ReloadDeletedKeys() { LoadDeletedKeys(); }
 
   const boost::filesystem::path& GetDictionaryPath() const { return dictionary_path_; }
 
@@ -92,6 +92,16 @@ class ReadOnlySegment {
   const std::string& GetDictionaryFilename() const { return dictionary_filename_; }
 
   bool HasDeletedKeys() const { return has_deleted_keys_; }
+
+  const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() const { return atomic_load(&deleted_keys_); }
+
+  bool IsDeleted(const std::string& key) const {
+    if (has_deleted_keys_) {
+      return (DeletedKeys()->count(key) > 0);
+    }
+
+    return false;
+  }
 
  protected:
   void Load() {
@@ -158,6 +168,8 @@ class ReadOnlySegment {
 
       // safe swap
       atomic_store(&deleted_keys_, deleted_keys);
+
+      has_deleted_keys_ = true;
     }
   }
 
