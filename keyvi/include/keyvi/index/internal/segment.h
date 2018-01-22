@@ -46,10 +46,13 @@ class Segment final : public ReadOnlySegment {
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),
         in_merge_(false),
-        new_delete_(false) {
+        new_delete_(false),
+        deleted_keys_swap_filename_(path) {
     if (load) {
       Load();
     }
+
+    deleted_keys_swap_filename_ += ".dk-swap";
   }
 
   explicit Segment(const boost::filesystem::path& path, const std::vector<std::shared_ptr<Segment>> parent_segments,
@@ -58,10 +61,13 @@ class Segment final : public ReadOnlySegment {
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),
         in_merge_(false),
-        new_delete_(false) {
+        new_delete_(false),
+        deleted_keys_swap_filename_(path) {
     if (load) {
       Load();
     }
+
+    deleted_keys_swap_filename_ += ".dk-swap";
 
     // move deletions that happened during merge into the list of deleted keys
     for (const auto& p_segment : parent_segments) {
@@ -140,12 +146,13 @@ class Segment final : public ReadOnlySegment {
   std::unordered_set<std::string> deleted_keys_during_merge_for_write_;
   bool in_merge_;
   bool new_delete_;
+  boost::filesystem::path deleted_keys_swap_filename_;
 
-  static inline void SaveDeletedKeys(const std::string& filename, const std::unordered_set<std::string>& deleted_keys) {
-    // todo write to another file, than rename
-
-    std::ofstream out_stream(filename, std::ios::binary);
+  void SaveDeletedKeys(const std::string& filename, const std::unordered_set<std::string>& deleted_keys) {
+    // write to swap file, than rename it
+    std::ofstream out_stream(deleted_keys_swap_filename_.string(), std::ios::binary);
     msgpack::pack(out_stream, deleted_keys);
+    std::rename(deleted_keys_swap_filename_.string().c_str(), filename.c_str());
   }
 };
 

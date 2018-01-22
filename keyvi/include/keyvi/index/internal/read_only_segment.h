@@ -130,7 +130,51 @@ class ReadOnlySegment {
   //! last modification time for the deleted keys file during a merge operation
   std::time_t last_modification_time_deleted_keys_during_merge_;
 
-  void LoadDeletedKeys() {}
+  void LoadDeletedKeys() {
+    boost::system::error_code ec;
+    std::time_t last_write_dk = boost::filesystem::last_write_time(deleted_keys_path_, ec);
+    // effectively ignore if file does not exist
+    if (ec) {
+      last_write_dk = last_modification_time_deleted_keys_;
+    }
+
+    std::time_t last_write_dkm = boost::filesystem::last_write_time(deleted_keys_during_merge_path_, ec);
+    // effectively ignore if file does not exist
+    if (ec) {
+      last_write_dkm = last_modification_time_deleted_keys_during_merge_;
+    }
+
+    // if any list has changed, reload it
+    if (last_write_dk > last_modification_time_deleted_keys_ ||
+        last_write_dkm > last_modification_time_deleted_keys_during_merge_) {
+      std::shared_ptr<std::unordered_set<std::string>> deleted_keys;
+      std::unordered_set<std::string> deleted_keys_dk = LoadAndUnserializeDeletedKeys(deleted_keys_path_.string());
+
+      deleted_keys->swap(deleted_keys_dk);
+      std::unordered_set<std::string> deleted_keys_dkm =
+          LoadAndUnserializeDeletedKeys(deleted_keys_during_merge_path_.string());
+
+      deleted_keys->insert(deleted_keys_dkm.begin(), deleted_keys_dkm.end());
+
+      // safe swap
+      atomic_store(&deleted_keys_, deleted_keys);
+    }
+  }
+
+  inline static std::unordered_set<std::string> LoadAndUnserializeDeletedKeys(const std::string& filename) {
+    std::unordered_set<std::string> deleted_keys;
+    std::ifstream deleted_keys_stream(filename, std::ios::binary);
+    if (deleted_keys_stream.good()) {
+      std::stringstream buffer;
+      buffer << deleted_keys_stream.rdbuf();
+
+      msgpack::unpacked unpacked_object;
+      msgpack::unpack(unpacked_object, buffer.str().data(), buffer.str().size());
+      std::unordered_set<std::string> deleted_keys;
+      unpacked_object.get().convert(deleted_keys);
+    }
+    return deleted_keys;
+  }
 };
 
 typedef std::shared_ptr<ReadOnlySegment> read_only_segment_t;

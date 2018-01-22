@@ -149,6 +149,8 @@ class IndexReaderWorker final {
     read_only_segments_t new_segments = std::make_shared<read_only_segment_vec_t>();
 
     for (boost::property_tree::ptree::value_type& f : index_toc_.get_child("files")) {
+      // todo: check if segment is already loaded and reuse if possible
+
       boost::filesystem::path p(index_directory_);
       p /= f.second.data();
       read_only_segment_t w(new ReadOnlySegment(p));
