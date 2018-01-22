@@ -99,7 +99,7 @@ class IndexReaderWorker final {
 
   void Reload() { ReloadIndex(); }
 
-  const_read_only_segments_t Segments() const { return segments_; }
+  const_read_only_segments_t Segments() const { return atomic_load(&segments_); }
 
  private:
   boost::filesystem::path index_directory_;
@@ -155,7 +155,7 @@ class IndexReaderWorker final {
       new_segments->push_back(w);
     }
 
-    segments_ = new_segments;
+    atomic_store(&segments_, new_segments);
     TRACE("Loaded new segments");
   }
 

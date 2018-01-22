@@ -109,7 +109,7 @@ class IndexWriterWorker final {
     });
   }
 
-  const_segments_t Segments() const { return payload_.segments_; }
+  const_segments_t Segments() const { return atomic_load(&payload_.segments_); }
 
   // todo: rvalue version??
   void Add(const std::string& key, const std::string& value) {
@@ -242,8 +242,8 @@ class IndexWriterWorker final {
           TRACE("merged segment %s", p.MergedSegment()->GetDictionaryFilename().c_str());
           TRACE("1st segment after merge: %s", (*new_segments)[0]->GetDictionaryFilename().c_str());
 
-          // todo: thread-safe?
-          payload_.segments_ = new_segments;
+          // thread-safe atomic exchange
+          atomic_store(&payload_.segments_, new_segments);
           WriteToc(&payload_);
 
           // delete old segment files
