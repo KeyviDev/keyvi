@@ -118,7 +118,7 @@ class MergeJob final {
     std::stringstream command;
     command << "keyvimerger -m 5242880";
     for (auto s : payload_.segments_) {
-      command << " -i " << s->GetPath().string();
+      command << " -i " << s->GetDictionaryPath().string();
     }
 
     command << " -o " << payload_.output_filename_.string();

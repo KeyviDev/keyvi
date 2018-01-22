@@ -244,7 +244,7 @@ class DictionaryMerger final {
       TRACE("found deleted keys file");
 
       {
-        // reads the buffer as 1 big checker, could be improved
+        // reads the buffer as 1 big chunk, could be improved
         // msgpack v2.x provides a better interface (visitor)
         std::stringstream buffer;
         buffer << deleted_keys_stream.rdbuf();

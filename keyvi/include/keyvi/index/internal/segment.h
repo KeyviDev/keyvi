@@ -91,8 +91,7 @@ class Segment final : public ReadOnlySegment {
       Persist();
       deleted_keys_during_merge_for_write_.clear();
       // remove dkm file
-      std::string deleted_keys_file_merge{GetPath().string() + ".dkm"};
-      std::remove(deleted_keys_file_merge.c_str());
+      std::remove(GetDeletedKeysDuringMergePath().string().c_str());
     }
   }
 
@@ -100,13 +99,9 @@ class Segment final : public ReadOnlySegment {
 
   void RemoveFiles() {
     // delete files, not all files might exist, therefore ignore the output
-    std::remove(GetPath().c_str());
-
-    std::string deleted_keys_file_merge{GetPath().string() + ".dkm"};
-    std::remove(deleted_keys_file_merge.c_str());
-
-    std::string deleted_keys_file{GetPath().string() + ".dk"};
-    std::remove(deleted_keys_file.c_str());
+    std::remove(GetDictionaryPath().c_str());
+    std::remove(GetDeletedKeysDuringMergePath().string().c_str());
+    std::remove(GetDeletedKeysPath().string().c_str());
   }
 
   void DeleteKey(const std::string& key) {
@@ -130,15 +125,13 @@ class Segment final : public ReadOnlySegment {
       return;
     }
     TRACE("persist deleted keys");
-    boost::filesystem::path deleted_keys_file = GetPath();
+    boost::filesystem::path deleted_keys_file = GetDictionaryPath();
 
     // its ensured that before merge persist is called, so we have to persist only one or the other file
     if (in_merge_) {
-      deleted_keys_file += ".dkm";
-      SaveDeletedKeys(deleted_keys_file.string(), deleted_keys_during_merge_for_write_);
+      SaveDeletedKeys(GetDeletedKeysDuringMergePath().string(), deleted_keys_during_merge_for_write_);
     } else {
-      deleted_keys_file += ".dk";
-      SaveDeletedKeys(deleted_keys_file.string(), deleted_keys_for_write_);
+      SaveDeletedKeys(GetDeletedKeysPath().string(), deleted_keys_for_write_);
     }
   }
 

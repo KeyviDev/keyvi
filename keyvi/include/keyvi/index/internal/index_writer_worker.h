@@ -227,9 +227,9 @@ class IndexWriterWorker final {
 
           std::copy_if(payload_.segments_->begin(), payload_.segments_->end(), std::back_inserter(*new_segments),
                        [&new_segments, &merged_new_segment, &p](const segment_t& s) {
-                         TRACE("checking %s", s->GetFilename().c_str());
+                         TRACE("checking %s", s->GetDictionaryFilename().c_str());
                          if (std::count_if(p.Segments().begin(), p.Segments().end(), [s](const segment_t& s2) {
-                               return s2->GetFilename() == s->GetFilename();
+                               return s2->GetDictionaryFilename() == s->GetDictionaryFilename();
                              })) {
                            if (!merged_new_segment) {
                              new_segments->push_back(p.MergedSegment());
@@ -239,15 +239,16 @@ class IndexWriterWorker final {
                          }
                          return true;
                        });
-          TRACE("merged segment %s", p.MergedSegment()->GetFilename().c_str());
-          TRACE("1st segment after merge: %s", (*new_segments)[0]->GetFilename().c_str());
+          TRACE("merged segment %s", p.MergedSegment()->GetDictionaryFilename().c_str());
+          TRACE("1st segment after merge: %s", (*new_segments)[0]->GetDictionaryFilename().c_str());
 
+          // todo: thread-safe?
           payload_.segments_ = new_segments;
           WriteToc(&payload_);
 
           // delete old segment files
           for (const segment_t& s : p.Segments()) {
-            TRACE("delete old file: %s", s->GetFilename().c_str());
+            TRACE("delete old file: %s", s->GetDictionaryFilename().c_str());
             s->RemoveFiles();
           }
 
@@ -352,9 +353,9 @@ class IndexWriterWorker final {
     TRACE("Number of segments: %ld", payload->segments_->size());
 
     for (const auto s : *(payload->segments_)) {
-      TRACE("put %s", s->GetFilename().c_str());
+      TRACE("put %s", s->GetDictionaryFilename().c_str());
       boost::property_tree::ptree sp;
-      sp.put("", s->GetFilename());
+      sp.put("", s->GetDictionaryFilename());
       files.push_back(std::make_pair("", sp));
     }
 
