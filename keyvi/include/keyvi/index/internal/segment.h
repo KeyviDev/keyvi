@@ -126,9 +126,9 @@ class Segment final : public ReadOnlySegment {
   }
 
   // persist deleted keys
-  void Persist() {
+  bool Persist() {
     if (!new_delete_) {
-      return;
+      return false;
     }
     TRACE("persist deleted keys");
     boost::filesystem::path deleted_keys_file = GetDictionaryPath();
@@ -139,6 +139,8 @@ class Segment final : public ReadOnlySegment {
     } else {
       SaveDeletedKeys(GetDeletedKeysPath().string(), deleted_keys_for_write_);
     }
+
+    return true;
   }
 
  private:

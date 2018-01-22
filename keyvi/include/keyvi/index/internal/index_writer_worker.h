@@ -312,7 +312,9 @@ class IndexWriterWorker final {
     // only loop through segments if any delete has happened
     if (payload->any_delete_) {
       for (segment_t& s : *payload->segments_) {
-        s->Persist();
+        if (s->Persist()) {
+          s->ReloadDeletedKeys();
+        }
       }
     }
 

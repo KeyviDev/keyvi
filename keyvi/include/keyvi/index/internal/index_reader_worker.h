@@ -33,6 +33,7 @@
 #include <memory>
 #include <string>
 #include <thread>  //NOLINT
+#include <unordered_map>
 #include <vector>
 
 #include <boost/filesystem.hpp>
@@ -107,6 +108,7 @@ class IndexReaderWorker final {
   std::time_t last_modification_time_;
   boost::property_tree::ptree index_toc_;
   read_only_segments_t segments_;
+  std::unordered_map<std::string, read_only_segment_t> segments_by_name_;
   std::chrono::milliseconds refresh_interval_;
   std::thread update_thread_;
   std::atomic_bool stop_update_thread_;
@@ -147,18 +149,31 @@ class IndexReaderWorker final {
     TRACE("reading segments");
 
     read_only_segments_t new_segments = std::make_shared<read_only_segment_vec_t>();
+    std::unordered_map<std::string, read_only_segment_t> new_segments_by_name;
 
     for (boost::property_tree::ptree::value_type& f : index_toc_.get_child("files")) {
-      // todo: check if segment is already loaded and reuse if possible
-
-      boost::filesystem::path p(index_directory_);
-      p /= f.second.data();
-      read_only_segment_t w(new ReadOnlySegment(p));
-      new_segments->push_back(w);
+      // check if segment is already loaded and reuse if possible
+      if (segments_by_name_.count(f.second.data())) {
+        new_segments->push_back(segments_by_name_.at(f.second.data()));
+        new_segments_by_name[f.second.data()] = segments_by_name_.at(f.second.data());
+      } else {
+        boost::filesystem::path p(index_directory_);
+        p /= f.second.data();
+        read_only_segment_t w(new ReadOnlySegment(p));
+        new_segments->push_back(w);
+        new_segments_by_name[f.second.data()] = w;
+      }
     }
 
     atomic_store(&segments_, new_segments);
+    segments_by_name_.swap(new_segments_by_name);
     TRACE("Loaded new segments");
+  }
+
+  void ReloadDeletedKeys() {
+    for (const read_only_segment_t& s : *segments_) {
+      s->ReloadDeletedKeys();
+    }
   }
 
   void UpdateWatcher() {
@@ -166,7 +181,7 @@ class IndexReaderWorker final {
       TRACE("UpdateWatcher: Check for new segments");
       // reload
       ReloadIndex();
-
+      ReloadDeletedKeys();
       // sleep for next refresh
       std::this_thread::sleep_for(refresh_interval_);
     }
