@@ -109,7 +109,15 @@ class IndexWriterWorker final {
     });
   }
 
-  const_segments_t Segments() const { return atomic_load(&payload_.segments_); }
+  const_segments_t Segments() {
+    segments_t segments = segments_weak_.lock();
+    if (!segments) {
+      std::unique_lock<std::mutex> lock(mutex_);
+      segments_weak_ = payload_.segments_;
+      segments = payload_.segments_;
+    }
+    return segments;
+  }
 
   // todo: rvalue version??
   void Add(const std::string& key, const std::string& value) {
@@ -182,6 +190,8 @@ class IndexWriterWorker final {
 
  private:
   IndexPayload payload_;
+  std::weak_ptr<segment_vec_t> segments_weak_;
+  std::mutex mutex_;
   std::unique_ptr<MergePolicy> merge_policy_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
 
@@ -242,8 +252,11 @@ class IndexWriterWorker final {
           TRACE("merged segment %s", p.MergedSegment()->GetDictionaryFilename().c_str());
           TRACE("1st segment after merge: %s", (*new_segments)[0]->GetDictionaryFilename().c_str());
 
-          // thread-safe atomic exchange
-          atomic_store(&payload_.segments_, new_segments);
+          // thread-safe swap
+          {
+            std::unique_lock<std::mutex> lock(mutex_);
+            payload_.segments_.swap(new_segments);
+          }
           WriteToc(&payload_);
 
           // delete old segment files

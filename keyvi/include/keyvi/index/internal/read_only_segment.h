@@ -28,6 +28,7 @@
 #include <cstdio>
 #include <ctime>
 #include <memory>
+#include <mutex>  //NOLINT
 #include <set>
 #include <string>
 #include <unordered_set>
@@ -93,9 +94,19 @@ class ReadOnlySegment {
 
   bool HasDeletedKeys() const { return has_deleted_keys_; }
 
-  const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() const { return atomic_load(&deleted_keys_); }
+  const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
+    // check has_deleted_keys_ or make this private
 
-  bool IsDeleted(const std::string& key) const {
+    std::shared_ptr<std::unordered_set<std::string>> deleted_keys = deleted_keys_weak_.lock();
+    if (!deleted_keys) {
+      std::unique_lock<std::mutex> lock(mutex_);
+      deleted_keys_weak_ = deleted_keys_;
+      deleted_keys = deleted_keys_;
+    }
+    return deleted_keys;
+  }
+
+  bool IsDeleted(const std::string& key) {
     if (has_deleted_keys_) {
       return (DeletedKeys()->count(key) > 0);
     }
@@ -134,6 +145,12 @@ class ReadOnlySegment {
   //! deleted keys
   std::shared_ptr<std::unordered_set<std::string>> deleted_keys_;
 
+  //! a weak ptr to deleted keys for access in the main thread
+  std::weak_ptr<std::unordered_set<std::string>> deleted_keys_weak_;
+
+  //! a mutex to secure access to the deleted keys shared pointer
+  std::mutex mutex_;
+
   //! last modification time for the deleted keys file
   std::time_t last_modification_time_deleted_keys_;
 
@@ -157,17 +174,22 @@ class ReadOnlySegment {
     // if any list has changed, reload it
     if (last_write_dk > last_modification_time_deleted_keys_ ||
         last_write_dkm > last_modification_time_deleted_keys_during_merge_) {
-      std::shared_ptr<std::unordered_set<std::string>> deleted_keys;
+      std::shared_ptr<std::unordered_set<std::string>> deleted_keys =
+          std::make_shared<std::unordered_set<std::string>>();
       std::unordered_set<std::string> deleted_keys_dk = LoadAndUnserializeDeletedKeys(deleted_keys_path_.string());
 
       deleted_keys->swap(deleted_keys_dk);
+      // deleted_keys->insert(deleted_keys_dk.begin(), deleted_keys_dk.end());
       std::unordered_set<std::string> deleted_keys_dkm =
           LoadAndUnserializeDeletedKeys(deleted_keys_during_merge_path_.string());
 
       deleted_keys->insert(deleted_keys_dkm.begin(), deleted_keys_dkm.end());
 
       // safe swap
-      atomic_store(&deleted_keys_, deleted_keys);
+      {
+        std::unique_lock<std::mutex> lock(mutex_);
+        deleted_keys_.swap(deleted_keys);
+      }
 
       has_deleted_keys_ = true;
     }

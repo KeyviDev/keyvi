@@ -44,7 +44,7 @@ class BaseIndexReader {
   template <typename... Args>
   explicit BaseIndexReader(Args... args) : payload_(args...) {}
 
-  dictionary::Match operator[](const std::string& key) const {
+  dictionary::Match operator[](const std::string& key) {
     dictionary::Match m;
     const_segments_t segments = payload_.Segments();
 
@@ -61,7 +61,7 @@ class BaseIndexReader {
     return m;
   }
 
-  bool Contains(const std::string& key) const {
+  bool Contains(const std::string& key) {
     const_segments_t segments = payload_.Segments();
     for (auto it = segments->crbegin(); it != segments->crend(); it++) {
       if ((*it)->GetDictionary()->Contains(key)) {

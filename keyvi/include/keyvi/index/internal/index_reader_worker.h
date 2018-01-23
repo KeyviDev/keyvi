@@ -31,6 +31,7 @@
 #include <chrono>  //NOLINT
 #include <ctime>
 #include <memory>
+#include <mutex>  //NOLINT
 #include <string>
 #include <thread>  //NOLINT
 #include <unordered_map>
@@ -100,7 +101,15 @@ class IndexReaderWorker final {
 
   void Reload() { ReloadIndex(); }
 
-  const_read_only_segments_t Segments() const { return atomic_load(&segments_); }
+  const_read_only_segments_t Segments() {
+    read_only_segments_t segments = segments_weak_.lock();
+    if (!segments) {
+      std::unique_lock<std::mutex> lock(mutex_);
+      segments_weak_ = segments_;
+      segments = segments_;
+    }
+    return segments;
+  }
 
  private:
   boost::filesystem::path index_directory_;
@@ -108,6 +117,8 @@ class IndexReaderWorker final {
   std::time_t last_modification_time_;
   boost::property_tree::ptree index_toc_;
   read_only_segments_t segments_;
+  std::weak_ptr<read_only_segment_vec_t> segments_weak_;
+  std::mutex mutex_;
   std::unordered_map<std::string, read_only_segment_t> segments_by_name_;
   std::chrono::milliseconds refresh_interval_;
   std::thread update_thread_;
@@ -165,7 +176,12 @@ class IndexReaderWorker final {
       }
     }
 
-    atomic_store(&segments_, new_segments);
+    // thread-safe swap
+    {
+      std::unique_lock<std::mutex> lock(mutex_);
+      segments_.swap(new_segments);
+    }
+
     segments_by_name_.swap(new_segments_by_name);
     TRACE("Loaded new segments");
   }
