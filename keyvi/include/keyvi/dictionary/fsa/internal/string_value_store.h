@@ -34,10 +34,8 @@
 #include "dictionary/fsa/internal/ivalue_store.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/minimization_hash.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
-
-// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
+#include "util/serialization_utils.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -180,7 +178,7 @@ class StringValueStore final : public IValueStoreWriter {
     boost::property_tree::ptree pt;
     pt.put("size", std::to_string(string_values_.size()));
 
-    internal::SerializationUtils::WriteJsonRecord(stream, pt);
+    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     stream.write((const char*)&string_values_[0], string_values_.size());
@@ -217,7 +215,7 @@ class StringValueStoreReader final : public IValueStoreReader {
   StringValueStoreReader(std::istream& stream, boost::interprocess::file_mapping* file_mapping,
                          loading_strategy_types loading_strategy = loading_strategy_types::lazy)
       : IValueStoreReader(stream, file_mapping) {
-    const boost::property_tree::ptree properties = internal::SerializationUtils::ReadValueStoreProperties(stream);
+    const boost::property_tree::ptree properties = keyvi::util::SerializationUtils::ReadValueStoreProperties(stream);
 
     const size_t offset = stream.tellg();
     const size_t strings_size = boost::lexical_cast<size_t>(properties.get<std::string>("size"));

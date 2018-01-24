@@ -37,7 +37,7 @@
 
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
+#include "util/serialization_utils.h"
 #include "dictionary/util/endian.h"
 #include "util/vint.h"
 
@@ -196,7 +196,7 @@ class SparseArrayPersistence final {
 
     pt.put("size", std::to_string(highest_write_position));
 
-    internal::SerializationUtils::WriteJsonRecord(stream, pt);
+    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     labels_extern_->Write(stream, highest_write_position);

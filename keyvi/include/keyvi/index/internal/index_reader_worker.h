@@ -43,11 +43,11 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "dictionary/dictionary.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/match.h"
 #include "index/internal/constants.h"
 #include "index/internal/read_only_segment.h"
 #include "util/configuration.h"
+#include "util/serialization_utils.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"

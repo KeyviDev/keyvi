@@ -22,21 +22,21 @@
  *      Author: hendrik
  */
 
-#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_SERIALIZATION_UTILS_H_
-#define KEYVI_DICTIONARY_FSA_INTERNAL_SERIALIZATION_UTILS_H_
+#ifndef KEYVI_UTIL_SERIALIZATION_UTILS_H_
+#define KEYVI_UTIL_SERIALIZATION_UTILS_H_
 
 #include <arpa/inet.h>
 
 #include <string>
 
+// boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
+#define BOOST_SPIRIT_THREADSAFE
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 namespace keyvi {
-namespace dictionary {
-namespace fsa {
-namespace internal {
+namespace util {
 
 class SerializationUtils {
  public:
@@ -102,9 +102,7 @@ class SerializationUtils {
   }
 };
 
-} /* namespace internal */
-} /* namespace fsa */
-} /* namespace dictionary */
+} /* namespace util */
 } /* namespace keyvi */
 
-#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_SERIALIZATION_UTILS_H_
+#endif  // KEYVI_UTIL_SERIALIZATION_UTILS_H_

@@ -38,14 +38,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include "dictionary/dictionary.h"
-#include "dictionary/dictionary_compiler.h"
-#include "dictionary/dictionary_types.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
-#include "dictionary/match.h"
 #include "index/internal/base_index_reader.h"
 #include "index/internal/index_writer_worker.h"
 #include "index/internal/segment.h"
