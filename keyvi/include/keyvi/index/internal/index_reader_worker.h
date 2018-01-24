@@ -37,6 +37,8 @@
 #include <unordered_map>
 #include <vector>
 
+// boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
+#define BOOST_SPIRIT_THREADSAFE
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -47,7 +49,6 @@
 #include "index/internal/constants.h"
 #include "index/internal/read_only_segment.h"
 #include "util/configuration.h"
-#include "util/serialization_utils.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -129,17 +130,12 @@ class IndexReaderWorker final {
       TRACE("No index found.");
       return;
     }
-    TRACE("read toc");
-
     std::ifstream toc_fstream(index_toc_file_.string());
-
     TRACE("rereading %s", index_toc_file_.string().c_str());
 
     if (!toc_fstream.good()) {
       throw std::invalid_argument("file not found");
     }
-
-    TRACE("read toc 2");
 
     boost::property_tree::read_json(toc_fstream, index_toc_);
     TRACE("index_toc loaded");
