@@ -37,8 +37,8 @@
 
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
-#include "util/serialization_utils.h"
 #include "dictionary/util/endian.h"
+#include "util/serialization_utils.h"
 #include "util/vint.h"
 
 // #define PERSISTENCE_DEBUG
