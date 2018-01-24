@@ -32,6 +32,8 @@
 #include <utility>
 #include <vector>
 
+#include <boost/filesystem.hpp>
+
 #include "dictionary/fsa/automata.h"
 #include "testing/compilation_utils.h"
 
@@ -49,6 +51,8 @@ class IndexMock final {
 
     create_directories(mock_index_);
   }
+
+  ~IndexMock() { boost::filesystem::remove_all(mock_index_); }
 
   void AddSegment(std::vector<std::pair<std::string, std::string>>* input) {
     using boost::filesystem::path;

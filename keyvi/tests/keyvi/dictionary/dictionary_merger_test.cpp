@@ -624,11 +624,11 @@ BOOST_AUTO_TEST_CASE(Delete) {
   };
   testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
 
+  boost::filesystem::path deleted_keys_file{dictionary.GetFileName()};
+  deleted_keys_file += ".dk";
   JsonDictionaryMerger merger;
   {
     std::unordered_set<std::string> deleted_keys_{"xyz"};
-    boost::filesystem::path deleted_keys_file{dictionary.GetFileName()};
-    deleted_keys_file += ".dk";
     std::ofstream out_stream(deleted_keys_file.string(), std::ios::binary);
     msgpack::pack(out_stream, deleted_keys_);
   }
@@ -644,6 +644,7 @@ BOOST_AUTO_TEST_CASE(Delete) {
   BOOST_CHECK(d->Contains("abcd"));
   BOOST_CHECK(!d->Contains("xyz"));
   std::remove(filename.c_str());
+  std::remove(deleted_keys_file.string().c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
