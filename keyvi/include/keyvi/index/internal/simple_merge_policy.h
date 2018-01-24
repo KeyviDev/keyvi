@@ -37,7 +37,7 @@ class SimpleMergePolicy final : public MergePolicy {
 
   inline void MergeFinished(const size_t id) {}
 
-  inline std::vector<segment_t> SelectMergeSegments(const segments_t& segments, size_t* id) {
+  inline bool SelectMergeSegments(const segments_t& segments, std::vector<segment_t>* elected_segments, size_t* id) {
     std::vector<segment_t> to_merge;
     for (segment_t& s : *segments) {
       if (!s->MarkedForMerge()) {
@@ -47,7 +47,12 @@ class SimpleMergePolicy final : public MergePolicy {
     }
 
     *id = 0;
-    return to_merge;
+    if ((to_merge.size() > 1) || (to_merge.size() == 1 && to_merge[0]->HasDeletedKeys())) {
+      elected_segments->swap(to_merge);
+      return true;
+    }
+
+    return false;
   }
 };
 

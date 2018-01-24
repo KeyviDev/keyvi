@@ -35,7 +35,8 @@ class MergePolicy {
 
   virtual void MergeFinished(const size_t id) = 0;
 
-  virtual std::vector<segment_t> SelectMergeSegments(const segments_t& segments, size_t* id) = 0;
+  virtual bool SelectMergeSegments(const segments_t& segments, std::vector<segment_t>* elected_segments,
+                                   size_t* id) = 0;
 };
 
 } /* namespace internal */

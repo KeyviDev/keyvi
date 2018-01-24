@@ -292,20 +292,15 @@ class IndexWriterWorker final {
    * Run a merge if mergers are available and segments require merge
    */
   void RunMerge() {
-    // to few segments, return
-    if (payload_.segments_->size() <= 1) {
-      return;
-    }
-
     if (payload_.merge_jobs_.size() == payload_.max_concurrent_merges_) {
       // to many merges already running, so throttle
       return;
     }
 
     size_t merge_policy_id = 0;
-    std::vector<segment_t> to_merge = merge_policy_->SelectMergeSegments(payload_.segments_, &merge_policy_id);
+    std::vector<segment_t> to_merge;
 
-    if (to_merge.size() < 1) {
+    if (merge_policy_->SelectMergeSegments(payload_.segments_, &to_merge, &merge_policy_id) == false) {
       return;
     }
 
