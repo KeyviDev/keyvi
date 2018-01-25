@@ -41,7 +41,7 @@ namespace internal {
 
 class Segment final : public ReadOnlySegment {
  public:
-  explicit Segment(const boost::filesystem::path& path, const bool load = true)
+  explicit Segment(const boost::filesystem::path& path, const bool load = false)
       : ReadOnlySegment(path, load),
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),

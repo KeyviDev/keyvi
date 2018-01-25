@@ -63,10 +63,15 @@ class IndexWriterWorker final {
           segments_(),
           mutex_(),
           index_directory_(index_directory),
+          index_toc_file_(index_directory),
+          index_toc_file_part_(index_directory),
           merge_jobs_(),
           any_delete_(false),
           merge_enabled_(true) {
       segments_ = std::make_shared<segment_vec_t>();
+
+      index_toc_file_ /= "index.toc";
+      index_toc_file_part_ /= "index.toc.part";
     }
 
     compiler_t compiler_;
@@ -74,6 +79,8 @@ class IndexWriterWorker final {
     segments_t segments_;
     std::mutex mutex_;
     boost::filesystem::path index_directory_;
+    boost::filesystem::path index_toc_file_;
+    boost::filesystem::path index_toc_file_part_;
     std::list<MergeJob> merge_jobs_;
     size_t max_concurrent_merges_ = 2;
     bool any_delete_;
@@ -89,6 +96,7 @@ class IndexWriterWorker final {
     TRACE("construct worker: %s", payload_.index_directory_.c_str());
 
     merge_policy_.reset(merge_policy(keyvi::util::mapGet<std::string>(params, MERGE_POLICY, DEFAULT_MERGE_POLICY)));
+    LoadIndex();
   }
 
   IndexWriterWorker& operator=(IndexWriterWorker const&) = delete;
@@ -312,6 +320,27 @@ class IndexWriterWorker final {
     payload_.merge_jobs_.back().Run();
   }
 
+  void LoadIndex() {
+    std::ifstream toc_fstream(payload_.index_toc_file_.string());
+
+    if (!toc_fstream.good()) {
+      // empty index
+      return;
+    }
+
+    boost::property_tree::ptree index_toc;
+    boost::property_tree::read_json(toc_fstream, index_toc);
+    TRACE("index_toc loaded");
+
+    TRACE("reading segments");
+
+    for (boost::property_tree::ptree::value_type& f : index_toc.get_child("files")) {
+      boost::filesystem::path p(payload_.index_directory_);
+      p /= f.second.data();
+      payload_.segments_->emplace_back(new Segment(p));
+    }
+  }
+
   static inline void PersistDeletes(IndexPayload* payload) {
     // only loop through segments if any delete has happened
     if (payload->any_delete_) {
@@ -376,14 +405,9 @@ class IndexWriterWorker final {
     }
 
     ptree.add_child("files", files);
-    boost::filesystem::path p(payload->index_directory_);
-    p /= "index.toc.part";
 
-    boost::filesystem::path p2(payload->index_directory_);
-    p2 /= "index.toc";
-
-    boost::property_tree::write_json(p.string(), ptree);
-    boost::filesystem::rename(p, p2);
+    boost::property_tree::write_json(payload->index_toc_file_part_.string(), ptree);
+    boost::filesystem::rename(payload->index_toc_file_part_, payload->index_toc_file_);
   }
 };
 
