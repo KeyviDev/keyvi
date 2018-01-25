@@ -61,6 +61,7 @@ class IndexWriterWorker final {
         : compiler_(),
           write_counter_(0),
           segments_(),
+          mutex_(),
           index_directory_(index_directory),
           merge_jobs_(),
           any_delete_(false),
@@ -71,6 +72,7 @@ class IndexWriterWorker final {
     compiler_t compiler_;
     std::atomic_size_t write_counter_;
     segments_t segments_;
+    std::mutex mutex_;
     boost::filesystem::path index_directory_;
     std::list<MergeJob> merge_jobs_;
     size_t max_concurrent_merges_ = 2;
@@ -107,7 +109,7 @@ class IndexWriterWorker final {
   const_segments_t Segments() {
     segments_t segments = segments_weak_.lock();
     if (!segments) {
-      std::unique_lock<std::mutex> lock(mutex_);
+      std::unique_lock<std::mutex> lock(payload_.mutex_);
       segments_weak_ = payload_.segments_;
       segments = payload_.segments_;
     }
@@ -186,13 +188,16 @@ class IndexWriterWorker final {
  private:
   IndexPayload payload_;
   std::weak_ptr<segment_vec_t> segments_weak_;
-  std::mutex mutex_;
   std::unique_ptr<MergePolicy> merge_policy_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
 
   void ScheduledTask() {
     TRACE("Scheduled task");
-    FinalizeMerge();
+
+    if (payload_.merge_jobs_.size()) {
+      FinalizeMerge();
+    }
+
     if (payload_.merge_enabled_) {
       RunMerge();
     }
@@ -245,7 +250,7 @@ class IndexWriterWorker final {
 
           // thread-safe swap
           {
-            std::unique_lock<std::mutex> lock(mutex_);
+            std::unique_lock<std::mutex> lock(payload_.mutex_);
             payload_.segments_.swap(new_segments);
           }
           WriteToc(&payload_);
@@ -339,9 +344,19 @@ class IndexWriterWorker final {
     // free resources
     payload->compiler_.reset();
 
-    segment_t w(new Segment(p));
-    // register segment
-    payload->segments_->push_back(w);
+    // add/register new segment
+    // we have to copy the segments (shallow copy/list of shared pointers to segments)
+    // and then swap it
+    segment_t new_segment(new Segment(p));
+    segments_t new_segments = std::make_shared<segment_vec_t>(*payload->segments_);
+    new_segments->push_back(new_segment);
+
+    // thread-safe swap
+    {
+      std::unique_lock<std::mutex> lock(payload->mutex_);
+      payload->segments_.swap(new_segments);
+    }
+
     WriteToc(payload);
   }
 
