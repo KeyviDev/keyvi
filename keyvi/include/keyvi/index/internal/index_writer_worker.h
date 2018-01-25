@@ -57,14 +57,12 @@ namespace internal {
 class IndexWriterWorker final {
   typedef std::shared_ptr<dictionary::JsonDictionaryCompilerSmallData> compiler_t;
   struct IndexPayload {
-    explicit IndexPayload(const std::string& index_directory, const std::chrono::milliseconds& refresh_interval)
+    explicit IndexPayload(const std::string& index_directory)
         : compiler_(),
           write_counter_(0),
           segments_(),
           index_directory_(index_directory),
           merge_jobs_(),
-          last_flush_(),
-          refresh_interval_(refresh_interval),
           any_delete_(false),
           merge_enabled_(true) {
       segments_ = std::make_shared<segment_vec_t>();
@@ -75,8 +73,6 @@ class IndexWriterWorker final {
     segments_t segments_;
     boost::filesystem::path index_directory_;
     std::list<MergeJob> merge_jobs_;
-    std::chrono::system_clock::time_point last_flush_;
-    std::chrono::milliseconds refresh_interval_;
     size_t max_concurrent_merges_ = 2;
     bool any_delete_;
     std::atomic_bool merge_enabled_;
@@ -84,8 +80,7 @@ class IndexWriterWorker final {
 
  public:
   explicit IndexWriterWorker(const std::string& index_directory, const keyvi::util::parameters_t& params)
-      : payload_(index_directory,
-                 std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))),
+      : payload_(index_directory),
         compiler_active_object_(
             &payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
             std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))) {
@@ -206,12 +201,8 @@ class IndexWriterWorker final {
       return;
     }
 
-    auto tp = std::chrono::system_clock::now();
-    if (tp - payload_.last_flush_ > payload_.refresh_interval_) {
-      PersistDeletes(&payload_);
-      Compile(&payload_);
-      payload_.last_flush_ = tp;
-    }
+    PersistDeletes(&payload_);
+    Compile(&payload_);
   }
 
   /**
