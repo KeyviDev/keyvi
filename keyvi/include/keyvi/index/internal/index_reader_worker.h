@@ -125,7 +125,16 @@ class IndexReaderWorker final {
   std::thread update_thread_;
   std::atomic_bool stop_update_thread_;
 
-  void LoadIndex() {
+  void ReloadIndex() {
+    std::time_t t = boost::filesystem::last_write_time(index_toc_file_);
+
+    if (t <= last_modification_time_) {
+      TRACE("no modifications found");
+      return;
+    }
+
+    TRACE("reload toc");
+    last_modification_time_ = t;
     if (!boost::filesystem::exists(index_directory_)) {
       TRACE("No index found.");
       return;
@@ -139,19 +148,6 @@ class IndexReaderWorker final {
 
     boost::property_tree::read_json(toc_fstream, index_toc_);
     TRACE("index_toc loaded");
-  }
-
-  void ReloadIndex() {
-    std::time_t t = boost::filesystem::last_write_time(index_toc_file_);
-
-    if (t <= last_modification_time_) {
-      TRACE("no modifications found");
-      return;
-    }
-
-    TRACE("reload toc");
-    last_modification_time_ = t;
-    LoadIndex();
 
     TRACE("reading segments");
 
