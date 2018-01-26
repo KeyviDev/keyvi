@@ -16,6 +16,8 @@
 // limitations under the License.
 //
 
+#include <cstdio>
+
 #include <boost/test/unit_test.hpp>
 
 #include <msgpack.hpp>
@@ -37,21 +39,27 @@ BOOST_AUTO_TEST_CASE(deletedkey) {
   std::vector<std::string> deleted_keys{"abc", "tyc"};
   std::vector<std::string> deleted_keys_dkm{"b", "o"};
 
+  std::string filename{dictionary.GetFileName() + ".dk"};
+  std::string filename_dkm{dictionary.GetFileName() + ".dkm"};
+
   {
-    std::ofstream out_stream(dictionary.GetFileName() + ".dk", std::ios::binary);
+    std::ofstream out_stream(filename, std::ios::binary);
     msgpack::pack(out_stream, deleted_keys);
 
-    std::ofstream out_stream_dkm(dictionary.GetFileName() + ".dkm", std::ios::binary);
+    std::ofstream out_stream_dkm(filename_dkm, std::ios::binary);
     msgpack::pack(out_stream_dkm, deleted_keys_dkm);
   }
 
-  read_only_segment_t segment(new ReadOnlySegment(dictionary.GetFileName(), false));
+  read_only_segment_t segment(new ReadOnlySegment(dictionary.GetFileName()));
 
   BOOST_CHECK(segment->HasDeletedKeys());
   BOOST_CHECK(segment->DeletedKeys()->count("abc"));
   BOOST_CHECK(segment->DeletedKeys()->count("b"));
   BOOST_CHECK(segment->DeletedKeys()->count("o"));
   BOOST_CHECK(segment->IsDeleted("abc"));
+
+  std::remove(filename_dkm.c_str());
+  std::remove(filename.c_str());
 }
 
 BOOST_AUTO_TEST_CASE(deletedkeys_reload) {
@@ -59,13 +67,16 @@ BOOST_AUTO_TEST_CASE(deletedkeys_reload) {
       {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"cde", "{c:2}"}, {"fgh", "{g:6}"}, {"tyc", "{o:2}"}};
   testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
 
-  read_only_segment_t segment(new ReadOnlySegment(dictionary.GetFileName(), false));
+  read_only_segment_t segment(new ReadOnlySegment(dictionary.GetFileName()));
 
   BOOST_CHECK(!segment->HasDeletedKeys());
 
+  std::string filename{dictionary.GetFileName() + ".dk"};
+  std::string filename_dkm{dictionary.GetFileName() + ".dkm"};
+
   std::vector<std::string> deleted_keys{"abc", "tyc"};
   {
-    std::ofstream out_stream(dictionary.GetFileName() + ".dk", std::ios::binary);
+    std::ofstream out_stream(filename, std::ios::binary);
     msgpack::pack(out_stream, deleted_keys);
   }
 
@@ -78,7 +89,7 @@ BOOST_AUTO_TEST_CASE(deletedkeys_reload) {
 
   std::vector<std::string> deleted_keys_2{"abc", "tyc", "o"};
   {
-    std::ofstream out_stream(dictionary.GetFileName() + ".dk", std::ios::binary);
+    std::ofstream out_stream(filename, std::ios::binary);
     msgpack::pack(out_stream, deleted_keys_2);
   }
   segment->ReloadDeletedKeys();
@@ -90,7 +101,7 @@ BOOST_AUTO_TEST_CASE(deletedkeys_reload) {
 
   std::vector<std::string> deleted_keys_dkm{"cde"};
   {
-    std::ofstream out_stream(dictionary.GetFileName() + ".dkm", std::ios::binary);
+    std::ofstream out_stream(filename_dkm, std::ios::binary);
     msgpack::pack(out_stream, deleted_keys_dkm);
   }
   segment->ReloadDeletedKeys();
@@ -100,6 +111,9 @@ BOOST_AUTO_TEST_CASE(deletedkeys_reload) {
   BOOST_CHECK(segment->DeletedKeys()->count("cde"));
   BOOST_CHECK(segment->HasDeletedKeys());
   BOOST_CHECK(segment->IsDeleted("abc"));
+
+  std::remove(filename_dkm.c_str());
+  std::remove(filename.c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

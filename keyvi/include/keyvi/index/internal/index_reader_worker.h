@@ -100,7 +100,10 @@ class IndexReaderWorker final {
     }
   }
 
-  void Reload() { ReloadIndex(); }
+  void Reload() {
+    ReloadIndex();
+    ReloadDeletedKeys();
+  }
 
   const_read_only_segments_t Segments() {
     read_only_segments_t segments = segments_weak_.lock();

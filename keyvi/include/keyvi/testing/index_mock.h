@@ -34,6 +34,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include <msgpack.hpp>
+
 #include "dictionary/fsa/automata.h"
 #include "testing/compilation_utils.h"
 
@@ -55,9 +57,7 @@ class IndexMock final {
   ~IndexMock() { boost::filesystem::remove_all(mock_index_); }
 
   void AddSegment(std::vector<std::pair<std::string, std::string>>* input) {
-    using boost::filesystem::path;
-
-    path filename(mock_index_);
+    boost::filesystem::path filename(mock_index_);
     filename /= "kv-";
     filename += std::to_string(kv_files_++);
     filename += ".kv";
@@ -67,6 +67,18 @@ class IndexMock final {
     CompilationUtils::CompileJson(input, filename_str);
 
     WriteToc();
+  }
+
+  void AddDeletedKeys(const std::vector<std::string>& deleted_keys, size_t segment_number = 0,
+                      const std::string& type = "dk") {
+    boost::filesystem::path filename(mock_index_);
+    filename /= "kv-";
+    filename += std::to_string(segment_number);
+    filename += ".kv.";
+    filename += type;
+
+    std::ofstream out_stream(filename.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys);
   }
 
   std::string GetIndexFolder() const { return mock_index_.string(); }
