@@ -49,7 +49,7 @@ namespace internal {
 
 class ReadOnlySegment {
  public:
-  explicit ReadOnlySegment(const boost::filesystem::path& path, const bool load = true)
+  explicit ReadOnlySegment(const boost::filesystem::path& path)
       : dictionary_path_(path),
         deleted_keys_path_(path),
         deleted_keys_during_merge_path_(path),
@@ -61,54 +61,17 @@ class ReadOnlySegment {
         last_modification_time_deleted_keys_during_merge_(0) {
     deleted_keys_path_ += ".dk";
     deleted_keys_during_merge_path_ += ".dkm";
-    if (load) {
-      Load();
-    }
+
+    Load();
   }
 
-  dictionary::dictionary_t& operator*() {
-    if (!dictionary_) {
-      Load();
-    }
+  dictionary::dictionary_t& operator*() { return dictionary_; }
 
-    return dictionary_;
-  }
+  dictionary::dictionary_t& GetDictionary() { return dictionary_; }
 
-  dictionary::dictionary_t& GetDictionary() {
-    if (!dictionary_) {
-      Load();
-    }
-
-    return dictionary_;
-  }
-
-  void ReloadDeletedKeys() {
-    if (!dictionary_) {
-      Load();
-    }
-    LoadDeletedKeys();
-  }
-
-  const boost::filesystem::path& GetDictionaryPath() const { return dictionary_path_; }
-
-  const boost::filesystem::path& GetDeletedKeysPath() const { return deleted_keys_path_; }
-
-  const boost::filesystem::path& GetDeletedKeysDuringMergePath() const { return deleted_keys_during_merge_path_; }
-
-  const std::string& GetDictionaryFilename() const { return dictionary_filename_; }
-
-  bool HasDeletedKeys() {
-    if (!dictionary_) {
-      Load();
-    }
-    return has_deleted_keys_;
-  }
+  bool HasDeletedKeys() { return has_deleted_keys_; }
 
   const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
-    if (!dictionary_) {
-      Load();
-    }
-
     if (!has_deleted_keys_) {
       return std::shared_ptr<std::unordered_set<std::string>>();
     }
@@ -123,15 +86,22 @@ class ReadOnlySegment {
   }
 
   bool IsDeleted(const std::string& key) {
-    if (!dictionary_) {
-      Load();
-    }
     if (has_deleted_keys_) {
       return (DeletedKeys()->count(key) > 0);
     }
 
     return false;
   }
+
+  void ReloadDeletedKeys() { LoadDeletedKeys(); }
+
+  const boost::filesystem::path& GetDictionaryPath() const { return dictionary_path_; }
+
+  const boost::filesystem::path& GetDeletedKeysPath() const { return deleted_keys_path_; }
+
+  const boost::filesystem::path& GetDeletedKeysDuringMergePath() const { return deleted_keys_during_merge_path_; }
+
+  const std::string& GetDictionaryFilename() const { return dictionary_filename_; }
 
  protected:
   void Load() {

@@ -42,9 +42,10 @@ namespace internal {
 class Segment final : public ReadOnlySegment {
  public:
   explicit Segment(const boost::filesystem::path& path, const bool load = false)
-      : ReadOnlySegment(path, load),
+      : ReadOnlySegment(path),
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),
+        loaded(load),
         in_merge_(false),
         new_delete_(false),
         deleted_keys_swap_filename_(path) {
@@ -57,9 +58,10 @@ class Segment final : public ReadOnlySegment {
 
   explicit Segment(const boost::filesystem::path& path, const std::vector<std::shared_ptr<Segment>> parent_segments,
                    const bool load = true)
-      : ReadOnlySegment(path, load),
+      : ReadOnlySegment(path),
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),
+        loaded(load),
         in_merge_(false),
         new_delete_(false),
         deleted_keys_swap_filename_(path) {
@@ -80,6 +82,32 @@ class Segment final : public ReadOnlySegment {
       new_delete_ = true;
       Persist();
     }
+  }
+
+  dictionary::dictionary_t& operator*() {
+    LazyLoad();
+    return ReadOnlySegment::GetDictionary();
+  }
+
+  dictionary::dictionary_t& GetDictionary() {
+    LazyLoad();
+    return ReadOnlySegment::GetDictionary();
+  }
+
+  bool HasDeletedKeys() {
+    LazyLoad();
+    return ReadOnlySegment::HasDeletedKeys();
+  }
+
+  const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
+    LazyLoad();
+    return ReadOnlySegment::DeletedKeys();
+  }
+
+  bool IsDeleted(const std::string& key) {
+    LazyLoad();
+
+    return ReadOnlySegment::IsDeleted(key);
   }
 
   void ElectedForMerge() {
@@ -146,9 +174,17 @@ class Segment final : public ReadOnlySegment {
  private:
   std::unordered_set<std::string> deleted_keys_for_write_;
   std::unordered_set<std::string> deleted_keys_during_merge_for_write_;
+  bool loaded;
   bool in_merge_;
   bool new_delete_;
   boost::filesystem::path deleted_keys_swap_filename_;
+
+  inline void LazyLoad() {
+    if (!loaded) {
+      Load();
+      loaded = true;
+    }
+  }
 
   void SaveDeletedKeys(const std::string& filename, const std::unordered_set<std::string>& deleted_keys) {
     // write to swap file, than rename it
@@ -156,15 +192,15 @@ class Segment final : public ReadOnlySegment {
     msgpack::pack(out_stream, deleted_keys);
     std::rename(deleted_keys_swap_filename_.string().c_str(), filename.c_str());
   }
-};
+};  // namespace internal
 
 typedef std::shared_ptr<Segment> segment_t;
 typedef std::vector<segment_t> segment_vec_t;
 typedef std::shared_ptr<segment_vec_t> segments_t;
 typedef const std::shared_ptr<segment_vec_t> const_segments_t;
 
-} /* namespace internal */
-} /* namespace index */
+}  // namespace internal
+}  // namespace index
 } /* namespace keyvi */
 
 #endif  // KEYVI_INDEX_INTERNAL_SEGMENT_H_
