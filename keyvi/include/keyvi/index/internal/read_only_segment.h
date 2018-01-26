@@ -82,7 +82,12 @@ class ReadOnlySegment {
     return dictionary_;
   }
 
-  void ReloadDeletedKeys() { LoadDeletedKeys(); }
+  void ReloadDeletedKeys() {
+    if (!dictionary_) {
+      Load();
+    }
+    LoadDeletedKeys();
+  }
 
   const boost::filesystem::path& GetDictionaryPath() const { return dictionary_path_; }
 
@@ -92,10 +97,21 @@ class ReadOnlySegment {
 
   const std::string& GetDictionaryFilename() const { return dictionary_filename_; }
 
-  bool HasDeletedKeys() const { return has_deleted_keys_; }
+  bool HasDeletedKeys() {
+    if (!dictionary_) {
+      Load();
+    }
+    return has_deleted_keys_;
+  }
 
   const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
-    // check has_deleted_keys_ or make this private
+    if (!dictionary_) {
+      Load();
+    }
+
+    if (!has_deleted_keys_) {
+      return std::shared_ptr<std::unordered_set<std::string>>();
+    }
 
     std::shared_ptr<std::unordered_set<std::string>> deleted_keys = deleted_keys_weak_.lock();
     if (!deleted_keys) {
@@ -107,6 +123,9 @@ class ReadOnlySegment {
   }
 
   bool IsDeleted(const std::string& key) {
+    if (!dictionary_) {
+      Load();
+    }
     if (has_deleted_keys_) {
       return (DeletedKeys()->count(key) > 0);
     }
@@ -158,6 +177,8 @@ class ReadOnlySegment {
   std::time_t last_modification_time_deleted_keys_during_merge_;
 
   void LoadDeletedKeys() {
+    TRACE("load deleted keys");
+
     boost::system::error_code ec;
     std::time_t last_write_dk = boost::filesystem::last_write_time(deleted_keys_path_, ec);
     // effectively ignore if file does not exist
@@ -174,14 +195,18 @@ class ReadOnlySegment {
     // if any list has changed, reload it
     if (last_write_dk > last_modification_time_deleted_keys_ ||
         last_write_dkm > last_modification_time_deleted_keys_during_merge_) {
+      TRACE("found deleted keys");
+
       std::shared_ptr<std::unordered_set<std::string>> deleted_keys =
           std::make_shared<std::unordered_set<std::string>>();
       std::unordered_set<std::string> deleted_keys_dk = LoadAndUnserializeDeletedKeys(deleted_keys_path_.string());
+      TRACE("Loaded deleted keys: %d", deleted_keys_dk.size());
 
       deleted_keys->swap(deleted_keys_dk);
       // deleted_keys->insert(deleted_keys_dk.begin(), deleted_keys_dk.end());
       std::unordered_set<std::string> deleted_keys_dkm =
           LoadAndUnserializeDeletedKeys(deleted_keys_during_merge_path_.string());
+      TRACE("Loaded deleted keys m: %d", deleted_keys_dkm.size());
 
       deleted_keys->insert(deleted_keys_dkm.begin(), deleted_keys_dkm.end());
 
@@ -190,12 +215,15 @@ class ReadOnlySegment {
         std::unique_lock<std::mutex> lock(mutex_);
         deleted_keys_.swap(deleted_keys);
       }
+      TRACE("Number of deleted keys: %d", deleted_keys_->size());
 
       has_deleted_keys_ = true;
     }
   }
 
   inline static std::unordered_set<std::string> LoadAndUnserializeDeletedKeys(const std::string& filename) {
+    TRACE("loading deleted keys file %s", filename.c_str());
+
     std::unordered_set<std::string> deleted_keys;
     std::ifstream deleted_keys_stream(filename, std::ios::binary);
     if (deleted_keys_stream.good()) {
@@ -204,7 +232,6 @@ class ReadOnlySegment {
 
       msgpack::unpacked unpacked_object;
       msgpack::unpack(unpacked_object, buffer.str().data(), buffer.str().size());
-      std::unordered_set<std::string> deleted_keys;
       unpacked_object.get().convert(deleted_keys);
     }
     return deleted_keys;
