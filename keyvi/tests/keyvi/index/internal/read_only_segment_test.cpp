@@ -70,6 +70,7 @@ BOOST_AUTO_TEST_CASE(deletedkeys_reload) {
   read_only_segment_t segment(new ReadOnlySegment(dictionary.GetFileName()));
 
   BOOST_CHECK(!segment->HasDeletedKeys());
+  BOOST_CHECK(!segment->DeletedKeys());
 
   std::string filename{dictionary.GetFileName() + ".dk"};
   std::string filename_dkm{dictionary.GetFileName() + ".dkm"};
