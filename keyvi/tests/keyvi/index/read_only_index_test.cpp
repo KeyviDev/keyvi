@@ -147,7 +147,6 @@ BOOST_AUTO_TEST_CASE(indexwithdeletedkeys) {
   BOOST_CHECK(!reader.Contains("störe"));
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace index */
