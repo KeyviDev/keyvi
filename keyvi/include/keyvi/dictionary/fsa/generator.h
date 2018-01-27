@@ -36,11 +36,11 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/sparse_array_builder.h"
 #include "dictionary/fsa/internal/unpacked_state.h"
 #include "dictionary/fsa/internal/unpacked_state_stack.h"
 #include "util/configuration.h"
+#include "util/serialization_utils.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -338,7 +338,7 @@ class Generator final {
    * @param manifest as JSON string
    */
   inline void SetManifestFromString(const std::string& manifest) {
-    SetManifest(internal::SerializationUtils::ReadJsonRecord(manifest));
+    SetManifest(keyvi::util::SerializationUtils::ReadJsonRecord(manifest));
   }
 
   /**
@@ -373,7 +373,7 @@ class Generator final {
     pt.put("number_of_states", std::to_string(number_of_states_));
     pt.add_child("manifest", manifest_);
 
-    internal::SerializationUtils::WriteJsonRecord(stream, pt);
+    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
   }
 
   inline void FeedStack(const size_t start, const std::string& key) {

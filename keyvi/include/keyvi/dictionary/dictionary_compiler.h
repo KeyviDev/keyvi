@@ -34,10 +34,10 @@
 #include "dictionary/fsa/generator_adapter.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/sort/in_memory_sorter.h"
 #include "dictionary/sort/sorter_common.h"
 #include "util/configuration.h"
+#include "util/serialization_utils.h"
 
 #if !defined(KEYVI_DISABLE_TPIE)
 #include "dictionary/sort/tpie_sorter.h"
@@ -222,7 +222,7 @@ class DictionaryCompiler final {
    * @param manifest as JSON string
    */
   void SetManifestFromString(const std::string& manifest) {
-    SetManifest(fsa::internal::SerializationUtils::ReadJsonRecord(manifest));
+    SetManifest(keyvi::util::SerializationUtils::ReadJsonRecord(manifest));
   }
 
   /**

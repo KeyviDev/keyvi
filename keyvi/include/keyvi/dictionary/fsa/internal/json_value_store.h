@@ -51,11 +51,11 @@
 #include "dictionary/fsa/internal/lru_generation_cache.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
 #include "dictionary/keyvi_file.h"
 #include "util/configuration.h"
 #include "util/json_value.h"
+#include "util/serialization_utils.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -121,7 +121,7 @@ class JsonValueStore final : public IValueStoreWriter {
       KeyViFile keyViFile(filename);
 
       auto& vsStream = keyViFile.valueStoreStream();
-      const boost::property_tree::ptree props = internal::SerializationUtils::ReadValueStoreProperties(vsStream);
+      const boost::property_tree::ptree props = keyvi::util::SerializationUtils::ReadValueStoreProperties(vsStream);
       offsets_.push_back(values_buffer_size_);
 
       number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
@@ -205,7 +205,7 @@ class JsonValueStore final : public IValueStoreWriter {
       pt.put(std::string("__") + COMPRESSION_THRESHOLD_KEY, compression_threshold_);
     }
 
-    internal::SerializationUtils::WriteJsonRecord(stream, pt);
+    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     if (!mergeMode_) {
@@ -214,7 +214,7 @@ class JsonValueStore final : public IValueStoreWriter {
       for (const auto& filename : inputFiles_) {
         KeyViFile keyViFile(filename);
         auto& in_stream = keyViFile.valueStoreStream();
-        internal::SerializationUtils::ReadValueStoreProperties(in_stream);
+        keyvi::util::SerializationUtils::ReadValueStoreProperties(in_stream);
 
         stream << in_stream.rdbuf();
       }
@@ -303,7 +303,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
       : IValueStoreReader(stream, file_mapping) {
     TRACE("JsonValueStoreReader construct");
 
-    properties_ = internal::SerializationUtils::ReadValueStoreProperties(stream);
+    properties_ = keyvi::util::SerializationUtils::ReadValueStoreProperties(stream);
 
     const size_t offset = stream.tellg();
     const size_t strings_size = boost::lexical_cast<size_t>(properties_.get<std::string>("size"));

@@ -27,27 +27,33 @@
 #define KEYVI_INDEX_INTERNAL_BASE_INDEX_READER_H_
 
 #include <string>
+#include <vector>
 
 #include "dictionary/match.h"
-#include "index/internal/segment.h"
+#include "index/internal/read_only_segment.h"
 
 namespace keyvi {
 namespace index {
 namespace internal {
 
-template <class PayloadT>
+template <class PayloadT, class SegmentT = ReadOnlySegment>
 class BaseIndexReader {
  public:
+  using const_segments_t = const std::shared_ptr<std::vector<std::shared_ptr<SegmentT>>>;
+
   template <typename... Args>
   explicit BaseIndexReader(Args... args) : payload_(args...) {}
 
-  dictionary::Match operator[](const std::string& key) const {
+  dictionary::Match operator[](const std::string& key) {
     dictionary::Match m;
-    segments_t segments = payload_.Segments();
+    const_segments_t segments = payload_.Segments();
 
     for (auto it = segments->crbegin(); it != segments->crend(); ++it) {
       m = (*it)->GetDictionary()->operator[](key);
       if (!m.IsEmpty()) {
+        if ((*it)->IsDeleted(key)) {
+          return dictionary::Match();
+        }
         return m;
       }
     }
@@ -55,11 +61,11 @@ class BaseIndexReader {
     return m;
   }
 
-  bool Contains(const std::string& key) const {
-    segments_t segments = payload_.Segments();
+  bool Contains(const std::string& key) {
+    const_segments_t segments = payload_.Segments();
     for (auto it = segments->crbegin(); it != segments->crend(); it++) {
       if ((*it)->GetDictionary()->Contains(key)) {
-        return true;
+        return !(*it)->IsDeleted(key);
       }
     }
 

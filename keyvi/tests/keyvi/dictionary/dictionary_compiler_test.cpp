@@ -228,6 +228,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(compactSize, SorterT, sorter_types) {
   BOOST_CHECK_EQUAL("überfall", it.GetKey());
   ++it;
   BOOST_CHECK(it == end_it);
+  std::remove(file_name.c_str());
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(stableInsert, SorterT, sorter_types) {
@@ -279,6 +280,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(stableInsert, SorterT, sorter_types) {
   BOOST_CHECK_EQUAL("\"{5:22}\"", it.GetValueAsString());
   ++it;
   BOOST_CHECK(it == end_it);
+  std::remove(file_name.c_str());
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(addAndDeletes, SorterT, sorter_types) {

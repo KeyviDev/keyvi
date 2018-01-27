@@ -57,26 +57,31 @@ namespace internal {
 class IndexWriterWorker final {
   typedef std::shared_ptr<dictionary::JsonDictionaryCompilerSmallData> compiler_t;
   struct IndexPayload {
-    explicit IndexPayload(const std::string& index_directory, const std::chrono::milliseconds& refresh_interval)
+    explicit IndexPayload(const std::string& index_directory)
         : compiler_(),
           write_counter_(0),
           segments_(),
+          mutex_(),
           index_directory_(index_directory),
+          index_toc_file_(index_directory),
+          index_toc_file_part_(index_directory),
           merge_jobs_(),
-          last_flush_(),
-          refresh_interval_(refresh_interval),
           any_delete_(false),
           merge_enabled_(true) {
       segments_ = std::make_shared<segment_vec_t>();
+
+      index_toc_file_ /= "index.toc";
+      index_toc_file_part_ /= "index.toc.part";
     }
 
     compiler_t compiler_;
     std::atomic_size_t write_counter_;
     segments_t segments_;
+    std::mutex mutex_;
     boost::filesystem::path index_directory_;
+    boost::filesystem::path index_toc_file_;
+    boost::filesystem::path index_toc_file_part_;
     std::list<MergeJob> merge_jobs_;
-    std::chrono::system_clock::time_point last_flush_;
-    std::chrono::milliseconds refresh_interval_;
     size_t max_concurrent_merges_ = 2;
     bool any_delete_;
     std::atomic_bool merge_enabled_;
@@ -84,14 +89,14 @@ class IndexWriterWorker final {
 
  public:
   explicit IndexWriterWorker(const std::string& index_directory, const keyvi::util::parameters_t& params)
-      : payload_(index_directory,
-                 std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))),
+      : payload_(index_directory),
         compiler_active_object_(
             &payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
             std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))) {
     TRACE("construct worker: %s", payload_.index_directory_.c_str());
 
     merge_policy_.reset(merge_policy(keyvi::util::mapGet<std::string>(params, MERGE_POLICY, DEFAULT_MERGE_POLICY)));
+    LoadIndex();
   }
 
   IndexWriterWorker& operator=(IndexWriterWorker const&) = delete;
@@ -109,7 +114,15 @@ class IndexWriterWorker final {
     });
   }
 
-  segments_t Segments() const { return payload_.segments_; }
+  const_segments_t Segments() {
+    segments_t segments = segments_weak_.lock();
+    if (!segments) {
+      std::unique_lock<std::mutex> lock(payload_.mutex_);
+      segments_weak_ = payload_.segments_;
+      segments = payload_.segments_;
+    }
+    return segments;
+  }
 
   // todo: rvalue version??
   void Add(const std::string& key, const std::string& value) {
@@ -134,7 +147,7 @@ class IndexWriterWorker final {
   }
 
   void Delete(const std::string& key) {
-    compiler_active_object_([&key](IndexPayload& payload) {
+    compiler_active_object_([key](IndexPayload& payload) {
       payload.any_delete_ = true;
       TRACE("delete key %s", key.c_str());
 
@@ -144,10 +157,7 @@ class IndexWriterWorker final {
 
       if (payload.segments_) {
         for (const segment_t& s : *payload.segments_) {
-          if (s->operator*()->Contains(key)) {
-            // todo: what if segment is in merge? -> delete also for the merge job
-            s->DeleteKey(key);
-          }
+          s->DeleteKey(key);
         }
       }
     });
@@ -185,25 +195,27 @@ class IndexWriterWorker final {
 
  private:
   IndexPayload payload_;
+  std::weak_ptr<segment_vec_t> segments_weak_;
   std::unique_ptr<MergePolicy> merge_policy_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
 
   void ScheduledTask() {
     TRACE("Scheduled task");
-    FinalizeMerge();
+
+    if (payload_.merge_jobs_.size()) {
+      FinalizeMerge();
+    }
+
     if (payload_.merge_enabled_) {
       RunMerge();
     }
 
-    if (!payload_.compiler_) {
+    if (!payload_.compiler_ && !payload_.any_delete_) {
       return;
     }
 
-    auto tp = std::chrono::system_clock::now();
-    if (tp - payload_.last_flush_ > payload_.refresh_interval_) {
-      Compile(&payload_);
-      payload_.last_flush_ = tp;
-    }
+    PersistDeletes(&payload_);
+    Compile(&payload_);
   }
 
   /**
@@ -229,9 +241,9 @@ class IndexWriterWorker final {
 
           std::copy_if(payload_.segments_->begin(), payload_.segments_->end(), std::back_inserter(*new_segments),
                        [&new_segments, &merged_new_segment, &p](const segment_t& s) {
-                         TRACE("checking %s", s->GetFilename().c_str());
+                         TRACE("checking %s", s->GetDictionaryFilename().c_str());
                          if (std::count_if(p.Segments().begin(), p.Segments().end(), [s](const segment_t& s2) {
-                               return s2->GetFilename() == s->GetFilename();
+                               return s2->GetDictionaryFilename() == s->GetDictionaryFilename();
                              })) {
                            if (!merged_new_segment) {
                              new_segments->push_back(p.MergedSegment());
@@ -241,16 +253,20 @@ class IndexWriterWorker final {
                          }
                          return true;
                        });
-          TRACE("merged segment %s", p.MergedSegment()->GetFilename().c_str());
-          TRACE("1st segment after merge: %s", (*new_segments)[0]->GetFilename().c_str());
+          TRACE("merged segment %s", p.MergedSegment()->GetDictionaryFilename().c_str());
+          TRACE("1st segment after merge: %s", (*new_segments)[0]->GetDictionaryFilename().c_str());
 
-          payload_.segments_ = new_segments;
+          // thread-safe swap
+          {
+            std::unique_lock<std::mutex> lock(payload_.mutex_);
+            payload_.segments_.swap(new_segments);
+          }
           WriteToc(&payload_);
 
           // delete old segment files
           for (const segment_t& s : p.Segments()) {
-            TRACE("delete old file: %s", s->GetFilename().c_str());
-            std::remove(s->GetPath().string().c_str());
+            TRACE("delete old file: %s", s->GetDictionaryFilename().c_str());
+            s->RemoveFiles();
           }
 
           p.SetMerged();
@@ -260,7 +276,7 @@ class IndexWriterWorker final {
           TRACE("merge failed, reset markers");
           // mark all segments as mergeable again
           for (const segment_t& s : p.Segments()) {
-            s->UnMarkMerge();
+            s->MergeFailed();
           }
 
           // todo throttle strategy?
@@ -280,20 +296,15 @@ class IndexWriterWorker final {
    * Run a merge if mergers are available and segments require merge
    */
   void RunMerge() {
-    // to few segments, return
-    if (payload_.segments_->size() <= 1) {
-      return;
-    }
-
     if (payload_.merge_jobs_.size() == payload_.max_concurrent_merges_) {
       // to many merges already running, so throttle
       return;
     }
 
     size_t merge_policy_id = 0;
-    std::vector<segment_t> to_merge = merge_policy_->SelectMergeSegments(payload_.segments_, &merge_policy_id);
+    std::vector<segment_t> to_merge;
 
-    if (to_merge.size() < 1) {
+    if (merge_policy_->SelectMergeSegments(payload_.segments_, &to_merge, &merge_policy_id) == false) {
       return;
     }
 
@@ -302,18 +313,41 @@ class IndexWriterWorker final {
     p /= boost::filesystem::unique_path("%%%%-%%%%-%%%%-%%%%.kv");
 
     for (segment_t& s : to_merge) {
-      s->MarkMerge();
+      s->ElectedForMerge();
     }
 
     payload_.merge_jobs_.emplace_back(to_merge, merge_policy_id, p);
     payload_.merge_jobs_.back().Run();
   }
 
+  void LoadIndex() {
+    std::ifstream toc_fstream(payload_.index_toc_file_.string());
+
+    if (!toc_fstream.good()) {
+      // empty index
+      return;
+    }
+
+    boost::property_tree::ptree index_toc;
+    boost::property_tree::read_json(toc_fstream, index_toc);
+    TRACE("index_toc loaded");
+
+    TRACE("reading segments");
+
+    for (boost::property_tree::ptree::value_type& f : index_toc.get_child("files")) {
+      boost::filesystem::path p(payload_.index_directory_);
+      p /= f.second.data();
+      payload_.segments_->emplace_back(new Segment(p));
+    }
+  }
+
   static inline void PersistDeletes(IndexPayload* payload) {
     // only loop through segments if any delete has happened
     if (payload->any_delete_) {
       for (segment_t& s : *payload->segments_) {
-        s->Persist();
+        if (s->Persist()) {
+          s->ReloadDeletedKeys();
+        }
       }
     }
 
@@ -339,9 +373,19 @@ class IndexWriterWorker final {
     // free resources
     payload->compiler_.reset();
 
-    segment_t w(new Segment(p));
-    // register segment
-    payload->segments_->push_back(w);
+    // add/register new segment
+    // we have to copy the segments (shallow copy/list of shared pointers to segments)
+    // and then swap it
+    segment_t new_segment(new Segment(p));
+    segments_t new_segments = std::make_shared<segment_vec_t>(*payload->segments_);
+    new_segments->push_back(new_segment);
+
+    // thread-safe swap
+    {
+      std::unique_lock<std::mutex> lock(payload->mutex_);
+      payload->segments_.swap(new_segments);
+    }
+
     WriteToc(payload);
   }
 
@@ -354,21 +398,16 @@ class IndexWriterWorker final {
     TRACE("Number of segments: %ld", payload->segments_->size());
 
     for (const auto s : *(payload->segments_)) {
-      TRACE("put %s", s->GetFilename().c_str());
+      TRACE("put %s", s->GetDictionaryFilename().c_str());
       boost::property_tree::ptree sp;
-      sp.put("", s->GetFilename());
+      sp.put("", s->GetDictionaryFilename());
       files.push_back(std::make_pair("", sp));
     }
 
     ptree.add_child("files", files);
-    boost::filesystem::path p(payload->index_directory_);
-    p /= "index.toc.part";
 
-    boost::filesystem::path p2(payload->index_directory_);
-    p2 /= "index.toc";
-
-    boost::property_tree::write_json(p.string(), ptree);
-    boost::filesystem::rename(p, p2);
+    boost::property_tree::write_json(payload->index_toc_file_part_.string(), ptree);
+    boost::filesystem::rename(payload->index_toc_file_part_, payload->index_toc_file_);
   }
 };
 

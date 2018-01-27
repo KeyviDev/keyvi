@@ -1,7 +1,7 @@
 //
 // keyvi - A key value store.
 //
-// Copyright 2017 Hendrik Muhs<hendrik.muhs@gmail.com>
+// Copyright 2015 Hendrik Muhs<hendrik.muhs@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,31 +16,36 @@
 // limitations under the License.
 //
 
-#ifndef KEYVI_INDEX_INTERNAL_MERGE_POLICY_H_
-#define KEYVI_INDEX_INTERNAL_MERGE_POLICY_H_
+/*
+ * merge_policy_selector_test.cpp
+ *
+ *  Created on: Jan 20, 2018
+ *      Author: hendrik
+ */
 
-#include <vector>
+#include <boost/test/unit_test.hpp>
 
-#include "index/internal/segment.h"
+#include "index/internal/merge_policy_selector.h"
 
 namespace keyvi {
 namespace index {
 namespace internal {
 
-class MergePolicy {
- public:
-  MergePolicy() {}
+BOOST_AUTO_TEST_SUITE(MergePolicySelectorTests)
 
-  virtual ~MergePolicy() = default;
+BOOST_AUTO_TEST_CASE(wrong_select) {
+  // check that it throws
+  BOOST_CHECK_THROW(merge_policy("invalid"), std::invalid_argument);
+}
 
-  virtual void MergeFinished(const size_t id) = 0;
+BOOST_AUTO_TEST_CASE(select_simple) {
+  MergePolicy* simple = merge_policy("simple");
+  BOOST_CHECK(simple != nullptr);
+  delete simple;
+}
 
-  virtual bool SelectMergeSegments(const segments_t& segments, std::vector<segment_t>* elected_segments,
-                                   size_t* id) = 0;
-};
+BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace internal */
 } /* namespace index */
 } /* namespace keyvi */
-
-#endif  // KEYVI_INDEX_INTERNAL_MERGE_POLICY_H_

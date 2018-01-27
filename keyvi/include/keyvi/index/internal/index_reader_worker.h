@@ -31,20 +31,23 @@
 #include <chrono>  //NOLINT
 #include <ctime>
 #include <memory>
+#include <mutex>  //NOLINT
 #include <string>
 #include <thread>  //NOLINT
+#include <unordered_map>
 #include <vector>
 
+// boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
+#define BOOST_SPIRIT_THREADSAFE
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "dictionary/dictionary.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/match.h"
 #include "index/internal/constants.h"
-#include "index/internal/segment.h"
+#include "index/internal/read_only_segment.h"
 #include "util/configuration.h"
 
 // #define ENABLE_TRACING
@@ -97,40 +100,33 @@ class IndexReaderWorker final {
     }
   }
 
-  void Reload() { ReloadIndex(); }
+  void Reload() {
+    ReloadIndex();
+    ReloadDeletedKeys();
+  }
 
-  segments_t Segments() const { return segments_; }
+  const_read_only_segments_t Segments() {
+    read_only_segments_t segments = segments_weak_.lock();
+    if (!segments) {
+      std::unique_lock<std::mutex> lock(mutex_);
+      segments_weak_ = segments_;
+      segments = segments_;
+    }
+    return segments;
+  }
 
  private:
   boost::filesystem::path index_directory_;
   boost::filesystem::path index_toc_file_;
   std::time_t last_modification_time_;
   boost::property_tree::ptree index_toc_;
-  segments_t segments_;
+  read_only_segments_t segments_;
+  std::weak_ptr<read_only_segment_vec_t> segments_weak_;
+  std::mutex mutex_;
+  std::unordered_map<std::string, read_only_segment_t> segments_by_name_;
   std::chrono::milliseconds refresh_interval_;
   std::thread update_thread_;
   std::atomic_bool stop_update_thread_;
-
-  void LoadIndex() {
-    if (!boost::filesystem::exists(index_directory_)) {
-      TRACE("No index found.");
-      return;
-    }
-    TRACE("read toc");
-
-    std::ifstream toc_fstream(index_toc_file_.string());
-
-    TRACE("rereading %s", index_toc_file_.string().c_str());
-
-    if (!toc_fstream.good()) {
-      throw std::invalid_argument("file not found");
-    }
-
-    TRACE("read toc 2");
-
-    boost::property_tree::read_json(toc_fstream, index_toc_);
-    TRACE("index_toc loaded");
-  }
 
   void ReloadIndex() {
     std::time_t t = boost::filesystem::last_write_time(index_toc_file_);
@@ -142,21 +138,53 @@ class IndexReaderWorker final {
 
     TRACE("reload toc");
     last_modification_time_ = t;
-    LoadIndex();
+    if (!boost::filesystem::exists(index_directory_)) {
+      TRACE("No index found.");
+      return;
+    }
+    std::ifstream toc_fstream(index_toc_file_.string());
+    TRACE("rereading %s", index_toc_file_.string().c_str());
+
+    if (!toc_fstream.good()) {
+      throw std::invalid_argument("file not found");
+    }
+
+    boost::property_tree::read_json(toc_fstream, index_toc_);
+    TRACE("index_toc loaded");
 
     TRACE("reading segments");
 
-    segments_t new_segments = std::make_shared<segment_vec_t>();
+    read_only_segments_t new_segments = std::make_shared<read_only_segment_vec_t>();
+    std::unordered_map<std::string, read_only_segment_t> new_segments_by_name;
 
     for (boost::property_tree::ptree::value_type& f : index_toc_.get_child("files")) {
-      boost::filesystem::path p(index_directory_);
-      p /= f.second.data();
-      segment_t w(new Segment(p));
-      new_segments->push_back(w);
+      // check if segment is already loaded and reuse if possible
+      if (segments_by_name_.count(f.second.data())) {
+        new_segments->push_back(segments_by_name_.at(f.second.data()));
+        new_segments_by_name[f.second.data()] = segments_by_name_.at(f.second.data());
+      } else {
+        boost::filesystem::path p(index_directory_);
+        p /= f.second.data();
+        read_only_segment_t w(new ReadOnlySegment(p));
+        new_segments->push_back(w);
+        new_segments_by_name[f.second.data()] = w;
+      }
     }
 
-    segments_ = new_segments;
+    // thread-safe swap
+    {
+      std::unique_lock<std::mutex> lock(mutex_);
+      segments_.swap(new_segments);
+    }
+
+    segments_by_name_.swap(new_segments_by_name);
     TRACE("Loaded new segments");
+  }
+
+  void ReloadDeletedKeys() {
+    for (const read_only_segment_t& s : *segments_) {
+      s->ReloadDeletedKeys();
+    }
   }
 
   void UpdateWatcher() {
@@ -164,7 +192,7 @@ class IndexReaderWorker final {
       TRACE("UpdateWatcher: Check for new segments");
       // reload
       ReloadIndex();
-
+      ReloadDeletedKeys();
       // sleep for next refresh
       std::this_thread::sleep_for(refresh_interval_);
     }

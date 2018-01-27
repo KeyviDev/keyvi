@@ -60,7 +60,7 @@ class MergeJob final {
 
  public:
   // todo: add ability to stop merging for shutdown
-  explicit MergeJob(std::vector<segment_t> segments, size_t id, const boost::filesystem::path& output_filename)
+  explicit MergeJob(segment_vec_t segments, size_t id, const boost::filesystem::path& output_filename)
       : payload_(segments, output_filename), id_(id), external_process_() {}
 
   ~MergeJob() {
@@ -95,7 +95,9 @@ class MergeJob final {
 
   const std::vector<segment_t>& Segments() const { return payload_.segments_; }
 
-  const segment_t MergedSegment() const { return segment_t(new Segment(payload_.output_filename_, false)); }
+  const segment_t MergedSegment() const {
+    return segment_t(new Segment(payload_.output_filename_, payload_.segments_, false));
+  }
 
   void SetMerged() { payload_.merge_done = true; }
 
@@ -116,7 +118,7 @@ class MergeJob final {
     std::stringstream command;
     command << "keyvimerger -m 5242880";
     for (auto s : payload_.segments_) {
-      command << " -i " << s->GetPath().string();
+      command << " -i " << s->GetDictionaryPath().string();
     }
 
     command << " -o " << payload_.output_filename_.string();

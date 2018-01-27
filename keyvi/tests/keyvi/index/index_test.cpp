@@ -41,16 +41,19 @@ BOOST_AUTO_TEST_CASE(basic_writer) {
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path();
-  Index writer(tmp_path.string());
+  {
+    Index writer(tmp_path.string());
 
-  writer.Set("a", "{\"id\":3}");
+    writer.Set("a", "{\"id\":3}");
 
-  writer.Set("b", "{\"id\":4}");
-  writer.Flush();
-  writer.Set("c", "{\"id\":5}");
-  writer.Flush();
-  writer.Set("d", "{\"id\":6}");
-  writer.Flush();
+    writer.Set("b", "{\"id\":4}");
+    writer.Flush();
+    writer.Set("c", "{\"id\":5}");
+    writer.Flush();
+    writer.Set("d", "{\"id\":6}");
+    writer.Flush();
+  }
+  boost::filesystem::remove_all(tmp_path);
 }
 
 BOOST_AUTO_TEST_CASE(bigger_feed) {
@@ -59,19 +62,22 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path();
-  Index writer(tmp_path.string(), {{"refresh_interval", "100"}});
+  {
+    Index writer(tmp_path.string(), {{"refresh_interval", "100"}});
 
-  for (int i = 0; i < 10000; ++i) {
-    writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
-    if (i % 50 == 0) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    for (int i = 0; i < 10000; ++i) {
+      writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
+      if (i % 50 == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
     }
-  }
-  writer.Flush(false);
-  BOOST_CHECK(writer.Contains("a"));
-  dictionary::Match m = writer["a"];
+    writer.Flush(false);
+    BOOST_CHECK(writer.Contains("a"));
+    dictionary::Match m = writer["a"];
 
-  BOOST_CHECK_EQUAL("{\"id\":9999}", m.GetValueAsString());
+    BOOST_CHECK_EQUAL("{\"id\":9999}", m.GetValueAsString());
+  }
+  boost::filesystem::remove_all(tmp_path);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
