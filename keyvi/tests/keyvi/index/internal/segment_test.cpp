@@ -217,6 +217,106 @@ BOOST_AUTO_TEST_CASE(deletekeyMerging) {
   BOOST_CHECK(!boost::filesystem::exists(dictionary3.GetFileName()));
 }
 
+BOOST_AUTO_TEST_CASE(deletekeyendtoend) {
+  std::vector<std::pair<std::string, std::string>> test_data{{"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"b", "{ytr:2}"},
+                                                             {"cde", "{c:2}"}, {"fgh", "{g:6}"},  {"o", "{ee:2}"},
+                                                             {"tyc", "{o:2}"}};
+  testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
+
+  segment_t segment(new Segment(dictionary.GetFileName(), true));
+
+  BOOST_CHECK(!segment->HasDeletedKeys());
+  BOOST_CHECK(!segment->DeletedKeys());
+
+  segment->DeleteKey("abc");
+  segment->DeleteKey("tyc");
+  segment->DeleteKey("not_in_dict");
+  segment->Persist();
+
+  segment->ReloadDeletedKeys();
+  BOOST_CHECK(segment->HasDeletedKeys());
+  BOOST_CHECK(segment->DeletedKeys()->count("abc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("tyc"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("o"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("not_in_dict"));
+  BOOST_CHECK(segment->IsDeleted("abc"));
+
+  segment->DeleteKey("o");
+  segment->Persist();
+
+  segment->ReloadDeletedKeys();
+  BOOST_CHECK(segment->HasDeletedKeys());
+  BOOST_CHECK(segment->DeletedKeys()->count("abc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("tyc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("o"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("not_in_dict"));
+
+  segment->ElectedForMerge();
+
+  BOOST_CHECK(segment->HasDeletedKeys());
+  BOOST_CHECK(segment->DeletedKeys()->count("abc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("tyc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("o"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("not_in_dict"));
+
+  segment->DeleteKey("b");
+  segment->DeleteKey("not_in_dict");
+  segment->Persist();
+
+  segment->ReloadDeletedKeys();
+  BOOST_CHECK(segment->HasDeletedKeys());
+  BOOST_CHECK(segment->DeletedKeys()->count("abc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("tyc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("o"));
+  BOOST_CHECK(segment->DeletedKeys()->count("b"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("not_in_dict"));
+
+  segment->MergeFailed();
+
+  BOOST_CHECK(segment->HasDeletedKeys());
+  BOOST_CHECK(segment->DeletedKeys()->count("abc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("tyc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("o"));
+  BOOST_CHECK(segment->DeletedKeys()->count("b"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("not_in_dict"));
+
+  segment->ReloadDeletedKeys();
+  BOOST_CHECK(segment->HasDeletedKeys());
+  BOOST_CHECK(segment->DeletedKeys()->count("abc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("tyc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("o"));
+  BOOST_CHECK(segment->DeletedKeys()->count("b"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("not_in_dict"));
+
+  segment->ElectedForMerge();
+
+  segment->ReloadDeletedKeys();
+  BOOST_CHECK(segment->HasDeletedKeys());
+  BOOST_CHECK(segment->DeletedKeys()->count("abc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("tyc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("o"));
+  BOOST_CHECK(segment->DeletedKeys()->count("b"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("not_in_dict"));
+
+  segment->DeleteKey("fgh");
+  segment->DeleteKey("not_in_dict");
+  segment->Persist();
+
+  segment->ReloadDeletedKeys();
+  BOOST_CHECK(segment->HasDeletedKeys());
+  BOOST_CHECK(segment->DeletedKeys()->count("abc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("tyc"));
+  BOOST_CHECK(segment->DeletedKeys()->count("o"));
+  BOOST_CHECK(segment->DeletedKeys()->count("b"));
+  BOOST_CHECK(segment->DeletedKeys()->count("fgh"));
+  BOOST_CHECK(!segment->DeletedKeys()->count("not_in_dict"));
+
+  segment->RemoveFiles();
+  BOOST_CHECK(!boost::filesystem::exists(dictionary.GetFileName() + ".dk"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary.GetFileName() + ".dkm"));
+  BOOST_CHECK(!boost::filesystem::exists(dictionary.GetFileName()));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 }  // namespace internal
