@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
   using boost::filesystem::unique_path;
 
   auto tmp_path = temp_directory_path();
-  tmp_path /= unique_path();
+  tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
   {
     Index writer(tmp_path.string(), {{"refresh_interval", "100"}});
 
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
     }
-    writer.Flush(false);
+    writer.Flush();
     BOOST_CHECK(writer.Contains("a"));
     dictionary::Match m = writer["a"];
 
@@ -80,7 +80,108 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
   boost::filesystem::remove_all(tmp_path);
 }
 
+BOOST_AUTO_TEST_CASE(index_reopen) {
+  using boost::filesystem::temp_directory_path;
+  using boost::filesystem::unique_path;
+
+  auto tmp_path = temp_directory_path();
+  tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
+  {
+    Index index(tmp_path.string(), {{"refresh_interval", "100"}});
+
+    index.Set("a", "{\"id\":1}");
+    index.Set("b", "{\"id\":2}");
+
+    index.Flush();
+    index.Set("c", "{\"id\":3}");
+
+    BOOST_CHECK(index.Contains("a"));
+  }
+
+  {
+    // reopen
+    Index index(tmp_path.string(), {{"refresh_interval", "100"}});
+    BOOST_CHECK(index.Contains("a"));
+    BOOST_CHECK(index.Contains("b"));
+    BOOST_CHECK(index.Contains("c"));
+
+    index.Set("d", "{\"id\":4}");
+    index.Delete("b");
+  }
+
+  {
+    // reopen again
+    Index index(tmp_path.string(), {{"refresh_interval", "100"}});
+    BOOST_CHECK(index.Contains("a"));
+    BOOST_CHECK(!index.Contains("b"));
+    BOOST_CHECK(index.Contains("c"));
+    BOOST_CHECK(index.Contains("d"));
+  }
+
+  boost::filesystem::remove_all(tmp_path);
+}
+
+BOOST_AUTO_TEST_CASE(index_delete_keys) {
+  using boost::filesystem::temp_directory_path;
+  using boost::filesystem::unique_path;
+
+  auto tmp_path = temp_directory_path();
+  tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
+  {
+    Index index(tmp_path.string(), {{"refresh_interval", "100"}});
+
+    for (int i = 0; i < 100; ++i) {
+      index.Set("a" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}");
+    }
+
+    // delete keys, also some non-existing ones
+    for (int i = 20; i < 120; ++i) {
+      index.Delete("a" + std::to_string(i));
+    }
+
+    for (int i = 0; i < 25; ++i) {
+      index.Set("b" + std::to_string(i), "{\"id_b\":" + std::to_string(i) + "}");
+    }
+    index.Flush();
+
+    for (int i = 25; i < 50; ++i) {
+      index.Set("b" + std::to_string(i), "{\"id_b\":" + std::to_string(i) + "}");
+    }
+
+    for (int i = 20; i < 30; ++i) {
+      index.Delete("b" + std::to_string(i));
+    }
+
+    index.Flush();
+    for (int i = 45; i < 50; ++i) {
+      index.Delete("b" + std::to_string(i));
+    }
+    index.Flush();
+
+    for (int i = 0; i < 20; ++i) {
+      BOOST_CHECK(index.Contains("a" + std::to_string(i)));
+    }
+    for (int i = 20; i < 80; ++i) {
+      BOOST_CHECK(!index.Contains("a" + std::to_string(i)));
+    }
+    for (int i = 0; i < 20; ++i) {
+      BOOST_CHECK(index.Contains("b" + std::to_string(i)));
+    }
+    for (int i = 20; i < 30; ++i) {
+      BOOST_CHECK(!index.Contains("b" + std::to_string(i)));
+    }
+    for (int i = 30; i < 45; ++i) {
+      BOOST_CHECK(index.Contains("b" + std::to_string(i)));
+    }
+    for (int i = 45; i < 50; ++i) {
+      BOOST_CHECK(!index.Contains("a" + std::to_string(i)));
+    }
+  }
+
+  boost::filesystem::remove_all(tmp_path);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
-} /* namespace index */
-} /* namespace keyvi */
+}  // namespace index
+}  // namespace keyvi

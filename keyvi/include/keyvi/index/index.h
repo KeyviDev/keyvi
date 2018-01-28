@@ -90,9 +90,14 @@ class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker
 
   void Delete(const std::string& key) { Payload().Delete(key); }
 
-  void Flush(bool async = true) {
+  void Flush() {
     TRACE("Flush (manually)");
-    Payload().Flush(async);
+    Payload().Flush();
+  }
+
+  void FlushAsync() {
+    TRACE("Flush (manually)");
+    Payload().FlushAsync();
   }
 
  private:

@@ -169,28 +169,35 @@ class IndexWriterWorker final {
   }
 
   /**
-   * Flush for external use.
+   * FlushAsync for external use.
    */
-  void Flush(bool async = true) {
+  void FlushAsync() {
     TRACE("flush");
 
     compiler_active_object_([](IndexPayload& payload) {
       PersistDeletes(&payload);
       Compile(&payload);
     });
+  }
 
-    if (async == false) {
-      std::mutex m;
-      std::condition_variable c;
-      std::unique_lock<std::mutex> lock(m);
+  /**
+   * Flush for external use.
+   */
+  void Flush() {
+    TRACE("flush");
 
-      compiler_active_object_([&m, &c](IndexPayload& payload) {
-        std::unique_lock<std::mutex> waitLock(m);
-        c.notify_all();
-      });
+    std::mutex m;
+    std::condition_variable c;
+    std::unique_lock<std::mutex> lock(m);
 
-      c.wait(lock);
-    }
+    compiler_active_object_([&m, &c](IndexPayload& payload) {
+      PersistDeletes(&payload);
+      Compile(&payload);
+      std::unique_lock<std::mutex> waitLock(m);
+      c.notify_all();
+    });
+
+    c.wait(lock);
   }
 
  private:
