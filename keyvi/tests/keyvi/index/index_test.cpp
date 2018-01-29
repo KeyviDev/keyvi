@@ -68,6 +68,7 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
     for (int i = 0; i < 10000; ++i) {
       writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
       if (i % 50 == 0) {
+        writer.FlushAsync();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
     }
@@ -133,6 +134,7 @@ BOOST_AUTO_TEST_CASE(index_delete_keys) {
     for (int i = 0; i < 100; ++i) {
       index.Set("a" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}");
     }
+    index.FlushAsync();
 
     // delete keys, also some non-existing ones
     for (int i = 20; i < 120; ++i) {
