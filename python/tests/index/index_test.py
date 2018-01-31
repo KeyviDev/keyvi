@@ -16,8 +16,9 @@ def test_open_index():
         del index
         index = Index(os.path.join(test_dir, "index"))
         assert "a" in index
+        del index
     finally:
-        shutil.rmtree(test_dir)
+        shutil.rmtree(test_dir, ignore_errors=True)
     
 def test_some_indexing():
     test_dir = os.path.join(tempfile.gettempdir(), "index_some_indexing")
@@ -39,6 +40,6 @@ def test_some_indexing():
 
         for i in range (split, iterations):
             assert not "key-{}".format(i) in index
-
+        del index
     finally:
-        shutil.rmtree(test_dir)
+        shutil.rmtree(test_dir, ignore_errors=True)
