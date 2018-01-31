@@ -10,7 +10,8 @@ import tempfile
 def test_open_index():
     test_dir = os.path.join(tempfile.gettempdir(), "index_open_index")
     try:
-        os.makedirs(test_dir, exist_ok=True)
+        if not os.path.exists(test_dir):
+            os.mkdir(test_dir)
         index = Index(os.path.join(test_dir, "index"))
         index.Set("a", "{}")
         del index
@@ -25,7 +26,8 @@ def test_some_indexing():
     iterations = 10000
     split = 2000
     try:
-        os.makedirs(test_dir, exist_ok=True)
+        if not os.path.exists(test_dir):
+            os.mkdir(test_dir)
         index = Index(os.path.join(test_dir, "index"))
         for i in range (0, iterations):
             index.Set("key-{}".format(i), "value-{}".format(i))
