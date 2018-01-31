@@ -106,7 +106,7 @@ size_t getVarintLength(int_t value) {
  */
 template <typename int_t = uint64_t>
 size_t getVarshortLength(int_t value) {
-  return (value > 0x1fffffffffff) ? 4 : (value < 0x3fffffff) ? (value < 0x7fff) ? 1 : 2 : 3;
+  return (value > 0x1fffffffffff) ? 4 : (value < 0x40000000) ? (value < 0x8000) ? 1 : 2 : 3;
 }
 
 /**
