@@ -29,5 +29,4 @@ def test_input_output_keys():
         for _ in d.GetAllItems():
             output_keys_count += 1
 
-    print input_keys_count, output_keys_count
     assert input_keys_count == output_keys_count
