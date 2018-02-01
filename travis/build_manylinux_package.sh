@@ -5,3 +5,4 @@ docker run -e "PYTHON_VERSION=$PYTHON_VERSION" --rm -v `pwd`:/keyvi $DOCKER_IMAG
 
 pip install python/wheelhouse/keyvi*.whl
 py.test python/tests/
+py.test python/integration-tests/
