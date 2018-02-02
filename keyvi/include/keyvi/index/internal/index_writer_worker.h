@@ -108,6 +108,7 @@ class IndexWriterWorker final {
 
     // push a function to finish all pending merges
     compiler_active_object_([](IndexPayload& payload) {
+      Compile(&payload);
       for (MergeJob& p : payload.merge_jobs_) {
         p.Finalize();
       }
