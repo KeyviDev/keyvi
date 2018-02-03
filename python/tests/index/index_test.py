@@ -5,7 +5,7 @@ from keyvi.index import Index
 import os
 import shutil
 import tempfile
-
+import gc
 
 def test_open_index():
     test_dir = os.path.join(tempfile.gettempdir(), "index_open_index")
@@ -15,6 +15,8 @@ def test_open_index():
         index = Index(os.path.join(test_dir, "index"))
         index.Set("a", "{}")
         del index
+        # required for pypy to ensure deletion/destruction of the index object
+        gc.collect()
         index = Index(os.path.join(test_dir, "index"))
         assert "a" in index
         del index
