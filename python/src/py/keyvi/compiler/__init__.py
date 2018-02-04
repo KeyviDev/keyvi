@@ -17,15 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 
-# global keyvi concepts
-from keyvi._core import MatchIterator, Match
-
-# backwards compatibility for 0.2, deprecated, use sub-packages instead
-
-from keyvi._core import CompletionDictionaryCompiler, CompletionDictionaryMerger, Dictionary
-from keyvi._core import ForwardBackwardCompletion, FsaTransform, IntDictionaryCompiler, IntDictionaryMerger
-from keyvi._core import JsonDictionaryCompiler, JsonDictionaryCompilerSmallData, JsonDictionaryMerger, JumpConsistentHashString
+from keyvi._core import CompletionDictionaryCompiler, CompletionDictionaryMerger, IntDictionaryCompiler, IntDictionaryMerger
+from keyvi._core import JsonDictionaryCompiler, JsonDictionaryCompilerSmallData, JsonDictionaryMerger
 from keyvi._core import KeyOnlyDictionaryCompiler, KeyOnlyDictionaryGenerator, KeyOnlyDictionaryMerger
-from keyvi._core import MatchIterator, Match
-from keyvi._core import MultiWordCompletion, PredictiveCompression, PrefixCompletion, ReadOnlyIndex
 from keyvi._core import StringDictionaryCompiler, StringDictionaryMerger
