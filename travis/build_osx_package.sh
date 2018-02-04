@@ -26,4 +26,5 @@ brew remove snappy
 
 sudo -H pip install wheelhouse/*.whl
 py.test tests
+py.test integration-tests
 cd ..

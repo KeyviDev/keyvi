@@ -29,9 +29,9 @@
 
 #include <string>
 
+#include <boost/lexical_cast.hpp>
 // boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
 #define BOOST_SPIRIT_THREADSAFE
-#include <boost/lexical_cast.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 

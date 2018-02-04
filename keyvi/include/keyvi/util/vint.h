@@ -59,7 +59,7 @@ void encodeVarint(int_t value, uint8_t* output, size_t* outputSizePtr) {
 }
 
 /**
- * Encodes an unsigned variable-length integer using the MSB algorithm.
+ * Encodes an unsigned variable-length short using the MSB algorithm.
  * @param value The input value. Any standard integer type is allowed.
  * @param output A pointer to a piece of reserved memory. Should have a minimum size dependent on the input size (32 bit
  * = 5 bytes, 64 bit = 10 bytes).
@@ -106,7 +106,7 @@ size_t getVarintLength(int_t value) {
  */
 template <typename int_t = uint64_t>
 size_t getVarshortLength(int_t value) {
-  return (value > 0x1fffffffffff) ? 4 : (value < 0x3fffffff) ? (value < 0x7fff) ? 1 : 2 : 3;
+  return (value > 0x1fffffffffff) ? 4 : (value < 0x40000000) ? (value < 0x8000) ? 1 : 2 : 3;
 }
 
 /**
@@ -149,7 +149,7 @@ int_t decodeVarint(const uint8_t* input) {
 }
 
 /**
- * Decodes an unsigned variable-length integer using the MSB algorithm.
+ * Decodes an unsigned variable-length short using the MSB algorithm.
  * @param value The input value. Any standard integer type is allowed.
  */
 template <typename int_t = uint64_t>
