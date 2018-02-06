@@ -6,8 +6,6 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=release -DZLIB_ROOT=/usr/local/opt/zlib ..
 make -j 4
 
-sudo make install
-
 ./unit_test_all
 cd ..
 
