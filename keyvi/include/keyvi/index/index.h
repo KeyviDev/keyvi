@@ -41,6 +41,7 @@
 
 #include "dictionary/dictionary.h"
 #include "index/internal/base_index_reader.h"
+#include "index/internal/index_settings.h"
 #include "index/internal/index_writer_worker.h"
 #include "index/internal/segment.h"
 
@@ -56,6 +57,8 @@ class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker
                  const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
       : BaseIndexReader(index_directory, params), lock_file_() {
     index_directory_ = index_directory;
+
+    internal::IndexSettings::GetInstance().ParseSettings(params);
 
     index_toc_file_ = index_directory_;
     index_toc_file_ /= "index.toc";

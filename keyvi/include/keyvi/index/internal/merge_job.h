@@ -32,6 +32,7 @@
 #include "dictionary/dictionary_types.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "index/internal/index_settings.h"
 #include "index/internal/segment.h"
 
 // #define ENABLE_TRACING
@@ -116,7 +117,10 @@ class MergeJob final {
     payload_.start_time_ = std::chrono::system_clock::now();
 
     std::stringstream command;
-    command << "keyvimerger -m 5242880";
+
+    command << internal::IndexSettings::GetInstance().GetKeyviMergerBin();
+    command << " -m 5242880";
+
     for (auto s : payload_.segments_) {
       command << " -i " << s->GetDictionaryPath().string();
     }
