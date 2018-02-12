@@ -8,7 +8,7 @@ cpplint_files=()
 for file in ${infiles}; do
   fqfile=`git rev-parse --show-toplevel`/${file}
   echo "Checking: ${file}"
-  if ! cmp -s ${fqfile} <(clang-format ${fqfile}); then
+  if ! cmp -s ${fqfile} <(clang-format -style=file ${fqfile}); then
     clang_format_files+=("${file}")
   fi
   if ! cpplint --quiet ${fqfile}; then
