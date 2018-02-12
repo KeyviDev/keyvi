@@ -5,6 +5,8 @@ Language: Cpp
 Standard: Cpp11
 TabWidth: '4'
 UseTab: Never
+IndentWidth: 4
+AccessModifierOffset: -3
+ConstructorInitializerIndentWidth: 8
 
 ...
-
