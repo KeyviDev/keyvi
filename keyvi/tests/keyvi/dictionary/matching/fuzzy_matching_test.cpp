@@ -235,6 +235,121 @@ BOOST_AUTO_TEST_CASE(fuzzy_5) {
   BOOST_CHECK(expected_it == expected_output.end());
 }
 
+BOOST_AUTO_TEST_CASE(fuzzy_no_match) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"türkei news", 23698},
+      {"türkei side", 18838},
+      {"türkei urlaub", 23424},
+      {"türkisch anfänger", 20788},
+      {"türkisch für", 21655},
+      {"türkisch für anfänger", 20735},
+      {"türkçe dublaj", 28575},
+      {"türkçe dublaj izle", 16391},
+      {"türkçe izle", 19946},
+      {"tüv akademie", 9557},
+      {"tüv hessen", 7744},
+      {"tüv i", 331},
+      {"tüv in", 10188},
+      {"tüv ib", 10189},
+      {"tüv kosten", 11387},
+      {"tüv nord", 46052},
+      {"tüs rhein", 462},
+      {"tüs rheinland", 39131},
+      {"tüs öffnungszeiten", 15999},
+  };
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  auto iter = d->GetFuzzy("türkisch", 2);
+  BOOST_CHECK(iter.begin() == iter.end());
+}
+
+BOOST_AUTO_TEST_CASE(fuzzy_empty_input) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"türkei news", 23698},
+      {"türkei side", 18838},
+      {"türkei urlaub", 23424},
+      {"türkisch anfänger", 20788},
+      {"türkisch für", 21655},
+      {"türkisch für anfänger", 20735},
+      {"türkçe dublaj", 28575},
+      {"türkçe dublaj izle", 16391},
+      {"türkçe izle", 19946},
+      {"tüv akademie", 9557},
+      {"tüv hessen", 7744},
+      {"tüv i", 331},
+      {"tüv in", 10188},
+      {"tüv ib", 10189},
+      {"tüv kosten", 11387},
+      {"tüv nord", 46052},
+      {"tüs rhein", 462},
+      {"tüs rheinland", 39131},
+      {"tüs öffnungszeiten", 15999},
+  };
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  auto iter = d->GetFuzzy("", 7);
+  BOOST_CHECK(iter.begin() == iter.end());
+}
+
+BOOST_AUTO_TEST_CASE(fuzzy_short_prefix) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"türkei news", 23698},
+      {"türkei side", 18838},
+      {"türkei urlaub", 23424},
+      {"türkisch anfänger", 20788},
+      {"türkisch für", 21655},
+      {"türkisch für anfänger", 20735},
+      {"türkçe dublaj", 28575},
+      {"türkçe dublaj izle", 16391},
+      {"türkçe izle", 19946},
+      {"tüv akademie", 9557},
+      {"tüv hessen", 7744},
+      {"üüv i", 331},
+      {"üüv in", 10188},
+      {"üüv ib", 10189},
+      {"üüv kosten", 11387},
+      {"üüv nord", 46052},
+      {"üüs rhein", 462},
+      {"üüs rheinland", 39131},
+      {"üüs öffnungszeiten", 15999},
+  };
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  const auto iter1 = d->GetFuzzy("t", 2);
+  BOOST_CHECK(iter1.begin() == iter1.end());
+
+  const auto iter2 = d->GetFuzzy("ü", 2);
+  BOOST_CHECK(iter2.begin() == iter2.end());
+}
+
+BOOST_AUTO_TEST_CASE(fuzzy_cjk) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"あsだ", 331},       {"あsだs", 23698},    {"あsだsっdさ", 18838},
+      {"あsだsdさ", 11387}, {"あsだsっd", 10189}, {"あsださ", 10188},
+  };
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  std::vector<std::pair<std::string, uint32_t>> expected_output = {
+      {"あsだs", 2},
+      {"あsだsっd", 0},
+      {"あsだsっdさ", 1},
+      {"あsだsdさ", 2},
+  };
+
+  auto expected_it = expected_output.begin();
+  for (auto m : d->GetFuzzy("あsだsっd", 2)) {
+    BOOST_CHECK_EQUAL(expected_it->first, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(expected_it->second, m.GetScore());
+    expected_it++;
+  }
+
+  BOOST_CHECK(expected_it == expected_output.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace matching */

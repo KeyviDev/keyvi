@@ -48,20 +48,16 @@ class FuzzyMatching final {
     utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
 
     query_char_length_ = codepoints.size();
-    metric_ptr_.reset(new stringdistance::Levenshtein(codepoints, 20, max_edit_distance_));
-
-    const size_t minimum_exact_prefix_in_chars = 2;
-    size_t exact_prefix_in_bytes = 0;
-    while (exact_prefix_in_chars_ < minimum_exact_prefix_in_chars && exact_prefix_in_bytes < query_.size()) {
-      exact_prefix_in_bytes += util::Utf8Utils::GetCharLength(query[exact_prefix_in_bytes]);
-      ++exact_prefix_in_chars_;
+    if (query_char_length_ < MINIMUM_EXACT_PREFIX_IN_CHARS) {
+      return;
     }
+    metric_ptr_.reset(new stringdistance::Levenshtein(codepoints, 20, max_edit_distance_));
 
     // match exact prefix
     uint64_t state = fsa_->GetStartState();
     size_t depth = 0;
     size_t utf8_depth = 0;
-    while (state != 0 && depth < exact_prefix_in_chars_) {
+    while (state != 0 && depth < MINIMUM_EXACT_PREFIX_IN_CHARS) {
       const size_t code_point_length = util::Utf8Utils::GetCharLength(query[utf8_depth]);
       for (size_t i = 0; i < code_point_length; ++i, ++utf8_depth) {
         state = fsa_->TryWalkTransition(state, query[utf8_depth]);
@@ -110,7 +106,7 @@ class FuzzyMatching final {
  private:
   size_t candidate_length() const {
     assert(traverser_ptr_);
-    return exact_prefix_in_chars_ + traverser_ptr_->GetDepth();
+    return MINIMUM_EXACT_PREFIX_IN_CHARS + traverser_ptr_->GetDepth();
   }
 
  private:
@@ -118,13 +114,14 @@ class FuzzyMatching final {
   std::string query_;
   const size_t max_edit_distance_;
 
-  size_t exact_prefix_in_chars_ = 0;
   size_t query_char_length_ = 0;
 
   Match first_match_;
 
   std::unique_ptr<stringdistance::Levenshtein> metric_ptr_;
   std::unique_ptr<fsa::CodePointStateTraverser<fsa::WeightedStateTraverser>> traverser_ptr_;
+
+  const size_t MINIMUM_EXACT_PREFIX_IN_CHARS = 2;
 };
 
 } /* namespace matching */
