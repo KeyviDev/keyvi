@@ -22,8 +22,8 @@
  *      Author: Narek Gharibyan <narekgharibyan@gmail.com>
  */
 
-#ifndef KEYVI_DICTIONARY_FUZZY_MATCH_H_
-#define KEYVI_DICTIONARY_FUZZY_MATCH_H_
+#ifndef KEYVI_DICTIONARY_MATCHING_FUZZY_MATCHING_H_
+#define KEYVI_DICTIONARY_MATCHING_FUZZY_MATCHING_H_
 
 #include <string>
 #include <vector>
@@ -38,10 +38,11 @@
 
 namespace keyvi {
 namespace dictionary {
+namespace matching {
 
-class FuzzyMatch final {
+class FuzzyMatching final {
  public:
-  FuzzyMatch(const fsa::automata_t& fsa, const std::string& query, size_t max_edit_distance)
+  FuzzyMatching(const fsa::automata_t& fsa, const std::string& query, size_t max_edit_distance)
       : fsa_(fsa), query_(query), max_edit_distance_(max_edit_distance), first_match_() {
     std::vector<int> codepoints;
     utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
@@ -126,6 +127,7 @@ class FuzzyMatch final {
   std::unique_ptr<fsa::CodePointStateTraverser<fsa::WeightedStateTraverser>> traverser_ptr_;
 };
 
+} /* namespace matching */
 } /* namespace dictionary */
 } /* namespace keyvi */
-#endif  // KEYVI_DICTIONARY_FUZZY_MATCH_H_
+#endif  // KEYVI_DICTIONARY_MATCHING_FUZZY_MATCHING_H_

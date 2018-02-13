@@ -29,8 +29,9 @@
 
 namespace keyvi {
 namespace dictionary {
+namespace matching {
 
-BOOST_AUTO_TEST_SUITE(FuzzyMatchTests)
+BOOST_AUTO_TEST_SUITE(FuzzyMatchingTests)
 
 BOOST_AUTO_TEST_CASE(fuzzy_0) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
@@ -236,5 +237,6 @@ BOOST_AUTO_TEST_CASE(fuzzy_5) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
+} /* namespace matching */
 } /* namespace dictionary */
 } /* namespace keyvi */
