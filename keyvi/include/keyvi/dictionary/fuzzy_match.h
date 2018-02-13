@@ -39,10 +39,10 @@
 namespace keyvi {
 namespace dictionary {
 
-class FuzzyMatch {
+class FuzzyMatch final {
  public:
-  FuzzyMatch(fsa::automata_t fsa, const std::string& query, size_t max_edit_distance)
-      : fsa_(std::move(fsa)), query_(query), max_edit_distance_(max_edit_distance) {
+  FuzzyMatch(const fsa::automata_t& fsa, const std::string& query, size_t max_edit_distance)
+      : fsa_(fsa), query_(query), max_edit_distance_(max_edit_distance), first_match_() {
     std::vector<int> codepoints;
     utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
 
