@@ -40,17 +40,15 @@ namespace internal {
 
 class IndexSettings final {
  public:
-  static IndexSettings& GetInstance() {
-    static IndexSettings instance;
-    return instance;
-  }
-
-  void ParseSettings(const keyvi::util::parameters_t& params) {
+  explicit IndexSettings(const keyvi::util::parameters_t& params) : settings_() {
     // only parse what we know
     if (params.count(KEYVIMERGER_BIN)) {
       settings_[KEYVIMERGER_BIN] = params.at(KEYVIMERGER_BIN);
     }
   }
+
+  IndexSettings(IndexSettings const&) = delete;
+  void operator=(IndexSettings const&) = delete;
 
   const std::string& GetKeyviMergerBin() const {
     if (settings_.count(KEYVIMERGER_BIN)) {
@@ -63,11 +61,6 @@ class IndexSettings final {
  private:
   std::unordered_map<std::string, std::string> settings_;
   std::string default_keyvimerger_bin_ = "keyvimerger";
-
-  IndexSettings() : settings_() {}
-
-  IndexSettings(IndexSettings const&) = delete;
-  void operator=(IndexSettings const&) = delete;
 };
 
 } /* namespace internal */

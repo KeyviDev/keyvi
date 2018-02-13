@@ -33,7 +33,7 @@
 #include "index/index.h"
 #include "index/internal/constants.h"
 
-std::string get_keyvimerger_bin() {
+inline std::string get_keyvimerger_bin() {
   boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};
   path /= "keyvimerger";
 
