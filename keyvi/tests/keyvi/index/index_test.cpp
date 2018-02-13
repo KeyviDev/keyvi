@@ -24,12 +24,23 @@
  */
 
 #include <chrono>  //NOLINT
+#include <cstdlib>
 #include <thread>  //NOLINT
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "index/index.h"
+#include "index/internal/constants.h"
+
+std::string get_keyvimerger_bin() {
+  boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};
+  path /= "keyvimerger";
+
+  BOOST_CHECK(boost::filesystem::is_regular_file(path));
+
+  return path.string();
+}
 
 namespace keyvi {
 namespace index {
@@ -42,7 +53,7 @@ BOOST_AUTO_TEST_CASE(basic_writer) {
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path();
   {
-    Index writer(tmp_path.string());
+    Index writer(tmp_path.string(), {{KEYVIMERGER_BIN, get_keyvimerger_bin()}});
 
     writer.Set("a", "{\"id\":3}");
 
@@ -52,6 +63,11 @@ BOOST_AUTO_TEST_CASE(basic_writer) {
     writer.Flush();
     writer.Set("d", "{\"id\":6}");
     writer.Flush();
+
+    BOOST_CHECK(writer.Contains("a"));
+    BOOST_CHECK(writer.Contains("b"));
+    BOOST_CHECK(writer.Contains("c"));
+    BOOST_CHECK(writer.Contains("d"));
   }
   boost::filesystem::remove_all(tmp_path);
 }
@@ -63,7 +79,7 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
   {
-    Index writer(tmp_path.string(), {{"refresh_interval", "100"}});
+    Index writer(tmp_path.string(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
 
     for (int i = 0; i < 10000; ++i) {
       writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
@@ -88,7 +104,7 @@ BOOST_AUTO_TEST_CASE(index_reopen) {
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
   {
-    Index index(tmp_path.string(), {{"refresh_interval", "100"}});
+    Index index(tmp_path.string(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
 
     index.Set("a", "{\"id\":1}");
     index.Set("b", "{\"id\":2}");
@@ -101,7 +117,7 @@ BOOST_AUTO_TEST_CASE(index_reopen) {
 
   {
     // reopen
-    Index index(tmp_path.string(), {{"refresh_interval", "100"}});
+    Index index(tmp_path.string(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
     BOOST_CHECK(index.Contains("a"));
     BOOST_CHECK(index.Contains("b"));
     BOOST_CHECK(index.Contains("c"));
@@ -112,7 +128,7 @@ BOOST_AUTO_TEST_CASE(index_reopen) {
 
   {
     // reopen again
-    Index index(tmp_path.string(), {{"refresh_interval", "100"}});
+    Index index(tmp_path.string(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
     BOOST_CHECK(index.Contains("a"));
     BOOST_CHECK(!index.Contains("b"));
     BOOST_CHECK(index.Contains("c"));
@@ -129,7 +145,7 @@ BOOST_AUTO_TEST_CASE(index_delete_keys) {
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
   {
-    Index index(tmp_path.string(), {{"refresh_interval", "100"}});
+    Index index(tmp_path.string(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
 
     for (int i = 0; i < 100; ++i) {
       index.Set("a" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}");
