@@ -34,6 +34,7 @@
 #include "dictionary/fsa/traverser_types.h"
 #include "dictionary/match.h"
 #include "dictionary/match_iterator.h"
+#include "dictionary/matching/fuzzy_matching.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -379,6 +380,12 @@ class Dictionary final {
     };
 
     return MatchIterator::MakeIteratorPair(tfunc);
+  }
+
+  MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, size_t max_edit_distance) const {
+    auto data = std::make_shared<matching::FuzzyMatching>(fsa_, query, max_edit_distance);
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
   }
 
   std::string GetManifestAsString() const { return fsa_->GetManifestAsString(); }

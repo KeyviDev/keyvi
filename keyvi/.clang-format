@@ -3,8 +3,8 @@ BasedOnStyle: Google
 ColumnLimit: '120'
 Language: Cpp
 Standard: Cpp11
-TabWidth: '4'
+TabWidth: '2'
 UseTab: Never
+ConstructorInitializerIndentWidth: 4
 
 ...
-
