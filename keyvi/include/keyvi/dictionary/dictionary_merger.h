@@ -182,8 +182,15 @@ class DictionaryMerger final {
 
       if (!deleted_keys_[segment_it.segmentIndex()].empty() &&
           top_key == deleted_keys_[segment_it.segmentIndex()].back()) {
-        // check the other deleted_keys,
         deleted_keys_[segment_it.segmentIndex()].pop_back();
+
+        // check the other deleted_keys for duplicates
+        for (auto& deleted_keys : deleted_keys_) {
+          if (!deleted_keys.empty() && top_key == deleted_keys.back()) {
+            deleted_keys.pop_back();
+          }
+        }
+
       } else {
         fsa::ValueHandle handle;
         handle.no_minimization = false;
