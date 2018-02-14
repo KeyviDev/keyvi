@@ -28,9 +28,21 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "index/internal/constants.h"
+#include "index/internal/index_settings.h"
 #include "index/internal/merge_job.h"
 #include "index/internal/segment.h"
+
 #include "testing/temp_dictionary.h"
+
+inline std::string get_keyvimerger_bin() {
+  boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};
+  path /= "keyvimerger";
+
+  BOOST_CHECK(boost::filesystem::is_regular_file(path));
+
+  return path.string();
+}
 
 namespace keyvi {
 namespace index {
@@ -56,8 +68,8 @@ BOOST_AUTO_TEST_CASE(basic_merge) {
   segment_t w2(new Segment(dictionary2.GetFileName()));
 
   boost::filesystem::path p("merged.kv");
-
-  MergeJob m({w1, w2}, 0, p);
+  IndexSettings settings({{KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+  MergeJob m({w1, w2}, 0, p, settings);
   m.Run();
 
   int retry = 100;

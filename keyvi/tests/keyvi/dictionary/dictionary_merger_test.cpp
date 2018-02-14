@@ -628,9 +628,9 @@ BOOST_AUTO_TEST_CASE(Delete) {
   deleted_keys_file += ".dk";
   JsonDictionaryMerger merger;
   {
-    std::unordered_set<std::string> deleted_keys_{"xyz"};
+    std::unordered_set<std::string> deleted_keys{"xyz"};
     std::ofstream out_stream(deleted_keys_file.string(), std::ios::binary);
-    msgpack::pack(out_stream, deleted_keys_);
+    msgpack::pack(out_stream, deleted_keys);
   }
 
   merger.Add(dictionary.GetFileName());
@@ -645,6 +645,72 @@ BOOST_AUTO_TEST_CASE(Delete) {
   BOOST_CHECK(!d->Contains("xyz"));
   std::remove(filename.c_str());
   std::remove(deleted_keys_file.string().c_str());
+}
+
+BOOST_AUTO_TEST_CASE(MultipleDeletes) {
+  std::vector<std::pair<std::string, std::string>> test_data1 = {
+      {"abcd", "{g:5}"},   {"abbc", "{t:4}"}, {"abbcd", "{u:3}"}, {"abbd", "{v:2}"},
+      {"abbdef", "{w:1}"}, {"abbe", "{x:0}"}, {"acdd", "{y:-1}"}, {"afgh", "{z:-2}"},
+  };
+  testing::TempDictionary dictionary1 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data1);
+  boost::filesystem::path deleted_keys_file1{dictionary1.GetFileName()};
+  deleted_keys_file1 += ".dk";
+  {
+    std::unordered_set<std::string> deleted_keys1{"abbc", "afgh"};
+    std::ofstream out_stream(deleted_keys_file1.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys1);
+  }
+
+  std::vector<std::pair<std::string, std::string>> test_data2 = {
+      {"abcd", "{g:15}"},   {"abbc", "{t:14}"}, {"abbcd", "{u:13}"}, {"abbd", "{v:12}"},
+      {"abbdef", "{w:11}"}, {"abbe", "{x:10}"}, {"acdd", "{y:9}"},
+  };
+  testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data2);
+  boost::filesystem::path deleted_keys_file2{dictionary2.GetFileName()};
+  deleted_keys_file2 += ".dk";
+  {
+    std::unordered_set<std::string> deleted_keys2{"abbc", "abbcd", "abbd"};
+    std::ofstream out_stream(deleted_keys_file2.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys2);
+  }
+
+  std::vector<std::pair<std::string, std::string>> test_data3 = {
+      {"abcd", "{g:25}"},   {"abbc", "{t:24}"}, {"abbcd", "{u:23}"},
+      {"abbdef", "{w:21}"}, {"abbe", "{x:20}"}, {"acdd", "{y:19}"},
+  };
+  testing::TempDictionary dictionary3 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data3);
+  boost::filesystem::path deleted_keys_file3{dictionary3.GetFileName()};
+  deleted_keys_file3 += ".dk";
+  {
+    std::unordered_set<std::string> deleted_keys3{"abbc", "abbcd", "abbdef"};
+    std::ofstream out_stream(deleted_keys_file3.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys3);
+  }
+
+  JsonDictionaryMerger merger;
+  merger.Add(dictionary1.GetFileName());
+  merger.Add(dictionary2.GetFileName());
+  merger.Add(dictionary3.GetFileName());
+
+  std::string filename("merge-multiple-deletes-dict.kv");
+  merger.Merge(filename);
+
+  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+  dictionary_t d(new Dictionary(fsa));
+
+  BOOST_CHECK(d->Contains("abcd"));
+  BOOST_CHECK(!d->Contains("abbc"));
+  BOOST_CHECK(!d->Contains("abbcd"));
+  BOOST_CHECK(!d->Contains("abbd"));
+  BOOST_CHECK(!d->Contains("abbdef"));
+  BOOST_CHECK(d->Contains("abbe"));
+  BOOST_CHECK(d->Contains("acdd"));
+  BOOST_CHECK(!d->Contains("afgh"));
+
+  std::remove(filename.c_str());
+  std::remove(deleted_keys_file1.string().c_str());
+  std::remove(deleted_keys_file2.string().c_str());
+  std::remove(deleted_keys_file3.string().c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

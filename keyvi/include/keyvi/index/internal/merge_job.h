@@ -32,6 +32,7 @@
 #include "dictionary/dictionary_types.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "index/internal/index_settings.h"
 #include "index/internal/segment.h"
 
 // #define ENABLE_TRACING
@@ -43,14 +44,16 @@ namespace internal {
 
 class MergeJob final {
   struct MergeJobPayload {
-    explicit MergeJobPayload(std::vector<segment_t> segments, const boost::filesystem::path& output_filename)
-        : segments_(segments), output_filename_(output_filename), process_finished_(false) {}
+    explicit MergeJobPayload(std::vector<segment_t> segments, const boost::filesystem::path& output_filename,
+                             const IndexSettings& settings)
+        : segments_(segments), output_filename_(output_filename), settings_(settings), process_finished_(false) {}
 
     MergeJobPayload(MergeJobPayload&&) = default;
     MergeJobPayload& operator=(MergeJobPayload&&) = default;
 
     std::vector<segment_t> segments_;
     boost::filesystem::path output_filename_;
+    const IndexSettings& settings_;
     std::chrono::time_point<std::chrono::system_clock> start_time_;
     std::chrono::time_point<std::chrono::system_clock> end_time_;
     int exit_code_ = -1;
@@ -60,8 +63,9 @@ class MergeJob final {
 
  public:
   // todo: add ability to stop merging for shutdown
-  explicit MergeJob(segment_vec_t segments, size_t id, const boost::filesystem::path& output_filename)
-      : payload_(segments, output_filename), id_(id), external_process_() {}
+  explicit MergeJob(segment_vec_t segments, size_t id, const boost::filesystem::path& output_filename,
+                    const IndexSettings& settings)
+      : payload_(segments, output_filename, settings), id_(id), external_process_() {}
 
   ~MergeJob() {
     if (payload_.process_finished_ == false) {
@@ -116,7 +120,10 @@ class MergeJob final {
     payload_.start_time_ = std::chrono::system_clock::now();
 
     std::stringstream command;
-    command << "keyvimerger -m 5242880";
+
+    command << payload_.settings_.GetKeyviMergerBin();
+    command << " -m 5242880";
+
     for (auto s : payload_.segments_) {
       command << " -i " << s->GetDictionaryPath().string();
     }

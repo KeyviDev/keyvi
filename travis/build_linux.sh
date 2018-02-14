@@ -6,8 +6,6 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=$CONF ..
 make -j 4
 
-sudo make install
-
 ./unit_test_all
 
 cd ../python

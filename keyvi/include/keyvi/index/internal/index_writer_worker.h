@@ -41,6 +41,7 @@
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/dictionary_types.h"
 #include "index/internal/constants.h"
+#include "index/internal/index_settings.h"
 #include "index/internal/merge_job.h"
 #include "index/internal/merge_policy_selector.h"
 #include "index/internal/segment.h"
@@ -57,7 +58,7 @@ namespace internal {
 class IndexWriterWorker final {
   typedef std::shared_ptr<dictionary::JsonDictionaryCompilerSmallData> compiler_t;
   struct IndexPayload {
-    explicit IndexPayload(const std::string& index_directory)
+    explicit IndexPayload(const std::string& index_directory, const keyvi::util::parameters_t& params)
         : compiler_(),
           write_counter_(0),
           segments_(),
@@ -65,6 +66,7 @@ class IndexWriterWorker final {
           index_directory_(index_directory),
           index_toc_file_(index_directory),
           index_toc_file_part_(index_directory),
+          settings_(params),
           merge_jobs_(),
           any_delete_(false),
           merge_enabled_(true) {
@@ -81,6 +83,7 @@ class IndexWriterWorker final {
     boost::filesystem::path index_directory_;
     boost::filesystem::path index_toc_file_;
     boost::filesystem::path index_toc_file_part_;
+    internal::IndexSettings settings_;
     std::list<MergeJob> merge_jobs_;
     size_t max_concurrent_merges_ = 2;
     bool any_delete_;
@@ -89,7 +92,7 @@ class IndexWriterWorker final {
 
  public:
   explicit IndexWriterWorker(const std::string& index_directory, const keyvi::util::parameters_t& params)
-      : payload_(index_directory),
+      : payload_(index_directory, params),
         compiler_active_object_(
             &payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
             std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))) {
@@ -324,7 +327,7 @@ class IndexWriterWorker final {
       s->ElectedForMerge();
     }
 
-    payload_.merge_jobs_.emplace_back(to_merge, merge_policy_id, p);
+    payload_.merge_jobs_.emplace_back(to_merge, merge_policy_id, p, payload_.settings_);
     payload_.merge_jobs_.back().Run();
   }
 
