@@ -130,7 +130,7 @@ mod tests {
         values.sort();
         let new_values: Vec<(String, String)> = values.into_iter().map(|(x, y)| (x.into(), y.into())).collect();
 
-        let mit = dictionary::Dictionary::new("test_data/fuzzy.kv").unwrap().get_fuzzy_completions("aafcül", 3);
+        let mit = dictionary::Dictionary::new("test_data/fuzzy.kv").unwrap().get_fuzzy("aafcül", 3);
         let mut a: Vec<(String, String)> = mit.map(|m| (m.get_value_as_string(), m.matched_string())).collect();
         a.sort();
 
@@ -140,14 +140,15 @@ mod tests {
     #[test]
     fn fuzzy_completions_non_ascii() {
         let mut values = vec![
-            ("331", "tücv i"),
-            ("45901", "tücv süd"),
-            ("46052", "tücv nord")
+            ("10188", "tüv in"),
+            ("331", "tüv i"),
+            ("45901", "tüv süd"),
+            ("46052", "tüv nord")
         ];
         values.sort();
         let new_values: Vec<(String, String)> = values.into_iter().map(|(x, y)| (x.into(), y.into())).collect();
 
-        let mit = dictionary::Dictionary::new("test_data/fuzzy_non_ascii.kv").unwrap().get_fuzzy_completions("tüc", 3);
+        let mit = dictionary::Dictionary::new("test_data/fuzzy_non_ascii.kv").unwrap().get_fuzzy("tüc", 6);
         let mut a: Vec<(String, String)> = mit.map(|m| (m.get_value_as_string(), m.matched_string())).collect();
         a.sort();
 
@@ -163,7 +164,7 @@ mod tests {
         values.sort();
         let new_values: Vec<(String, String, String)> = values.into_iter().map(|(x, y, z)| (x.into(), y.into(), z.into())).collect();
 
-        let mit = dictionary::Dictionary::new("test_data/fuzzy.kv").unwrap().get_fuzzy_completions("aafcül", 3);
+        let mit = dictionary::Dictionary::new("test_data/fuzzy.kv").unwrap().get_fuzzy("aafcül", 3);
         let mut a: Vec<(String, String, String)> = mit.map(|m| (m.get_value_as_string(), m.matched_string(), format!("{:.*}", 1, m.get_score()))).collect();
         a.sort();
         assert_eq!(new_values, a);

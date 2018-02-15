@@ -121,9 +121,8 @@ keyvi_dictionary_get_prefix_completions(const keyvi_dictionary *dict, const char
 }
 
 keyvi_match_iterator *
-keyvi_dictionary_get_fuzzy_completions(const keyvi_dictionary *dict, const char *key, size_t max_edit_distance) {
-    completion::PrefixCompletion prefixCompletion(dict->obj_);
-    return new keyvi_match_iterator(prefixCompletion.GetFuzzyCompletions(key, max_edit_distance));
+keyvi_dictionary_get_fuzzy(const keyvi_dictionary *dict, const char *key, size_t max_edit_distance) {
+    return new keyvi_match_iterator(dict->obj_->GetFuzzy(key, max_edit_distance));
 }
 
 keyvi_match_iterator *

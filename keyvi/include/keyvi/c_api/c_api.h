@@ -68,7 +68,7 @@ struct keyvi_match_iterator *
 keyvi_dictionary_get_prefix_completions(const struct keyvi_dictionary *, const char *, size_t);
 
 struct keyvi_match_iterator *
-keyvi_dictionary_get_fuzzy_completions(const struct keyvi_dictionary *, const char *, size_t);
+keyvi_dictionary_get_fuzzy(const struct keyvi_dictionary *, const char *, size_t);
 
 struct keyvi_match_iterator *
 keyvi_dictionary_get_multi_word_completions(const struct keyvi_dictionary *, const char *, size_t);
