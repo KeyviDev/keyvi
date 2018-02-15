@@ -22,12 +22,12 @@
  *      Author: hendrik
  */
 
-#ifndef KEYVI_INDEX_INTERNAL_CONSTANTS_H_
-#define KEYVI_INDEX_INTERNAL_CONSTANTS_H_
+#ifndef KEYVI_INDEX_CONSTANTS_H_
+#define KEYVI_INDEX_CONSTANTS_H_
 
 static const char INDEX_REFRESH_INTERVAL[] = "refresh_interval";
 static const char MERGE_POLICY[] = "merge_policy";
 static const char DEFAULT_MERGE_POLICY[] = "simple";
 static const char KEYVIMERGER_BIN[] = "keyvimerger_bin";
 
-#endif  // KEYVI_INDEX_INTERNAL_CONSTANTS_H_
+#endif  // KEYVI_INDEX_CONSTANTS_H_

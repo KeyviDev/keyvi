@@ -30,8 +30,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
+#include "index/constants.h"
 #include "index/index.h"
-#include "index/internal/constants.h"
 
 inline std::string get_keyvimerger_bin() {
   boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};

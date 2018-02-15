@@ -40,7 +40,7 @@
 
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/dictionary_types.h"
-#include "index/internal/constants.h"
+#include "index/constants.h"
 #include "index/internal/index_settings.h"
 #include "index/internal/merge_job.h"
 #include "index/internal/merge_policy_selector.h"
