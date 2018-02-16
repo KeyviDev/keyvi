@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 /*
  * c_api.h
  *
@@ -23,9 +22,8 @@
  *      Author: Narek Gharibyan <narekgharibyan@gmail.com>
  */
 
-
-#ifndef KEYVI_C_API_H
-#define KEYVI_C_API_H
+#ifndef KEYVI_C_API_C_API_H_
+#define KEYVI_C_API_C_API_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,78 +39,58 @@ struct keyvi_match_iterator;
 //// String
 //////////////////////
 
-void
-keyvi_string_destroy(char *str);
-
+void keyvi_string_destroy(char* str);
 
 //////////////////////
 //// Dictionary
 //////////////////////
 
-struct keyvi_dictionary *
-keyvi_create_dictionary(const char *);
+struct keyvi_dictionary* keyvi_create_dictionary(const char*);
 
-void
-keyvi_dictionary_destroy(const struct keyvi_dictionary *);
+void keyvi_dictionary_destroy(const struct keyvi_dictionary*);
 
-size_t
-keyvi_dictionary_get_size(const struct keyvi_dictionary *);
+size_t keyvi_dictionary_get_size(const struct keyvi_dictionary*);
 
-char *
-keyvi_dictionary_get_statistics(const struct keyvi_dictionary *);
+char* keyvi_dictionary_get_statistics(const struct keyvi_dictionary*);
 
-struct keyvi_match *
-keyvi_dictionary_get(const struct keyvi_dictionary *, const char *);
+struct keyvi_match* keyvi_dictionary_get(const struct keyvi_dictionary*, const char*);
 
-struct keyvi_match_iterator *
-keyvi_dictionary_get_prefix_completions(const struct keyvi_dictionary *, const char *, size_t);
+struct keyvi_match_iterator* keyvi_dictionary_get_prefix_completions(const struct keyvi_dictionary*, const char*,
+                                                                     size_t);
 
-struct keyvi_match_iterator *
-keyvi_dictionary_get_fuzzy(const struct keyvi_dictionary *, const char *, size_t);
+struct keyvi_match_iterator* keyvi_dictionary_get_fuzzy(const struct keyvi_dictionary*, const char*, size_t);
 
-struct keyvi_match_iterator *
-keyvi_dictionary_get_multi_word_completions(const struct keyvi_dictionary *, const char *, size_t);
-
+struct keyvi_match_iterator* keyvi_dictionary_get_multi_word_completions(const struct keyvi_dictionary*, const char*,
+                                                                         size_t);
 
 //////////////////////
 //// Match
 //////////////////////
 
-void
-keyvi_match_destroy(const struct keyvi_match *);
+void keyvi_match_destroy(const struct keyvi_match*);
 
-bool
-keyvi_match_is_empty(const struct keyvi_match *);
+bool keyvi_match_is_empty(const struct keyvi_match*);
 
-double
-keyvi_match_get_score(const struct keyvi_match *);
+double keyvi_match_get_score(const struct keyvi_match*);
 
-char *
-keyvi_match_get_value_as_string(const struct keyvi_match *);
+char* keyvi_match_get_value_as_string(const struct keyvi_match*);
 
-char *
-keyvi_match_get_matched_string(const struct keyvi_match *);
-
+char* keyvi_match_get_matched_string(const struct keyvi_match*);
 
 //////////////////////
 //// Match Iterator
 //////////////////////
 
+void keyvi_match_iterator_destroy(const struct keyvi_match_iterator*);
 
-void
-keyvi_match_iterator_destroy(const struct keyvi_match_iterator *);
+bool keyvi_match_iterator_empty(const struct keyvi_match_iterator*);
 
-bool
-keyvi_match_iterator_empty(const struct keyvi_match_iterator *);
+struct keyvi_match* keyvi_match_iterator_dereference(const struct keyvi_match_iterator*);
 
-struct keyvi_match *
-keyvi_match_iterator_dereference(const struct keyvi_match_iterator *);
-
-void
-keyvi_match_iterator_increment(struct keyvi_match_iterator *);
+void keyvi_match_iterator_increment(struct keyvi_match_iterator*);
 
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
 
-#endif //KEYVI_C_API_H
+#endif  // KEYVI_C_API_C_API_H_

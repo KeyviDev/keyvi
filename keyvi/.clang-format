@@ -6,5 +6,6 @@ Standard: Cpp11
 TabWidth: '2'
 UseTab: Never
 ConstructorInitializerIndentWidth: 4
+AllowShortFunctionsOnASingleLine: Inline
 
 ...
