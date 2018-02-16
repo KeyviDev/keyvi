@@ -26,8 +26,6 @@
 #define NEEDLEMAN_WUNSCH_H_
 
 #include <climits>
-#include <vector>
-#include <string>
 #include "utf8.h"
 #include "stringdistance/distance_matrix.h"
 

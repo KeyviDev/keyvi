@@ -38,14 +38,19 @@ namespace fsa {
 template <class TransitionT = traversal::Transition>
 class StateTraverser final {
  public:
-  explicit StateTraverser(automata_t f) : StateTraverser(f, f->GetStartState(), true) {}
+  explicit StateTraverser(automata_t f)
+      : fsa_(f), current_state_(f->GetStartState()), current_weight_(0), current_label_(0), at_end_(false), stack_() {
+    TRACE("StateTraverser starting with Start state %d", current_state_);
+    f->GetOutGoingTransitions(current_state_, &stack_.GetStates(), &stack_.traversal_stack_payload);
+
+    this->operator++(0);
+  }
 
   StateTraverser(automata_t f, uint64_t start_state, traversal::TraversalPayload<TransitionT>* payload,
                  bool advance = true)
-      : fsa_(f), current_state_(start_state), current_weight_(0), current_label_(0), at_end_(false), stack_(*payload) {
-    if (0 == current_state_) {
-      at_end_ = true;
-    }
+      : fsa_(f), current_weight_(0), current_label_(0), at_end_(false), stack_(*payload) {
+    current_state_ = start_state;
+
     TRACE("StateTraverser starting with Start state %d", current_state_);
     f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload);
 
@@ -56,9 +61,6 @@ class StateTraverser final {
 
   StateTraverser(automata_t f, uint64_t start_state, bool advance = true)
       : fsa_(f), current_state_(start_state), current_weight_(0), current_label_(0), at_end_(false), stack_() {
-    if (0 == current_state_) {
-      at_end_ = true;
-    }
     TRACE("StateTraverser starting with Start state %d", current_state_);
     f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload);
 
@@ -110,7 +112,7 @@ class StateTraverser final {
   void operator++(int) {
     TRACE("statetraverser++");
     // ignore cases where we are already at the end
-    if (at_end_) {
+    if (current_state_ == 0) {
       TRACE("at the end");
       return;
     }
