@@ -63,10 +63,10 @@ class DictionaryMerger final {
 
  public:
   struct MergeStats {
-    MergeStats() : number_of_keys_(0), deleted_keys_(0), duplicate_keys_(0) {}
+    MergeStats() : number_of_keys_(0), deleted_keys_(0), updated_keys_(0) {}
     size_t number_of_keys_;
     size_t deleted_keys_;
-    size_t duplicate_keys_;
+    size_t updated_keys_;
   };
 
  private:
@@ -193,7 +193,7 @@ class DictionaryMerger final {
 
       // check for same keys and merge only the most recent one
       while (!segments_pqueue_.empty() && segments_pqueue_.top().entryIterator().operator==(top_key)) {
-        ++stats_.duplicate_keys_;
+        ++stats_.updated_keys_;
         auto to_inc = segments_pqueue_.top();
 
         segments_pqueue_.pop();
