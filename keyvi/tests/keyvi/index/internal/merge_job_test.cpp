@@ -28,7 +28,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "index/internal/constants.h"
+#include "index/constants.h"
 #include "index/internal/index_settings.h"
 #include "index/internal/merge_job.h"
 #include "index/internal/segment.h"

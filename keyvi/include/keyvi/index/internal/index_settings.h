@@ -27,7 +27,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "index/internal/constants.h"
+#include "index/constants.h"
 
 #include "util/configuration.h"
 

@@ -1,7 +1,7 @@
 //
 // keyvi - A key value store.
 //
-// Copyright 2015 Hendrik Muhs<hendrik.muhs@gmail.com>
+// Copyright 2018 Hendrik Muhs<hendrik.muhs@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@
 
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/dictionary_types.h"
-#include "index/internal/constants.h"
+#include "index/constants.h"
 #include "index/internal/index_settings.h"
 #include "index/internal/merge_job.h"
 #include "index/internal/merge_policy_selector.h"

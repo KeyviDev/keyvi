@@ -46,7 +46,7 @@
 
 #include "dictionary/dictionary.h"
 #include "dictionary/match.h"
-#include "index/internal/constants.h"
+#include "index/constants.h"
 #include "index/internal/read_only_segment.h"
 #include "util/configuration.h"
 
