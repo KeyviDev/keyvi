@@ -22,11 +22,13 @@
  *      Author: hendrik
  */
 
-#ifndef LEVENSHTEIN_H_
-#define LEVENSHTEIN_H_
+#ifndef KEYVI_STRINGDISTANCE_LEVENSHTEIN_H_
+#define KEYVI_STRINGDISTANCE_LEVENSHTEIN_H_
 
-#include "stringdistance/needleman_wunsch.h"
+#include <memory>
+
 #include "stringdistance/costfunctions/damerau_levenshtein.h"
+#include "stringdistance/needleman_wunsch.h"
 
 namespace keyvi {
 namespace stringdistance {
@@ -38,4 +40,4 @@ typedef std::shared_ptr<Levenshtein> levenshtein_t;
 } /* namespace stringdistance */
 } /* namespace keyvi */
 
-#endif /* LEVENSHTEIN_H_ */
+#endif  // KEYVI_STRINGDISTANCE_LEVENSHTEIN_H_
