@@ -323,8 +323,7 @@ class Generator final {
     value_store_->Write(stream);
   }
 
-  template <typename StringType>
-  void WriteToFile(StringType filename) {
+  void WriteToFile(const std::string& filename) {
     std::ofstream out_stream(filename, std::ios::binary);
     Write(out_stream);
     out_stream.close();

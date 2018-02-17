@@ -364,7 +364,6 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
 
   BOOST_CHECK(d->Contains("abc"));
   BOOST_CHECK(d->Contains("abbc"));
-  ;
   BOOST_CHECK(d->Contains("abbcd"));
   BOOST_CHECK(d->Contains("abbe"));
   BOOST_CHECK(d->Contains("abcd"));
@@ -741,6 +740,18 @@ BOOST_AUTO_TEST_CASE(MultipleDeletes) {
   std::remove(deleted_keys_file1.string().c_str());
   std::remove(deleted_keys_file2.string().c_str());
   std::remove(deleted_keys_file3.string().c_str());
+}
+
+BOOST_AUTO_TEST_CASE(WriteWithoutMerge) {
+  JsonDictionaryMerger merger;
+  const std::string filename("write-without-merger.kv");
+
+  BOOST_CHECK_THROW(merger.WriteToFile(filename), merger_exception);
+  {
+    std::ofstream out_stream(filename, std::ios::binary);
+    BOOST_CHECK_THROW(merger.Write(out_stream), merger_exception);
+  }
+  std::remove(filename.c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

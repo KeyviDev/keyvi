@@ -57,17 +57,15 @@ struct merger_exception : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
+struct MergeStats {
+  size_t number_of_keys_ = 0;
+  size_t deleted_keys_ = 0;
+  size_t updated_keys_ = 0;
+};
+
 template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryMerger final {
   using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
-
- public:
-  struct MergeStats {
-    MergeStats() : number_of_keys_(0), deleted_keys_(0), updated_keys_(0) {}
-    size_t number_of_keys_;
-    size_t deleted_keys_;
-    size_t updated_keys_;
-  };
 
  private:
   class SegmentIterator {
@@ -256,8 +254,7 @@ class DictionaryMerger final {
     generator_->Write(stream);
   }
 
-  template <typename StringType>
-  void WriteToFile(StringType filename) {
+  void WriteToFile(const std::string& filename) {
     if (!generator_) {
       throw merger_exception("not merged yet");
     }
