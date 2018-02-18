@@ -4,7 +4,7 @@ import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
 import distutils.command.build_py as _build_py
 import distutils.command.sdist as _sdist
-import distutils.command.install_data as _install_data
+import distutils.command.install as _install
 import os
 import sys
 import subprocess
@@ -258,10 +258,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             _build_py.build_py.run(self)
 
-    class install_data(_install_data.install_data):
+    class install(_install.install):
 
         def run(self):
-            _install_data.install_data.run(self)
+            _install.install.run(self)
             for fn in self.get_outputs():
                 if fn.endswith("keyvimerger"):
                     # make it  executable
@@ -300,7 +300,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         'msgpack-python',
     ]
 
-    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist, 'install_data': install_data}
+    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist, 'install': install}
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
 
