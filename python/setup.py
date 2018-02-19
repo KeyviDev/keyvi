@@ -32,16 +32,16 @@ except:
 # as we ship keyvimerger as binary this fails
 try:
     _detect_encoding = tokenize.detect_encoding
-except AttributeError:
-    pass
-else:
+
     def detect_encoding(readline):
         try:
             return _detect_encoding(readline)
         except SyntaxError:
             return 'utf-8', []
 
-tokenize.detect_encoding = detect_encoding
+    tokenize.detect_encoding = detect_encoding
+except AttributeError:
+    pass
 
 
 def generate_pykeyvi_source():
