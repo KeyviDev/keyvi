@@ -11,6 +11,7 @@ import sys
 import subprocess
 import multiprocessing
 import shutil
+import tokenize
 import glob
 
 from contextlib import contextmanager
@@ -26,6 +27,21 @@ try:
     cpu_count = multiprocessing.cpu_count()
 except:
     cpu_count = 1
+
+# workaround for python 3 trying to analyze scripts
+# as we ship keyvimerger as binary this fails
+try:
+    _detect_encoding = tokenize.detect_encoding
+except AttributeError:
+    pass
+else:
+    def detect_encoding(readline):
+        try:
+            return _detect_encoding(readline)
+        except SyntaxError:
+            return 'utf-8', []
+
+tokenize.detect_encoding = detect_encoding
 
 
 def generate_pykeyvi_source():
@@ -43,15 +59,17 @@ def generate_pykeyvi_source():
 @contextmanager
 def symlink_keyvi():
     if not path.exists(keyvi_cpp_link):
-        if not path.exists(keyvi_cpp):
-            os.makedirs(keyvi_cpp)
-        os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
-        shutil.copy('../CMakeLists.txt', path.join(keyvi_cpp, 'CMakeLists.txt'))
-        keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
-        pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
-        yield (pykeyvi_source_path, keyvi_source_path)
-        os.unlink(keyvi_cpp_link)
-        os.remove(path.join(keyvi_cpp, 'CMakeLists.txt'))
+        try:
+            if not path.exists(keyvi_cpp):
+                os.makedirs(keyvi_cpp)
+            os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
+            shutil.copy('../CMakeLists.txt', path.join(keyvi_cpp, 'CMakeLists.txt'))
+            keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
+            pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
+            yield (pykeyvi_source_path, keyvi_source_path)
+        finally:
+            os.unlink(keyvi_cpp_link)
+            os.remove(path.join(keyvi_cpp, 'CMakeLists.txt'))
     else:
         yield None, None
 
@@ -239,7 +257,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             keyvi_build_cmd = 'mkdir -p {}'.format(keyvi_build_dir)
             keyvi_build_cmd += ' && cd {}'.format(keyvi_build_dir)
-            keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=python ' \
+            keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=bindings ' \
                                 ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
                                 ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX}'.format(
                 CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=keyvi_install_prefix)
