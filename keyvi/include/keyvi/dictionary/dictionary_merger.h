@@ -49,8 +49,24 @@
 namespace keyvi {
 namespace dictionary {
 
+/**
+ * Exception class for dictionary merger
+ */
+
+struct merger_exception : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
+struct MergeStats {
+  size_t number_of_keys_ = 0;
+  size_t deleted_keys_ = 0;
+  size_t updated_keys_ = 0;
+};
+
 template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryMerger final {
+  using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+
  private:
   class SegmentIterator {
     using EntryIteratorPtr = std::shared_ptr<fsa::EntryIterator>;
@@ -106,7 +122,7 @@ class DictionaryMerger final {
    * @params params merger parameters
    */
   explicit DictionaryMerger(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
-      : dicts_to_merge_(), params_(params) {
+      : dicts_to_merge_(), params_(params), stats_() {
     params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
     append_merge_ = MERGE_APPEND == keyvi::util::mapGet<std::string>(params_, MERGE_MODE, "");
@@ -150,8 +166,12 @@ class DictionaryMerger final {
   void SetManifestFromString(const std::string& manifest) { manifest_ = manifest; }
 
   void Merge(const std::string& filename) {
-    using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+    Merge();
+    generator_->SetManifestFromString(manifest_);
+    generator_->WriteToFile(filename);
+  }
 
+  void Merge() {
     size_t sparse_array_size_sum = 0;
     for (auto fsa : dicts_to_merge_) {
       sparse_array_size_sum += fsa->SparseArraySize();
@@ -159,7 +179,7 @@ class DictionaryMerger final {
 
     ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
 
-    auto generator = GeneratorAdapter::CreateGenerator(sparse_array_size_sum, params_, value_store);
+    generator_ = GeneratorAdapter::CreateGenerator(sparse_array_size_sum, params_, value_store);
 
     std::string top_key;
 
@@ -171,6 +191,7 @@ class DictionaryMerger final {
 
       // check for same keys and merge only the most recent one
       while (!segments_pqueue_.empty() && segments_pqueue_.top().entryIterator().operator==(top_key)) {
+        ++stats_.updated_keys_;
         auto to_inc = segments_pqueue_.top();
 
         segments_pqueue_.pop();
@@ -183,10 +204,11 @@ class DictionaryMerger final {
       if (!deleted_keys_[segment_it.segmentIndex()].empty() &&
           top_key == deleted_keys_[segment_it.segmentIndex()].back()) {
         deleted_keys_[segment_it.segmentIndex()].pop_back();
-
+        ++stats_.deleted_keys_;
         // check the other deleted_keys for duplicates
         for (auto& deleted_keys : deleted_keys_) {
           if (!deleted_keys.empty() && top_key == deleted_keys.back()) {
+            ++stats_.deleted_keys_;
             deleted_keys.pop_back();
           }
         }
@@ -209,7 +231,8 @@ class DictionaryMerger final {
         }
 
         TRACE("Add key: %s", top_key.c_str());
-        generator->Add(std::move(top_key), handle);
+        ++stats_.number_of_keys_;
+        generator_->Add(std::move(top_key), handle);
       }
       if (++segment_it) {
         segments_pqueue_.push(segment_it);
@@ -220,21 +243,36 @@ class DictionaryMerger final {
 
     TRACE("finished iterating, do final compile.");
 
-    generator->CloseFeeding();
-
-    generator->SetManifestFromString(manifest_);
-    generator->WriteToFile(filename);
+    generator_->CloseFeeding();
   }
 
+  void Write(std::ostream& stream) {
+    if (!generator_) {
+      throw merger_exception("not merged yet");
+    }
+
+    generator_->Write(stream);
+  }
+
+  void WriteToFile(const std::string& filename) {
+    if (!generator_) {
+      throw merger_exception("not merged yet");
+    }
+    generator_->WriteToFile(filename);
+  }
+
+  const MergeStats& GetStats() const { return stats_; }
+
  private:
+  typename GeneratorAdapter::AdapterPtr generator_;
   bool append_merge_ = false;
   std::vector<fsa::automata_t> dicts_to_merge_;
   std::vector<std::vector<std::string>> deleted_keys_;
   std::vector<std::string> inputFiles_;
   std::priority_queue<SegmentIterator> segments_pqueue_;
-
   keyvi::util::parameters_t params_;
   std::string manifest_ = std::string();
+  MergeStats stats_;
 
   /**
    * Load a file with deleted keys if it exists

@@ -248,8 +248,7 @@ class DictionaryCompiler final {
     generator_->Write(stream);
   }
 
-  template <typename StringType>
-  void WriteToFile(StringType filename) {
+  void WriteToFile(const std::string& filename) {
     if (!generator_) {
       throw compiler_exception("not compiled yet");
     }

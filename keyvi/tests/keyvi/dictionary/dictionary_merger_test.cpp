@@ -73,6 +73,10 @@ BOOST_AUTO_TEST_CASE(MergeKeyOnlyDicts) {
   BOOST_CHECK(!d->Contains("a"));
   BOOST_CHECK(!d->Contains("cde"));
 
+  BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(10, merger.GetStats().number_of_keys_);
+
   std::remove(filename.c_str());
 }
 
@@ -361,9 +365,12 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
   BOOST_CHECK(d->Contains("abc"));
   BOOST_CHECK(d->Contains("abbc"));
   BOOST_CHECK(d->Contains("abbcd"));
+  BOOST_CHECK(d->Contains("abbe"));
+  BOOST_CHECK(d->Contains("abcd"));
   BOOST_CHECK(d->Contains("abcde"));
   BOOST_CHECK(d->Contains("abdd"));
   BOOST_CHECK(d->Contains("bba"));
+  BOOST_CHECK(d->Contains("bbacd"));
 
   BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abc").GetValueAsString());
 
@@ -381,6 +388,10 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
   BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcd").GetValueAsString());
   BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
   BOOST_CHECK_EQUAL("\"{f:5}\"", d->operator[]("bbacd").GetValueAsString());
+
+  BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(1, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(9, merger.GetStats().number_of_keys_);
 
   std::remove(filename.c_str());
 }
@@ -601,6 +612,10 @@ BOOST_AUTO_TEST_CASE(MergeToEmptyDict) {
   BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc").GetValueAsString());
   BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
 
+  BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(2, merger.GetStats().number_of_keys_);
+
   std::remove(filename.c_str());
 }
 
@@ -636,13 +651,21 @@ BOOST_AUTO_TEST_CASE(Delete) {
   merger.Add(dictionary.GetFileName());
 
   std::string filename("merge-delete-key-dict.kv");
-  merger.Merge(filename);
+  std::ofstream out_stream(filename, std::ios::binary);
+  merger.Merge();
+  merger.Write(out_stream);
+  out_stream.close();
 
   fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
   dictionary_t d(new Dictionary(fsa));
 
   BOOST_CHECK(d->Contains("abcd"));
   BOOST_CHECK(!d->Contains("xyz"));
+
+  BOOST_CHECK_EQUAL(1, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(1, merger.GetStats().number_of_keys_);
+
   std::remove(filename.c_str());
   std::remove(deleted_keys_file.string().c_str());
 }
@@ -693,7 +716,9 @@ BOOST_AUTO_TEST_CASE(MultipleDeletes) {
   merger.Add(dictionary3.GetFileName());
 
   std::string filename("merge-multiple-deletes-dict.kv");
-  merger.Merge(filename);
+  merger.Merge();
+
+  merger.WriteToFile(filename);
 
   fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
   dictionary_t d(new Dictionary(fsa));
@@ -707,10 +732,26 @@ BOOST_AUTO_TEST_CASE(MultipleDeletes) {
   BOOST_CHECK(d->Contains("acdd"));
   BOOST_CHECK(!d->Contains("afgh"));
 
+  BOOST_CHECK_EQUAL(8, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(13, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(3, merger.GetStats().number_of_keys_);
+
   std::remove(filename.c_str());
   std::remove(deleted_keys_file1.string().c_str());
   std::remove(deleted_keys_file2.string().c_str());
   std::remove(deleted_keys_file3.string().c_str());
+}
+
+BOOST_AUTO_TEST_CASE(WriteWithoutMerge) {
+  JsonDictionaryMerger merger;
+  const std::string filename("write-without-merger.kv");
+
+  BOOST_CHECK_THROW(merger.WriteToFile(filename), merger_exception);
+  {
+    std::ofstream out_stream(filename, std::ios::binary);
+    BOOST_CHECK_THROW(merger.Write(out_stream), merger_exception);
+  }
+  std::remove(filename.c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
