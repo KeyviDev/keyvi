@@ -4,12 +4,14 @@ import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
 import distutils.command.build_py as _build_py
 import distutils.command.sdist as _sdist
-import distutils.command.install_data as _install_data
+import distutils.command.install as _install
+from distutils import log
 import os
 import sys
 import subprocess
 import multiprocessing
 import shutil
+import tokenize
 import glob
 
 from contextlib import contextmanager
@@ -25,6 +27,21 @@ try:
     cpu_count = multiprocessing.cpu_count()
 except:
     cpu_count = 1
+
+# workaround for python 3 trying to analyze scripts
+# as we ship keyvimerger as binary this fails
+try:
+    _detect_encoding = tokenize.detect_encoding
+
+    def detect_encoding(readline):
+        try:
+            return _detect_encoding(readline)
+        except SyntaxError:
+            return 'utf-8', []
+
+    tokenize.detect_encoding = detect_encoding
+except AttributeError:
+    pass
 
 
 def generate_pykeyvi_source():
@@ -42,15 +59,17 @@ def generate_pykeyvi_source():
 @contextmanager
 def symlink_keyvi():
     if not path.exists(keyvi_cpp_link):
-        if not path.exists(keyvi_cpp):
-            os.makedirs(keyvi_cpp)
-        os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
-        shutil.copy('../CMakeLists.txt', path.join(keyvi_cpp, 'CMakeLists.txt'))
-        keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
-        pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
-        yield (pykeyvi_source_path, keyvi_source_path)
-        os.unlink(keyvi_cpp_link)
-        os.remove(path.join(keyvi_cpp, 'CMakeLists.txt'))
+        try:
+            if not path.exists(keyvi_cpp):
+                os.makedirs(keyvi_cpp)
+            os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
+            shutil.copy('../CMakeLists.txt', path.join(keyvi_cpp, 'CMakeLists.txt'))
+            keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
+            pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
+            yield (pykeyvi_source_path, keyvi_source_path)
+        finally:
+            os.unlink(keyvi_cpp_link)
+            os.remove(path.join(keyvi_cpp, 'CMakeLists.txt'))
     else:
         yield None, None
 
@@ -238,7 +257,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             keyvi_build_cmd = 'mkdir -p {}'.format(keyvi_build_dir)
             keyvi_build_cmd += ' && cd {}'.format(keyvi_build_dir)
-            keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=python ' \
+            keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=bindings ' \
                                 ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
                                 ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX}'.format(
                 CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=keyvi_install_prefix)
@@ -258,12 +277,13 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             _build_py.build_py.run(self)
 
-    class install_data(_install_data.install_data):
+    class install(_install.install):
 
         def run(self):
-            _install_data.install_data.run(self)
+            _install.install.run(self)
             for fn in self.get_outputs():
                 if fn.endswith("keyvimerger"):
+                    log.info("setting executable flags for keyvimerger")
                     # make it  executable
                     mode = ((os.stat(fn).st_mode) | 0o555) & 0o7777
                     os.chmod(fn, mode)
@@ -300,7 +320,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         'msgpack-python',
     ]
 
-    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist, 'install_data': install_data}
+    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist, 'install': install}
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
 
@@ -312,7 +332,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         author_email='hendrik.muhs@gmail.com',
         license="ASL 2.0",
         cmdclass=commands,
-        scripts=['src/py/bin/keyvi'],
+        scripts=['src/py/bin/keyvi', 'src/cpp/build/keyvimerger'],
         packages=['keyvi',
                   'keyvi.cli',
                   'keyvi.compiler',
