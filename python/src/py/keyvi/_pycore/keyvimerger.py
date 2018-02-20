@@ -34,7 +34,7 @@ if __name__ == '__main__':
     args = argument_parser.parse_args()
 
     if args.output_file and len(args.input_file) > 0:
-        params = {}
+        params = {key: value for key, value in args.params}
 
         if args.memory_limit:
             params["memory-limit"] = args.memory_limit
