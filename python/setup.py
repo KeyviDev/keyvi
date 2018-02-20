@@ -4,7 +4,6 @@ import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
 import distutils.command.build_py as _build_py
 import distutils.command.sdist as _sdist
-import distutils.command.install as _install
 import os
 import sys
 import subprocess
@@ -251,22 +250,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
 
-            # patch keyvimerger into the package
-            # note: package_data does not work for this as it would break sdist
-            build_dir = os.path.join(*([self.build_lib] + ['keyvi', '_bin']))
-            self.data_files.append(("keyvi._bin", keyvi_install_dir + "/bin", build_dir, ['keyvimerger']))
-
             _build_py.build_py.run(self)
-
-    class install(_install.install):
-
-        def run(self):
-            _install.install.run(self)
-            for fn in self.get_outputs():
-                if fn.endswith("keyvimerger"):
-                    # make it  executable
-                    mode = ((os.stat(fn).st_mode) | 0o555) & 0o7777
-                    os.chmod(fn, mode)
 
     class build_ext(_build_ext.build_ext):
 
@@ -300,7 +284,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         'msgpack-python',
     ]
 
-    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist, 'install': install}
+    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist}
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
 
