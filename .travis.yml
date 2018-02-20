@@ -109,7 +109,7 @@ script:
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ]; then ./travis/coverage.sh ; fi
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ]; then ./travis/style.sh ; fi
-  - if [ "$BUILD_TYPE" == "doc" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then source ./travis/build_doc.sh ; fi
+  - if [ "$BUILD_TYPE" == "doc" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then source ./travis/build_doc.sh ; fi
 
 deploy:
   provider: script
