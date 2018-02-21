@@ -4,7 +4,6 @@ import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
 import distutils.command.build_py as _build_py
 import distutils.command.sdist as _sdist
-import distutils.command.install_data as _install_data
 import os
 import sys
 import subprocess
@@ -42,15 +41,17 @@ def generate_pykeyvi_source():
 @contextmanager
 def symlink_keyvi():
     if not path.exists(keyvi_cpp_link):
-        if not path.exists(keyvi_cpp):
-            os.makedirs(keyvi_cpp)
-        os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
-        shutil.copy('../CMakeLists.txt', path.join(keyvi_cpp, 'CMakeLists.txt'))
-        keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
-        pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
-        yield (pykeyvi_source_path, keyvi_source_path)
-        os.unlink(keyvi_cpp_link)
-        os.remove(path.join(keyvi_cpp, 'CMakeLists.txt'))
+        try:
+            if not path.exists(keyvi_cpp):
+                os.makedirs(keyvi_cpp)
+            os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
+            shutil.copy('../CMakeLists.txt', path.join(keyvi_cpp, 'CMakeLists.txt'))
+            keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
+            pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
+            yield (pykeyvi_source_path, keyvi_source_path)
+        finally:
+            os.unlink(keyvi_cpp_link)
+            os.remove(path.join(keyvi_cpp, 'CMakeLists.txt'))
     else:
         yield None, None
 
@@ -238,7 +239,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             keyvi_build_cmd = 'mkdir -p {}'.format(keyvi_build_dir)
             keyvi_build_cmd += ' && cd {}'.format(keyvi_build_dir)
-            keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=python ' \
+            keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=bindings ' \
                                 ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
                                 ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX}'.format(
                 CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=keyvi_install_prefix)
@@ -251,22 +252,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
 
-            # patch keyvimerger into the package
-            # note: package_data does not work for this as it would break sdist
-            build_dir = os.path.join(*([self.build_lib] + ['keyvi', '_bin']))
-            self.data_files.append(("keyvi._bin", keyvi_install_dir + "/bin", build_dir, ['keyvimerger']))
-
             _build_py.build_py.run(self)
-
-    class install_data(_install_data.install_data):
-
-        def run(self):
-            _install_data.install_data.run(self)
-            for fn in self.get_outputs():
-                if fn.endswith("keyvimerger"):
-                    # make it  executable
-                    mode = ((os.stat(fn).st_mode) | 0o555) & 0o7777
-                    os.chmod(fn, mode)
 
     class build_ext(_build_ext.build_ext):
 
@@ -300,7 +286,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         'msgpack-python',
     ]
 
-    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist, 'install_data': install_data}
+    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist}
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
 
