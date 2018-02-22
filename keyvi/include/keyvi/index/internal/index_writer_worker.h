@@ -93,12 +93,11 @@ class IndexWriterWorker final {
  public:
   explicit IndexWriterWorker(const std::string& index_directory, const keyvi::util::parameters_t& params)
       : payload_(index_directory, params),
+        merge_policy_(merge_policy(keyvi::util::mapGet<std::string>(params, MERGE_POLICY, DEFAULT_MERGE_POLICY))),
         compiler_active_object_(
             &payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
             std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))) {
     TRACE("construct worker: %s", payload_.index_directory_.c_str());
-
-    merge_policy_.reset(merge_policy(keyvi::util::mapGet<std::string>(params, MERGE_POLICY, DEFAULT_MERGE_POLICY)));
     LoadIndex();
   }
 
@@ -207,7 +206,7 @@ class IndexWriterWorker final {
  private:
   IndexPayload payload_;
   std::weak_ptr<segment_vec_t> segments_weak_;
-  std::unique_ptr<MergePolicy> merge_policy_;
+  merge_policy_t merge_policy_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
 
   void ScheduledTask() {

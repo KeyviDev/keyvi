@@ -47,9 +47,6 @@ class IndexSettings final {
     }
   }
 
-  IndexSettings(IndexSettings const&) = delete;
-  void operator=(IndexSettings const&) = delete;
-
   const std::string& GetKeyviMergerBin() const {
     if (settings_.count(KEYVIMERGER_BIN)) {
       return settings_.at(KEYVIMERGER_BIN);
@@ -60,7 +57,7 @@ class IndexSettings final {
 
  private:
   std::unordered_map<std::string, std::string> settings_;
-  std::string default_keyvimerger_bin_ = "keyvimerger";
+  const std::string default_keyvimerger_bin_ = "keyvimerger";
 };
 
 } /* namespace internal */
