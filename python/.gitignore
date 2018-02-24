@@ -1,5 +1,5 @@
 # PyTest
-.cache/v/cache/lastfailed
+.cache
 
 # build artifacts
 keyvi.egg-info/
@@ -10,7 +10,6 @@ __pycache__/
 *.so
 *.egg-info
 MANIFEST
-.cache
 
 # autowrap artifacts
 _core.pyx

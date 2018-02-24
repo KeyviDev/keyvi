@@ -66,6 +66,7 @@ struct MergeStats {
 template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryMerger final {
   using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+  using parameters_t = keyvi::util::parameters_t;
 
  private:
   class SegmentIterator {
@@ -121,7 +122,7 @@ class DictionaryMerger final {
    *
    * @params params merger parameters
    */
-  explicit DictionaryMerger(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
+  explicit DictionaryMerger(const parameters_t& params = parameters_t())
       : dicts_to_merge_(), params_(params), stats_() {
     params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
@@ -270,7 +271,7 @@ class DictionaryMerger final {
   std::vector<std::vector<std::string>> deleted_keys_;
   std::vector<std::string> inputFiles_;
   std::priority_queue<SegmentIterator> segments_pqueue_;
-  keyvi::util::parameters_t params_;
+  parameters_t params_;
   std::string manifest_ = std::string();
   MergeStats stats_;
 

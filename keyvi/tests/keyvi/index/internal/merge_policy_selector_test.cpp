@@ -39,9 +39,8 @@ BOOST_AUTO_TEST_CASE(wrong_select) {
 }
 
 BOOST_AUTO_TEST_CASE(select_simple) {
-  MergePolicy* simple = merge_policy("simple");
-  BOOST_CHECK(simple != nullptr);
-  delete simple;
+  merge_policy_t simple = merge_policy("simple");
+  BOOST_CHECK(simple);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

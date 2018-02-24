@@ -41,36 +41,30 @@ struct Item {
 };
 
 BOOST_AUTO_TEST_CASE(SimpleTest) {
-  SingeProducerSingleConsumerRingBuffer<Item*, 10> s;
+  SingeProducerSingleConsumerRingBuffer<Item, 10> s;
 
-  Item* a = new Item("test");
-  Item* b = new Item("test2");
-  Item* c = new Item("test3");
+  Item a("test");
+  Item b("test2");
+  Item c("test3");
 
-  BOOST_CHECK_EQUAL("test", a->key);
+  BOOST_CHECK_EQUAL("test", a.key);
   BOOST_CHECK_EQUAL(0, s.Size());
-  s.Push(a);
-  s.Push(b);
-  s.Push(c);
+  s.Push(std::move(a));
+  s.Push(std::move(b));
+  s.Push(std::move(c));
   BOOST_CHECK_EQUAL(3, s.Size());
-  Item* d;
+  Item d;
   s.Pop(&d);
-  BOOST_CHECK_EQUAL(a, d);
   BOOST_CHECK_EQUAL(2, s.Size());
-  BOOST_CHECK_EQUAL("test", d->key);
-  delete (d);
+  BOOST_CHECK_EQUAL("test", d.key);
 
   s.Pop(&d);
   BOOST_CHECK_EQUAL(1, s.Size());
-  BOOST_CHECK_EQUAL(b, d);
-  BOOST_CHECK_EQUAL("test2", d->key);
-  delete (d);
+  BOOST_CHECK_EQUAL("test2", d.key);
 
   s.Pop(&d);
   BOOST_CHECK_EQUAL(0, s.Size());
-  BOOST_CHECK_EQUAL(c, d);
-  BOOST_CHECK_EQUAL("test3", d->key);
-  delete (d);
+  BOOST_CHECK_EQUAL("test3", d.key);
 }
 
 BOOST_AUTO_TEST_CASE(SizeTest) {
@@ -78,7 +72,7 @@ BOOST_AUTO_TEST_CASE(SizeTest) {
 
   for (size_t i = 0; i < 10; ++i) {
     Item v(std::to_string(i));
-    s.Push(v);
+    s.Push(std::move(v));
   }
   BOOST_CHECK_EQUAL(10, s.Size());
   Item v;
@@ -86,11 +80,11 @@ BOOST_AUTO_TEST_CASE(SizeTest) {
   s.Pop(&v);
   BOOST_CHECK_EQUAL(8, s.Size());
   Item w(std::to_string(10));
-  s.Push(w);
+  s.Push(std::move(w));
   BOOST_CHECK_EQUAL(9, s.Size());
 
   Item x(std::to_string(11));
-  s.Push(x);
+  s.Push(std::move(x));
   BOOST_CHECK_EQUAL(10, s.Size());
 
   s.Pop(&v);

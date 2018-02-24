@@ -47,7 +47,7 @@ class SingeProducerSingleConsumerRingBuffer {
     next_pop_ = std::chrono::system_clock::now() + return_interval_;
   }
 
-  void Push(const T& value) {
+  void Push(T&& value) {
     size_t head = head_.load(boost::memory_order_relaxed);
     size_t next_head = next(head);
     if (next_head == tail_.load(boost::memory_order_acquire)) {
@@ -58,7 +58,6 @@ class SingeProducerSingleConsumerRingBuffer {
     }
     ring_[head] = std::move(value);
     head_.store(next_head, boost::memory_order_release);
-    return;
   }
 
   bool Pop(T* value) {

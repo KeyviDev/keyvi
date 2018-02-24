@@ -25,6 +25,7 @@
 #ifndef KEYVI_INDEX_INTERNAL_MERGE_POLICY_SELECTOR_H_
 #define KEYVI_INDEX_INTERNAL_MERGE_POLICY_SELECTOR_H_
 
+#include <memory>
 #include <string>
 
 #include "index/internal/merge_policy.h"
@@ -34,16 +35,18 @@ namespace keyvi {
 namespace index {
 namespace internal {
 
-inline MergePolicy* merge_policy(const std::string& name = "") throw(std::invalid_argument) {
+inline std::shared_ptr<MergePolicy> merge_policy(const std::string& name = "") throw(std::invalid_argument) {
   auto lower_name = name;
 
   boost::algorithm::to_lower(lower_name);
   if (lower_name == "simple") {
-    return new SimpleMergePolicy();
+    return std::make_shared<SimpleMergePolicy>();
   } else {
     throw std::invalid_argument(name + " is not a valid merge policy");
   }
 }
+
+typedef std::shared_ptr<MergePolicy> merge_policy_t;
 
 } /* namespace internal */
 } /* namespace index */

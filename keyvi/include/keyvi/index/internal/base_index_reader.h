@@ -45,20 +45,20 @@ class BaseIndexReader {
   explicit BaseIndexReader(Args... args) : payload_(args...) {}
 
   dictionary::Match operator[](const std::string& key) {
-    dictionary::Match m;
+    dictionary::Match match;
     const_segments_t segments = payload_.Segments();
 
     for (auto it = segments->crbegin(); it != segments->crend(); ++it) {
-      m = (*it)->GetDictionary()->operator[](key);
-      if (!m.IsEmpty()) {
+      match = (*it)->GetDictionary()->operator[](key);
+      if (!match.IsEmpty()) {
         if ((*it)->IsDeleted(key)) {
           return dictionary::Match();
         }
-        return m;
+        return match;
       }
     }
 
-    return m;
+    return match;
   }
 
   bool Contains(const std::string& key) {
