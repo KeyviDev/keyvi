@@ -69,6 +69,19 @@ BOOST_AUTO_TEST_CASE(reset) {
   delete hash;
 }
 
+BOOST_AUTO_TEST_CASE(memory_usage) {
+  // default
+  MinimizationHash<PackedState<>> *hash = new MinimizationHash<PackedState<>>();
+  BOOST_CHECK_EQUAL(hash->GetMemoryUsage(), (8171 + 2042) * sizeof(PackedState<>));
+  delete hash;
+
+  // some non-default
+  MinimizationHash<PackedState<>> *hash2 = new MinimizationHash<PackedState<>>(5);
+  BOOST_CHECK_EQUAL(hash->GetMemoryUsage(), (32749 + 8187) * sizeof(PackedState<>));
+
+  delete hash2;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace internal */

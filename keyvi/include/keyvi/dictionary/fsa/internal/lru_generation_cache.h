@@ -61,7 +61,7 @@ class LeastRecentlyUsedGenerationsCache final {
    *  @param sizePerGeneration The maximal size of one generation.
    *  @param maxNumberOfGenerations The maximum number of generations to keep.
    */
-  LeastRecentlyUsedGenerationsCache(int size_per_generation, int max_number_of_generations)
+  LeastRecentlyUsedGenerationsCache(size_t size_per_generation, size_t max_number_of_generations)
       : size_per_generation_(size_per_generation), max_number_of_generations_(max_number_of_generations) {
     current_generation_ = new MinimizationHash<EntryT>();
   }
