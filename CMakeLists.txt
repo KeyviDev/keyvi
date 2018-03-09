@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(keyvi)
 
-string(TOLOWER ${CMAKE_BUILD_TYPE} LOWERCASE_CMAKE_BUILD_TYPE)
-
 # configure C++11
 if(NOT CMAKE_VERSION VERSION_LESS 3.1)
     set(CMAKE_CXX_STANDARD 11)
@@ -61,25 +59,23 @@ include_directories(keyvi/3rdparty/tiny-process-library/)
 include_directories(${CMAKE_BINARY_DIR}/keyvi/3rdparty/tpie)
 include_directories(${CMAKE_BINARY_DIR}/keyvi/3rdparty/tiny-process-library/)
 
-# workaroundL we need to build something that requires tpie
+FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
+add_executable(unit_test_all ${UNIT_TEST_SOURCES})
+add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
+add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
 add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
+
+target_link_libraries(unit_test_all tiny-process-library tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(keyvicompiler tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(keyviinspector tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyvimerger tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
-install (TARGETS keyvimerger DESTINATION bin)
 
-# if build for bindings, do not compile binaries and unit tests
-IF(NOT LOWERCASE_CMAKE_BUILD_TYPE MATCHES bindings)
-    FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
-    add_executable(unit_test_all ${UNIT_TEST_SOURCES})
-    add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
-    add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
+install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
+install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
+install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
 
-    target_link_libraries(keyvicompiler tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
-    target_link_libraries(keyviinspector tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
-    target_link_libraries(unit_test_all tiny-process-library tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
-
-    install (TARGETS keyvicompiler DESTINATION bin)
-    install (TARGETS keyviinspector DESTINATION bin)
-ENDIF(NOT LOWERCASE_CMAKE_BUILD_TYPE MATCHES bindings)
-
-install  (FILES $<TARGET_FILE:tpie> DESTINATION lib CONFIGURATIONS bindings)
-install  (FILES $<TARGET_FILE:tiny-process-library> DESTINATION lib CONFIGURATIONS bindings)
+add_custom_target(bindings
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tpie> ${CMAKE_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tiny-process-library> ${CMAKE_BINARY_DIR}
+    DEPENDS tpie tiny-process-library
+)

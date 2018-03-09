@@ -62,9 +62,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     dictionary_sources = path.abspath(keyvi_cpp_link)
     keyvi_build_dir = path.join(keyvi_cpp, 'build')
-    keyvi_install_prefix = 'install'
-    keyvi_install_dir = path.join(keyvi_build_dir, keyvi_install_prefix)
-    keyvi_lib_dir = path.join(keyvi_install_dir, 'lib')
 
     additional_compile_flags = []
 
@@ -95,7 +92,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     mac_os_static_libs_dir = 'mac_os_static_libs'
 
     extra_link_arguments = []
-    link_library_dirs = [keyvi_lib_dir]
+    link_library_dirs = [keyvi_build_dir]
     zlib_root = None
 
     if sys.platform == 'darwin':
@@ -239,15 +236,12 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             keyvi_build_cmd = 'mkdir -p {}'.format(keyvi_build_dir)
             keyvi_build_cmd += ' && cd {}'.format(keyvi_build_dir)
-            keyvi_build_cmd += ' && cmake -D CMAKE_BUILD_TYPE:STRING=bindings ' \
-                                ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"' \
-                                ' -D CMAKE_INSTALL_PREFIX={INSTALL_PREFIX}'.format(
-                CXX_FLAGS=CMAKE_CXX_FLAGS, INSTALL_PREFIX=keyvi_install_prefix)
+            keyvi_build_cmd += ' && cmake' \
+                                ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"'.format(CXX_FLAGS=CMAKE_CXX_FLAGS)
             if zlib_root is not None:
                  keyvi_build_cmd += ' -D ZLIB_ROOT={ZLIB_ROOT}'.format(ZLIB_ROOT=zlib_root)
             keyvi_build_cmd += ' ..'
-            keyvi_build_cmd += ' && make -j {}'.format(cpu_count)
-            keyvi_build_cmd += ' && make install'
+            keyvi_build_cmd += ' && make -j {} bindings'.format(cpu_count)
 
             print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
