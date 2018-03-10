@@ -9,6 +9,7 @@ import subprocess
 import multiprocessing
 import shutil
 import glob
+import platform
 
 from contextlib import contextmanager
 from os import path
@@ -33,8 +34,8 @@ def generate_pykeyvi_source():
 def symlink_keyvi():
     if not path.exists('keyvi'):
         os.symlink('../keyvi', 'keyvi')
-        keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), "../keyvi"))
-        pykeyvi_source_path = os.path.join(os.getcwd(),"keyvi")
+        keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), '../keyvi'))
+        pykeyvi_source_path = os.path.join(os.getcwd(), 'keyvi')
         yield (pykeyvi_source_path, keyvi_source_path)
         os.unlink('keyvi')
     else:
@@ -46,7 +47,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     autowrap_data_dir = "autowrap_includes"
 
     dictionary_sources = path.abspath('keyvi')
-    tpie_build_dir = path.join(dictionary_sources, '3rdparty/tpie/build')
+    tpie_build_dir = path.join(dictionary_sources, '3rdparty/tpie/build-{}'.format(platform.platform()))
     tpie_install_prefix = 'install'
     tpie_include_dir = path.join(tpie_build_dir, tpie_install_prefix, 'include')
     tpie_lib_dir = path.join(tpie_build_dir, tpie_install_prefix, 'lib')
