@@ -36,7 +36,7 @@
 
         self.inst.get().Delete(key)
 
-    def get (self, key, default = None):
+    def Get (self, key, default = None):
         if isinstance(key, unicode):
             key = key.encode('utf-8')
         assert isinstance(key, bytes), 'arg in_0 wrong type'
