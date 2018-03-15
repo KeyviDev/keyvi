@@ -27,9 +27,11 @@
 #include <boost/test/unit_test.hpp>
 
 #include "dictionary/dictionary.h"
+#include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "testing/temp_dictionary.h"
+#include "util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -38,7 +40,7 @@ BOOST_AUTO_TEST_SUITE(DictionaryTests)
 BOOST_AUTO_TEST_CASE(loadDict) {
   fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-  fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb", "10"}}));
+  fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g.Add("aaaa");
   g.Add("aabb");
   g.Add("aabc");

@@ -42,8 +42,7 @@
 #include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/string_value_store.h"
-
-typedef keyvi::dictionary::fsa::internal::IValueStoreWriter::vs_param_t vs_param_t;
+#include "util/configuration.h"
 
 void callback(size_t added, size_t overall, void*) {
   std::cout << "Processed " << added << "/" << overall << "(" << ((100 * added) / overall) << "%)." << std::endl;
@@ -112,7 +111,8 @@ void finalize_compile(CompilerType* compiler, const std::string& output, const s
 
 template <class BucketT = uint32_t>
 void compile_completion(const std::vector<std::string>& input, const std::string& output,
-                        const std::string& manifest = "", const vs_param_t& value_store_params = vs_param_t()) {
+                        const std::string& manifest = "",
+                        const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
                                         keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
       compiler(value_store_params);
@@ -141,7 +141,7 @@ void compile_completion(const std::vector<std::string>& input, const std::string
 
 template <class BucketT = uint32_t>
 void compile_integer(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
-                     const vs_param_t& value_store_params = vs_param_t()) {
+                     const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
                                         keyvi::dictionary::fsa::internal::IntValueStore>
       compiler(value_store_params);
@@ -187,7 +187,7 @@ void compile_strings_inner(Compiler* compiler, const std::vector<std::string>& i
 
 template <class BucketT = uint32_t>
 void compile_strings(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
-                     const vs_param_t& value_store_params = vs_param_t()) {
+                     const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
                                         keyvi::dictionary::fsa::internal::StringValueStore>
       compiler(value_store_params);
@@ -196,7 +196,8 @@ void compile_strings(const std::vector<std::string>& input, const std::string& o
 
 template <class BucketT = uint32_t>
 void compile_key_only(const std::vector<std::string>& input, const std::string& output,
-                      const std::string& manifest = "", const vs_param_t& value_store_params = vs_param_t()) {
+                      const std::string& manifest = "",
+                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>> compiler(
       value_store_params);
 
@@ -218,7 +219,7 @@ void compile_key_only(const std::vector<std::string>& input, const std::string& 
 
 template <class BucketT = uint32_t>
 void compile_json(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
-                  const vs_param_t& value_store_params = vs_param_t()) {
+                  const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
                                         keyvi::dictionary::fsa::internal::JsonValueStore>
       compiler(value_store_params);
@@ -226,8 +227,8 @@ void compile_json(const std::vector<std::string>& input, const std::string& outp
 }
 
 /** Extracts the parameters. */
-vs_param_t extract_parameters(const boost::program_options::variables_map& vm) {
-  vs_param_t ret;
+keyvi::util::parameters_t extract_parameters(const boost::program_options::variables_map& vm) {
+  keyvi::util::parameters_t ret;
   for (auto& v : vm["parameter"].as<std::vector<std::string>>()) {
     std::vector<std::string> key_value;
     boost::split(key_value, v, std::bind1st(std::equal_to<char>(), '='));
@@ -254,9 +255,10 @@ int main(int argc, char** argv) {
                             "amount of main memory to use");
   description.add_options()("dictionary-type,d", boost::program_options::value<std::string>()->default_value("integer"),
                             "type of dictionary (integer (default), string, key-only, json, completion)");
-  description.add_options()("parameter,p", boost::program_options::value<std::vector<std::string>>()
-                                               ->default_value(std::vector<std::string>(), "EMPTY")
-                                               ->composing(),
+  description.add_options()("parameter,p",
+                            boost::program_options::value<std::vector<std::string>>()
+                                ->default_value(std::vector<std::string>(), "EMPTY")
+                                ->composing(),
                             "An option; format is -p xxx=yyy");
 
   description.add_options()("manifest", boost::program_options::value<std::string>()->default_value(""),
@@ -288,7 +290,7 @@ int main(int argc, char** argv) {
     std::cout << manifest << std::endl;
 
     std::string dictionary_type = vm["dictionary-type"].as<std::string>();
-    vs_param_t value_store_params = extract_parameters(vm);
+    keyvi::util::parameters_t value_store_params = extract_parameters(vm);
 
     if (vm.count("memory-limit")) {
       value_store_params[MEMORY_LIMIT_KEY] = vm["memory-limit"].as<std::string>();
@@ -302,7 +304,6 @@ int main(int argc, char** argv) {
         compile_integer<uint16_t>(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "string") {
         compile_strings<uint16_t>(input_files, output_file, manifest, value_store_params);
-
       } else if (dictionary_type == "key-only") {
         compile_key_only<uint16_t>(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "json") {

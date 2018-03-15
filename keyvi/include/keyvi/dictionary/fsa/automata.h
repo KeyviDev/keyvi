@@ -39,12 +39,12 @@
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/intrinsics.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/value_store_factory.h"
 #include "dictionary/fsa/traversal/traversal_base.h"
 #include "dictionary/fsa/traversal/weighted_traversal.h"
 #include "dictionary/keyvi_file.h"
 #include "dictionary/util/endian.h"
+#include "util/serialization_utils.h"
 #include "util/vint.h"
 
 // #define ENABLE_TRACING
@@ -69,7 +69,7 @@ class Automata final {
     number_of_keys_ = boost::lexical_cast<uint64_t>(automata_properties_.get<std::string>("number_of_keys"));
 
     std::istream& persistenceStream = keyViFile.persistenceStream();
-    sparse_array_properties_ = internal::SerializationUtils::ReadJsonRecord(persistenceStream);
+    sparse_array_properties_ = keyvi::util::SerializationUtils::ReadJsonRecord(persistenceStream);
 
     const size_t bucket_size = sizeof(uint16_t);
     const size_t array_size = boost::lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));

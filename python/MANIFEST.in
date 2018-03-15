@@ -1,18 +1,20 @@
 recursive-include autowrap_includes *.hpp
 graft src
-include keyvi.cpp
+include _core.cpp
 
-recursive-include keyvi/include/keyvi *.h
+recursive-include src/cpp/keyvi/bin *.cpp
+recursive-include src/cpp/keyvi/include/keyvi *.h
 
-recursive-include keyvi/3rdparty *.h
-recursive-include keyvi/3rdparty *.inl
-recursive-include keyvi/3rdparty *.hpp
-recursive-include keyvi/3rdparty *.cpp
-recursive-include keyvi/3rdparty *.cpp.in
+recursive-include src/cpp/keyvi/3rdparty *.h
+recursive-include src/cpp/keyvi/3rdparty *.inl
+recursive-include src/cpp/keyvi/3rdparty *.hpp
+recursive-include src/cpp/keyvi/3rdparty *.cpp
+recursive-include src/cpp/keyvi/3rdparty *.cpp.in
 
-recursive-include keyvi/3rdparty CMakeLists.txt
-recursive-include keyvi/3rdparty *.cmake
-recursive-include keyvi/3rdparty *.cmake.in
+recursive-include src/cpp/keyvi/3rdparty CMakeLists.txt
+recursive-include src/cpp/keyvi/3rdparty *.cmake
+recursive-include src/cpp/keyvi/3rdparty *.cmake.in
 
-recursive-include keyvi/3rdparty/tpie *.md
-graft keyvi/3rdparty/tpie/doc
+recursive-include src/cpp/keyvi/3rdparty/tpie *.md
+graft  src/cpp/keyvi/3rdparty/tpie/doc
+include src/cpp/CMakeLists.txt

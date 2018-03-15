@@ -23,28 +23,29 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
 #include <boost/filesystem.hpp>
-#include "dictionary/fsa/generator.h"
+#include <boost/test/unit_test.hpp>
+
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/entry_iterator.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "util/configuration.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-BOOST_AUTO_TEST_SUITE( GeneratorTests )
+BOOST_AUTO_TEST_SUITE(GeneratorTests)
 
-BOOST_AUTO_TEST_CASE( simple ) {
-  internal::SparseArrayPersistence<> p(2048,
-                                     boost::filesystem::temp_directory_path());
+BOOST_AUTO_TEST_CASE(simple) {
+  internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  Generator<internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g.Add("aaaa");
   g.Add("aabb");
   g.Add("aabc");
@@ -75,11 +76,10 @@ BOOST_AUTO_TEST_CASE( simple ) {
   BOOST_CHECK(it == end_it);
 }
 
-BOOST_AUTO_TEST_CASE( simple2 ) {
-  internal::SparseArrayPersistence<> p(2048,
-                                     boost::filesystem::temp_directory_path());
+BOOST_AUTO_TEST_CASE(simple2) {
+  internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  Generator<internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g.Add("aaa");
   g.Add("abcde");
   g.Add("bar");
@@ -109,8 +109,8 @@ BOOST_AUTO_TEST_CASE( simple2 ) {
   BOOST_CHECK(it == end_it);
 }
 
-BOOST_AUTO_TEST_CASE( stringtest ) {
-  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+BOOST_AUTO_TEST_CASE(stringtest) {
+  Generator<internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g.Add(std::string("aaa"));
   g.Add(std::string("abcde"));
   g.Add("bar");
@@ -140,11 +140,11 @@ BOOST_AUTO_TEST_CASE( stringtest ) {
   BOOST_CHECK(it == end_it);
 }
 
-BOOST_AUTO_TEST_CASE( intvaluetest ) {
-  internal::SparseArrayPersistence<> p(2048,
-                                     boost::filesystem::temp_directory_path());
+BOOST_AUTO_TEST_CASE(intvaluetest) {
+  internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore> g(
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g.Add("eads", 576);
 
   g.Add("facebook", 4368451);
@@ -175,10 +175,11 @@ BOOST_AUTO_TEST_CASE( intvaluetest ) {
   BOOST_CHECK(it == end_it);
 }
 
-BOOST_AUTO_TEST_CASE( feedwithoutclose ) {
+BOOST_AUTO_TEST_CASE(feedwithoutclose) {
   // test that just triggers the case (if) generato is created but FSA creation is not finalized
 
-  auto g = new   Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore>(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  auto g = new Generator<internal::SparseArrayPersistence<>, internal::IntInnerWeightsValueStore>(
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g->Add("eads", 576);
 
   g->Add("facebook", 4368451);
@@ -186,8 +187,8 @@ BOOST_AUTO_TEST_CASE( feedwithoutclose ) {
   delete g;
 }
 
-BOOST_AUTO_TEST_CASE( manifesttest ) {
-  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+BOOST_AUTO_TEST_CASE(manifesttest) {
+  Generator<internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g.Add(std::string("aaa"));
   g.Add(std::string("abcde"));
   g.Add("bar");
@@ -206,13 +207,11 @@ BOOST_AUTO_TEST_CASE( manifesttest ) {
   BOOST_CHECK_EQUAL("{\"version\":\"42\"}\n", f->GetManifestAsString());
 }
 
-
-BOOST_AUTO_TEST_CASE( zeroBytes ) {
-  internal::SparseArrayPersistence<> p(2048,
-                                     boost::filesystem::temp_directory_path());
+BOOST_AUTO_TEST_CASE(zeroBytes) {
+  internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
   TRACE("test zerobyte");
-  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  Generator<internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g.Add(std::string("\0bbcd", 5));
   g.Add(std::string("a\0abc", 5));
   g.Add("aaaa");
@@ -241,7 +240,7 @@ BOOST_AUTO_TEST_CASE( zeroBytes ) {
   ++it;
   BOOST_CHECK_EQUAL("aaaa", it.GetKey());
   ++it;
-  BOOST_CHECK_EQUAL(std::string("aabb\0",5), it.GetKey());
+  BOOST_CHECK_EQUAL(std::string("aabb\0", 5), it.GetKey());
   ++it;
   BOOST_CHECK_EQUAL("aacd", it.GetKey());
   ++it;
@@ -250,32 +249,31 @@ BOOST_AUTO_TEST_CASE( zeroBytes ) {
   BOOST_CHECK(it == end_it);
 }
 
-BOOST_AUTO_TEST_CASE( state_exception_handling ) {
-  internal::SparseArrayPersistence<> p(2048,
-                                       boost::filesystem::temp_directory_path());
+BOOST_AUTO_TEST_CASE(state_exception_handling) {
+  internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
-  Generator<internal::SparseArrayPersistence<>> g(fsa::generator_param_t({{"memory_limit_mb","10"}}));
+  Generator<internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
-  BOOST_CHECK_THROW( g.WriteToFile("somefile"), generator_exception );
+  BOOST_CHECK_THROW(g.WriteToFile("somefile"), generator_exception);
 
   g.Add("abcd");
-  BOOST_CHECK_THROW( g.WriteToFile("somefile"), generator_exception );
+  BOOST_CHECK_THROW(g.WriteToFile("somefile"), generator_exception);
   g.CloseFeeding();
-  BOOST_CHECK_THROW( g.CloseFeeding(), generator_exception );
+  BOOST_CHECK_THROW(g.CloseFeeding(), generator_exception);
 
-  BOOST_CHECK_THROW( g.Add("cdef"), generator_exception );
+  BOOST_CHECK_THROW(g.Add("cdef"), generator_exception);
 
   ValueHandle handle;
-  BOOST_CHECK_THROW( g.Add("ghij", handle), generator_exception );
+  BOOST_CHECK_THROW(g.Add("ghij", handle), generator_exception);
 }
 
-BOOST_AUTO_TEST_CASE( value_handle ) {
-  ValueHandle handle = {0,0,0,false, false};
-  ValueHandle handle2 = {1,0,0,false, false};
-  ValueHandle handle3 = {0,1,0,false, false};
-  ValueHandle handle4 = {0,0,1,false, false};
-  ValueHandle handle5 = {0,0,0,true, false};
-  ValueHandle handle6 = {0,0,0,false, true};
+BOOST_AUTO_TEST_CASE(value_handle) {
+  ValueHandle handle = {0, 0, 0, false, false};
+  ValueHandle handle2 = {1, 0, 0, false, false};
+  ValueHandle handle3 = {0, 1, 0, false, false};
+  ValueHandle handle4 = {0, 0, 1, false, false};
+  ValueHandle handle5 = {0, 0, 0, true, false};
+  ValueHandle handle6 = {0, 0, 0, false, true};
 
   BOOST_CHECK(handle == handle);
   BOOST_CHECK(handle != handle2);

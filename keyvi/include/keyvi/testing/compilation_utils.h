@@ -37,6 +37,7 @@
 #include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/internal/sparse_array_persistence.h"
 #include "dictionary/fsa/internal/string_value_store.h"
+#include "util/configuration.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -52,7 +53,7 @@ class CompilationUtils {
     dictionary::fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
     dictionary::fsa::Generator<dictionary::fsa::internal::SparseArrayPersistence<>> g(
-        dictionary::fsa::generator_param_t({{"memory_limit_mb", "10"}}));
+        keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
     for (const auto& key : *input) {
       g.Add(key);
@@ -75,7 +76,7 @@ class CompilationUtils {
 
     dictionary::fsa::Generator<dictionary::fsa::internal::SparseArrayPersistence<>,
                                dictionary::fsa::internal::StringValueStore>
-        g(dictionary::fsa::generator_param_t({{"memory_limit_mb", "10"}}));
+        g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
     for (const auto& pair : *input) {
       g.Add(pair.first, pair.second);
@@ -98,7 +99,7 @@ class CompilationUtils {
 
     dictionary::fsa::Generator<dictionary::fsa::internal::SparseArrayPersistence<>,
                                dictionary::fsa::internal::JsonValueStore>
-        g(dictionary::fsa::generator_param_t({{"memory_limit_mb", "10"}}));
+        g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
     for (const auto& pair : *input) {
       g.Add(pair.first, pair.second);
@@ -121,7 +122,7 @@ class CompilationUtils {
 
     dictionary::fsa::Generator<dictionary::fsa::internal::SparseArrayPersistence<>,
                                dictionary::fsa::internal::IntInnerWeightsValueStore>
-        g(dictionary::fsa::generator_param_t({{"memory_limit_mb", "10"}}));
+        g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
     for (const auto& pair : *input) {
       g.Add(pair.first, pair.second);
@@ -144,7 +145,7 @@ class CompilationUtils {
 
     dictionary::fsa::Generator<dictionary::fsa::internal::SparseArrayPersistence<>,
                                dictionary::fsa::internal::IntValueStore>
-        g(dictionary::fsa::generator_param_t({{"memory_limit_mb", "10"}}));
+        g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
     for (const auto& pair : *input) {
       g.Add(pair.first, pair.second);

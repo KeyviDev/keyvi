@@ -34,10 +34,10 @@
 #include "dictionary/fsa/generator_adapter.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/sort/in_memory_sorter.h"
 #include "dictionary/sort/sorter_common.h"
 #include "util/configuration.h"
+#include "util/serialization_utils.h"
 
 #if !defined(KEYVI_DISABLE_TPIE)
 #include "dictionary/sort/tpie_sorter.h"
@@ -49,7 +49,6 @@
 namespace keyvi {
 namespace dictionary {
 
-typedef const fsa::internal::IValueStoreWriter::vs_param_t compiler_param_t;
 typedef sort::key_value_pair<std::string, fsa::ValueHandle> key_value_t;
 
 /**
@@ -84,7 +83,8 @@ class DictionaryCompiler final {
    *
    * @param params compiler parameters
    */
-  explicit DictionaryCompiler(const compiler_param_t& params = compiler_param_t()) : sorter_(params), params_(params) {
+  explicit DictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
+      : sorter_(params), params_(params) {
     params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
@@ -222,7 +222,7 @@ class DictionaryCompiler final {
    * @param manifest as JSON string
    */
   void SetManifestFromString(const std::string& manifest) {
-    SetManifest(fsa::internal::SerializationUtils::ReadJsonRecord(manifest));
+    SetManifest(keyvi::util::SerializationUtils::ReadJsonRecord(manifest));
   }
 
   /**
@@ -248,8 +248,7 @@ class DictionaryCompiler final {
     generator_->Write(stream);
   }
 
-  template <typename StringType>
-  void WriteToFile(StringType filename) {
+  void WriteToFile(const std::string& filename) {
     if (!generator_) {
       throw compiler_exception("not compiled yet");
     }
@@ -261,7 +260,7 @@ class DictionaryCompiler final {
 
  private:
   SorterT sorter_;
-  fsa::internal::IValueStoreWriter::vs_param_t params_;
+  keyvi::util::parameters_t params_;
   ValueStoreT* value_store_;
   typename GeneratorAdapter::AdapterPtr generator_;
   boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
