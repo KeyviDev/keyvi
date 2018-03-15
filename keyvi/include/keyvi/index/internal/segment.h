@@ -56,7 +56,7 @@ class Segment final : public ReadOnlySegment {
     deleted_keys_swap_filename_ += ".dk-swap";
   }
 
-  explicit Segment(const boost::filesystem::path& path, const std::vector<std::shared_ptr<Segment>> parent_segments,
+  explicit Segment(const boost::filesystem::path& path, const std::vector<std::shared_ptr<Segment>>& parent_segments,
                    const bool load = true)
       : ReadOnlySegment(path),
         deleted_keys_for_write_(),

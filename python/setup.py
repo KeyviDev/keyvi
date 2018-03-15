@@ -215,7 +215,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         have_wheel = True
     except: None
 
-    class build_py(_build_py.build_py):
+    class build_ext(_build_ext.build_ext):
 
         def run(self):
             generate_pykeyvi_source()
@@ -246,11 +246,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
 
-            _build_py.build_py.run(self)
-
-    class build_ext(_build_ext.build_ext):
-
-        def run(self):
             os.environ['ARCHFLAGS'] = '-arch x86_64'
             _build_ext.build_ext.run(self)
 
@@ -280,7 +275,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         'msgpack-python',
     ]
 
-    commands = {'build_py': build_py, 'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist}
+    commands = {'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist}
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
 
