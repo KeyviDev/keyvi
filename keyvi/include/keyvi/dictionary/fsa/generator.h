@@ -36,11 +36,11 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
 #include "dictionary/fsa/internal/sparse_array_builder.h"
 #include "dictionary/fsa/internal/unpacked_state.h"
 #include "dictionary/fsa/internal/unpacked_state_stack.h"
 #include "util/configuration.h"
+#include "util/serialization_utils.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -132,8 +132,6 @@ class generator_exception final : public std::runtime_error {
  * containing "e", than stack 4 with "d", stack 3 with "c", "e" and so on.
  * Note: The input must be sorted according to a user-defined sort order.
  */
-typedef const internal::IValueStoreWriter::vs_param_t generator_param_t;
-
 struct ValueHandle final {
   bool operator==(const ValueHandle other) const {
     return (value_idx == other.value_idx) && (count == other.count) && (weight == other.weight) &&
@@ -153,7 +151,8 @@ template <class PersistenceT, class ValueStoreT = internal::NullValueStore, clas
           class HashCodeTypeT = int32_t>
 class Generator final {
  public:
-  explicit Generator(const generator_param_t& params = generator_param_t(), ValueStoreT* value_store = NULL)
+  explicit Generator(const keyvi::util::parameters_t& params = keyvi::util::parameters_t(),
+                     ValueStoreT* value_store = NULL)
       : params_(params) {
     memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
 
@@ -324,8 +323,7 @@ class Generator final {
     value_store_->Write(stream);
   }
 
-  template <typename StringType>
-  void WriteToFile(StringType filename) {
+  void WriteToFile(const std::string& filename) {
     std::ofstream out_stream(filename, std::ios::binary);
     Write(out_stream);
     out_stream.close();
@@ -339,7 +337,7 @@ class Generator final {
    * @param manifest as JSON string
    */
   inline void SetManifestFromString(const std::string& manifest) {
-    SetManifest(internal::SerializationUtils::ReadJsonRecord(manifest));
+    SetManifest(keyvi::util::SerializationUtils::ReadJsonRecord(manifest));
   }
 
   /**
@@ -351,7 +349,7 @@ class Generator final {
 
  private:
   size_t memory_limit_;
-  internal::IValueStoreWriter::vs_param_t params_;
+  keyvi::util::parameters_t params_;
   PersistenceT* persistence_;
   ValueStoreT* value_store_;
   internal::SparseArrayBuilder<PersistenceT, OffsetTypeT, HashCodeTypeT>* builder_;
@@ -374,7 +372,7 @@ class Generator final {
     pt.put("number_of_states", std::to_string(number_of_states_));
     pt.add_child("manifest", manifest_);
 
-    internal::SerializationUtils::WriteJsonRecord(stream, pt);
+    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
   }
 
   inline void FeedStack(const size_t start, const std::string& key) {

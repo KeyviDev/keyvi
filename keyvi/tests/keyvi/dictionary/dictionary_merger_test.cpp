@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 
+#include <unordered_set>
+
 #include <boost/test/unit_test.hpp>
 
 #include "dictionary/dictionary.h"
@@ -30,6 +32,7 @@
 #include "dictionary/dictionary_types.h"
 #include "dictionary/fsa/traverser_types.h"
 #include "testing/temp_dictionary.h"
+#include "util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -43,7 +46,8 @@ BOOST_AUTO_TEST_CASE(MergeKeyOnlyDicts) {
   std::vector<std::string> test_data2 = {"aaaaz", "aabbe", "cdddefgh"};
   testing::TempDictionary dictionary2(&test_data2);
 
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>> merger(merger_param_t({{"memory_limit_mb", "10"}}));
+  DictionaryMerger<fsa::internal::SparseArrayPersistence<>> merger(
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   std::string filename("merged-dict-key-only.kv");
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
@@ -69,6 +73,10 @@ BOOST_AUTO_TEST_CASE(MergeKeyOnlyDicts) {
   BOOST_CHECK(!d->Contains("a"));
   BOOST_CHECK(!d->Contains("cde"));
 
+  BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(10, merger.GetStats().number_of_keys_);
+
   std::remove(filename.c_str());
 }
 
@@ -87,7 +95,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDicts) {
 
   std::string filename("merged-dict-int.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -134,7 +142,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
   testing::TempDictionary dictionary2(&test_data2, false);
 
   std::string filename("merged-dict-int-v1.kv");
-  IntDictionaryMerger merger(merger_param_t({{"memory_limit_mb", "10"}}));
+  IntDictionaryMerger merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -155,7 +163,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
 
   filename = "merged-dict-int-v2.kv";
   testing::TempDictionary dictionary3(&test_data, false);
-  IntDictionaryMerger merger2(merger_param_t({{"memory_limit_mb", "10"}}));
+  IntDictionaryMerger merger2(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -178,7 +186,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v3.kv";
-  IntDictionaryMerger merger3(merger_param_t({{"memory_limit_mb", "10"}}));
+  IntDictionaryMerger merger3(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
@@ -212,7 +220,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
   testing::TempDictionary dictionary2(&test_data2, false);
 
   std::string filename("merged-dict-int-v1.kv");
-  IntDictionaryMerger merger(merger_param_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
+  IntDictionaryMerger merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -233,7 +241,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
 
   filename = "merged-dict-int-v2.kv";
   testing::TempDictionary dictionary3(&test_data, false);
-  IntDictionaryMerger merger2(merger_param_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
+  IntDictionaryMerger merger2(keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -256,7 +264,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-v3.kv";
-  IntDictionaryMerger merger3(merger_param_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
+  IntDictionaryMerger merger3(keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
@@ -293,7 +301,7 @@ BOOST_AUTO_TEST_CASE(MergeStringDicts) {
 
   std::string filename("merged-dict-string.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -345,7 +353,7 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
 
   std::string filename("merged-dict-json.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -357,9 +365,12 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
   BOOST_CHECK(d->Contains("abc"));
   BOOST_CHECK(d->Contains("abbc"));
   BOOST_CHECK(d->Contains("abbcd"));
+  BOOST_CHECK(d->Contains("abbe"));
+  BOOST_CHECK(d->Contains("abcd"));
   BOOST_CHECK(d->Contains("abcde"));
   BOOST_CHECK(d->Contains("abdd"));
   BOOST_CHECK(d->Contains("bba"));
+  BOOST_CHECK(d->Contains("bbacd"));
 
   BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abc").GetValueAsString());
 
@@ -378,6 +389,10 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
   BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
   BOOST_CHECK_EQUAL("\"{f:5}\"", d->operator[]("bbacd").GetValueAsString());
 
+  BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(1, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(9, merger.GetStats().number_of_keys_);
+
   std::remove(filename.c_str());
 }
 
@@ -385,7 +400,7 @@ BOOST_AUTO_TEST_CASE(MergeIncompatible) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
   testing::TempDictionary dictionary(&test_data);
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
 }
@@ -404,7 +419,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
 
   std::string filename("merged-dict-int-weight-v1.kv");
   DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
-      merger_param_t({{"memory_limit_mb", "10"}}));
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -459,7 +474,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
 
   filename = "merged-dict-int-weight-v2.kv";
   testing::TempDictionary dictionary3(&test_data);
-  CompletionDictionaryMerger merger2(merger_param_t({{"memory_limit_mb", "10"}}));
+  CompletionDictionaryMerger merger2(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -482,7 +497,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
   std::remove(filename.c_str());
 
   filename = "merged-dict-int-weight-v3.kv";
-  CompletionDictionaryMerger merger3(merger_param_t({{"memory_limit_mb", "10"}}));
+  CompletionDictionaryMerger merger3(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   merger3.Add(dictionary2.GetFileName());
   merger3.Add(dictionary.GetFileName());
@@ -551,7 +566,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsAppendMerge) {
 
   std::string filename = "merged-dict-int-weight-v2.kv";
   testing::TempDictionary dictionary3(&test_data);
-  CompletionDictionaryMerger merger2(merger_param_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
+  CompletionDictionaryMerger merger2(keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {"merge_mode", "append"}}));
   merger2.Add(dictionary.GetFileName());
   merger2.Add(dictionary2.GetFileName());
   merger2.Add(dictionary3.GetFileName());
@@ -597,6 +612,10 @@ BOOST_AUTO_TEST_CASE(MergeToEmptyDict) {
   BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc").GetValueAsString());
   BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
 
+  BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(2, merger.GetStats().number_of_keys_);
+
   std::remove(filename.c_str());
 }
 
@@ -611,6 +630,128 @@ BOOST_AUTO_TEST_CASE(MergeDuplicateAdd) {
   merger.Add(dictionary.GetFileName());
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(Delete) {
+  std::vector<std::pair<std::string, std::string>> test_data = {
+      {"abcd", "{g:5}"},
+      {"xyz", "{t:4}"},
+  };
+  testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
+
+  boost::filesystem::path deleted_keys_file{dictionary.GetFileName()};
+  deleted_keys_file += ".dk";
+  JsonDictionaryMerger merger;
+  {
+    std::unordered_set<std::string> deleted_keys{"xyz"};
+    std::ofstream out_stream(deleted_keys_file.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys);
+  }
+
+  merger.Add(dictionary.GetFileName());
+
+  std::string filename("merge-delete-key-dict.kv");
+  std::ofstream out_stream(filename, std::ios::binary);
+  merger.Merge();
+  merger.Write(out_stream);
+  out_stream.close();
+
+  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+  dictionary_t d(new Dictionary(fsa));
+
+  BOOST_CHECK(d->Contains("abcd"));
+  BOOST_CHECK(!d->Contains("xyz"));
+
+  BOOST_CHECK_EQUAL(1, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(1, merger.GetStats().number_of_keys_);
+
+  std::remove(filename.c_str());
+  std::remove(deleted_keys_file.string().c_str());
+}
+
+BOOST_AUTO_TEST_CASE(MultipleDeletes) {
+  std::vector<std::pair<std::string, std::string>> test_data1 = {
+      {"abcd", "{g:5}"},   {"abbc", "{t:4}"}, {"abbcd", "{u:3}"}, {"abbd", "{v:2}"},
+      {"abbdef", "{w:1}"}, {"abbe", "{x:0}"}, {"acdd", "{y:-1}"}, {"afgh", "{z:-2}"},
+  };
+  testing::TempDictionary dictionary1 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data1);
+  boost::filesystem::path deleted_keys_file1{dictionary1.GetFileName()};
+  deleted_keys_file1 += ".dk";
+  {
+    std::unordered_set<std::string> deleted_keys1{"abbc", "afgh"};
+    std::ofstream out_stream(deleted_keys_file1.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys1);
+  }
+
+  std::vector<std::pair<std::string, std::string>> test_data2 = {
+      {"abcd", "{g:15}"},   {"abbc", "{t:14}"}, {"abbcd", "{u:13}"}, {"abbd", "{v:12}"},
+      {"abbdef", "{w:11}"}, {"abbe", "{x:10}"}, {"acdd", "{y:9}"},
+  };
+  testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data2);
+  boost::filesystem::path deleted_keys_file2{dictionary2.GetFileName()};
+  deleted_keys_file2 += ".dk";
+  {
+    std::unordered_set<std::string> deleted_keys2{"abbc", "abbcd", "abbd"};
+    std::ofstream out_stream(deleted_keys_file2.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys2);
+  }
+
+  std::vector<std::pair<std::string, std::string>> test_data3 = {
+      {"abcd", "{g:25}"},   {"abbc", "{t:24}"}, {"abbcd", "{u:23}"},
+      {"abbdef", "{w:21}"}, {"abbe", "{x:20}"}, {"acdd", "{y:19}"},
+  };
+  testing::TempDictionary dictionary3 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data3);
+  boost::filesystem::path deleted_keys_file3{dictionary3.GetFileName()};
+  deleted_keys_file3 += ".dk";
+  {
+    std::unordered_set<std::string> deleted_keys3{"abbc", "abbcd", "abbdef"};
+    std::ofstream out_stream(deleted_keys_file3.string(), std::ios::binary);
+    msgpack::pack(out_stream, deleted_keys3);
+  }
+
+  JsonDictionaryMerger merger;
+  merger.Add(dictionary1.GetFileName());
+  merger.Add(dictionary2.GetFileName());
+  merger.Add(dictionary3.GetFileName());
+
+  std::string filename("merge-multiple-deletes-dict.kv");
+  merger.Merge();
+
+  merger.WriteToFile(filename);
+
+  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+  dictionary_t d(new Dictionary(fsa));
+
+  BOOST_CHECK(d->Contains("abcd"));
+  BOOST_CHECK(!d->Contains("abbc"));
+  BOOST_CHECK(!d->Contains("abbcd"));
+  BOOST_CHECK(!d->Contains("abbd"));
+  BOOST_CHECK(!d->Contains("abbdef"));
+  BOOST_CHECK(d->Contains("abbe"));
+  BOOST_CHECK(d->Contains("acdd"));
+  BOOST_CHECK(!d->Contains("afgh"));
+
+  BOOST_CHECK_EQUAL(8, merger.GetStats().deleted_keys_);
+  BOOST_CHECK_EQUAL(13, merger.GetStats().updated_keys_);
+  BOOST_CHECK_EQUAL(3, merger.GetStats().number_of_keys_);
+
+  std::remove(filename.c_str());
+  std::remove(deleted_keys_file1.string().c_str());
+  std::remove(deleted_keys_file2.string().c_str());
+  std::remove(deleted_keys_file3.string().c_str());
+}
+
+BOOST_AUTO_TEST_CASE(WriteWithoutMerge) {
+  JsonDictionaryMerger merger;
+  const std::string filename("write-without-merger.kv");
+
+  BOOST_CHECK_THROW(merger.WriteToFile(filename), merger_exception);
+  {
+    std::ofstream out_stream(filename, std::ios::binary);
+    BOOST_CHECK_THROW(merger.Write(out_stream), merger_exception);
+  }
+  std::remove(filename.c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

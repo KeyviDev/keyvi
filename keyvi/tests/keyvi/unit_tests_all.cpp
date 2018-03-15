@@ -24,6 +24,28 @@
  */
 
 #define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE Dictionary Test Suite
+#define BOOST_TEST_MODULE Keyvi Unit Test Suite
+#define BOOST_TEST_NO_MAIN
+
+#include <stdlib.h>
+
+#include <iostream>
+
+#include <boost/filesystem.hpp>
+#include <boost/system/error_code.hpp>
 #include <boost/test/unit_test.hpp>
 
+// entry point:
+int main(int argc, char* argv[], char* envp[]) {
+  boost::filesystem::path path_of_executable{boost::filesystem::system_complete(argv[0])};
+  path_of_executable.remove_filename();
+
+  boost::system::error_code error_code;
+  boost::filesystem::path base_path = boost::filesystem::canonical(path_of_executable, error_code);
+
+  std::cout << "Running unit tests from path: " << base_path.string() << std::endl;
+
+  // set an environment variable, to be used in tests
+  setenv("KEYVI_UNITTEST_BASEPATH", base_path.string().c_str(), 1);
+  return boost::unit_test::unit_test_main(&init_unit_test, argc, argv);
+}

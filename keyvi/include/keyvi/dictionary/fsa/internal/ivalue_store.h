@@ -36,6 +36,7 @@
 #include <boost/variant.hpp>
 
 #include "dictionary/dictionary_merger_fwd.h"
+#include "util/configuration.h"
 #include "util/json_value.h"
 
 namespace keyvi {
@@ -73,10 +74,7 @@ enum value_store_t {
  */
 class IValueStoreWriter {
  public:
-  /** Parameter map type. */
-  typedef std::map<std::string, std::string> vs_param_t;
-
-  IValueStoreWriter() : IValueStoreWriter(vs_param_t()) {}
+  IValueStoreWriter() : IValueStoreWriter(keyvi::util::parameters_t()) {}
 
   /**
    * Default constructor. Override if the value store implementation requires
@@ -85,10 +83,10 @@ class IValueStoreWriter {
    * @param parameters a map of string parameter values. It is up to the
    *                   value store what parameters it wants to use (if any).
    */
-  explicit IValueStoreWriter(const vs_param_t& parameters) : parameters_(parameters) {}
+  explicit IValueStoreWriter(const keyvi::util::parameters_t& parameters) : parameters_(parameters) {}
 
   /// TODO: workaround till ValueStore merger classes are separated from ValueStore writer
-  explicit IValueStoreWriter(const std::vector<std::string>&) : IValueStoreWriter(vs_param_t()) {}
+  explicit IValueStoreWriter(const std::vector<std::string>&) : IValueStoreWriter(keyvi::util::parameters_t()) {}
 
   virtual ~IValueStoreWriter() {}
 
@@ -105,7 +103,7 @@ class IValueStoreWriter {
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
  protected:
-  vs_param_t parameters_;
+  keyvi::util::parameters_t parameters_;
 };
 
 /**

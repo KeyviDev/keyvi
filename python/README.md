@@ -20,4 +20,4 @@ Then build/install a python package:
 
 ## Develop
 
-The python binding uses [cython](http://cython.org/) and [autowrap](https://github.com/uweschmitt/autowrap). All source files can be found in the src folder. The files keyvi.cpp and keyvi.pyx are generated on the fly during build.
+The python binding uses [cython](http://cython.org/) and [autowrap](https://github.com/uweschmitt/autowrap). All source files can be found in the src folder. The files _core.cpp and _core.pyx are generated on the fly during build.

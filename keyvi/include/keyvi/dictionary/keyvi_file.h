@@ -30,7 +30,7 @@
 #include <string>
 
 #include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/serialization_utils.h"
+#include "util/serialization_utils.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -51,14 +51,14 @@ class KeyViFile {
       throw std::invalid_argument("not a keyvi file");
     }
 
-    automata_properties_ = fsa::internal::SerializationUtils::ReadJsonRecord(file_stream_);
+    automata_properties_ = keyvi::util::SerializationUtils::ReadJsonRecord(file_stream_);
     persistence_offset_ = file_stream_.tellg();
 
     if (boost::lexical_cast<int>(automata_properties_.get<std::string>("version")) < KEYVI_FILE_VERSION_MIN) {
       throw std::invalid_argument("this version of keyvi file is unsupported");
     }
 
-    const ptree sparse_array_properties = fsa::internal::SerializationUtils::ReadJsonRecord(file_stream_);
+    const ptree sparse_array_properties = keyvi::util::SerializationUtils::ReadJsonRecord(file_stream_);
 
     if (boost::lexical_cast<int>(sparse_array_properties.get<std::string>("version")) <
         KEYVI_FILE_PERSISTENCE_VERSION_MIN) {

@@ -1,11 +1,16 @@
 # PyTest
-.cache/v/cache/lastfailed
+.cache
 
 # build artifacts
 keyvi.egg-info/
 build/
 dist/
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info
+MANIFEST
 
 # autowrap artifacts
-keyvi.pyx
-keyvi.cpp
+_core.pyx
+_core.cpp
