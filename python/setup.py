@@ -2,7 +2,6 @@ from setuptools import setup, Extension
 import distutils.command.build as _build
 import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
-import distutils.command.build_py as _build_py
 import distutils.command.sdist as _sdist
 import os
 import sys
@@ -10,6 +9,7 @@ import subprocess
 import multiprocessing
 import shutil
 import glob
+import platform
 
 from contextlib import contextmanager
 from os import path
@@ -61,7 +61,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     autowrap_data_dir = "autowrap_includes"
 
     dictionary_sources = path.abspath(keyvi_cpp_link)
-    keyvi_build_dir = path.join(keyvi_cpp, 'build')
+    keyvi_build_dir = path.join(keyvi_cpp, 'build-{}'.format(platform.platform()))
 
     additional_compile_flags = []
 
