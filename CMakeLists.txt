@@ -64,11 +64,13 @@ add_executable(unit_test_all ${UNIT_TEST_SOURCES})
 add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
 add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
 add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
+add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
 
 target_link_libraries(unit_test_all tiny-process-library tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyvicompiler tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyviinspector tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyvimerger tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(keyvi_c tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 
 install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
 install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
