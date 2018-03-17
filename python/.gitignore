@@ -5,6 +5,7 @@
 keyvi.egg-info/
 build/
 dist/
+src/cpp/build*
 __pycache__/
 *.py[cod]
 *.so
