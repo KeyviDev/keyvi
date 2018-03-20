@@ -68,26 +68,6 @@ inline size_t get_common_prefix_length(const std::string& first, const std::stri
 }
 
 /**
- * helper template functions to be flexible regarding strings
- */
-
-template <typename StringType>
-inline const char* c_stringify(const StringType&) {
-  throw std::invalid_argument("unsupported stringtype");
-  return "";
-}
-
-template <>
-inline const char* c_stringify<const char*>(const char* const& str) {
-  return str ? str : "";  // return empty string if str is NULL
-}
-
-template <>
-inline const char* c_stringify<std::string>(std::string const& str) {
-  return str.c_str();
-}
-
-/**
  *  states of the generator
  *
  * FEEDING - generator is ready for consumption, expects more data or close()
@@ -314,7 +294,7 @@ class Generator final {
       throw generator_exception("not compiled yet");
     }
 
-    stream << "KEYVIFSA";
+    stream << KEYVI_FILE_MAGIC;
     WriteHeader(stream);
     // write data from persistence
     persistence_->Write(stream);
