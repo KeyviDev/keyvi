@@ -1,5 +1,6 @@
 # PyTest
 .cache
+.pytest_cache
 
 # build artifacts
 keyvi.egg-info/

@@ -295,6 +295,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                   'keyvi.dictionary',
                   'keyvi.index',
                   'keyvi.util',
+                  'keyvi.vector',
                   'keyvi._pycore'],
         package_dir={'': 'src/py'},
         ext_modules=ext_modules,
