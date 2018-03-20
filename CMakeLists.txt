@@ -72,6 +72,8 @@ target_link_libraries(keyviinspector tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyvimerger tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_link_libraries(keyvi_c tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 
+add_dependencies(unit_test_all keyvimerger)
+
 install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
 install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
 install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
