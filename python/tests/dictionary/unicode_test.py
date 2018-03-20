@@ -37,6 +37,6 @@ def test_unicode_lookup():
         assert "Kirchheim bei München" in d
         matched_strings = [x.GetMatchedString() for x in d.LookupText(text)]
         assert len(matched_strings) == 3
-        assert decode_to_unicode("Kirchheim bei München") in decode_to_unicode(matched_strings)
-        assert decode_to_unicode("Los Angeles") in decode_to_unicode(matched_strings)
-        assert decode_to_unicode("Frankfurt am Main") in decode_to_unicode(matched_strings)
+        assert decode_to_unicode(u"Kirchheim bei München") in decode_to_unicode(matched_strings)
+        assert decode_to_unicode(u"Los Angeles") in decode_to_unicode(matched_strings)
+        assert decode_to_unicode(u"Frankfurt am Main") in decode_to_unicode(matched_strings)

@@ -35,8 +35,8 @@ def test_unicode_attributes():
 
 def test_bytes_attributes():
     m = keyvi.Match()
-    bytes_key = bytes(decode_to_unicode("äöü").encode('utf-8'))
-    bytes_value = bytes(decode_to_unicode("äöüöäü").encode('utf-8'))
+    bytes_key = bytes(decode_to_unicode(u"äöü").encode('utf-8'))
+    bytes_value = bytes(decode_to_unicode(u"äöüöäü").encode('utf-8'))
     m.SetAttribute(bytes_key, 22)
     assert m.GetAttribute(bytes_key) == 22
     m.SetAttribute("k2", bytes_value)

@@ -31,8 +31,8 @@ def test_get_fuzzy():
     c.Add("tüs öffnungszeiten", 15999)
 
     key_values = [
-        ('tüv sood', 46057),
-        ('tüv nord', 46052),
+        (u'tüv sood', 46057),
+        (u'tüv nord', 46052),
     ]
 
     with tmp_dictionary(c, 'get_fuzzy.kv') as d:

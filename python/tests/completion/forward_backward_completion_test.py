@@ -26,5 +26,5 @@ def test_forward_backward_completion():
             matches = sorted([(match.GetAttribute('weight'), match.GetMatchedString())
                               for match in completer.GetCompletions("munich")], reverse=True)
             assert len(matches) == 2
-            assert matches[0][1] == b'bayern munich vs. real madrid'
-            assert matches[1][1] == b'munich vs. real madrid'
+            assert matches[0][1] == 'bayern munich vs. real madrid'
+            assert matches[1][1] == 'munich vs. real madrid'

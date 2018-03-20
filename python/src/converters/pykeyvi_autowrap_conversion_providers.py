@@ -1,6 +1,7 @@
 from __future__ import print_function
 from autowrap.Code import Code
-from autowrap.ConversionProvider import TypeConverterBase
+from autowrap.ConversionProvider import TypeConverterBase, StdStringUnicodeConverter
+
 
 class MatchIteratorPairConverter(TypeConverterBase):
 
@@ -33,3 +34,8 @@ class MatchIteratorPairConverter(TypeConverterBase):
             |$output_py_var.end = _r.end()
             """, locals())
 
+
+class OutputStdStringUnicodeConverter(StdStringUnicodeConverter):
+
+    def output_conversion(self, cpp_type, input_cpp_var, output_py_var):
+        return "%s = %s.decode('utf-8')" % (output_py_var, input_cpp_var)
