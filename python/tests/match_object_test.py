@@ -2,7 +2,7 @@
 # Usage: py.test tests
 
 import keyvi
-from test_tools import tmp_dictionary, decode_to_unicode
+from test_tools import tmp_dictionary
 
 def test_serialization():
     m = keyvi.Match()
@@ -19,38 +19,38 @@ def test_raw_serialization():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
         m = d["abc"]
-        assert decode_to_unicode(m.GetValueAsString()) == decode_to_unicode('{"a":2}')
+        assert m.GetValueAsString() == '{"a":2}'
         d = m.dumps()
         m2 = keyvi.Match.loads(d)
-        assert decode_to_unicode(m2.GetValueAsString()) == decode_to_unicode('{"a":2}')
+        assert m2.GetValueAsString() == '{"a":2}'
 
 def test_unicode_attributes():
     m = keyvi.Match()
-    m.SetAttribute(decode_to_unicode("küy"), 22)
+    m.SetAttribute("küy", 22)
     assert m.GetAttribute("küy") == 22
-    m.SetAttribute("k2", decode_to_unicode(" 吃饭了吗"))
+    m.SetAttribute("k2", " 吃饭了吗")
     m.SetScore(99)
-    assert decode_to_unicode(m.GetAttribute("k2")) == decode_to_unicode(" 吃饭了吗")
+    assert m.GetAttribute("k2") == " 吃饭了吗"
     assert m.GetScore() == 99.0
 
 def test_bytes_attributes():
     m = keyvi.Match()
-    bytes_key = bytes(decode_to_unicode("äöü").encode('utf-8'))
-    bytes_value = bytes(decode_to_unicode("äöüöäü").encode('utf-8'))
+    bytes_key = bytes(u"äöü".encode('utf-8'))
+    bytes_value = bytes(u"äöüöäü".encode('utf-8'))
     m.SetAttribute(bytes_key, 22)
     assert m.GetAttribute(bytes_key) == 22
     m.SetAttribute("k2", bytes_value)
-    assert decode_to_unicode(m.GetAttribute("k2")) == decode_to_unicode("äöüöäü")
+    assert m.GetAttribute("k2") == "äöüöäü"
 
 def test_double_attributes():
     m = keyvi.Match()
-    bytes_key = bytes(decode_to_unicode("abc").encode('utf-8'))
+    bytes_key = bytes("abc".encode('utf-8'))
     m.SetAttribute(bytes_key, 42.0)
     assert m.GetAttribute(bytes_key) == 42.0
 
 def test_boolean_attributes():
     m = keyvi.Match()
-    bytes_key = bytes(decode_to_unicode("def").encode('utf-8'))
+    bytes_key = bytes("def".encode('utf-8'))
     m.SetAttribute(bytes_key, True)
     assert m.GetAttribute(bytes_key) == True
 
@@ -60,9 +60,9 @@ def test_get_value():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
         m = d["abc"]
-        assert decode_to_unicode(m.GetValue()) == decode_to_unicode({"a":2})
+        assert m.GetValue() == {"a":2}
         m = d["abd"]
-        assert decode_to_unicode(m.GetValue()) == decode_to_unicode({"a":3})
+        assert m.GetValue() == {"a":3}
 
 def test_get_value_int():
     c = keyvi.CompletionDictionaryCompiler({"memory_limit_mb":"10"})
@@ -80,9 +80,9 @@ def test_get_value_key_only():
     c.Add("abd")
     with tmp_dictionary(c, 'match_object_key_only.kv') as d:
         m = d["abc"]
-        assert decode_to_unicode(m.GetValue()) == decode_to_unicode('')
+        assert m.GetValue() == ''
         m = d["abd"]
-        assert decode_to_unicode(m.GetValue()) == decode_to_unicode('')
+        assert m.GetValue() == ''
 
 def test_get_value_string():
     c = keyvi.StringDictionaryCompiler({"memory_limit_mb":"10"})
@@ -90,6 +90,6 @@ def test_get_value_string():
     c.Add("abd", "bbbbb")
     with tmp_dictionary(c, 'match_object_string.kv') as d:
         m = d["abc"]
-        assert decode_to_unicode(m.GetValue()) == decode_to_unicode("aaaaa")
+        assert m.GetValue() == "aaaaa"
         m = d["abd"]
-        assert decode_to_unicode(m.GetValue()) == decode_to_unicode("bbbbb")
+        assert m.GetValue() == "bbbbb"
