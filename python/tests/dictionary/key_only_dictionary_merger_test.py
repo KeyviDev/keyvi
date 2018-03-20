@@ -16,8 +16,6 @@ from os import path
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
 
-from test_tools import decode_to_unicode
-
 keys_1 = {
     'a',
     'bzzzz',
@@ -82,7 +80,7 @@ def test_merge(merger):
         keys_ordered = sorted(keys)
 
         for base_key, keyvi_key in zip(keys_ordered, merged_dictionary.GetAllKeys()):
-            assert decode_to_unicode(base_key) == decode_to_unicode(keyvi_key)
+            assert base_key == keyvi_key
 
     finally:
         shutil.rmtree(tmp_dir)

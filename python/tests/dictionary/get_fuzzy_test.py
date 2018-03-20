@@ -4,7 +4,7 @@
 
 import keyvi
 
-from test_tools import tmp_dictionary, decode_to_unicode
+from test_tools import tmp_dictionary
 
 
 def test_get_fuzzy():
@@ -37,7 +37,7 @@ def test_get_fuzzy():
 
     with tmp_dictionary(c, 'get_fuzzy.kv') as d:
         for (base_key, base_value), m in zip(key_values, d.GetFuzzy('tüv koid', 2)):
-            assert decode_to_unicode(base_key) == decode_to_unicode(m.GetMatchedString())
+            assert base_key == m.GetMatchedString()
             assert base_value == m.GetValue()
 
         assert len(list(d.GetFuzzy('tüv koid', 2))) == 2

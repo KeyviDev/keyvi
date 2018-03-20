@@ -6,9 +6,9 @@ import os
 import tempfile
 import keyvi
 
+
 @contextlib.contextmanager
 def tmp_dictionary(compiler, file_name):
-
     tmp_dir = tempfile.gettempdir()
     fq_file_name = os.path.join(tmp_dir, file_name)
     compiler.Compile()
@@ -18,6 +18,3 @@ def tmp_dictionary(compiler, file_name):
     yield d
     del d
     os.remove(fq_file_name)
-
-def decode_to_unicode(data):
-    return data

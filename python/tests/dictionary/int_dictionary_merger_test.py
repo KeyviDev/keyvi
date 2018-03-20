@@ -15,8 +15,6 @@ from os import path
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
 
-from test_tools import decode_to_unicode
-
 key_values_1 = {
     'a': 12,
     'bzzzz': 34,
@@ -83,7 +81,7 @@ def test_merge(merger):
 
         for (base_key, base_value), (keyvi_key, keyvi_value) in zip(key_values_ordered.items(),
                                                                     merged_dictionary.GetAllItems()):
-            assert decode_to_unicode(base_key) == decode_to_unicode(keyvi_key)
+            assert base_key == keyvi_key
             assert base_value == keyvi_value
 
     finally:
