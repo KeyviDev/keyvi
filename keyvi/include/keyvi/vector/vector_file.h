@@ -79,7 +79,8 @@ class VectorFile {
     const auto map_options = dictionary::fsa::internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
     index_region_ = mapped_region(file_mapping, boost::interprocess::read_only, in_stream.tellg(), index_size, nullptr,
                                   map_options);
-    index_region_.advise(mapped_region::advice_types::advice_random);
+    const auto advise = dictionary::fsa::internal::MemoryMapFlags::FSAGetMemoryMapAdvices(loading_strategy);
+    index_region_.advise(advise);
 
     in_stream.seekg(size_t(in_stream.tellg()) + index_size);
     value_store_reader_.reset(dictionary::fsa::internal::ValueStoreFactory::MakeReader(
