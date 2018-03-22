@@ -100,7 +100,7 @@ class MergeJob final {
   const std::vector<segment_t>& Segments() const { return payload_.segments_; }
 
   const segment_t MergedSegment() const {
-    return segment_t(new Segment(payload_.output_filename_, payload_.segments_, false));
+    return segment_t(new Segment(payload_.output_filename_, payload_.segments_));
   }
 
   void SetMerged() { payload_.merge_done = true; }

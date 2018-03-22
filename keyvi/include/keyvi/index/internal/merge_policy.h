@@ -19,6 +19,7 @@
 #ifndef KEYVI_INDEX_INTERNAL_MERGE_POLICY_H_
 #define KEYVI_INDEX_INTERNAL_MERGE_POLICY_H_
 
+#include <cstddef>
 #include <vector>
 
 #include "index/internal/segment.h"

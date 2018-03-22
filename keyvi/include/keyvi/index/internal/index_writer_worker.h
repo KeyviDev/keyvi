@@ -347,7 +347,7 @@ class IndexWriterWorker final {
     for (boost::property_tree::ptree::value_type& f : index_toc.get_child("files")) {
       boost::filesystem::path p(payload_.index_directory_);
       p /= f.second.data();
-      payload_.segments_->emplace_back(new Segment(p));
+      payload_.segments_->emplace_back(new Segment(p, false));
     }
   }
 
@@ -386,7 +386,7 @@ class IndexWriterWorker final {
     // add/register new segment
     // we have to copy the segments (shallow copy/list of shared pointers to segments)
     // and then swap it
-    segment_t new_segment(new Segment(p));
+    segment_t new_segment(new Segment(p, true));
     segments_t new_segments = std::make_shared<segment_vec_t>(*payload->segments_);
     new_segments->push_back(new_segment);
 

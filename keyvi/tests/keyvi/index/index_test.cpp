@@ -32,6 +32,7 @@
 
 #include "index/constants.h"
 #include "index/index.h"
+#include "testing/index_mock.h"
 
 inline std::string get_keyvimerger_bin() {
   boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};
@@ -136,6 +137,52 @@ BOOST_AUTO_TEST_CASE(index_reopen) {
   }
 
   boost::filesystem::remove_all(tmp_path);
+}
+
+BOOST_AUTO_TEST_CASE(index_reopen_deleted_keys) {
+  testing::IndexMock mock_index;
+  std::vector<std::pair<std::string, std::string>> test_data = {
+      {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"abbcd", "{c:3}"}, {"abcde", "{a:1}"}, {"abdd", "{b:2}"},
+  };
+  mock_index.AddSegment(&test_data);
+
+  std::vector<std::pair<std::string, std::string>> test_data_2 = {
+      {"abbc", "{c:6}"}, {"babc", "{a:1}"}, {"babbc", "{b:2}"}, {"babcde", "{a:1}"}, {"babdd", "{b:2}"},
+  };
+  mock_index.AddSegment(&test_data_2);
+  mock_index.AddDeletedKeys({"abbc", "abdd"}, 0);
+
+  {
+    Index index(mock_index.GetIndexFolder(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+    BOOST_CHECK(index.Contains("abc"));
+    BOOST_CHECK(!index.Contains("abdd"));
+    BOOST_CHECK(index.Contains("abbc"));
+    BOOST_CHECK(index.Contains("babc"));
+    BOOST_CHECK(index.Contains("babcde"));
+  }
+
+  testing::IndexMock mock_index2;
+  std::vector<std::pair<std::string, std::string>> test_data2 = {
+      {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"abbcd", "{c:3}"}, {"abcde", "{a:1}"}, {"abdd", "{b:2}"},
+  };
+  mock_index2.AddSegment(&test_data2);
+
+  std::vector<std::pair<std::string, std::string>> test_data2_2 = {
+      {"abbc", "{c:6}"}, {"babc", "{a:1}"}, {"babbc", "{b:2}"}, {"babcde", "{a:1}"}, {"babdd", "{b:2}"},
+  };
+  mock_index2.AddSegment(&test_data2_2);
+  mock_index2.AddDeletedKeys({"abbc", "abdd"}, 0);
+
+  {
+    Index index(mock_index.GetIndexFolder(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+    index.Delete("abc");
+    index.Flush();
+    BOOST_CHECK(!index.Contains("abc"));
+    BOOST_CHECK(!index.Contains("abdd"));
+    BOOST_CHECK(index.Contains("abbc"));
+    BOOST_CHECK(index.Contains("babc"));
+    BOOST_CHECK(index.Contains("babcde"));
+  }
 }
 
 BOOST_AUTO_TEST_CASE(index_delete_keys) {

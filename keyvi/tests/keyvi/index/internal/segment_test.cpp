@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(deletekey) {
   testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
 
   // do with lazy load
-  segment_t segment(new Segment(dictionary.GetFileName(), false));
+  segment_t segment(new Segment(dictionary.GetFileName()));
 
   // delete a key
   segment->DeleteKey("abc");
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(deletekeyMerging) {
   testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data_segment2);
 
   // mixin lazy load
-  segment_t segment2(new Segment(dictionary2.GetFileName(), false));
+  segment_t segment2(new Segment(dictionary2.GetFileName()));
 
   // simulate a merge operation
   segment1->ElectedForMerge();
@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(deletekeyendtoend) {
                                                              {"tyc", "{o:2}"}};
   testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
 
-  segment_t segment(new Segment(dictionary.GetFileName(), true));
+  segment_t segment(new Segment(dictionary.GetFileName()));
 
   BOOST_CHECK(!segment->HasDeletedKeys());
   BOOST_CHECK(!segment->DeletedKeys());
