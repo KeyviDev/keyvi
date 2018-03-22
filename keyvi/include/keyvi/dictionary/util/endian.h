@@ -66,8 +66,8 @@
     #define CLQ_LITTLE_ENDIAN
     #define htole16(x) (x)
     #define le16toh(x) (x)
-    #define htobe32(x) __bswap_32(x)
-    #define be32toh(x) __bswap_32(x)
+    #define htole64(x) (x)
+    #define le64toh(x) (x)
 
 #else
     #include <endian.h>
