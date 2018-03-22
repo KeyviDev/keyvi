@@ -40,9 +40,9 @@ static const char KEYVI_VECTOR_BEGIN[] = "KEYVI_VECTOR_BEGIN";
 static const size_t KEYVI_VECTOR_BEGIN_LEN = 18;
 static const char KEYVI_VECTOR_END[] = "KEYVI_VECTOR_END";
 static const size_t KEYVI_VECTOR_END_LEN = 16;
-static const char MANIFEST[] = "manifest";
-static const char SIZE[] = "size";
-static const char VALUE_STORE_TYPE[] = "value_store_type";
+static const char MANIFEST_LABEL[] = "manifest";
+static const char SIZE_LABEL[] = "size";
+static const char VALUE_STORE_TYPE_LABEl[] = "value_store_type";
 
 namespace keyvi {
 namespace vector {
@@ -66,13 +66,13 @@ class VectorFile {
 
     in_stream.seekg(KEYVI_VECTOR_BEGIN_LEN);
     const auto file_ptree = util::SerializationUtils::ReadJsonRecord(in_stream);
-    if (value_store_type != boost::lexical_cast<size_t>(file_ptree.get<std::string>(VALUE_STORE_TYPE))) {
+    if (value_store_type != boost::lexical_cast<size_t>(file_ptree.get<std::string>(VALUE_STORE_TYPE_LABEl))) {
       throw std::invalid_argument("wrong vector file");
     }
-    manifest_ = file_ptree.get<std::string>(MANIFEST);
+    manifest_ = file_ptree.get<std::string>(MANIFEST_LABEL);
 
     const auto index_ptree = util::SerializationUtils::ReadJsonRecord(in_stream);
-    size_ = boost::lexical_cast<size_t>(index_ptree.get<std::string>(SIZE));
+    size_ = boost::lexical_cast<size_t>(index_ptree.get<std::string>(SIZE_LABEL));
     const auto index_size = size_ * sizeof(offset_type);
 
     auto file_mapping = boost::interprocess::file_mapping(filename.c_str(), boost::interprocess::read_only);
@@ -94,12 +94,12 @@ class VectorFile {
 
     boost::property_tree::ptree file_ptree;
     file_ptree.put("file_version", "1");
-    file_ptree.put(MANIFEST, manifest);
-    file_ptree.put(VALUE_STORE_TYPE, value_store->GetValueStoreType());
+    file_ptree.put(MANIFEST_LABEL, manifest);
+    file_ptree.put(VALUE_STORE_TYPE_LABEl, value_store->GetValueStoreType());
     file_ptree.put("index_version", "1");
 
     boost::property_tree::ptree index_ptree;
-    index_ptree.put(SIZE, std::to_string(size));
+    index_ptree.put(SIZE_LABEL, std::to_string(size));
 
     out_stream.write(KEYVI_VECTOR_BEGIN, KEYVI_VECTOR_BEGIN_LEN);
     util::SerializationUtils::WriteJsonRecord(out_stream, file_ptree);

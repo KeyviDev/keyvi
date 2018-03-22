@@ -28,6 +28,7 @@
 #include <exception>
 #include <string>
 
+#include "dictionary/util/endian.h"
 #include "vector/vector_file.h"
 
 namespace keyvi {
@@ -44,7 +45,8 @@ class Vector final {
     if (index >= vector_file_.size_) {
       throw std::out_of_range("out of range access");
     }
-    return vector_file_.value_store_reader_->GetValueAsString(index_ptr_[index]);
+    const offset_type offset = le64toh(index_ptr_[index]);
+    return vector_file_.value_store_reader_->GetValueAsString(offset);
   }
 
   size_t Size() const { return vector_file_.size_; }

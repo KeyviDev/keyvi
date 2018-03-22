@@ -30,6 +30,7 @@
 #include <boost/filesystem/path.hpp>
 
 #include "dictionary/fsa/internal/constants.h"
+#include "dictionary/util/endian.h"
 #include "util/configuration.h"
 #include "vector/vector_file.h"
 
@@ -63,8 +64,10 @@ class VectorGenerator final {
   ~VectorGenerator() { boost::filesystem::remove_all(temporary_directory_); }
 
   void PushBack(typename ValueStoreT::value_t value) {
+    static_assert(sizeof(offset_type) == 8, "");
+
     bool dummy_minimization = false;
-    const offset_type value_idx = value_store_->GetValue(value, &dummy_minimization);
+    const offset_type value_idx = htole64(value_store_->GetValue(value, &dummy_minimization));
 
     index_store_->Append(&value_idx, sizeof(offset_type));
     ++size_;
