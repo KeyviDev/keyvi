@@ -90,7 +90,7 @@ class Automata final {
     transitions_region_ = boost::interprocess::mapped_region(
         file_mapping_, boost::interprocess::read_only, transitionsOffset, bucket_size * array_size, 0, map_options);
 
-    const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
+    const auto advise = internal::MemoryMapFlags::FSAGetMemoryMapAdvices(loading_strategy);
 
     labels_region_.advise(advise);
     transitions_region_.advise(advise);
