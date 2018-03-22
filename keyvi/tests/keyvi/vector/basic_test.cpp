@@ -25,6 +25,7 @@
 #include <exception>
 #include <string>
 
+#include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include "vector/vector_types.h"
@@ -32,21 +33,42 @@
 namespace keyvi {
 namespace vector {
 
+namespace {
+template <typename VectorType>
+struct TempVectorGenerator {
+  TempVectorGenerator() {
+    boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+    temp_path /= boost::filesystem::unique_path("vector-unit-test-%%%%-%%%%-%%%%-%%%%.kvv");
+    filename = temp_path.string();
+  }
+
+  ~TempVectorGenerator() {
+    if (boost::filesystem::exists(filename)) {
+      boost::filesystem::remove(filename);
+    }
+  }
+
+  void WriteToFile() { vector.WriteToFile(filename); }
+
+  VectorType vector;
+  std::string filename;
+};
+
+}  // namespace
+
 BOOST_AUTO_TEST_SUITE(VectorTests)
 
 BOOST_AUTO_TEST_CASE(string_test) {
-  StringVectorGenerator generator;
-
-  const std::string filename = "vector_string.kvv";
+  TempVectorGenerator<StringVectorGenerator> temp_vector;
   const size_t size = 100;
 
   for (size_t i = 0; i < size; ++i) {
-    generator.PushBack(std::to_string(i));
+    temp_vector.vector.PushBack(std::to_string(i));
   }
 
-  generator.WriteToFile(filename);
+  temp_vector.WriteToFile();
 
-  StringVector vector(filename);
+  StringVector vector(temp_vector.filename);
   BOOST_CHECK_EQUAL(size, vector.Size());
 
   for (size_t i = 0; i < vector.Size(); ++i) {
@@ -55,34 +77,30 @@ BOOST_AUTO_TEST_CASE(string_test) {
 }
 
 BOOST_AUTO_TEST_CASE(string_out_of_range) {
-  StringVectorGenerator generator;
-
-  const std::string filename = "vector_string.kvv";
+  TempVectorGenerator<StringVectorGenerator> temp_vector;
   const size_t size = 100;
 
   for (size_t i = 0; i < size; ++i) {
-    generator.PushBack(std::to_string(i));
+    temp_vector.vector.PushBack(std::to_string(i));
   }
 
-  generator.WriteToFile(filename);
+  temp_vector.WriteToFile();
 
-  StringVector vector(filename);
+  StringVector vector(temp_vector.filename);
   BOOST_CHECK_THROW(vector.Get(size + 1), std::out_of_range);
 }
 
 BOOST_AUTO_TEST_CASE(json_test) {
-  JsonVectorGenerator generator;
-
-  const std::string filename = "vector.kvv";
+  TempVectorGenerator<JsonVectorGenerator> temp_vector;
   const size_t size = 100;
 
   for (size_t i = 0; i < size; ++i) {
-    generator.PushBack(std::to_string(i));
+    temp_vector.vector.PushBack(std::to_string(i));
   }
 
-  generator.WriteToFile(filename);
+  temp_vector.WriteToFile();
 
-  JsonVector vector(filename);
+  JsonVector vector(temp_vector.filename);
   BOOST_CHECK_EQUAL(size, vector.Size());
 
   for (size_t i = 0; i < vector.Size(); ++i) {
@@ -91,36 +109,30 @@ BOOST_AUTO_TEST_CASE(json_test) {
 }
 
 BOOST_AUTO_TEST_CASE(manifest) {
-  const std::string filename = "vector.kvv";
+  TempVectorGenerator<JsonVectorGenerator> temp_vector;
+  temp_vector.vector.SetManifest("Some manifest");
+  temp_vector.WriteToFile();
 
-  JsonVectorGenerator generator;
-  generator.SetManifest("Some manifest");
-  generator.WriteToFile(filename);
-
-  JsonVector vector(filename);
+  JsonVector vector(temp_vector.filename);
 
   BOOST_CHECK_EQUAL(vector.Manifest(), "Some manifest");
 }
 
 BOOST_AUTO_TEST_CASE(wrong_value_store) {
-  JsonVectorGenerator generator;
+  TempVectorGenerator<JsonVectorGenerator> temp_vector;
+  temp_vector.WriteToFile();
 
-  const std::string filename = "vector.kvv";
-  generator.WriteToFile(filename);
-
-  BOOST_CHECK_THROW(std::move(StringVector(filename)), std::invalid_argument);
+  BOOST_CHECK_THROW(std::move(StringVector(temp_vector.filename)), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(truncation) {
-  JsonVectorGenerator generator;
-
-  const std::string filename = "vector.kvv";
-  generator.WriteToFile(filename);
+  TempVectorGenerator<JsonVectorGenerator> temp_vector;
+  temp_vector.WriteToFile();
 
   // make sure file is okay
-  JsonVector vector_normal(filename);
+  JsonVector vector_normal(temp_vector.filename);
 
-  std::ifstream in_stream(filename);
+  std::ifstream in_stream(temp_vector.filename);
   in_stream.seekg(0, std::ios_base::end);
   const int file_size = in_stream.tellg();
   in_stream.seekg(0, std::ios_base::beg);
@@ -129,13 +141,15 @@ BOOST_AUTO_TEST_CASE(truncation) {
 
   in_stream.read(file_content.data(), file_size);
 
-  const std::string truncated_filename = "truncated_vector.kvv";
+  const std::string truncated_filename = temp_vector.filename + "-truncated";
 
   std::ofstream truncated_file(truncated_filename);
   truncated_file.write(file_content.data(), file_size - 1);
   truncated_file.close();
 
   BOOST_CHECK_THROW(std::move(JsonVector(truncated_filename)), std::invalid_argument);
+
+  boost::filesystem::remove(truncated_filename);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
