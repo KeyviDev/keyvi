@@ -42,6 +42,14 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
+/**
+ * Exception class, mostly for IO problems (out of space, file handles exhausted)
+ */
+
+class memory_map_manager_exception final : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
 /***
  * A wrapper around boost memory mapping for writing the buffer in external memory.
  * Chunks the memory across multiple files.
@@ -164,10 +172,19 @@ class MemoryMapManager final {
   void Write(std::ostream& stream, const size_t end) const {
     if (persisted_) {
       for (size_t i = 0; i < number_of_chunks_; i++) {
-        std::ifstream data_file;
-        data_file.open(GetFilenameForChunk(i).native().c_str(), std::ios::binary);
-        stream << data_file.rdbuf();
-        data_file.close();
+        std::ifstream data_stream(GetFilenameForChunk(i).native().c_str(), std::ios::binary);
+
+        if (!data_stream) {
+          throw memory_map_manager_exception("failed to open data stream");
+        }
+
+        stream << data_stream.rdbuf();
+
+        if (!data_stream) {
+          throw memory_map_manager_exception("failed to write into output stream");
+        }
+
+        data_stream.close();
       }
     } else if (number_of_chunks_ == 0) {
       return;
@@ -203,8 +220,13 @@ class MemoryMapManager final {
 
     // truncate last file according to the written buffers
     if (number_of_chunks_ > 0) {
+      boost::system::error_code error_code;
       boost::filesystem::resize_file(GetFilenameForChunk(number_of_chunks_ - 1),
-                                     tail_ - ((number_of_chunks_ - 1) * chunk_size_));
+                                     static_cast<uintmax_t>(tail_ - ((number_of_chunks_ - 1) * chunk_size_)),
+                                     error_code);
+      if (error_code) {
+        throw memory_map_manager_exception("failed to resize chunk: " + error_code.message());
+      }
     }
 
     mappings_.clear();
@@ -246,13 +268,21 @@ class MemoryMapManager final {
 
     boost::filesystem::path filename = GetFilenameForChunk(number_of_chunks_);
 
-    std::filebuf fbuf;
-    fbuf.open(filename.native().c_str(),
-              std::ios_base::in | std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+    std::ofstream chunk(filename.string().c_str(),
+                        std::ios_base::in | std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
+
+    if (!chunk) {
+      throw memory_map_manager_exception("failed to create chunk (open)");
+    }
+
     // Set the size
-    fbuf.pubseekoff(chunk_size_ - 1, std::ios_base::beg);
-    fbuf.sputc(0);
-    fbuf.close();
+    chunk.seekp(chunk_size_ - 1, std::ios_base::beg);
+    chunk.put(0);
+    chunk.close();
+
+    if (!chunk) {
+      throw memory_map_manager_exception("failed to create chunk (setting size)");
+    }
 
     new_mapping.mapping_ =
         new boost::interprocess::file_mapping(filename.native().c_str(), boost::interprocess::read_write);
