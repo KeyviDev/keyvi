@@ -42,7 +42,7 @@ namespace internal {
 class Segment final : public ReadOnlySegment {
  public:
   explicit Segment(const boost::filesystem::path& path, bool no_deletes = false)
-      : ReadOnlySegment(path),
+      : ReadOnlySegment(path, false, !no_deletes),
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),
         dictionary_loaded(false),
@@ -54,7 +54,7 @@ class Segment final : public ReadOnlySegment {
   }
 
   explicit Segment(const boost::filesystem::path& path, const std::vector<std::shared_ptr<Segment>>& parent_segments)
-      : ReadOnlySegment(path),
+      : ReadOnlySegment(path, false, false),
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),
         dictionary_loaded(false),

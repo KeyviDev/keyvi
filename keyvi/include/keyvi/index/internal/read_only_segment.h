@@ -105,6 +105,28 @@ class ReadOnlySegment {
   const std::string& GetDictionaryFilename() const { return dictionary_filename_; }
 
  protected:
+  explicit ReadOnlySegment(const boost::filesystem::path& path, bool load_dictionary, bool load_deleted_keys)
+      : dictionary_path_(path),
+        deleted_keys_path_(path),
+        deleted_keys_during_merge_path_(path),
+        dictionary_filename_(path.filename().string()),
+        dictionary_(),
+        has_deleted_keys_(false),
+        deleted_keys_(),
+        last_modification_time_deleted_keys_(0),
+        last_modification_time_deleted_keys_during_merge_(0) {
+    deleted_keys_path_ += ".dk";
+    deleted_keys_during_merge_path_ += ".dkm";
+
+    if (load_dictionary) {
+      LoadDictionary();
+    }
+
+    if (load_deleted_keys) {
+      LoadDeletedKeys();
+    }
+  }
+
   void LoadDictionary() {
     // load dictionary
     dictionary_.reset(new dictionary::Dictionary(dictionary_path_.string()));
