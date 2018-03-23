@@ -183,8 +183,6 @@ class MemoryMapManager final {
         if (!data_stream) {
           throw memory_map_manager_exception("failed to write into output stream");
         }
-
-        data_stream.close();
       }
     } else if (number_of_chunks_ == 0) {
       return;
