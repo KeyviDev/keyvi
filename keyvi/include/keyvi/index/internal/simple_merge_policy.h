@@ -44,6 +44,10 @@ class SimpleMergePolicy final : public MergePolicy {
         TRACE("Add to merge list %s", s->GetFilename().c_str());
         to_merge.push_back(s);
       }
+
+      if (to_merge.size() > MAX_SEGMENT_PER_MERGE) {
+        break;
+      }
     }
 
     *id = 0;
@@ -54,6 +58,9 @@ class SimpleMergePolicy final : public MergePolicy {
 
     return false;
   }
+
+ private:
+  static const size_t MAX_SEGMENT_PER_MERGE = 500;
 };
 
 } /* namespace internal */
