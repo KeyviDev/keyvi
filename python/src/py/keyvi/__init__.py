@@ -29,3 +29,4 @@ from keyvi._core import KeyOnlyDictionaryCompiler, KeyOnlyDictionaryGenerator, K
 from keyvi._core import MatchIterator, Match
 from keyvi._core import MultiWordCompletion, PredictiveCompression, PrefixCompletion, ReadOnlyIndex
 from keyvi._core import StringDictionaryCompiler, StringDictionaryMerger
+from keyvi._core import loading_strategy_types
