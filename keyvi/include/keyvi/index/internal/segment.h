@@ -41,34 +41,27 @@ namespace internal {
 
 class Segment final : public ReadOnlySegment {
  public:
-  explicit Segment(const boost::filesystem::path& path, const bool load = false)
-      : ReadOnlySegment(path),
+  explicit Segment(const boost::filesystem::path& path, bool no_deletes = false)
+      : ReadOnlySegment(path, false, !no_deletes),
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),
-        loaded(load),
+        dictionary_loaded(false),
+        deletes_loaded(no_deletes),
         in_merge_(false),
         new_delete_(false),
         deleted_keys_swap_filename_(path) {
-    if (load) {
-      Load();
-    }
-
     deleted_keys_swap_filename_ += ".dk-swap";
   }
 
-  explicit Segment(const boost::filesystem::path& path, const std::vector<std::shared_ptr<Segment>>& parent_segments,
-                   const bool load = true)
-      : ReadOnlySegment(path),
+  explicit Segment(const boost::filesystem::path& path, const std::vector<std::shared_ptr<Segment>>& parent_segments)
+      : ReadOnlySegment(path, false, false),
         deleted_keys_for_write_(),
         deleted_keys_during_merge_for_write_(),
-        loaded(load),
+        dictionary_loaded(false),
+        deletes_loaded(true),
         in_merge_(false),
         new_delete_(false),
         deleted_keys_swap_filename_(path) {
-    if (load) {
-      Load();
-    }
-
     deleted_keys_swap_filename_ += ".dk-swap";
 
     // move deletions that happened during merge into the list of deleted keys
@@ -85,28 +78,27 @@ class Segment final : public ReadOnlySegment {
   }
 
   dictionary::dictionary_t& operator*() {
-    LazyLoad();
+    LazyLoadDictionary();
     return ReadOnlySegment::GetDictionary();
   }
 
   dictionary::dictionary_t& GetDictionary() {
-    LazyLoad();
+    LazyLoadDictionary();
     return ReadOnlySegment::GetDictionary();
   }
 
   bool HasDeletedKeys() {
-    LazyLoad();
+    LazyLoadDeletedKeys();
     return ReadOnlySegment::HasDeletedKeys();
   }
 
   const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
-    LazyLoad();
+    LazyLoadDeletedKeys();
     return ReadOnlySegment::DeletedKeys();
   }
 
   bool IsDeleted(const std::string& key) {
-    LazyLoad();
-
+    LazyLoadDeletedKeys();
     return ReadOnlySegment::IsDeleted(key);
   }
 
@@ -143,6 +135,9 @@ class Segment final : public ReadOnlySegment {
       return;
     }
 
+    // load deleted keys as well
+    LazyLoadDeletedKeys();
+
     if (in_merge_) {
       TRACE("delete key (in merge) %s", key.c_str());
       deleted_keys_during_merge_for_write_.insert(key);
@@ -174,15 +169,32 @@ class Segment final : public ReadOnlySegment {
  private:
   std::unordered_set<std::string> deleted_keys_for_write_;
   std::unordered_set<std::string> deleted_keys_during_merge_for_write_;
-  bool loaded;
+  bool dictionary_loaded;
+  bool deletes_loaded;
   bool in_merge_;
   bool new_delete_;
   boost::filesystem::path deleted_keys_swap_filename_;
 
-  inline void LazyLoad() {
-    if (!loaded) {
-      Load();
-      loaded = true;
+  inline void LazyLoadDictionary() {
+    if (!dictionary_loaded) {
+      LoadDictionary();
+      dictionary_loaded = true;
+    }
+  }
+
+  inline void LazyLoadDeletedKeys() {
+    if (!deletes_loaded) {
+      LoadDeletedKeys();
+
+      // get a copy of the deleted keys for writing
+      if (ReadOnlySegment::HasDeletedKeys()) {
+        if (in_merge_) {
+          deleted_keys_during_merge_for_write_.insert(DeletedKeysDirect().begin(), DeletedKeysDirect().end());
+        } else {
+          deleted_keys_for_write_.insert(DeletedKeysDirect().begin(), DeletedKeysDirect().end());
+        }
+      }
+      deletes_loaded = true;
     }
   }
 

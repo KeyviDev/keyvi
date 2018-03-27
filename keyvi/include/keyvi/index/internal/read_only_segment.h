@@ -62,7 +62,8 @@ class ReadOnlySegment {
     deleted_keys_path_ += ".dk";
     deleted_keys_during_merge_path_ += ".dkm";
 
-    Load();
+    LoadDictionary();
+    LoadDeletedKeys();
   }
 
   dictionary::dictionary_t& operator*() { return dictionary_; }
@@ -104,47 +105,32 @@ class ReadOnlySegment {
   const std::string& GetDictionaryFilename() const { return dictionary_filename_; }
 
  protected:
-  void Load() {
-    // load dictionary
-    dictionary_.reset(new dictionary::Dictionary(dictionary_path_.string()));
+  explicit ReadOnlySegment(const boost::filesystem::path& path, bool load_dictionary, bool load_deleted_keys)
+      : dictionary_path_(path),
+        deleted_keys_path_(path),
+        deleted_keys_during_merge_path_(path),
+        dictionary_filename_(path.filename().string()),
+        dictionary_(),
+        has_deleted_keys_(false),
+        deleted_keys_(),
+        last_modification_time_deleted_keys_(0),
+        last_modification_time_deleted_keys_during_merge_(0) {
+    deleted_keys_path_ += ".dk";
+    deleted_keys_during_merge_path_ += ".dkm";
 
-    // load deleted keys
-    LoadDeletedKeys();
+    if (load_dictionary) {
+      LoadDictionary();
+    }
+
+    if (load_deleted_keys) {
+      LoadDeletedKeys();
+    }
   }
 
- private:
-  //! path of the underlying dictionary
-  boost::filesystem::path dictionary_path_;
-
-  //! list of deleted keys
-  boost::filesystem::path deleted_keys_path_;
-
-  //! deleted keys while segment gets merged with other segments
-  boost::filesystem::path deleted_keys_during_merge_path_;
-
-  //! just the filename part of the dictionary
-  std::string dictionary_filename_;
-
-  //! the dictionary itself
-  dictionary::dictionary_t dictionary_;
-
-  //! quick and cheap check whether this segment has deletes (assuming that deletes are rare)
-  std::atomic_bool has_deleted_keys_;
-
-  //! deleted keys
-  std::shared_ptr<std::unordered_set<std::string>> deleted_keys_;
-
-  //! a weak ptr to deleted keys for access in the main thread
-  std::weak_ptr<std::unordered_set<std::string>> deleted_keys_weak_;
-
-  //! a mutex to secure access to the deleted keys shared pointer
-  std::mutex mutex_;
-
-  //! last modification time for the deleted keys file
-  std::time_t last_modification_time_deleted_keys_;
-
-  //! last modification time for the deleted keys file during a merge operation
-  std::time_t last_modification_time_deleted_keys_during_merge_;
+  void LoadDictionary() {
+    // load dictionary
+    dictionary_.reset(new dictionary::Dictionary(dictionary_path_.string()));
+  }
 
   void LoadDeletedKeys() {
     TRACE("load deleted keys");
@@ -190,6 +176,42 @@ class ReadOnlySegment {
       has_deleted_keys_ = true;
     }
   }
+
+  const std::unordered_set<std::string>& DeletedKeysDirect() const { return *deleted_keys_; }
+
+ private:
+  //! path of the underlying dictionary
+  boost::filesystem::path dictionary_path_;
+
+  //! list of deleted keys
+  boost::filesystem::path deleted_keys_path_;
+
+  //! deleted keys while segment gets merged with other segments
+  boost::filesystem::path deleted_keys_during_merge_path_;
+
+  //! just the filename part of the dictionary
+  std::string dictionary_filename_;
+
+  //! the dictionary itself
+  dictionary::dictionary_t dictionary_;
+
+  //! quick and cheap check whether this segment has deletes (assuming that deletes are rare)
+  std::atomic_bool has_deleted_keys_;
+
+  //! deleted keys
+  std::shared_ptr<std::unordered_set<std::string>> deleted_keys_;
+
+  //! a weak ptr to deleted keys for access in the main thread
+  std::weak_ptr<std::unordered_set<std::string>> deleted_keys_weak_;
+
+  //! a mutex to secure access to the deleted keys shared pointer
+  std::mutex mutex_;
+
+  //! last modification time for the deleted keys file
+  std::time_t last_modification_time_deleted_keys_;
+
+  //! last modification time for the deleted keys file during a merge operation
+  std::time_t last_modification_time_deleted_keys_during_merge_;
 
   inline static std::unordered_set<std::string> LoadAndUnserializeDeletedKeys(const std::string& filename) {
     TRACE("loading deleted keys file %s", filename.c_str());
