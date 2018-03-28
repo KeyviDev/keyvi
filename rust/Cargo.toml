@@ -11,11 +11,11 @@ keywords = ["big-data", "keyvaluestore", "fst", "search"]
 
 [build-dependencies]
 bindgen = ">=0.30.0"
-cmake = "*"
+cmake = ">=0.1.29"
 
 [dependencies]
 serde_json = "1.0"
 
 [dev-dependencies]
 rayon = "0.9"
-rand = "*"
+rand = ">=0.4.2"
