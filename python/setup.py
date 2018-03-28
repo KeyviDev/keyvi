@@ -269,7 +269,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     PACKAGE_NAME = 'keyvi'
 
-    version = '0.2.6'
+    version = '0.3.0'
 
     install_requires = [
         'msgpack-python',
