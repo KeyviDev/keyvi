@@ -3,14 +3,19 @@ name = "keyvi"
 version = "0.3.0"
 build = "build.rs"
 authors = ["Narek Gharibyan <narekgharibyan@gmail.com>", "Subu <subu@cliqz.com>"]
+license = "Apache-2.0"
+description = "Keyvi - the key value index. It is an in-memory FST-based data structure highly optimized for size and lookup performance."
+repository = "https://github.com/KeyviDev/keyvi"
+categories = ["data-structures", "algorithms", "external-ffi-bindings", "memory-management"]
+keywords = ["big-data", "keyvaluestore", "fst", "search"]
 
 [build-dependencies]
 bindgen = ">=0.30.0"
-cmake = "*"
+cmake = ">=0.1.29"
 
 [dependencies]
 serde_json = "1.0"
 
 [dev-dependencies]
 rayon = "0.9"
-rand = "*"
+rand = ">=0.4.2"
