@@ -27,8 +27,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "index/constants.h"
+#include <boost/variant.hpp>
 
+#include "index/constants.h"
+#include "index/internal/index_auto_config.h"
 #include "util/configuration.h"
 
 // #define ENABLE_TRACING
@@ -45,18 +47,23 @@ class IndexSettings final {
     if (params.count(KEYVIMERGER_BIN)) {
       settings_[KEYVIMERGER_BIN] = params.at(KEYVIMERGER_BIN);
     }
+    if (params.count(INDEX_MAX_SEGMENTS)) {
+      settings_[INDEX_MAX_SEGMENTS] = params.at(INDEX_MAX_SEGMENTS);
+    } else {
+      settings_[INDEX_MAX_SEGMENTS] = IndexAutoConfig::MaxSegments();
+    }
   }
 
   const std::string& GetKeyviMergerBin() const {
     if (settings_.count(KEYVIMERGER_BIN)) {
-      return settings_.at(KEYVIMERGER_BIN);
+      return boost::get<std::string>(settings_.at(KEYVIMERGER_BIN));
     }
 
     return default_keyvimerger_bin_;
   }
 
  private:
-  std::unordered_map<std::string, std::string> settings_;
+  std::unordered_map<std::string, boost::variant <std::string, size_t>> settings_;
   const std::string default_keyvimerger_bin_ = "keyvimerger";
 };
 
