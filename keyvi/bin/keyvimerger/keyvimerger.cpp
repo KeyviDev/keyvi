@@ -91,7 +91,6 @@ int main(int argc, char** argv) {
 
     for (auto f : input_files) {
       if (boost::filesystem::is_directory(f)) {
-        int files_added = 0;
         for (auto& entry : boost::make_iterator_range(boost::filesystem::directory_iterator(f), {})) {
           if (entry.path().extension() == ".kv") {
             inputs.push_back(entry.path().string());

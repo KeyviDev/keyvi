@@ -78,8 +78,6 @@ BOOST_AUTO_TEST_CASE( GetAddressOverflowCheck ) {
   BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize -1, 4));
   BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize -1, 5));
 
-  char* testptr = (char*) m.GetAddress(chunkSize-1);
-
   boost::filesystem::remove_all(path);
 }
 
