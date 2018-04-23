@@ -40,3 +40,6 @@ build/*
 .pydevproject
 .project
 .settings
+
+# vim swap files
+*.swp

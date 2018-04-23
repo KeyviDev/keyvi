@@ -38,32 +38,30 @@ static const int KEYVI_FILE_VERSION_MIN = 2;
 
 // min version of the persistence part
 static const int KEYVI_FILE_PERSISTENCE_VERSION_MIN = 2;
-
-#define NUMBER_OF_STATE_CODINGS 255
-#define FINAL_OFFSET_TRANSITION 256
-#define FINAL_OFFSET_CODE 1
-#define INNER_WEIGHT_TRANSITION_COMPACT 260
-#define MAX_TRANSITIONS_OF_A_STATE 261
+static const size_t NUMBER_OF_STATE_CODINGS = 255;
+static const uint16_t FINAL_OFFSET_TRANSITION = 256;
+static const size_t FINAL_OFFSET_CODE = 1;
+static const size_t INNER_WEIGHT_TRANSITION_COMPACT = 260;
+static const size_t MAX_TRANSITIONS_OF_A_STATE = 261;
 
 // Compact mode definitions
-
-#define COMPACT_SIZE_RELATIVE_MAX_VALUE 32768
-#define COMPACT_SIZE_ABSOLUTE_MAX_VALUE 16384
-#define COMPACT_SIZE_WINDOW 512
-#define COMPACT_SIZE_INNER_WEIGHT_MAX_VALUE 0xffff
+static const size_t COMPACT_SIZE_RELATIVE_MAX_VALUE = 32768;
+static const size_t COMPACT_SIZE_ABSOLUTE_MAX_VALUE = 16384;
+static const size_t COMPACT_SIZE_WINDOW = 512;
+static const size_t COMPACT_SIZE_INNER_WEIGHT_MAX_VALUE = 0xffff;
 
 // how many buckets to go left doing (brute force) search for free buckets in
 // the sparse array where the new state fits in
-#define SPARSE_ARRAY_SEARCH_OFFSET 151
+static const size_t SPARSE_ARRAY_SEARCH_OFFSET = 151;
 
 // 1 GB default memory limit for the sorter (tpie)
-#define DEFAULT_MEMORY_LIMIT_TPIE_SORT 1073741824
+static const int DEFAULT_MEMORY_LIMIT_TPIE_SORT = (1 << 30);
 
 // 1 GB default memory limit for the generator
-#define DEFAULT_MEMORY_LIMIT_GENERATOR 1073741824
+static const int DEFAULT_MEMORY_LIMIT_GENERATOR = (1 << 30);
 
 // 500MB default memory limit for value stores
-#define DEFAULT_MEMORY_LIMIT_VALUE_STORE 524288000
+static const int DEFAULT_MEMORY_LIMIT_VALUE_STORE = (500 << 20);
 
 // option key names
 static const char MEMORY_LIMIT_KEY[] = "memory_limit";
