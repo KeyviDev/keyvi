@@ -23,8 +23,8 @@
  *      Author: hendrik
  */
 
-#include <cstring>
 #include <boost/test/unit_test.hpp>
+#include <cstring>
 
 #include "dictionary/fsa/internal/memory_map_manager.h"
 
@@ -33,23 +33,22 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-BOOST_AUTO_TEST_SUITE( MemoryMapManagerTests )
+BOOST_AUTO_TEST_SUITE(MemoryMapManagerTests)
 
-BOOST_AUTO_TEST_CASE( basic ) {
+BOOST_AUTO_TEST_CASE(basic) {
   size_t chunkSize = 1024 * 1024;
 
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
-  path /= boost::filesystem::unique_path(
-      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  path /= boost::filesystem::unique_path("dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directory(path);
   MemoryMapManager m(chunkSize, path, "basic test");
 
   m.GetAddress(0);
-  char* testptr = (char*) m.GetAddress(2 * chunkSize);
+  char* testptr = (char*)m.GetAddress(2 * chunkSize);
   std::memset(testptr, 42, chunkSize);
 
   BOOST_CHECK_EQUAL(testptr[42], 42);
-  char* testptr2 = (char*) m.GetAddress(chunkSize);
+  char* testptr2 = (char*)m.GetAddress(chunkSize);
   std::memset(testptr2, 24, chunkSize);
 
   BOOST_CHECK_EQUAL(testptr[42], 42);
@@ -58,75 +57,72 @@ BOOST_AUTO_TEST_CASE( basic ) {
   boost::filesystem::remove_all(path);
 }
 
-BOOST_AUTO_TEST_CASE( GetAddressOverflowCheck ) {
+BOOST_AUTO_TEST_CASE(GetAddressOverflowCheck) {
   size_t chunkSize = 1024 * 1024;
 
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
-  path /= boost::filesystem::unique_path(
-      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  path /= boost::filesystem::unique_path("dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directory(path);
   MemoryMapManager m(chunkSize, path, "basic test");
 
   m.GetAddress(0);
 
-  BOOST_CHECK(m.GetAddressQuickTestOk(chunkSize -1, 1));
-  BOOST_CHECK(m.GetAddressQuickTestOk(chunkSize -3, 2));
-  BOOST_CHECK(m.GetAddressQuickTestOk(chunkSize -5, 5));
+  BOOST_CHECK(m.GetAddressQuickTestOk(chunkSize - 1, 1));
+  BOOST_CHECK(m.GetAddressQuickTestOk(chunkSize - 3, 2));
+  BOOST_CHECK(m.GetAddressQuickTestOk(chunkSize - 5, 5));
 
-  BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize -1, 2));
-  BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize -1, 3));
-  BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize -1, 4));
-  BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize -1, 5));
+  BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize - 1, 2));
+  BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize - 1, 3));
+  BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize - 1, 4));
+  BOOST_CHECK(!m.GetAddressQuickTestOk(chunkSize - 1, 5));
 
   boost::filesystem::remove_all(path);
 }
 
-BOOST_AUTO_TEST_CASE( GetBuffer ) {
+BOOST_AUTO_TEST_CASE(GetBuffer) {
   size_t chunkSize = 1024 * 1024;
 
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
-  path /= boost::filesystem::unique_path(
-      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  path /= boost::filesystem::unique_path("dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directory(path);
   MemoryMapManager m(chunkSize, path, "basic test");
 
   m.GetAddress(0);
-  char* testptr = (char*) m.GetAddress(chunkSize-2);
+  char* testptr = (char*)m.GetAddress(chunkSize - 2);
   *testptr = 104;
 
-  testptr = (char*) m.GetAddress(chunkSize-1);
+  testptr = (char*)m.GetAddress(chunkSize - 1);
   *testptr = 101;
 
-  testptr = (char*) m.GetAddress(chunkSize);
+  testptr = (char*)m.GetAddress(chunkSize);
   *testptr = 108;
 
-  testptr = (char*) m.GetAddress(chunkSize+1);
+  testptr = (char*)m.GetAddress(chunkSize + 1);
   *testptr = 108;
 
-  testptr = (char*) m.GetAddress(chunkSize+2);
+  testptr = (char*)m.GetAddress(chunkSize + 2);
   *testptr = 111;
 
   char buffer[20];
   buffer[5] = 0;
 
-  m.GetBuffer(chunkSize -2, buffer, 20);
+  m.GetBuffer(chunkSize - 2, buffer, 20);
   BOOST_CHECK_EQUAL("hello", std::string(buffer));
 
   boost::filesystem::remove_all(path);
 }
 
-BOOST_AUTO_TEST_CASE( AppendLargeChunk ) {
+BOOST_AUTO_TEST_CASE(AppendLargeChunk) {
   size_t chunkSize = 4096;
 
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
-  path /= boost::filesystem::unique_path(
-      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  path /= boost::filesystem::unique_path("dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directory(path);
   MemoryMapManager m(chunkSize, path, "append large chunk test");
 
   char buffer[16384];
-  std::fill(buffer, buffer+4096, 'y');
-  std::fill(buffer+4096, buffer+16384, 'x');
+  std::fill(buffer, buffer + 4096, 'y');
+  std::fill(buffer + 4096, buffer + 16384, 'x');
   buffer[8887] = 'w';
   buffer[8889] = 'y';
 
@@ -153,27 +149,26 @@ BOOST_AUTO_TEST_CASE( AppendLargeChunk ) {
   boost::filesystem::remove_all(path);
 }
 
-BOOST_AUTO_TEST_CASE( Appendchunkoverflow ) {
+BOOST_AUTO_TEST_CASE(Appendchunkoverflow) {
   size_t chunkSize = 4096;
 
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
-  path /= boost::filesystem::unique_path(
-      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  path /= boost::filesystem::unique_path("dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directory(path);
   MemoryMapManager m(chunkSize, path, "append large chunk test");
 
   char buffer[1000];
-  std::fill(buffer, buffer+1000, 'x');
+  std::fill(buffer, buffer + 1000, 'x');
   m.Append(buffer, 1000);
-  std::fill(buffer, buffer+1000, 'y');
+  std::fill(buffer, buffer + 1000, 'y');
   m.Append(buffer, 1000);
-  std::fill(buffer, buffer+1000, 'z');
+  std::fill(buffer, buffer + 1000, 'z');
   m.Append(buffer, 1000);
-  std::fill(buffer, buffer+1000, '1');
+  std::fill(buffer, buffer + 1000, '1');
   m.Append(buffer, 1000);
-  std::fill(buffer, buffer+1000, '2');
+  std::fill(buffer, buffer + 1000, '2');
   m.Append(buffer, 1000);
-  std::fill(buffer, buffer+1000, '3');
+  std::fill(buffer, buffer + 1000, '3');
   m.Append(buffer, 1000);
 
   BOOST_CHECK_EQUAL('x', ((char*)m.GetAddress(999))[0]);
@@ -186,23 +181,22 @@ BOOST_AUTO_TEST_CASE( Appendchunkoverflow ) {
   boost::filesystem::remove_all(path);
 }
 
-BOOST_AUTO_TEST_CASE( chunkbehindtail ) {
+BOOST_AUTO_TEST_CASE(chunkbehindtail) {
   size_t chunkSize = 4096;
 
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
-  path /= boost::filesystem::unique_path(
-      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  path /= boost::filesystem::unique_path("dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directory(path);
   MemoryMapManager m(chunkSize, path, "append large chunk test");
 
   char buffer[1024];
-  std::fill(buffer, buffer+1024, 'x');
+  std::fill(buffer, buffer + 1024, 'x');
   m.Append(buffer, 1024);
-  std::fill(buffer, buffer+1024, 'y');
+  std::fill(buffer, buffer + 1024, 'y');
   m.Append(buffer, 1024);
-  std::fill(buffer, buffer+1024, 'z');
+  std::fill(buffer, buffer + 1024, 'z');
   m.Append(buffer, 1024);
-  std::fill(buffer, buffer+1024, '1');
+  std::fill(buffer, buffer + 1024, '1');
   m.Append(buffer, 1023);
 
   // tail should now be at 4096
@@ -214,24 +208,23 @@ BOOST_AUTO_TEST_CASE( chunkbehindtail ) {
   auto filename = path;
   filename /= "out";
   std::ofstream out_stream(filename.native(), std::ios::binary);
-  m.Write(out_stream, m.GetSize() );
+  m.Write(out_stream, m.GetSize());
   BOOST_CHECK_EQUAL(4095, out_stream.tellp());
   out_stream.close();
 
   boost::filesystem::remove_all(path);
 }
 
-BOOST_AUTO_TEST_CASE( Persist ) {
+BOOST_AUTO_TEST_CASE(Persist) {
   size_t chunkSize = 4096;
 
   boost::filesystem::path path = boost::filesystem::temp_directory_path();
-  path /= boost::filesystem::unique_path(
-      "dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  path /= boost::filesystem::unique_path("dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
   boost::filesystem::create_directory(path);
   MemoryMapManager m(chunkSize, path, "append large chunk test");
 
   char buffer[4096];
-  std::fill(buffer, buffer+4096, 'x');
+  std::fill(buffer, buffer + 4096, 'x');
   m.Append(buffer, 4096);
   m.Append(buffer, 1);
 
@@ -240,7 +233,7 @@ BOOST_AUTO_TEST_CASE( Persist ) {
   auto filename = path;
   filename /= "out";
   std::ofstream out_stream(filename.native(), std::ios::binary);
-  m.Write(out_stream, 0 );
+  m.Write(out_stream, 0);
   BOOST_CHECK_EQUAL(4097, out_stream.tellp());
   out_stream.close();
 
@@ -248,7 +241,6 @@ BOOST_AUTO_TEST_CASE( Persist ) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-
 
 } /* namespace internal */
 } /* namespace fsa */

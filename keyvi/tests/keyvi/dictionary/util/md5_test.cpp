@@ -23,7 +23,6 @@
  *      Author: hendrik
  */
 
-
 #include <boost/test/unit_test.hpp>
 
 #include "md5.h"
@@ -32,9 +31,9 @@ namespace keyvi {
 namespace dictionary {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE( MD5Tests )
+BOOST_AUTO_TEST_SUITE(MD5Tests)
 
-BOOST_AUTO_TEST_CASE( MD5HashTest ) {
+BOOST_AUTO_TEST_CASE(MD5HashTest) {
   misc::MD5 m = misc::MD5();
 
   BOOST_CHECK_EQUAL(m.digestString("test"), "098f6bcd4621d373cade4e832627b4f6");
@@ -46,11 +45,8 @@ BOOST_AUTO_TEST_CASE( MD5HashTest ) {
   BOOST_CHECK_EQUAL(13356017483753479679U, m.Hash("-------------------------------------"));
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace util */
 } /* namespace dictionary */
 } /* namespace keyvi */
-
-

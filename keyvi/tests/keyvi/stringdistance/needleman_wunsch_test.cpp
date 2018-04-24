@@ -23,40 +23,38 @@
  *      Author: hendrik
  */
 
+#include "stringdistance/needleman_wunsch.h"
 #include <boost/test/unit_test.hpp>
 #include "stringdistance/costfunctions/damerau_levenshtein.h"
-#include "stringdistance/needleman_wunsch.h"
 #include "utf8.h"
 
 namespace keyvi {
 namespace stringdistance {
 
-BOOST_AUTO_TEST_SUITE( NeedlemanWunschTests )
+BOOST_AUTO_TEST_SUITE(NeedlemanWunschTests)
 
 void TestDistance(NeedlemanWunsch<costfunctions::Damerau_Levenshtein>& metric, std::string candidate,
                   std::vector<int> intermediateScores, int finalScore) {
   std::vector<int> codepoints;
-  utf8::unchecked::utf8to32(candidate.begin(), candidate.end(),
-                            back_inserter(codepoints));
+  utf8::unchecked::utf8to32(candidate.begin(), candidate.end(), back_inserter(codepoints));
 
   for (int i = 0; i < codepoints.size(); ++i) {
     BOOST_CHECK_EQUAL(intermediateScores[i], metric.Put(codepoints[i], i));
   }
 
-  //Assert.AreEqual(candidate, metric.Candidate);
+  // Assert.AreEqual(candidate, metric.Candidate);
   BOOST_CHECK_EQUAL(finalScore, metric.GetScore());
 }
 
-BOOST_AUTO_TEST_CASE( exact ) {
+BOOST_AUTO_TEST_CASE(exact) {
   std::string input_string = "text";
   std::string comparison_string = "text";
   std::vector<int> codepoints;
 
-  utf8::unchecked::utf8to32(input_string.begin(), input_string.end(),
-                            back_inserter(codepoints));
+  utf8::unchecked::utf8to32(input_string.begin(), input_string.end(), back_inserter(codepoints));
 
   NeedlemanWunsch<costfunctions::Damerau_Levenshtein> nw(codepoints, 20, 3);
-  std::vector<int> scores = { 0, 0, 0, 0 };
+  std::vector<int> scores = {0, 0, 0, 0};
 
   TestDistance(nw, comparison_string, scores, 0);
 }

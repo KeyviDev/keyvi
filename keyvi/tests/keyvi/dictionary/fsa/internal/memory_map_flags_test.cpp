@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestLazy) {
 #if not defined(OS_MACOSX)
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
-  
+
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestPopulate) {
 #if not defined(OS_MACOSX)
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
-  
+
   // map populate
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE));
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestPopulate_key_part) {
 #if not defined(OS_MACOSX)
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
-  
+
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestPopulate_lazy) {
 #if not defined(OS_MACOSX)
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
-  
+
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestlazy_no_readahead) {
 #if not defined(OS_MACOSX)
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
-  
+
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestlazy_no_readahead_value_part) {
 #if not defined(OS_MACOSX)
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
-  
+
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE) == 0);
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);
@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(MemoryMapFlagsTestpopulate_key_part_no_readahead_value_part
 #if not defined(OS_MACOSX)
   int key_flags = MemoryMapFlags::FSAGetMemoryMapOptions(strategy);
   int value_flags = MemoryMapFlags::ValuesGetMemoryMapOptions(strategy);
-  
+
   // no map populate
   BOOST_CHECK((key_flags & MAP_POPULATE));
   BOOST_CHECK((value_flags & MAP_POPULATE) == 0);

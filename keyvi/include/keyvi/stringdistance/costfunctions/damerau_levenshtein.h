@@ -25,7 +25,6 @@
 #ifndef DAMERAU_LEVENSHTEIN_H_
 #define DAMERAU_LEVENSHTEIN_H_
 
-
 namespace keyvi {
 namespace stringdistance {
 namespace costfunctions {
@@ -35,7 +34,7 @@ namespace costfunctions {
  */
 class Damerau_Levenshtein final {
  public:
-  int GetSubstitutionCost(int codepoint_from, int codepoint_to){
+  int GetSubstitutionCost(int codepoint_from, int codepoint_to) {
     if (codepoint_from != codepoint_to) {
       return 1;
     }
@@ -43,22 +42,15 @@ class Damerau_Levenshtein final {
     return 0;
   }
 
-  int GetInsertionCost(){
-      return 1;
-  }
+  int GetInsertionCost() { return 1; }
 
-  int GetDeletionCost(){
-    return 1;
-  }
+  int GetDeletionCost() { return 1; }
 
-  int GetTranspositionCost(){
-    return 1;
-  }
+  int GetTranspositionCost() { return 1; }
 };
 
 } /* namespace costfunctions */
 } /* namespace stringdistance */
 } /* namespace keyvi */
-
 
 #endif /* DAMERAU_LEVENSHTEIN_H_ */
