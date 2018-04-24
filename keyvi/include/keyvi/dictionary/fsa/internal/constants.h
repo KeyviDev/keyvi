@@ -55,13 +55,13 @@ static const size_t COMPACT_SIZE_INNER_WEIGHT_MAX_VALUE = 0xffff;
 static const size_t SPARSE_ARRAY_SEARCH_OFFSET = 151;
 
 // 1 GB default memory limit for the sorter (tpie)
-static const int DEFAULT_MEMORY_LIMIT_TPIE_SORT = (1 << 30);
+static const size_t DEFAULT_MEMORY_LIMIT_TPIE_SORT = 1 * 1024 * 1024 * 1024;
 
 // 1 GB default memory limit for the generator
-static const int DEFAULT_MEMORY_LIMIT_GENERATOR = (1 << 30);
+static const size_t DEFAULT_MEMORY_LIMIT_GENERATOR = 1 * 1024 * 1024 * 1024;
 
 // 500MB default memory limit for value stores
-static const int DEFAULT_MEMORY_LIMIT_VALUE_STORE = (500 << 20);
+static const size_t DEFAULT_MEMORY_LIMIT_VALUE_STORE = 500 * 1024 * 1024;
 
 // option key names
 static const char MEMORY_LIMIT_KEY[] = "memory_limit";
