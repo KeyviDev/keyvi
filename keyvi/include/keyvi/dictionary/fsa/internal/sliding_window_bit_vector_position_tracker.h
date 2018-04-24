@@ -29,9 +29,9 @@
  * The window must be large enough for the pointer arithmetics you do in the sparse array builder.
  * All 3 variables must fit to each other
  */
-#define SLIDING_WINDOW_SIZE 2048
-#define SLIDING_WINDOW_MASK 2047  // bit mask: SLIDING_WINDOW_SIZE - 1
-#define SLIDING_WINDOW_SHIFT 11   // same as /2048
+static const size_t SLIDING_WINDOW_SIZE = 2048;
+static const size_t SLIDING_WINDOW_MASK = 2047;  // bit mask: SLIDING_WINDOW_SIZE - 1
+static const size_t SLIDING_WINDOW_SHIFT = 11;   // same as /2048
 
 #include <utility>
 #include "dictionary/fsa/internal/bit_vector.h"

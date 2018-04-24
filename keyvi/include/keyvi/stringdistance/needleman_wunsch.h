@@ -82,7 +82,7 @@ class NeedlemanWunsch final {
     }
   }
 
-  int Put(int codepoint, int position) {
+  size_t Put(int codepoint, int position) {
     int row = position + 1;
 
     // ensure that we have enough rows in the matrix
@@ -174,10 +174,12 @@ class NeedlemanWunsch final {
 
     intermediate_scores_[row] = intermediate_score;
 
-    return intermediate_score;
+    //TODO/Amit: Remove the typecast
+    return static_cast<size_t>(intermediate_score);
   }
 
-  int GetScore() const { return distance_matrix_.Get(latest_calculated_row_, distance_matrix_.Columns() - 1); }
+  //TODO/Amit: Remove the typecast after refactoring DistanceMatrix class
+  size_t GetScore() const { return static_cast<size_t>(distance_matrix_.Get(latest_calculated_row_, distance_matrix_.Columns() - 1)); }
 
   std::string GetCandidate() {
     std::vector<unsigned char> utf8result;
