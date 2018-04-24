@@ -17,8 +17,9 @@ Keyvi - the short form for "Key value index" - defines a special subtype of the 
 ## Introduction
   * [BBuzz2016 talk](https://www.youtube.com/watch?v=GBjisdmHe4g)
   * [Announcement blog post](https://cliqz.com/en/aboutus/blog/keyvi)
-  * [Search Meetup Munich Slidedeck](http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz)
+  * [Search Meetup Munich Jan 2016](http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz)
   * [Progscon 2017 talk](https://www.infoq.com/presentations/keyvi)
+  * [Search Meetup Munich Apr 2018](https://cdn.rawgit.com/KeyviDev/keyvi/master/doc/presentations/searchmuc_apr_2018/keyvi-presentation-search-meetup-2018.svg#1_0)
 
 ## Install
 
