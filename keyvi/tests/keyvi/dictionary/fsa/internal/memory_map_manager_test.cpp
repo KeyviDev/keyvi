@@ -24,8 +24,8 @@
  */
 
 #include "dictionary/fsa/internal/memory_map_manager.h"
-#include <cstring>
 #include <boost/test/unit_test.hpp>
+#include <cstring>
 
 namespace keyvi {
 namespace dictionary {
