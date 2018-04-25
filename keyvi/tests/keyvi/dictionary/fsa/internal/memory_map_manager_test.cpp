@@ -24,8 +24,8 @@
  */
 
 #include "dictionary/fsa/internal/memory_map_manager.h"
-#include <boost/test/unit_test.hpp>
 #include <cstring>
+#include <boost/test/unit_test.hpp>
 
 namespace keyvi {
 namespace dictionary {
@@ -139,11 +139,11 @@ BOOST_AUTO_TEST_CASE(AppendLargeChunk) {
 
   m.Append(buffer, 16384);
 
-  BOOST_CHECK_EQUAL('x', ((char*)m.GetAddress(8888))[0]);
-  BOOST_CHECK_EQUAL('a', ((char*)m.GetAddress(9503))[0]);
-  BOOST_CHECK_EQUAL('x', ((char*)m.GetAddress(12004))[0]);
-  BOOST_CHECK_EQUAL('e', ((char*)m.GetAddress(14000))[0]);
-  BOOST_CHECK_EQUAL('h', ((char*)m.GetAddress(16383))[0]);
+  BOOST_CHECK_EQUAL('x', (reinterpret_cast<char*>(m.GetAddress(8888))[0]));
+  BOOST_CHECK_EQUAL('a', (reinterpret_cast<char*>(m.GetAddress(9503))[0]));
+  BOOST_CHECK_EQUAL('x', (reinterpret_cast<char*>(m.GetAddress(12004))[0]));
+  BOOST_CHECK_EQUAL('e', (reinterpret_cast<char*>(m.GetAddress(14000))[0]));
+  BOOST_CHECK_EQUAL('h', (reinterpret_cast<char*>(m.GetAddress(16383))[0]));
 
   boost::filesystem::remove_all(path);
 }
