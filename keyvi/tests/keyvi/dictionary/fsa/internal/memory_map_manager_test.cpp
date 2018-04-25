@@ -23,10 +23,9 @@
  *      Author: hendrik
  */
 
+#include "dictionary/fsa/internal/memory_map_manager.h"
 #include <boost/test/unit_test.hpp>
 #include <cstring>
-
-#include "dictionary/fsa/internal/memory_map_manager.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -44,11 +43,11 @@ BOOST_AUTO_TEST_CASE(basic) {
   MemoryMapManager m(chunkSize, path, "basic test");
 
   m.GetAddress(0);
-  char* testptr = (char*)m.GetAddress(2 * chunkSize);
+  char* testptr = reinterpret_cast<char*>(m.GetAddress(2 * chunkSize));
   std::memset(testptr, 42, chunkSize);
 
   BOOST_CHECK_EQUAL(testptr[42], 42);
-  char* testptr2 = (char*)m.GetAddress(chunkSize);
+  char* testptr2 = reinterpret_cast<char*>(m.GetAddress(chunkSize));
   std::memset(testptr2, 24, chunkSize);
 
   BOOST_CHECK_EQUAL(testptr[42], 42);
@@ -88,19 +87,19 @@ BOOST_AUTO_TEST_CASE(GetBuffer) {
   MemoryMapManager m(chunkSize, path, "basic test");
 
   m.GetAddress(0);
-  char* testptr = (char*)m.GetAddress(chunkSize - 2);
+  char* testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize - 2));
   *testptr = 104;
 
-  testptr = (char*)m.GetAddress(chunkSize - 1);
+  testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize - 1));
   *testptr = 101;
 
-  testptr = (char*)m.GetAddress(chunkSize);
+  testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize));
   *testptr = 108;
 
-  testptr = (char*)m.GetAddress(chunkSize + 1);
+  testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize + 1));
   *testptr = 108;
 
-  testptr = (char*)m.GetAddress(chunkSize + 2);
+  testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize + 2));
   *testptr = 111;
 
   char buffer[20];
@@ -171,12 +170,12 @@ BOOST_AUTO_TEST_CASE(Appendchunkoverflow) {
   std::fill(buffer, buffer + 1000, '3');
   m.Append(buffer, 1000);
 
-  BOOST_CHECK_EQUAL('x', ((char*)m.GetAddress(999))[0]);
-  BOOST_CHECK_EQUAL('y', ((char*)m.GetAddress(1567))[0]);
-  BOOST_CHECK_EQUAL('z', ((char*)m.GetAddress(2356))[0]);
-  BOOST_CHECK_EQUAL('1', ((char*)m.GetAddress(3333))[0]);
-  BOOST_CHECK_EQUAL('2', ((char*)m.GetAddress(4444))[0]);
-  BOOST_CHECK_EQUAL('3', ((char*)m.GetAddress(5555))[0]);
+  BOOST_CHECK_EQUAL('x', (reinterpret_cast<char*>(m.GetAddress(999))[0]));
+  BOOST_CHECK_EQUAL('y', (reinterpret_cast<char*>(m.GetAddress(1567))[0]));
+  BOOST_CHECK_EQUAL('z', (reinterpret_cast<char*>(m.GetAddress(2356))[0]));
+  BOOST_CHECK_EQUAL('1', (reinterpret_cast<char*>(m.GetAddress(3333))[0]));
+  BOOST_CHECK_EQUAL('2', (reinterpret_cast<char*>(m.GetAddress(4444))[0]));
+  BOOST_CHECK_EQUAL('3', (reinterpret_cast<char*>(m.GetAddress(5555))[0]));
   BOOST_CHECK_EQUAL(6000, m.GetSize());
   boost::filesystem::remove_all(path);
 }

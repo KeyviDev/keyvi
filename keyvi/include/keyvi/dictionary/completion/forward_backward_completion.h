@@ -22,16 +22,20 @@
  *      Author: hendrik
  */
 
-#ifndef FORWARD_BACKWARD_COMPLETION_H_
-#define FORWARD_BACKWARD_COMPLETION_H_
+#ifndef KEYVI_DICTIONARY_COMPLETION_FORWARD_BACKWARD_COMPLETION_H_
+#define KEYVI_DICTIONARY_COMPLETION_FORWARD_BACKWARD_COMPLETION_H_
 
 #include <algorithm>
+#include <fucntional>
+#include <string>
+#include <utility>
+#include <vector>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include "dictionary/completion/prefix_completion.h"
 #include "dictionary/util/bounded_priority_queue.h"
 
-//#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
 
 namespace keyvi {
@@ -134,7 +138,6 @@ class ForwardBackwardCompletion final {
 
         // add the forward completion as well
         results_forward_and_backward.push_back(m);
-
       } while (results.size() > 0);
 
       TRACE("Done backward completions");
@@ -217,7 +220,7 @@ class ForwardBackwardCompletion final {
     std::make_heap(results.begin(), results.end(), result_compare());
 
     struct delegate_payload {
-      delegate_payload(std::vector<Match>& r) : results(std::move(r)) {}
+      explicit delegate_payload(std::vector<Match>& r) : results(std::move(r)) {}
 
       std::vector<Match> results;
       Match last_result;
@@ -260,4 +263,4 @@ class ForwardBackwardCompletion final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* FORWARD_BACKWARD_COMPLETION_H_ */
+#endif  // KEYVI_DICTIONARY_COMPLETION_FORWARD_BACKWARD_COMPLETION_H_
