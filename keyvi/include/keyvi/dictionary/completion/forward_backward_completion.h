@@ -26,7 +26,7 @@
 #define KEYVI_DICTIONARY_COMPLETION_FORWARD_BACKWARD_COMPLETION_H_
 
 #include <algorithm>
-#include <fucntional>
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
