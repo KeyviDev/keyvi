@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_FSA_INTERNAL_CONSTANTS_H_
 
 #include <cstddef>
+#include <cstdint>
 
 // file format definitions
 
