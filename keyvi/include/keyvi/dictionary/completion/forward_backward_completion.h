@@ -26,12 +26,14 @@
 #define KEYVI_DICTIONARY_COMPLETION_FORWARD_BACKWARD_COMPLETION_H_
 
 #include <algorithm>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #include <functional>
 #include <string>
 #include <utility>
 #include <vector>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+
 #include "dictionary/completion/prefix_completion.h"
 #include "dictionary/util/bounded_priority_queue.h"
 
