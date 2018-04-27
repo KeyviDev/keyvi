@@ -124,7 +124,7 @@ class PrefixCompletion final {
     return MatchIterator::EmptyIteratorPair();
   }
 
-  MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query, int max_edit_distance) {
+  MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query, size_t max_edit_distance) {
     uint64_t state = fsa_->GetStartState();
     const size_t query_length = query.size();
     size_t depth = 0;
