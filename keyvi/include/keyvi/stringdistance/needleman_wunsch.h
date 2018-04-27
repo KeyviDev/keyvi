@@ -177,10 +177,7 @@ class NeedlemanWunsch final {
     return intermediate_score;
   }
 
-  // TODO(Amit) Refactor DistanceMatrix and remove type cast.
-  size_t GetScore() const {
-    return static_cast<size_t>(distance_matrix_.Get(latest_calculated_row_, distance_matrix_.Columns() - 1));
-  }
+  int GetScore() const { return distance_matrix_.Get(latest_calculated_row_, distance_matrix_.Columns() - 1); }
 
   std::string GetCandidate() {
     std::vector<unsigned char> utf8result;

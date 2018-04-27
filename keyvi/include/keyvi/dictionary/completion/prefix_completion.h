@@ -124,7 +124,7 @@ class PrefixCompletion final {
     return MatchIterator::EmptyIteratorPair();
   }
 
-  MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query, size_t max_edit_distance) {
+  MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query, int max_edit_distance) {
     uint64_t state = fsa_->GetStartState();
     const size_t query_length = query.size();
     size_t depth = 0;
@@ -173,7 +173,8 @@ class PrefixCompletion final {
           if (data->traverser) {
             TRACE("Current depth %d", exact_prefix + data->traverser.GetDepth() - 1);
 
-            size_t score =
+            // TODO(Amit) use int32_t instead of int.
+            int score =
                 data->metric.Put(data->traverser.GetStateLabel(), exact_prefix + data->traverser.GetDepth() - 1);
 
             TRACE("Intermediate score %d", score);

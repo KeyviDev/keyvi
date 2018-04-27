@@ -23,9 +23,11 @@
  *      Author: hendrik
  */
 
-#include "dictionary/fsa/internal/memory_map_manager.h"
-#include <boost/test/unit_test.hpp>
 #include <cstring>
+
+#include <boost/test/unit_test.hpp>
+
+#include "dictionary/fsa/internal/memory_map_manager.h"
 
 namespace keyvi {
 namespace dictionary {
