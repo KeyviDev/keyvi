@@ -46,6 +46,7 @@ BOOST_AUTO_TEST_CASE(SimpleTest) {
   Item a("test");
   Item b("test2");
   Item c("test3");
+  auto now = std::chrono::system_clock::now();
 
   BOOST_CHECK_EQUAL("test", a.key);
   BOOST_CHECK_EQUAL(0, s.Size());
@@ -58,7 +59,7 @@ BOOST_AUTO_TEST_CASE(SimpleTest) {
   BOOST_CHECK_EQUAL(2, s.Size());
   BOOST_CHECK_EQUAL("test", d.key);
 
-  s.Pop(&d);
+  s.Pop(&d, now);
   BOOST_CHECK_EQUAL(1, s.Size());
   BOOST_CHECK_EQUAL("test2", d.key);
 
@@ -69,6 +70,7 @@ BOOST_AUTO_TEST_CASE(SimpleTest) {
 
 BOOST_AUTO_TEST_CASE(SizeTest) {
   SingeProducerSingleConsumerRingBuffer<Item, 11> s;
+  auto now = std::chrono::system_clock::now();
 
   for (size_t i = 0; i < 10; ++i) {
     Item v(std::to_string(i));

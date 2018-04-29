@@ -25,15 +25,17 @@
 #ifndef KEYVI_UTIL_SINGLE_PRODUCER_CONSUMER_RINGBUFFER_H_
 #define KEYVI_UTIL_SINGLE_PRODUCER_CONSUMER_RINGBUFFER_H_
 
-#include <chrono>  //NOLINT
-#include <thread>  //NOLINT
+#include <atomic>
+#include <chrono>              //NOLINT
+#include <condition_variable>  //NOLINT
+#include <mutex>               //NOLINT
+#include <thread>              //NOLINT
 
-#include <boost/atomic.hpp>
+// #define ENABLE_TRACING
+#include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace util {
-
-#define SPINLOCK_WAIT_IN_MS 1
 
 /**
  * Simple lock-free single producer, single consumer queue
@@ -41,39 +43,118 @@ namespace util {
 template <typename T, size_t Tsize>
 class SingeProducerSingleConsumerRingBuffer {
  public:
-  explicit SingeProducerSingleConsumerRingBuffer(
-      const std::chrono::milliseconds& return_interval = std::chrono::milliseconds(1000))
-      : head_(0), tail_(0), return_interval_(return_interval) {
-    next_pop_ = std::chrono::system_clock::now() + return_interval_;
-  }
+  SingeProducerSingleConsumerRingBuffer()
+      : head_(0),
+        tail_(0),
+        mutex_(),
+        producer_condition_(),
+        consumer_condition_(),
+        producer_stopped_(false),
+        consumer_stopped_(false) {}
 
   void Push(T&& value) {
-    size_t head = head_.load(boost::memory_order_relaxed);
+    size_t head = head_.load(std::memory_order_relaxed);
+    size_t tail = tail_.load(std::memory_order_acquire);
     size_t next_head = next(head);
-    if (next_head == tail_.load(boost::memory_order_acquire)) {
-      // spin-lock
-      while (next_head == tail_.load(boost::memory_order_acquire)) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_IN_MS));
+    if (next_head == tail) {
+      // wait for bucket
+      std::unique_lock<std::mutex> lock(mutex_);
+
+      // check again
+      tail = tail_.load(std::memory_order_acquire);
+
+      while (next_head == tail) {
+        TRACE("queue full, wait.");
+        if (consumer_stopped_) {
+          consumer_condition_.notify_all();
+        }
+        producer_stopped_ = true;
+        producer_condition_.wait(lock);
+        TRACE("woke up, producer");
+        tail = tail_.load(std::memory_order_acquire);
       }
+
+      producer_stopped_ = false;
     }
     ring_[head] = std::move(value);
-    head_.store(next_head, boost::memory_order_release);
+    head_.store(next_head, std::memory_order_release);
+
+    if (consumer_stopped_) {
+      consumer_condition_.notify_all();
+    }
   }
 
   bool Pop(T* value) {
-    size_t tail = tail_.load(boost::memory_order_relaxed);
-    while (tail == head_.load(boost::memory_order_acquire)) {
-      auto tp = std::chrono::system_clock::now();
-      if (tp > next_pop_) {
-        next_pop_ = tp + return_interval_;
-        return false;
-      }
+    size_t tail = tail_.load(std::memory_order_relaxed);
+    size_t head = head_.load(std::memory_order_acquire);
 
-      std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_IN_MS));
+    if (tail == head) {
+      // wait for bucket
+      std::unique_lock<std::mutex> lock(mutex_);
+
+      head = head_.load(std::memory_order_acquire);
+
+      while (tail == head) {
+        TRACE("queue empty");
+
+        if (producer_stopped_) {
+          producer_condition_.notify_all();
+        }
+
+        consumer_stopped_ = true;
+        consumer_condition_.wait(lock);
+
+        head = head_.load(std::memory_order_acquire);
+      }
+      consumer_stopped_ = false;
     }
     *value = std::move(ring_[tail]);
-    tail_.store(next(tail), boost::memory_order_release);
-    next_pop_ = std::chrono::system_clock::now() + return_interval_;
+    tail_.store(next(tail), std::memory_order_release);
+
+    if (producer_stopped_) {
+      producer_condition_.notify_all();
+    }
+
+    return true;
+  }
+
+  bool Pop(T* value, const std::chrono::time_point<std::chrono::system_clock>& timeout_time) {
+    size_t tail = tail_.load(std::memory_order_relaxed);
+    size_t head = head_.load(std::memory_order_acquire);
+    size_t next_tail = next(tail);
+
+    if (tail == head) {
+      // wait for bucket
+      std::unique_lock<std::mutex> lock(mutex_);
+
+      head = head_.load(std::memory_order_acquire);
+
+      while (tail == head) {
+        TRACE("queue empty");
+        if (producer_stopped_) {
+          producer_condition_.notify_all();
+        }
+
+        consumer_stopped_ = true;
+
+        if (consumer_condition_.wait_until(lock, timeout_time) == std::cv_status::timeout) {
+          // woken up by timeout
+          consumer_stopped_ = false;
+          return false;
+        }
+
+        head = head_.load(std::memory_order_acquire);
+      }
+
+      consumer_stopped_ = false;
+    }
+    *value = std::move(ring_[tail]);
+    tail_.store(next_tail, std::memory_order_release);
+
+    if (producer_stopped_) {
+      producer_condition_.notify_all();
+    }
+
     return true;
   }
 
@@ -88,9 +169,12 @@ class SingeProducerSingleConsumerRingBuffer {
  private:
   size_t next(size_t current) { return (current + 1) % Tsize; }
   T ring_[Tsize];
-  boost::atomic<size_t> head_, tail_;
-  std::chrono::time_point<std::chrono::system_clock> next_pop_;
-  std::chrono::milliseconds return_interval_;
+  std::atomic_size_t head_, tail_;
+  std::mutex mutex_;
+  std::condition_variable producer_condition_;
+  std::condition_variable consumer_condition_;
+  std::atomic_bool producer_stopped_;
+  std::atomic_bool consumer_stopped_;
 };
 
 } /* namespace util */
