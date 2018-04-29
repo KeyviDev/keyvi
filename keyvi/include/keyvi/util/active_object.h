@@ -81,6 +81,8 @@ class ActiveObject final {
     queue_.Push([=] { f(*resource_); });
   }
 
+  size_t Size() const { return queue_.Size(); }
+
  private:
   mutable SingeProducerSingleConsumerRingBuffer<std::function<void()>, Tsize> queue_;
 

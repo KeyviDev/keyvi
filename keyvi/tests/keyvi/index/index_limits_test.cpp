@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
 
-  limit_filedescriptors(10);
+  limit_filedescriptors(20);
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-limits-test-temp-index-%%%%-%%%%-%%%%-%%%%");
@@ -66,16 +66,16 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
     Index writer(tmp_path.string(), {{"refresh_interval", "100"},
                                      {KEYVIMERGER_BIN, get_keyvimerger_bin()},
                                      {"segment_compile_key_threshold", "10"},
-                                     {"max_segments", "4"}});
+                                     {"max_segments", "10"}});
 
-    for (int i = 0; i < 100000; ++i) {
+    for (int i = 0; i < 5000; ++i) {
       writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
     }
     writer.Flush();
     BOOST_CHECK(writer.Contains("a"));
     dictionary::Match m = writer["a"];
 
-    BOOST_CHECK_EQUAL("{\"id\":9999}", m.GetValueAsString());
+    BOOST_CHECK_EQUAL("{\"id\":4999}", m.GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
 }

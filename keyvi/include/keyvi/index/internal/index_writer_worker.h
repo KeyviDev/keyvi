@@ -217,8 +217,8 @@ class IndexWriterWorker final {
       payload_.write_counter_ = 0;
 
       // worst case scenario, to many segments, throttle further writes until we are below the limit
-      while (payload_.segments_->size() >= payload_.max_segments_) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_FOR_SEGMENT_MERGES));
+      while (compiler_active_object_.Size() + payload_.segments_->size() >= payload_.max_segments_) {
+        Flush();
       }
     }
   }

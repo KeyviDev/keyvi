@@ -50,7 +50,7 @@ class IndexSettings final {
       settings_[KEYVIMERGER_BIN] = DEFAULT_KEYVIMERGER_BIN;
     }
     if (params.count(INDEX_MAX_SEGMENTS)) {
-      settings_[INDEX_MAX_SEGMENTS] = keyvi::util::mapGet<size_t>(params, INDEX_REFRESH_INTERVAL);
+      settings_[INDEX_MAX_SEGMENTS] = keyvi::util::mapGet<size_t>(params, INDEX_MAX_SEGMENTS);
     } else {
       settings_[INDEX_MAX_SEGMENTS] = IndexAutoConfig::MaxSegments();
     }
