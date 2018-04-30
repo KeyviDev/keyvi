@@ -24,6 +24,7 @@
 #ifndef KEYVI_INDEX_INTERNAL_INDEX_AUTO_CONFIG_H_
 #define KEYVI_INDEX_INTERNAL_INDEX_AUTO_CONFIG_H_
 
+#include <algorithm>
 #include <string>
 #include <thread>  // NOLINT
 #include <unordered_map>
@@ -53,7 +54,7 @@ class IndexAutoConfig final {
 
     // for now use half the cores for mergers
     size_t max_concurrent_merges = cores / 2;
-    return max_concurrent_merges;
+    return std::min(MAX_CONCURRENT_MERGES_DEFAULT, std::max(size_t(1), max_concurrent_merges));
   }
 };
 

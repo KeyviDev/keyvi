@@ -43,4 +43,7 @@ static const char DEFAULT_KEYVIMERGER_BIN[] = "keyvimerger";
 // spinlock wait time if there are to many segments
 static const size_t SPINLOCK_WAIT_FOR_SEGMENT_MERGES_MS = 10;
 
+// max parallel process for segment merging
+static const size_t MAX_CONCURRENT_MERGES_DEFAULT = 8;
+
 #endif  // KEYVI_INDEX_CONSTANTS_H_
