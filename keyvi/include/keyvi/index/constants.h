@@ -41,6 +41,6 @@ static const size_t DEFAULT_COMPILE_KEY_THRESHOLD = 10000ul;
 static const char DEFAULT_KEYVIMERGER_BIN[] = "keyvimerger";
 
 // spinlock wait time if there are to many segments
-static const size_t SPINLOCK_WAIT_FOR_SEGMENT_MERGES = 10;
+static const size_t SPINLOCK_WAIT_FOR_SEGMENT_MERGES_MS = 10;
 
 #endif  // KEYVI_INDEX_CONSTANTS_H_
