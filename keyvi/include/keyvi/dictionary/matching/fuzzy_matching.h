@@ -93,7 +93,7 @@ class FuzzyMatching final {
         continue;
       }
 
-      if (traverser_ptr_->IsFinalState() && metric_ptr_->GetScore() <= static_cast<int>(max_edit_distance_)) {
+      if (traverser_ptr_->IsFinalState() && metric_ptr_->GetScore() <= max_edit_distance_) {
         Match m = Match(0, candidate_length(), metric_ptr_->GetCandidate(), metric_ptr_->GetScore(),
                         traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
         (*traverser_ptr_)++;
