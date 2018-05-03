@@ -44,7 +44,8 @@ namespace internal {
 class IndexAutoConfig final {
  public:
   static size_t MaxSegments() {
-    // increase file descriptors and leave some extra room, to be improved later
+    // increase file descriptors and leave some extra room, 1 segment == 1 file, but we want
+    // to leave some room for the client.
     size_t file_descriptors = keyvi::util::OsUtils::TryIncreaseFileDescriptors();
     return file_descriptors - 100;
   }

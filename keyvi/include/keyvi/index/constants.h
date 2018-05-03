@@ -40,7 +40,7 @@ static const size_t DEFAULT_REFRESH_INTERVAL = 1000ul;
 static const size_t DEFAULT_COMPILE_KEY_THRESHOLD = 10000ul;
 static const char DEFAULT_KEYVIMERGER_BIN[] = "keyvimerger";
 
-// spinlock wait time if there are to many segments
+// spinlock wait time if there are too many segments
 static const size_t SPINLOCK_WAIT_FOR_SEGMENT_MERGES_MS = 10;
 
 // max parallel process for segment merging
