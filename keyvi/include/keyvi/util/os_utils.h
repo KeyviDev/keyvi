@@ -36,7 +36,7 @@ namespace util {
 class OsUtils {
  public:
   static size_t TryIncreaseFileDescriptors() {
-    struct rlimit limit;
+    rlimit limit;
 
     getrlimit(RLIMIT_NOFILE, &limit);
     if (limit.rlim_cur != limit.rlim_max) {
@@ -50,6 +50,9 @@ class OsUtils {
         }
       }
     }
+    // read back to return what ever is set now
+    getrlimit(RLIMIT_NOFILE, &limit);
+
     return limit.rlim_cur;
   }
 };

@@ -72,7 +72,6 @@ BOOST_AUTO_TEST_CASE(SimpleTest) {
 
 BOOST_AUTO_TEST_CASE(SizeTest) {
   SingeProducerSingleConsumerRingBuffer<Item, 11> s;
-  auto now = std::chrono::system_clock::now();
 
   for (size_t i = 0; i < 10; ++i) {
     Item v(std::to_string(i));

@@ -64,37 +64,32 @@ class IndexWriterWorker final {
           segments_(),
           mutex_(),
           index_directory_(index_directory),
-          index_toc_file_(index_directory),
-          index_toc_file_part_(index_directory),
+          index_toc_file_(index_directory_ / "index.toc"),
+          index_toc_file_part_(index_directory_ / "index.toc.part"),
           settings_(params),
+          max_concurrent_merges_(settings_.GetMaxConcurrentMerges()),
+          max_segments_(settings_.GetMaxSegments()),
+          compile_key_threshold_(settings_.GetSegmentCompileKeyThreshold()),
+          index_refresh_interval_(settings_.GetRefreshInterval()),
           merge_jobs_(),
           any_delete_(false),
           merge_enabled_(true) {
       segments_ = std::make_shared<segment_vec_t>();
-
-      index_toc_file_ /= "index.toc";
-      index_toc_file_part_ /= "index.toc.part";
-
-      max_concurrent_merges_ = settings_.GetMaxConcurrentMerges();
-      max_segments_ = settings_.GetMaxSegments();
-      compile_key_threshold_ = settings_.GetSegmentCompileKeyThreshold();
-      index_refresh_interval_ = settings_.GetRefreshInterval();
     }
 
     compiler_t compiler_;
     std::atomic_size_t write_counter_;
     segments_t segments_;
     std::mutex mutex_;
-    boost::filesystem::path index_directory_;
-    boost::filesystem::path index_toc_file_;
-    boost::filesystem::path index_toc_file_part_;
-    internal::IndexSettings settings_;
+    const boost::filesystem::path index_directory_;
+    const boost::filesystem::path index_toc_file_;
+    const boost::filesystem::path index_toc_file_part_;
+    const internal::IndexSettings settings_;
+    const size_t max_concurrent_merges_;
+    const size_t max_segments_;
+    const size_t compile_key_threshold_;
+    const size_t index_refresh_interval_;
     std::list<MergeJob> merge_jobs_;
-    size_t max_concurrent_merges_;
-    size_t max_segments_;
-    size_t compile_key_threshold_;
-    size_t index_refresh_interval_;
-
     bool any_delete_;
     std::atomic_bool merge_enabled_;
   };
