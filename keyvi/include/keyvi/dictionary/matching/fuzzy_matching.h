@@ -81,7 +81,7 @@ class FuzzyMatching final {
 
   Match NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
-      const size_t intermediate_score = metric_ptr_->Put(traverser_ptr_->GetStateLabel(), candidate_length() - 1);
+      const int intermediate_score = metric_ptr_->Put(traverser_ptr_->GetStateLabel(), candidate_length() - 1);
       // don't consider subtrees which can not be matched anyways
       if (query_char_length_ > candidate_length() && intermediate_score > max_edit_distance_) {
         traverser_ptr_->Prune();

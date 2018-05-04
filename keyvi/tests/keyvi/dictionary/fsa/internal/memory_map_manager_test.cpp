@@ -45,11 +45,11 @@ BOOST_AUTO_TEST_CASE(basic) {
   MemoryMapManager m(chunkSize, path, "basic test");
 
   m.GetAddress(0);
-  char* testptr = reinterpret_cast<char*>(m.GetAddress(2 * chunkSize));
+  char* testptr = static_cast<char*>(m.GetAddress(2 * chunkSize));
   std::memset(testptr, 42, chunkSize);
 
   BOOST_CHECK_EQUAL(testptr[42], 42);
-  char* testptr2 = reinterpret_cast<char*>(m.GetAddress(chunkSize));
+  char* testptr2 = static_cast<char*>(m.GetAddress(chunkSize));
   std::memset(testptr2, 24, chunkSize);
 
   BOOST_CHECK_EQUAL(testptr[42], 42);
@@ -89,19 +89,19 @@ BOOST_AUTO_TEST_CASE(GetBuffer) {
   MemoryMapManager m(chunkSize, path, "basic test");
 
   m.GetAddress(0);
-  char* testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize - 2));
+  char* testptr = static_cast<char*>(m.GetAddress(chunkSize - 2));
   *testptr = 104;
 
-  testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize - 1));
+  testptr = static_cast<char*>(m.GetAddress(chunkSize - 1));
   *testptr = 101;
 
-  testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize));
+  testptr = static_cast<char*>(m.GetAddress(chunkSize));
   *testptr = 108;
 
-  testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize + 1));
+  testptr = static_cast<char*>(m.GetAddress(chunkSize + 1));
   *testptr = 108;
 
-  testptr = reinterpret_cast<char*>(m.GetAddress(chunkSize + 2));
+  testptr = static_cast<char*>(m.GetAddress(chunkSize + 2));
   *testptr = 111;
 
   char buffer[20];
@@ -141,11 +141,11 @@ BOOST_AUTO_TEST_CASE(AppendLargeChunk) {
 
   m.Append(buffer, 16384);
 
-  BOOST_CHECK_EQUAL('x', (reinterpret_cast<char*>(m.GetAddress(8888))[0]));
-  BOOST_CHECK_EQUAL('a', (reinterpret_cast<char*>(m.GetAddress(9503))[0]));
-  BOOST_CHECK_EQUAL('x', (reinterpret_cast<char*>(m.GetAddress(12004))[0]));
-  BOOST_CHECK_EQUAL('e', (reinterpret_cast<char*>(m.GetAddress(14000))[0]));
-  BOOST_CHECK_EQUAL('h', (reinterpret_cast<char*>(m.GetAddress(16383))[0]));
+  BOOST_CHECK_EQUAL('x', (static_cast<char*>(m.GetAddress(8888))[0]));
+  BOOST_CHECK_EQUAL('a', (static_cast<char*>(m.GetAddress(9503))[0]));
+  BOOST_CHECK_EQUAL('x', (static_cast<char*>(m.GetAddress(12004))[0]));
+  BOOST_CHECK_EQUAL('e', (static_cast<char*>(m.GetAddress(14000))[0]));
+  BOOST_CHECK_EQUAL('h', (static_cast<char*>(m.GetAddress(16383))[0]));
 
   boost::filesystem::remove_all(path);
 }
@@ -172,12 +172,12 @@ BOOST_AUTO_TEST_CASE(Appendchunkoverflow) {
   std::fill(buffer, buffer + 1000, '3');
   m.Append(buffer, 1000);
 
-  BOOST_CHECK_EQUAL('x', (reinterpret_cast<char*>(m.GetAddress(999))[0]));
-  BOOST_CHECK_EQUAL('y', (reinterpret_cast<char*>(m.GetAddress(1567))[0]));
-  BOOST_CHECK_EQUAL('z', (reinterpret_cast<char*>(m.GetAddress(2356))[0]));
-  BOOST_CHECK_EQUAL('1', (reinterpret_cast<char*>(m.GetAddress(3333))[0]));
-  BOOST_CHECK_EQUAL('2', (reinterpret_cast<char*>(m.GetAddress(4444))[0]));
-  BOOST_CHECK_EQUAL('3', (reinterpret_cast<char*>(m.GetAddress(5555))[0]));
+  BOOST_CHECK_EQUAL('x', (static_cast<char*>(m.GetAddress(999))[0]));
+  BOOST_CHECK_EQUAL('y', (static_cast<char*>(m.GetAddress(1567))[0]));
+  BOOST_CHECK_EQUAL('z', (static_cast<char*>(m.GetAddress(2356))[0]));
+  BOOST_CHECK_EQUAL('1', (static_cast<char*>(m.GetAddress(3333))[0]));
+  BOOST_CHECK_EQUAL('2', (static_cast<char*>(m.GetAddress(4444))[0]));
+  BOOST_CHECK_EQUAL('3', (static_cast<char*>(m.GetAddress(5555))[0]));
   BOOST_CHECK_EQUAL(6000, m.GetSize());
   boost::filesystem::remove_all(path);
 }
