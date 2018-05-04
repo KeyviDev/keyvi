@@ -27,8 +27,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "index/constants.h"
+#include <boost/variant.hpp>
 
+#include "index/constants.h"
+#include "index/internal/index_auto_config.h"
 #include "util/configuration.h"
 
 // #define ENABLE_TRACING
@@ -44,20 +46,45 @@ class IndexSettings final {
     // only parse what we know
     if (params.count(KEYVIMERGER_BIN)) {
       settings_[KEYVIMERGER_BIN] = params.at(KEYVIMERGER_BIN);
+    } else {
+      settings_[KEYVIMERGER_BIN] = DEFAULT_KEYVIMERGER_BIN;
+    }
+    if (params.count(INDEX_MAX_SEGMENTS)) {
+      settings_[INDEX_MAX_SEGMENTS] = keyvi::util::mapGet<size_t>(params, INDEX_MAX_SEGMENTS);
+    } else {
+      settings_[INDEX_MAX_SEGMENTS] = IndexAutoConfig::MaxSegments();
+    }
+    if (params.count(MAX_CONCURRENT_MERGES)) {
+      settings_[MAX_CONCURRENT_MERGES] = keyvi::util::mapGet<size_t>(params, MAX_CONCURRENT_MERGES);
+    } else {
+      settings_[MAX_CONCURRENT_MERGES] = IndexAutoConfig::MaxConcurrentMerges();
+    }
+    if (params.count(SEGMENT_COMPILE_KEY_THRESHOLD)) {
+      settings_[SEGMENT_COMPILE_KEY_THRESHOLD] = keyvi::util::mapGet<size_t>(params, SEGMENT_COMPILE_KEY_THRESHOLD);
+    } else {
+      settings_[SEGMENT_COMPILE_KEY_THRESHOLD] = DEFAULT_COMPILE_KEY_THRESHOLD;
+    }
+    if (params.count(INDEX_REFRESH_INTERVAL)) {
+      settings_[INDEX_REFRESH_INTERVAL] = keyvi::util::mapGet<size_t>(params, INDEX_REFRESH_INTERVAL);
+    } else {
+      settings_[INDEX_REFRESH_INTERVAL] = DEFAULT_REFRESH_INTERVAL;
     }
   }
 
-  const std::string& GetKeyviMergerBin() const {
-    if (settings_.count(KEYVIMERGER_BIN)) {
-      return settings_.at(KEYVIMERGER_BIN);
-    }
+  const std::string& GetKeyviMergerBin() const { return boost::get<std::string>(settings_.at(KEYVIMERGER_BIN)); }
 
-    return default_keyvimerger_bin_;
+  const size_t GetMaxSegments() const { return boost::get<size_t>(settings_.at(INDEX_MAX_SEGMENTS)); }
+
+  const size_t GetSegmentCompileKeyThreshold() const {
+    return boost::get<size_t>(settings_.at(SEGMENT_COMPILE_KEY_THRESHOLD));
   }
+
+  const size_t GetMaxConcurrentMerges() const { return boost::get<size_t>(settings_.at(MAX_CONCURRENT_MERGES)); }
+
+  const size_t GetRefreshInterval() const { return boost::get<size_t>(settings_.at(INDEX_REFRESH_INTERVAL)); }
 
  private:
-  std::unordered_map<std::string, std::string> settings_;
-  const std::string default_keyvimerger_bin_ = "keyvimerger";
+  std::unordered_map<std::string, boost::variant<std::string, size_t>> settings_;
 };
 
 } /* namespace internal */

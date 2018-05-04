@@ -64,28 +64,32 @@ class IndexWriterWorker final {
           segments_(),
           mutex_(),
           index_directory_(index_directory),
-          index_toc_file_(index_directory),
-          index_toc_file_part_(index_directory),
+          index_toc_file_(index_directory_ / "index.toc"),
+          index_toc_file_part_(index_directory_ / "index.toc.part"),
           settings_(params),
+          max_concurrent_merges_(settings_.GetMaxConcurrentMerges()),
+          max_segments_(settings_.GetMaxSegments()),
+          compile_key_threshold_(settings_.GetSegmentCompileKeyThreshold()),
+          index_refresh_interval_(settings_.GetRefreshInterval()),
           merge_jobs_(),
           any_delete_(false),
           merge_enabled_(true) {
       segments_ = std::make_shared<segment_vec_t>();
-
-      index_toc_file_ /= "index.toc";
-      index_toc_file_part_ /= "index.toc.part";
     }
 
     compiler_t compiler_;
     std::atomic_size_t write_counter_;
     segments_t segments_;
     std::mutex mutex_;
-    boost::filesystem::path index_directory_;
-    boost::filesystem::path index_toc_file_;
-    boost::filesystem::path index_toc_file_part_;
-    internal::IndexSettings settings_;
+    const boost::filesystem::path index_directory_;
+    const boost::filesystem::path index_toc_file_;
+    const boost::filesystem::path index_toc_file_part_;
+    const internal::IndexSettings settings_;
+    const size_t max_concurrent_merges_;
+    const size_t max_segments_;
+    const size_t compile_key_threshold_;
+    const size_t index_refresh_interval_;
     std::list<MergeJob> merge_jobs_;
-    size_t max_concurrent_merges_ = 2;
     bool any_delete_;
     std::atomic_bool merge_enabled_;
   };
@@ -94,9 +98,8 @@ class IndexWriterWorker final {
   explicit IndexWriterWorker(const std::string& index_directory, const keyvi::util::parameters_t& params)
       : payload_(index_directory, params),
         merge_policy_(merge_policy(keyvi::util::mapGet<std::string>(params, MERGE_POLICY, DEFAULT_MERGE_POLICY))),
-        compiler_active_object_(
-            &payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
-            std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))) {
+        compiler_active_object_(&payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
+                                std::chrono::milliseconds(payload_.index_refresh_interval_)) {
     TRACE("construct worker: %s", payload_.index_directory_.c_str());
     LoadIndex();
   }
@@ -143,10 +146,7 @@ class IndexWriterWorker final {
       payload.compiler_->Add(key, value);
     });
 
-    if (++payload_.write_counter_ > 1000) {
-      compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
-      payload_.write_counter_ = 0;
-    }
+    CompileIfThresholdIsHit();
   }
 
   void Delete(const std::string& key) {
@@ -165,10 +165,7 @@ class IndexWriterWorker final {
       }
     });
 
-    if (++payload_.write_counter_ > 1000) {
-      compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
-      payload_.write_counter_ = 0;
-    }
+    CompileIfThresholdIsHit();
   }
 
   /**
@@ -208,6 +205,20 @@ class IndexWriterWorker final {
   std::weak_ptr<segment_vec_t> segments_weak_;
   merge_policy_t merge_policy_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
+
+  void CompileIfThresholdIsHit() {
+    if (++payload_.write_counter_ > payload_.compile_key_threshold_) {
+      compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
+      payload_.write_counter_ = 0;
+
+      // worst case scenario, to0 many segments, throttle further writes until we are below the limit
+      while (compiler_active_object_.Size() + payload_.segments_->size() >= payload_.max_segments_) {
+        // wait some time and then flush, which should give time to reduce the number of open file descriptors
+        std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_FOR_SEGMENT_MERGES_MS));
+        Flush();
+      }
+    }
+  }
 
   void ScheduledTask() {
     TRACE("Scheduled task");

@@ -43,7 +43,7 @@ class ActiveObject final {
  public:
   explicit ActiveObject(T* resource, const std::function<void()>& scheduled_task,
                         const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
-      : queue_(std::min(std::chrono::milliseconds(5), flush_interval_)),
+      : queue_(),
         resource_(resource),
         flush_interval_(flush_interval),
         scheduled_task_(scheduled_task),
@@ -52,7 +52,7 @@ class ActiveObject final {
     worker_ = std::thread([this] {
       std::function<void()> item;
       while (!done_) {
-        if (queue_.Pop(&item)) {
+        if (queue_.Pop(&item, scheduled_task_next_run_)) {
           item();
         }
 
@@ -60,6 +60,7 @@ class ActiveObject final {
         auto tp = std::chrono::system_clock::now();
         if (tp > scheduled_task_next_run_) {
           scheduled_task_next_run_ = tp + flush_interval_;
+          TRACE("run scheduled task");
           scheduled_task_();
         }
       }
@@ -79,6 +80,8 @@ class ActiveObject final {
   void operator()(F f) {
     queue_.Push([=] { f(*resource_); });
   }
+
+  size_t Size() const { return queue_.Size(); }
 
  private:
   mutable SingeProducerSingleConsumerRingBuffer<std::function<void()>, Tsize> queue_;

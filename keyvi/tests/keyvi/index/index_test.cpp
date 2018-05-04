@@ -80,7 +80,9 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
   {
-    Index writer(tmp_path.string(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+    Index writer(
+        tmp_path.string(),
+        {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}, {"max_concurrent_merges", "2"}});
 
     for (int i = 0; i < 10000; ++i) {
       writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
