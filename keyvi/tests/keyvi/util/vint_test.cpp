@@ -99,7 +99,6 @@ BOOST_AUTO_TEST_CASE(VShortSimple2) {
 
   uint64_t pointer = 380108;
 
-  auto pointer_low = pointer & 0x7;  // get the lower part
   auto pointer_high = pointer >> 3;  // the higher part
   BOOST_CHECK_EQUAL(47513, pointer_high);
   encodeVarshort(pointer_high, buffer, &size);
@@ -155,8 +154,6 @@ BOOST_AUTO_TEST_CASE(VIntDecode) {
 
   BOOST_CHECK_EQUAL((const char*)buffer + 1, buf_ptr);
   BOOST_CHECK_EQUAL(15, size);
-
-  uint8_t long_buffer[1000];
 
   encodeVarint(800, buffer, &size);
   BOOST_CHECK_EQUAL(2, size);
