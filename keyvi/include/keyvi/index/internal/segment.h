@@ -200,8 +200,10 @@ class Segment final : public ReadOnlySegment {
 
   void SaveDeletedKeys(const std::string& filename, const std::unordered_set<std::string>& deleted_keys) {
     // write to swap file, than rename it
-    std::ofstream out_stream(deleted_keys_swap_filename_.string(), std::ios::binary);
-    msgpack::pack(out_stream, deleted_keys);
+    {
+      std::ofstream out_stream(deleted_keys_swap_filename_.string(), std::ios::binary);
+      msgpack::pack(out_stream, deleted_keys);
+    }
     std::rename(deleted_keys_swap_filename_.string().c_str(), filename.c_str());
   }
 };  // namespace internal
