@@ -26,6 +26,7 @@
 #ifndef KEYVI_TESTING_INDEX_MOCK_H_
 #define KEYVI_TESTING_INDEX_MOCK_H_
 
+#include <cstdio>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -77,8 +78,13 @@ class IndexMock final {
     filename += ".kv.";
     filename += type;
 
-    std::ofstream out_stream(filename.string(), std::ios::binary);
-    msgpack::pack(out_stream, deleted_keys);
+    boost::filesystem::path tmp_filename(filename);
+    tmp_filename += "-swap";
+    {
+      std::ofstream out_stream(tmp_filename.string(), std::ios::binary);
+      msgpack::pack(out_stream, deleted_keys);
+    }
+    std::rename(tmp_filename.c_str(), filename.c_str());
   }
 
   std::string GetIndexFolder() const { return mock_index_.string(); }
