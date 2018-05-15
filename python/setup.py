@@ -10,6 +10,9 @@ import multiprocessing
 import shutil
 import glob
 import platform
+import re
+import codecs
+
 
 from contextlib import contextmanager
 from os import path
@@ -24,6 +27,16 @@ try:
     cpu_count = multiprocessing.cpu_count()
 except:
     cpu_count = 1
+
+
+def get_version():
+    here = os.path.abspath(os.path.dirname(__file__))
+    version_file_path = os.path.join(here, 'src/py/keyvi/__init__.py')
+    version_file = codecs.open(version_file_path, 'r').read()
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
 
 
 def generate_pykeyvi_source():
@@ -269,7 +282,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     PACKAGE_NAME = 'keyvi'
 
-    version = '0.3.0'
+    version = get_version()
 
     install_requires = [
         'msgpack-python',

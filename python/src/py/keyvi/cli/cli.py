@@ -84,6 +84,9 @@ def merge(args):
 
 def main():
     argument_parser = ArgumentParser(description='keyvi')
+
+    argument_parser.add_argument('-v', '--version', action='version', version=keyvi.__version__)
+
     subparsers = argument_parser.add_subparsers(dest='command')
 
     stats_parser = subparsers.add_parser('stats')
