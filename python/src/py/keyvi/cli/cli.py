@@ -84,6 +84,9 @@ def merge(args):
 
 def main():
     argument_parser = ArgumentParser(description='keyvi')
+
+    argument_parser.add_argument('-v', '--version', action='version', version=keyvi.__version__)
+
     subparsers = argument_parser.add_subparsers(dest='command')
 
     stats_parser = subparsers.add_parser('stats')
@@ -126,7 +129,7 @@ def main():
             merge_parser.error('Expecting at least 2 input files, got {}'.format(len(args.input_files)))
         merge(args)
     else:
-        return 'Must never reach here'
+        argument_parser.print_usage()
 
 
 if __name__ == '__main__':

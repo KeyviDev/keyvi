@@ -25,6 +25,35 @@ try:
 except:
     cpu_count = 1
 
+#################
+
+VERSION_MAJOR = 0
+VERSION_MINOR = 3
+VERSION_PATCH = 1
+VERSION_DEV = 0
+IS_RELEASED = False
+
+VERSION = "{}.{}.{}".format(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
+if not IS_RELEASED:
+    VERSION += 'dev{}'.format(VERSION_DEV)
+
+
+###################
+
+
+def write_version_file():
+    here = os.path.abspath(os.path.dirname(__file__))
+    version_file_path = os.path.join(here, 'src/py/keyvi/_version.py')
+    content = """
+# THIS FILE IS GENERATED FROM KEYVI SETUP.PY
+
+__version__ = '{}'
+
+""".format(VERSION)
+
+    with open(version_file_path, 'w') as f_out:
+        f_out.write(content)
+
 
 def generate_pykeyvi_source():
     addons = glob.glob('src/addons/*')
@@ -269,8 +298,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     PACKAGE_NAME = 'keyvi'
 
-    version = '0.3.0'
-
     install_requires = [
         'msgpack-python',
     ]
@@ -279,9 +306,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
 
+    write_version_file()
     setup(
         name=PACKAGE_NAME,
-        version=version,
+        version=VERSION,
         description='Python package for keyvi',
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
@@ -301,7 +329,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         ext_modules=ext_modules,
         zip_safe=False,
         url='http://keyvi.org',
-        download_url='https://github.com/KeyviDev/keyvi/tarball/v{}'.format(version),
+        download_url='https://github.com/KeyviDev/keyvi/tarball/v{}'.format(VERSION),
         keywords=['FST'],
         classifiers=[
             'Programming Language :: C++',
