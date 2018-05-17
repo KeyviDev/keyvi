@@ -16,3 +16,5 @@ MANIFEST
 # autowrap artifacts
 _core.pyx
 _core.cpp
+
+src/py/keyvi/_version.py

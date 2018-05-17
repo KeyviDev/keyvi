@@ -129,7 +129,7 @@ def main():
             merge_parser.error('Expecting at least 2 input files, got {}'.format(len(args.input_files)))
         merge(args)
     else:
-        return 'Must never reach here'
+        argument_parser.print_usage()
 
 
 if __name__ == '__main__':

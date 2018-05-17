@@ -17,7 +17,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 
-__version__ = '0.3.1dev0'
+from keyvi._version import __version__
 
 # global keyvi concepts
 from keyvi._core import MatchIterator, Match
