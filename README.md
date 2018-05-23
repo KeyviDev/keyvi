@@ -10,7 +10,7 @@
 ##
 ![Keyvi](/doc/images/keyvi-small.png)
 
-Keyvi - the short form for "Key value index" - defines a special subtype of the popular key value store (KVS) technologies. As you can imagine from the name, keyvi is an immutable key value store, therefore an index not a store. Keyvi's strengths: high compression ratio and extreme scalability. So if you need online read/writes keyvi is not for you, however, if your use case is mostly reads and infrequent writes you might be interested in checking keyvi out.
+Keyvi - the short form for "Key value index" is a key value store (KVS) optimized for size and lookup speed. The usage of shared memory makes it scalable and resistant. The biggest difference to other stores is the underlying data structure based on [finite state machine](https://en.wikipedia.org/wiki/Finite-state_machine). Storage is very space efficient, fast and by design makes various sorts of approximate matching be it fuzzy string matching or geo highly efficient. The immutable FST data structure can be used stand-alone if online writes are not required.
 
 > This is the continuation of cliqz-oss/keyvi. Keyvi was initially developed at Cliqz by Hendrik Muhs and others. For more information, please refer to https://github.com/cliqz-oss/keyvi
 
