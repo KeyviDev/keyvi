@@ -1,6 +1,7 @@
 from libc.stdint cimport uint32_t
 from libcpp.string cimport string as libcpp_string
 from libcpp.string cimport string as libcpp_utf8_string
+from libcpp.string cimport string as libcpp_utf8_output_string
 from libcpp cimport bool
 from cpython.ref cimport PyObject
 
@@ -14,10 +15,10 @@ cdef extern from "dictionary/match.h" namespace "keyvi::dictionary":
         void SetEnd(size_t end)
         float GetScore()
         void SetScore(float score)
-        libcpp_utf8_string GetMatchedString()
+        libcpp_utf8_output_string GetMatchedString()
         void SetMatchedString (libcpp_utf8_string matched_string)
         PyObject* GetAttributePy(libcpp_utf8_string) nogil except + # wrap-ignore
-        libcpp_utf8_string GetValueAsString() except +
+        libcpp_utf8_output_string GetValueAsString() except +
         libcpp_string GetRawValueAsString() except +
         libcpp_string GetMsgPackedValueAsString() except + # wrap-ignore
         void SetRawValue(libcpp_utf8_string) except + # wrap-ignore
