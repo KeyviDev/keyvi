@@ -25,9 +25,9 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_BIT_VECTOR_64_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_BIT_VECTOR_64_H_
 
-#include <limits.h>
 #include <algorithm>
 #include <array>
+#include <limits>
 
 namespace keyvi {
 namespace dictionary {
@@ -72,20 +72,22 @@ struct BitVector final {
    */
   template <std::size_t TsizeOther>
   inline void SetVector(const BitVector<TsizeOther>& other, const size_t start_bit) {
-    size_t bytePosition = start_bit >> 6;
-    size_t bitPosition = start_bit & 63;
-    size_t write_length = std::min(bits_.size() - bytePosition, other.bits_.size());
+    size_t byte_position = start_bit >> 6;
+    size_t bit_position = start_bit & 63;
+    size_t write_length = std::min(bits_.size() - byte_position, other.bits_.size());
 
-    if (bitPosition == 0) {
+    if (bit_position == 0) {
       for (size_t i = 0; i < write_length; ++i) {
-        bits_[bytePosition + i] |= other.bits_[i];
+        bits_[byte_position + i] |= other.bits_[i];
       }
     } else {
-      bits_[bytePosition] |= ((uint64_t)other.bits_[0] << bitPosition);
+      bits_[byte_position] |= ((uint64_t)other.bits_[0] << bit_position);
       for (size_t i = 1; i < write_length; ++i) {
-        bits_[bytePosition + i] |= ((other.bits_[i] << bitPosition) | (other.bits_[i - 1] >> (64 - bitPosition)));
+        bits_[byte_position + i] |= ((other.bits_[i] << bit_position) | (other.bits_[i - 1] >> (64 - bit_position)));
       }
-      bits_[bytePosition + write_length] |= (other.bits_[write_length - 1] >> (64 - bitPosition));
+      if (byte_position + write_length < bits_.size()) {
+        bits_[byte_position + write_length] |= (other.bits_[write_length - 1] >> (64 - bit_position));
+      }
     }
   }
 
@@ -96,13 +98,13 @@ struct BitVector final {
    */
   template <std::size_t TsizeOther>
   inline void SetVectorAndShiftOther(const BitVector<TsizeOther>& other, const size_t start_bit_other = 0) {
-    size_t bytePosition_other = start_bit_other >> 6;
-    size_t bitPosition_other = start_bit_other & 63;
+    size_t byte_position_other = start_bit_other >> 6;
+    size_t bit_position_other = start_bit_other & 63;
 
-    size_t write_length = std::min(bits_.size(), other.bits_.size()) - bytePosition_other;
+    size_t write_length = std::min(bits_.size(), other.bits_.size()) - byte_position_other;
 
     for (size_t i = 0; i < write_length; ++i) {
-      bits_[i] |= other.GetUnderlyingIntegerAtPosition(bytePosition_other + i, bitPosition_other);
+      bits_[i] |= other.GetUnderlyingIntegerAtPosition(byte_position_other + i, bit_position_other);
     }
   }
 
@@ -125,15 +127,15 @@ struct BitVector final {
    * @return the next unset bit.
    */
   inline int GetNextNonSetBit(size_t start_bit) const {
-    size_t bytePosition = start_bit >> 6;
-    size_t bitPosition = start_bit & 63;
+    size_t byte_position = start_bit >> 6;
+    size_t bit_position = start_bit & 63;
 
-    uint64_t a = GetUnderlyingIntegerAtPosition(bytePosition, bitPosition);
+    uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
 
-    while (a == UINT64_MAX) {
-      ++bytePosition;
+    while (a == std::numeric_limits<uint64_t>::max()) {
+      ++byte_position;
       start_bit += 64;
-      a = GetUnderlyingIntegerAtPosition(bytePosition, bitPosition);
+      a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
     }
 
     return Position(~a) + start_bit;
@@ -147,14 +149,14 @@ struct BitVector final {
    */
   template <std::size_t TsizeOther>
   inline bool Disjoint(const BitVector<TsizeOther>& other, const size_t start_bit) const {
-    size_t bytePosition = start_bit >> 6;
-    size_t lenthToCheck = std::min(other.bits_.size(), bits_.size() - bytePosition);
-    size_t bitPosition = start_bit & 63;
+    size_t byte_position = start_bit >> 6;
+    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
+    size_t bit_position = start_bit & 63;
 
-    for (size_t i = 0; i < lenthToCheck; ++i) {
+    for (size_t i = 0; i < length_to_check; ++i) {
       uint64_t b = other.bits_[i];
       if (b != 0) {
-        uint64_t a = GetUnderlyingIntegerAtPosition(bytePosition, bitPosition);
+        uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
 
         if ((a & b) != 0) {
           // shift until it fits
@@ -162,7 +164,7 @@ struct BitVector final {
         }
       }
 
-      ++bytePosition;
+      ++byte_position;
     }
 
     return true;
@@ -179,10 +181,10 @@ struct BitVector final {
   template <std::size_t TsizeOther>
   inline int DisjointAndShiftOther(const BitVector<TsizeOther>& other, const size_t start_bit) const {
     size_t byte_position = start_bit >> 6;
-    size_t lengthToCheck = std::min(other.bits_.size(), bits_.size() - byte_position);
+    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
     size_t bit_position = start_bit & 63;
 
-    for (size_t i = 0; i < lengthToCheck; ++i) {
+    for (size_t i = 0; i < length_to_check; ++i) {
       uint64_t b = other.bits_[i];
       if (b != 0) {
         uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
@@ -210,10 +212,10 @@ struct BitVector final {
   template <std::size_t TsizeOther>
   inline int DisjointAndShiftThis(const BitVector<TsizeOther>& other, const size_t start_bit) const {
     size_t byte_position = start_bit >> 6;
-    size_t lengthToCheck = std::min(other.bits_.size(), bits_.size() - byte_position);
+    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
     size_t bit_position = start_bit & 63;
 
-    for (size_t i = 0; i < lengthToCheck; ++i) {
+    for (size_t i = 0; i < length_to_check; ++i) {
       uint64_t b = other.bits_[i];
       if (b != 0) {
         uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);

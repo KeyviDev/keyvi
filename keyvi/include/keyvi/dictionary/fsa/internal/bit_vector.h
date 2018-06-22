@@ -25,9 +25,9 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_BIT_VECTOR_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_BIT_VECTOR_H_
 
-#include <limits.h>
 #include <algorithm>
 #include <array>
+#include <limits>
 
 #if defined(__GNUC__) || defined(__GNUG__)
 #include "dictionary/fsa/internal/bit_vector_64.h"
@@ -76,20 +76,22 @@ struct BitVector final {
    */
   template <std::size_t TsizeOther>
   inline void SetVector(const BitVector<TsizeOther>& other, const size_t start_bit) {
-    size_t bytePosition = start_bit >> 5;
-    size_t bitPosition = start_bit & 31;
-    size_t write_length = std::min(bits_.size() - bytePosition, other.bits_.size());
+    size_t byte_position = start_bit >> 5;
+    size_t bit_position = start_bit & 31;
+    size_t write_length = std::min(bits_.size() - byte_position, other.bits_.size());
 
-    if (bitPosition == 0) {
-      for (auto i = 0; i < write_length; i++) {
-        bits_[bytePosition + i] |= other.bits_[i];
+    if (bit_position == 0) {
+      for (size_t i = 0; i < write_length; i++) {
+        bits_[byte_position + i] |= other.bits_[i];
       }
     } else {
-      bits_[bytePosition] |= ((uint32_t)other.bits_[0] << bitPosition);
-      for (auto i = 1; i < write_length; i++) {
-        bits_[bytePosition + i] |= ((other.bits_[i] << bitPosition) | (other.bits_[i - 1] >> (32 - bitPosition)));
+      bits_[byte_position] |= ((uint32_t)other.bits_[0] << bit_position);
+      for (size_t i = 1; i < write_length; i++) {
+        bits_[byte_position + i] |= ((other.bits_[i] << bit_position) | (other.bits_[i - 1] >> (32 - bit_position)));
       }
-      bits_[bytePosition + write_length] |= (other.bits_[write_length - 1] >> (32 - bitPosition));
+      if (byte_position + write_length < bits_.size()) {
+        bits_[byte_position + write_length] |= (other.bits_[write_length - 1] >> (32 - bit_position));
+      }
     }
   }
 
@@ -100,13 +102,13 @@ struct BitVector final {
    */
   template <std::size_t TsizeOther>
   inline void SetVectorAndShiftOther(const BitVector<TsizeOther>& other, const size_t start_bit_other = 0) {
-    size_t bytePosition_other = start_bit_other >> 5;
-    size_t bitPosition_other = start_bit_other & 31;
+    size_t byte_position_other = start_bit_other >> 5;
+    size_t bit_position_other = start_bit_other & 31;
 
-    size_t write_length = std::min(bits_.size(), other.bits_.size()) - bytePosition_other;
+    size_t write_length = std::min(bits_.size(), other.bits_.size()) - byte_position_other;
 
-    for (auto i = 0; i < write_length; i++) {
-      bits_[i] |= other.GetUnderlyingIntegerAtPosition(bytePosition_other + i, bitPosition_other);
+    for (size_t i = 0; i < write_length; i++) {
+      bits_[i] |= other.GetUnderlyingIntegerAtPosition(byte_position_other + i, bit_position_other);
     }
   }
 
@@ -129,15 +131,15 @@ struct BitVector final {
    * @return the next unset bit.
    */
   inline int GetNextNonSetBit(size_t start_bit) const {
-    size_t bytePosition = start_bit >> 5;
-    size_t bitPosition = start_bit & 31;
+    size_t byte_position = start_bit >> 5;
+    size_t bit_position = start_bit & 31;
 
-    uint32_t a = GetUnderlyingIntegerAtPosition(bytePosition, bitPosition);
+    uint32_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
 
-    while (a == UINT32_MAX) {
-      ++bytePosition;
+    while (a == std::numeric_limits<uint32_t>::max()) {
+      ++byte_position;
       start_bit += 32;
-      a = GetUnderlyingIntegerAtPosition(bytePosition, bitPosition);
+      a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
     }
 
     return Position(~a) + start_bit;
@@ -151,14 +153,14 @@ struct BitVector final {
    */
   template <std::size_t TsizeOther>
   inline bool Disjoint(const BitVector<TsizeOther>& other, const size_t start_bit) const {
-    size_t bytePosition = start_bit >> 5;
-    size_t lenthToCheck = std::min(other.bits_.size(), bits_.size() - bytePosition);
-    size_t bitPosition = start_bit & 31;
+    size_t byte_position = start_bit >> 5;
+    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
+    size_t bit_position = start_bit & 31;
 
-    for (size_t i = 0; i < lenthToCheck; ++i) {
+    for (size_t i = 0; i < length_to_check; ++i) {
       uint32_t b = other.bits_[i];
       if (b != 0) {
-        uint32_t a = GetUnderlyingIntegerAtPosition(bytePosition, bitPosition);
+        uint32_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
 
         if ((a & b) != 0) {
           // shift until it fits
@@ -166,7 +168,7 @@ struct BitVector final {
         }
       }
 
-      ++bytePosition;
+      ++byte_position;
     }
 
     return true;
@@ -183,10 +185,10 @@ struct BitVector final {
   template <std::size_t TsizeOther>
   inline int DisjointAndShiftOther(const BitVector<TsizeOther>& other, const size_t start_bit) const {
     size_t byte_position = start_bit >> 5;
-    size_t lengthToCheck = std::min(other.bits_.size(), bits_.size() - byte_position);
+    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
     size_t bit_position = start_bit & 31;
 
-    for (size_t i = 0; i < lengthToCheck; ++i) {
+    for (size_t i = 0; i < length_to_check; ++i) {
       uint32_t b = other.bits_[i];
       if (b != 0) {
         uint32_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
@@ -214,10 +216,10 @@ struct BitVector final {
   template <std::size_t TsizeOther>
   inline int DisjointAndShiftThis(const BitVector<TsizeOther>& other, const size_t start_bit) const {
     size_t byte_position = start_bit >> 5;
-    size_t lengthToCheck = std::min(other.bits_.size(), bits_.size() - byte_position);
+    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
     size_t bit_position = start_bit & 31;
 
-    for (size_t i = 0; i < lengthToCheck; ++i) {
+    for (size_t i = 0; i < length_to_check; ++i) {
       uint32_t b = other.bits_[i];
       if (b != 0) {
         uint32_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
@@ -256,13 +258,13 @@ struct BitVector final {
 #if defined(__GNUC__) || defined(__GNUG__)
   inline int Position(uint32_t number) const { return __builtin_ffs(number) - 1; }
 #else
-  const int kDeBruijnPositions[32] = {0,  1,  28, 2,  29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4,  8,
-                                      31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6,  11, 5,  10, 9};
+  const int k_de_Bruijn_positions[32] = {0,  1,  28, 2,  29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4,  8,
+                                         31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6,  11, 5,  10, 9};
 
   inline int Position(uint32_t number) const {
     uint32_t res = ((uint32_t)(number & -number) * 0x077CB531U) >> 27;
 
-    return kDeBruijnPositions[res];
+    return k_de_Bruijn_positions[res];
   }
 #endif
 
