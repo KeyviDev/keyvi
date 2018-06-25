@@ -72,9 +72,9 @@ struct BitVector final {
    */
   template <std::size_t TsizeOther>
   inline void SetVector(const BitVector<TsizeOther>& other, const size_t start_bit) {
-    size_t byte_position = start_bit >> 6;
-    size_t bit_position = start_bit & 63;
-    size_t write_length = std::min(bits_.size() - byte_position, other.bits_.size());
+    const size_t byte_position = start_bit >> 6;
+    const size_t bit_position = start_bit & 63;
+    const size_t write_length = std::min(bits_.size() - byte_position, other.bits_.size());
 
     if (bit_position == 0) {
       for (size_t i = 0; i < write_length; ++i) {
@@ -98,10 +98,10 @@ struct BitVector final {
    */
   template <std::size_t TsizeOther>
   inline void SetVectorAndShiftOther(const BitVector<TsizeOther>& other, const size_t start_bit_other = 0) {
-    size_t byte_position_other = start_bit_other >> 6;
-    size_t bit_position_other = start_bit_other & 63;
+    const size_t byte_position_other = start_bit_other >> 6;
+    const size_t bit_position_other = start_bit_other & 63;
 
-    size_t write_length = std::min(bits_.size(), other.bits_.size()) - byte_position_other;
+    const size_t write_length = std::min(bits_.size(), other.bits_.size()) - byte_position_other;
 
     for (size_t i = 0; i < write_length; ++i) {
       bits_[i] |= other.GetUnderlyingIntegerAtPosition(byte_position_other + i, bit_position_other);
@@ -128,7 +128,7 @@ struct BitVector final {
    */
   inline int GetNextNonSetBit(size_t start_bit) const {
     size_t byte_position = start_bit >> 6;
-    size_t bit_position = start_bit & 63;
+    const size_t bit_position = start_bit & 63;
 
     uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
 
@@ -150,13 +150,13 @@ struct BitVector final {
   template <std::size_t TsizeOther>
   inline bool Disjoint(const BitVector<TsizeOther>& other, const size_t start_bit) const {
     size_t byte_position = start_bit >> 6;
-    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
-    size_t bit_position = start_bit & 63;
+    const size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
+    const size_t bit_position = start_bit & 63;
 
     for (size_t i = 0; i < length_to_check; ++i) {
-      uint64_t b = other.bits_[i];
+      const uint64_t b = other.bits_[i];
       if (b != 0) {
-        uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
+        const uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
 
         if ((a & b) != 0) {
           // shift until it fits
@@ -181,13 +181,13 @@ struct BitVector final {
   template <std::size_t TsizeOther>
   inline int DisjointAndShiftOther(const BitVector<TsizeOther>& other, const size_t start_bit) const {
     size_t byte_position = start_bit >> 6;
-    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
-    size_t bit_position = start_bit & 63;
+    const size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
+    const size_t bit_position = start_bit & 63;
 
     for (size_t i = 0; i < length_to_check; ++i) {
-      uint64_t b = other.bits_[i];
+      const uint64_t b = other.bits_[i];
       if (b != 0) {
-        uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
+        const uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
 
         if ((a & b) != 0) {
           // shift until it fits
@@ -212,13 +212,13 @@ struct BitVector final {
   template <std::size_t TsizeOther>
   inline int DisjointAndShiftThis(const BitVector<TsizeOther>& other, const size_t start_bit) const {
     size_t byte_position = start_bit >> 6;
-    size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
-    size_t bit_position = start_bit & 63;
+    const size_t length_to_check = std::min(other.bits_.size(), bits_.size() - byte_position);
+    const size_t bit_position = start_bit & 63;
 
     for (size_t i = 0; i < length_to_check; ++i) {
-      uint64_t b = other.bits_[i];
+      const uint64_t b = other.bits_[i];
       if (b != 0) {
-        uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
+        const uint64_t a = GetUnderlyingIntegerAtPosition(byte_position, bit_position);
 
         if ((a & b) != 0) {
           // shift until it fits
@@ -248,7 +248,7 @@ struct BitVector final {
 #endif
   /// internal data
   std::array<uint64_t, (Tsize >> 6) + 1> bits_;
-  size_t size_ = Tsize;
+  const size_t size_ = Tsize;
 
   inline int Position(uint64_t number) const { return __builtin_ffsll(number) - 1; }
 
