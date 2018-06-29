@@ -44,9 +44,9 @@
 #define le64toh(x) OSSwapLittleToHostInt64(x)
 
 #if defined(__LITTLE_ENDIAN__)
-#define CLQ_LITTLE_ENDIAN
+#define KEYVI_LITTLE_ENDIAN
 #elif defined(__BIG_ENDIAN__)
-#define CLQ_BIG_ENDIAN
+#define KEYVI_BIG_ENDIAN
 #else
 #error "Unknown endianess"
 #endif
@@ -63,7 +63,7 @@
 #include <sys/types.h>
 #elif defined(__linux__) && (__BYTE_ORDER == __LITTLE_ENDIAN) && (__GLIBC__ <= 2 && __GLIBC_MINOR__ < 9)
 
-#define CLQ_LITTLE_ENDIAN
+#define KEYVI_LITTLE_ENDIAN
 #define htole16(x) (x)
 #define le16toh(x) (x)
 #define htole64(x) (x)
@@ -72,9 +72,9 @@
 #else
 #include <endian.h>
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-#define CLQ_LITTLE_ENDIAN
+#define KEYVI_LITTLE_ENDIAN
 #elif __BYTE_ORDER == __BIG_ENDIAN
-#define CLQ_BIG_ENDIAN
+#define KEYVI_BIG_ENDIAN
 #else
 #error "Unknown endianess"
 #endif

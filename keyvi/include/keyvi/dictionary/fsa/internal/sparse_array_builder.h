@@ -334,7 +334,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
   }
 
   /**
-   * Compact Encode for ushorts
+   * Compact Encode for uint16_t
    *
    * bit
    *  1             0: value fits into bits 1-16 (value <32768)     1: overflow encoding
@@ -356,12 +356,12 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     TRACE("Write offset: %ld, label: %d", offset, transitionId);
     size_t difference = SIZE_MAX;
 
-    if (offset + 512 > transitionPointer) {
-      difference = offset + 512 - transitionPointer;
+    if (offset + COMPACT_SIZE_WINDOW > transitionPointer) {
+      difference = offset + COMPACT_SIZE_WINDOW - transitionPointer;
     }
 
     if (difference < COMPACT_SIZE_RELATIVE_MAX_VALUE) {
-      ushort diff_as_short = static_cast<ushort>(difference);
+      const uint16_t diff_as_short = static_cast<uint16_t>(difference);
 
       TRACE("Transition fits in uint16 relative: %d->%d (%d)", offset, transitionPointer, diff_as_short);
 
@@ -372,16 +372,16 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     if (transitionPointer < COMPACT_SIZE_ABSOLUTE_MAX_VALUE) {
       TRACE("Transition fits in uint16 absolute: %d->%d", offset, transitionPointer);
 
-      ushort absolute_compact_coding = static_cast<ushort>(transitionPointer) | 0xC000;
+      const uint16_t absolute_compact_coding = static_cast<uint16_t>(transitionPointer) | 0xC000;
       persistence_->WriteTransition(offset, transitionId, absolute_compact_coding);
       return;
     }
 
     TRACE("Transition requires overflow %d->%d", offset, transitionPointer);
 
-    // pt to overflow bucket with various other codings
+    // pointer to overflow bucket with variable length encoding
     // set first bit to indicate overflow
-    ushort pt_to_overflow_bucket = 0x8000;
+    uint16_t pt_to_overflow_bucket = 0x8000;
 
     size_t overflow_code = transitionPointer;
 
@@ -392,8 +392,8 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       overflow_code = difference;
     }
 
-    auto transitionPointer_low = overflow_code & 0x7;  // get the lower part
-    auto transitionPointer_high = overflow_code >> 3;  // the higher part
+    size_t transitionPointer_low = overflow_code & 0x7;  // get the lower part
+    size_t transitionPointer_high = overflow_code >> 3;  // the higher part
 
     // else overflow encoding
     uint16_t vshort_pointer[8];
@@ -402,7 +402,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     keyvi::util::encodeVarshort(transitionPointer_high, vshort_pointer, &vshort_size);
 
     // find free spots in the sparse array where the pointer fits in
-    size_t start_position = offset > 512 ? offset - 512 : 0;
+    size_t start_position = offset > COMPACT_SIZE_WINDOW ? offset - COMPACT_SIZE_WINDOW : 0;
     size_t zerobyte_scrambling_state = 0;
     unsigned char zerobyte_scrambling_label = 0xff;
 
@@ -485,7 +485,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     }
 
     // encode the pointer to that bucket
-    size_t overflow_bucket = (512 + start_position) - offset;
+    size_t overflow_bucket = (COMPACT_SIZE_WINDOW + start_position) - offset;
     pt_to_overflow_bucket |= overflow_bucket << 4;
 
     // add the lower part (4 bits)
