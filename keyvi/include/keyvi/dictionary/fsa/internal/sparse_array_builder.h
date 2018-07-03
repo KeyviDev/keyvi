@@ -392,8 +392,8 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
       overflow_code = difference;
     }
 
-    size_t transitionPointer_low = overflow_code & 0x7;  // get the lower part
-    size_t transitionPointer_high = overflow_code >> 3;  // the higher part
+    const size_t transitionPointer_low = overflow_code & 0x7;  // get the lower part
+    const size_t transitionPointer_high = overflow_code >> 3;  // the higher part
 
     // else overflow encoding
     uint16_t vshort_pointer[8];
