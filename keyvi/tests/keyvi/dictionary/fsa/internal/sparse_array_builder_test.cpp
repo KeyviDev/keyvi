@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteGhostState) {
     b.taken_positions_in_sparsearray_.Set(i);
   }
 
-  b.FindFreeBucket(&u2);
+  BOOST_CHECK_EQUAL(255, b.FindFreeBucket(&u2));
   b.WriteState(0xff, u2);
 
   // 0 + 255 -> 255 should not exist as it would mean u1 has a transition 255
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteEdgecaseStartPositio
     b.WriteTransition(1000000 + i, 70, 21);
   }
 
-  // write a state with a large offset and a low pointer > short
+  // write a state with a large offset and a large pointer that does not fit in a short and requires overflow
   p.BeginNewState(1001000 - 65);
   b.WriteTransition(1001000, 65, 333336);
   b.taken_positions_in_sparsearray_.Set(1001000);
@@ -299,8 +299,6 @@ BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteEdgecaseStartPositio
   BOOST_CHECK_EQUAL(p.ResolveTransitionValue(1001000, p.ReadTransitionValue(1001000)), 333336);
 
   for (int i = 0; i < 1000; ++i) {
-    // mark some state beginnings that could lead to zombie states
-    b.state_start_positions_.Set(1000000 + i);
     BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000000 + i), 70);
   }
 }

@@ -267,7 +267,7 @@ inline uint16_t SparseArrayPersistence<uint16_t>::HostOrderToPesistenceOrder(uin
 
 template <>
 inline void SparseArrayPersistence<uint16_t>::HostOrderToPersistenceOrder(uint16_t* values, size_t length) const {
-#ifdef CLQ_BIG_ENDIAN
+#ifdef KEYVI_BIG_ENDIAN
   for (size_t i = 0; i < flush_size_; ++i) {
     values[i] = htole16(values[i]);
   }
@@ -290,10 +290,10 @@ inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t 
   if (pt & 0x8000) {
     // clear the first bit
     pt &= 0x7FFF;
-    size_t overflow_bucket = (pt >> 4) + offset - 512;
+    const size_t overflow_bucket = (pt >> 4) + offset - 512;
 
     if (overflow_bucket >= in_memory_buffer_offset_) {
-      resolved_ptr = keyvi::util::decodeVarshort(transitions_ - in_memory_buffer_offset_ + overflow_bucket);
+      resolved_ptr = keyvi::util::decodeVarshort(transitions_ + overflow_bucket - in_memory_buffer_offset_);
     } else {
       if (transitions_extern_->GetAddressQuickTestOk(overflow_bucket * sizeof(uint16_t), 5)) {
         resolved_ptr = keyvi::util::decodeVarshort(
