@@ -38,6 +38,10 @@ case "${PYTHON_VERSION}" in
       pyenv install 3.6.4
       pyenv global 3.6.4
       ;;
+  37)
+      pyenv install 3.7.0b2
+      pyenv global 3.7.0b2
+      ;;
   pypy2)
       pyenv install pypy-5.3.1
       pyenv global pypy-5.3.1
