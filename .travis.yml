@@ -116,6 +116,7 @@ addons:
     - graphviz
     - libstdc++-4.8-dev
     - clang-format-3.8
+    - libffi-dev
 
 script:
   - if [ "$BUILD_TYPE" == "linux" ]; then source ./travis/build_linux.sh ; fi
