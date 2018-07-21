@@ -262,14 +262,14 @@ class Generator final {
     ConsumeStack(0);
 
     // handling of last State.
-    internal::UnpackedState<PersistenceT>* unpackedState = stack_->Get(0);
+    internal::UnpackedState<PersistenceT>* unpacked_state = stack_->Get(0);
 
-    start_state_ = builder_->PersistState(unpackedState);
+    start_state_ = builder_->PersistState(unpacked_state);
 
     TRACE("wrote start state at %d", start_state_);
-    TRACE("Check first transition: %d/%d %s", (*unpackedState)[0].label,
-          persistence_->ReadTransitionLabel(start_state_ + (*unpackedState)[0].label),
-          (*unpackedState)[0].label == persistence_->ReadTransitionLabel(start_state_ + (*unpackedState)[0].label)
+    TRACE("Check first transition: %d/%d %s", (*unpacked_state)[0].label,
+          persistence_->ReadTransitionLabel(start_state_ + (*unpacked_state)[0].label),
+          (*unpacked_state)[0].label == persistence_->ReadTransitionLabel(start_state_ + (*unpacked_state)[0].label)
               ? "OK"
               : "BROKEN");
 
@@ -357,7 +357,7 @@ class Generator final {
 
   inline void FeedStack(const size_t start, const std::string& key) {
     for (size_t i = start; i < key.size(); ++i) {
-      uint32_t ukey = static_cast<uint32_t>(static_cast<unsigned char>(key[i]));
+      const uint32_t ukey = static_cast<uint32_t>(static_cast<unsigned char>(key[i]));
       stack_->Insert(i, ukey, 0);
     }
 
@@ -370,13 +370,13 @@ class Generator final {
   inline void ConsumeStack(const size_t end) {
     while (highest_stack_ > end) {
       // Get outgoing transitions from the stack.
-      internal::UnpackedState<PersistenceT>* unpackedState = stack_->Get(highest_stack_);
+      internal::UnpackedState<PersistenceT>* unpacked_state = stack_->Get(highest_stack_);
 
-      OffsetTypeT transitionPointer = builder_->PersistState(unpackedState);
+      const OffsetTypeT transition_pointer = builder_->PersistState(unpacked_state);
 
       // Save transition_pointer in previous stack, indicate whether it makes
       // sense continuing minimization
-      stack_->PushTransitionPointer(highest_stack_ - 1, transitionPointer, unpackedState->GetNoMinimizationCounter());
+      stack_->PushTransitionPointer(highest_stack_ - 1, transition_pointer, unpacked_state->GetNoMinimizationCounter());
 
       // Delete state
       stack_->Erase(highest_stack_);
