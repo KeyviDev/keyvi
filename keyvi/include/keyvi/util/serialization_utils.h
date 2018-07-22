@@ -25,8 +25,6 @@
 #ifndef KEYVI_UTIL_SERIALIZATION_UTILS_H_
 #define KEYVI_UTIL_SERIALIZATION_UTILS_H_
 
-#include <arpa/inet.h>
-
 #include <string>
 
 #include <boost/lexical_cast.hpp>
@@ -34,6 +32,8 @@
 #define BOOST_SPIRIT_THREADSAFE
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+
+#include "dictionary/util/endian.h"
 
 namespace keyvi {
 namespace util {
@@ -46,7 +46,7 @@ class SerializationUtils {
     boost::property_tree::write_json(string_buffer, properties, false);
     std::string header = string_buffer.str();
 
-    uint32_t size = ntohl(header.size());
+    uint32_t size = htobe32(header.size());
 
     stream.write(reinterpret_cast<const char*>(&size), sizeof(uint32_t));
     stream << header;
@@ -55,7 +55,7 @@ class SerializationUtils {
   static boost::property_tree::ptree ReadJsonRecord(std::istream& stream) {
     uint32_t header_size;
     stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
-    header_size = htonl(header_size);
+    header_size = be32toh(header_size);
     char* buffer = new char[header_size];
     stream.read(buffer, header_size);
     std::string buffer_as_string(buffer, header_size);
