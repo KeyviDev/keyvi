@@ -54,7 +54,7 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-/// TODO: refator (split) class Automata, so there is no need for param "loadVS" and friend classes
+/// TODO: refactor (split) class Automata, so there is no need for param "loadVS" and friend classes
 class Automata final {
  public:
   explicit Automata(const std::string& filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
