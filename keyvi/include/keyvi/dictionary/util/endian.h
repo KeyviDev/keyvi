@@ -68,6 +68,8 @@
 #define le16toh(x) (x)
 #define htole64(x) (x)
 #define le64toh(x) (x)
+#define htobe32(x) htonl(x)
+#define be32toh(x) ntohl(x)
 
 #else
 #include <endian.h>

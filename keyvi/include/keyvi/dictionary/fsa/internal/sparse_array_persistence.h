@@ -164,8 +164,7 @@ class SparseArrayPersistence final {
   uint64_t ReadFinalValue(size_t offset) const;
 
   /**
-   * Flush buffer up to the given position
-   * @param position the latest position until flush should happen
+   * Flush all internal buffers
    */
   void Flush() {
     // make idempotent, so it can be called twice or more);
