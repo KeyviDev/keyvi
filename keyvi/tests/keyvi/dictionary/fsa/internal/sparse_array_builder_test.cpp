@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteGhostState) {
   u2.Add(65, 100);
   u2.Add(66, 101);
   u2.Add(233, 102);
-  for (int i = 1; i < 255 + 65; ++i) {
+  for (size_t i = 1; i < 255 + 65; ++i) {
     // mark transitions
     if (i == 255) {
       continue;
@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteEdgecase) {
 
   p.BeginNewState(1000000);
 
-  for (int i = 0xff; i > 1; i--) {
+  for (size_t i = 0xff; i > 1; i--) {
     // mark some state beginnings that could lead to zombie states
     b.state_start_positions_.Set(1000001 - i);
   }
@@ -282,7 +282,7 @@ BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteEdgecaseStartPositio
 
   p.BeginNewState(1000000);
 
-  for (int i = 0; i < 1000; ++i) {
+  for (size_t i = 0; i < 1000; ++i) {
     // mark some state beginnings that could lead to zombie states
     b.state_start_positions_.Set(1000000 + i);
 
@@ -298,7 +298,7 @@ BOOST_AUTO_TEST_CASE(writeTransitionRelativeOverflowZerobyteEdgecaseStartPositio
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1001000), 65);
   BOOST_CHECK_EQUAL(p.ResolveTransitionValue(1001000, p.ReadTransitionValue(1001000)), 333336);
 
-  for (int i = 0; i < 1000; ++i) {
+  for (size_t i = 0; i < 1000; ++i) {
     BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000000 + i), 70);
   }
 }
@@ -341,6 +341,68 @@ BOOST_AUTO_TEST_CASE(writeTransitionFinalStateTransition) {
 
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000000 + FINAL_OFFSET_TRANSITION), 1);
   BOOST_CHECK_EQUAL(p.ReadTransitionLabel(1000000 + FINAL_OFFSET_TRANSITION + 1), 2);
+}
+
+BOOST_AUTO_TEST_CASE(writeTransitionExternalMemory) {
+  const size_t memory_limit_persistence = 64000;
+  SparseArrayPersistence<uint16_t> p(memory_limit_persistence, boost::filesystem::temp_directory_path());
+  const int64_t limit = 1024 * 1024;
+  SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
+
+  // simulate that sparse array builder got tons of states
+  b.highest_persisted_state_ = 1024 * 1024;
+
+  const size_t chunk_size = p.GetChunkSizeExternalTransitions();
+  const size_t factor = (1024 * 1024) / memory_limit_persistence;
+
+  const size_t offset = (factor * chunk_size) - 2;
+
+  p.BeginNewState(offset - 100);
+
+  // write a transition on the chunk border with a overflowing transition
+  b.WriteTransition(offset - 20, 20, offset - 80000);
+  b.taken_positions_in_sparsearray_.Set(offset - 20);
+
+  // force flushing buffers
+  p.BeginNewState(chunk_size * (factor + 2));
+
+  const uint16_t val = p.ReadTransitionValue(offset - 20);
+
+  BOOST_CHECK_EQUAL(offset - 80000, p.ResolveTransitionValue(offset - 20, val));
+}
+
+BOOST_AUTO_TEST_CASE(writeTransitionChunkborder) {
+  const size_t memory_limit_persistence = 64000;
+  SparseArrayPersistence<uint16_t> p(memory_limit_persistence, boost::filesystem::temp_directory_path());
+  const int64_t limit = 1024 * 1024;
+  SparseArrayBuilder<SparseArrayPersistence<uint16_t>> b(limit, &p, false);
+
+  // simulate that sparse array builder got tons of states
+  b.highest_persisted_state_ = 1024 * 1024;
+
+  // find some setting to setup write on a chunk border
+  const size_t chunk_size = p.GetChunkSizeExternalTransitions();
+  const size_t factor = (1024 * 1024) / memory_limit_persistence;
+
+  const size_t offset = (factor * chunk_size) - 2;
+
+  // mark slots taken in sparse array to force writing on chunk border
+  for (size_t i = offset - COMPACT_SIZE_WINDOW - 10; i <= offset - 1; ++i) {
+    b.taken_positions_in_sparsearray_.Set(i);
+  }
+
+  p.BeginNewState(offset - 5);
+
+  // write a transition on the chunk border with a overflowing transition
+  b.WriteTransition(offset - 3, 5, offset - 80000);
+  b.taken_positions_in_sparsearray_.Set(offset - 3);
+
+  // force flushing buffers
+  p.BeginNewState(chunk_size * (factor + 2));
+
+  const uint16_t val = p.ReadTransitionValue(offset - 3);
+
+  BOOST_CHECK_EQUAL(offset - 80000, p.ResolveTransitionValue(offset - 3, val));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

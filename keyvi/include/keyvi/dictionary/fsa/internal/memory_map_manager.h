@@ -73,7 +73,6 @@ class MemoryMapManager final {
    */
   bool GetAddressQuickTestOk(size_t offset, size_t length) const {
     size_t chunk_offset = offset % chunk_size_;
-
     return (length <= (chunk_size_ - chunk_offset));
   }
 
@@ -192,7 +191,7 @@ class MemoryMapManager final {
 
       while (remaining > 0) {
         size_t bytes_in_chunk = std::min(chunk_size_, remaining);
-        TRACE("write chunk %d, with size: %ld, remaining: %ld", i, bytes_in_chunk, remaining);
+        TRACE("write chunk %d, with size: %ld, remaining: %ld", chunk, bytes_in_chunk, remaining);
 
         const char* ptr = reinterpret_cast<const char*>(mappings_[chunk].region_->get_address());
         stream.write(ptr, bytes_in_chunk);
@@ -229,6 +228,8 @@ class MemoryMapManager final {
 
     mappings_.clear();
   }
+
+  size_t GetChunkSize() const { return chunk_size_; }
 
  private:
   struct mapping {
