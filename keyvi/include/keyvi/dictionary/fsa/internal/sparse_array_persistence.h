@@ -206,6 +206,8 @@ class SparseArrayPersistence final {
     TRACE("Wrote Transitions, stream at %d", stream.tellp());
   }
 
+  size_t GetChunkSizeExternalTransitions() const { return transitions_extern_->GetChunkSize(); }
+
  private:
   unsigned char* labels_;
   MemoryMapManager* labels_extern_;
@@ -289,19 +291,21 @@ inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t 
   if (pt & 0x8000) {
     // clear the first bit
     pt &= 0x7FFF;
-    const size_t overflow_bucket = (pt >> 4) + offset - 512;
+    const size_t overflow_bucket = (pt >> 4) + offset - COMPACT_SIZE_WINDOW;
 
     if (overflow_bucket >= in_memory_buffer_offset_) {
       resolved_ptr = keyvi::util::decodeVarshort(transitions_ + overflow_bucket - in_memory_buffer_offset_);
     } else {
-      if (transitions_extern_->GetAddressQuickTestOk(overflow_bucket * sizeof(uint16_t), 5)) {
+      // value needs to be read from external storage, which in 99.9% is a trivial access to the mmap'ed area
+      // but in rare cases might be spread across 2 chunks, for the chunk border test we assume worst case 3 varshorts
+      // to be read, that is a maximum of 2**45, so together with shifting 2**48 == 256 TB of addressable space
+      if (transitions_extern_->GetAddressQuickTestOk(overflow_bucket * sizeof(uint16_t), 3 * sizeof(uint16_t))) {
         resolved_ptr = keyvi::util::decodeVarshort(
             reinterpret_cast<uint16_t*>(transitions_extern_->GetAddress(overflow_bucket * sizeof(uint16_t))));
       } else {
-        // value might be on the chunk border, take a secure approach
-        uint16_t buffer[10];
-        transitions_extern_->GetBuffer((offset + FINAL_OFFSET_TRANSITION) * sizeof(uint16_t), buffer,
-                                       10 * sizeof(uint16_t));
+        // value might be on the chunk border, read it into a buffer and read from there
+        uint16_t buffer[3 * sizeof(uint16_t)];
+        transitions_extern_->GetBuffer(overflow_bucket * sizeof(uint16_t), buffer, 3 * sizeof(uint16_t));
 
         resolved_ptr = keyvi::util::decodeVarshort(buffer);
       }
@@ -311,11 +315,11 @@ inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t 
 
     if (pt & 0x8) {
       // relative coding
-      resolved_ptr = offset - resolved_ptr + 512;
+      resolved_ptr = offset - resolved_ptr + COMPACT_SIZE_WINDOW;
     }
 
   } else {
-    resolved_ptr = offset - pt + 512;
+    resolved_ptr = offset - pt + COMPACT_SIZE_WINDOW;
   }
 
   return resolved_ptr;
