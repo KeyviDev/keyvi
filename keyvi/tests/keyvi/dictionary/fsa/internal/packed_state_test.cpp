@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(numOutgoingAndPrivateUse) {
 
   p2.SetCookie(PackedState<>::GetMaxCookieSize());
   BOOST_CHECK(p2.GetNumberOfOutgoingTransitions() == 257);
-  BOOST_CHECK(p2.GetCookie() == PackedState<>::GetMaxCookieSize());
+  BOOST_CHECK(p2.GetCookie() == static_cast<int>(PackedState<>::GetMaxCookieSize()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

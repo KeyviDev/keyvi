@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
 
   std::vector<std::string> expected_matches = {"pizzeria:u281wu8bmmzq"};
 
-  int i = 0;
+  size_t i = 0;
 
   // check near match for pizzeria:u28, it should only return 1 match "281wu" is the closest
   for (auto m : d->GetNear("pizzeria:u281wu88kekq", 12)) {

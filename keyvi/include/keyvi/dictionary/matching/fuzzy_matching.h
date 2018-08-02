@@ -25,16 +25,18 @@
 #ifndef KEYVI_DICTIONARY_MATCHING_FUZZY_MATCHING_H_
 #define KEYVI_DICTIONARY_MATCHING_FUZZY_MATCHING_H_
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
-#include "stringdistance/levenshtein.h"
+#include "utf8.h"
 
 #include "dictionary/fsa/automata.h"
 #include "dictionary/fsa/codepoint_state_traverser.h"
 #include "dictionary/fsa/traverser_types.h"
 #include "dictionary/match.h"
 #include "dictionary/util/utf8_utils.h"
+#include "stringdistance/levenshtein.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -42,9 +44,9 @@ namespace matching {
 
 class FuzzyMatching final {
  public:
-  FuzzyMatching(const fsa::automata_t& fsa, const std::string& query, size_t max_edit_distance)
+  FuzzyMatching(const fsa::automata_t& fsa, const std::string& query, int32_t max_edit_distance)
       : fsa_(fsa), query_(query), max_edit_distance_(max_edit_distance), first_match_() {
-    std::vector<int> codepoints;
+    std::vector<uint32_t> codepoints;
     utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
 
     query_char_length_ = codepoints.size();
@@ -81,7 +83,7 @@ class FuzzyMatching final {
 
   Match NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
-      const int intermediate_score = metric_ptr_->Put(traverser_ptr_->GetStateLabel(), candidate_length() - 1);
+      const int32_t intermediate_score = metric_ptr_->Put(traverser_ptr_->GetStateLabel(), candidate_length() - 1);
       // don't consider subtrees which can not be matched anyways
       if (query_char_length_ > candidate_length() && intermediate_score > max_edit_distance_) {
         traverser_ptr_->Prune();
@@ -112,7 +114,7 @@ class FuzzyMatching final {
  private:
   fsa::automata_t fsa_;
   std::string query_;
-  const size_t max_edit_distance_;
+  const int32_t max_edit_distance_;
 
   size_t query_char_length_ = 0;
 
