@@ -96,7 +96,6 @@ class Automata final {
     transitions_region_.advise(advise);
 
     labels_ = static_cast<unsigned char*>(labels_region_.get_address());
-    transitions_ = static_cast<uint32_t*>(transitions_region_.get_address());
     transitions_compact_ = static_cast<uint16_t*>(transitions_region_.get_address());
 
     value_store_type_ = static_cast<internal::value_store_t>(
@@ -411,7 +410,6 @@ class Automata final {
   boost::interprocess::mapped_region labels_region_;
   boost::interprocess::mapped_region transitions_region_;
   unsigned char* labels_;
-  uint32_t* transitions_;
   uint16_t* transitions_compact_;
   uint64_t start_state_;
   uint64_t number_of_keys_;
@@ -445,7 +443,7 @@ class Automata final {
       size_t overflow_bucket;
       TRACE("Compact Transition overflow bucket %d", pt);
 
-      overflow_bucket = (pt >> 4) + starting_state + c - 512;
+      overflow_bucket = (pt >> 4) + starting_state + c - COMPACT_SIZE_WINDOW;
 
       TRACE("Compact Transition found overflow bucket %d", overflow_bucket);
 
@@ -454,12 +452,12 @@ class Automata final {
 
       if (pt & 0x8) {
         // relative coding
-        resolved_ptr = (starting_state + c) - resolved_ptr + 512;
+        resolved_ptr = (starting_state + c) - resolved_ptr + COMPACT_SIZE_WINDOW;
       }
 
     } else {
       TRACE("Compact Transition uint16 transition %d", pt);
-      resolved_ptr = (starting_state + c) - pt + 512;
+      resolved_ptr = (starting_state + c) - pt + COMPACT_SIZE_WINDOW;
     }
 
     TRACE("Compact Transition after resolve %d", resolved_ptr);
