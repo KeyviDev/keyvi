@@ -35,13 +35,21 @@ namespace internal {
 // The name of the suite must be a different name to your class
 BOOST_AUTO_TEST_SUITE(PackedStateTests)
 
-BOOST_AUTO_TEST_CASE(size) { BOOST_CHECK_EQUAL(12, sizeof(PackedState<>)); }
+BOOST_AUTO_TEST_CASE(size) {
+  BOOST_CHECK_EQUAL(12, sizeof(PackedState<>));
+}
 
-BOOST_AUTO_TEST_CASE(size64) { BOOST_CHECK_EQUAL(16, sizeof(PackedState<uint64_t>)); }
+BOOST_AUTO_TEST_CASE(size64) {
+  BOOST_CHECK_EQUAL(16, sizeof(PackedState<uint64_t>));
+}
 
-BOOST_AUTO_TEST_CASE(sizeHash64) { BOOST_CHECK_EQUAL(16, sizeof(PackedState<uint32_t, int64_t>)); }
+BOOST_AUTO_TEST_CASE(sizeHash64) {
+  BOOST_CHECK_EQUAL(16, sizeof(PackedState<uint32_t, int64_t>));
+}
 
-BOOST_AUTO_TEST_CASE(size64Hash64) { BOOST_CHECK_EQUAL(20, sizeof(PackedState<uint64_t, int64_t>)); }
+BOOST_AUTO_TEST_CASE(size64Hash64) {
+  BOOST_CHECK_EQUAL(20, sizeof(PackedState<uint64_t, int64_t>));
+}
 
 BOOST_AUTO_TEST_CASE(compare64) {
   PackedState<> p(0, 42, 42);
