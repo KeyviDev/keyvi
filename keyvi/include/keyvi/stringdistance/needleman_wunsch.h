@@ -27,6 +27,8 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstdint>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -42,7 +44,7 @@ namespace stringdistance {
 template <class CostFunctionT>
 class NeedlemanWunsch final {
  public:
-  NeedlemanWunsch(const std::vector<int>& input_sequence, int rows, int max_distance)
+  NeedlemanWunsch(const std::vector<uint32_t>& input_sequence, size_t rows, int32_t max_distance)
       : max_distance_(max_distance),
         input_sequence_(input_sequence),
         distance_matrix_(rows, input_sequence.size() + 1),
@@ -82,15 +84,15 @@ class NeedlemanWunsch final {
     }
   }
 
-  int Put(int codepoint, int position) {
-    int row = position + 1;
+  int32_t Put(uint32_t codepoint, size_t position) {
+    size_t row = position + 1;
 
     // ensure that we have enough rows in the matrix
     EnsureCapacity(row + 1);
     compare_sequence_[position] = codepoint;
 
     last_put_position_ = position;
-    int columns = distance_matrix_.Columns();
+    size_t columns = distance_matrix_.Columns();
 
     // Implementation of so called Ukkonen's cutoff.
     // The basic idea is to only calculate the cells of the matrix which are
@@ -104,35 +106,37 @@ class NeedlemanWunsch final {
     // ---+++++
 
     // 3 because minimum from MaxDistance + 1, IntermediateScore + 1, row + 1
-    int right_cutoff = std::min(columns, row + max_distance_ - intermediate_scores_[row - 1] + 3);
-    int left_cutoff = std::max(1, row - max_distance_);
-    int intermediate_score = INT_MAX;
+    size_t max_distance_as_size_t = static_cast<size_t>(max_distance_);
+
+    size_t right_cutoff = std::min(columns, row + max_distance_as_size_t - intermediate_scores_[row - 1] + 3);
+    size_t left_cutoff = row > max_distance_as_size_t ? row - max_distance_as_size_t : 1;
+    int32_t intermediate_score = std::numeric_limits<int32_t>::max();
     if (left_cutoff > columns) {
-      intermediate_scores_[row] = INT_MAX;
-      return INT_MAX;
+      intermediate_scores_[row] = std::numeric_limits<int32_t>::max();
+      return std::numeric_limits<int32_t>::max();
     }
 
     // initialize the first cell according to Ukkonen's cutoff
     distance_matrix_.Set(row, left_cutoff - 1, (row - left_cutoff + 1) * cost_function_.GetInsertionCost());
 
-    for (int i = left_cutoff; i < right_cutoff; ++i) {
-      int field_result;
+    for (size_t i = left_cutoff; i < right_cutoff; ++i) {
+      int32_t field_result;
 
       // 1. check for exact match according to the substitution cost
       // function
-      int substitution_cost = cost_function_.GetSubstitutionCost(input_sequence_[i - 1], codepoint);
+      int32_t substitution_cost = cost_function_.GetSubstitutionCost(input_sequence_[i - 1], codepoint);
 
-      int substitution_result = substitution_cost + distance_matrix_.Get(row - 1, i - 1);
+      int32_t substitution_result = substitution_cost + distance_matrix_.Get(row - 1, i - 1);
 
       if (substitution_cost == 0) {
         // codePoints match
         field_result = substitution_result;
       } else {
         // 2. calculate costs for deletion, insertion and transposition
-        int deletion_result = distance_matrix_.Get(row, i - 1) + cost_function_.GetDeletionCost();
-        int insertion_result = distance_matrix_.Get(row - 1, i) + cost_function_.GetInsertionCost();
+        int32_t deletion_result = distance_matrix_.Get(row, i - 1) + cost_function_.GetDeletionCost();
+        int32_t insertion_result = distance_matrix_.Get(row - 1, i) + cost_function_.GetInsertionCost();
 
-        int transposition_result = INT_MAX;
+        int32_t transposition_result = std::numeric_limits<int32_t>::max();
 
         if (row > 1 && i > 1 && input_sequence_[i - 1] == compare_sequence_[position - 1] &&
             input_sequence_[i - 2] == compare_sequence_[position]) {
@@ -177,7 +181,7 @@ class NeedlemanWunsch final {
     return intermediate_score;
   }
 
-  int GetScore() const { return distance_matrix_.Get(latest_calculated_row_, distance_matrix_.Columns() - 1); }
+  int32_t GetScore() const { return distance_matrix_.Get(latest_calculated_row_, distance_matrix_.Columns() - 1); }
 
   std::string GetCandidate() {
     std::vector<unsigned char> utf8result;
@@ -191,13 +195,13 @@ class NeedlemanWunsch final {
   }
 
  private:
-  int max_distance_ = 0;
-  int* compare_sequence_ = 0;
+  int32_t max_distance_ = 0;
+  uint32_t* compare_sequence_ = 0;
   size_t compare_sequence_size_;
-  int* intermediate_scores_ = 0;
-  int last_put_position_ = 0;
-  int latest_calculated_row_ = 0;
-  std::vector<int> input_sequence_;
+  int32_t* intermediate_scores_ = 0;
+  size_t last_put_position_ = 0;
+  size_t latest_calculated_row_ = 0;
+  std::vector<uint32_t> input_sequence_;
   DistanceMatrix distance_matrix_;
   CostFunctionT cost_function_;
 
@@ -210,8 +214,8 @@ class NeedlemanWunsch final {
     latest_calculated_row_ = 1;
 
     // initialize compare Sequence and immediateScore
-    compare_sequence_ = new int[rows];
-    intermediate_scores_ = new int[rows];
+    compare_sequence_ = new uint32_t[rows];
+    intermediate_scores_ = new int32_t[rows];
     intermediate_scores_[0] = 0;
     compare_sequence_size_ = rows;
   }
@@ -223,11 +227,11 @@ class NeedlemanWunsch final {
       // todo: increase by more than 1
 
       TRACE("expanding buffers from %d to %d", compare_sequence_size_, capacity);
-      int* compare_sequence_new = new int[capacity];
-      std::memcpy(compare_sequence_new, compare_sequence_, sizeof(int) * compare_sequence_size_);
+      uint32_t* compare_sequence_new = new uint32_t[capacity];
+      std::memcpy(compare_sequence_new, compare_sequence_, sizeof(uint32_t) * compare_sequence_size_);
 
-      int* intermediate_scores_new = new int[capacity];
-      std::memcpy(intermediate_scores_new, intermediate_scores_, sizeof(int) * compare_sequence_size_);
+      int32_t* intermediate_scores_new = new int32_t[capacity];
+      std::memcpy(intermediate_scores_new, intermediate_scores_, sizeof(int32_t) * compare_sequence_size_);
 
       delete[] compare_sequence_;
       delete[] intermediate_scores_;

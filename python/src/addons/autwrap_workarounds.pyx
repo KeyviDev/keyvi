@@ -1,6 +1,8 @@
 
 # import uint32_t type
 from libc.stdint cimport uint32_t
+from libc.stdint cimport uint64_t
+from libc.stdint cimport int32_t
 from cpython.version cimport PY_MAJOR_VERSION
 
 import json

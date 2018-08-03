@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, SorterT, sorter_types
   std::vector<std::string> query_data = {"fb#", "msg#", "downl#", "fb msg#", "fb downl#", "downl fb#", "downl de#"};
   std::cout << "test " << std::endl;
 
-  int tested_values = 0;
+  size_t tested_values = 0;
   for (auto q : query_data) {
     std::cout << "test " << q << std::endl;
     BOOST_CHECK(reference_weight == DCTTestHelper::GetStateIdForPrefix(a, q));

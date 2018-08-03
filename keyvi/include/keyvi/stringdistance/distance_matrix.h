@@ -41,7 +41,7 @@ struct DistanceMatrix final {
       throw new std::invalid_argument("Distance Matrix must have at least 1 row and 1 column.");
     }
 
-    distance_matrix_ = new int[rows * columns];
+    distance_matrix_ = new int32_t[rows * columns];
     number_of_rows_ = rows;
     number_of_columns_ = columns;
   }
@@ -67,9 +67,11 @@ struct DistanceMatrix final {
     }
   }
 
-  int Get(size_t row, size_t column) const { return distance_matrix_[((row * number_of_columns_) + column)]; }
+  int32_t Get(size_t row, size_t column) const { return distance_matrix_[((row * number_of_columns_) + column)]; }
 
-  void Set(size_t row, size_t column, int value) { distance_matrix_[((row * number_of_columns_) + column)] = value; }
+  void Set(size_t row, size_t column, int32_t value) {
+    distance_matrix_[((row * number_of_columns_) + column)] = value;
+  }
 
   void EnsureRowCapacity(size_t minimum_rows) {
     TRACE("boundary check %d", minimum_rows);
@@ -80,10 +82,10 @@ struct DistanceMatrix final {
       const size_t new_rows = std::max(minimum_rows, (number_of_rows_ * 6) / 5);
       TRACE("increase capacity to %d", new_rows);
 
-      int* newDistanceMatrix = new int[new_rows * number_of_columns_];
+      int32_t* newDistanceMatrix = new int32_t[new_rows * number_of_columns_];
 
       // copy the old array into the new one
-      std::memcpy(newDistanceMatrix, distance_matrix_, sizeof(int) * number_of_rows_ * number_of_columns_);
+      std::memcpy(newDistanceMatrix, distance_matrix_, sizeof(int32_t) * number_of_rows_ * number_of_columns_);
 
       delete[] distance_matrix_;
 
@@ -98,7 +100,7 @@ struct DistanceMatrix final {
   size_t Columns() const { return number_of_columns_; }
 
  private:
-  int* distance_matrix_;      //< internal matrix
+  int32_t* distance_matrix_;  //< internal matrix
   size_t number_of_columns_;  //< number of columns in the table. This is fixed at initialization time.
   size_t number_of_rows_;
 };
