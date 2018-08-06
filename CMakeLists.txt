@@ -9,6 +9,8 @@ else()
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.2 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRAPIDJSON_HAS_STDSTRING")
+
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
@@ -83,3 +85,5 @@ add_custom_target(bindings
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tiny-process-library> ${CMAKE_BINARY_DIR}
     DEPENDS tpie tiny-process-library
 )
+
+configure_file(keyvi/flags.cmake keyvi/flags)
