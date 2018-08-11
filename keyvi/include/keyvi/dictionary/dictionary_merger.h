@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_DICTIONARY_MERGER_H_
 
 #include <algorithm>
+#include <cstdint>
 #include <fstream>
 #include <functional>
 #include <memory>
@@ -63,9 +64,9 @@ struct MergeStats {
   size_t updated_keys_ = 0;
 };
 
-template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore>
+template <class ValueStoreT = fsa::internal::NullValueStore>
 class DictionaryMerger final {
-  using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+  using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;
   using parameters_t = keyvi::util::parameters_t;
 
  private:
@@ -180,7 +181,9 @@ class DictionaryMerger final {
 
     ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
 
-    generator_ = GeneratorAdapter::CreateGenerator(sparse_array_size_sum, params_, value_store);
+    generator_ =
+        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
+            sparse_array_size_sum, params_, value_store);
 
     std::string top_key;
 

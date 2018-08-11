@@ -139,12 +139,9 @@ void compile_completion(const std::vector<std::string>& input, const std::string
   finalize_compile(&compiler, output, manifest);
 }
 
-template <class BucketT = uint32_t>
 void compile_integer(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-                                        keyvi::dictionary::fsa::internal::IntValueStore>
-      compiler(value_store_params);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::IntValueStore> compiler(value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
@@ -185,21 +182,17 @@ void compile_strings_inner(Compiler* compiler, const std::vector<std::string>& i
   finalize_compile(compiler, output, manifest);
 }
 
-template <class BucketT = uint32_t>
 void compile_strings(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-                                        keyvi::dictionary::fsa::internal::StringValueStore>
-      compiler(value_store_params);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::StringValueStore> compiler(
+      value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
 }
 
-template <class BucketT = uint32_t>
 void compile_key_only(const std::vector<std::string>& input, const std::string& output,
                       const std::string& manifest = "",
                       const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>> compiler(
-      value_store_params);
+  keyvi::dictionary::DictionaryCompiler<> compiler(value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     std::string key = line;
@@ -217,12 +210,9 @@ void compile_key_only(const std::vector<std::string>& input, const std::string& 
   finalize_compile(&compiler, output, manifest);
 }
 
-template <class BucketT = uint32_t>
 void compile_json(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                   const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-                                        keyvi::dictionary::fsa::internal::JsonValueStore>
-      compiler(value_store_params);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::JsonValueStore> compiler(value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
 }
 
@@ -301,15 +291,15 @@ int main(int argc, char** argv) {
       output_file = vm["output-file"].as<std::string>();
 
       if (dictionary_type == "integer") {
-        compile_integer<uint16_t>(input_files, output_file, manifest, value_store_params);
+        compile_integer(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "string") {
-        compile_strings<uint16_t>(input_files, output_file, manifest, value_store_params);
+        compile_strings(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "key-only") {
-        compile_key_only<uint16_t>(input_files, output_file, manifest, value_store_params);
+        compile_key_only(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "json") {
-        compile_json<uint16_t>(input_files, output_file, manifest, value_store_params);
+        compile_json(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "completion") {
-        compile_integer<uint16_t>(input_files, output_file, manifest, value_store_params);
+        compile_integer(input_files, output_file, manifest, value_store_params);
       } else {
         std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;
         std::cout << description;

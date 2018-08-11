@@ -30,7 +30,7 @@
 namespace keyvi {
 namespace dictionary {
 
-template <class PersistenceT, class ValueStoreT>
+template <class ValueStoreT>
 class DictionaryMerger;
 
 } /* namespace dictionary */

@@ -46,8 +46,7 @@ BOOST_AUTO_TEST_CASE(MergeKeyOnlyDicts) {
   std::vector<std::string> test_data2 = {"aaaaz", "aabbe", "cdddefgh"};
   testing::TempDictionary dictionary2(&test_data2);
 
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>> merger(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictionaryMerger<> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   std::string filename("merged-dict-key-only.kv");
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
@@ -94,7 +93,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDicts) {
   testing::TempDictionary dictionary2(&test_data2);
 
   std::string filename("merged-dict-int.kv");
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
+  DictionaryMerger<fsa::internal::IntInnerWeightsValueStore> merger(
       keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
@@ -300,8 +299,7 @@ BOOST_AUTO_TEST_CASE(MergeStringDicts) {
   testing::TempDictionary dictionary2(&test_data2);
 
   std::string filename("merged-dict-string.kv");
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::StringValueStore> merger(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictionaryMerger<fsa::internal::StringValueStore> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -352,8 +350,7 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
   testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data2);
 
   std::string filename("merged-dict-json.kv");
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::JsonValueStore> merger(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictionaryMerger<fsa::internal::JsonValueStore> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -399,7 +396,7 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
 BOOST_AUTO_TEST_CASE(MergeIncompatible) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
   testing::TempDictionary dictionary(&test_data);
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
+  DictionaryMerger<fsa::internal::IntInnerWeightsValueStore> merger(
       keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
@@ -418,7 +415,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
   testing::TempDictionary dictionary2(&test_data2);
 
   std::string filename("merged-dict-int-weight-v1.kv");
-  DictionaryMerger<fsa::internal::SparseArrayPersistence<>, fsa::internal::IntInnerWeightsValueStore> merger(
+  DictionaryMerger<fsa::internal::IntInnerWeightsValueStore> merger(
       keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());

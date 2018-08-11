@@ -72,7 +72,7 @@ namespace internal {
 class JsonValueStore final : public IValueStoreWriter {
  public:
   typedef std::string value_t;
-  static const uint64_t no_value = 0;
+  static const std::string no_value;
   static const bool inner_weight = false;
 
   explicit JsonValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())

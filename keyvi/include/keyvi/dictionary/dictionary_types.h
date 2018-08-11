@@ -40,48 +40,32 @@ namespace dictionary {
 typedef keyvi::dictionary::fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>>
     KeyOnlyDictionaryGenerator;
 
-typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-                                              keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
     CompletionDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-                                              keyvi::dictionary::fsa::internal::IntValueStore>
-    IntDictionaryCompiler;
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::IntValueStore> IntDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>>
-    KeyOnlyDictionaryCompiler;
+typedef keyvi::dictionary::DictionaryCompiler<> KeyOnlyDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-                                              keyvi::dictionary::fsa::internal::JsonValueStore>
-    JsonDictionaryCompiler;
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-                                              keyvi::dictionary::fsa::internal::JsonValueStore,
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::JsonValueStore,
                                               keyvi::dictionary::sort::InMemorySorter<key_value_t>>
     JsonDictionaryCompilerSmallData;
 
-typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-                                              keyvi::dictionary::fsa::internal::StringValueStore>
+typedef keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::StringValueStore>
     StringDictionaryCompiler;
 
-typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-                                            keyvi::dictionary::fsa::internal::JsonValueStore>
-    JsonDictionaryMerger;
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::JsonValueStore> JsonDictionaryMerger;
 
-typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-                                            keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
     CompletionDictionaryMerger;
 
-typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>,
-                                            keyvi::dictionary::fsa::internal::IntValueStore>
-    IntDictionaryMerger;
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::IntValueStore> IntDictionaryMerger;
 
-typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>,
-                                            keyvi::dictionary::fsa::internal::StringValueStore>
-    StringDictionaryMerger;
+typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::StringValueStore> StringDictionaryMerger;
 
-typedef keyvi::dictionary::DictionaryMerger<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>
-    KeyOnlyDictionaryMerger;
+typedef keyvi::dictionary::DictionaryMerger<> KeyOnlyDictionaryMerger;
 
 } /* namespace dictionary */
 } /* namespace keyvi */

@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, SorterT, sorter_types
       {"de fb#fb msg downl de", 22},    {"de msg#fb msg downl de", 22},    {"de downl#fb msg downl de", 22},
   };
 
-  keyvi::dictionary::DictionaryCompiler<fsa::internal::SparseArrayPersistence<>,
+  keyvi::dictionary::DictionaryCompiler<
                                         fsa::internal::IntInnerWeightsValueStore, SorterT>
       compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
@@ -115,8 +115,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sortOrder, SorterT, sorter_types) {
       {"uboot", 22}, {"überfall", 33}, {"vielleicht", 43}, {"arbeit", 3}, {"zoo", 5}, {"ändern", 6},
   };
 
-  keyvi::dictionary::DictionaryCompiler<fsa::internal::SparseArrayPersistence<>,
-                                        fsa::internal::IntInnerWeightsValueStore, SorterT>
+  keyvi::dictionary::DictionaryCompiler<fsa::internal::IntInnerWeightsValueStore, SorterT>
       compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
@@ -192,8 +191,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(compactSize, SorterT, sorter_types) {
       {"uboot", 22}, {"überfall", 33}, {"vielleicht", 43}, {"arbeit", 3}, {"zoo", 5}, {"ändern", 6},
   };
 
-  keyvi::dictionary::DictionaryCompiler<fsa::internal::SparseArrayPersistence<uint16_t>,
-                                        fsa::internal::IntInnerWeightsValueStore, SorterT>
+  keyvi::dictionary::DictionaryCompiler<fsa::internal::IntInnerWeightsValueStore, SorterT>
       compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
@@ -240,7 +238,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(stableInsert, SorterT, sorter_types) {
 
   keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}, {STABLE_INSERTS, "true"}};
 
-  keyvi::dictionary::DictionaryCompiler<fsa::internal::SparseArrayPersistence<uint16_t>, fsa::internal::JsonValueStore,
+  keyvi::dictionary::DictionaryCompiler<fsa::internal::JsonValueStore,
                                         SorterT>
       compiler(params);
 
@@ -286,7 +284,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(stableInsert, SorterT, sorter_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(addAndDeletes, SorterT, sorter_types) {
   keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}, {STABLE_INSERTS, "true"}};
 
-  keyvi::dictionary::DictionaryCompiler<fsa::internal::SparseArrayPersistence<uint16_t>, fsa::internal::JsonValueStore,
+  keyvi::dictionary::DictionaryCompiler<fsa::internal::JsonValueStore,
                                         SorterT>
       compiler(params);
 
@@ -336,7 +334,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(addAndDeletes, SorterT, sorter_types) {
 BOOST_AUTO_TEST_CASE_TEMPLATE(DeleteUnsupported, SorterT, sorter_types) {
   keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}};
 
-  keyvi::dictionary::DictionaryCompiler<fsa::internal::SparseArrayPersistence<uint16_t>, fsa::internal::JsonValueStore,
+  keyvi::dictionary::DictionaryCompiler<fsa::internal::JsonValueStore,
                                         SorterT>
       compiler(params);
 

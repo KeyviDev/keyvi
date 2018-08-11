@@ -63,7 +63,7 @@ struct compiler_exception : public std::runtime_error {
 /**
  * Dictionary Compiler
  */
-template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore,
+template <class ValueStoreT = fsa::internal::NullValueStore,
 #if !defined(KEYVI_DISABLE_TPIE)
           class SorterT = sort::TpieSorter<key_value_t>>
 #else
@@ -71,7 +71,7 @@ template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore,
 #endif
 class DictionaryCompiler final {
   typedef std::function<void(size_t, size_t, void*)> callback_t;
-  using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+  using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;
 
  public:
   /**
@@ -146,7 +146,9 @@ class DictionaryCompiler final {
 
     value_store_->CloseFeeding();
     sorter_.sort();
-    generator_ = GeneratorAdapter::CreateGenerator(size_of_keys_, params_, value_store_);
+    generator_ =
+        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
+            size_of_keys_, params_, value_store_);
     generator_->SetManifest(manifest_);
 
     if (sorter_.size() > 0) {

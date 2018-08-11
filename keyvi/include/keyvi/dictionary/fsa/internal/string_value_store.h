@@ -128,7 +128,7 @@ class StringValueStore final : public IValueStoreWriter {
   };
 
   typedef std::string value_t;
-  static const uint64_t no_value = 0;
+  static const std::string no_value;
   static const bool inner_weight = false;
 
   using IValueStoreWriter::IValueStoreWriter;

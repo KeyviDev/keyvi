@@ -36,18 +36,21 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-template <class PersistenceT, class ValueStoreT>
+template <typename ValueT>
 class GeneratorAdapterInterface {
  public:
   using AdapterPtr = std::unique_ptr<GeneratorAdapterInterface>;
 
+  template <class PersistenceT, class ValueStoreT>
   static AdapterPtr CreateGenerator(size_t size_of_keys, const keyvi::util::parameters_t& params,
                                     ValueStoreT* value_store);
 
  public:
   GeneratorAdapterInterface() {}
 
-  virtual void Add(const std::string& input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {}
+  // virtual void Add(const std::string& input_key) {}
+
+  virtual void Add(const std::string& input_key, ValueT value) {}
   virtual void Add(const std::string& input_key, const fsa::ValueHandle& value) {}
 
   virtual size_t GetFsaSize() const { return 0; }
@@ -61,13 +64,15 @@ class GeneratorAdapterInterface {
 };
 
 template <class PersistenceT, class ValueStoreT, class OffsetTypeT, class HashCodeTypeT>
-class GeneratorAdapter final : public GeneratorAdapterInterface<PersistenceT, ValueStoreT> {
+class GeneratorAdapter final : public GeneratorAdapterInterface<typename ValueStoreT::value_t> {
  public:
   explicit GeneratorAdapter(const keyvi::util::parameters_t& params = keyvi::util::parameters_t(),
                             ValueStoreT* value_store = NULL)
       : generator_(params, value_store) {}
 
-  void Add(const std::string& input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {
+  // void Add(const std::string& input_key) { generator_.Add(std::move(input_key)); }
+
+  void Add(const std::string& input_key, typename ValueStoreT::value_t value) {
     generator_.Add(std::move(input_key), value);
   }
 
@@ -89,11 +94,10 @@ class GeneratorAdapter final : public GeneratorAdapterInterface<PersistenceT, Va
   Generator<PersistenceT, ValueStoreT, OffsetTypeT, HashCodeTypeT> generator_;
 };
 
+template <typename ValueT>
 template <class PersistenceT, class ValueStoreT>
-typename GeneratorAdapterInterface<PersistenceT, ValueStoreT>::AdapterPtr
-GeneratorAdapterInterface<PersistenceT, ValueStoreT>::CreateGenerator(size_t size_of_keys,
-                                                                      const keyvi::util::parameters_t& params,
-                                                                      ValueStoreT* value_store) {
+typename GeneratorAdapterInterface<ValueT>::AdapterPtr GeneratorAdapterInterface<ValueT>::CreateGenerator(
+    size_t size_of_keys, const keyvi::util::parameters_t& params, ValueStoreT* value_store) {
   size_t memory_limit = keyvi::util::mapGetMemory(params, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_GENERATOR);
 
   // todo: find good parameters for auto-guessing this
