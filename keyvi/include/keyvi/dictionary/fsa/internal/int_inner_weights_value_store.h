@@ -67,7 +67,7 @@ class IntInnerWeightsValueStore final : public IValueStoreWriter {
 
   uint32_t GetMergeWeight(uint64_t fsa_value) { return fsa_value; }
 
-  static value_store_t GetValueStoreType() { return INT_INNER_WEIGHTS_VALUE_STORE; }
+  static value_store_t GetValueStoreType() { return INT_WITH_WEIGHTS; }
 
   void Write(std::ostream& stream) const {}
 
@@ -87,7 +87,7 @@ class IntInnerWeightsValueStoreReader final : public IValueStoreReader {
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  value_store_t GetValueStoreType() const override { return INT_INNER_WEIGHTS_VALUE_STORE; }
+  value_store_t GetValueStoreType() const override { return INT_WITH_WEIGHTS; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());
@@ -97,6 +97,12 @@ class IntInnerWeightsValueStoreReader final : public IValueStoreReader {
   }
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return std::to_string(fsa_value); }
+};
+
+template <>
+struct Dict<value_store_t::INT_WITH_WEIGHTS> {
+  typedef IntInnerWeightsValueStore value_store_t;
+  typedef IntInnerWeightsValueStore value_store_append_merge_t;
 };
 
 } /* namespace internal */

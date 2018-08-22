@@ -27,6 +27,7 @@
 
 #include "dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "dictionary/fsa/internal/int_value_store.h"
+#include "dictionary/fsa/internal/ivalue_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/null_value_store.h"
@@ -43,17 +44,17 @@ class ValueStoreFactory final {
                                        boost::interprocess::file_mapping* file_mapping,
                                        loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
     switch (type) {
-      case NULL_VALUE_STORE:
+      case KEY_ONLY:
         return new NullValueStoreReader(stream, file_mapping);
-      case INT_VALUE_STORE:
+      case INT:
         return new IntValueStoreReader(stream, file_mapping);
-      case STRING_VALUE_STORE:
+      case STRING:
         return new StringValueStoreReader(stream, file_mapping, loading_strategy);
-      case JSON_VALUE_STORE_DEPRECATED:
+      case JSON_DEPRECATED:
         throw std::invalid_argument("Deprecated Value Storage type");
-      case JSON_VALUE_STORE:
+      case JSON:
         return new JsonValueStoreReader(stream, file_mapping, loading_strategy);
-      case INT_INNER_WEIGHTS_VALUE_STORE:
+      case INT_WITH_WEIGHTS:
         return new IntInnerWeightsValueStoreReader(stream, file_mapping);
       default:
         throw std::invalid_argument("Unknown Value Storage type");

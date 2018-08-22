@@ -63,12 +63,13 @@ struct compiler_exception : public std::runtime_error {
 /**
  * Dictionary Compiler
  */
-template <class ValueStoreT = fsa::internal::NullValueStore,
+template <int DictionaryType = fsa::internal::value_store_t::KEY_ONLY,
 #if !defined(KEYVI_DISABLE_TPIE)
-          class SorterT = sort::TpieSorter<key_value_t>>
+          class SorterT = sort::TpieSorter<key_value_t>,
 #else
-          class SorterT = sort::InMemorySorter<key_value_t>>
+          class SorterT = sort::InMemorySorter<key_value_t>,
 #endif
+          typename ValueStoreT = typename fsa::internal::Dict<DictionaryType>::value_store_t>
 class DictionaryCompiler final {
   typedef std::function<void(size_t, size_t, void*)> callback_t;
   using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;

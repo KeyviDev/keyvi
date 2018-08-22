@@ -30,7 +30,7 @@
 namespace keyvi {
 namespace dictionary {
 
-template <class ValueStoreT>
+template <int DictionaryType, typename ValueStoreT, typename ValueStoreMergeT> // = value_store_from<DictionaryType>>
 class DictionaryMerger;
 
 } /* namespace dictionary */

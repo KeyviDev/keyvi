@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(reader) {
 
   NullValueStoreReader nvsr(string_stream, &file_mapping);
 
-  BOOST_CHECK_EQUAL(nvsr.GetValueStoreType(), NULL_VALUE_STORE);
+  BOOST_CHECK_EQUAL(nvsr.GetValueStoreType(), KEY_ONLY);
   BOOST_CHECK_EQUAL(nvsr.GetValueAsAttributeVector(42), IValueStoreReader::attributes_t());
 }
 

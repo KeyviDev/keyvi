@@ -37,6 +37,7 @@
 #include <boost/range/iterator_range.hpp>
 
 #include "dictionary/dictionary_compiler.h"
+#include "dictionary/dictionary_types.h"
 #include "dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "dictionary/fsa/internal/int_value_store.h"
 #include "dictionary/fsa/internal/json_value_store.h"
@@ -113,9 +114,8 @@ template <class BucketT = uint32_t>
 void compile_completion(const std::vector<std::string>& input, const std::string& output,
                         const std::string& manifest = "",
                         const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::SparseArrayPersistence<BucketT>,
-                                        keyvi::dictionary::fsa::internal::IntInnerWeightsValueStore>
-      compiler(value_store_params);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::INT_WITH_WEIGHTS> compiler(
+      value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
@@ -141,7 +141,7 @@ void compile_completion(const std::vector<std::string>& input, const std::string
 
 void compile_integer(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::IntValueStore> compiler(value_store_params);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::INT> compiler(value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
@@ -184,7 +184,7 @@ void compile_strings_inner(Compiler* compiler, const std::vector<std::string>& i
 
 void compile_strings(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::StringValueStore> compiler(
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::STRING> compiler(
       value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
 }
@@ -212,7 +212,7 @@ void compile_key_only(const std::vector<std::string>& input, const std::string& 
 
 void compile_json(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                   const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::fsa::internal::JsonValueStore> compiler(value_store_params);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::JSON> compiler(value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
 }
 

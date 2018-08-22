@@ -50,13 +50,20 @@ namespace internal {
  * Do not forget to add the new value store to ValueStoreFactory
  */
 enum value_store_t {
-  NULL_VALUE_STORE = 1,               //!< NullValueStore
-  INT_VALUE_STORE = 2,                //!< IntValueStore
-  STRING_VALUE_STORE = 3,             //!< StringValueStore
-  JSON_VALUE_STORE_DEPRECATED = 4,    // !< JsonValueStoreDeprecated
-  JSON_VALUE_STORE = 5,               // !< JsonValueStore
-  INT_INNER_WEIGHTS_VALUE_STORE = 6,  // !< IntInnerWeightsValueStore
+  KEY_ONLY = 1,          //!< NullValueStore
+  INT = 2,               //!< IntValueStore
+  STRING = 3,            //!< StringValueStore
+  JSON_DEPRECATED = 4,   //!< deprecated, not used
+  JSON = 5,              //!< JsonValueStore
+  INT_WITH_WEIGHTS = 6,  //!< IntInnerWeightsValueStore
 };
+
+/*
+ * Template that hold information about dictionary types, to be specialized.
+ */
+
+template <int>
+struct Dict {};
 
 /* Writing value stores is based on template (duck-typing).
  * Base class / Interface definition for writing to the value store.

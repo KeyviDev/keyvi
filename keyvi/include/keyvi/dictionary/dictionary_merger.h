@@ -42,6 +42,7 @@
 #include "dictionary/fsa/entry_iterator.h"
 #include "dictionary/fsa/generator_adapter.h"
 #include "dictionary/fsa/internal/constants.h"
+#include "dictionary/fsa/internal/value_store_factory.h"
 #include "util/configuration.h"
 
 // #define ENABLE_TRACING
@@ -64,7 +65,9 @@ struct MergeStats {
   size_t updated_keys_ = 0;
 };
 
-template <class ValueStoreT = fsa::internal::NullValueStore>
+template <int DictionaryType = fsa::internal::value_store_t::KEY_ONLY,
+          typename ValueStoreT = typename fsa::internal::Dict<DictionaryType>::value_store_t,
+          typename ValueStoreAppendMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_append_merge_t>
 class DictionaryMerger final {
   using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;
   using parameters_t = keyvi::util::parameters_t;
@@ -174,80 +177,11 @@ class DictionaryMerger final {
   }
 
   void Merge() {
-    size_t sparse_array_size_sum = 0;
-    for (auto fsa : dicts_to_merge_) {
-      sparse_array_size_sum += fsa->SparseArraySize();
+    if (append_merge_) {
+      AppendMerge();
+    } else {
+      CompleteMerge();
     }
-
-    ValueStoreT* value_store = append_merge_ ? new ValueStoreT(inputFiles_) : new ValueStoreT(params_);
-
-    generator_ =
-        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
-            sparse_array_size_sum, params_, value_store);
-
-    std::string top_key;
-
-    while (!segments_pqueue_.empty()) {
-      auto segment_it = segments_pqueue_.top();
-      segments_pqueue_.pop();
-
-      top_key = segment_it.entryIterator().GetKey();
-
-      // check for same keys and merge only the most recent one
-      while (!segments_pqueue_.empty() && segments_pqueue_.top().entryIterator().operator==(top_key)) {
-        ++stats_.updated_keys_;
-        auto to_inc = segments_pqueue_.top();
-
-        segments_pqueue_.pop();
-        if (++to_inc) {
-          TRACE("push iterator");
-          segments_pqueue_.push(to_inc);
-        }
-      }
-
-      if (!deleted_keys_[segment_it.segmentIndex()].empty() &&
-          top_key == deleted_keys_[segment_it.segmentIndex()].back()) {
-        deleted_keys_[segment_it.segmentIndex()].pop_back();
-        ++stats_.deleted_keys_;
-        // check the other deleted_keys for duplicates
-        for (auto& deleted_keys : deleted_keys_) {
-          if (!deleted_keys.empty() && top_key == deleted_keys.back()) {
-            ++stats_.deleted_keys_;
-            deleted_keys.pop_back();
-          }
-        }
-
-      } else {
-        fsa::ValueHandle handle;
-        handle.no_minimization = false;
-
-        // get the weight value, for now simple: does not require access to the
-        // value store itself
-        handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
-
-        if (append_merge_) {
-          handle.value_idx =
-              value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
-        } else {
-          handle.value_idx =
-              value_store->GetValue(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
-                                    segment_it.entryIterator().GetValueId(), &handle.no_minimization);
-        }
-
-        TRACE("Add key: %s", top_key.c_str());
-        ++stats_.number_of_keys_;
-        generator_->Add(std::move(top_key), handle);
-      }
-      if (++segment_it) {
-        segments_pqueue_.push(segment_it);
-      }
-    }
-
-    dicts_to_merge_.clear();
-
-    TRACE("finished iterating, do final compile.");
-
-    generator_->CloseFeeding();
   }
 
   void Write(std::ostream& stream) {
@@ -277,6 +211,129 @@ class DictionaryMerger final {
   parameters_t params_;
   std::string manifest_ = std::string();
   MergeStats stats_;
+
+  size_t GetTotalSparseArraySize() const {
+    size_t sparse_array_size_sum = 0;
+    for (auto fsa : dicts_to_merge_) {
+      sparse_array_size_sum += fsa->SparseArraySize();
+    }
+    return sparse_array_size_sum;
+  }
+
+  bool KeyDeleted(size_t segment_index, const std::string& key) {
+    if (!deleted_keys_[segment_index].empty() && key == deleted_keys_[segment_index].back()) {
+      deleted_keys_[segment_index].pop_back();
+      ++stats_.deleted_keys_;
+      // check the other deleted_keys for duplicates
+      for (auto& deleted_keys : deleted_keys_) {
+        if (!deleted_keys.empty() && key == deleted_keys.back()) {
+          ++stats_.deleted_keys_;
+          deleted_keys.pop_back();
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  void CompleteMerge() {
+    ValueStoreT* value_store = new ValueStoreT(params_);
+    generator_ =
+        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
+            GetTotalSparseArraySize(), params_, value_store);
+
+    std::string top_key;
+
+    while (!segments_pqueue_.empty()) {
+      auto segment_it = segments_pqueue_.top();
+      segments_pqueue_.pop();
+
+      top_key = segment_it.entryIterator().GetKey();
+
+      // check for same keys and merge only the most recent one
+      while (!segments_pqueue_.empty() && segments_pqueue_.top().entryIterator().operator==(top_key)) {
+        ++stats_.updated_keys_;
+        auto to_inc = segments_pqueue_.top();
+
+        segments_pqueue_.pop();
+        if (++to_inc) {
+          TRACE("push iterator");
+          segments_pqueue_.push(to_inc);
+        }
+      }
+
+      if (KeyDeleted(segment_it.segmentIndex(), top_key) == false) {
+        fsa::ValueHandle handle;
+        handle.no_minimization = false;
+
+        // get the weight value, for now simple: does not require access to the
+        // value store itself
+        handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
+        handle.value_idx =
+            value_store->GetValue(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
+                                  segment_it.entryIterator().GetValueId(), &handle.no_minimization);
+
+        TRACE("Add key: %s", top_key.c_str());
+        ++stats_.number_of_keys_;
+        generator_->Add(std::move(top_key), handle);
+      }
+      if (++segment_it) {
+        segments_pqueue_.push(segment_it);
+      }
+    }
+    dicts_to_merge_.clear();
+    TRACE("finished iterating, do final compile.");
+    generator_->CloseFeeding();
+  }
+
+  void AppendMerge() {
+    ValueStoreAppendMergeT* value_store = new ValueStoreAppendMergeT(inputFiles_);
+    generator_ =
+        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
+            GetTotalSparseArraySize(), params_, value_store);
+
+    std::string top_key;
+
+    while (!segments_pqueue_.empty()) {
+      auto segment_it = segments_pqueue_.top();
+      segments_pqueue_.pop();
+
+      top_key = segment_it.entryIterator().GetKey();
+
+      // check for same keys and merge only the most recent one
+      while (!segments_pqueue_.empty() && segments_pqueue_.top().entryIterator().operator==(top_key)) {
+        ++stats_.updated_keys_;
+        auto to_inc = segments_pqueue_.top();
+
+        segments_pqueue_.pop();
+        if (++to_inc) {
+          TRACE("push iterator");
+          segments_pqueue_.push(to_inc);
+        }
+      }
+
+      if (KeyDeleted(segment_it.segmentIndex(), top_key) == false) {
+        fsa::ValueHandle handle;
+        handle.no_minimization = false;
+
+        // get the weight value, for now simple: does not require access to the
+        // value store itself
+        handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
+        handle.value_idx =
+            value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
+
+        TRACE("Add key: %s", top_key.c_str());
+        ++stats_.number_of_keys_;
+        generator_->Add(std::move(top_key), handle);
+      }
+      if (++segment_it) {
+        segments_pqueue_.push(segment_it);
+      }
+    }
+    dicts_to_merge_.clear();
+    TRACE("finished iterating, do final compile.");
+    generator_->CloseFeeding();
+  }
 
   /**
    * Load a file with deleted keys if it exists

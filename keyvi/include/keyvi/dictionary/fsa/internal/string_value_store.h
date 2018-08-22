@@ -172,7 +172,7 @@ class StringValueStore final : public IValueStoreWriter {
 
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
-  static value_store_t GetValueStoreType() { return STRING_VALUE_STORE; }
+  static value_store_t GetValueStoreType() { return STRING; }
 
   void Write(std::ostream& stream) const {
     boost::property_tree::ptree pt;
@@ -235,7 +235,7 @@ class StringValueStoreReader final : public IValueStoreReader {
 
   ~StringValueStoreReader() { delete strings_region_; }
 
-  value_store_t GetValueStoreType() const override { return STRING_VALUE_STORE; }
+  value_store_t GetValueStoreType() const override { return STRING; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());
@@ -253,6 +253,12 @@ class StringValueStoreReader final : public IValueStoreReader {
   const char* strings_;
 
   const char* GetValueStorePayload() const override { return strings_; }
+};
+
+template <>
+struct Dict<value_store_t::STRING> {
+  typedef StringValueStore value_store_t;
+  typedef StringValueStore value_store_append_merge_t;
 };
 
 } /* namespace internal */

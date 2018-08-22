@@ -183,7 +183,7 @@ class JsonValueStore final : public IValueStoreWriter {
 
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
-  static value_store_t GetValueStoreType() { return JSON_VALUE_STORE; }
+  static value_store_t GetValueStoreType() { return JSON; }
 
   /**
    * Close the value store, so no more updates;
@@ -323,7 +323,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
 
   ~JsonValueStoreReader() { delete strings_region_; }
 
-  value_store_t GetValueStoreType() const override { return JSON_VALUE_STORE; }
+  value_store_t GetValueStoreType() const override { return JSON; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());
@@ -360,6 +360,12 @@ class JsonValueStoreReader final : public IValueStoreReader {
   boost::property_tree::ptree properties_;
 
   const char* GetValueStorePayload() const override { return strings_; }
+};
+
+template <>
+struct Dict<value_store_t::JSON> {
+  typedef JsonValueStore value_store_t;
+  typedef JsonValueStore value_store_append_merge_t;
 };
 
 } /* namespace internal */

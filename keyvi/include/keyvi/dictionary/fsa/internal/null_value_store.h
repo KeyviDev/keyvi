@@ -57,7 +57,7 @@ class NullValueStore final : public IValueStoreWriter {
 
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
-  static value_store_t GetValueStoreType() { return NULL_VALUE_STORE; }
+  static value_store_t GetValueStoreType() { return KEY_ONLY; }
 
   void Write(std::ostream& stream) const {}
 
@@ -77,11 +77,17 @@ class NullValueStoreReader final : public IValueStoreReader {
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  value_store_t GetValueStoreType() const override { return NULL_VALUE_STORE; }
+  value_store_t GetValueStoreType() const override { return KEY_ONLY; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override { return attributes_t(); }
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return ""; }
+};
+
+template <>
+struct Dict<value_store_t::KEY_ONLY> {
+  typedef NullValueStore value_store_t;
+  typedef NullValueStore value_store_append_merge_t;
 };
 
 } /* namespace internal */
