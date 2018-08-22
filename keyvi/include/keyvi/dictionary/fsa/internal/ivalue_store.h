@@ -173,7 +173,7 @@ class IValueStoreReader {
   virtual std::string GetStatistics() const { return ""; }
 
  private:
-  template <typename, typename>
+  template <typename, typename, typename>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
   virtual const char* GetValueStorePayload() const { return 0; }

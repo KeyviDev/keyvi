@@ -196,7 +196,7 @@ class StringValueStore final : public IValueStoreWriter {
   std::vector<char> string_values_;
   MinimizationHash<StringPointer> hash_;
 
-  template <typename, typename>
+  template <typename, typename, typename>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
   uint64_t GetValue(const char* p, uint64_t fsa_value, bool* no_minimization) {

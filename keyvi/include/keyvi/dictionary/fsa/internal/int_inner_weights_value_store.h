@@ -77,7 +77,7 @@ class IntInnerWeightsValueStore final : public IValueStoreWriter {
   void CloseFeeding() {}
 
  private:
-  template <typename, typename>
+  template <typename, typename, typename>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
   uint64_t GetValue(const char* p, uint64_t v, bool* no_minimization) { return v; }
