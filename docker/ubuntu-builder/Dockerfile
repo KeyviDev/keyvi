@@ -24,3 +24,15 @@ RUN pyenv install 3.5.6
 RUN pyenv install 3.6.6
 RUN pyenv install 3.7.0
 RUN pyenv install pypy-5.3.1
+
+#RUN curl -s https://static.rust-lang.org/rustup.sh | sh -s -- --channel=stable
+
+
+# install toolchain
+RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
+ENV PATH "$HOME/.cargo/bin:$PATH"
+
+#To get started you need Cargo's bin directory ($HOME/.cargo/bin) in your PATH
+#environment variable. Next time you log in this will be done automatically.
+#
+#To configure your current shell run source $HOME/.cargo/env

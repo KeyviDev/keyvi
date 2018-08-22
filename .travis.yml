@@ -20,27 +20,27 @@ services:
 
 env:
   matrix:
-    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=debug      ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=34     CONF=debug      ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=35     CONF=debug      ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=36     CONF=debug      ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=37     CONF=debug      ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=pypy2  CONF=debug      ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=release    ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=34     CONF=release    ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=35     CONF=release    ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=36     CONF=release    ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=37     CONF=release    ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=pypy2  CONF=release    ARCH=x86_64
-    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=coverage   ARCH=x86_64
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=27     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=34     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=35     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=36     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=37     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-    - BUILD_TYPE=sdist      PYTHON_VERSION=27
-    - BUILD_TYPE=doc
-    - BUILD_TYPE=rust
+    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=debug      ARCH=x86_64   DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
+#    - BUILD_TYPE=linux      PYTHON_VERSION=34     CONF=debug      ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=35     CONF=debug      ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=36     CONF=debug      ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=37     CONF=debug      ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=pypy2  CONF=debug      ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=release    ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=34     CONF=release    ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=35     CONF=release    ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=36     CONF=release    ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=37     CONF=release    ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=pypy2  CONF=release    ARCH=x86_64
+#    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=coverage   ARCH=x86_64
+#    - BUILD_TYPE=manylinux  PYTHON_VERSION=27     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+#    - BUILD_TYPE=manylinux  PYTHON_VERSION=34     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+#    - BUILD_TYPE=manylinux  PYTHON_VERSION=35     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+#    - BUILD_TYPE=manylinux  PYTHON_VERSION=36     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+#    - BUILD_TYPE=manylinux  PYTHON_VERSION=37     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+#    - BUILD_TYPE=sdist      PYTHON_VERSION=27
+#    - BUILD_TYPE=doc
+#    - BUILD_TYPE=rust
 
   global:
     - GH_REPO_NAME='keyvi'
@@ -86,40 +86,40 @@ install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
   - if [ "$DOCKER_IMAGE" != "" ]; then docker pull $DOCKER_IMAGE ; fi
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-# disable, LLVM broken for now    - llvm-toolchain-precise-3.6
-    - boost-latest
-    packages:
-    - gcc-4.8
-    - g++-4.8
-# disabled due to https://github.com/travis-ci/travis-ci/issues/6120    - clang
-    - valgrind
-    - cmake
-    - libboost-thread1.55-dev
-    - libboost-system1.55-dev
-    - libboost-test1.55-dev
-    - libboost1.55-dev
-    - libboost-date-time1.55-dev
-    - libboost-regex1.55-dev
-    - libboost-filesystem1.55-dev
-    - libboost-program-options1.55-dev
-    - libboost-iostreams1.55-dev
-    - libsnappy-dev
-    - zlib1g-dev
-    - doxygen
-    - doxygen-doc
-    - doxygen-latex
-    - doxygen-gui
-    - graphviz
-    - libstdc++-4.8-dev
-    - clang-format-3.8
-    - libffi-dev
+#addons:
+#  apt:
+#    sources:
+#    - ubuntu-toolchain-r-test
+## disable, LLVM broken for now    - llvm-toolchain-precise-3.6
+#    - boost-latest
+#    packages:
+#    - gcc-4.8
+#    - g++-4.8
+## disabled due to https://github.com/travis-ci/travis-ci/issues/6120    - clang
+#    - valgrind
+#    - cmake
+#    - libboost-thread1.55-dev
+#    - libboost-system1.55-dev
+#    - libboost-test1.55-dev
+#    - libboost1.55-dev
+#    - libboost-date-time1.55-dev
+#    - libboost-regex1.55-dev
+#    - libboost-filesystem1.55-dev
+#    - libboost-program-options1.55-dev
+#    - libboost-iostreams1.55-dev
+#    - libsnappy-dev
+#    - zlib1g-dev
+#    - doxygen
+#    - doxygen-doc
+#    - doxygen-latex
+#    - doxygen-gui
+#    - graphviz
+#    - libstdc++-4.8-dev
+#    - clang-format-3.8
+#    - libffi-dev
 
 script:
-  - if [ "$BUILD_TYPE" == "linux" ]; then source ./travis/build_linux.sh ; fi
+  - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm `pwd`:/io ./travis/build_linux.sh ; fi
   - if [ "$BUILD_TYPE" == "manylinux" ]; then source ./travis/build_manylinux_package.sh ; fi
   - if [ "$BUILD_TYPE" == "sdist" ]; then source ./travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
