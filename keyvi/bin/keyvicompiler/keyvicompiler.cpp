@@ -184,8 +184,7 @@ void compile_strings_inner(Compiler* compiler, const std::vector<std::string>& i
 
 void compile_strings(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::STRING> compiler(
-      value_store_params);
+  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::STRING> compiler(value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
 }
 

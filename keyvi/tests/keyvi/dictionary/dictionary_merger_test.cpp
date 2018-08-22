@@ -93,8 +93,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDicts) {
   testing::TempDictionary dictionary2(&test_data2);
 
   std::string filename("merged-dict-int.kv");
-  DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS> merger(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
@@ -396,8 +395,7 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
 BOOST_AUTO_TEST_CASE(MergeIncompatible) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
   testing::TempDictionary dictionary(&test_data);
-  DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS> merger(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
 }
@@ -415,8 +413,7 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
   testing::TempDictionary dictionary2(&test_data2);
 
   std::string filename("merged-dict-int-weight-v1.kv");
-  DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS> merger(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   merger.Add(dictionary.GetFileName());
   merger.Add(dictionary2.GetFileName());
 
