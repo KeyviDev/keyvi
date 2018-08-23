@@ -22,6 +22,14 @@ env:
   matrix:
     - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=debug
     - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=release
+
+    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=release
+
 #    - BUILD_TYPE=linux      PYTHON_VERSION=35     CONF=debug      ARCH=x86_64
 #    - BUILD_TYPE=linux      PYTHON_VERSION=36     CONF=debug      ARCH=x86_64
 #    - BUILD_TYPE=linux      PYTHON_VERSION=37     CONF=debug      ARCH=x86_64
@@ -120,6 +128,7 @@ install:
 
 script:
   - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_linux.sh ; fi
+  - if [ "$BUILD_TYPE" == "python" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_python.sh ; fi
   - if [ "$BUILD_TYPE" == "manylinux" ]; then source ./travis/build_manylinux_package.sh ; fi
   - if [ "$BUILD_TYPE" == "sdist" ]; then source ./travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
