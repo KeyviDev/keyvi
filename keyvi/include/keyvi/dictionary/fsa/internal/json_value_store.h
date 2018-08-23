@@ -248,7 +248,7 @@ class JsonValueStore final : public IValueStoreWriter {
   std::vector<size_t> offsets_;
 
  private:
-  template <typename, typename, typename>
+  template <int, typename, typename>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
   uint64_t GetValue(const char* payload, uint64_t fsa_value, bool* no_minimization) {
