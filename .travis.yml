@@ -37,12 +37,14 @@ env:
     - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=debug
 #    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=debug
 
+    - BUILD_TYPE=sdist      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15
+
 #    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=coverage   ARCH=x86_64
-#    - BUILD_TYPE=manylinux  PYTHON_VERSION=27     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-#    - BUILD_TYPE=manylinux  PYTHON_VERSION=34     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-#    - BUILD_TYPE=manylinux  PYTHON_VERSION=35     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-#    - BUILD_TYPE=manylinux  PYTHON_VERSION=36     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
-#    - BUILD_TYPE=manylinux  PYTHON_VERSION=37     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+    - BUILD_TYPE=manylinux  PYTHON_VERSION=27     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+    - BUILD_TYPE=manylinux  PYTHON_VERSION=34     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+    - BUILD_TYPE=manylinux  PYTHON_VERSION=35     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+    - BUILD_TYPE=manylinux  PYTHON_VERSION=36     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
+    - BUILD_TYPE=manylinux  PYTHON_VERSION=37     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
 #    - BUILD_TYPE=sdist      PYTHON_VERSION=27
 #    - BUILD_TYPE=doc
 #    - BUILD_TYPE=rust
@@ -127,7 +129,7 @@ script:
   - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_linux.sh ; fi
   - if [ "$BUILD_TYPE" == "python" ]; then docker run --rm -e CONF -e PYTHON_VERSION -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_python.sh ; fi
   - if [ "$BUILD_TYPE" == "manylinux" ]; then source ./travis/build_manylinux_package.sh ; fi
-  - if [ "$BUILD_TYPE" == "sdist" ]; then source ./travis/build_sdist_package.sh ; fi
+  - if [ "$BUILD_TYPE" == "sdist" ]; then docker run --rm -e PYTHON_VERSION -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
   - if [ "$BUILD_TYPE" == "rust" ]; then source ./travis/build_rust.sh ; fi
 

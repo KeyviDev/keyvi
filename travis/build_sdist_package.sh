@@ -5,6 +5,9 @@ set -ev
 python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
 
 cd python
+
+pip install -r requirements.txt
+
 python setup.py sdist -d wheelhouse
 
 pip uninstall -y autowrap
