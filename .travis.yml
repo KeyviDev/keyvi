@@ -21,7 +21,7 @@ services:
 env:
   matrix:
     - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=debug      ARCH=x86_64   DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
-    - BUILD_TYPE=linux      PYTHON_VERSION=34     CONF=debug      ARCH=x86_64
+    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=release      ARCH=x86_64   DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
 #    - BUILD_TYPE=linux      PYTHON_VERSION=35     CONF=debug      ARCH=x86_64
 #    - BUILD_TYPE=linux      PYTHON_VERSION=36     CONF=debug      ARCH=x86_64
 #    - BUILD_TYPE=linux      PYTHON_VERSION=37     CONF=debug      ARCH=x86_64
