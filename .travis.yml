@@ -20,22 +20,22 @@ services:
 
 env:
   matrix:
-    - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=release
-    - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=debug
-
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=release
-#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=release
-
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=debug
-#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=debug
+#    - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=release
+#    - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=debug
+#
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=release
+##    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=release
+#
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=debug
+##    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=debug
 
     - BUILD_TYPE=sdist      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15
 
