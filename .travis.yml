@@ -48,28 +48,28 @@ env:
     - GITHUB_REPO='KeyviDev/keyvi'
     - GH_REPO_REF='github.com/KeyviDev/keyvi.git'
 
-matrix:
-  include:
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=27
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=34
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=35
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=36
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=37
+#matrix:
+#  include:
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=27
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=34
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=35
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=36
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=37
 # temporarily disabled pypy builds on osx
 # till https://bitbucket.org/pypy/pypy/issues/2626/invalid-conversion-from-const-char-to-char is released
 #    - os: osx
@@ -79,7 +79,7 @@ matrix:
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./travis/setup_osx.sh ; fi
-  - if [ "$PYTHON_VERSION" != "" ]; then source ./travis/setup_pyenv.sh ; fi
+#  - if [ "$PYTHON_VERSION" != "" ]; then source ./travis/setup_pyenv.sh ; fi
   - if [ "$BUILD_TYPE" == "rust" ]; then ./travis/setup_rust.sh ; fi
 
 install:
@@ -119,7 +119,7 @@ install:
 #    - libffi-dev
 
 script:
-  - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm `pwd`:/io ./travis/build_linux.sh ; fi
+  - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm `pwd`:/io $DOCKER_IMAGE ./travis/build_linux.sh ; fi
   - if [ "$BUILD_TYPE" == "manylinux" ]; then source ./travis/build_manylinux_package.sh ; fi
   - if [ "$BUILD_TYPE" == "sdist" ]; then source ./travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
