@@ -37,16 +37,6 @@ env:
     - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=debug
 #    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=debug
 
-#    - BUILD_TYPE=linux      PYTHON_VERSION=35     CONF=debug      ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=36     CONF=debug      ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=37     CONF=debug      ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=pypy2  CONF=debug      ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=release    ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=34     CONF=release    ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=35     CONF=release    ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=36     CONF=release    ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=37     CONF=release    ARCH=x86_64
-#    - BUILD_TYPE=linux      PYTHON_VERSION=pypy2  CONF=release    ARCH=x86_64
 #    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=coverage   ARCH=x86_64
 #    - BUILD_TYPE=manylinux  PYTHON_VERSION=27     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
 #    - BUILD_TYPE=manylinux  PYTHON_VERSION=34     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder
