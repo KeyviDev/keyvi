@@ -119,7 +119,7 @@ install:
 #    - libffi-dev
 
 script:
-  - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE ./travis/build_linux.sh ; fi
+  - if [ "$BUILD_TYPE" == "linux" ]; then cd /io; docker run --rm -v `pwd`:/io $DOCKER_IMAGE ./travis/build_linux.sh ; fi
   - if [ "$BUILD_TYPE" == "manylinux" ]; then source ./travis/build_manylinux_package.sh ; fi
   - if [ "$BUILD_TYPE" == "sdist" ]; then source ./travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
