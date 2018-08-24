@@ -12,7 +12,7 @@ brew upgrade pyenv
 
 export PATH="${HOME}/.pyenv/shims/:/root/.pyenv/bin:${PATH}"
 
-pyenv install --list
+pyenv install ${PYTHON_VERSION}
+pyenv global ${PYTHON_VERSION}
 
-pyenv install 3.7.0
-pyenv global 3.7.0
+python --version
