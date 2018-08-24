@@ -37,14 +37,15 @@ env:
 #    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=debug
 ##    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=debug
 
+    - BUILD_TYPE=manylinux    DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder       PYTHON_PATH=cp27-cp27mu
+    - BUILD_TYPE=manylinux    DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder       PYTHON_PATH=cp34-cp34m
+    - BUILD_TYPE=manylinux    DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder       PYTHON_PATH=cp35-cp35m
+    - BUILD_TYPE=manylinux    DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder       PYTHON_PATH=cp36-cp36m
+    - BUILD_TYPE=manylinux    DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder       PYTHON_PATH=cp37-cp37m
+
 #    - BUILD_TYPE=sdist      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15
 
 #    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=coverage   ARCH=x86_64
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=2.7.15     DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder PYTHON_PATH=cp27-cp27mu
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=3.4.5      DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder PYTHON_PATH=cp34-cp34m
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=3.5.6      DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder PYTHON_PATH=cp35-cp35m
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=3.6.6      DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder PYTHON_PATH=cp36-cp36m
-    - BUILD_TYPE=manylinux  PYTHON_VERSION=3.7.0      DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder PYTHON_PATH=cp37-cp37m
 #    - BUILD_TYPE=sdist      PYTHON_VERSION=27
 #    - BUILD_TYPE=doc
 #    - BUILD_TYPE=rust
