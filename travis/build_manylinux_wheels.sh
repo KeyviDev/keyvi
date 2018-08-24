@@ -51,16 +51,16 @@ cd /io/python/
 
 "${PYBIN}/pip" install -r requirements.txt
 
-${PYBIN}/python setup.py bdist_wheel -d wheelhouse
+${PYBIN}/python setup.py bdist_wheel -d dist
 
 
 # Bundle external shared libraries into the wheels
-for whl in wheelhouse/*.whl; do
-    auditwheel repair "$whl" -w /io/wheelhouse/
+for whl in dist/*.whl; do
+    auditwheel repair $whl -w wheelhouse/
 done
 
 
-"${PYBIN}/pip" install keyvi --no-index -f /io/wheelhouse
+"${PYBIN}/pip" install keyvi --no-index -f wheelhouse/
 
 cd ~
 

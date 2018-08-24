@@ -35,7 +35,7 @@ IS_RELEASED = False
 
 VERSION = "{}.{}.{}".format(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
 if not IS_RELEASED:
-    VERSION += 'dev{}'.format(VERSION_DEV)
+    VERSION += '.dev{}'.format(VERSION_DEV)
 
 
 ###################
