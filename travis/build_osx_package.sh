@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-set -ev
+set -ex
 
-#mkdir build
-#cd build
-#cmake -DCMAKE_BUILD_TYPE=release -DZLIB_ROOT=/usr/local/opt/zlib ..
-#make -j 4
-#
-#./unit_test_all
-#cd ..
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=release -DZLIB_ROOT=/usr/local/opt/zlib ..
+make -j 4
+
+./unit_test_all
+cd ..
+
 
 export TMPDIR=/Volumes/ram-disk
 
