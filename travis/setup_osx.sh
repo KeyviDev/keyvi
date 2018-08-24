@@ -15,4 +15,4 @@ export PATH="${HOME}/.pyenv/shims/:/root/.pyenv/bin:${PATH}"
 pyenv install ${PYTHON_VERSION}
 pyenv global ${PYTHON_VERSION}
 
-python --version
+pip install -r python/requirements.txt
