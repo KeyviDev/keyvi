@@ -7,4 +7,10 @@ df -h
 brew update
 brew install zlib
 brew install snappy
-brew install pyenv
+
+export PATH="${HOME}/.pyenv/shims/:/root/.pyenv/bin:${PATH}"
+
+pyenv install --list
+
+pyenv install 3.7.0
+pyenv global 3.7.0
