@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ev
 
-docker run -e "PYTHON_VERSION=$PYTHON_VERSION" --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/travis/build_manylinux_wheels.sh
+docker run -e PYTHON_PATH --rm -v `pwd`:/keyvi $DOCKER_IMAGE /keyvi/travis/build_manylinux_wheels.sh
 
 
 pyenv global $PYTHON_VERSION
