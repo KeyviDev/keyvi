@@ -64,5 +64,5 @@ done
 
 cd ~
 
-py.test /io/python/tests/
-py.test /io/python/integration-tests/
+${PYBIN}/py.test /io/python/tests/
+${PYBIN}/py.test /io/python/integration-tests/
