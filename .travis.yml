@@ -45,7 +45,7 @@ env:
 
     - BUILD_TYPE=rust         DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
 
-#    - BUILD_TYPE=sdist      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15
+    - BUILD_TYPE=sdist      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15
 
 #    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=coverage   ARCH=x86_64
 #    - BUILD_TYPE=sdist      PYTHON_VERSION=27
