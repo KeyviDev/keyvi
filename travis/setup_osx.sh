@@ -7,5 +7,4 @@ df -h
 brew update
 brew install zlib
 brew install snappy
-sudo -H easy_install pip
-sudo -H pip install wheel
+brew install pyenv
