@@ -89,7 +89,7 @@ env:
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then ./travis/setup_osx.sh ; fi
 #  - if [ "$PYTHON_VERSION" != "" ]; then source ./travis/setup_pyenv.sh ; fi
-  - if [ "$BUILD_TYPE" == "rust" ]; then ./travis/setup_rust.sh ; fi
+#  - if [ "$BUILD_TYPE" == "rust" ]; then ./travis/setup_rust.sh ; fi
 
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
