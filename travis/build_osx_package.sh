@@ -1,17 +1,13 @@
 #!/usr/bin/env bash
 set -ev
 
-mkdir build
-cd build
-cmake -DCMAKE_BUILD_TYPE=release -DZLIB_ROOT=/usr/local/opt/zlib ..
-make -j 4
-
-./unit_test_all
-cd ..
-
-# use python from pyenv
-PYENV_ROOT="$HOME/.pyenv"
-PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+#mkdir build
+#cd build
+#cmake -DCMAKE_BUILD_TYPE=release -DZLIB_ROOT=/usr/local/opt/zlib ..
+#make -j 4
+#
+#./unit_test_all
+#cd ..
 
 export TMPDIR=/Volumes/ram-disk
 
