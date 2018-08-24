@@ -47,9 +47,11 @@ set -ex
 
 PYBIN=/opt/python/${PYTHON_PATH}/bin
 
-"${PYBIN}/pip" install -r /io/python/requirements.txt
+cd /io/python/
 
-"${PYBIN}/pip" wheel /io/python -w wheelhouse/ --no-deps
+"${PYBIN}/pip" install -r requirements.txt
+
+${PYBIN}/python setup.py bdist_wheel -d wheelhouse
 
 
 # Bundle external shared libraries into the wheels
@@ -59,6 +61,8 @@ done
 
 
 "${PYBIN}/pip" install keyvi --no-index -f /io/wheelhouse
+
+cd ~
 
 py.test /io/python/tests/
 py.test /io/python/integration-tests/
