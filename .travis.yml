@@ -20,33 +20,34 @@ services:
 
 env:
   matrix:
-    - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=release
-    - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=debug
+#    - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=release
+#    - BUILD_TYPE=linux      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      CONF=debug
+#
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=release
+##    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=release
+#
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=debug
+##    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=debug
+#
+#    - BUILD_TYPE=sdist      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
+#
+#    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp27-cp27mu
+#    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp34-cp34m
+#    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp35-cp35m
+#    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp36-cp36m
+#    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp37-cp37m
+#
+#    - BUILD_TYPE=rust       DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
 
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=release
-#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=release
-
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15     CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5      CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6      CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6      CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0      CONF=debug
-#    - BUILD_TYPE=python     DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder      PYTHON_VERSION=pypy-5.3.1 CONF=debug
-
-    - BUILD_TYPE=sdist      DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
-
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp27-cp27mu
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp34-cp34m
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp35-cp35m
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp36-cp36m
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp37-cp37m
-
-    - BUILD_TYPE=rust       DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
-
+    - BUILD_TYPE=coverage   DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
 
 #    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=coverage   ARCH=x86_64
 #    - BUILD_TYPE=doc
@@ -133,6 +134,7 @@ script:
   - if [ "$BUILD_TYPE" == "sdist" ]; then docker run --rm -e PYTHON_VERSION -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
   - if [ "$BUILD_TYPE" == "rust" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_rust.sh ; fi
+  - if [ "$BUILD_TYPE" == "coverage" ]; then docker run --rm -e COVERALLS_REPO_TOKEN -v `pwd`:/io $DOCKER_IMAGE /io/travis/coverage.sh ; fi
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ]; then ./travis/coverage.sh ; fi
