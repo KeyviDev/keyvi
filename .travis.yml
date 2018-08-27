@@ -127,12 +127,12 @@ install:
 #    - libffi-dev
 
 script:
-  - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_linux.sh ; fi
-  - if [ "$BUILD_TYPE" == "python" ]; then docker run --rm -e CONF -e PYTHON_VERSION -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_python.sh ; fi
-  - if [ "$BUILD_TYPE" == "manylinux" ]; then docker run --rm -e PYTHON_PATH -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_manylinux_wheels.sh ; fi
-  - if [ "$BUILD_TYPE" == "sdist" ]; then docker run --rm -e PYTHON_VERSION -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_sdist_package.sh ; fi
+  - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_linux.sh ; fi
+  - if [ "$BUILD_TYPE" == "python" ]; then docker run --rm -e CONF -e PYTHON_VERSION -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_python.sh ; fi
+  - if [ "$BUILD_TYPE" == "manylinux" ]; then docker run --rm -e PYTHON_PATH -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_manylinux_wheels.sh ; fi
+  - if [ "$BUILD_TYPE" == "sdist" ]; then docker run --rm -e PYTHON_VERSION -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
-  - if [ "$BUILD_TYPE" == "rust" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE /bin/bash -c /io/travis/build_rust.sh ; fi
+  - if [ "$BUILD_TYPE" == "rust" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_rust.sh ; fi
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ]; then ./travis/coverage.sh ; fi
