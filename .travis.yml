@@ -50,7 +50,7 @@ env:
     - BUILD_TYPE=coverage   DOCKER_IMAGE=narekgharibyan/keyvi-ubuntu-builder
 
 #    - BUILD_TYPE=linux      PYTHON_VERSION=27     CONF=coverage   ARCH=x86_64
-#    - BUILD_TYPE=doc
+    - BUILD_TYPE=doc
 
   global:
     - GH_REPO_NAME='keyvi'
@@ -58,28 +58,28 @@ env:
     - GITHUB_REPO='KeyviDev/keyvi'
     - GH_REPO_REF='github.com/KeyviDev/keyvi.git'
 
-matrix:
-  include:
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=2.7.15
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=3.4.5
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=3.5.6
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=3.6.6
-    - os: osx
-      osx_image: xcode7.3
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=3.7.0
+#matrix:
+#  include:
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=2.7.15
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=3.4.5
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=3.5.6
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=3.6.6
+#    - os: osx
+#      osx_image: xcode7.3
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=3.7.0
 # temporarily disabled pypy builds on osx
 # till https://bitbucket.org/pypy/pypy/issues/2626/invalid-conversion-from-const-char-to-char is released
 #    - os: osx
