@@ -131,7 +131,7 @@ script:
   - if [ "$BUILD_TYPE" == "sdist" ]; then docker run --rm -e PYTHON_VERSION -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_sdist_package.sh ; fi
   - if [ "$BUILD_TYPE" == "osx" ]; then source ./travis/build_osx_package.sh ; fi
   - if [ "$BUILD_TYPE" == "rust" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_rust.sh ; fi
-  - if [ "$BUILD_TYPE" == "coverage" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ]; then docker run --rm -e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} -v `pwd`:/io $DOCKER_IMAGE /io/travis/coverage.sh ; fi
+  - if [ "$BUILD_TYPE" == "coverage" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ]; then docker run --rm -e TRAVIS_JOB_ID -e COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN} -v `pwd`:/io $DOCKER_IMAGE /io/travis/coverage.sh ; fi
 
 after_success:
   - if [ "$CC" = "gcc-4.8" ] && [ "$CONF" = "coverage" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ]; then ./travis/coverage.sh ; fi
