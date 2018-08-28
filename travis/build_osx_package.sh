@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ev
+set -ex
 
 mkdir build
 cd build
@@ -9,9 +9,6 @@ make -j 4
 ./unit_test_all
 cd ..
 
-# use python from pyenv
-PYENV_ROOT="$HOME/.pyenv"
-PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
 export TMPDIR=/Volumes/ram-disk
 
