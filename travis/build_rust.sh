@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -ev
+set -ex
 
-cd rust
+cd /io/rust
+
 cargo build --verbose
 cargo test --verbose
