@@ -35,7 +35,7 @@ IS_RELEASED = False
 
 VERSION = "{}.{}.{}".format(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
 if not IS_RELEASED:
-    VERSION += 'dev{}'.format(VERSION_DEV)
+    VERSION += '.dev{}'.format(VERSION_DEV)
 
 
 ###################
@@ -339,6 +339,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             'Programming Language :: Python :: 3.4',
             'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
+            'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: Implementation :: CPython',
             'Programming Language :: Python :: Implementation :: PyPy',
             'Operating System :: MacOS :: MacOS X',
