@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-set -ev
+set -ex
 
-# for now only check changed files, pull requests only
-if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-    ./keyvi/check-style.sh
-fi
+pyenv global 2.7.15
+pip install cpplint
+
+cd /io
+./keyvi/check-style.sh
