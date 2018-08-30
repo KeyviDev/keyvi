@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-set -ev
+set -ex
 
-# https://github.com/travis-ci/travis-ci/issues/8920
-python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
+pyenv global 2.7.15
 
-cd python
+cd /io/python
+
+pip install -r requirements.txt
+
 python setup.py sdist -d wheelhouse
 
 pip uninstall -y autowrap

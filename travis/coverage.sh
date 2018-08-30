@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
-set -ev
+set -ex
+
+cd /io
+
+export CONF=coverage
+travis/build_linux.sh
+
+export PYTHON_VERSION=2.7.15
+travis/build_python.sh
+
+pip install coveralls-merge cpp-coveralls --upgrade
 
 coveralls   -r . -b build/ -i keyvi \
-            --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' \
+            --gcov-options '\-lp' \
             -E '.*/keyvi/3rdparty/.*' \
             -e python \
             -E '.*/keyvi/tests/.*' \
@@ -15,7 +25,7 @@ ln -s ../../../keyvi src/cpp/keyvi
 cd ..
 
 coveralls   -r . -b python/ -i python \
-            --gcov /usr/bin/gcov-4.8 --gcov-options '\-lp' \
+            --gcov-options '\-lp' \
             -e python/src/cpp/keyvi/3rdparty -e build \
             -E '.*/autowrap_includes/autowrap_tools.hpp' \
             -E '.*/src/extra/attributes_converter.h' \
