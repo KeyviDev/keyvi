@@ -66,10 +66,10 @@ struct MergeStats {
 };
 
 template <int DictionaryType = fsa::internal::value_store_t::KEY_ONLY,
-          typename ValueStoreT = typename fsa::internal::Dict<DictionaryType>::value_store_t,
+          typename ValueStoreMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_merge_t,
           typename ValueStoreAppendMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_append_merge_t>
 class DictionaryMerger final {
-  using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;
+  using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreMergeT::value_t>;
   using parameters_t = keyvi::util::parameters_t;
 
  private:
@@ -145,7 +145,7 @@ class DictionaryMerger final {
       fsa.reset(new fsa::Automata(filename));
     }
 
-    if (fsa->GetValueStoreType() != ValueStoreT::GetValueStoreType()) {
+    if (fsa->GetValueStoreType() != ValueStoreMergeT::GetValueStoreType()) {
       throw std::invalid_argument("Dictionaries must have the same type.");
     }
 
@@ -237,7 +237,7 @@ class DictionaryMerger final {
   }
 
   void CompleteMerge() {
-    ValueStoreT* value_store = new ValueStoreT(params_);
+    ValueStoreMergeT* value_store = new ValueStoreMergeT(params_);
     generator_ =
         GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
             GetTotalSparseArraySize(), params_, value_store);
@@ -270,8 +270,8 @@ class DictionaryMerger final {
         // value store itself
         handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
         handle.value_idx =
-            value_store->GetValue(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
-                                  segment_it.entryIterator().GetValueId(), &handle.no_minimization);
+            value_store->AddValueMerge(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
+                                       segment_it.entryIterator().GetValueId(), &handle.no_minimization);
 
         TRACE("Add key: %s", top_key.c_str());
         ++stats_.number_of_keys_;
@@ -320,7 +320,7 @@ class DictionaryMerger final {
         // value store itself
         handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
         handle.value_idx =
-            value_store->GetMergeValueId(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
+            value_store->AddValueAppendMerge(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
 
         TRACE("Add key: %s", top_key.c_str());
         ++stats_.number_of_keys_;

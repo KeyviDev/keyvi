@@ -143,7 +143,7 @@ class JsonValueStore final : public IValueStoreWriter {
    * Simple implementation of a value store for json values:
    * todo: performance improvements?
    */
-  uint64_t GetValue(const value_t& value, bool* no_minimization) {
+  uint64_t AddValue(const value_t& value, bool* no_minimization) {
     msgpack_buffer_.clear();
 
     keyvi::util::EncodeJsonValue(long_compress_, short_compress_, &msgpack_buffer_, &string_buffer_, value,
@@ -154,7 +154,7 @@ class JsonValueStore final : public IValueStoreWriter {
     if (!minimize_) {
       TRACE("Minimization is turned off.");
       *no_minimization = true;
-      return AddValue();
+      return CreateNewValue();
     }
 
     const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(),
@@ -171,15 +171,13 @@ class JsonValueStore final : public IValueStoreWriter {
     TRACE("New unique value");
     ++number_of_unique_values_;
 
-    uint64_t pt = AddValue();
+    uint64_t pt = CreateNewValue();
 
     TRACE("add value to hash at %d, length %d", pt, string_buffer_.size());
     hash_.Add(RawPointer<>(pt, stp.GetHashcode(), string_buffer_.size()));
 
     return pt;
   }
-
-  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) const { return offsets_[fileIndex] + oldIndex; }
 
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
@@ -251,7 +249,9 @@ class JsonValueStore final : public IValueStoreWriter {
   template <int, typename, typename>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
-  uint64_t GetValue(const char* payload, uint64_t fsa_value, bool* no_minimization) {
+  uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) const { return offsets_[fileIndex] + oldIndex; }
+
+  uint64_t AddValueMerge(const char* payload, uint64_t fsa_value, bool* no_minimization) {
     size_t buffer_size;
 
     const char* full_buf = payload + fsa_value;
@@ -281,7 +281,7 @@ class JsonValueStore final : public IValueStoreWriter {
     return pt;
   }
 
-  uint64_t AddValue() {
+  uint64_t CreateNewValue() {
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
     size_t length;
 
@@ -292,6 +292,39 @@ class JsonValueStore final : public IValueStoreWriter {
 
     return pt;
   }
+};
+
+class JsonValueStoreAppendMerge final {
+ public:
+  typedef std::string value_t;
+
+  explicit JsonValueStoreAppendMerge(const std::vector<std::string>& inputFiles,
+                                     const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : inputFiles_(inputFiles), offsets_() {
+    for (const auto& filename : inputFiles) {
+      KeyViFile keyViFile(filename);
+
+      auto& vsStream = keyViFile.valueStoreStream();
+      const boost::property_tree::ptree props = keyvi::util::SerializationUtils::ReadValueStoreProperties(vsStream);
+      offsets_.push_back(values_buffer_size_);
+
+      number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
+      number_of_unique_values_ += boost::lexical_cast<size_t>(props.get<std::string>("unique_values"));
+      values_buffer_size_ += boost::lexical_cast<size_t>(props.get<std::string>("size"));
+    }
+  }
+
+  JsonValueStoreAppendMerge& operator=(JsonValueStoreAppendMerge const&) = delete;
+  JsonValueStoreAppendMerge(const JsonValueStoreAppendMerge& that) = delete;
+  uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) const { return offsets_[fileIndex] + oldIndex; }
+  uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
+
+ private:
+  std::vector<std::string> inputFiles_;
+  std::vector<size_t> offsets_;
+  size_t number_of_values_ = 0;
+  size_t number_of_unique_values_ = 0;
+  size_t values_buffer_size_ = 0;
 };
 
 class JsonValueStoreReader final : public IValueStoreReader {
@@ -365,6 +398,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
 template <>
 struct Dict<value_store_t::JSON> {
   typedef JsonValueStore value_store_t;
+  typedef JsonValueStore value_store_merge_t;
   typedef JsonValueStore value_store_append_merge_t;
 };
 

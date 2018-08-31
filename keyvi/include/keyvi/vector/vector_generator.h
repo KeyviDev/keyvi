@@ -67,7 +67,7 @@ class VectorGenerator final {
     static_assert(sizeof(offset_type) == 8, "");
 
     bool dummy_minimization = false;
-    const offset_type value_idx = htole64(value_store_->GetValue(value, &dummy_minimization));
+    const offset_type value_idx = htole64(value_store_->AddValue(value, &dummy_minimization));
 
     index_store_->Append(&value_idx, sizeof(offset_type));
     ++size_;

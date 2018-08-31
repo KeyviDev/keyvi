@@ -196,7 +196,7 @@ class Generator final {
 
     // get value and mark final state
     bool no_minimization = false;
-    uint64_t value_idx = value_store_->GetValue(value, &no_minimization);
+    uint64_t value_idx = value_store_->AddValue(value, &no_minimization);
 
     stack_->InsertFinalState(input_key.size(), value_idx, no_minimization);
 

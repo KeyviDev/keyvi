@@ -42,15 +42,15 @@ BOOST_AUTO_TEST_SUITE(JsonValueTest)
 BOOST_AUTO_TEST_CASE(minimization) {
   JsonValueStore strings(keyvi::util::parameters_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
   bool no_minimization = false;
-  uint32_t v = strings.GetValue("{\"mytestvalue\":25, \"mytestvalue2\":23}", &no_minimization);
+  uint32_t v = strings.AddValue("{\"mytestvalue\":25, \"mytestvalue2\":23}", &no_minimization);
   BOOST_CHECK_EQUAL(v, 0);
-  uint32_t w = strings.GetValue("othervalue", &no_minimization);
-  uint32_t x = strings.GetValue("{\"mytestvalue3\":55, \"mytestvalue4\":773}", &no_minimization);
+  uint32_t w = strings.AddValue("othervalue", &no_minimization);
+  uint32_t x = strings.AddValue("{\"mytestvalue3\":55, \"mytestvalue4\":773}", &no_minimization);
 
   BOOST_CHECK(w > 0);
-  BOOST_CHECK_EQUAL(v, strings.GetValue("{\"mytestvalue\": 25, \"mytestvalue2\": 23}", &no_minimization));
-  BOOST_CHECK_EQUAL(x, strings.GetValue("{\"mytestvalue3\":55, \"mytestvalue4\":773}", &no_minimization));
-  BOOST_CHECK_EQUAL(w, strings.GetValue("othervalue", &no_minimization));
+  BOOST_CHECK_EQUAL(v, strings.AddValue("{\"mytestvalue\": 25, \"mytestvalue2\": 23}", &no_minimization));
+  BOOST_CHECK_EQUAL(x, strings.AddValue("{\"mytestvalue3\":55, \"mytestvalue4\":773}", &no_minimization));
+  BOOST_CHECK_EQUAL(w, strings.AddValue("othervalue", &no_minimization));
 }
 
 BOOST_AUTO_TEST_CASE(minimization_longvalues) {
@@ -60,25 +60,25 @@ BOOST_AUTO_TEST_CASE(minimization_longvalues) {
   value += std::string(60000, 'a');
   value += "\":42}";
 
-  uint32_t v = strings.GetValue(value, &no_minimization);
+  uint32_t v = strings.AddValue(value, &no_minimization);
   BOOST_CHECK_EQUAL(v, 0);
-  uint32_t w = strings.GetValue("othervalue", &no_minimization);
+  uint32_t w = strings.AddValue("othervalue", &no_minimization);
   BOOST_CHECK(v != w);
 
   BOOST_CHECK(w > 0);
-  BOOST_CHECK_EQUAL(v, strings.GetValue(value, &no_minimization));
-  BOOST_CHECK_EQUAL(w, strings.GetValue("othervalue", &no_minimization));
+  BOOST_CHECK_EQUAL(v, strings.AddValue(value, &no_minimization));
+  BOOST_CHECK_EQUAL(w, strings.AddValue("othervalue", &no_minimization));
 }
 
 BOOST_AUTO_TEST_CASE(minimization2) {
   JsonValueStore strings(keyvi::util::parameters_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
   bool no_minimization = false;
 
-  uint64_t v = strings.GetValue(
+  uint64_t v = strings.AddValue(
       "{\"f\": 5571575, \"df\": 1362790, \"uqf\": 2129086, \"tf1df\": 99838, \"tf2df\": 274586, \"tf3df\": 481278, "
       "\"tf5df\": 811157}",
       &no_minimization);
-  uint64_t w = strings.GetValue(
+  uint64_t w = strings.AddValue(
       "{\"f\": 3, \"df\": 1, \"uqf\": 1, \"tf1df\": 0, \"tf2df\": 0, \"tf3df\": 0, \"tf5df\": 0}", &no_minimization);
   BOOST_CHECK(v != w);
 }
@@ -90,8 +90,8 @@ BOOST_AUTO_TEST_CASE(persistence) {
   value += std::string(60000, 'a');
   value += "\":42}";
 
-  uint32_t v = json_value_store.GetValue(value, &no_minimization);
-  uint32_t w = json_value_store.GetValue("{\"mytestvalue2\":23}", &no_minimization);
+  uint32_t v = json_value_store.AddValue(value, &no_minimization);
+  uint32_t w = json_value_store.AddValue("{\"mytestvalue2\":23}", &no_minimization);
 
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 

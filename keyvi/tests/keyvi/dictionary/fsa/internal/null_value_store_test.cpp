@@ -37,11 +37,11 @@ BOOST_AUTO_TEST_CASE(basic) {
 
   bool no_minimization = false;
 
-  BOOST_CHECK_EQUAL(nvs.GetValue(42, &no_minimization), 0);
+  BOOST_CHECK_EQUAL(nvs.AddValue(42, &no_minimization), 0);
   BOOST_CHECK(no_minimization == false);
-  BOOST_CHECK_EQUAL(nvs.GetValue(3535, &no_minimization), 0);
+  BOOST_CHECK_EQUAL(nvs.AddValue(3535, &no_minimization), 0);
   BOOST_CHECK(no_minimization == false);
-  BOOST_CHECK_EQUAL(nvs.GetValue(0, &no_minimization), 0);
+  BOOST_CHECK_EQUAL(nvs.AddValue(0, &no_minimization), 0);
   BOOST_CHECK(no_minimization == false);
 }
 

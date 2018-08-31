@@ -97,7 +97,7 @@ class IValueStoreWriter {
 
   virtual ~IValueStoreWriter() {}
 
-  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) { return 0; }
+  uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) { return 0; }
 
   /**
    * Get the weight for merging dictionaries.

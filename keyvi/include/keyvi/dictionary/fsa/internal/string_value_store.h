@@ -143,7 +143,7 @@ class StringValueStore final : public IValueStoreWriter {
    * Simple implementation of a value store for strings:
    * todo: performance improvements / port stuff from json_value_store
    */
-  uint64_t GetValue(const value_t& value, bool* no_minimization) {
+  uint64_t AddValue(const value_t& value, bool* no_minimization) {
     const StringPointerForCompare<std::vector<char>> stp(value, &string_values_);
 
     const StringPointer p = hash_.Get(stp);
@@ -199,12 +199,12 @@ class StringValueStore final : public IValueStoreWriter {
   template <int, typename, typename>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
-  uint64_t GetValue(const char* p, uint64_t fsa_value, bool* no_minimization) {
+  uint64_t AddValueMerge(const char* p, uint64_t fsa_value, bool* no_minimization) {
     // simple, not optimized version
 
     std::string value(p + fsa_value);
 
-    return GetValue(value, no_minimization);
+    return AddValue(value, no_minimization);
   }
 };
 
@@ -258,6 +258,7 @@ class StringValueStoreReader final : public IValueStoreReader {
 template <>
 struct Dict<value_store_t::STRING> {
   typedef StringValueStore value_store_t;
+  typedef StringValueStore value_store_merge_t;
   typedef StringValueStore value_store_append_merge_t;
 };
 

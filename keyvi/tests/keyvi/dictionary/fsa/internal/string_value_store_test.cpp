@@ -44,13 +44,13 @@ BOOST_AUTO_TEST_CASE(minimization) {
 
   bool no_minimization = false;
 
-  uint64_t v = strings.GetValue("mytestvalue", &no_minimization);
+  uint64_t v = strings.AddValue("mytestvalue", &no_minimization);
   BOOST_CHECK_EQUAL(v, 0);
-  uint64_t w = strings.GetValue("othervalue", &no_minimization);
+  uint64_t w = strings.AddValue("othervalue", &no_minimization);
 
   BOOST_CHECK(w > 0);
-  BOOST_CHECK_EQUAL(v, strings.GetValue("mytestvalue", &no_minimization));
-  BOOST_CHECK_EQUAL(w, strings.GetValue("othervalue", &no_minimization));
+  BOOST_CHECK_EQUAL(v, strings.AddValue("mytestvalue", &no_minimization));
+  BOOST_CHECK_EQUAL(w, strings.AddValue("othervalue", &no_minimization));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
