@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-pip install pip --upgrade
-pip install wheel twine --upgrade
+pip install --user wheel twine --upgrade
 
 cd python
 if [ -n "$(ls -A wheelhouse)" ]; then
