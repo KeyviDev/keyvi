@@ -14,8 +14,7 @@ RUN set -ex \
     && apt-get install -y cmake g++ libboost-all-dev libsnappy-dev libzzip-dev zlib1g-dev clang clang-format-6.0 doxygen \
     && rm -rf /var/lib/apt/lists/*
 
-# symlink for clang-format
-RUN ln -s /usr/bin/clang-format-6.0 /usr/bin/clang-format
+RUN update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-6.0 1000
 
 # install pyenv
 RUN curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
