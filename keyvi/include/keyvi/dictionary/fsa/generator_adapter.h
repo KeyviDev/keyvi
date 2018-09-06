@@ -48,8 +48,6 @@ class GeneratorAdapterInterface {
  public:
   GeneratorAdapterInterface() {}
 
-  // virtual void Add(const std::string& input_key) {}
-
   virtual void Add(const std::string& input_key, ValueT value) {}
   virtual void Add(const std::string& input_key, const fsa::ValueHandle& value) {}
 
@@ -69,8 +67,6 @@ class GeneratorAdapter final : public GeneratorAdapterInterface<typename ValueSt
   explicit GeneratorAdapter(const keyvi::util::parameters_t& params = keyvi::util::parameters_t(),
                             ValueStoreT* value_store = NULL)
       : generator_(params, value_store) {}
-
-  // void Add(const std::string& input_key) { generator_.Add(std::move(input_key)); }
 
   void Add(const std::string& input_key, typename ValueStoreT::value_t value) {
     generator_.Add(std::move(input_key), value);
