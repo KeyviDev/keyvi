@@ -103,7 +103,7 @@ script:
 
   - if [ "$BUILD_TYPE" == "rust" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_rust.sh ; fi
 
-  - if [ "$BUILD_TYPE" == "coverage" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ]; then
+  - if [ "$BUILD_TYPE" == "coverage" ]; then
       docker run --rm -v `pwd`:/io -e TRAVIS -e TRAVIS_JOB_ID -e TRAVIS_BRANCH -e TRAVIS_PULL_REQUEST $DOCKER_IMAGE /io/travis/coverage.sh ; fi
 
   - if [ "$BUILD_TYPE" == "doc" ] && [ "$TRAVIS_REPO_SLUG" == "$GITHUB_REPO" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
