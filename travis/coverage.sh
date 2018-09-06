@@ -35,6 +35,4 @@ coveralls   -r . -b python/ -i python \
 # workaround: remove 'python' from source path before merge
 sed s/"python\/src\/cpp\/keyvi"/"keyvi"/g python.cov_report_tmp > python.cov_report
 
-export COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN}
-
 coveralls-merge keyvi.cov_report python.cov_report
