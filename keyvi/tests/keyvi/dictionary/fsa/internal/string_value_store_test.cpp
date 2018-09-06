@@ -38,12 +38,11 @@ namespace internal {
 BOOST_AUTO_TEST_SUITE(StringValueTest)
 
 BOOST_AUTO_TEST_CASE(minimization) {
-  IValueStoreWriter ivsw1(keyvi::util::parameters_t{{"hello", "bello"}});
-  IValueStoreWriter ivsw2;
+  StringValueStore ivsw1(keyvi::util::parameters_t{{"hello", "bello"}});
+  StringValueStore ivsw2;
   StringValueStore strings;
 
   bool no_minimization = false;
-
   uint64_t v = strings.AddValue("mytestvalue", &no_minimization);
   BOOST_CHECK_EQUAL(v, 0);
   uint64_t w = strings.AddValue("othervalue", &no_minimization);

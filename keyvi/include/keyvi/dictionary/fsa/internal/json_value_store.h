@@ -45,7 +45,6 @@
 #include "msgpack/type/rapidjson.hpp"
 
 #include "compression/compression_selector.h"
-#include "dictionary/dictionary_merger_fwd.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/ivalue_store.h"
 #include "dictionary/fsa/internal/lru_generation_cache.h"

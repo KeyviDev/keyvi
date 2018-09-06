@@ -25,12 +25,9 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_
 
-#include <map>
 #include <string>
-#include <vector>
 
 #include <boost/container/flat_map.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/variant.hpp>
@@ -68,7 +65,7 @@ struct Dict {};
 /* Writing value stores is based on template (duck-typing).
  * Base class / Interface definition for writing to the value store.
  *
- * The following types/constants/methods are required:
+ * The following types/constants/methods (incomplete list) are required:
  *
  * typedef {type} value_t;
  * static const {type} no_value = 0;
@@ -77,41 +74,12 @@ struct Dict {};
  *
  * value_store_t GetValueStoreType
  *
+ * uint32_t GetWeightValue(value_t value)
+ *
+ * void CloseFeeding()
+ *
  * void Write(std::ostream& stream)
  */
-class IValueStoreWriter {
- public:
-  IValueStoreWriter() : IValueStoreWriter(keyvi::util::parameters_t()) {}
-
-  /**
-   * Default constructor. Override if the value store implementation requires
-   * extra data.
-   *
-   * @param parameters a map of string parameter values. It is up to the
-   *                   value store what parameters it wants to use (if any).
-   */
-  explicit IValueStoreWriter(const keyvi::util::parameters_t& parameters) : parameters_(parameters) {}
-
-  /// TODO: workaround till ValueStore merger classes are separated from ValueStore writer
-  explicit IValueStoreWriter(const std::vector<std::string>&) : IValueStoreWriter(keyvi::util::parameters_t()) {}
-
-  virtual ~IValueStoreWriter() {}
-
-  uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) { return 0; }
-
-  /**
-   * Get the weight for merging dictionaries.
-   *
-   * Note: for now only the fsa_value is given, in future this might change, so that also the payload is required.
-   *
-   * @param fsa_value
-   * @return weight to be used as inner weight
-   */
-  uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
-
- protected:
-  keyvi::util::parameters_t parameters_;
-};
 
 /**
  * Base class / Interface definition for reading from the value store.

@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "dictionary/dictionary_merger_fwd.h"
 #include "dictionary/fsa/internal/ivalue_store.h"
 
 // #define ENABLE_TRACING
