@@ -284,112 +284,123 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
 }
 
 BOOST_AUTO_TEST_CASE(MergeStringDicts) {
-  std::vector<std::pair<std::string, std::string>> test_data = {
-      {"abc", "a"}, {"abbc", "b"}, {"abbcd", "c"}, {"abcde", "a"}, {"abdd", "b"}, {"bba", "c"},
-  };
-  testing::TempDictionary dictionary(&test_data);
+  keyvi::util::parameters_t merge_configurations[] = {{{"memory_limit_mb", "10"}},
+                                                      {{"memory_limit_mb", "10"}, {"merge_mode", "append"}}};
 
-  std::vector<std::pair<std::string, std::string>> test_data2 = {
-      {"abbe", "d"},
-      {"abbc", "z"},
-      {"abcd", "a"},
-      {"bbacd", "f"},
-  };
-  testing::TempDictionary dictionary2(&test_data2);
+  for (const auto params : merge_configurations) {
+    std::vector<std::pair<std::string, std::string>> test_data = {
+        {"abc", "a"}, {"abbc", "b"}, {"abbcd", "c"}, {"abcde", "a"}, {"abdd", "b"}, {"bba", "c"},
+    };
+    testing::TempDictionary dictionary(&test_data);
 
-  std::string filename("merged-dict-string.kv");
-  DictionaryMerger<dictionary_type_t::STRING> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
-  merger.Add(dictionary.GetFileName());
-  merger.Add(dictionary2.GetFileName());
+    std::vector<std::pair<std::string, std::string>> test_data2 = {
+        {"abbe", "d"},
+        {"abbc", "z"},
+        {"abcd", "a"},
+        {"bbacd", "f"},
+    };
+    testing::TempDictionary dictionary2(&test_data2);
 
-  merger.Merge(filename);
+    std::string filename("merged-dict-string.kv");
+    DictionaryMerger<dictionary_type_t::STRING> merger(params);
+    merger.Add(dictionary.GetFileName());
+    merger.Add(dictionary2.GetFileName());
 
-  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
-  dictionary_t d(new Dictionary(fsa));
+    merger.Merge(filename);
 
-  BOOST_CHECK(d->Contains("abc"));
-  BOOST_CHECK(d->Contains("abbc"));
-  BOOST_CHECK(d->Contains("abbcd"));
-  BOOST_CHECK(d->Contains("abcde"));
-  BOOST_CHECK(d->Contains("abdd"));
-  BOOST_CHECK(d->Contains("bba"));
+    fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+    dictionary_t d(new Dictionary(fsa));
 
-  BOOST_CHECK_EQUAL("a", d->operator[]("abc").GetValueAsString());
+    BOOST_CHECK(d->Contains("abc"));
+    BOOST_CHECK(d->Contains("abbc"));
+    BOOST_CHECK(d->Contains("abbcd"));
+    BOOST_CHECK(d->Contains("abcde"));
+    BOOST_CHECK(d->Contains("abdd"));
+    BOOST_CHECK(d->Contains("bba"));
 
-  // overwritten by 2nd
-  BOOST_CHECK_EQUAL("z", d->operator[]("abbc").GetValueAsString());
-  BOOST_CHECK_EQUAL("c", d->operator[]("abbcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("a", d->operator[]("abcde").GetValueAsString());
-  BOOST_CHECK_EQUAL("b", d->operator[]("abdd").GetValueAsString());
-  BOOST_CHECK_EQUAL("c", d->operator[]("bba").GetValueAsString());
+    BOOST_CHECK_EQUAL("a", d->operator[]("abc").GetValueAsString());
 
-  BOOST_CHECK(d->Contains("abcd"));
-  BOOST_CHECK(d->Contains("abbe"));
-  BOOST_CHECK(d->Contains("bbacd"));
+    // overwritten by 2nd
+    BOOST_CHECK_EQUAL("z", d->operator[]("abbc").GetValueAsString());
+    BOOST_CHECK_EQUAL("c", d->operator[]("abbcd").GetValueAsString());
+    BOOST_CHECK_EQUAL("a", d->operator[]("abcde").GetValueAsString());
+    BOOST_CHECK_EQUAL("b", d->operator[]("abdd").GetValueAsString());
+    BOOST_CHECK_EQUAL("c", d->operator[]("bba").GetValueAsString());
 
-  BOOST_CHECK_EQUAL("a", d->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("d", d->operator[]("abbe").GetValueAsString());
-  BOOST_CHECK_EQUAL("f", d->operator[]("bbacd").GetValueAsString());
+    BOOST_CHECK(d->Contains("abcd"));
+    BOOST_CHECK(d->Contains("abbe"));
+    BOOST_CHECK(d->Contains("bbacd"));
 
-  std::remove(filename.c_str());
+    BOOST_CHECK_EQUAL("a", d->operator[]("abcd").GetValueAsString());
+    BOOST_CHECK_EQUAL("d", d->operator[]("abbe").GetValueAsString());
+    BOOST_CHECK_EQUAL("f", d->operator[]("bbacd").GetValueAsString());
+
+    std::remove(filename.c_str());
+  }
 }
 
 BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
-  std::vector<std::pair<std::string, std::string>> test_data = {
-      {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"abbcd", "{c:3}"}, {"abcde", "{a:1}"}, {"abdd", "{b:2}"}, {"bba", "{c:3}"},
-  };
-  testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
+  keyvi::util::parameters_t merge_configurations[] = {{{"memory_limit_mb", "10"}},
+                                                      {{"memory_limit_mb", "10"}, {"merge_mode", "append"}}};
 
-  std::vector<std::pair<std::string, std::string>> test_data2 = {
-      {"abbe", "{d:4}"},
-      {"abbc", "{b:3}"},
-      {"abcd", "{a:1}"},
-      {"bbacd", "{f:5}"},
-  };
-  testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data2);
+  for (const auto params : merge_configurations) {
+    std::vector<std::pair<std::string, std::string>> test_data = {
+        {"abc", "{a:1}"},   {"abbc", "{b:2}"}, {"abbcd", "{c:3}"},
+        {"abcde", "{a:1}"}, {"abdd", "{b:2}"}, {"bba", "{c:3}"},
+    };
+    testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromJson(&test_data);
 
-  std::string filename("merged-dict-json.kv");
-  DictionaryMerger<dictionary_type_t::JSON> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
-  merger.Add(dictionary.GetFileName());
-  merger.Add(dictionary2.GetFileName());
+    std::vector<std::pair<std::string, std::string>> test_data2 = {
+        {"abbe", "{d:4}"},
+        {"abbc", "{b:3}"},
+        {"abcd", "{a:1}"},
+        {"bbacd", "{f:5}"},
+    };
+    testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromJson(&test_data2);
 
-  merger.Merge(filename);
+    std::string filename("merged-dict-json.kv");
+    DictionaryMerger<dictionary_type_t::JSON> merger(params);
+    merger.Add(dictionary.GetFileName());
+    merger.Add(dictionary2.GetFileName());
 
-  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
-  dictionary_t d(new Dictionary(fsa));
+    merger.Merge(filename);
 
-  BOOST_CHECK(d->Contains("abc"));
-  BOOST_CHECK(d->Contains("abbc"));
-  BOOST_CHECK(d->Contains("abbcd"));
-  BOOST_CHECK(d->Contains("abbe"));
-  BOOST_CHECK(d->Contains("abcd"));
-  BOOST_CHECK(d->Contains("abcde"));
-  BOOST_CHECK(d->Contains("abdd"));
-  BOOST_CHECK(d->Contains("bba"));
-  BOOST_CHECK(d->Contains("bbacd"));
+    fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+    dictionary_t d(new Dictionary(fsa));
 
-  BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abc").GetValueAsString());
+    BOOST_CHECK(d->Contains("abc"));
+    BOOST_CHECK(d->Contains("abbc"));
+    BOOST_CHECK(d->Contains("abbcd"));
+    BOOST_CHECK(d->Contains("abbe"));
+    BOOST_CHECK(d->Contains("abcd"));
+    BOOST_CHECK(d->Contains("abcde"));
+    BOOST_CHECK(d->Contains("abdd"));
+    BOOST_CHECK(d->Contains("bba"));
+    BOOST_CHECK(d->Contains("bbacd"));
 
-  // overwritten by 2nd
-  BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc").GetValueAsString());
-  BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("abbcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcde").GetValueAsString());
-  BOOST_CHECK_EQUAL("\"{b:2}\"", d->operator[]("abdd").GetValueAsString());
-  BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("bba").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abc").GetValueAsString());
 
-  BOOST_CHECK(d->Contains("abcd"));
-  BOOST_CHECK(d->Contains("abbe"));
-  BOOST_CHECK(d->Contains("bbacd"));
+    // overwritten by 2nd
+    BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("abbcd").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcde").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{b:2}\"", d->operator[]("abdd").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("bba").GetValueAsString());
 
-  BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
-  BOOST_CHECK_EQUAL("\"{f:5}\"", d->operator[]("bbacd").GetValueAsString());
+    BOOST_CHECK(d->Contains("abcd"));
+    BOOST_CHECK(d->Contains("abbe"));
+    BOOST_CHECK(d->Contains("bbacd"));
 
-  BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
-  BOOST_CHECK_EQUAL(1, merger.GetStats().updated_keys_);
-  BOOST_CHECK_EQUAL(9, merger.GetStats().number_of_keys_);
+    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcd").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{f:5}\"", d->operator[]("bbacd").GetValueAsString());
 
-  std::remove(filename.c_str());
+    BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+    BOOST_CHECK_EQUAL(1, merger.GetStats().updated_keys_);
+    BOOST_CHECK_EQUAL(9, merger.GetStats().number_of_keys_);
+
+    std::remove(filename.c_str());
+  }
 }
 
 BOOST_AUTO_TEST_CASE(MergeIncompatible) {

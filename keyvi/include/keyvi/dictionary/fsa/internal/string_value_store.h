@@ -37,8 +37,11 @@
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/minimization_hash.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
-#include "dictionary/util/trace.h"
+#include "dictionary/keyvi_file.h"
 #include "util/serialization_utils.h"
+
+// #define ENABLE_TRACING
+#include "dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -72,7 +75,7 @@ class StringValueStoreMinimizationBase : public StringValueStoreBase {
         hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
     temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
 
-    temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
+    temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-string_value_store-%%%%-%%%%-%%%%-%%%%");
     boost::filesystem::create_directory(temporary_directory_);
     // use memory limit as an indicator for the external memory chunksize
     const size_t external_memory_chunk_size =
@@ -81,7 +84,7 @@ class StringValueStoreMinimizationBase : public StringValueStoreBase {
     TRACE("External Memory chunk size: %d", external_memory_chunk_size);
 
     values_extern_.reset(
-        new MemoryMapManager(external_memory_chunk_size, temporary_directory_, "json_values_filebuffer"));
+        new MemoryMapManager(external_memory_chunk_size, temporary_directory_, "string_values_filebuffer"));
   }
 
   ~StringValueStoreMinimizationBase() { boost::filesystem::remove_all(temporary_directory_); }
@@ -217,15 +220,47 @@ class StringValueStoreAppendMerge final : public StringValueStoreBase {
   explicit StringValueStoreAppendMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
   explicit StringValueStoreAppendMerge(const std::vector<std::string>& inputFiles,
-                                       const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
+                                       const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : input_files_(inputFiles), offsets_() {
+    for (const auto& filename : inputFiles) {
+      KeyViFile keyvi_file(filename);
+
+      auto& vsStream = keyvi_file.valueStoreStream();
+      const boost::property_tree::ptree props = keyvi::util::SerializationUtils::ReadValueStoreProperties(vsStream);
+      offsets_.push_back(values_buffer_size_);
+
+      number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
+      number_of_unique_values_ += boost::lexical_cast<size_t>(props.get<std::string>("unique_values"));
+      values_buffer_size_ += boost::lexical_cast<size_t>(props.get<std::string>("size"));
+    }
+  }
 
   StringValueStoreAppendMerge& operator=(StringValueStoreAppendMerge const&) = delete;
   StringValueStoreAppendMerge(const StringValueStoreAppendMerge& that) = delete;
-  uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) const { return 0; }
+  uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) const { return offsets_[fileIndex] + oldIndex; }
 
   void CloseFeeding() {}
 
-  void Write(std::ostream& stream) {}
+  void Write(std::ostream& stream) {
+    boost::property_tree::ptree pt;
+    pt.put("size", std::to_string(values_buffer_size_));
+    pt.put("values", std::to_string(number_of_values_));
+    pt.put("unique_values", std::to_string(number_of_unique_values_));
+
+    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
+
+    for (const auto& filename : input_files_) {
+      KeyViFile keyvi_file(filename);
+      auto& in_stream = keyvi_file.valueStoreStream();
+      keyvi::util::SerializationUtils::ReadValueStoreProperties(in_stream);
+
+      stream << in_stream.rdbuf();
+    }
+  }
+
+ private:
+  std::vector<std::string> input_files_;
+  std::vector<size_t> offsets_;
 };
 
 class StringValueStoreReader final : public IValueStoreReader {
