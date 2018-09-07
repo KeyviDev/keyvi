@@ -198,8 +198,6 @@ class StringValueStoreMerge final : public StringValueStoreMinimizationBase {
     hash_.Add(RawPointer<>(pt, stp.GetHashcode(), value_size));
 
     return pt;
-
-    return 0;
   }
 
   void Write(std::ostream& stream) {
