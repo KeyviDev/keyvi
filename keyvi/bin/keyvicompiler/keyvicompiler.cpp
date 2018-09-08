@@ -38,11 +38,6 @@
 
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/dictionary_types.h"
-#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "dictionary/fsa/internal/int_value_store.h"
-#include "dictionary/fsa/internal/json_value_store.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/fsa/internal/string_value_store.h"
 #include "util/configuration.h"
 
 void callback(size_t added, size_t overall, void*) {
