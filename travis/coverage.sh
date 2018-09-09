@@ -26,7 +26,8 @@ cd ..
 
 coveralls   -r . -b python/ -i python \
             --gcov-options '\-lp' \
-            -e python/src/cpp/keyvi/3rdparty -e build \
+            -e python/src/cpp/keyvi/3rdparty \
+            -E 'python/src/cpp/build-.*' \
             -E '.*/autowrap_includes/autowrap_tools.hpp' \
             -E '.*/src/extra/attributes_converter.h' \
             -E '.*/_core.cpp' \
