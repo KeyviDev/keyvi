@@ -128,8 +128,8 @@ class IValueStoreReader {
   virtual std::string GetStatistics() const { return ""; }
 
  private:
-  template <int, typename, typename>
-  friend class ::keyvi::dictionary::DictionaryMerger;
+  template <keyvi::dictionary::fsa::internal::value_store_t>
+  friend class keyvi::dictionary::DictionaryMerger;
 
   virtual const char* GetValueStorePayload() const { return 0; }
 };

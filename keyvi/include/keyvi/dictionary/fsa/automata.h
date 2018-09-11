@@ -436,8 +436,8 @@ class Automata final {
   uint64_t number_of_keys_;
   internal::value_store_t value_store_type_;
 
-  template <internal::value_store_t>
-  friend class ::keyvi::dictionary::DictionaryMerger;
+  template <keyvi::dictionary::fsa::internal::value_store_t>
+  friend class keyvi::dictionary::DictionaryMerger;
 
   internal::IValueStoreReader* GetValueStore() const {
     assert(value_store_reader_);
