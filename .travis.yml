@@ -18,38 +18,38 @@ services:
 
 env:
   matrix:
-    - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      CONF=release
-    - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      CONF=debug
+    - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/ubuntu-builder      CONF=release
+    - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/ubuntu-builder      CONF=debug
 
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15         CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5          CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6          CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6          CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0          CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=pypy2.7-6.0.0  CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=2.7.15         CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.4.5          CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.5.6          CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.6.6          CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.7.0          CONF=release
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=pypy2.7-6.0.0  CONF=release
 
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=2.7.15         CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=3.4.5          CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=3.5.6          CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=3.6.6          CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=3.7.0          CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder      PYTHON_VERSION=pypy2.7-6.0.0  CONF=debug
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=2.7.15         CONF=debug
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.4.5          CONF=debug
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.5.6          CONF=debug
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.6.6          CONF=debug
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.7.0          CONF=debug
+    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=pypy2.7-6.0.0  CONF=debug
 
-    - BUILD_TYPE=sdist      DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder
+    - BUILD_TYPE=sdist      DOCKER_IMAGE=keyvidev/ubuntu-builder
 
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp27-cp27mu
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp34-cp34m
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp35-cp35m
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp36-cp36m
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/keyvi-manylinux-builder         PYTHON_PATH=cp37-cp37m
+    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp27-cp27mu
+    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp34-cp34m
+    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp35-cp35m
+    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp36-cp36m
+    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp37-cp37m
 
-    - BUILD_TYPE=rust       DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder
+    - BUILD_TYPE=rust       DOCKER_IMAGE=keyvidev/ubuntu-builder
 
-    - BUILD_TYPE=coverage   DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder
+    - BUILD_TYPE=coverage   DOCKER_IMAGE=keyvidev/ubuntu-builder
 
-    - BUILD_TYPE=doc        DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder
+    - BUILD_TYPE=doc        DOCKER_IMAGE=keyvidev/ubuntu-builder
 
-    - BUILD_TYPE=style      DOCKER_IMAGE=keyvidev/keyvi-ubuntu-builder
+    - BUILD_TYPE=style      DOCKER_IMAGE=keyvidev/ubuntu-builder
 
   global:
     - GITHUB_REPO='KeyviDev/keyvi'
