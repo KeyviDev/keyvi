@@ -436,7 +436,7 @@ class Automata final {
   uint64_t number_of_keys_;
   internal::value_store_t value_store_type_;
 
-  template <int, typename, typename>
+  template <internal::value_store_t>
   friend class ::keyvi::dictionary::DictionaryMerger;
 
   internal::IValueStoreReader* GetValueStore() const {

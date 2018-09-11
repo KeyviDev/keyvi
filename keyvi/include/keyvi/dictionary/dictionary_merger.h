@@ -65,10 +65,10 @@ struct MergeStats {
   size_t updated_keys_ = 0;
 };
 
-template <keyvi::dictionary::fsa::internal::value_store_t DictionaryType = fsa::internal::value_store_t::KEY_ONLY,
-          typename ValueStoreMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_merge_t,
-          typename ValueStoreAppendMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_append_merge_t>
+template <keyvi::dictionary::fsa::internal::value_store_t DictionaryType = fsa::internal::value_store_t::KEY_ONLY>
 class DictionaryMerger final {
+  using ValueStoreMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_merge_t;
+  using ValueStoreAppendMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_append_merge_t;
   using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreMergeT::value_t>;
   using parameters_t = keyvi::util::parameters_t;
 

@@ -32,8 +32,7 @@
 namespace keyvi {
 namespace dictionary {
 
-template <keyvi::dictionary::fsa::internal::value_store_t DictionaryType, typename ValueStoreT,
-          typename ValueStoreMergeT>
+template <keyvi::dictionary::fsa::internal::value_store_t DictionaryType>
 class DictionaryMerger;
 
 } /* namespace dictionary */
