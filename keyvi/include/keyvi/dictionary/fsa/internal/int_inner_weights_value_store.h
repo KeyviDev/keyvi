@@ -109,9 +109,9 @@ class IntInnerWeightsValueStoreReader final : public IValueStoreReader {
 
 template <>
 struct Dict<value_store_t::INT_WITH_WEIGHTS> {
-  typedef IntInnerWeightsValueStore value_store_t;
-  typedef IntInnerWeightsValueStoreMerge value_store_merge_t;
-  typedef IntInnerWeightsValueStoreAppendMerge value_store_append_merge_t;
+  using value_store_t = IntInnerWeightsValueStore;
+  using value_store_merge_t = IntInnerWeightsValueStoreMerge;
+  using value_store_append_merge_t = IntInnerWeightsValueStoreAppendMerge;
 };
 
 } /* namespace internal */

@@ -41,32 +41,32 @@ namespace dictionary {
 // forward define the value store types as dictionary types
 using dictionary_type_t = fsa::internal::value_store_t;
 
-typedef keyvi::dictionary::fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>>
-    KeyOnlyDictionaryGenerator;
+using KeyOnlyDictionaryGenerator =
+    keyvi::dictionary::fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>>;
 
-typedef keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS> CompletionDictionaryCompiler;
+using CompletionDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS>;
 
-typedef keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT> IntDictionaryCompiler;
+using IntDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT>;
 
-typedef keyvi::dictionary::DictionaryCompiler<dictionary_type_t::KEY_ONLY> KeyOnlyDictionaryCompiler;
+using KeyOnlyDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::KEY_ONLY>;
 
-typedef keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON> JsonDictionaryCompiler;
+using JsonDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON>;
 
-typedef keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON,
-                                              keyvi::dictionary::sort::InMemorySorter<key_value_t>>
-    JsonDictionaryCompilerSmallData;
+using JsonDictionaryCompilerSmallData =
+    keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON,
+                                          keyvi::dictionary::sort::InMemorySorter<key_value_t>>;
 
-typedef keyvi::dictionary::DictionaryCompiler<dictionary_type_t::STRING> StringDictionaryCompiler;
+using StringDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::STRING>;
 
-typedef keyvi::dictionary::DictionaryMerger<dictionary_type_t::JSON> JsonDictionaryMerger;
+using JsonDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_t::JSON>;
 
-typedef keyvi::dictionary::DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS> CompletionDictionaryMerger;
+using CompletionDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS>;
 
-typedef keyvi::dictionary::DictionaryMerger<dictionary_type_t::INT> IntDictionaryMerger;
+using IntDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_t::INT>;
 
-typedef keyvi::dictionary::DictionaryMerger<dictionary_type_t::STRING> StringDictionaryMerger;
+using StringDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_t::STRING>;
 
-typedef keyvi::dictionary::DictionaryMerger<dictionary_type_t::KEY_ONLY> KeyOnlyDictionaryMerger;
+using KeyOnlyDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_t::KEY_ONLY>;
 
 } /* namespace dictionary */
 } /* namespace keyvi */

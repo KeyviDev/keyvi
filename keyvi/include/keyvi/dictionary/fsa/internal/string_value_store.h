@@ -309,9 +309,9 @@ class StringValueStoreReader final : public IValueStoreReader {
 
 template <>
 struct Dict<value_store_t::STRING> {
-  typedef StringValueStore value_store_t;
-  typedef StringValueStoreMerge value_store_merge_t;
-  typedef StringValueStoreAppendMerge value_store_append_merge_t;
+  using value_store_t = StringValueStore;
+  using value_store_merge_t = StringValueStoreMerge;
+  using value_store_append_merge_t = StringValueStoreAppendMerge;
 };
 
 } /* namespace internal */

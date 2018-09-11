@@ -101,9 +101,9 @@ class NullValueStoreReader final : public IValueStoreReader {
 
 template <>
 struct Dict<value_store_t::KEY_ONLY> {
-  typedef NullValueStore value_store_t;
-  typedef NullValueStoreMerge value_store_merge_t;
-  typedef NullValueStoreAppendMerge value_store_append_merge_t;
+  using value_store_t = NullValueStore;
+  using value_store_merge_t = NullValueStoreMerge;
+  using value_store_append_merge_t = NullValueStoreAppendMerge;
 };
 
 } /* namespace internal */

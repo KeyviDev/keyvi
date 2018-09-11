@@ -110,9 +110,9 @@ class IntValueStoreReader final : public IValueStoreReader {
 
 template <>
 struct Dict<value_store_t::INT> {
-  typedef IntValueStore value_store_t;
-  typedef IntValueStoreMerge value_store_merge_t;
-  typedef IntValueStoreAppendMerge value_store_append_merge_t;
+  using value_store_t = IntValueStore;
+  using value_store_merge_t = IntValueStoreMerge;
+  using value_store_append_merge_t = IntValueStoreAppendMerge;
 };
 
 } /* namespace internal */

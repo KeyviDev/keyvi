@@ -405,9 +405,9 @@ class JsonValueStoreReader final : public IValueStoreReader {
 
 template <>
 struct Dict<value_store_t::JSON> {
-  typedef JsonValueStore value_store_t;
-  typedef JsonValueStoreMerge value_store_merge_t;
-  typedef JsonValueStoreAppendMerge value_store_append_merge_t;
+  using value_store_t = JsonValueStore;
+  using value_store_merge_t = JsonValueStoreMerge;
+  using value_store_append_merge_t = JsonValueStoreAppendMerge;
 };
 
 } /* namespace internal */
