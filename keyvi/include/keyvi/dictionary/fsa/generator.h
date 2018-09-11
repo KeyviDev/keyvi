@@ -348,7 +348,7 @@ class Generator final {
     pt.put("version", "2");
     pt.put("start_state", std::to_string(start_state_));
     pt.put("number_of_keys", std::to_string(number_of_keys_added_));
-    pt.put("value_store_type", std::to_string(value_store_->GetValueStoreType()));
+    pt.put("value_store_type", std::to_string(static_cast<int>(value_store_->GetValueStoreType())));
     pt.put("number_of_states", std::to_string(number_of_states_));
     pt.add_child("manifest", manifest_);
 

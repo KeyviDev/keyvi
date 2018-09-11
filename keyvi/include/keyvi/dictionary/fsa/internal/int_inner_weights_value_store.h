@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "dictionary/fsa/internal/ivalue_store.h"
+#include "dictionary/fsa/internal/value_store_types.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -43,7 +44,7 @@ class IntInnerWeightsValueStoreBase {
   typedef uint32_t value_t;
   static const bool inner_weight = true;
 
-  static value_store_t GetValueStoreType() { return INT_WITH_WEIGHTS; }
+  static value_store_t GetValueStoreType() { return value_store_t::INT_WITH_WEIGHTS; }
 
   uint64_t AddValue(value_t value, bool* no_minimization) const {
     TRACE("Value store value: %d", value);
@@ -94,7 +95,7 @@ class IntInnerWeightsValueStoreReader final : public IValueStoreReader {
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  value_store_t GetValueStoreType() const override { return INT_WITH_WEIGHTS; }
+  value_store_t GetValueStoreType() const override { return value_store_t::INT_WITH_WEIGHTS; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());

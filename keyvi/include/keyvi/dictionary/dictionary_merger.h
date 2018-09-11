@@ -65,7 +65,7 @@ struct MergeStats {
   size_t updated_keys_ = 0;
 };
 
-template <int DictionaryType = fsa::internal::value_store_t::KEY_ONLY,
+template <keyvi::dictionary::fsa::internal::value_store_t DictionaryType = fsa::internal::value_store_t::KEY_ONLY,
           typename ValueStoreMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_merge_t,
           typename ValueStoreAppendMergeT = typename fsa::internal::Dict<DictionaryType>::value_store_append_merge_t>
 class DictionaryMerger final {

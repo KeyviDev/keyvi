@@ -37,6 +37,7 @@
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/minimization_hash.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
+#include "dictionary/fsa/internal/value_store_types.h"
 #include "dictionary/keyvi_file.h"
 #include "util/serialization_utils.h"
 
@@ -56,7 +57,7 @@ class StringValueStoreBase {
 
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
-  static value_store_t GetValueStoreType() { return STRING; }
+  static value_store_t GetValueStoreType() { return value_store_t::STRING; }
 
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
@@ -151,8 +152,6 @@ class StringValueStore final : public StringValueStoreMinimizationBase {
   }
 
   uint32_t GetWeightValue(value_t value) const { return 0; }
-
-  static value_store_t GetValueStoreType() { return STRING; }
 
   void Write(std::ostream& stream) const {
     boost::property_tree::ptree pt;
@@ -288,7 +287,7 @@ class StringValueStoreReader final : public IValueStoreReader {
 
   ~StringValueStoreReader() { delete strings_region_; }
 
-  value_store_t GetValueStoreType() const override { return STRING; }
+  value_store_t GetValueStoreType() const override { return value_store_t::STRING; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());

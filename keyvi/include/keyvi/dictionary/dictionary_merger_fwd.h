@@ -27,10 +27,13 @@
 #ifndef KEYVI_DICTIONARY_DICTIONARY_MERGER_FWD_H_
 #define KEYVI_DICTIONARY_DICTIONARY_MERGER_FWD_H_
 
+#include "dictionary/fsa/internal/value_store_types.h"
+
 namespace keyvi {
 namespace dictionary {
 
-template <int DictionaryType, typename ValueStoreT, typename ValueStoreMergeT>
+template <keyvi::dictionary::fsa::internal::value_store_t DictionaryType, typename ValueStoreT,
+          typename ValueStoreMergeT>
 class DictionaryMerger;
 
 } /* namespace dictionary */

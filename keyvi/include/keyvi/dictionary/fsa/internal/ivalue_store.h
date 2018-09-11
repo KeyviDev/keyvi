@@ -33,6 +33,7 @@
 #include <boost/variant.hpp>
 
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/fsa/internal/value_store_types.h"
 #include "util/configuration.h"
 #include "util/json_value.h"
 
@@ -41,25 +42,11 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-/**
- * "Registry" for value stores, required to differ between the stores.
- *
- * Do not forget to add the new value store to ValueStoreFactory
- */
-enum value_store_t {
-  KEY_ONLY = 1,          //!< NullValueStore
-  INT = 2,               //!< IntValueStore
-  STRING = 3,            //!< StringValueStore
-  JSON_DEPRECATED = 4,   //!< deprecated, not used
-  JSON = 5,              //!< JsonValueStore
-  INT_WITH_WEIGHTS = 6,  //!< IntInnerWeightsValueStore
-};
-
 /*
  * Template that hold information about dictionary types, to be specialized.
  */
 
-template <int>
+template <value_store_t>
 struct Dict {};
 
 /* Writing value stores is based on template (duck-typing).

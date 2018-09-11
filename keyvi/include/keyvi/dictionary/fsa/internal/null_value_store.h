@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "dictionary/fsa/internal/ivalue_store.h"
+#include "dictionary/fsa/internal/value_store_types.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -41,7 +42,7 @@ class NullValueStoreBase {
   static const uint64_t no_value = 0;
   static const bool inner_weight = false;
 
-  static value_store_t GetValueStoreType() { return KEY_ONLY; }
+  static value_store_t GetValueStoreType() { return value_store_t::KEY_ONLY; }
 
   uint64_t AddValue(value_t value, bool* no_minimization) { return 0; }
 
@@ -91,7 +92,7 @@ class NullValueStoreReader final : public IValueStoreReader {
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  value_store_t GetValueStoreType() const override { return KEY_ONLY; }
+  value_store_t GetValueStoreType() const override { return value_store_t::KEY_ONLY; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override { return attributes_t(); }
 

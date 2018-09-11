@@ -44,17 +44,17 @@ class ValueStoreFactory final {
                                        boost::interprocess::file_mapping* file_mapping,
                                        loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
     switch (type) {
-      case KEY_ONLY:
+      case value_store_t::KEY_ONLY:
         return new NullValueStoreReader(stream, file_mapping);
-      case INT:
+      case value_store_t::INT:
         return new IntValueStoreReader(stream, file_mapping);
-      case STRING:
+      case value_store_t::STRING:
         return new StringValueStoreReader(stream, file_mapping, loading_strategy);
-      case JSON_DEPRECATED:
+      case value_store_t::JSON_DEPRECATED:
         throw std::invalid_argument("Deprecated Value Storage type");
-      case JSON:
+      case value_store_t::JSON:
         return new JsonValueStoreReader(stream, file_mapping, loading_strategy);
-      case INT_WITH_WEIGHTS:
+      case value_store_t::INT_WITH_WEIGHTS:
         return new IntInnerWeightsValueStoreReader(stream, file_mapping);
       default:
         throw std::invalid_argument("Unknown Value Storage type");

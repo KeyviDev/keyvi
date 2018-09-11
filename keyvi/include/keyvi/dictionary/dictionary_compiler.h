@@ -63,7 +63,7 @@ struct compiler_exception : public std::runtime_error {
 /**
  * Dictionary Compiler
  */
-template <int DictionaryType = fsa::internal::value_store_t::KEY_ONLY,
+template <keyvi::dictionary::fsa::internal::value_store_t DictionaryType = fsa::internal::value_store_t::KEY_ONLY,
 #if !defined(KEYVI_DISABLE_TPIE)
           class SorterT = sort::TpieSorter<key_value_t>,
 #else

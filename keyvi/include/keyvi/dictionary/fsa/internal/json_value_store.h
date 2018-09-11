@@ -51,6 +51,7 @@
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
+#include "dictionary/fsa/internal/value_store_types.h"
 #include "dictionary/keyvi_file.h"
 #include "util/configuration.h"
 #include "util/json_value.h"
@@ -72,7 +73,7 @@ class JsonValueStoreBase {
 
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
-  static value_store_t GetValueStoreType() { return JSON; }
+  static value_store_t GetValueStoreType() { return value_store_t::JSON; }
 
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
@@ -363,7 +364,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
 
   ~JsonValueStoreReader() { delete strings_region_; }
 
-  value_store_t GetValueStoreType() const override { return JSON; }
+  value_store_t GetValueStoreType() const override { return value_store_t::JSON; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());

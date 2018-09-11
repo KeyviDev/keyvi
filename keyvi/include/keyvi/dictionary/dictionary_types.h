@@ -38,6 +38,7 @@
 namespace keyvi {
 namespace dictionary {
 
+// forward define the value store types as dictionary types
 using dictionary_type_t = fsa::internal::value_store_t;
 
 typedef keyvi::dictionary::fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<>>
