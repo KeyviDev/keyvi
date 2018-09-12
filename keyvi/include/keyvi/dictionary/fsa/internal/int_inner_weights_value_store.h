@@ -44,7 +44,10 @@ class IntInnerWeightsValueStoreBase {
   typedef uint32_t value_t;
   static const bool inner_weight = true;
 
-  static value_store_t GetValueStoreType() { return value_store_t::INT_WITH_WEIGHTS; }
+  IntInnerWeightsValueStoreBase() {}
+
+  IntInnerWeightsValueStoreBase(const IntInnerWeightsValueStoreBase& that) = delete;
+  IntInnerWeightsValueStoreBase& operator=(IntInnerWeightsValueStoreBase const&) = delete;
 
   uint64_t AddValue(value_t value, bool* no_minimization) const {
     TRACE("Value store value: %d", value);
@@ -57,6 +60,8 @@ class IntInnerWeightsValueStoreBase {
 
   void CloseFeeding() {}
   void Write(std::ostream& stream) const {}
+
+  static value_store_t GetValueStoreType() { return value_store_t::INT_WITH_WEIGHTS; }
 };
 
 /**
@@ -65,16 +70,12 @@ class IntInnerWeightsValueStoreBase {
 class IntInnerWeightsValueStore final : public IntInnerWeightsValueStoreBase {
  public:
   explicit IntInnerWeightsValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
-  IntInnerWeightsValueStore(const IntInnerWeightsValueStore& that) = delete;
-  IntInnerWeightsValueStore& operator=(IntInnerWeightsValueStore const&) = delete;
 };
 
 class IntInnerWeightsValueStoreMerge final : public IntInnerWeightsValueStoreBase {
  public:
   explicit IntInnerWeightsValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
-  IntInnerWeightsValueStoreMerge& operator=(IntInnerWeightsValueStoreMerge const&) = delete;
-  IntInnerWeightsValueStoreMerge(const IntInnerWeightsValueStoreMerge& that) = delete;
   uint64_t AddValueMerge(const char* p, uint64_t v, bool* no_minimization) { return v; }
 };
 
@@ -86,8 +87,6 @@ class IntInnerWeightsValueStoreAppendMerge final : public IntInnerWeightsValueSt
   explicit IntInnerWeightsValueStoreAppendMerge(
       const std::vector<std::string>&, const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
-  IntInnerWeightsValueStoreAppendMerge& operator=(IntInnerWeightsValueStoreAppendMerge const&) = delete;
-  IntInnerWeightsValueStoreAppendMerge(const IntInnerWeightsValueStoreAppendMerge& that) = delete;
   uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) { return oldIndex; }
 };
 

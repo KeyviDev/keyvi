@@ -55,13 +55,18 @@ class StringValueStoreBase {
   static const std::string no_value;
   static const bool inner_weight = false;
 
-  uint32_t GetWeightValue(value_t value) const { return 0; }
+  StringValueStoreBase() {}
 
-  static value_store_t GetValueStoreType() { return value_store_t::STRING; }
+  StringValueStoreBase& operator=(StringValueStoreBase const&) = delete;
+  StringValueStoreBase(const StringValueStoreBase& that) = delete;
+
+  uint32_t GetWeightValue(value_t value) const { return 0; }
 
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
   uint64_t AddValue(const value_t& value, bool* no_minimization) { return 0; }
+
+  static value_store_t GetValueStoreType() { return value_store_t::STRING; }
 
  protected:
   size_t number_of_values_ = 0;
@@ -90,9 +95,6 @@ class StringValueStoreMinimizationBase : public StringValueStoreBase {
 
   ~StringValueStoreMinimizationBase() { boost::filesystem::remove_all(temporary_directory_); }
 
-  StringValueStoreMinimizationBase& operator=(StringValueStoreMinimizationBase const&) = delete;
-  StringValueStoreMinimizationBase(const StringValueStoreMinimizationBase& that) = delete;
-
   /**
    * Close the value store, so no more updates;
    */
@@ -116,9 +118,6 @@ class StringValueStore final : public StringValueStoreMinimizationBase {
  public:
   explicit StringValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : StringValueStoreMinimizationBase(parameters) {}
-
-  StringValueStore& operator=(StringValueStore const&) = delete;
-  StringValueStore(const StringValueStore& that) = delete;
 
   /**
    * Simple implementation of a value store for strings:
@@ -232,8 +231,6 @@ class StringValueStoreAppendMerge final : public StringValueStoreBase {
     }
   }
 
-  StringValueStoreAppendMerge& operator=(StringValueStoreAppendMerge const&) = delete;
-  StringValueStoreAppendMerge(const StringValueStoreAppendMerge& that) = delete;
   uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) const { return offsets_[fileIndex] + oldIndex; }
 
   void CloseFeeding() {}

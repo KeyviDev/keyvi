@@ -42,7 +42,10 @@ class NullValueStoreBase {
   static const uint64_t no_value = 0;
   static const bool inner_weight = false;
 
-  static value_store_t GetValueStoreType() { return value_store_t::KEY_ONLY; }
+  NullValueStoreBase() {}
+
+  NullValueStoreBase& operator=(NullValueStoreBase const&) = delete;
+  NullValueStoreBase(const NullValueStoreBase& that) = delete;
 
   uint64_t AddValue(value_t value, bool* no_minimization) { return 0; }
 
@@ -53,6 +56,8 @@ class NullValueStoreBase {
   void CloseFeeding() {}
 
   void Write(std::ostream& stream) const {}
+
+  static value_store_t GetValueStoreType() { return value_store_t::KEY_ONLY; }
 };
 
 /**
@@ -62,16 +67,11 @@ class NullValueStoreBase {
 class NullValueStore final : public NullValueStoreBase {
  public:
   explicit NullValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
-
-  NullValueStore& operator=(NullValueStore const&) = delete;
-  NullValueStore(const NullValueStore& that) = delete;
 };
 
 class NullValueStoreMerge final : public NullValueStoreBase {
  public:
   explicit NullValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
-  NullValueStoreMerge& operator=(NullValueStoreMerge const&) = delete;
-  NullValueStoreMerge(const NullValueStoreMerge& that) = delete;
 
   uint64_t AddValueMerge(const char* p, uint64_t v, bool* no_minimization) { return 0; }
 };
@@ -83,8 +83,6 @@ class NullValueStoreAppendMerge final : public NullValueStoreBase {
   explicit NullValueStoreAppendMerge(const std::vector<std::string>&,
                                      const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
-  NullValueStoreAppendMerge& operator=(NullValueStoreAppendMerge const&) = delete;
-  NullValueStoreAppendMerge(const NullValueStoreAppendMerge& that) = delete;
   uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) { return 0; }
 };
 

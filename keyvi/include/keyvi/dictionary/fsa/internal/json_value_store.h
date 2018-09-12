@@ -71,13 +71,18 @@ class JsonValueStoreBase {
   static const std::string no_value;
   static const bool inner_weight = false;
 
-  uint32_t GetWeightValue(value_t value) const { return 0; }
+  JsonValueStoreBase() {}
 
-  static value_store_t GetValueStoreType() { return value_store_t::JSON; }
+  JsonValueStoreBase& operator=(JsonValueStoreBase const&) = delete;
+  JsonValueStoreBase(const JsonValueStoreBase& that) = delete;
+
+  uint32_t GetWeightValue(value_t value) const { return 0; }
 
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
   uint64_t AddValue(const value_t& value, bool* no_minimization) { return 0; }
+
+  static value_store_t GetValueStoreType() { return value_store_t::JSON; }
 
  protected:
   size_t number_of_values_ = 0;
@@ -105,9 +110,6 @@ class JsonValueStoreMinimizationBase : public JsonValueStoreBase {
   }
 
   ~JsonValueStoreMinimizationBase() { boost::filesystem::remove_all(temporary_directory_); }
-
-  JsonValueStoreMinimizationBase& operator=(JsonValueStoreMinimizationBase const&) = delete;
-  JsonValueStoreMinimizationBase(const JsonValueStoreMinimizationBase& that) = delete;
 
   /**
    * Close the value store, so no more updates;
@@ -151,9 +153,6 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
         std::bind(static_cast<compression::compress_mem_fn_t>(&compression::CompressionStrategy::Compress),
                   raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
   }
-
-  JsonValueStore& operator=(JsonValueStore const&) = delete;
-  JsonValueStore(const JsonValueStore& that) = delete;
 
   /**
    * Simple implementation of a value store for json values:
@@ -306,8 +305,6 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
     }
   }
 
-  JsonValueStoreAppendMerge& operator=(JsonValueStoreAppendMerge const&) = delete;
-  JsonValueStoreAppendMerge(const JsonValueStoreAppendMerge& that) = delete;
   uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) const { return offsets_[fileIndex] + oldIndex; }
 
   void CloseFeeding() {}

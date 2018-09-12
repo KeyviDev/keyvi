@@ -44,7 +44,10 @@ class IntValueStoreBase {
   typedef uint32_t value_t;
   static const bool inner_weight = false;
 
-  static value_store_t GetValueStoreType() { return value_store_t::INT; }
+  IntValueStoreBase() {}
+
+  IntValueStoreBase(const IntValueStoreBase& that) = delete;
+  IntValueStoreBase& operator=(IntValueStoreBase const&) = delete;
 
   uint64_t AddValue(value_t value, bool* no_minimization) const {
     TRACE("Value store value: %d", value);
@@ -57,6 +60,8 @@ class IntValueStoreBase {
 
   void CloseFeeding() {}
   void Write(std::ostream& stream) const {}
+
+  static value_store_t GetValueStoreType() { return value_store_t::INT; }
 };
 
 /**
@@ -66,17 +71,12 @@ class IntValueStoreBase {
 class IntValueStore final : public IntValueStoreBase {
  public:
   explicit IntValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
-
-  IntValueStore(const IntValueStore& that) = delete;
-  IntValueStore& operator=(IntValueStore const&) = delete;
 };
 
 class IntValueStoreMerge final : public IntValueStoreBase {
  public:
   explicit IntValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
-  IntValueStoreMerge& operator=(IntValueStoreMerge const&) = delete;
-  IntValueStoreMerge(const IntValueStoreMerge& that) = delete;
   uint64_t AddValueMerge(const char* p, uint64_t v, bool* no_minimization) { return v; }
 };
 
@@ -87,8 +87,6 @@ class IntValueStoreAppendMerge final : public IntValueStoreBase {
   explicit IntValueStoreAppendMerge(const std::vector<std::string>&,
                                     const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
-  IntValueStoreAppendMerge& operator=(IntValueStoreAppendMerge const&) = delete;
-  IntValueStoreAppendMerge(const IntValueStoreAppendMerge& that) = delete;
   uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) { return oldIndex; }
 };
 
