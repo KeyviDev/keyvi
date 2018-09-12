@@ -109,8 +109,7 @@ template <class BucketT = uint32_t>
 void compile_completion(const std::vector<std::string>& input, const std::string& output,
                         const std::string& manifest = "",
                         const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::INT_WITH_WEIGHTS> compiler(
-      value_store_params);
+  keyvi::dictionary::CompletionDictionaryCompiler compiler(value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
@@ -136,7 +135,7 @@ void compile_completion(const std::vector<std::string>& input, const std::string
 
 void compile_integer(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::INT> compiler(value_store_params);
+  keyvi::dictionary::IntDictionaryCompiler compiler(value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
@@ -179,14 +178,14 @@ void compile_strings_inner(Compiler* compiler, const std::vector<std::string>& i
 
 void compile_strings(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::STRING> compiler(value_store_params);
+  keyvi::dictionary::StringDictionaryCompiler compiler(value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
 }
 
 void compile_key_only(const std::vector<std::string>& input, const std::string& output,
                       const std::string& manifest = "",
                       const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<> compiler(value_store_params);
+  keyvi::dictionary::KeyOnlyDictionaryCompiler compiler(value_store_params);
 
   std::function<std::pair<std::string, uint32_t>(std::string)> parser = [](std::string line) {
     std::string key = line;
@@ -206,7 +205,7 @@ void compile_key_only(const std::vector<std::string>& input, const std::string& 
 
 void compile_json(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
                   const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
-  keyvi::dictionary::DictionaryCompiler<keyvi::dictionary::dictionary_type_t::JSON> compiler(value_store_params);
+  keyvi::dictionary::JsonDictionaryCompiler compiler(value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
 }
 
