@@ -45,13 +45,13 @@
 #include "msgpack/type/rapidjson.hpp"
 
 #include "compression/compression_selector.h"
-#include "dictionary/dictionary_merger_fwd.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/ivalue_store.h"
 #include "dictionary/fsa/internal/lru_generation_cache.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
+#include "dictionary/fsa/internal/value_store_types.h"
 #include "dictionary/keyvi_file.h"
 #include "util/configuration.h"
 #include "util/json_value.h"
@@ -65,30 +65,78 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-/**
- * Value store where the value is a json object.
- */
-/// TODO: move merge logic into dedicated JsonValueStoreMerger class
-class JsonValueStore final : public IValueStoreWriter {
+class JsonValueStoreBase {
  public:
   typedef std::string value_t;
-  static const uint64_t no_value = 0;
+  static const std::string no_value;
   static const bool inner_weight = false;
 
-  explicit JsonValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
-      : IValueStoreWriter(parameters),
+  JsonValueStoreBase() {}
+
+  JsonValueStoreBase& operator=(JsonValueStoreBase const&) = delete;
+  JsonValueStoreBase(const JsonValueStoreBase& that) = delete;
+
+  uint32_t GetWeightValue(value_t value) const { return 0; }
+
+  uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
+
+  uint64_t AddValue(const value_t& value, bool* no_minimization) { return 0; }
+
+  static value_store_t GetValueStoreType() { return value_store_t::JSON; }
+
+ protected:
+  size_t number_of_values_ = 0;
+  size_t number_of_unique_values_ = 0;
+  size_t values_buffer_size_ = 0;
+};
+
+class JsonValueStoreMinimizationBase : public JsonValueStoreBase {
+ public:
+  explicit JsonValueStoreMinimizationBase(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : parameters_(parameters),
         hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
     temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
 
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
     boost::filesystem::create_directory(temporary_directory_);
+    // use memory limit as an indicator for the external memory chunksize
+    const size_t external_memory_chunk_size =
+        keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE);
 
+    TRACE("External Memory chunk size: %d", external_memory_chunk_size);
+
+    values_extern_.reset(
+        new MemoryMapManager(external_memory_chunk_size, temporary_directory_, "json_values_filebuffer"));
+  }
+
+  ~JsonValueStoreMinimizationBase() { boost::filesystem::remove_all(temporary_directory_); }
+
+  /**
+   * Close the value store, so no more updates;
+   */
+  void CloseFeeding() {
+    values_extern_->Persist();
+    // free up memory from hashtable
+    hash_.Clear();
+  }
+
+ protected:
+  keyvi::util::parameters_t parameters_;
+  boost::filesystem::path temporary_directory_;
+  std::unique_ptr<MemoryMapManager> values_extern_;
+  LeastRecentlyUsedGenerationsCache<RawPointer<>> hash_;
+};
+
+/**
+ * Value store where the value is a json object.
+ */
+class JsonValueStore final : public JsonValueStoreMinimizationBase {
+ public:
+  explicit JsonValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : JsonValueStoreMinimizationBase(parameters) {
     compression_threshold_ = keyvi::util::mapGet(parameters_, COMPRESSION_THRESHOLD_KEY, 32);
-
     std::string compressor = keyvi::util::mapGet<std::string>(parameters_, COMPRESSION_KEY, "");
-
     minimize_ = keyvi::util::mapGetBool(parameters_, MINIMIZATION_KEY, true);
-
     std::string float_mode = keyvi::util::mapGet<std::string>(parameters_, SINGLE_PRECISION_FLOAT_KEY, "");
 
     if (float_mode == "single") {
@@ -104,46 +152,13 @@ class JsonValueStore final : public IValueStoreWriter {
     short_compress_ =
         std::bind(static_cast<compression::compress_mem_fn_t>(&compression::CompressionStrategy::Compress),
                   raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-
-    // use memory limit as an indicator for the external memory chunksize
-    const size_t external_memory_chunk_size =
-        keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE);
-
-    TRACE("External Memory chunk size: %d", external_memory_chunk_size);
-
-    values_extern_.reset(
-        new MemoryMapManager(external_memory_chunk_size, temporary_directory_, "json_values_filebuffer"));
   }
-
-  explicit JsonValueStore(const std::vector<std::string>& inputFiles)
-      : hash_(0), mergeMode_(true), inputFiles_(inputFiles), offsets_() {
-    for (const auto& filename : inputFiles) {
-      KeyViFile keyViFile(filename);
-
-      auto& vsStream = keyViFile.valueStoreStream();
-      const boost::property_tree::ptree props = keyvi::util::SerializationUtils::ReadValueStoreProperties(vsStream);
-      offsets_.push_back(values_buffer_size_);
-
-      number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
-      number_of_unique_values_ += boost::lexical_cast<size_t>(props.get<std::string>("unique_values"));
-      values_buffer_size_ += boost::lexical_cast<size_t>(props.get<std::string>("size"));
-    }
-  }
-
-  ~JsonValueStore() {
-    if (!mergeMode_) {
-      boost::filesystem::remove_all(temporary_directory_);
-    }
-  }
-
-  JsonValueStore& operator=(JsonValueStore const&) = delete;
-  JsonValueStore(const JsonValueStore& that) = delete;
 
   /**
    * Simple implementation of a value store for json values:
    * todo: performance improvements?
    */
-  uint64_t GetValue(const value_t& value, bool* no_minimization) {
+  uint64_t AddValue(const value_t& value, bool* no_minimization) {
     msgpack_buffer_.clear();
 
     keyvi::util::EncodeJsonValue(long_compress_, short_compress_, &msgpack_buffer_, &string_buffer_, value,
@@ -154,7 +169,7 @@ class JsonValueStore final : public IValueStoreWriter {
     if (!minimize_) {
       TRACE("Minimization is turned off.");
       *no_minimization = true;
-      return AddValue();
+      return CreateNewValue();
     }
 
     const RawPointerForCompare<MemoryMapManager> stp(string_buffer_.data(), string_buffer_.size(),
@@ -171,7 +186,7 @@ class JsonValueStore final : public IValueStoreWriter {
     TRACE("New unique value");
     ++number_of_unique_values_;
 
-    uint64_t pt = AddValue();
+    uint64_t pt = CreateNewValue();
 
     TRACE("add value to hash at %d, length %d", pt, string_buffer_.size());
     hash_.Add(RawPointer<>(pt, stp.GetHashcode(), string_buffer_.size()));
@@ -179,51 +194,21 @@ class JsonValueStore final : public IValueStoreWriter {
     return pt;
   }
 
-  uint64_t GetMergeValueId(size_t fileIndex, uint64_t oldIndex) const { return offsets_[fileIndex] + oldIndex; }
-
-  uint32_t GetWeightValue(value_t value) const { return 0; }
-
-  static value_store_t GetValueStoreType() { return JSON_VALUE_STORE; }
-
-  /**
-   * Close the value store, so no more updates;
-   */
-  void CloseFeeding() {
-    values_extern_->Persist();
-    // free up memory from hashtable
-    hash_.Clear();
-  }
-
   void Write(std::ostream& stream) {
     boost::property_tree::ptree pt;
     pt.put("size", std::to_string(values_buffer_size_));
     pt.put("values", std::to_string(number_of_values_));
     pt.put("unique_values", std::to_string(number_of_unique_values_));
-
-    if (!mergeMode_) {
-      pt.put(std::string("__") + COMPRESSION_KEY, compressor_->name());
-      pt.put(std::string("__") + COMPRESSION_THRESHOLD_KEY, compression_threshold_);
-    }
+    pt.put(std::string("__") + COMPRESSION_KEY, compressor_->name());
+    pt.put(std::string("__") + COMPRESSION_THRESHOLD_KEY, compression_threshold_);
 
     keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
-    if (!mergeMode_) {
-      values_extern_->Write(stream, values_buffer_size_);
-    } else {
-      for (const auto& filename : inputFiles_) {
-        KeyViFile keyViFile(filename);
-        auto& in_stream = keyViFile.valueStoreStream();
-        keyvi::util::SerializationUtils::ReadValueStoreProperties(in_stream);
-
-        stream << in_stream.rdbuf();
-      }
-    }
+    values_extern_->Write(stream, values_buffer_size_);
   }
 
  private:
-  std::unique_ptr<MemoryMapManager> values_extern_;
-
   /*
    * Compressors & the associated compression functions. Ugly, but
    * needed for EncodeJsonValue.
@@ -235,23 +220,29 @@ class JsonValueStore final : public IValueStoreWriter {
   size_t compression_threshold_;
   bool minimize_ = true;
 
-  LeastRecentlyUsedGenerationsCache<RawPointer<>> hash_;
   compression::buffer_t string_buffer_;
   keyvi::util::msgpack_buffer msgpack_buffer_;
-  size_t number_of_values_ = 0;
-  size_t number_of_unique_values_ = 0;
-  size_t values_buffer_size_ = 0;
-  boost::filesystem::path temporary_directory_;
-
-  const bool mergeMode_ = false;
-  std::vector<std::string> inputFiles_;
-  std::vector<size_t> offsets_;
 
  private:
-  template <typename, typename>
-  friend class ::keyvi::dictionary::DictionaryMerger;
+  uint64_t CreateNewValue() {
+    uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
+    size_t length;
 
-  uint64_t GetValue(const char* payload, uint64_t fsa_value, bool* no_minimization) {
+    keyvi::util::encodeVarint(string_buffer_.size(), values_extern_.get(), &length);
+    values_buffer_size_ += length;
+    values_extern_->Append(reinterpret_cast<const void*>(string_buffer_.data()), string_buffer_.size());
+    values_buffer_size_ += string_buffer_.size();
+
+    return pt;
+  }
+};
+
+class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
+ public:
+  explicit JsonValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : JsonValueStoreMinimizationBase(parameters) {}
+
+  uint64_t AddValueMerge(const char* payload, uint64_t fsa_value, bool* no_minimization) {
     size_t buffer_size;
 
     const char* full_buf = payload + fsa_value;
@@ -281,17 +272,64 @@ class JsonValueStore final : public IValueStoreWriter {
     return pt;
   }
 
-  uint64_t AddValue() {
-    uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
-    size_t length;
+  void Write(std::ostream& stream) {
+    boost::property_tree::ptree pt;
+    pt.put("size", std::to_string(values_buffer_size_));
+    pt.put("values", std::to_string(number_of_values_));
+    pt.put("unique_values", std::to_string(number_of_unique_values_));
 
-    keyvi::util::encodeVarint(string_buffer_.size(), values_extern_.get(), &length);
-    values_buffer_size_ += length;
-    values_extern_->Append(reinterpret_cast<const void*>(string_buffer_.data()), string_buffer_.size());
-    values_buffer_size_ += string_buffer_.size();
+    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
+    TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
-    return pt;
+    values_extern_->Write(stream, values_buffer_size_);
   }
+};
+
+class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
+ public:
+  explicit JsonValueStoreAppendMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
+
+  explicit JsonValueStoreAppendMerge(const std::vector<std::string>& inputFiles,
+                                     const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : input_files_(inputFiles), offsets_() {
+    for (const auto& filename : inputFiles) {
+      KeyViFile keyViFile(filename);
+
+      auto& vsStream = keyViFile.valueStoreStream();
+      const boost::property_tree::ptree props = keyvi::util::SerializationUtils::ReadValueStoreProperties(vsStream);
+      offsets_.push_back(values_buffer_size_);
+
+      number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
+      number_of_unique_values_ += boost::lexical_cast<size_t>(props.get<std::string>("unique_values"));
+      values_buffer_size_ += boost::lexical_cast<size_t>(props.get<std::string>("size"));
+    }
+  }
+
+  uint64_t AddValueAppendMerge(size_t fileIndex, uint64_t oldIndex) const { return offsets_[fileIndex] + oldIndex; }
+
+  void CloseFeeding() {}
+
+  void Write(std::ostream& stream) {
+    boost::property_tree::ptree pt;
+    pt.put("size", std::to_string(values_buffer_size_));
+    pt.put("values", std::to_string(number_of_values_));
+    pt.put("unique_values", std::to_string(number_of_unique_values_));
+
+    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
+    TRACE("Wrote JSON header, stream at %d", stream.tellp());
+
+    for (const auto& filename : input_files_) {
+      KeyViFile keyViFile(filename);
+      auto& in_stream = keyViFile.valueStoreStream();
+      keyvi::util::SerializationUtils::ReadValueStoreProperties(in_stream);
+
+      stream << in_stream.rdbuf();
+    }
+  }
+
+ private:
+  std::vector<std::string> input_files_;
+  std::vector<size_t> offsets_;
 };
 
 class JsonValueStoreReader final : public IValueStoreReader {
@@ -323,7 +361,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
 
   ~JsonValueStoreReader() { delete strings_region_; }
 
-  value_store_t GetValueStoreType() const override { return JSON_VALUE_STORE; }
+  value_store_t GetValueStoreType() const override { return value_store_t::JSON; }
 
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());
@@ -360,6 +398,14 @@ class JsonValueStoreReader final : public IValueStoreReader {
   boost::property_tree::ptree properties_;
 
   const char* GetValueStorePayload() const override { return strings_; }
+};
+
+template <>
+struct ValueStoreComponents<value_store_t::JSON> {
+  using value_store_writer_t = JsonValueStore;
+  using value_store_reader_t = JsonValueStoreReader;
+  using value_store_merger_t = JsonValueStoreMerge;
+  using value_store_append_merger_t = JsonValueStoreAppendMerge;
 };
 
 } /* namespace internal */

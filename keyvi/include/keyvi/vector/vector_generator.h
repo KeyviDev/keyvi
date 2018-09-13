@@ -37,10 +37,12 @@
 namespace keyvi {
 namespace vector {
 
-template <class ValueStoreT>
+template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType>
 class VectorGenerator final {
   static const size_t INDEX_EXTERNAL_MEMORY_CHUNK_SIZE = sizeof(offset_type) * 100 * 1000 * 1000;
 
+  using ValueStoreT =
+      typename keyvi::dictionary::fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_writer_t;
   using parameters_t = keyvi::util::parameters_t;
 
  public:
@@ -67,7 +69,7 @@ class VectorGenerator final {
     static_assert(sizeof(offset_type) == 8, "");
 
     bool dummy_minimization = false;
-    const offset_type value_idx = htole64(value_store_->GetValue(value, &dummy_minimization));
+    const offset_type value_idx = htole64(value_store_->AddValue(value, &dummy_minimization));
 
     index_store_->Append(&value_idx, sizeof(offset_type));
     ++size_;

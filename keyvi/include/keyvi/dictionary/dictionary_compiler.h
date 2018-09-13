@@ -63,15 +63,17 @@ struct compiler_exception : public std::runtime_error {
 /**
  * Dictionary Compiler
  */
-template <class PersistenceT, class ValueStoreT = fsa::internal::NullValueStore,
+template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType = fsa::internal::value_store_t::KEY_ONLY,
 #if !defined(KEYVI_DISABLE_TPIE)
-          class SorterT = sort::TpieSorter<key_value_t>>
+          class SorterT = sort::TpieSorter<key_value_t>
 #else
-          class SorterT = sort::InMemorySorter<key_value_t>>
+          class SorterT = sort::InMemorySorter<key_value_t>
 #endif
+          >
 class DictionaryCompiler final {
-  typedef std::function<void(size_t, size_t, void*)> callback_t;
-  using GeneratorAdapter = fsa::GeneratorAdapterInterface<PersistenceT, ValueStoreT>;
+  using ValueStoreT = typename fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_writer_t;
+  using callback_t = std::function<void(size_t, size_t, void*)>;
+  using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;
 
  public:
   /**
@@ -146,7 +148,9 @@ class DictionaryCompiler final {
 
     value_store_->CloseFeeding();
     sorter_.sort();
-    generator_ = GeneratorAdapter::CreateGenerator(size_of_keys_, params_, value_store_);
+    generator_ =
+        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
+            size_of_keys_, params_, value_store_);
     generator_->SetManifest(manifest_);
 
     if (sorter_.size() > 0) {
@@ -281,7 +285,7 @@ class DictionaryCompiler final {
    */
   fsa::ValueHandle RegisterValue(typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     bool no_minimization = false;
-    uint64_t value_idx = value_store_->GetValue(value, &no_minimization);
+    uint64_t value_idx = value_store_->AddValue(value, &no_minimization);
 
     fsa::ValueHandle handle = {
         value_idx,                            // offset of value
