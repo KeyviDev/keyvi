@@ -46,37 +46,42 @@ BOOST_AUTO_TEST_CASE(MergeKeyOnlyDicts) {
   std::vector<std::string> test_data2 = {"aaaaz", "aabbe", "cdddefgh"};
   testing::TempDictionary dictionary2(&test_data2);
 
-  DictionaryMerger<> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
-  std::string filename("merged-dict-key-only.kv");
-  merger.Add(dictionary.GetFileName());
-  merger.Add(dictionary2.GetFileName());
+  keyvi::util::parameters_t merge_configurations[] = {{{"memory_limit_mb", "10"}},
+                                                      {{"memory_limit_mb", "10"}, {"merge_mode", "append"}}};
 
-  merger.Merge(filename);
+  for (const auto params : merge_configurations) {
+    DictionaryMerger<> merger(params);
+    std::string filename("merged-dict-key-only.kv");
+    merger.Add(dictionary.GetFileName());
+    merger.Add(dictionary2.GetFileName());
 
-  fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
-  dictionary_t d(new Dictionary(fsa));
+    merger.Merge(filename);
 
-  BOOST_CHECK(d->Contains("aaaa"));
-  BOOST_CHECK(d->Contains("aabb"));
-  BOOST_CHECK(d->Contains("aabc"));
-  BOOST_CHECK(d->Contains("aacd"));
-  BOOST_CHECK(d->Contains("bbcd"));
-  BOOST_CHECK(d->Contains("aaceh"));
-  BOOST_CHECK(d->Contains("cdefgh"));
+    fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+    dictionary_t d(new Dictionary(fsa));
 
-  BOOST_CHECK(d->Contains("aaaaz"));
-  BOOST_CHECK(d->Contains("aabbe"));
-  BOOST_CHECK(d->Contains("cdddefgh"));
+    BOOST_CHECK(d->Contains("aaaa"));
+    BOOST_CHECK(d->Contains("aabb"));
+    BOOST_CHECK(d->Contains("aabc"));
+    BOOST_CHECK(d->Contains("aacd"));
+    BOOST_CHECK(d->Contains("bbcd"));
+    BOOST_CHECK(d->Contains("aaceh"));
+    BOOST_CHECK(d->Contains("cdefgh"));
 
-  BOOST_CHECK(!d->Contains("aaab"));
-  BOOST_CHECK(!d->Contains("a"));
-  BOOST_CHECK(!d->Contains("cde"));
+    BOOST_CHECK(d->Contains("aaaaz"));
+    BOOST_CHECK(d->Contains("aabbe"));
+    BOOST_CHECK(d->Contains("cdddefgh"));
 
-  BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
-  BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);
-  BOOST_CHECK_EQUAL(10, merger.GetStats().number_of_keys_);
+    BOOST_CHECK(!d->Contains("aaab"));
+    BOOST_CHECK(!d->Contains("a"));
+    BOOST_CHECK(!d->Contains("cde"));
 
-  std::remove(filename.c_str());
+    BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+    BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);
+    BOOST_CHECK_EQUAL(10, merger.GetStats().number_of_keys_);
+
+    std::remove(filename.c_str());
+  }
 }
 
 BOOST_AUTO_TEST_CASE(MergeIntegerDicts) {
