@@ -345,6 +345,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(DeleteUnsupported, SorterT, sorter_types) {
   BOOST_CHECK_THROW(compiler.Delete("aa"), compiler_exception);
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(MultipleKeyUpdateAndCompile, SorterT, sorter_types) {
+  keyvi::dictionary::DictionaryCompiler<fsa::internal::SparseArrayPersistence<uint16_t>, fsa::internal::JsonValueStore,
+                                        SorterT>
+      compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+
+  compiler.Add("a", "1");
+  compiler.Add("a", "1");
+  compiler.Compile();
+  BOOST_CHECK_THROW(compiler.Add("a", "1"), compiler_exception);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */

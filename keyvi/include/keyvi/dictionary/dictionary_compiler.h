@@ -106,6 +106,10 @@ class DictionaryCompiler final {
   DictionaryCompiler(const DictionaryCompiler& that) = delete;
 
   void Add(const std::string& input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {
+    if (generator_) {
+      throw compiler_exception("You're not supposed to add more data once compilation is done!");
+    }
+
     size_of_keys_ += input_key.size();
     sorter_.push_back(key_value_t(std::move(input_key), RegisterValue(value)));
   }
