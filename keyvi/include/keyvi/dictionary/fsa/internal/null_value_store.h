@@ -98,10 +98,11 @@ class NullValueStoreReader final : public IValueStoreReader {
 };
 
 template <>
-struct Dict<value_store_t::KEY_ONLY> {
-  using value_store_t = NullValueStore;
-  using value_store_merge_t = NullValueStoreMerge;
-  using value_store_append_merge_t = NullValueStoreAppendMerge;
+struct ValueStoreComponents<value_store_t::KEY_ONLY> {
+  using value_store_writer_t = NullValueStore;
+  using value_store_reader_t = NullValueStoreReader;
+  using value_store_merger_t = NullValueStoreMerge;
+  using value_store_append_merger_t = NullValueStoreAppendMerge;
 };
 
 } /* namespace internal */

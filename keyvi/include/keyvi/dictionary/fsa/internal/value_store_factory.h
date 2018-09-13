@@ -45,17 +45,19 @@ class ValueStoreFactory final {
                                        loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
     switch (type) {
       case value_store_t::KEY_ONLY:
-        return new NullValueStoreReader(stream, file_mapping);
+        return new ValueStoreComponents<value_store_t::KEY_ONLY>::value_store_reader_t(stream, file_mapping);
       case value_store_t::INT:
-        return new IntValueStoreReader(stream, file_mapping);
+        return new ValueStoreComponents<value_store_t::INT>::value_store_reader_t(stream, file_mapping);
       case value_store_t::STRING:
-        return new StringValueStoreReader(stream, file_mapping, loading_strategy);
+        return new ValueStoreComponents<value_store_t::STRING>::value_store_reader_t(stream, file_mapping,
+                                                                                     loading_strategy);
       case value_store_t::JSON_DEPRECATED:
         throw std::invalid_argument("Deprecated Value Storage type");
       case value_store_t::JSON:
-        return new JsonValueStoreReader(stream, file_mapping, loading_strategy);
+        return new ValueStoreComponents<value_store_t::JSON>::value_store_reader_t(stream, file_mapping,
+                                                                                   loading_strategy);
       case value_store_t::INT_WITH_WEIGHTS:
-        return new IntInnerWeightsValueStoreReader(stream, file_mapping);
+        return new ValueStoreComponents<value_store_t::INT_WITH_WEIGHTS>::value_store_reader_t(stream, file_mapping);
       default:
         throw std::invalid_argument("Unknown Value Storage type");
     }

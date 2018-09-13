@@ -107,10 +107,11 @@ class IntInnerWeightsValueStoreReader final : public IValueStoreReader {
 };
 
 template <>
-struct Dict<value_store_t::INT_WITH_WEIGHTS> {
-  using value_store_t = IntInnerWeightsValueStore;
-  using value_store_merge_t = IntInnerWeightsValueStoreMerge;
-  using value_store_append_merge_t = IntInnerWeightsValueStoreAppendMerge;
+struct ValueStoreComponents<value_store_t::INT_WITH_WEIGHTS> {
+  using value_store_writer_t = IntInnerWeightsValueStore;
+  using value_store_reader_t = IntInnerWeightsValueStoreReader;
+  using value_store_merger_t = IntInnerWeightsValueStoreMerge;
+  using value_store_append_merger_t = IntInnerWeightsValueStoreAppendMerge;
 };
 
 } /* namespace internal */

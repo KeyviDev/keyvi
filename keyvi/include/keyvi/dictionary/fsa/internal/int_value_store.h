@@ -107,10 +107,11 @@ class IntValueStoreReader final : public IValueStoreReader {
 };
 
 template <>
-struct Dict<value_store_t::INT> {
-  using value_store_t = IntValueStore;
-  using value_store_merge_t = IntValueStoreMerge;
-  using value_store_append_merge_t = IntValueStoreAppendMerge;
+struct ValueStoreComponents<value_store_t::INT> {
+  using value_store_writer_t = IntValueStore;
+  using value_store_reader_t = IntValueStoreReader;
+  using value_store_merger_t = IntValueStoreMerge;
+  using value_store_append_merger_t = IntValueStoreAppendMerge;
 };
 
 } /* namespace internal */

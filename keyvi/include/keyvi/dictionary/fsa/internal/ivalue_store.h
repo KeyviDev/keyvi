@@ -47,7 +47,7 @@ namespace internal {
  */
 
 template <value_store_t>
-struct Dict {};
+struct ValueStoreComponents {};
 
 /* Writing value stores is based on template (duck-typing).
  * Base class / Interface definition for writing to the value store.

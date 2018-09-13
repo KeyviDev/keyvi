@@ -401,10 +401,11 @@ class JsonValueStoreReader final : public IValueStoreReader {
 };
 
 template <>
-struct Dict<value_store_t::JSON> {
-  using value_store_t = JsonValueStore;
-  using value_store_merge_t = JsonValueStoreMerge;
-  using value_store_append_merge_t = JsonValueStoreAppendMerge;
+struct ValueStoreComponents<value_store_t::JSON> {
+  using value_store_writer_t = JsonValueStore;
+  using value_store_reader_t = JsonValueStoreReader;
+  using value_store_merger_t = JsonValueStoreMerge;
+  using value_store_append_merger_t = JsonValueStoreAppendMerge;
 };
 
 } /* namespace internal */
