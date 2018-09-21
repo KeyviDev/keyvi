@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(manifesttest) {
 
   g.CloseFeeding();
 
-  g.SetManifestFromString("{\"version\":\"42\"}");
+  g.SetManifest("{\"version\":\"42\"}");
 
   std::ofstream out_stream("testFile3", std::ios::binary);
   g.Write(out_stream);
