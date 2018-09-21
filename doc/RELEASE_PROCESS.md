@@ -15,8 +15,9 @@ Create a release branch called `release-X.Y.Z`
  - Add the release notes in the description with references to PRs
  - Publish release
 
+## On the `master` branch
+
 ### Update the `setup.py` file
- - Update the flag `IS_RELEASED` again to False
  - Update to the next release version 
 ```
 VERSION_MAJOR = X
@@ -24,4 +25,3 @@ VERSION_MINOR = Y
 VERSION_PATCH = Z + 1
 VERSION_DEV = 0
 ```
- - Create a PR to `master`
