@@ -59,8 +59,8 @@ If you like to go deep down in the basics, keyvi is inspired by the following 2 
   * Sparse Array (See Storing a Sparse Table, Robert E. Tarjan et al. http://infolab.stanford.edu/pub/cstr/reports/cs/tr/78/683/CS-TR-78-683.pdf)
   * Incremental, which means minimization is done on the fly (See Incremental Construction of Minimal Acyclic Finite-State Automata, J. Daciuk et al.: http://www.mitpressjournals.org/doi/pdf/10.1162/089120100561601)
 
-## Making release 
-  * [How to make release](doc/RELEASE_PROCESS.md)
+## Release procedure
+  * [How to make a release](doc/Release_Process.md)
   
 ## Licence and 3rdparty dependencies
 

@@ -3,18 +3,20 @@
 ## Create a release branch
 Create a release branch called `release-X.Y.Z`
 
-## Update the `setup.py` file
+## On the `release-X.Y.Z` branch
+
+### Update the `setup.py` file
  - Update the flag `IS_RELEASED` to `True`
  - Commit to `release-X.Y.Z` and push it to https://github.com/KeyviDev/keyvi/
  - Wait for travis to build all targets
 
-## Create tag 
+### Create tag 
  - Draft a new release tagged vX.Y.Z with `release-X.Y.Z` as the target branch
  - Add the release notes in the description with references to PRs
  - Publish release
 
-## Update the `setup.py` file
- - Update the flag `IS_RELEASED` to False
+### Update the `setup.py` file
+ - Update the flag `IS_RELEASED` again to False
  - Update to the next release version 
 ```
 VERSION_MAJOR = X
