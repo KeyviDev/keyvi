@@ -227,7 +227,15 @@ class DictionaryCompiler final {
    *
    * @param manifest as string
    */
-  void SetManifest(const std::string& manifest) { manifest_ = manifest; }
+  void SetManifest(const std::string& manifest) {
+    manifest_ = manifest;
+
+    // if generator object is already there, set it otherwise cache it until it
+    // is created
+    if (generator_) {
+      generator_->SetManifest(manifest);
+    }
+  }
 
   void Write(std::ostream& stream) {
     if (!generator_) {
