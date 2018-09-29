@@ -29,8 +29,6 @@
 #include <functional>
 #include <string>
 
-#include <boost/property_tree/ptree.hpp>
-
 #include "dictionary/fsa/generator_adapter.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/null_value_store.h"
@@ -227,18 +225,9 @@ class DictionaryCompiler final {
   /**
    * Set a custom manifest to be embedded into the index file.
    *
-   * @param manifest as JSON string
+   * @param manifest as string
    */
-  void SetManifestFromString(const std::string& manifest) {
-    SetManifest(keyvi::util::SerializationUtils::ReadJsonRecord(manifest));
-  }
-
-  /**
-   * Set a custom manifest to be embedded into the index file.
-   *
-   * @param manifest
-   */
-  void SetManifest(const boost::property_tree::ptree& manifest) {
+  void SetManifest(const std::string& manifest) {
     manifest_ = manifest;
 
     // if generator object is already there, set it otherwise cache it until it
@@ -271,7 +260,7 @@ class DictionaryCompiler final {
   keyvi::util::parameters_t params_;
   ValueStoreT* value_store_;
   typename GeneratorAdapter::AdapterPtr generator_;
-  boost::property_tree::ptree manifest_ = boost::property_tree::ptree();
+  std::string manifest_;
   size_t count_ = 0;
   size_t size_of_keys_ = 0;
   bool sort_finalized_ = false;

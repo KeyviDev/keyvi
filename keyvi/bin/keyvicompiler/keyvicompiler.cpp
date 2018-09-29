@@ -96,7 +96,7 @@ void finalize_compile(CompilerType* compiler, const std::string& output, const s
   std::ofstream out_stream(output, std::ios::binary);
   compiler->Compile(callback);
   try {
-    compiler->SetManifestFromString(manifest);
+    compiler->SetManifest(manifest);
   } catch (boost::property_tree::json_parser::json_parser_error const& error) {
     std::cout << "Failed to set manifest: " << manifest << std::endl;
     std::cout << error.what() << std::endl;

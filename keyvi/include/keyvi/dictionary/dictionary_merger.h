@@ -167,13 +167,13 @@ class DictionaryMerger final {
   /**
    * Set a custom manifest to be embedded into the index file.
    *
-   * @param manifest as JSON string
+   * @param manifest as string
    */
-  void SetManifestFromString(const std::string& manifest) { manifest_ = manifest; }
+  void SetManifest(const std::string& manifest) { manifest_ = manifest; }
 
   void Merge(const std::string& filename) {
     Merge();
-    generator_->SetManifestFromString(manifest_);
+    generator_->SetManifest(manifest_);
     generator_->WriteToFile(filename);
   }
 

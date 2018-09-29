@@ -10,7 +10,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         JsonDictionaryMerger() except +
         JsonDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
         void Add(libcpp_utf8_string) except +
-        void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) # wrap-ignore
         void Merge(libcpp_utf8_string) nogil
 
 cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
@@ -18,7 +18,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         CompletionDictionaryMerger() except +
         CompletionDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
         void Add(libcpp_utf8_string) except +
-        void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) # wrap-ignore
         void Merge(libcpp_utf8_string) nogil
 
 cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
@@ -26,7 +26,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         StringDictionaryMerger() except +
         StringDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
         void Add(libcpp_utf8_string) except +
-        void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) # wrap-ignore
         void Merge(libcpp_utf8_string) nogil
 
 cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
@@ -34,7 +34,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         KeyOnlyDictionaryMerger() except +
         KeyOnlyDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
         void Add(libcpp_utf8_string) except +
-        void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) # wrap-ignore
         void Merge(libcpp_utf8_string) nogil
 
 cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
@@ -42,5 +42,5 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         IntDictionaryMerger() except +
         IntDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
         void Add(libcpp_utf8_string) except +
-        void SetManifestFromString(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) # wrap-ignore
         void Merge(libcpp_utf8_string) nogil
