@@ -51,6 +51,7 @@
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 #include "dictionary/fsa/internal/value_store_types.h"
 #include "dictionary/keyvi_file.h"
 #include "util/configuration.h"
@@ -336,21 +337,16 @@ class JsonValueStoreReader final : public IValueStoreReader {
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  JsonValueStoreReader(std::istream& stream, boost::interprocess::file_mapping* file_mapping,
+  JsonValueStoreReader(boost::interprocess::file_mapping* file_mapping, const ValueStoreProperties& properties,
                        loading_strategy_types loading_strategy = loading_strategy_types::lazy)
-      : IValueStoreReader(stream, file_mapping) {
+      : IValueStoreReader(file_mapping, properties) {
     TRACE("JsonValueStoreReader construct");
-
-    properties_ = keyvi::util::SerializationUtils::ReadValueStoreProperties(stream);
-
-    const size_t offset = stream.tellg();
-    const size_t strings_size = boost::lexical_cast<size_t>(properties_.get<std::string>("size"));
 
     const boost::interprocess::map_options_t map_options =
         internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 
-    strings_region_ = new boost::interprocess::mapped_region(*file_mapping, boost::interprocess::read_only, offset,
-                                                             strings_size, 0, map_options);
+    strings_region_ = new boost::interprocess::mapped_region(
+        *file_mapping, boost::interprocess::read_only, properties.GetOffset(), properties.GetSize(), 0, map_options);
 
     const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
 
@@ -386,16 +382,11 @@ class JsonValueStoreReader final : public IValueStoreReader {
     return keyvi::util::DecodeJsonValue(packed_string);
   }
 
-  std::string GetStatistics() const override {
-    std::ostringstream buf;
-    boost::property_tree::write_json(buf, properties_, false);
-    return buf.str();
-  }
+  std::string GetStatistics() const override { return ""; }
 
  private:
   boost::interprocess::mapped_region* strings_region_;
   const char* strings_;
-  boost::property_tree::ptree properties_;
 
   const char* GetValueStorePayload() const override { return strings_; }
 };

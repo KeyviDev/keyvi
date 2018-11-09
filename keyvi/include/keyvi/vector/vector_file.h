@@ -33,6 +33,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "dictionary/fsa/internal/value_store_factory.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 #include "util/serialization_utils.h"
 #include "vector/types.h"
 
@@ -84,8 +85,15 @@ class VectorFile {
     index_region_.advise(advise);
 
     in_stream.seekg(size_t(in_stream.tellg()) + index_size);
+
+    dictionary::fsa::internal::ValueStoreProperties value_store_properties;
+    // not all value stores have properties
+    if (in_stream.peek() != EOF) {
+      value_store_properties = dictionary::fsa::internal::ValueStoreProperties::FromJsonStream(in_stream);
+    }
+
     value_store_reader_.reset(dictionary::fsa::internal::ValueStoreFactory::MakeReader(
-        value_store_type, in_stream, &file_mapping, loading_strategy));
+        value_store_type, &file_mapping, value_store_properties, loading_strategy));
   }
 
   template <typename ValueStoreT>

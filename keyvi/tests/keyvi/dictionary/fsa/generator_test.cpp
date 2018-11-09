@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(manifesttest) {
   out_stream.close();
 
   automata_t f(new Automata("testFile3"));
-  BOOST_CHECK_EQUAL("{\"version\":\"42\"}\n", f->GetManifestAsString());
+  BOOST_CHECK_EQUAL("{\"version\":\"42\"}", f->GetManifestAsString());
 }
 
 BOOST_AUTO_TEST_CASE(zeroBytes) {

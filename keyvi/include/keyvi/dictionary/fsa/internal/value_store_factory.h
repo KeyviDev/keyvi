@@ -32,6 +32,7 @@
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/null_value_store.h"
 #include "dictionary/fsa/internal/string_value_store.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -40,24 +41,25 @@ namespace internal {
 
 class ValueStoreFactory final {
  public:
-  static IValueStoreReader* MakeReader(value_store_t type, std::istream& stream,
-                                       boost::interprocess::file_mapping* file_mapping,
+  static IValueStoreReader* MakeReader(value_store_t type, boost::interprocess::file_mapping* file_mapping,
+                                       const ValueStoreProperties& properties,
                                        loading_strategy_types loading_strategy = loading_strategy_types::lazy) {
     switch (type) {
       case value_store_t::KEY_ONLY:
-        return new ValueStoreComponents<value_store_t::KEY_ONLY>::value_store_reader_t(stream, file_mapping);
+        return new ValueStoreComponents<value_store_t::KEY_ONLY>::value_store_reader_t(file_mapping, properties);
       case value_store_t::INT:
-        return new ValueStoreComponents<value_store_t::INT>::value_store_reader_t(stream, file_mapping);
+        return new ValueStoreComponents<value_store_t::INT>::value_store_reader_t(file_mapping, properties);
       case value_store_t::STRING:
-        return new ValueStoreComponents<value_store_t::STRING>::value_store_reader_t(stream, file_mapping,
+        return new ValueStoreComponents<value_store_t::STRING>::value_store_reader_t(file_mapping, properties,
                                                                                      loading_strategy);
       case value_store_t::JSON_DEPRECATED:
         throw std::invalid_argument("Deprecated Value Storage type");
       case value_store_t::JSON:
-        return new ValueStoreComponents<value_store_t::JSON>::value_store_reader_t(stream, file_mapping,
+        return new ValueStoreComponents<value_store_t::JSON>::value_store_reader_t(file_mapping, properties,
                                                                                    loading_strategy);
       case value_store_t::INT_WITH_WEIGHTS:
-        return new ValueStoreComponents<value_store_t::INT_WITH_WEIGHTS>::value_store_reader_t(stream, file_mapping);
+        return new ValueStoreComponents<value_store_t::INT_WITH_WEIGHTS>::value_store_reader_t(file_mapping,
+                                                                                               properties);
       default:
         throw std::invalid_argument("Unknown Value Storage type");
     }

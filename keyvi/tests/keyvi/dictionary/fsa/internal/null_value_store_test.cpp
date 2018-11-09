@@ -23,6 +23,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "dictionary/fsa/internal/null_value_store.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -46,10 +47,10 @@ BOOST_AUTO_TEST_CASE(basic) {
 }
 
 BOOST_AUTO_TEST_CASE(reader) {
-  std::istringstream string_stream;
   boost::interprocess::file_mapping file_mapping;
+  ValueStoreProperties properties;
 
-  NullValueStoreReader nvsr(string_stream, &file_mapping);
+  NullValueStoreReader nvsr(&file_mapping, properties);
 
   BOOST_CHECK(nvsr.GetValueStoreType() == value_store_t::KEY_ONLY);
   BOOST_CHECK_EQUAL(nvsr.GetValueAsAttributeVector(42), IValueStoreReader::attributes_t());

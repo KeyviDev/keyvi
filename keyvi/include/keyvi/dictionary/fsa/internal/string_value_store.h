@@ -37,6 +37,7 @@
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/minimization_hash.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 #include "dictionary/fsa/internal/value_store_types.h"
 #include "dictionary/keyvi_file.h"
 #include "util/serialization_utils.h"
@@ -261,19 +262,14 @@ class StringValueStoreReader final : public IValueStoreReader {
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  StringValueStoreReader(std::istream& stream, boost::interprocess::file_mapping* file_mapping,
+  StringValueStoreReader(boost::interprocess::file_mapping* file_mapping, const ValueStoreProperties& properties,
                          loading_strategy_types loading_strategy = loading_strategy_types::lazy)
-      : IValueStoreReader(stream, file_mapping) {
-    const boost::property_tree::ptree properties = keyvi::util::SerializationUtils::ReadValueStoreProperties(stream);
-
-    const size_t offset = stream.tellg();
-    const size_t strings_size = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
-
+      : IValueStoreReader(file_mapping, properties) {
     const boost::interprocess::map_options_t map_options =
         internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 
-    strings_region_ = new boost::interprocess::mapped_region(*file_mapping, boost::interprocess::read_only, offset,
-                                                             strings_size, 0, map_options);
+    strings_region_ = new boost::interprocess::mapped_region(
+        *file_mapping, boost::interprocess::read_only, properties.GetOffset(), properties.GetSize(), 0, map_options);
 
     const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
 

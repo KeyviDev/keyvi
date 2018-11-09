@@ -33,6 +33,10 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
+
 #include "dictionary/util/endian.h"
 
 namespace keyvi {
@@ -65,6 +69,15 @@ class SerializationUtils {
     boost::property_tree::ptree properties;
     boost::property_tree::read_json(string_stream, properties);
     return properties;
+  }
+
+  static void ReadJsonRecord(std::istream& stream, rapidjson::Document& record) {
+    uint32_t header_size;
+    stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
+    header_size = be32toh(header_size);
+    char* buffer = new char[header_size];
+    stream.read(buffer, header_size);
+    record.Parse(buffer, header_size);
   }
 
   static boost::property_tree::ptree ReadValueStoreProperties(std::istream& stream) {
