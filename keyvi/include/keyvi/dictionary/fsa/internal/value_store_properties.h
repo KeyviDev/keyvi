@@ -46,14 +46,21 @@ class ValueStoreProperties final {
  public:
   ValueStoreProperties() {}
 
-  ValueStoreProperties(const size_t offset, const size_t size) {
+  ValueStoreProperties(const size_t offset, const size_t size, const size_t number_of_values,
+                       const size_t number_of_unique_values) {
     offset_ = offset;
     size_ = size;
+    number_of_values_ = number_of_values;
+    number_of_unique_values_ = number_of_unique_values;
   }
 
   size_t GetSize() const { return size_; }
 
   size_t GetOffset() const { return offset_; }
+
+  size_t GetNumberOfValues() const { return number_of_values_; }
+
+  size_t GetNumberOfUniqueValues() const { return number_of_unique_values_; }
 
   static ValueStoreProperties FromJsonStream(std::istream& stream) {
     rapidjson::Document value_store_properties;
@@ -68,12 +75,20 @@ class ValueStoreProperties final {
         throw std::invalid_argument("file is corrupt(truncated)");
       }
     }
-    return ValueStoreProperties(offset, size);
+
+    const size_t number_of_values =
+        keyvi::util::SerializationUtils::GetSizeValueOrDefault(value_store_properties, "values", 0);
+    const size_t number_of_unique_values =
+        keyvi::util::SerializationUtils::GetSizeValueOrDefault(value_store_properties, "unique_values", 0);
+
+    return ValueStoreProperties(offset, size, number_of_values, number_of_unique_values);
   }
 
  private:
   size_t offset_ = 0;
   size_t size_ = 0;
+  size_t number_of_values_ = 0;
+  size_t number_of_unique_values_ = 0;
 };
 
 } /* namespace internal */

@@ -45,6 +45,7 @@
 #include "msgpack/type/rapidjson.hpp"
 
 #include "compression/compression_selector.h"
+#include "dictionary/dictionary_properties.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/ivalue_store.h"
 #include "dictionary/fsa/internal/lru_generation_cache.h"
@@ -53,7 +54,6 @@
 #include "dictionary/fsa/internal/value_store_persistence.h"
 #include "dictionary/fsa/internal/value_store_properties.h"
 #include "dictionary/fsa/internal/value_store_types.h"
-#include "dictionary/keyvi_file.h"
 #include "util/configuration.h"
 #include "util/json_value.h"
 #include "util/serialization_utils.h"
@@ -294,15 +294,12 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
                                      const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : input_files_(inputFiles), offsets_() {
     for (const auto& filename : inputFiles) {
-      KeyViFile keyViFile(filename);
+      properties_.emplace_back(filename);
 
-      auto& vsStream = keyViFile.valueStoreStream();
-      const boost::property_tree::ptree props = keyvi::util::SerializationUtils::ReadValueStoreProperties(vsStream);
       offsets_.push_back(values_buffer_size_);
-
-      number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
-      number_of_unique_values_ += boost::lexical_cast<size_t>(props.get<std::string>("unique_values"));
-      values_buffer_size_ += boost::lexical_cast<size_t>(props.get<std::string>("size"));
+      number_of_values_ += properties_.back().GetValueStoreProperties().GetNumberOfValues();
+      number_of_unique_values_ += properties_.back().GetValueStoreProperties().GetNumberOfUniqueValues();
+      values_buffer_size_ += properties_.back().GetValueStoreProperties().GetSize();
     }
   }
 
@@ -319,17 +316,16 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
     keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
-    for (const auto& filename : input_files_) {
-      KeyViFile keyViFile(filename);
-      auto& in_stream = keyViFile.valueStoreStream();
-      keyvi::util::SerializationUtils::ReadValueStoreProperties(in_stream);
-
+    for (size_t i = 0; i < input_files_.size(); ++i) {
+      std::ifstream in_stream(input_files_[i]);
+      in_stream.seekg(properties_[i].GetValueStoreProperties().GetOffset());
       stream << in_stream.rdbuf();
     }
   }
 
  private:
   std::vector<std::string> input_files_;
+  std::vector<DictionaryProperties> properties_;
   std::vector<size_t> offsets_;
 };
 

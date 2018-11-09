@@ -30,18 +30,18 @@
 #include <memory>
 #include <string>
 
-#include <dictionary/dictionary_properties.h>
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
+
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/dictionary_properties.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/intrinsics.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/value_store_factory.h"
 #include "dictionary/fsa/traversal/traversal_base.h"
 #include "dictionary/fsa/traversal/weighted_traversal.h"
-#include "dictionary/keyvi_file.h"
 #include "dictionary/util/endian.h"
 #include "util/serialization_utils.h"
 #include "util/vint.h"

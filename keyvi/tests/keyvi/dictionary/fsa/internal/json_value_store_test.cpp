@@ -29,6 +29,7 @@
 
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/json_value_store.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 #include "util/configuration.h"
 
 namespace keyvi {
@@ -106,10 +107,12 @@ BOOST_AUTO_TEST_CASE(persistence) {
   std::ifstream in_stream(filename, std::ios::binary);
   auto file_mapping = new boost::interprocess::file_mapping(filename.c_str(), boost::interprocess::read_only);
 
-///  JsonValueStoreReader reader(in_stream, file_mapping, loading_strategy_types::lazy);
+  fsa::internal::ValueStoreProperties properties = fsa::internal::ValueStoreProperties::FromJsonStream(in_stream);
 
-  //BOOST_CHECK_EQUAL(value, reader.GetValueAsString(v));
-  //BOOST_CHECK_EQUAL("{\"mytestvalue2\":23}", reader.GetValueAsString(w));
+  JsonValueStoreReader reader(file_mapping, properties, loading_strategy_types::lazy);
+
+  BOOST_CHECK_EQUAL(value, reader.GetValueAsString(v));
+  BOOST_CHECK_EQUAL("{\"mytestvalue2\":23}", reader.GetValueAsString(w));
 
   std::remove(filename.c_str());
 }

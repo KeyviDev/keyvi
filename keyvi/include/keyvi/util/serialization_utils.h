@@ -25,6 +25,7 @@
 #ifndef KEYVI_UTIL_SERIALIZATION_UTILS_H_
 #define KEYVI_UTIL_SERIALIZATION_UTILS_H_
 
+#include <cstddef>
 #include <string>
 
 #include <boost/lexical_cast.hpp>
@@ -78,6 +79,19 @@ class SerializationUtils {
     char* buffer = new char[header_size];
     stream.read(buffer, header_size);
     record.Parse(buffer, header_size);
+  }
+
+  static size_t GetSizeValueOrDefault(const rapidjson::Document& record, const std::string& key,
+                                      const size_t defaultValue) {
+    if (record.HasMember(key)) {
+      if (record[key].IsString()) {
+        return boost::lexical_cast<size_t>(record[key].GetString());
+      } else {
+        return static_cast<size_t>(record[key].GetUint64());
+      }
+    }
+
+    return defaultValue;
   }
 
   static boost::property_tree::ptree ReadValueStoreProperties(std::istream& stream) {
