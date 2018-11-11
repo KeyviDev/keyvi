@@ -64,7 +64,7 @@ class ValueStoreProperties final {
 
   static ValueStoreProperties FromJsonStream(std::istream& stream) {
     rapidjson::Document value_store_properties;
-    keyvi::util::SerializationUtils::ReadJsonRecord(stream, value_store_properties);
+    keyvi::util::SerializationUtils::ReadJsonRecord(stream, &value_store_properties);
     const size_t offset = stream.tellg();
     const size_t size = boost::lexical_cast<size_t>(value_store_properties["size"].GetString());
 

@@ -105,7 +105,7 @@ class DictionaryProperties {
   void ReadJsonFormat(std::ifstream& file_stream) {
     rapidjson::Document automata_properties;
 
-    keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, automata_properties);
+    keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, &automata_properties);
 
     if (boost::lexical_cast<int>(automata_properties["version"].GetString()) < KEYVI_FILE_VERSION_MIN) {
       throw std::invalid_argument("this version of keyvi file is unsupported");
@@ -133,7 +133,7 @@ class DictionaryProperties {
     }
 
     rapidjson::Document sparse_array_properties;
-    keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, sparse_array_properties);
+    keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, &sparse_array_properties);
 
     if (boost::lexical_cast<int>(sparse_array_properties["version"].GetString()) < KEYVI_FILE_PERSISTENCE_VERSION_MIN) {
       throw std::invalid_argument("unsupported keyvi file version");

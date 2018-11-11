@@ -73,13 +73,13 @@ class SerializationUtils {
     return properties;
   }
 
-  static void ReadJsonRecord(std::istream& stream, rapidjson::Document& record) {
+  static void ReadJsonRecord(std::istream& stream, rapidjson::Document* record) {
     uint32_t header_size;
     stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
     header_size = be32toh(header_size);
     char* buffer = new char[header_size];
     stream.read(buffer, header_size);
-    record.Parse(buffer, header_size);
+    record->Parse(buffer, header_size);
   }
 
   static size_t GetSizeValueOrDefault(const rapidjson::Document& record, const std::string& key,
