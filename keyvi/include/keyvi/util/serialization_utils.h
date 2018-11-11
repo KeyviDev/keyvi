@@ -57,6 +57,7 @@ class SerializationUtils {
     stream << header;
   }
 
+  // DEPRECATED, still used by vector_file.h
   static boost::property_tree::ptree ReadJsonRecord(std::istream& stream) {
     uint32_t header_size;
     stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
@@ -92,23 +93,6 @@ class SerializationUtils {
     }
 
     return defaultValue;
-  }
-
-  static boost::property_tree::ptree ReadValueStoreProperties(std::istream& stream) {
-    const auto properties = ReadJsonRecord(stream);
-    const auto offset = stream.tellg();
-
-    // check for file truncation
-    const size_t vsSize = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
-    if (vsSize > 0) {
-      stream.seekg(vsSize - 1, stream.cur);
-      if (stream.peek() == EOF) {
-        throw std::invalid_argument("file is corrupt(truncated)");
-      }
-    }
-
-    stream.seekg(offset);
-    return properties;
   }
 
   /**
