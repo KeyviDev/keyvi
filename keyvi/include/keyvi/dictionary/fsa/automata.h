@@ -107,10 +107,10 @@ class Automata final {
     labels_ = static_cast<unsigned char*>(labels_region_.get_address());
     transitions_compact_ = static_cast<uint16_t*>(transitions_region_.get_address());
 
-    value_store_type_ = dictionary_properties_.GetValueStoreType();
     if (load_value_store) {
-      value_store_reader_.reset(internal::ValueStoreFactory::MakeReader(
-          value_store_type_, &file_mapping_, dictionary_properties_.GetValueStoreProperties(), loading_strategy));
+      value_store_reader_.reset(
+          internal::ValueStoreFactory::MakeReader(dictionary_properties_.GetValueStoreType(), &file_mapping_,
+                                                  dictionary_properties_.GetValueStoreProperties(), loading_strategy));
     }
   }
 
@@ -131,7 +131,7 @@ class Automata final {
 
   size_t SparseArraySize() const { return dictionary_properties_.GetSparseArraySize(); }
 
-  internal::value_store_t GetValueStoreType() const { return value_store_type_; }
+  internal::value_store_t GetValueStoreType() const { return dictionary_properties_.GetValueStoreType(); }
 
   uint64_t TryWalkTransition(uint64_t starting_state, unsigned char c) const {
     if (labels_[starting_state + c] == c) {
@@ -393,7 +393,6 @@ class Automata final {
   boost::interprocess::mapped_region transitions_region_;
   unsigned char* labels_;
   uint16_t* transitions_compact_;
-  internal::value_store_t value_store_type_;
 
   template <keyvi::dictionary::fsa::internal::value_store_t>
   friend class keyvi::dictionary::DictionaryMerger;
