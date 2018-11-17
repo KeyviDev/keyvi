@@ -27,10 +27,13 @@
 
 #include <cstddef>
 #include <fstream>
+#include <string>
 
 #include <boost/lexical_cast.hpp>
 
 #include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 #include "util/serialization_utils.h"
 
@@ -41,6 +44,11 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 namespace internal {
+
+static const char COMPRESSION_PROPERTY[] = "__compression";
+static const char SIZE_PROPERTY[] = "size";
+static const char UNIQUE_VALUES_PROPERTY[] = "unique_values";
+static const char VALUES_PROPERTY[] = "values";
 
 class ValueStoreProperties final {
  public:
@@ -62,11 +70,37 @@ class ValueStoreProperties final {
 
   size_t GetNumberOfUniqueValues() const { return number_of_unique_values_; }
 
+  std::string GetStatistics() const {
+    rapidjson::StringBuffer string_buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+
+    writer.StartObject();
+    GetStatistics(&writer);
+    writer.EndObject();
+
+    return string_buffer.GetString();
+  }
+
+  void GetStatistics(rapidjson::Writer<rapidjson::StringBuffer>* writer) const {
+    writer->Key("Value Store");
+    writer->StartObject();
+    writer->Key(SIZE_PROPERTY);
+    writer->Uint64(size_);
+    writer->Key(VALUES_PROPERTY);
+    writer->Uint64(number_of_values_);
+    writer->Key(UNIQUE_VALUES_PROPERTY);
+    writer->Uint64(number_of_unique_values_);
+    writer->Key(COMPRESSION_PROPERTY);
+    writer->String(compression_);
+
+    writer->EndObject();
+  }
+
   static ValueStoreProperties FromJsonStream(std::istream& stream) {
     rapidjson::Document value_store_properties;
     keyvi::util::SerializationUtils::ReadJsonRecord(stream, &value_store_properties);
     const size_t offset = stream.tellg();
-    const size_t size = boost::lexical_cast<size_t>(value_store_properties["size"].GetString());
+    const size_t size = boost::lexical_cast<size_t>(value_store_properties[SIZE_PROPERTY].GetString());
 
     // check for file truncation
     if (size > 0) {
@@ -77,9 +111,13 @@ class ValueStoreProperties final {
     }
 
     const size_t number_of_values =
-        keyvi::util::SerializationUtils::GetSizeValueOrDefault(value_store_properties, "values", 0);
-    const size_t number_of_unique_values =
-        keyvi::util::SerializationUtils::GetSizeValueOrDefault(value_store_properties, "unique_values", 0);
+        keyvi::util::SerializationUtils::GetOptionalUInt64FromValueOrString(value_store_properties, VALUES_PROPERTY, 0);
+    const size_t number_of_unique_values = keyvi::util::SerializationUtils::GetOptionalUInt64FromValueOrString(
+        value_store_properties, UNIQUE_VALUES_PROPERTY, 0);
+
+    if (value_store_properties.HasMember(COMPRESSION_PROPERTY)) {
+      std::string compression = value_store_properties[COMPRESSION_PROPERTY].GetString();
+    }
 
     return ValueStoreProperties(offset, size, number_of_values, number_of_unique_values);
   }
@@ -89,11 +127,13 @@ class ValueStoreProperties final {
   size_t size_ = 0;
   size_t number_of_values_ = 0;
   size_t number_of_unique_values_ = 0;
-};
+  std::string compression_;
+  std::string compression_threshold_;
+};  // namespace internal
 
-} /* namespace internal */
-} /* namespace fsa */
-} /* namespace dictionary */
+}  // namespace internal
+}  // namespace fsa
+}  // namespace dictionary
 } /* namespace keyvi */
 
 #endif  //  KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_PROPERTIES_H_

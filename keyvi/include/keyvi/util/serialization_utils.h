@@ -26,6 +26,7 @@
 #define KEYVI_UTIL_SERIALIZATION_UTILS_H_
 
 #include <cstddef>
+#include <iostream>
 #include <string>
 
 #include <boost/lexical_cast.hpp>
@@ -82,8 +83,35 @@ class SerializationUtils {
     record->Parse(buffer, header_size);
   }
 
-  static size_t GetSizeValueOrDefault(const rapidjson::Document& record, const std::string& key,
-                                      const size_t defaultValue) {
+  // utility methods to retrieve numeric values
+  // backwards compatibility: when using boost::property_tree numbers have been stored as string
+  static uint64_t GetUint64FromValueOrString(const rapidjson::Document& record, const char* key) {
+    if (record.HasMember(key)) {
+      if (record[key].IsString()) {
+        return boost::lexical_cast<uint64_t>(record[key].GetString());
+      } else {
+        return static_cast<uint64_t>(record[key].GetUint64());
+      }
+    }
+
+    throw std::invalid_argument("failed to parse value");
+  }
+
+  static uint64_t GetOptionalUInt64FromValueOrString(const rapidjson::Document& record, const char* key,
+                                                     const size_t defaultValue) {
+    if (record.HasMember(key)) {
+      if (record[key].IsString()) {
+        return boost::lexical_cast<uint64_t>(record[key].GetString());
+      } else {
+        return static_cast<uint64_t>(record[key].GetUint64());
+      }
+    }
+
+    return defaultValue;
+  }
+
+  static size_t GetOptionalSizeFromValueOrString(const rapidjson::Document& record, const char* key,
+                                                 const size_t defaultValue) {
     if (record.HasMember(key)) {
       if (record[key].IsString()) {
         return boost::lexical_cast<size_t>(record[key].GetString());
@@ -96,6 +124,8 @@ class SerializationUtils {
   }
 
   /**
+   * DEPRECATED
+   *
    * Utility method to return a property tree from a JSON string.
    * @param record a string containing a JSON
    * @return the parsed property tree

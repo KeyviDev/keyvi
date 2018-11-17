@@ -33,6 +33,8 @@
 #include <boost/lexical_cast.hpp>
 
 #include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/value_store_properties.h"
@@ -45,6 +47,14 @@
 
 namespace keyvi {
 namespace dictionary {
+
+static const char START_STATE_PROPERTY[] = "start_state";
+static const char VERSION_PROPERTY[] = "version";
+static const char MANIFEST_PROPERTY[] = "manifest";
+static const char NUMBER_OF_KEYS_PROPERTY[] = "number_of_keys";
+static const char VALUE_STORE_TYPE_PROPERTY[] = "value_store_type";
+static const char NUMBER_OF_STATES_PROPERTY[] = "number_of_states";
+static const char SIZE_PROPERTY[] = "size";
 
 class DictionaryProperties {
  public:
@@ -89,13 +99,47 @@ class DictionaryProperties {
 
   const std::string GetManifest() const { return manifest_; }
 
-  std::string GetStatistics() const { return ""; }
+  std::string GetStatistics() const {
+    rapidjson::StringBuffer string_buffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+
+    writer.StartObject();
+
+    writer.Key("General");
+    writer.StartObject();
+    writer.Key(VERSION_PROPERTY);
+    writer.Uint64(version_);
+    writer.Key(START_STATE_PROPERTY);
+    writer.Uint64(start_state_);
+    writer.Key(NUMBER_OF_KEYS_PROPERTY);
+    writer.Uint64(number_of_keys_);
+    writer.Key(VALUE_STORE_TYPE_PROPERTY);
+    writer.Uint64(static_cast<uint64_t>(value_store_type_));
+    writer.Key(NUMBER_OF_STATES_PROPERTY);
+    writer.Uint64(number_of_states_);
+    writer.EndObject();
+
+    writer.Key("Persistence");
+    writer.StartObject();
+    writer.Key(VERSION_PROPERTY);
+    writer.Uint64(sparse_array_version_);
+    writer.Key(SIZE_PROPERTY);
+    writer.Uint64(sparse_array_size_);
+    writer.EndObject();
+
+    value_store_properties_.GetStatistics(&writer);
+    writer.EndObject();
+    return string_buffer.GetString();
+  }
 
  private:
   std::string file_name_;
+  uint64_t version_ = 0;
   uint64_t start_state_ = 0;
   uint64_t number_of_keys_ = 0;
+  uint64_t number_of_states_ = 0;
   fsa::internal::value_store_t value_store_type_ = fsa::internal::value_store_t::KEY_ONLY;
+  uint64_t sparse_array_version_ = 0;
   size_t sparse_array_size_ = 0;
   size_t persistence_offset_ = 0;
   size_t transitions_offset_ = 0;
@@ -107,27 +151,32 @@ class DictionaryProperties {
 
     keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, &automata_properties);
 
-    if (boost::lexical_cast<int>(automata_properties["version"].GetString()) < KEYVI_FILE_VERSION_MIN) {
+    version_ = keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, VERSION_PROPERTY);
+    if (version_ < KEYVI_FILE_VERSION_MIN) {
       throw std::invalid_argument("this version of keyvi file is unsupported");
     }
 
-    start_state_ = boost::lexical_cast<uint64_t>(automata_properties["start_state"].GetString());
+    start_state_ =
+        keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, START_STATE_PROPERTY);
 
     TRACE("start state %d", start_state_);
 
-    number_of_keys_ = boost::lexical_cast<uint64_t>(automata_properties["number_of_keys"].GetString());
+    number_of_keys_ =
+        keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, NUMBER_OF_KEYS_PROPERTY);
     value_store_type_ = static_cast<fsa::internal::value_store_t>(
-        boost::lexical_cast<int>(automata_properties["value_store_type"].GetString()));
+        keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, VALUE_STORE_TYPE_PROPERTY));
+    number_of_states_ =
+        keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, NUMBER_OF_STATES_PROPERTY);
 
-    if (automata_properties.HasMember("manifest")) {
-      if (automata_properties["manifest"].IsString()) {
+    if (automata_properties.HasMember(MANIFEST_PROPERTY)) {
+      if (automata_properties[MANIFEST_PROPERTY].IsString()) {
         // normally manifest is a string
-        manifest_ = automata_properties["manifest"].GetString();
-      } else if (automata_properties["manifest"].IsObject()) {
+        manifest_ = automata_properties[MANIFEST_PROPERTY].GetString();
+      } else if (automata_properties[MANIFEST_PROPERTY].IsObject()) {
         // backwards compatibility: manifest might be a subtree
         rapidjson::StringBuffer sb;
         rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-        automata_properties["manifest"].Accept(writer);
+        automata_properties[MANIFEST_PROPERTY].Accept(writer);
         manifest_ = sb.GetString();
       }
     }
@@ -135,14 +184,17 @@ class DictionaryProperties {
     rapidjson::Document sparse_array_properties;
     keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, &sparse_array_properties);
 
-    if (boost::lexical_cast<int>(sparse_array_properties["version"].GetString()) < KEYVI_FILE_PERSISTENCE_VERSION_MIN) {
+    sparse_array_version_ =
+        keyvi::util::SerializationUtils::GetUint64FromValueOrString(sparse_array_properties, VERSION_PROPERTY);
+    if (sparse_array_version_ < KEYVI_FILE_PERSISTENCE_VERSION_MIN) {
       throw std::invalid_argument("unsupported keyvi file version");
     }
 
     persistence_offset_ = file_stream.tellg();
 
     const size_t bucket_size = sizeof(uint16_t);
-    sparse_array_size_ = boost::lexical_cast<size_t>(sparse_array_properties["size"].GetString());
+    sparse_array_size_ =
+        keyvi::util::SerializationUtils::GetOptionalSizeFromValueOrString(sparse_array_properties, SIZE_PROPERTY, 0);
 
     transitions_offset_ = persistence_offset_ + sparse_array_size_;
 
