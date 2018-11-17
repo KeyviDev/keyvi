@@ -83,7 +83,4 @@
         cdef bytes py_result = _r
         py_result_unicode = _r.decode('utf-8')
 
-        return {k: json.loads(v) for k, v in filter(
-            lambda kv: kv and isinstance(kv, list) and len(kv) > 1 and kv[1],
-            [s.rstrip().split("\n") for s in py_result_unicode.split("\n\n")]
-        )}
+        return json.loads(py_result_unicode)

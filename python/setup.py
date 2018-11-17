@@ -291,7 +291,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                                            path.join(dictionary_sources, '3rdparty/xchange/src')],
                              language='c++',
                              sources=[pykeyvi_cpp],
-                             extra_compile_args=['-std=c++11', '-msse4.2', '-Wall'] + additional_compile_flags,
+                             extra_compile_args=['-std=c++11', '-msse4.2', '-Wall', '-DRAPIDJSON_HAS_STDSTRING'] + additional_compile_flags,
                              extra_link_args=extra_link_arguments,
                              library_dirs=link_library_dirs,
                              libraries=linklibraries)]

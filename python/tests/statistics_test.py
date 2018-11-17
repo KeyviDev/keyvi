@@ -48,7 +48,7 @@ def test_statistics():
     with tmp_dictionary(c, 'brannigan_statistics.kv') as d:
         stats = d.GetStatistics()
         gen = stats.get('General', {})
-        man = gen.get('manifest', {})
+        man = d.GetManifest()
         size = int(gen.get('number_of_keys', 0))
         assert size == 2
         assert man.get('author') == "Zapp Brannigan"
