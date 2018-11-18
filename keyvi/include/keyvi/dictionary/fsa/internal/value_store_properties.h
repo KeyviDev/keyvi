@@ -55,11 +55,12 @@ class ValueStoreProperties final {
   ValueStoreProperties() {}
 
   ValueStoreProperties(const size_t offset, const size_t size, const size_t number_of_values,
-                       const size_t number_of_unique_values) {
+                       const size_t number_of_unique_values, const std::string& compression) {
     offset_ = offset;
     size_ = size;
     number_of_values_ = number_of_values;
     number_of_unique_values_ = number_of_unique_values;
+    compression_ = compression;
   }
 
   size_t GetSize() const { return size_; }
@@ -90,13 +91,17 @@ class ValueStoreProperties final {
     writer->Uint64(number_of_values_);
     writer->Key(UNIQUE_VALUES_PROPERTY);
     writer->Uint64(number_of_unique_values_);
-    writer->Key(COMPRESSION_PROPERTY);
-    writer->String(compression_);
+    if (compression_.size() > 0) {
+      writer->Key(COMPRESSION_PROPERTY);
+      writer->String(compression_);
+    }
 
     writer->EndObject();
   }
 
-  static ValueStoreProperties FromJsonStream(std::istream& stream) {
+  void WriteAsJson() {}
+
+  static ValueStoreProperties FromJson(std::istream& stream) {
     rapidjson::Document value_store_properties;
     keyvi::util::SerializationUtils::ReadJsonRecord(stream, &value_store_properties);
     const size_t offset = stream.tellg();
@@ -115,11 +120,12 @@ class ValueStoreProperties final {
     const size_t number_of_unique_values = keyvi::util::SerializationUtils::GetOptionalUInt64FromValueOrString(
         value_store_properties, UNIQUE_VALUES_PROPERTY, 0);
 
+    std::string compression;
     if (value_store_properties.HasMember(COMPRESSION_PROPERTY)) {
-      std::string compression = value_store_properties[COMPRESSION_PROPERTY].GetString();
+      compression = value_store_properties[COMPRESSION_PROPERTY].GetString();
     }
 
-    return ValueStoreProperties(offset, size, number_of_values, number_of_unique_values);
+    return ValueStoreProperties(offset, size, number_of_values, number_of_unique_values, compression);
   }
 
  private:

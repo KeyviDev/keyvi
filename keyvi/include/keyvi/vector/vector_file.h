@@ -89,7 +89,7 @@ class VectorFile {
     dictionary::fsa::internal::ValueStoreProperties value_store_properties;
     // not all value stores have properties
     if (in_stream.peek() != EOF) {
-      value_store_properties = dictionary::fsa::internal::ValueStoreProperties::FromJsonStream(in_stream);
+      value_store_properties = dictionary::fsa::internal::ValueStoreProperties::FromJson(in_stream);
     }
 
     value_store_reader_.reset(dictionary::fsa::internal::ValueStoreFactory::MakeReader(

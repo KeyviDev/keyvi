@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(persistence) {
   std::ifstream in_stream(filename, std::ios::binary);
   auto file_mapping = new boost::interprocess::file_mapping(filename.c_str(), boost::interprocess::read_only);
 
-  fsa::internal::ValueStoreProperties properties = fsa::internal::ValueStoreProperties::FromJsonStream(in_stream);
+  fsa::internal::ValueStoreProperties properties = fsa::internal::ValueStoreProperties::FromJson(in_stream);
 
   JsonValueStoreReader reader(file_mapping, properties, loading_strategy_types::lazy);
 

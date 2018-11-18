@@ -208,7 +208,7 @@ class DictionaryProperties {
 
     // not all value stores have properties
     if (file_stream.peek() != EOF) {
-      value_store_properties_ = fsa::internal::ValueStoreProperties::FromJsonStream(file_stream);
+      value_store_properties_ = fsa::internal::ValueStoreProperties::FromJson(file_stream);
     }
   }
 };
