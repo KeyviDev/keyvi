@@ -56,7 +56,6 @@
 #include "dictionary/fsa/internal/value_store_types.h"
 #include "util/configuration.h"
 #include "util/json_value.h"
-#include "util/serialization_utils.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -196,14 +195,10 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
   }
 
   void Write(std::ostream& stream) {
-    boost::property_tree::ptree pt;
-    pt.put("size", std::to_string(values_buffer_size_));
-    pt.put("values", std::to_string(number_of_values_));
-    pt.put("unique_values", std::to_string(number_of_unique_values_));
-    pt.put(std::string("__") + COMPRESSION_KEY, compressor_->name());
-    pt.put(std::string("__") + COMPRESSION_THRESHOLD_KEY, compression_threshold_);
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_,
+                                    compressor_->name());
 
-    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
+    properties.WriteAsJson(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     values_extern_->Write(stream, values_buffer_size_);
@@ -274,12 +269,10 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
   }
 
   void Write(std::ostream& stream) {
-    boost::property_tree::ptree pt;
-    pt.put("size", std::to_string(values_buffer_size_));
-    pt.put("values", std::to_string(number_of_values_));
-    pt.put("unique_values", std::to_string(number_of_unique_values_));
+    // TODO(hendrik) write compressor
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
 
-    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
+    properties.WriteAsJson(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     values_extern_->Write(stream, values_buffer_size_);
@@ -293,8 +286,8 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
   explicit JsonValueStoreAppendMerge(const std::vector<std::string>& inputFiles,
                                      const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : input_files_(inputFiles), offsets_() {
-    for (const auto& filename : inputFiles) {
-      properties_.emplace_back(filename);
+    for (const auto& file_name : inputFiles) {
+      properties_.push_back(DictionaryProperties::FromFile(file_name));
 
       offsets_.push_back(values_buffer_size_);
       number_of_values_ += properties_.back().GetValueStoreProperties().GetNumberOfValues();
@@ -308,12 +301,10 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
   void CloseFeeding() {}
 
   void Write(std::ostream& stream) {
-    boost::property_tree::ptree pt;
-    pt.put("size", std::to_string(values_buffer_size_));
-    pt.put("values", std::to_string(number_of_values_));
-    pt.put("unique_values", std::to_string(number_of_unique_values_));
+    // todo: preserve compression
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, std::string());
 
-    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
+    properties.WriteAsJson(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     for (size_t i = 0; i < input_files_.size(); ++i) {

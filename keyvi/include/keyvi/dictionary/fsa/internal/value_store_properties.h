@@ -95,17 +95,40 @@ class ValueStoreProperties final {
       writer->Key(COMPRESSION_PROPERTY);
       writer->String(compression_);
     }
-
     writer->EndObject();
   }
 
-  void WriteAsJson() {}
+  void WriteAsJson(std::ostream& stream) {
+    rapidjson::StringBuffer string_buffer;
+
+    {
+      rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+
+      writer.StartObject();
+      writer.Key(SIZE_PROPERTY);
+      writer.Uint64(size_);
+      writer.Key(VALUES_PROPERTY);
+      writer.Uint64(number_of_values_);
+      writer.Key(UNIQUE_VALUES_PROPERTY);
+      writer.Uint64(number_of_unique_values_);
+      if (compression_.size() > 0) {
+        writer.Key(COMPRESSION_PROPERTY);
+        writer.String(compression_);
+      }
+      writer.EndObject();
+    }
+
+    uint32_t size = htobe32(string_buffer.GetLength());
+    stream.write(reinterpret_cast<const char*>(&size), sizeof(uint32_t));
+    stream.write(string_buffer.GetString(), string_buffer.GetLength());
+  }
 
   static ValueStoreProperties FromJson(std::istream& stream) {
     rapidjson::Document value_store_properties;
     keyvi::util::SerializationUtils::ReadJsonRecord(stream, &value_store_properties);
     const size_t offset = stream.tellg();
-    const size_t size = boost::lexical_cast<size_t>(value_store_properties[SIZE_PROPERTY].GetString());
+    const size_t size =
+        keyvi::util::SerializationUtils::GetOptionalSizeFromValueOrString(value_store_properties, SIZE_PROPERTY, 0);
 
     // check for file truncation
     if (size > 0) {

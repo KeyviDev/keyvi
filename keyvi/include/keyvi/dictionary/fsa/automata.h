@@ -42,9 +42,6 @@
 #include "dictionary/fsa/internal/value_store_factory.h"
 #include "dictionary/fsa/traversal/traversal_base.h"
 #include "dictionary/fsa/traversal/weighted_traversal.h"
-#include "dictionary/util/endian.h"
-#include "util/serialization_utils.h"
-#include "util/vint.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -83,7 +80,7 @@ class Automata final {
 
  private:
   explicit Automata(const std::string& file_name, loading_strategy_types loading_strategy, const bool load_value_store)
-      : dictionary_properties_(file_name) {
+      : dictionary_properties_(DictionaryProperties::FromFile(file_name)) {
     file_mapping_ = boost::interprocess::file_mapping(file_name.c_str(), boost::interprocess::read_only);
 
     const boost::interprocess::map_options_t map_options =

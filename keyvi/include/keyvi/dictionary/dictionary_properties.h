@@ -33,6 +33,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "rapidjson/document.h"
+#include "rapidjson/ostreamwrapper.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
@@ -58,9 +59,45 @@ static const char SIZE_PROPERTY[] = "size";
 
 class DictionaryProperties {
  public:
-  DictionaryProperties() {}
+  /**
+   * Full constructor
+   */
+  DictionaryProperties(const std::string& file_name, const uint64_t version, const uint64_t start_state,
+                       const uint64_t number_of_keys, const uint64_t number_of_states,
+                       const fsa::internal::value_store_t value_store_type, uint64_t sparse_array_version,
+                       const size_t sparse_array_size, const size_t persistence_offset, const size_t transitions_offset,
+                       const fsa::internal::ValueStoreProperties& value_store_properties, const std::string& manifest) {
+    file_name_ = file_name;
+    version_ = version;
+    start_state_ = start_state;
+    number_of_keys_ = number_of_keys;
+    number_of_states_ = number_of_states;
+    value_store_type_ = value_store_type;
+    sparse_array_version_ = sparse_array_version;
+    sparse_array_size_ = sparse_array_size;
+    persistence_offset_ = persistence_offset;
+    transitions_offset_ = transitions_offset;
+    value_store_properties_ = value_store_properties;
+    manifest_ = manifest;
+  }
 
-  explicit DictionaryProperties(const std::string& file_name) : file_name_(file_name) {
+  /**
+   * Simplified constructor for writing properties, e.g. for dictionary compilation.
+   */
+  DictionaryProperties(const uint64_t version, const uint64_t start_state, const uint64_t number_of_keys,
+                       const uint64_t number_of_states, const fsa::internal::value_store_t value_store_type,
+                       uint64_t sparse_array_version, const size_t sparse_array_size, std::string manifest) {
+    version_ = version;
+    start_state_ = start_state;
+    number_of_keys_ = number_of_keys;
+    number_of_states_ = number_of_states;
+    value_store_type_ = value_store_type;
+    sparse_array_version_ = sparse_array_version;
+    sparse_array_size_ = sparse_array_size;
+    manifest_ = manifest;
+  }
+
+  static DictionaryProperties FromFile(const std::string& file_name) {
     std::ifstream file_stream(file_name, std::ios::binary);
 
     if (!file_stream.good()) {
@@ -72,9 +109,7 @@ class DictionaryProperties {
 
     // check magic
     if (std::strncmp(magic, KEYVI_FILE_MAGIC, KEYVI_FILE_MAGIC_LEN) == 0) {
-      ReadJsonFormat(file_stream);
-
-      return;
+      return ReadJsonFormat(file_name, file_stream);
     }
     throw std::invalid_argument("not a keyvi file");
   }
@@ -132,6 +167,52 @@ class DictionaryProperties {
     return string_buffer.GetString();
   }
 
+  void WriteAsJson(std::ostream& stream) {
+    rapidjson::StringBuffer string_buffer;
+
+    {
+      rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+
+      writer.StartObject();
+      writer.Key(VERSION_PROPERTY);
+      writer.Uint64(version_);
+      writer.Key(START_STATE_PROPERTY);
+      writer.Uint64(start_state_);
+      writer.Key(NUMBER_OF_KEYS_PROPERTY);
+      writer.Uint64(number_of_keys_);
+      writer.Key(VALUE_STORE_TYPE_PROPERTY);
+      writer.Uint64(static_cast<uint64_t>(value_store_type_));
+      writer.Key(NUMBER_OF_STATES_PROPERTY);
+      writer.Uint64(number_of_states_);
+      // manifest
+      writer.Key(MANIFEST_PROPERTY);
+      writer.String(manifest_);
+      writer.EndObject();
+    }
+
+    uint32_t size = htobe32(string_buffer.GetLength());
+    stream.write(reinterpret_cast<const char*>(&size), sizeof(uint32_t));
+    stream.write(string_buffer.GetString(), string_buffer.GetLength());
+
+    string_buffer.Clear();
+
+    // persistence
+    {
+      rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+
+      writer.StartObject();
+      writer.Key(VERSION_PROPERTY);
+      writer.Uint64(sparse_array_version_);
+      writer.Key(SIZE_PROPERTY);
+      writer.Uint64(sparse_array_size_);
+      writer.EndObject();
+    }
+
+    size = htobe32(string_buffer.GetLength());
+    stream.write(reinterpret_cast<const char*>(&size), sizeof(uint32_t));
+    stream.write(string_buffer.GetString(), string_buffer.GetLength());
+  }
+
  private:
   std::string file_name_;
   uint64_t version_ = 0;
@@ -146,70 +227,78 @@ class DictionaryProperties {
   fsa::internal::ValueStoreProperties value_store_properties_;
   std::string manifest_;
 
-  void ReadJsonFormat(std::ifstream& file_stream) {
+  static DictionaryProperties ReadJsonFormat(const std::string& file_name, std::ifstream& file_stream) {
     rapidjson::Document automata_properties;
 
     keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, &automata_properties);
 
-    version_ = keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, VERSION_PROPERTY);
-    if (version_ < KEYVI_FILE_VERSION_MIN) {
+    uint64_t version =
+        keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, VERSION_PROPERTY);
+    if (version < KEYVI_FILE_VERSION_MIN) {
       throw std::invalid_argument("this version of keyvi file is unsupported");
     }
 
-    start_state_ =
+    uint64_t start_state =
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, START_STATE_PROPERTY);
 
-    TRACE("start state %d", start_state_);
+    TRACE("start state %d", start_state);
 
-    number_of_keys_ =
+    uint64_t number_of_keys =
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, NUMBER_OF_KEYS_PROPERTY);
-    value_store_type_ = static_cast<fsa::internal::value_store_t>(
+    fsa::internal::value_store_t value_store_type = static_cast<fsa::internal::value_store_t>(
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, VALUE_STORE_TYPE_PROPERTY));
-    number_of_states_ =
+    uint64_t number_of_states =
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, NUMBER_OF_STATES_PROPERTY);
+
+    std::string manifest;
 
     if (automata_properties.HasMember(MANIFEST_PROPERTY)) {
       if (automata_properties[MANIFEST_PROPERTY].IsString()) {
         // normally manifest is a string
-        manifest_ = automata_properties[MANIFEST_PROPERTY].GetString();
+        manifest = automata_properties[MANIFEST_PROPERTY].GetString();
       } else if (automata_properties[MANIFEST_PROPERTY].IsObject()) {
         // backwards compatibility: manifest might be a subtree
         rapidjson::StringBuffer sb;
         rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
         automata_properties[MANIFEST_PROPERTY].Accept(writer);
-        manifest_ = sb.GetString();
+        manifest = sb.GetString();
       }
     }
 
     rapidjson::Document sparse_array_properties;
     keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, &sparse_array_properties);
 
-    sparse_array_version_ =
+    uint64_t sparse_array_version =
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(sparse_array_properties, VERSION_PROPERTY);
-    if (sparse_array_version_ < KEYVI_FILE_PERSISTENCE_VERSION_MIN) {
+    if (sparse_array_version < KEYVI_FILE_PERSISTENCE_VERSION_MIN) {
       throw std::invalid_argument("unsupported keyvi file version");
     }
 
-    persistence_offset_ = file_stream.tellg();
+    size_t persistence_offset = file_stream.tellg();
 
     const size_t bucket_size = sizeof(uint16_t);
-    sparse_array_size_ =
+    size_t sparse_array_size =
         keyvi::util::SerializationUtils::GetOptionalSizeFromValueOrString(sparse_array_properties, SIZE_PROPERTY, 0);
 
-    transitions_offset_ = persistence_offset_ + sparse_array_size_;
+    size_t transitions_offset = persistence_offset + sparse_array_size;
 
     // check for file truncation
-    file_stream.seekg((size_t)file_stream.tellg() + sparse_array_size_ + bucket_size * sparse_array_size_ - 1);
+    file_stream.seekg((size_t)file_stream.tellg() + sparse_array_size + bucket_size * sparse_array_size - 1);
     if (file_stream.peek() == EOF) {
       throw std::invalid_argument("file is corrupt(truncated)");
     }
 
     file_stream.get();
 
+    fsa::internal::ValueStoreProperties value_store_properties;
     // not all value stores have properties
     if (file_stream.peek() != EOF) {
-      value_store_properties_ = fsa::internal::ValueStoreProperties::FromJson(file_stream);
+      value_store_properties = fsa::internal::ValueStoreProperties::FromJson(file_stream);
     }
+
+    return DictionaryProperties(file_name, version, start_state, number_of_keys, number_of_states, value_store_type,
+                                sparse_array_version, sparse_array_size, persistence_offset, transitions_offset,
+                                value_store_properties, manifest);
   }
 };
 }  // namespace dictionary
