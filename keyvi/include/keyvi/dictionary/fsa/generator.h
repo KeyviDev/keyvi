@@ -25,8 +25,6 @@
 #ifndef KEYVI_DICTIONARY_FSA_GENERATOR_H_
 #define KEYVI_DICTIONARY_FSA_GENERATOR_H_
 
-#include <arpa/inet.h>
-
 #include <algorithm>
 #include <stdexcept>
 #include <string>

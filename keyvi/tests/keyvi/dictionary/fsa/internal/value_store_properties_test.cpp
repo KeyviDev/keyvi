@@ -25,8 +25,7 @@ namespace internal {
 
 BOOST_AUTO_TEST_SUITE(ValueStorePropertiesTest)
 
-BOOST_AUTO_TEST_CASE(simple) {
-}
+BOOST_AUTO_TEST_CASE(simple) {}
 
 BOOST_AUTO_TEST_SUITE_END()
 
