@@ -167,7 +167,13 @@ class DictionaryProperties {
     return string_buffer.GetString();
   }
 
-  void WriteAsJson(std::ostream& stream) {
+  /**
+   * Write as json using the version 2 binary format.
+   *
+   * Historically, version 2 used boost property trees which serialize everything as string,
+   * that's why we do here as well.
+   */
+  void WriteAsJsonV2(std::ostream& stream) {
     rapidjson::StringBuffer string_buffer;
 
     {
@@ -175,15 +181,15 @@ class DictionaryProperties {
 
       writer.StartObject();
       writer.Key(VERSION_PROPERTY);
-      writer.Uint64(version_);
+      writer.String(std::to_string(version_));
       writer.Key(START_STATE_PROPERTY);
-      writer.Uint64(start_state_);
+      writer.String(std::to_string(start_state_));
       writer.Key(NUMBER_OF_KEYS_PROPERTY);
-      writer.Uint64(number_of_keys_);
+      writer.String(std::to_string(number_of_keys_));
       writer.Key(VALUE_STORE_TYPE_PROPERTY);
-      writer.Uint64(static_cast<uint64_t>(value_store_type_));
+      writer.String(std::to_string(static_cast<uint64_t>(value_store_type_)));
       writer.Key(NUMBER_OF_STATES_PROPERTY);
-      writer.Uint64(number_of_states_);
+      writer.String(std::to_string(number_of_states_));
       // manifest
       writer.Key(MANIFEST_PROPERTY);
       writer.String(manifest_);
@@ -202,9 +208,9 @@ class DictionaryProperties {
 
       writer.StartObject();
       writer.Key(VERSION_PROPERTY);
-      writer.Uint64(sparse_array_version_);
+      writer.String(std::to_string(sparse_array_version_));
       writer.Key(SIZE_PROPERTY);
-      writer.Uint64(sparse_array_size_);
+      writer.String(std::to_string(sparse_array_size_));
       writer.EndObject();
     }
 

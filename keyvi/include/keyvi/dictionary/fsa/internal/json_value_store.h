@@ -198,7 +198,7 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
     ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_,
                                     compressor_->name());
 
-    properties.WriteAsJson(stream);
+    properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     values_extern_->Write(stream, values_buffer_size_);
@@ -272,7 +272,7 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
     // TODO(hendrik) write compressor
     ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
 
-    properties.WriteAsJson(stream);
+    properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     values_extern_->Write(stream, values_buffer_size_);
@@ -304,7 +304,7 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
     // todo: preserve compression
     ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, std::string());
 
-    properties.WriteAsJson(stream);
+    properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     for (size_t i = 0; i < input_files_.size(); ++i) {

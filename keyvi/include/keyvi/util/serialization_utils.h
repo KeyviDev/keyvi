@@ -46,6 +46,7 @@ namespace util {
 
 class SerializationUtils {
  public:
+  // DEPRECATED, still used by vector_file.h
   static void WriteJsonRecord(std::ostream& stream, const boost::property_tree::ptree& properties) {
     std::stringstream string_buffer;
 

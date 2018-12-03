@@ -155,7 +155,7 @@ class StringValueStore final : public StringValueStoreMinimizationBase {
   void Write(std::ostream& stream) const {
     ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
 
-    properties.WriteAsJson(stream);
+    properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     values_extern_->Write(stream, values_buffer_size_);
@@ -197,7 +197,7 @@ class StringValueStoreMerge final : public StringValueStoreMinimizationBase {
 
   void Write(std::ostream& stream) {
     ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
-    properties.WriteAsJson(stream);
+    properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     values_extern_->Write(stream, values_buffer_size_);
@@ -227,7 +227,7 @@ class StringValueStoreAppendMerge final : public StringValueStoreBase {
 
   void Write(std::ostream& stream) {
     ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
-    properties.WriteAsJson(stream);
+    properties.WriteAsJsonV2(stream);
 
     for (size_t i = 0; i < input_files_.size(); ++i) {
       std::ifstream in_stream(input_files_[i]);

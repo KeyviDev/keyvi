@@ -294,7 +294,7 @@ class Generator final {
     keyvi::dictionary::DictionaryProperties p(2, start_state_, number_of_keys_added_, number_of_states_,
                                               value_store_->GetValueStoreType(), persistence_->GetVersion(),
                                               persistence_->GetSize(), manifest_);
-    p.WriteAsJson(stream);
+    p.WriteAsJsonV2(stream);
 
     // write data from persistence
     persistence_->Write(stream);

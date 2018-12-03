@@ -98,7 +98,13 @@ class ValueStoreProperties final {
     writer->EndObject();
   }
 
-  void WriteAsJson(std::ostream& stream) {
+  /**
+   * Write as json using the version 2 binary format.
+   *
+   * Historically, version 2 used boost property trees which serialize everything as string,
+   * that's why we do here as well.
+   */
+  void WriteAsJsonV2(std::ostream& stream) {
     rapidjson::StringBuffer string_buffer;
 
     {
