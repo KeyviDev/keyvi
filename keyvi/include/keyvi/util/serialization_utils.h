@@ -30,10 +30,6 @@
 #include <string>
 
 #include <boost/lexical_cast.hpp>
-// boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
-#define BOOST_SPIRIT_THREADSAFE
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
@@ -46,35 +42,6 @@ namespace util {
 
 class SerializationUtils {
  public:
-  // DEPRECATED, still used by vector_file.h
-  static void WriteJsonRecord(std::ostream& stream, const boost::property_tree::ptree& properties) {
-    std::stringstream string_buffer;
-
-    boost::property_tree::write_json(string_buffer, properties, false);
-    std::string header = string_buffer.str();
-
-    uint32_t size = htobe32(header.size());
-
-    stream.write(reinterpret_cast<const char*>(&size), sizeof(uint32_t));
-    stream << header;
-  }
-
-  // DEPRECATED, still used by vector_file.h
-  static boost::property_tree::ptree ReadJsonRecord(std::istream& stream) {
-    uint32_t header_size;
-    stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
-    header_size = be32toh(header_size);
-    char* buffer = new char[header_size];
-    stream.read(buffer, header_size);
-    std::string buffer_as_string(buffer, header_size);
-    delete[] buffer;
-    std::istringstream string_stream(buffer_as_string);
-
-    boost::property_tree::ptree properties;
-    boost::property_tree::read_json(string_stream, properties);
-    return properties;
-  }
-
   static void ReadJsonRecord(std::istream& stream, rapidjson::Document* record) {
     uint32_t header_size;
     stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
@@ -122,25 +89,6 @@ class SerializationUtils {
     }
 
     return defaultValue;
-  }
-
-  /**
-   * DEPRECATED
-   *
-   * Utility method to return a property tree from a JSON string.
-   * @param record a string containing a JSON
-   * @return the parsed property tree
-   */
-  static boost::property_tree::ptree ReadJsonRecord(const std::string& record) {
-    boost::property_tree::ptree properties;
-
-    // sending an empty string clears the manifest
-    if (!record.empty()) {
-      std::istringstream string_stream(record);
-      boost::property_tree::read_json(string_stream, properties);
-    }
-
-    return properties;
   }
 };
 
