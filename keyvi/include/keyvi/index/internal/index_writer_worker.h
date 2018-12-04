@@ -38,6 +38,13 @@
 #include <thread>  //NOLINT
 #include <vector>
 
+// boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
+#define BOOST_SPIRIT_THREADSAFE
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/dictionary_types.h"
 #include "index/constants.h"
