@@ -30,6 +30,7 @@
 #include <atomic>
 #include <condition_variable>  //NOLINT
 #include <ctime>
+#include <fstream>
 #include <functional>
 #include <list>
 #include <memory>
@@ -38,12 +39,13 @@
 #include <thread>  //NOLINT
 #include <vector>
 
-// boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
-#define BOOST_SPIRIT_THREADSAFE
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+
+#include "rapidjson/document.h"
+#include "rapidjson/istreamwrapper.h"
+#include "rapidjson/ostreamwrapper.h"
+#include "rapidjson/writer.h"
 
 #include "dictionary/dictionary_compiler.h"
 #include "dictionary/dictionary_types.h"
@@ -356,15 +358,17 @@ class IndexWriterWorker final {
       return;
     }
 
-    boost::property_tree::ptree index_toc;
-    boost::property_tree::read_json(toc_fstream, index_toc);
+    rapidjson::Document index_toc;
+    rapidjson::IStreamWrapper isw(toc_fstream);
+    index_toc.ParseStream(isw);
+
     TRACE("index_toc loaded");
 
     TRACE("reading segments");
 
-    for (boost::property_tree::ptree::value_type& f : index_toc.get_child("files")) {
+    for (const auto& e : index_toc["files"].GetArray()) {
       boost::filesystem::path p(payload_.index_directory_);
-      p /= f.second.data();
+      p /= e.GetString();
       payload_.segments_->emplace_back(new Segment(p, false));
     }
   }
@@ -420,21 +424,24 @@ class IndexWriterWorker final {
   static void WriteToc(const IndexPayload* payload) {
     TRACE("write new TOC");
 
-    boost::property_tree::ptree ptree;
-    boost::property_tree::ptree files;
+    std::ofstream out_stream(payload->index_toc_file_part_.string());
+    {
+      rapidjson::OStreamWrapper ostream_wrapper(out_stream);
+      rapidjson::Writer<rapidjson::OStreamWrapper> writer(ostream_wrapper);
 
-    TRACE("Number of segments: %ld", payload->segments_->size());
+      TRACE("Number of segments: %ld", payload->segments_->size());
 
-    for (const auto s : *(payload->segments_)) {
-      TRACE("put %s", s->GetDictionaryFilename().c_str());
-      boost::property_tree::ptree sp;
-      sp.put("", s->GetDictionaryFilename());
-      files.push_back(std::make_pair("", sp));
+      writer.StartObject();
+      writer.Key("files");
+      writer.StartArray();
+      for (const auto s : *(payload->segments_)) {
+        TRACE("put %s", s->GetDictionaryFilename().c_str());
+        writer.String(s->GetDictionaryFilename());
+      }
+
+      writer.EndArray();
+      writer.EndObject();
     }
-
-    ptree.add_child("files", files);
-
-    boost::property_tree::write_json(payload->index_toc_file_part_.string(), ptree);
     boost::filesystem::rename(payload->index_toc_file_part_, payload->index_toc_file_);
   }
 };
