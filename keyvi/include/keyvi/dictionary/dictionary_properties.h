@@ -235,7 +235,7 @@ class DictionaryProperties {
   static DictionaryProperties ReadJsonFormat(const std::string& file_name, std::ifstream& file_stream) {
     rapidjson::Document automata_properties;
 
-    keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, &automata_properties);
+    keyvi::util::SerializationUtils::ReadLengthPrefixedJsonRecord(file_stream, &automata_properties);
 
     uint64_t version =
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, VERSION_PROPERTY);
@@ -271,7 +271,7 @@ class DictionaryProperties {
     }
 
     rapidjson::Document sparse_array_properties;
-    keyvi::util::SerializationUtils::ReadJsonRecord(file_stream, &sparse_array_properties);
+    keyvi::util::SerializationUtils::ReadLengthPrefixedJsonRecord(file_stream, &sparse_array_properties);
 
     uint64_t sparse_array_version =
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(sparse_array_properties, VERSION_PROPERTY);

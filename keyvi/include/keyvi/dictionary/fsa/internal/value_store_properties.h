@@ -112,11 +112,11 @@ class ValueStoreProperties final {
 
       writer.StartObject();
       writer.Key(SIZE_PROPERTY);
-      writer.Uint64(size_);
+      writer.String(std::to_string(size_));
       writer.Key(VALUES_PROPERTY);
-      writer.Uint64(number_of_values_);
+      writer.String(std::to_string(number_of_values_));
       writer.Key(UNIQUE_VALUES_PROPERTY);
-      writer.Uint64(number_of_unique_values_);
+      writer.String(std::to_string(number_of_unique_values_));
       if (compression_.size() > 0) {
         writer.Key(COMPRESSION_PROPERTY);
         writer.String(compression_);
@@ -131,7 +131,7 @@ class ValueStoreProperties final {
 
   static ValueStoreProperties FromJson(std::istream& stream) {
     rapidjson::Document value_store_properties;
-    keyvi::util::SerializationUtils::ReadJsonRecord(stream, &value_store_properties);
+    keyvi::util::SerializationUtils::ReadLengthPrefixedJsonRecord(stream, &value_store_properties);
     const size_t offset = stream.tellg();
     const size_t size =
         keyvi::util::SerializationUtils::GetOptionalSizeFromValueOrString(value_store_properties, SIZE_PROPERTY, 0);

@@ -70,7 +70,7 @@ class VectorFile {
     in_stream.seekg(KEYVI_VECTOR_BEGIN_LEN);
 
     rapidjson::Document file_properties;
-    keyvi::util::SerializationUtils::ReadJsonRecord(in_stream, &file_properties);
+    keyvi::util::SerializationUtils::ReadLengthPrefixedJsonRecord(in_stream, &file_properties);
 
     value_store_t value_store_type_from_file = static_cast<value_store_t>(
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(file_properties, VALUE_STORE_TYPE_LABEl));
@@ -93,7 +93,7 @@ class VectorFile {
     }
 
     rapidjson::Document index_properties;
-    keyvi::util::SerializationUtils::ReadJsonRecord(in_stream, &index_properties);
+    keyvi::util::SerializationUtils::ReadLengthPrefixedJsonRecord(in_stream, &index_properties);
 
     size_ = keyvi::util::SerializationUtils::GetOptionalSizeFromValueOrString(index_properties, SIZE_LABEL, 0);
     const auto index_size = size_ * sizeof(offset_type);

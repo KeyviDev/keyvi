@@ -42,7 +42,7 @@ namespace util {
 
 class SerializationUtils {
  public:
-  static void ReadJsonRecord(std::istream& stream, rapidjson::Document* record) {
+  static void ReadLengthPrefixedJsonRecord(std::istream& stream, rapidjson::Document* record) {
     uint32_t header_size;
     stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
     header_size = be32toh(header_size);
@@ -62,7 +62,7 @@ class SerializationUtils {
       }
     }
 
-    throw std::invalid_argument("failed to parse value");
+    throw std::invalid_argument("key not found");
   }
 
   static uint64_t GetOptionalUInt64FromValueOrString(const rapidjson::Document& record, const char* key,
