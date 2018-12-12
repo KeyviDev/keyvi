@@ -20,16 +20,12 @@
 
 namespace keyvi {
 namespace dictionary {
-namespace fsa {
-namespace internal {
 
-BOOST_AUTO_TEST_SUITE(ValueStorePropertiesTest)
+BOOST_AUTO_TEST_SUITE(DictionaryPropertiesTest)
 
 BOOST_AUTO_TEST_CASE(property_tree_bwc) {}
 
 BOOST_AUTO_TEST_SUITE_END()
 
-} /* namespace internal */
-} /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */
