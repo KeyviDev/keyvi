@@ -122,12 +122,6 @@ class IValueStoreReader {
    */
   virtual std::string GetValueAsString(uint64_t fsa_value) const = 0;
 
-  /**
-   * Get statistical information about the storage.
-   */
-
-  virtual std::string GetStatistics() const { return ""; }
-
  private:
   template <keyvi::dictionary::fsa::internal::value_store_t>
   friend class keyvi::dictionary::DictionaryMerger;

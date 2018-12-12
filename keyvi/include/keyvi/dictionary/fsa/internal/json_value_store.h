@@ -369,8 +369,6 @@ class JsonValueStoreReader final : public IValueStoreReader {
     return keyvi::util::DecodeJsonValue(packed_string);
   }
 
-  std::string GetStatistics() const override { return ""; }
-
  private:
   boost::interprocess::mapped_region* strings_region_;
   const char* strings_;
