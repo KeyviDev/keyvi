@@ -291,9 +291,9 @@ class Generator final {
 
     stream << KEYVI_FILE_MAGIC;
 
-    keyvi::dictionary::DictionaryProperties p(2, start_state_, number_of_keys_added_, number_of_states_,
-                                              value_store_->GetValueStoreType(), persistence_->GetVersion(),
-                                              persistence_->GetSize(), manifest_);
+    keyvi::dictionary::DictionaryProperties p(KEYVI_FILE_VERSION_CURRENT, start_state_, number_of_keys_added_,
+                                              number_of_states_, value_store_->GetValueStoreType(),
+                                              persistence_->GetVersion(), persistence_->GetSize(), manifest_);
     p.WriteAsJsonV2(stream);
 
     // write data from persistence

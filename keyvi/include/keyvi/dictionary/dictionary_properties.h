@@ -239,7 +239,7 @@ class DictionaryProperties {
 
     uint64_t version =
         keyvi::util::SerializationUtils::GetUint64FromValueOrString(automata_properties, VERSION_PROPERTY);
-    if (version < KEYVI_FILE_VERSION_MIN) {
+    if (version < KEYVI_FILE_VERSION_MIN || version > KEYVI_FILE_VERSION_MAX) {
       throw std::invalid_argument("this version of keyvi file is unsupported");
     }
 
