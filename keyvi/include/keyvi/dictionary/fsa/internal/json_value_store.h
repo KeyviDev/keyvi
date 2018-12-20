@@ -135,9 +135,9 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
   explicit JsonValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : JsonValueStoreMinimizationBase(parameters) {
     compression_threshold_ = keyvi::util::mapGet(parameters_, COMPRESSION_THRESHOLD_KEY, 32);
-    std::string compressor = keyvi::util::mapGet<std::string>(parameters_, COMPRESSION_KEY, "");
+    std::string compressor = keyvi::util::mapGet<std::string>(parameters_, COMPRESSION_KEY, {});
     minimize_ = keyvi::util::mapGetBool(parameters_, MINIMIZATION_KEY, true);
-    std::string float_mode = keyvi::util::mapGet<std::string>(parameters_, SINGLE_PRECISION_FLOAT_KEY, "");
+    std::string float_mode = keyvi::util::mapGet<std::string>(parameters_, SINGLE_PRECISION_FLOAT_KEY, {});
 
     if (float_mode == "single") {
       // set single precision float mode
@@ -270,7 +270,7 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
 
   void Write(std::ostream& stream) {
     // TODO(hendrik) write compressor
-    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, {});
 
     properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
@@ -302,7 +302,7 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
 
   void Write(std::ostream& stream) {
     // todo: preserve compression
-    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, std::string());
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, {});
 
     properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());

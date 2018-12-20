@@ -92,7 +92,7 @@ void compile_multiple(CompilerType* compiler, std::function<std::pair<std::strin
 }
 
 template <typename CompilerType>
-void finalize_compile(CompilerType* compiler, const std::string& output, const std::string& manifest = "") {
+void finalize_compile(CompilerType* compiler, const std::string& output, const std::string& manifest = {}) {
   std::ofstream out_stream(output, std::ios::binary);
   compiler->Compile(callback);
   compiler->SetManifest(manifest);
@@ -103,7 +103,7 @@ void finalize_compile(CompilerType* compiler, const std::string& output, const s
 
 template <class BucketT = uint32_t>
 void compile_completion(const std::vector<std::string>& input, const std::string& output,
-                        const std::string& manifest = "",
+                        const std::string& manifest = {},
                         const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::CompletionDictionaryCompiler compiler(value_store_params);
 
@@ -129,7 +129,7 @@ void compile_completion(const std::vector<std::string>& input, const std::string
   finalize_compile(&compiler, output, manifest);
 }
 
-void compile_integer(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
+void compile_integer(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = {},
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::IntDictionaryCompiler compiler(value_store_params);
 
@@ -157,7 +157,7 @@ void compile_integer(const std::vector<std::string>& input, const std::string& o
 
 template <class Compiler>
 void compile_strings_inner(Compiler* compiler, const std::vector<std::string>& input, const std::string& output,
-                           const std::string& manifest = "") {
+                           const std::string& manifest = {}) {
   std::function<std::pair<std::string, std::string>(std::string)> parser = [](std::string line) {
     size_t tab = line.find('\t');
     if (tab == std::string::npos) return std::pair<std::string, std::string>();
@@ -172,14 +172,14 @@ void compile_strings_inner(Compiler* compiler, const std::vector<std::string>& i
   finalize_compile(compiler, output, manifest);
 }
 
-void compile_strings(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
+void compile_strings(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = {},
                      const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::StringDictionaryCompiler compiler(value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
 }
 
 void compile_key_only(const std::vector<std::string>& input, const std::string& output,
-                      const std::string& manifest = "",
+                      const std::string& manifest = {},
                       const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::KeyOnlyDictionaryCompiler compiler(value_store_params);
 
@@ -199,7 +199,7 @@ void compile_key_only(const std::vector<std::string>& input, const std::string& 
   finalize_compile(&compiler, output, manifest);
 }
 
-void compile_json(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = "",
+void compile_json(const std::vector<std::string>& input, const std::string& output, const std::string& manifest = {},
                   const keyvi::util::parameters_t& value_store_params = keyvi::util::parameters_t()) {
   keyvi::dictionary::JsonDictionaryCompiler compiler(value_store_params);
   compile_strings_inner(&compiler, input, output, manifest);
@@ -240,7 +240,7 @@ int main(int argc, char** argv) {
                                 ->composing(),
                             "An option; format is -p xxx=yyy");
 
-  description.add_options()("manifest", boost::program_options::value<std::string>()->default_value(""),
+  description.add_options()("manifest", boost::program_options::value<std::string>()->default_value({}),
                             "manifest to be embedded");
 
   // Declare which options are positional

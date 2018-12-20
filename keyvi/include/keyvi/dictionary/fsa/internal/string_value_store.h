@@ -153,7 +153,7 @@ class StringValueStore final : public StringValueStoreMinimizationBase {
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
   void Write(std::ostream& stream) const {
-    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, {});
 
     properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
@@ -196,7 +196,7 @@ class StringValueStoreMerge final : public StringValueStoreMinimizationBase {
   }
 
   void Write(std::ostream& stream) {
-    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, {});
     properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
@@ -226,7 +226,7 @@ class StringValueStoreAppendMerge final : public StringValueStoreBase {
   void CloseFeeding() {}
 
   void Write(std::ostream& stream) {
-    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, "");
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, {});
     properties.WriteAsJsonV2(stream);
 
     for (size_t i = 0; i < input_files_.size(); ++i) {
