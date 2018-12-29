@@ -1,6 +1,7 @@
 from libc.string cimport const_char
 from libcpp.string cimport string as libcpp_string
 from libcpp.string cimport string as libcpp_utf8_string
+from libcpp.string cimport string as libcpp_utf8_output_string
 from libc.stdint cimport int32_t
 from libc.stdint cimport uint64_t
 from libcpp cimport bool
@@ -30,6 +31,6 @@ cdef extern from "dictionary/dictionary.h" namespace "keyvi::dictionary":
         _MatchIteratorPair GetAllItems () # wrap-ignore
         _MatchIteratorPair Lookup(libcpp_utf8_string)
         _MatchIteratorPair LookupText(libcpp_utf8_string)
-        libcpp_string GetManifestAsString() except + # wrap-ignore
+        libcpp_utf8_output_string GetManifestAsString() except +
         libcpp_string GetStatistics() # wrap-ignore
         uint64_t GetSize() # wrap-ignore

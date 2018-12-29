@@ -19,11 +19,6 @@
             self.inst.get().Compile(callback_wrapper, callback)
 
 
-    def SetManifest(self, manifest):
-        m = json.dumps(manifest).encode('utf-8')
-        self.inst.get().SetManifest(m)
-
-
 # definition for all compilers
 cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:
     (<object>py_callback)(a, b)
