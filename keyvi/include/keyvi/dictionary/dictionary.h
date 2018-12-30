@@ -388,7 +388,7 @@ class Dictionary final {
     return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
   }
 
-  std::string GetManifestAsString() const { return fsa_->GetManifestAsString(); }
+  std::string GetManifest() const { return fsa_->GetManifest(); }
 
  private:
   fsa::automata_t fsa_;

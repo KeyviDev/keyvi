@@ -71,13 +71,6 @@
         py_result.end = _r.end()
         return self._item_iterator_wrapper(py_result)
 
-    def GetManifest(self):
-        cdef libcpp_string _r = self.inst.get().GetManifestAsString()
-        cdef bytes py_result = _r
-        py_result_unicode = _r.decode('utf-8')
-
-        return json.loads(py_result_unicode)
-
     def GetStatistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()
         cdef bytes py_result = _r

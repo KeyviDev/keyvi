@@ -380,7 +380,7 @@ class Automata final {
 
   std::string GetStatistics() const { return dictionary_properties_.GetStatistics(); }
 
-  std::string GetManifestAsString() const { return dictionary_properties_.GetManifest(); }
+  std::string GetManifest() const { return dictionary_properties_.GetManifest(); }
 
  private:
   DictionaryProperties dictionary_properties_;
