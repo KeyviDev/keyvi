@@ -81,14 +81,8 @@ class VectorFile {
 
     if (file_properties.HasMember(MANIFEST_LABEL)) {
       if (file_properties[MANIFEST_LABEL].IsString()) {
-        // normally manifest is a string
+        // manifest is a string
         manifest_ = file_properties[MANIFEST_LABEL].GetString();
-      } else if (file_properties[MANIFEST_LABEL].IsObject()) {
-        // backwards compatibility: manifest might be a subtree
-        rapidjson::StringBuffer sb;
-        rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-        file_properties[MANIFEST_LABEL].Accept(writer);
-        manifest_ = sb.GetString();
       }
     }
 

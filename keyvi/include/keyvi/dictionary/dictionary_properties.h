@@ -259,14 +259,8 @@ class DictionaryProperties {
 
     if (automata_properties.HasMember(MANIFEST_PROPERTY)) {
       if (automata_properties[MANIFEST_PROPERTY].IsString()) {
-        // normally manifest is a string
+        // manifest should be a string, if not ignore it
         manifest = automata_properties[MANIFEST_PROPERTY].GetString();
-      } else if (automata_properties[MANIFEST_PROPERTY].IsObject()) {
-        // backwards compatibility: manifest might be a subtree
-        rapidjson::StringBuffer sb;
-        rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-        automata_properties[MANIFEST_PROPERTY].Accept(writer);
-        manifest = sb.GetString();
       }
     }
 
