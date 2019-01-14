@@ -25,16 +25,11 @@
 #ifndef KEYVI_DICTIONARY_FSA_GENERATOR_H_
 #define KEYVI_DICTIONARY_FSA_GENERATOR_H_
 
-#include <arpa/inet.h>
-
 #include <algorithm>
 #include <stdexcept>
 #include <string>
 
-#include <boost/filesystem.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-
+#include "dictionary/dictionary_properties.h"
 #include "dictionary/fsa/internal/null_value_store.h"
 #include "dictionary/fsa/internal/sparse_array_builder.h"
 #include "dictionary/fsa/internal/unpacked_state.h"
@@ -295,7 +290,12 @@ class Generator final {
     }
 
     stream << KEYVI_FILE_MAGIC;
-    WriteHeader(stream);
+
+    keyvi::dictionary::DictionaryProperties p(KEYVI_FILE_VERSION_CURRENT, start_state_, number_of_keys_added_,
+                                              number_of_states_, value_store_->GetValueStoreType(),
+                                              persistence_->GetVersion(), persistence_->GetSize(), manifest_);
+    p.WriteAsJsonV2(stream);
+
     // write data from persistence
     persistence_->Write(stream);
 
@@ -333,17 +333,6 @@ class Generator final {
   uint64_t number_of_states_ = 0;
   std::string manifest_;
   bool minimize_ = true;
-
-  void WriteHeader(std::ostream& stream) {
-    boost::property_tree::ptree pt;
-    pt.put("version", "2");
-    pt.put("start_state", std::to_string(start_state_));
-    pt.put("number_of_keys", std::to_string(number_of_keys_added_));
-    pt.put("value_store_type", std::to_string(static_cast<int>(value_store_->GetValueStoreType())));
-    pt.put("number_of_states", std::to_string(number_of_states_));
-    pt.add_child("manifest", keyvi::util::SerializationUtils::ReadJsonRecord(manifest_));
-    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
-  }
 
   inline void FeedStack(const size_t start, const std::string& key) {
     for (size_t i = start; i < key.size(); ++i) {

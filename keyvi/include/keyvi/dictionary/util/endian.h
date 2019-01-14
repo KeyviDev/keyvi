@@ -62,7 +62,7 @@
 #include <sys/endian.h>
 #include <sys/types.h>
 #elif defined(__linux__) && (__BYTE_ORDER == __LITTLE_ENDIAN) && (__GLIBC__ <= 2 && __GLIBC_MINOR__ < 9)
-
+#include <arpa/inet.h>
 #define KEYVI_LITTLE_ENDIAN
 #define htole16(x) (x)
 #define le16toh(x) (x)

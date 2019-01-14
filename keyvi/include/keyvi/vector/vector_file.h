@@ -30,9 +30,12 @@
 #include <memory>
 #include <string>
 
-#include <boost/property_tree/ptree.hpp>
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 #include "dictionary/fsa/internal/value_store_factory.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 #include "util/serialization_utils.h"
 #include "vector/types.h"
 
@@ -65,15 +68,28 @@ class VectorFile {
     CheckValidity(&in_stream);
 
     in_stream.seekg(KEYVI_VECTOR_BEGIN_LEN);
-    const auto file_ptree = util::SerializationUtils::ReadJsonRecord(in_stream);
-    if (static_cast<int>(value_store_type) !=
-        boost::lexical_cast<int>(file_ptree.get<std::string>(VALUE_STORE_TYPE_LABEl))) {
+
+    rapidjson::Document file_properties;
+    keyvi::util::SerializationUtils::ReadLengthPrefixedJsonRecord(in_stream, &file_properties);
+
+    value_store_t value_store_type_from_file = static_cast<value_store_t>(
+        keyvi::util::SerializationUtils::GetUint64FromValueOrString(file_properties, VALUE_STORE_TYPE_LABEl));
+
+    if (value_store_type != value_store_type_from_file) {
       throw std::invalid_argument("wrong vector file");
     }
-    manifest_ = file_ptree.get<std::string>(MANIFEST_LABEL);
 
-    const auto index_ptree = util::SerializationUtils::ReadJsonRecord(in_stream);
-    size_ = boost::lexical_cast<size_t>(index_ptree.get<std::string>(SIZE_LABEL));
+    if (file_properties.HasMember(MANIFEST_LABEL)) {
+      if (file_properties[MANIFEST_LABEL].IsString()) {
+        // manifest is a string
+        manifest_ = file_properties[MANIFEST_LABEL].GetString();
+      }
+    }
+
+    rapidjson::Document index_properties;
+    keyvi::util::SerializationUtils::ReadLengthPrefixedJsonRecord(in_stream, &index_properties);
+
+    size_ = keyvi::util::SerializationUtils::GetOptionalSizeFromValueOrString(index_properties, SIZE_LABEL, 0);
     const auto index_size = size_ * sizeof(offset_type);
 
     auto file_mapping = boost::interprocess::file_mapping(filename.c_str(), boost::interprocess::read_only);
@@ -84,8 +100,15 @@ class VectorFile {
     index_region_.advise(advise);
 
     in_stream.seekg(size_t(in_stream.tellg()) + index_size);
+
+    dictionary::fsa::internal::ValueStoreProperties value_store_properties;
+    // not all value stores have properties
+    if (in_stream.peek() != EOF) {
+      value_store_properties = dictionary::fsa::internal::ValueStoreProperties::FromJson(in_stream);
+    }
+
     value_store_reader_.reset(dictionary::fsa::internal::ValueStoreFactory::MakeReader(
-        value_store_type, in_stream, &file_mapping, loading_strategy));
+        value_store_type, &file_mapping, value_store_properties, loading_strategy));
   }
 
   template <typename ValueStoreT>
@@ -94,18 +117,43 @@ class VectorFile {
                           const std::unique_ptr<ValueStoreT>& value_store) {
     std::ofstream out_stream(filename, std::ios::binary);
 
-    boost::property_tree::ptree file_ptree;
-    file_ptree.put("file_version", "1");
-    file_ptree.put(MANIFEST_LABEL, manifest);
-    file_ptree.put(VALUE_STORE_TYPE_LABEl, static_cast<int>(value_store->GetValueStoreType()));
-    file_ptree.put("index_version", "1");
-
-    boost::property_tree::ptree index_ptree;
-    index_ptree.put(SIZE_LABEL, std::to_string(size));
-
     out_stream.write(KEYVI_VECTOR_BEGIN, KEYVI_VECTOR_BEGIN_LEN);
-    util::SerializationUtils::WriteJsonRecord(out_stream, file_ptree);
-    util::SerializationUtils::WriteJsonRecord(out_stream, index_ptree);
+
+    rapidjson::StringBuffer string_buffer;
+    {
+      rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+
+      writer.StartObject();
+      writer.Key("file_version");
+      writer.String(std::to_string(1));
+      writer.Key(VALUE_STORE_TYPE_LABEl);
+      writer.String(std::to_string(static_cast<int>(value_store->GetValueStoreType())));
+      writer.Key("index_version");
+      writer.String(std::to_string(1));
+
+      // manifest
+      writer.Key(MANIFEST_LABEL);
+      writer.String(manifest);
+      writer.EndObject();
+    }
+
+    uint32_t header_size = htobe32(string_buffer.GetLength());
+    out_stream.write(reinterpret_cast<const char*>(&header_size), sizeof(uint32_t));
+    out_stream.write(string_buffer.GetString(), string_buffer.GetLength());
+
+    string_buffer.Clear();
+    {
+      rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+
+      writer.StartObject();
+      writer.Key(SIZE_LABEL);
+      writer.String(std::to_string(size));
+      writer.EndObject();
+    }
+
+    header_size = htobe32(string_buffer.GetLength());
+    out_stream.write(reinterpret_cast<const char*>(&header_size), sizeof(uint32_t));
+    out_stream.write(string_buffer.GetString(), string_buffer.GetLength());
 
     index_store->Write(out_stream, index_store->GetSize());
     value_store->Write(out_stream);

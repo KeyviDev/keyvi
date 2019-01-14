@@ -37,12 +37,12 @@
 #include <unordered_map>
 #include <vector>
 
-// boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
-#define BOOST_SPIRIT_THREADSAFE
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+
+#include "rapidjson/document.h"
+#include "rapidjson/istreamwrapper.h"
+#include "rapidjson/writer.h"
 
 #include "dictionary/dictionary.h"
 #include "dictionary/match.h"
@@ -60,8 +60,7 @@ namespace internal {
 class IndexReaderWorker final {
  public:
   explicit IndexReaderWorker(const std::string index_directory, const keyvi::util::parameters_t& params)
-      : index_toc_(),
-        segments_(),
+      : segments_(),
         refresh_interval_(
             std::chrono::milliseconds(keyvi::util::mapGet<uint64_t>(params, INDEX_REFRESH_INTERVAL, 1000))),
         stop_update_thread_(true) {
@@ -119,7 +118,6 @@ class IndexReaderWorker final {
   boost::filesystem::path index_directory_;
   boost::filesystem::path index_toc_file_;
   std::time_t last_modification_time_;
-  boost::property_tree::ptree index_toc_;
   read_only_segments_t segments_;
   std::weak_ptr<read_only_segment_vec_t> segments_weak_;
   std::mutex mutex_;
@@ -149,7 +147,9 @@ class IndexReaderWorker final {
       throw std::invalid_argument("file not found");
     }
 
-    boost::property_tree::read_json(toc_fstream, index_toc_);
+    rapidjson::Document index_toc;
+    rapidjson::IStreamWrapper isw(toc_fstream);
+    index_toc.ParseStream(isw);
     TRACE("index_toc loaded");
 
     TRACE("reading segments");
@@ -157,17 +157,18 @@ class IndexReaderWorker final {
     read_only_segments_t new_segments = std::make_shared<read_only_segment_vec_t>();
     std::unordered_map<std::string, read_only_segment_t> new_segments_by_name;
 
-    for (boost::property_tree::ptree::value_type& f : index_toc_.get_child("files")) {
+    for (const auto& e : index_toc["files"].GetArray()) {
       // check if segment is already loaded and reuse if possible
-      if (segments_by_name_.count(f.second.data())) {
-        new_segments->push_back(segments_by_name_.at(f.second.data()));
-        new_segments_by_name[f.second.data()] = segments_by_name_.at(f.second.data());
+      std::string segment_name{e.GetString(), e.GetStringLength()};
+      if (segments_by_name_.count(segment_name)) {
+        new_segments->push_back(segments_by_name_.at(segment_name));
+        new_segments_by_name[segment_name] = segments_by_name_.at(segment_name);
       } else {
         boost::filesystem::path p(index_directory_);
-        p /= f.second.data();
+        p /= segment_name;
         read_only_segment_t w(new ReadOnlySegment(p));
         new_segments->push_back(w);
-        new_segments_by_name[f.second.data()] = w;
+        new_segments_by_name[segment_name] = w;
       }
     }
 

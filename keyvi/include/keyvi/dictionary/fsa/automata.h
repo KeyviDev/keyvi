@@ -33,19 +33,15 @@
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/dictionary_properties.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/intrinsics.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/value_store_factory.h"
 #include "dictionary/fsa/traversal/traversal_base.h"
 #include "dictionary/fsa/traversal/weighted_traversal.h"
-#include "dictionary/keyvi_file.h"
-#include "dictionary/util/endian.h"
-#include "util/serialization_utils.h"
-#include "util/vint.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -78,38 +74,27 @@ static unsigned char OUTGOING_TRANSITIONS_MASK[256] = {
 /// TODO: refactor (split) class Automata, so there is no need for param "loadVS" and friend classes
 class Automata final {
  public:
-  explicit Automata(const std::string& filename, loading_strategy_types loading_strategy = loading_strategy_types::lazy)
-      : Automata(filename, loading_strategy, true) {}
+  explicit Automata(const std::string& file_name,
+                    loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+      : Automata(file_name, loading_strategy, true) {}
 
  private:
-  explicit Automata(const std::string& filename, loading_strategy_types loading_strategy, const bool load_value_store) {
-    KeyViFile keyViFile(filename);
-
-    automata_properties_ = keyViFile.automataProperties();
-    start_state_ = boost::lexical_cast<uint64_t>(automata_properties_.get<std::string>("start_state"));
-    number_of_keys_ = boost::lexical_cast<uint64_t>(automata_properties_.get<std::string>("number_of_keys"));
-
-    std::istream& persistenceStream = keyViFile.persistenceStream();
-    sparse_array_properties_ = keyvi::util::SerializationUtils::ReadJsonRecord(persistenceStream);
-
-    const size_t bucket_size = sizeof(uint16_t);
-    const size_t array_size = boost::lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
-
-    const std::streampos offset = persistenceStream.tellg();
-
-    file_mapping_ = boost::interprocess::file_mapping(filename.c_str(), boost::interprocess::read_only);
+  explicit Automata(const std::string& file_name, loading_strategy_types loading_strategy, const bool load_value_store)
+      : dictionary_properties_(DictionaryProperties::FromFile(file_name)) {
+    file_mapping_ = boost::interprocess::file_mapping(file_name.c_str(), boost::interprocess::read_only);
 
     const boost::interprocess::map_options_t map_options =
         internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
-    TRACE("labels start offset: %d", offset);
-    labels_region_ = boost::interprocess::mapped_region(file_mapping_, boost::interprocess::read_only, offset,
-                                                        array_size, 0, map_options);
+    TRACE("labels start offset: %d", dictionary_properties_.GetPersistenceOffset());
+    labels_region_ = boost::interprocess::mapped_region(file_mapping_, boost::interprocess::read_only,
+                                                        dictionary_properties_.GetPersistenceOffset(),
+                                                        dictionary_properties_.GetSparseArraySize(), 0, map_options);
 
-    const std::streamoff transitionsOffset = offset + static_cast<int64_t>(array_size);
-    TRACE("transitions start offset: %d", transitionsOffset);
+    TRACE("transitions start offset: %d", dictionary_properties_.GetTransitionsOffset());
     transitions_region_ = boost::interprocess::mapped_region(
-        file_mapping_, boost::interprocess::read_only, transitionsOffset, bucket_size * array_size, 0, map_options);
+        file_mapping_, boost::interprocess::read_only, dictionary_properties_.GetTransitionsOffset(),
+        dictionary_properties_.GetTransitionsSize(), 0, map_options);
 
     const auto advise = internal::MemoryMapFlags::FSAGetMemoryMapAdvices(loading_strategy);
 
@@ -119,11 +104,10 @@ class Automata final {
     labels_ = static_cast<unsigned char*>(labels_region_.get_address());
     transitions_compact_ = static_cast<uint16_t*>(transitions_region_.get_address());
 
-    value_store_type_ = static_cast<internal::value_store_t>(
-        boost::lexical_cast<int>(automata_properties_.get<std::string>("value_store_type")));
     if (load_value_store) {
-      value_store_reader_.reset(internal::ValueStoreFactory::MakeReader(value_store_type_, keyViFile.valueStoreStream(),
-                                                                        &file_mapping_, loading_strategy));
+      value_store_reader_.reset(
+          internal::ValueStoreFactory::MakeReader(dictionary_properties_.GetValueStoreType(), &file_mapping_,
+                                                  dictionary_properties_.GetValueStoreProperties(), loading_strategy));
     }
   }
 
@@ -136,17 +120,15 @@ class Automata final {
    *
    * @return index of root state.
    */
-  uint64_t GetStartState() const { return start_state_; }
+  uint64_t GetStartState() const { return dictionary_properties_.GetStartState(); }
 
-  uint64_t GetNumberOfKeys() const { return number_of_keys_; }
+  uint64_t GetNumberOfKeys() const { return dictionary_properties_.GetNumberOfKeys(); }
 
   bool Empty() const { return 0 == GetNumberOfKeys(); }
 
-  size_t SparseArraySize() const {
-    return ::boost::lexical_cast<size_t>(sparse_array_properties_.get<std::string>("size"));
-  }
+  size_t SparseArraySize() const { return dictionary_properties_.GetSparseArraySize(); }
 
-  internal::value_store_t GetValueStoreType() const { return value_store_type_; }
+  internal::value_store_t GetValueStoreType() const { return dictionary_properties_.GetValueStoreType(); }
 
   uint64_t TryWalkTransition(uint64_t starting_state, unsigned char c) const {
     if (labels_[starting_state + c] == c) {
@@ -396,45 +378,18 @@ class Automata final {
     return value_store_reader_->GetRawValueAsString(state_value);
   }
 
-  std::string GetStatistics() const {
-    assert(value_store_reader_);
+  std::string GetStatistics() const { return dictionary_properties_.GetStatistics(); }
 
-    std::ostringstream buf;
-    buf << "General" << std::endl;
-    boost::property_tree::write_json(buf, automata_properties_, false);
-    buf << std::endl << "Persistence" << std::endl;
-    boost::property_tree::write_json(buf, sparse_array_properties_, false);
-    buf << std::endl << "Value Store" << std::endl;
-    buf << value_store_reader_->GetStatistics();
-    return buf.str();
-  }
-
-  boost::property_tree::ptree GetManifest() const {
-    return automata_properties_.get_child("manifest", boost::property_tree::ptree());
-  }
-
-  std::string GetManifestAsString() const {
-    std::ostringstream buf;
-
-    const boost::property_tree::ptree& manifest =
-        automata_properties_.get_child("manifest", boost::property_tree::ptree());
-    boost::property_tree::write_json(buf, manifest, false);
-
-    return buf.str();
-  }
+  std::string GetManifest() const { return dictionary_properties_.GetManifest(); }
 
  private:
-  boost::property_tree::ptree automata_properties_;
-  boost::property_tree::ptree sparse_array_properties_;
+  DictionaryProperties dictionary_properties_;
   std::unique_ptr<internal::IValueStoreReader> value_store_reader_;
   boost::interprocess::file_mapping file_mapping_;
   boost::interprocess::mapped_region labels_region_;
   boost::interprocess::mapped_region transitions_region_;
   unsigned char* labels_;
   uint16_t* transitions_compact_;
-  uint64_t start_state_;
-  uint64_t number_of_keys_;
-  internal::value_store_t value_store_type_;
 
   template <keyvi::dictionary::fsa::internal::value_store_t>
   friend class keyvi::dictionary::DictionaryMerger;

@@ -31,15 +31,15 @@
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "dictionary/dictionary_properties.h"
 #include "dictionary/fsa/internal/ivalue_store.h"
 #include "dictionary/fsa/internal/lru_generation_cache.h"
 #include "dictionary/fsa/internal/memory_map_flags.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/fsa/internal/minimization_hash.h"
 #include "dictionary/fsa/internal/value_store_persistence.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 #include "dictionary/fsa/internal/value_store_types.h"
-#include "dictionary/keyvi_file.h"
-#include "util/serialization_utils.h"
 
 // #define ENABLE_TRACING
 #include "dictionary/util/trace.h"
@@ -153,12 +153,9 @@ class StringValueStore final : public StringValueStoreMinimizationBase {
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
   void Write(std::ostream& stream) const {
-    boost::property_tree::ptree pt;
-    pt.put("size", std::to_string(values_buffer_size_));
-    pt.put("values", std::to_string(number_of_values_));
-    pt.put("unique_values", std::to_string(number_of_unique_values_));
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, {});
 
-    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
+    properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     values_extern_->Write(stream, values_buffer_size_);
@@ -199,12 +196,8 @@ class StringValueStoreMerge final : public StringValueStoreMinimizationBase {
   }
 
   void Write(std::ostream& stream) {
-    boost::property_tree::ptree pt;
-    pt.put("size", std::to_string(values_buffer_size_));
-    pt.put("values", std::to_string(number_of_values_));
-    pt.put("unique_values", std::to_string(number_of_unique_values_));
-
-    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, {});
+    properties.WriteAsJsonV2(stream);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
     values_extern_->Write(stream, values_buffer_size_);
@@ -218,16 +211,13 @@ class StringValueStoreAppendMerge final : public StringValueStoreBase {
   explicit StringValueStoreAppendMerge(const std::vector<std::string>& inputFiles,
                                        const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : input_files_(inputFiles), offsets_() {
-    for (const auto& filename : inputFiles) {
-      KeyViFile keyvi_file(filename);
+    for (const auto& file_name : inputFiles) {
+      properties_.push_back(DictionaryProperties::FromFile(file_name));
 
-      auto& vsStream = keyvi_file.valueStoreStream();
-      const boost::property_tree::ptree props = keyvi::util::SerializationUtils::ReadValueStoreProperties(vsStream);
       offsets_.push_back(values_buffer_size_);
-
-      number_of_values_ += boost::lexical_cast<size_t>(props.get<std::string>("values"));
-      number_of_unique_values_ += boost::lexical_cast<size_t>(props.get<std::string>("unique_values"));
-      values_buffer_size_ += boost::lexical_cast<size_t>(props.get<std::string>("size"));
+      number_of_values_ += properties_.back().GetValueStoreProperties().GetNumberOfValues();
+      number_of_unique_values_ += properties_.back().GetValueStoreProperties().GetNumberOfUniqueValues();
+      values_buffer_size_ += properties_.back().GetValueStoreProperties().GetSize();
     }
   }
 
@@ -236,24 +226,19 @@ class StringValueStoreAppendMerge final : public StringValueStoreBase {
   void CloseFeeding() {}
 
   void Write(std::ostream& stream) {
-    boost::property_tree::ptree pt;
-    pt.put("size", std::to_string(values_buffer_size_));
-    pt.put("values", std::to_string(number_of_values_));
-    pt.put("unique_values", std::to_string(number_of_unique_values_));
+    ValueStoreProperties properties(0, values_buffer_size_, number_of_values_, number_of_unique_values_, {});
+    properties.WriteAsJsonV2(stream);
 
-    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
-
-    for (const auto& filename : input_files_) {
-      KeyViFile keyvi_file(filename);
-      auto& in_stream = keyvi_file.valueStoreStream();
-      keyvi::util::SerializationUtils::ReadValueStoreProperties(in_stream);
-
+    for (size_t i = 0; i < input_files_.size(); ++i) {
+      std::ifstream in_stream(input_files_[i]);
+      in_stream.seekg(properties_[i].GetValueStoreProperties().GetOffset());
       stream << in_stream.rdbuf();
     }
   }
 
  private:
   std::vector<std::string> input_files_;
+  std::vector<DictionaryProperties> properties_;
   std::vector<size_t> offsets_;
 };
 
@@ -261,19 +246,14 @@ class StringValueStoreReader final : public IValueStoreReader {
  public:
   using IValueStoreReader::IValueStoreReader;
 
-  StringValueStoreReader(std::istream& stream, boost::interprocess::file_mapping* file_mapping,
+  StringValueStoreReader(boost::interprocess::file_mapping* file_mapping, const ValueStoreProperties& properties,
                          loading_strategy_types loading_strategy = loading_strategy_types::lazy)
-      : IValueStoreReader(stream, file_mapping) {
-    const boost::property_tree::ptree properties = keyvi::util::SerializationUtils::ReadValueStoreProperties(stream);
-
-    const size_t offset = stream.tellg();
-    const size_t strings_size = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
-
+      : IValueStoreReader(file_mapping, properties) {
     const boost::interprocess::map_options_t map_options =
         internal::MemoryMapFlags::ValuesGetMemoryMapOptions(loading_strategy);
 
-    strings_region_ = new boost::interprocess::mapped_region(*file_mapping, boost::interprocess::read_only, offset,
-                                                             strings_size, 0, map_options);
+    strings_region_ = new boost::interprocess::mapped_region(
+        *file_mapping, boost::interprocess::read_only, properties.GetOffset(), properties.GetSize(), 0, map_options);
 
     const auto advise = internal::MemoryMapFlags::ValuesGetMemoryMapAdvices(loading_strategy);
 

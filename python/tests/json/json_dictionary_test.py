@@ -35,7 +35,6 @@ def test_simple_zlib():
         assert d["abd"].GetValueAsString() == '{"a":3}'
         m = d.GetStatistics()['Value Store']
         assert m['__compression'] == "zlib"
-        assert m['__compression_threshold'] == "0"
 
 def test_simple_snappy():
     c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10", 'compression': 'snappy', 'compression_threshold': '0'})
@@ -47,7 +46,6 @@ def test_simple_snappy():
         assert d["abd"].GetValueAsString() == '{"a":3}'
         m = d.GetStatistics()['Value Store']
         assert m['__compression'] == "snappy"
-        assert m['__compression_threshold'] == "0"
 
 def test_unicode_compile():
     c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})

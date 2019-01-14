@@ -33,6 +33,7 @@
 #include <boost/variant.hpp>
 
 #include "dictionary/dictionary_merger_fwd.h"
+#include "dictionary/fsa/internal/value_store_properties.h"
 #include "dictionary/fsa/internal/value_store_types.h"
 #include "util/configuration.h"
 #include "util/json_value.h"
@@ -83,10 +84,10 @@ class IValueStoreReader {
   /**
    * Default constructor. Override if the value store implementation requires extra data.
    *
-   * @param stream The stream to read from
    * @param file_mapping The file_mapping instance of the loader to use memory mapping
+   * @param properties The dictionary properties
    */
-  IValueStoreReader(std::istream& stream, boost::interprocess::file_mapping* file_mapping) {}
+  IValueStoreReader(boost::interprocess::file_mapping* file_mapping, const ValueStoreProperties& properties) {}
 
   virtual ~IValueStoreReader() {}
 
@@ -120,12 +121,6 @@ class IValueStoreReader {
    * @return the value as string
    */
   virtual std::string GetValueAsString(uint64_t fsa_value) const = 0;
-
-  /**
-   * Get statistical information about the storage.
-   */
-
-  virtual std::string GetStatistics() const { return ""; }
 
  private:
   template <keyvi::dictionary::fsa::internal::value_store_t>

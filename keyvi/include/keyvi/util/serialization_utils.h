@@ -25,13 +25,15 @@
 #ifndef KEYVI_UTIL_SERIALIZATION_UTILS_H_
 #define KEYVI_UTIL_SERIALIZATION_UTILS_H_
 
+#include <cstddef>
+#include <iostream>
 #include <string>
 
 #include <boost/lexical_cast.hpp>
-// boost json parser depends on boost::spirit, and spirit is not thread-safe by default. so need to enable thread-safety
-#define BOOST_SPIRIT_THREADSAFE
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 #include "dictionary/util/endian.h"
 
@@ -40,65 +42,53 @@ namespace util {
 
 class SerializationUtils {
  public:
-  static void WriteJsonRecord(std::ostream& stream, const boost::property_tree::ptree& properties) {
-    std::stringstream string_buffer;
-
-    boost::property_tree::write_json(string_buffer, properties, false);
-    std::string header = string_buffer.str();
-
-    uint32_t size = htobe32(header.size());
-
-    stream.write(reinterpret_cast<const char*>(&size), sizeof(uint32_t));
-    stream << header;
-  }
-
-  static boost::property_tree::ptree ReadJsonRecord(std::istream& stream) {
+  static void ReadLengthPrefixedJsonRecord(std::istream& stream, rapidjson::Document* record) {
     uint32_t header_size;
     stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
     header_size = be32toh(header_size);
     char* buffer = new char[header_size];
     stream.read(buffer, header_size);
-    std::string buffer_as_string(buffer, header_size);
-    delete[] buffer;
-    std::istringstream string_stream(buffer_as_string);
-
-    boost::property_tree::ptree properties;
-    boost::property_tree::read_json(string_stream, properties);
-    return properties;
+    record->Parse(buffer, header_size);
   }
 
-  static boost::property_tree::ptree ReadValueStoreProperties(std::istream& stream) {
-    const auto properties = ReadJsonRecord(stream);
-    const auto offset = stream.tellg();
-
-    // check for file truncation
-    const size_t vsSize = boost::lexical_cast<size_t>(properties.get<std::string>("size"));
-    if (vsSize > 0) {
-      stream.seekg(vsSize - 1, stream.cur);
-      if (stream.peek() == EOF) {
-        throw std::invalid_argument("file is corrupt(truncated)");
+  // utility methods to retrieve numeric values
+  // backwards compatibility: when using boost::property_tree numbers have been stored as string
+  static uint64_t GetUint64FromValueOrString(const rapidjson::Document& record, const char* key) {
+    if (record.HasMember(key)) {
+      if (record[key].IsString()) {
+        return boost::lexical_cast<uint64_t>(record[key].GetString());
+      } else {
+        return static_cast<uint64_t>(record[key].GetUint64());
       }
     }
 
-    stream.seekg(offset);
-    return properties;
+    throw std::invalid_argument("key not found");
   }
 
-  /**
-   * Utility method to return a property tree from a JSON string.
-   * @param record a string containing a JSON
-   * @return the parsed property tree
-   */
-  static boost::property_tree::ptree ReadJsonRecord(const std::string& record) {
-    boost::property_tree::ptree properties;
-
-    // sending an empty string clears the manifest
-    if (!record.empty()) {
-      std::istringstream string_stream(record);
-      boost::property_tree::read_json(string_stream, properties);
+  static uint64_t GetOptionalUInt64FromValueOrString(const rapidjson::Document& record, const char* key,
+                                                     const size_t defaultValue) {
+    if (record.HasMember(key)) {
+      if (record[key].IsString()) {
+        return boost::lexical_cast<uint64_t>(record[key].GetString());
+      } else {
+        return static_cast<uint64_t>(record[key].GetUint64());
+      }
     }
 
-    return properties;
+    return defaultValue;
+  }
+
+  static size_t GetOptionalSizeFromValueOrString(const rapidjson::Document& record, const char* key,
+                                                 const size_t defaultValue) {
+    if (record.HasMember(key)) {
+      if (record[key].IsString()) {
+        return boost::lexical_cast<size_t>(record[key].GetString());
+      } else {
+        return static_cast<size_t>(record[key].GetUint64());
+      }
+    }
+
+    return defaultValue;
   }
 };
 

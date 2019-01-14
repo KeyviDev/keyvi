@@ -36,6 +36,10 @@ static const size_t KEYVI_FILE_MAGIC_LEN = 8;
 
 // min version of the file
 static const int KEYVI_FILE_VERSION_MIN = 2;
+// max version of the file we support
+static const int KEYVI_FILE_VERSION_MAX = 2;
+// the current version of the file format
+static const int KEYVI_FILE_VERSION_CURRENT = 2;
 
 // min version of the persistence part
 static const int KEYVI_FILE_PERSISTENCE_VERSION_MIN = 2;

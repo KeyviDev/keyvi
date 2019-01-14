@@ -12,7 +12,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__ (libcpp_utf8_string, int) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifest(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except +
         void WriteToFile(libcpp_utf8_string) except +
 
     cdef cppclass IntDictionaryCompiler:
@@ -22,7 +22,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__ (libcpp_utf8_string, int) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifest(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except +
         void WriteToFile(libcpp_utf8_string) except +
 
     cdef cppclass KeyOnlyDictionaryCompiler:
@@ -31,7 +31,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void Add(libcpp_utf8_string) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifest(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except +
         void WriteToFile(libcpp_utf8_string) except +
 
     cdef cppclass JsonDictionaryCompiler:
@@ -41,7 +41,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__(libcpp_utf8_string, libcpp_utf8_string) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifest(libcpp_utf8_string) except + # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except +
         void WriteToFile(libcpp_utf8_string) except +
 
     cdef cppclass JsonDictionaryCompilerSmallData:
@@ -51,7 +51,7 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__(libcpp_string, libcpp_string) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifest(libcpp_utf8_string) except + # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except +
         void WriteToFile(libcpp_utf8_string) except +
 
     cdef cppclass StringDictionaryCompiler:
@@ -61,6 +61,6 @@ cdef extern from "dictionary/dictionary_types.h" namespace "keyvi::dictionary":
         void __setitem__(libcpp_utf8_string, libcpp_utf8_string) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifest(libcpp_utf8_string) # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except +
         void WriteToFile(libcpp_utf8_string) except +
 

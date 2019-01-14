@@ -32,13 +32,10 @@
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/fsa/internal/memory_map_manager.h"
 #include "dictionary/util/endian.h"
-#include "util/serialization_utils.h"
 #include "util/vint.h"
 
 // #define PERSISTENCE_DEBUG
@@ -187,26 +184,24 @@ class SparseArrayPersistence final {
   }
 
   void Write(std::ostream& stream) {
-    boost::property_tree::ptree pt;
-    pt.put("version", GetVersion());
-
-    size_t highest_write_position =
-        std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_ + 1);
-
-    pt.put("size", std::to_string(highest_write_position));
-
-    keyvi::util::SerializationUtils::WriteJsonRecord(stream, pt);
     TRACE("Wrote JSON header, stream at %d", stream.tellp());
 
-    labels_extern_->Write(stream, highest_write_position);
+    size_t size = GetSize();
+    labels_extern_->Write(stream, size);
 
     TRACE("Wrote Labels, stream at %d", stream.tellp());
 
-    transitions_extern_->Write(stream, (highest_write_position) * sizeof(BucketT));
+    transitions_extern_->Write(stream, size * sizeof(BucketT));
     TRACE("Wrote Transitions, stream at %d", stream.tellp());
   }
 
   size_t GetChunkSizeExternalTransitions() const { return transitions_extern_->GetChunkSize(); }
+
+  uint32_t GetVersion() const;
+
+  uint64_t GetSize() const {
+    return std::max(highest_state_begin_ + MAX_TRANSITIONS_OF_A_STATE, highest_raw_write_bucket_ + 1);
+  }
 
  private:
   unsigned char* labels_;
@@ -242,8 +237,6 @@ class SparseArrayPersistence final {
 
     in_memory_buffer_offset_ += flush_size_;
   }
-
-  uint32_t GetVersion() const;
 
   BucketT PersistenceOrderToHostOrder(BucketT value) const;
   BucketT HostOrderToPesistenceOrder(BucketT value) const;
