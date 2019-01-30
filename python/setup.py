@@ -41,6 +41,15 @@ if not IS_RELEASED:
 ###################
 
 
+def run_once(f):
+    def wrapper(*args, **kwargs):
+        if not wrapper.has_run:
+            wrapper.has_run = True
+            return f(*args, **kwargs)
+    wrapper.has_run = False
+    return wrapper
+
+
 def write_version_file():
     here = os.path.abspath(os.path.dirname(__file__))
     version_file_path = os.path.join(here, 'src/py/keyvi/_version.py')
@@ -84,6 +93,60 @@ def symlink_keyvi():
     else:
         yield None, None
 
+@run_once
+def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags):
+    # needed for shared library
+    CMAKE_CXX_FLAGS = additional_compile_flags + ' -fPIC'
+
+    # TODO: still needed?
+    # workaround for https://bitbucket.org/pypy/pypy/issues/2626/invalid-conversion-from-const-char-to-char
+    if os.environ.get('PYTHON_VERSION', '') == 'pypy2':
+        CMAKE_CXX_FLAGS += ' -fpermissive'
+
+    cmake_configure_cmd = 'mkdir -p {}'.format(build_path)
+    cmake_configure_cmd += ' && cd {}'.format(build_path)
+    cmake_configure_cmd += ' && cmake' \
+                        ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"'.format(CXX_FLAGS=CMAKE_CXX_FLAGS.strip())
+    cmake_configure_cmd +=  ' -D CMAKE_BUILD_TYPE={BUILD_TYPE}'.format(BUILD_TYPE=build_type)
+
+    if zlib_root is not None:
+         cmake_configure_cmd += ' -D ZLIB_ROOT={ZLIB_ROOT}'.format(ZLIB_ROOT=zlib_root)
+    cmake_configure_cmd += ' ..'
+
+    print ("Building in {0} mode".format(build_type))
+    print ("Run keyvi C++ cmake: " + cmake_configure_cmd)
+    subprocess.call(cmake_configure_cmd, shell=True)
+
+    cmake_flags = {}
+    with open(os.path.join(build_path, "keyvi", "flags")) as flags:
+        for line in flags:
+            k, v = line.strip().split("=", 1)
+            cmake_flags[k] = v.strip()
+
+    # set additional compiler flags
+    set_additional_flags('extra_compile_args', cmake_flags['KEYVI_CXX_FLAGS_ALL'].split(' '))
+
+    # set defines
+    define_macros = []
+    for macro in cmake_flags['KEYVI_COMPILE_DEFINITIONS'].split(' '):
+        if macro.count("=") == 0:
+            define_macros.append((macro, None))
+        else:
+            define_macros.append(macro.split("=", 1))
+    set_additional_flags('define_macros', define_macros)
+
+    # set link libraries
+    set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_ALL'].split(' '))
+
+    return cmake_flags
+
+
+def set_additional_flags(key, additional_flags):
+     # patch the compile flags
+    for ext_m in ext_modules:
+        flags = getattr(ext_m, key) + additional_flags
+        setattr(ext_m, key, flags)
+
 
 with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     # workaround for autowrap bug (includes incompatible boost)
@@ -92,31 +155,11 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     dictionary_sources = path.abspath(keyvi_cpp_link)
     keyvi_build_dir = path.join(keyvi_cpp, 'build-{}'.format(platform.platform()))
 
-    additional_compile_flags = []
-
-    # workaround for https://bitbucket.org/pypy/pypy/issues/2626/invalid-conversion-from-const-char-to-char
-    if os.environ.get('PYTHON_VERSION', '') == 'pypy2':
-        additional_compile_flags.append('-fpermissive')
+    additional_compile_flags = ''
 
     # re-map the source files in the debug symbol tables to there original location so that stepping in a debugger works
     if pykeyvi_source_path is not None:
-        additional_compile_flags.append('-fdebug-prefix-map={}={}'.format(pykeyvi_source_path, keyvi_source_path))
-
-    linklibraries_static_or_dynamic = [
-        "boost_program_options",
-        "boost_iostreams",
-        "boost_filesystem",
-        "boost_system",
-        "boost_regex",
-        "boost_thread",
-        "snappy"
-    ]
-
-    linklibraries = [
-        "tiny-process-library",
-        "tpie",
-        "z"
-    ]
+        additional_compile_flags += ' -fdebug-prefix-map={}={}'.format(pykeyvi_source_path, keyvi_source_path)
 
     mac_os_static_libs_dir = 'mac_os_static_libs'
 
@@ -125,10 +168,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     zlib_root = None
 
     if sys.platform == 'darwin':
-        additional_compile_flags.append("-DOS_MACOSX")
-        additional_compile_flags.append('-mmacosx-version-min=10.9')
-        linklibraries_static_or_dynamic.remove('boost_thread')
-        linklibraries_static_or_dynamic.append('boost_thread-mt')
         link_library_dirs.append(mac_os_static_libs_dir)
         extra_link_arguments.append('-L{}'.format(mac_os_static_libs_dir))
 
@@ -139,9 +178,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     custom_user_options = [('mode=',
                             None,
                             "build mode."),
-                           ('staticlinkboost',
-                            None,
-                            "special mode to statically link boost."),
                            ('zlib-root=',
                             None,
                             "zlib installation root"),
@@ -158,48 +194,13 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             self.zlib_root = None
 
         def run(self):
-            global additional_compile_flags
-            global linklibraries
-            global linklibraries_static_or_dynamic
-            global extra_link_arguments
             global ext_modules
             global zlib_root
-            print ("Building in {0} mode".format(self.mode))
+            global build_type
 
-            if self.mode == 'debug':
-                additional_compile_flags.append("-O0")
-                additional_compile_flags.append("-ggdb3")
-                additional_compile_flags.append("-fstack-protector")
-            else:
-                additional_compile_flags.append("-O3")
+            build_type = self.mode
 
-            if self.mode == 'coverage':
-                additional_compile_flags.append("--coverage")
-                linklibraries.append("gcov")
-
-            # check linking
-            if self.staticlinkboost:
-                # set static
-                extra_link_arguments = ['-Wl,-Bstatic']
-                for lib in linklibraries_static_or_dynamic:
-                    extra_link_arguments.append("-l{}".format(lib))
-                # reset to dynamic
-                extra_link_arguments.append('-Wl,-Bdynamic')
-                extra_link_arguments.append('-static-libstdc++')
-                extra_link_arguments.append('-static-libgcc')
-                # workaround: link librt explicitly
-                linklibraries.append("rt")
-            else:
-                # no static linking, add the libs to dynamic linker
-                linklibraries += linklibraries_static_or_dynamic
-
-            # patch the compile flags
-            for ext_m in ext_modules:
-                flags = getattr(ext_m, 'extra_compile_args') + additional_compile_flags
-                setattr(ext_m, 'extra_compile_args', flags)
-                setattr(ext_m, 'libraries', linklibraries)
-                args = getattr(ext_m, 'extra_link_args') + extra_link_arguments
-                setattr(ext_m, 'extra_link_args', args)
+            cmake_flags = cmake_configure(keyvi_build_dir, build_type, zlib_root, additional_compile_flags)
 
             # custom zlib location
             if self.zlib_root:
@@ -244,39 +245,37 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         have_wheel = True
     except: None
 
-    class build_ext(_build_ext.build_ext):
+    class build_ext(custom_opts, _build_ext.build_ext):
 
-        def run(self):
-            generate_pykeyvi_source()
+        class build_cxx:
 
-            if sys.platform == 'darwin':
-                if not os.path.exists(mac_os_static_libs_dir):
-                    os.makedirs(mac_os_static_libs_dir)
+            def initialize_options(self):
+                _build_ext.build_ext.initialize_options(self)
 
-                for lib in linklibraries_static_or_dynamic:
-                    lib_file_name = 'lib{}.a'.format(lib)
-                    src_file = path.join('/usr/local/lib', lib_file_name)
-                    dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
-                    shutil.copyfile(src_file, dst_file)
+            def run(self):
+                generate_pykeyvi_source()
 
-            CMAKE_CXX_FLAGS = '-fPIC -std=c++11'
-            if sys.platform == 'darwin':
-                CMAKE_CXX_FLAGS += ' -mmacosx-version-min=10.9'
+                if sys.platform == 'darwin':
+                    if not os.path.exists(mac_os_static_libs_dir):
+                        os.makedirs(mac_os_static_libs_dir)
 
-            keyvi_build_cmd = 'mkdir -p {}'.format(keyvi_build_dir)
-            keyvi_build_cmd += ' && cd {}'.format(keyvi_build_dir)
-            keyvi_build_cmd += ' && cmake' \
-                                ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"'.format(CXX_FLAGS=CMAKE_CXX_FLAGS)
-            if zlib_root is not None:
-                 keyvi_build_cmd += ' -D ZLIB_ROOT={ZLIB_ROOT}'.format(ZLIB_ROOT=zlib_root)
-            keyvi_build_cmd += ' ..'
-            keyvi_build_cmd += ' && make -j {} bindings'.format(cpu_count)
+                    for lib in linklibraries_static_or_dynamic:
+                        lib_file_name = 'lib{}.a'.format(lib)
+                        src_file = path.join('/usr/local/lib', lib_file_name)
+                        dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
+                        shutil.copyfile(src_file, dst_file)
 
-            print ("Building keyvi C++ part: " + keyvi_build_cmd)
-            subprocess.call(keyvi_build_cmd, shell=True)
+                keyvi_build_cmd = 'cd {} && make -j {} bindings'.format(keyvi_build_dir, cpu_count)
 
-            os.environ['ARCHFLAGS'] = '-arch x86_64'
-            _build_ext.build_ext.run(self)
+                print ("Building keyvi C++ part: " + keyvi_build_cmd)
+                subprocess.call(keyvi_build_cmd, shell=True)
+
+                os.environ['ARCHFLAGS'] = '-arch x86_64'
+                _build_ext.build_ext.run(self)
+
+        parent = build_cxx
+        user_options = _build_ext.build_ext.user_options + custom_user_options
+
 
     ext_modules = [Extension('keyvi._core',
                              include_dirs=[autowrap_data_dir,
@@ -291,10 +290,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                                            path.join(dictionary_sources, '3rdparty/xchange/src')],
                              language='c++',
                              sources=[pykeyvi_cpp],
-                             extra_compile_args=['-std=c++11', '-msse4.2', '-Wall', '-DRAPIDJSON_HAS_STDSTRING'] + additional_compile_flags,
                              extra_link_args=extra_link_arguments,
-                             library_dirs=link_library_dirs,
-                             libraries=linklibraries)]
+                             library_dirs=link_library_dirs)]
 
     PACKAGE_NAME = 'keyvi'
 
