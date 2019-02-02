@@ -247,37 +247,36 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         have_wheel = True
     except: None
 
-    class build_ext(custom_opts, _build_ext.build_ext):
+    class build_cxx(_build_ext.build_ext):
 
-        class build_cxx:
+        def initialize_options(self):
+            _build_ext.build_ext.initialize_options(self)
 
-            def initialize_options(self):
-                _build_ext.build_ext.initialize_options(self)
+        def run(self):
+            generate_pykeyvi_source()
 
-            def run(self):
-                generate_pykeyvi_source()
+            if sys.platform == 'darwin':
+                if not os.path.exists(mac_os_static_libs_dir):
+                    os.makedirs(mac_os_static_libs_dir)
 
-                if sys.platform == 'darwin':
-                    if not os.path.exists(mac_os_static_libs_dir):
-                        os.makedirs(mac_os_static_libs_dir)
+                for lib in linklibraries_static_or_dynamic:
+                    lib_file_name = 'lib{}.a'.format(lib)
+                    src_file = path.join('/usr/local/lib', lib_file_name)
+                    dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
+                    shutil.copyfile(src_file, dst_file)
 
-                    for lib in linklibraries_static_or_dynamic:
-                        lib_file_name = 'lib{}.a'.format(lib)
-                        src_file = path.join('/usr/local/lib', lib_file_name)
-                        dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
-                        shutil.copyfile(src_file, dst_file)
+            keyvi_build_cmd = 'cd {} && make -j {} bindings'.format(keyvi_build_dir, cpu_count)
 
-                keyvi_build_cmd = 'cd {} && make -j {} bindings'.format(keyvi_build_dir, cpu_count)
+            print ("Building keyvi C++ part: " + keyvi_build_cmd)
+            subprocess.call(keyvi_build_cmd, shell=True)
 
-                print ("Building keyvi C++ part: " + keyvi_build_cmd)
-                subprocess.call(keyvi_build_cmd, shell=True)
+            os.environ['ARCHFLAGS'] = '-arch x86_64'
+            _build_ext.build_ext.run(self)
 
-                os.environ['ARCHFLAGS'] = '-arch x86_64'
-                _build_ext.build_ext.run(self)
+    class build_ext(custom_opts, build_cxx):
 
         parent = build_cxx
-        user_options = _build_ext.build_ext.user_options + custom_user_options
-
+        user_options = build_cxx.user_options + custom_user_options
 
     ext_modules = [Extension('keyvi._core',
                              include_dirs=[autowrap_data_dir,
