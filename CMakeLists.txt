@@ -113,7 +113,7 @@ include_directories(keyvi/3rdparty/xchange/src)
 include_directories(keyvi/include/keyvi)
 
 # target_compile_options expects a list
-string(REPLACE " " ";" _KEYVI_CXX_FLAGS_LIST "${_KEVYI_COMPILE_OPTIONS} ${_KEYVI_CXX_FLAGS}")
+string(REPLACE " " ";" _KEYVI_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}} ${_KEVYI_COMPILE_OPTIONS} ${_KEYVI_CXX_FLAGS}")
 
 #### Targets ####
 
