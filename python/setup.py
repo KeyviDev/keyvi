@@ -84,12 +84,14 @@ def symlink_keyvi():
                 os.makedirs(keyvi_cpp)
             os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
             shutil.copy('../CMakeLists.txt', path.join(keyvi_cpp, 'CMakeLists.txt'))
+            shutil.copytree('../cmake_modules', path.join(keyvi_cpp, 'cmake_modules'))
             keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
             pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
             yield (pykeyvi_source_path, keyvi_source_path)
         finally:
             os.unlink(keyvi_cpp_link)
             os.remove(path.join(keyvi_cpp, 'CMakeLists.txt'))
+            shutil.rmtree(path.join(keyvi_cpp, 'cmake_modules'))
     else:
         yield None, None
 
@@ -121,7 +123,7 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
     with open(os.path.join(build_path, "keyvi", "flags")) as flags:
         for line in flags:
             k, v = line.strip().split("=", 1)
-            cmake_flags[k] = v.strip()
+            cmake_flags[k] = " ".join(v.split())
 
     # set additional compiler flags
     set_additional_flags('extra_compile_args', cmake_flags['KEYVI_CXX_FLAGS_ALL'].split(' '))
