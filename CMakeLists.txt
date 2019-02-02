@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.0.2)
 project(keyvi)
 
 #### Build Type
-
-string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
+if (CMAKE_BUILD_TYPE)
+  string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
+endif()
 
 #### Compiler Flags ####
 
