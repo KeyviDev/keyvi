@@ -129,25 +129,30 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
     set_additional_flags('extra_compile_args', cmake_flags['KEYVI_CXX_FLAGS_ALL'].split(' '))
 
     # set defines
-    define_macros = []
-    for macro in cmake_flags['KEYVI_COMPILE_DEFINITIONS'].split(' '):
-        if macro.count("=") == 0:
-            define_macros.append((macro, None))
-        else:
-            define_macros.append(macro.split("=", 1))
-    set_additional_flags('define_macros', define_macros)
+    if cmake_flags['KEYVI_COMPILE_DEFINITIONS']:
+        define_macros = []
+
+        for macro in cmake_flags['KEYVI_COMPILE_DEFINITIONS'].split(' '):
+            if macro.count("=") == 0:
+                define_macros.append((macro, None))
+            else:
+                define_macros.append(macro.split("=", 1))
+
+        set_additional_flags('define_macros', define_macros)
 
     # set link libraries
-    set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_ALL'].split(' '))
+    if cmake_flags['KEYVI_LINK_LIBRARIES_ALL']:
+        set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_ALL'].split(' '))
 
     # set link args
-    set_additional_flags('extra_link_args', cmake_flags['KEYVI_LINK_FLAGS'].split(' '))
+    if cmake_flags['KEYVI_LINK_FLAGS']:
+        set_additional_flags('extra_link_args', cmake_flags['KEYVI_LINK_FLAGS'].split(' '))
 
     return cmake_flags
 
 
 def set_additional_flags(key, additional_flags):
-     # patch the compile flags
+     # patch the flags specified in key
     for ext_m in ext_modules:
         flags = getattr(ext_m, key) + additional_flags
         setattr(ext_m, key, flags)
