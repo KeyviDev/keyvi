@@ -113,8 +113,9 @@ include_directories(keyvi/3rdparty/xchange/src)
 # keyvi
 include_directories(keyvi/include/keyvi)
 
-# target_compile_options expects a list
+# target_compile_options and target_compile_definitions expect a list
 string(REPLACE " " ";" _KEYVI_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}} ${_KEVYI_COMPILE_OPTIONS} ${_KEYVI_CXX_FLAGS}")
+string(REPLACE " " ";" _KEYVI_COMPILE_DEFINITIONS_LIST "${_KEYVI_COMPILE_DEFINITIONS}")
 
 #### Targets ####
 
@@ -122,7 +123,7 @@ string(REPLACE " " ";" _KEYVI_CXX_FLAGS_LIST "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLA
 add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
 target_link_libraries(keyvicompiler tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_compile_options(keyvicompiler PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(keyvicompiler PRIVATE ${_KEYVI_COMPILE_DEFINITIONS})
+target_compile_definitions(keyvicompiler PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 
 install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
 
@@ -130,7 +131,7 @@ install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
 add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
 target_link_libraries(keyviinspector tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_compile_options(keyviinspector PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(keyviinspector PRIVATE ${_KEYVI_COMPILE_DEFINITIONS})
+target_compile_definitions(keyviinspector PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 
 install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
 
@@ -138,7 +139,7 @@ install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
 add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
 target_link_libraries(keyvimerger tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_compile_options(keyvimerger PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(keyvimerger PRIVATE ${_KEYVI_COMPILE_DEFINITIONS})
+target_compile_definitions(keyvimerger PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 
 install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
 
@@ -146,14 +147,14 @@ install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
 add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
 target_link_libraries(keyvi_c tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_compile_options(keyvi_c PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS})
+target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 
 # unit tests
 FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
 add_executable(unit_test_all ${UNIT_TEST_SOURCES})
 target_link_libraries(unit_test_all tiny-process-library tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 target_compile_options(unit_test_all PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS})
+target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 add_dependencies(unit_test_all keyvimerger)
 
 # bindings
