@@ -191,7 +191,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
         def initialize_options(self):
             self.parent.initialize_options(self)
-            self.mode = 'release'
+            self.mode = None
             self.staticlinkboost = False
             self.zlib_root = None
 
@@ -200,7 +200,16 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             global zlib_root
             global build_type
 
-            build_type = self.mode
+            if not self.mode:
+                try:
+                    f = open(path.join(keyvi_build_dir, "build_type"), "r")
+                    build_type = f.readline().strip()
+                except:
+                    # default to release
+                    build_type = 'release'
+            else:
+                # mode has been specified on the commandline
+                build_type = self.mode
 
             cmake_flags = cmake_configure(keyvi_build_dir, build_type, zlib_root, additional_compile_flags)
 
@@ -219,6 +228,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                     else:
                         library_dirs = [path.join(self.zlib_root, "lib")] + getattr(ext_m, 'library_dirs')
                         setattr(ext_m, 'library_dirs', library_dirs)
+
+            # store the build type
+            f = open(path.join(keyvi_build_dir, "build_type"), "w")
+            f.write(build_type)
 
             self.parent.run(self)
 
