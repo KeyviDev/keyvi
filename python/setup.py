@@ -140,6 +140,9 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
     # set link libraries
     set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_ALL'].split(' '))
 
+    # set link args
+    set_additional_flags('extra_link_args', cmake_flags['KEYVI_LINK_FLAGS'].split(' '))
+
     return cmake_flags
 
 
