@@ -47,8 +47,10 @@ def run_once(f):
     def wrapper(*args, **kwargs):
         if not wrapper.has_run:
             wrapper.has_run = True
-            return f(*args, **kwargs)
+            wrapper.ret = f(*args, **kwargs)
+        return wrapper.ret
     wrapper.has_run = False
+    wrapper.ret = None
     return wrapper
 
 
@@ -237,12 +239,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
         def run(self):
             self.load_options()
-            cmake_flags = cmake_configure(keyvi_build_dir, self.options['mode'], self.options.get('zlib_root'), additional_compile_flags)
-
-            # custom zlib location
-            if 'zlib_root' in self.options:
-                patch_for_custom_zlib(self.options['zlib_root'])
-
+            self.cmake_flags = cmake_configure(keyvi_build_dir, self.options['mode'], self.options.get('zlib_root'), additional_compile_flags)
             self.save_options()
             self.parent.run(self)
 
@@ -279,22 +276,28 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         def run(self):
             generate_pykeyvi_source()
 
+            # special linkage for OSX
             if sys.platform == 'darwin':
                 if not os.path.exists(mac_os_static_libs_dir):
                     os.makedirs(mac_os_static_libs_dir)
-
-                for lib in linklibraries_static_or_dynamic:
+                for lib in self.cmake_flags['KEYVI_LINK_LIBRARIES_ALL']:
                     lib_file_name = 'lib{}.a'.format(lib)
                     src_file = path.join('/usr/local/lib', lib_file_name)
                     dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
                     shutil.copyfile(src_file, dst_file)
+
+            # custom zlib location
+            if 'zlib_root' in self.options:
+                patch_for_custom_zlib(self.options['zlib_root'])
 
             keyvi_build_cmd = 'cd {} && make -j {} bindings'.format(keyvi_build_dir, cpu_count)
 
             print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
 
-            os.environ['ARCHFLAGS'] = '-arch x86_64'
+            if sys.platform == 'darwin':
+                os.environ['ARCHFLAGS'] = '-arch x86_64'
+
             _build_ext.build_ext.run(self)
 
     class build_ext(custom_opts, build_cxx):
