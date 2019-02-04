@@ -280,7 +280,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             if sys.platform == 'darwin':
                 if not os.path.exists(mac_os_static_libs_dir):
                     os.makedirs(mac_os_static_libs_dir)
-                for lib in self.cmake_flags['KEYVI_LINK_LIBRARIES_ALL']:
+                for lib in self.cmake_flags['KEYVI_LINK_LIBRARIES_ALL'].split(' '):
                     lib_file_name = 'lib{}.a'.format(lib)
                     src_file = path.join('/usr/local/lib', lib_file_name)
                     dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
