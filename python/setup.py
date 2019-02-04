@@ -3,6 +3,7 @@ import distutils.command.build as _build
 import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
 import distutils.command.sdist as _sdist
+import json
 import os
 import sys
 import subprocess
@@ -19,6 +20,7 @@ pykeyvi_cpp = '_core.cpp'
 keyvi_cpp_source = '../keyvi'
 keyvi_cpp = 'src/cpp'
 keyvi_cpp_link = path.join(keyvi_cpp, 'keyvi')
+mac_os_static_libs_dir = 'mac_os_static_libs'
 
 try:
     cpu_count = multiprocessing.cpu_count()
@@ -158,6 +160,21 @@ def set_additional_flags(key, additional_flags):
         setattr(ext_m, key, flags)
 
 
+def patch_for_custom_zlib(self, zlib_root):
+    for ext_m in ext_modules:
+        include_dirs = [path.join(zlib_root, "include")] + getattr(ext_m, 'include_dirs')
+        setattr(ext_m, 'include_dirs', include_dirs)
+        if sys.platform == 'darwin':
+            if not os.path.exists(mac_os_static_libs_dir):
+                os.makedirs(mac_os_static_libs_dir)
+            src_file = path.join(zlib_root, "lib", "libz.a")
+            dst_file = path.join(mac_os_static_libs_dir, "libz.a")
+            shutil.copyfile(src_file, dst_file)
+        else:
+            library_dirs = [path.join(zlib_root, "lib")] + getattr(ext_m, 'library_dirs')
+            setattr(ext_m, 'library_dirs', library_dirs)
+
+
 with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     # workaround for autowrap bug (includes incompatible boost)
     autowrap_data_dir = "autowrap_includes"
@@ -171,11 +188,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     if pykeyvi_source_path is not None:
         additional_compile_flags += ' -fdebug-prefix-map={}={}'.format(pykeyvi_source_path, keyvi_source_path)
 
-    mac_os_static_libs_dir = 'mac_os_static_libs'
-
     extra_link_arguments = []
     link_library_dirs = [keyvi_build_dir]
-    zlib_root = None
 
     if sys.platform == 'darwin':
         link_library_dirs.append(mac_os_static_libs_dir)
@@ -202,45 +216,34 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             self.mode = None
             self.staticlinkboost = False
             self.zlib_root = None
+            self.options = {}
+
+        def load_options(self):
+            # preserves setting between build and install
+            if not self.mode and not self.zlib_root:
+                try:
+                    f = open(path.join(keyvi_build_dir, "custom_opts"), "r")
+                    self.options = json.loads(f.readline())
+                    return
+                except: pass
+            self.options['mode'] = "release" if not self.mode else self.mode
+            if self.zlib_root:
+                self.options['zlib_root'] = self.zlib_root
+
+        def save_options(self):
+            # store the options
+            f = open(path.join(keyvi_build_dir, "custom_opts"), "w")
+            f.write(json.dumps(self.options))
 
         def run(self):
-            global ext_modules
-            global zlib_root
-            global build_type
-
-            if not self.mode:
-                try:
-                    f = open(path.join(keyvi_build_dir, "build_type"), "r")
-                    build_type = f.readline().strip()
-                except:
-                    # default to release
-                    build_type = 'release'
-            else:
-                # mode has been specified on the commandline
-                build_type = self.mode
-
-            cmake_flags = cmake_configure(keyvi_build_dir, build_type, zlib_root, additional_compile_flags)
+            self.load_options()
+            cmake_flags = cmake_configure(keyvi_build_dir, self.options['mode'], self.options.get('zlib_root'), additional_compile_flags)
 
             # custom zlib location
-            if self.zlib_root:
-                zlib_root = self.zlib_root
-                for ext_m in ext_modules:
-                    include_dirs = [path.join(self.zlib_root, "include")] + getattr(ext_m, 'include_dirs')
-                    setattr(ext_m, 'include_dirs', include_dirs)
-                    if sys.platform == 'darwin':
-                        if not os.path.exists(mac_os_static_libs_dir):
-                            os.makedirs(mac_os_static_libs_dir)
-                        src_file = path.join(self.zlib_root, "lib", "libz.a")
-                        dst_file = path.join(mac_os_static_libs_dir, "libz.a")
-                        shutil.copyfile(src_file, dst_file)
-                    else:
-                        library_dirs = [path.join(self.zlib_root, "lib")] + getattr(ext_m, 'library_dirs')
-                        setattr(ext_m, 'library_dirs', library_dirs)
+            if 'zlib_root' in self.options:
+                patch_for_custom_zlib(self.options['zlib_root'])
 
-            # store the build type
-            f = open(path.join(keyvi_build_dir, "build_type"), "w")
-            f.write(build_type)
-
+            self.save_options()
             self.parent.run(self)
 
     class build(custom_opts, _build.build):
