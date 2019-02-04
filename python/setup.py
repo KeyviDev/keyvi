@@ -160,7 +160,7 @@ def set_additional_flags(key, additional_flags):
         setattr(ext_m, key, flags)
 
 
-def patch_for_custom_zlib(self, zlib_root):
+def patch_for_custom_zlib(zlib_root):
     for ext_m in ext_modules:
         include_dirs = [path.join(zlib_root, "include")] + getattr(ext_m, 'include_dirs')
         setattr(ext_m, 'include_dirs', include_dirs)
