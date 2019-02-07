@@ -265,14 +265,14 @@ class DictionaryMerger final {
 
       if (KeyDeleted(segment_it.segmentIndex(), top_key) == false) {
         fsa::ValueHandle handle;
-        handle.no_minimization = false;
+        handle.no_minimization_ = false;
 
         // get the weight value, for now simple: does not require access to the
         // value store itself
-        handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
-        handle.value_idx =
+        handle.weight_ = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
+        handle.value_idx_ =
             value_store->AddValueMerge(segment_it.entryIterator().GetFsa()->GetValueStore()->GetValueStorePayload(),
-                                       segment_it.entryIterator().GetValueId(), &handle.no_minimization);
+                                       segment_it.entryIterator().GetValueId(), &handle.no_minimization_);
 
         TRACE("Add key: %s", top_key.c_str());
         ++stats_.number_of_keys_;
@@ -315,12 +315,12 @@ class DictionaryMerger final {
 
       if (KeyDeleted(segment_it.segmentIndex(), top_key) == false) {
         fsa::ValueHandle handle;
-        handle.no_minimization = false;
+        handle.no_minimization_ = false;
 
         // get the weight value, for now simple: does not require access to the
         // value store itself
-        handle.weight = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
-        handle.value_idx =
+        handle.weight_ = value_store->GetMergeWeight(segment_it.entryIterator().GetValueId());
+        handle.value_idx_ =
             value_store->AddValueAppendMerge(segment_it.segmentIndex(), segment_it.entryIterator().GetValueId());
 
         TRACE("Add key: %s", top_key.c_str());

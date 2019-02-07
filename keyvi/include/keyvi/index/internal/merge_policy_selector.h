@@ -35,7 +35,7 @@ namespace keyvi {
 namespace index {
 namespace internal {
 
-inline std::shared_ptr<MergePolicy> merge_policy(const std::string& name = "") throw(std::invalid_argument) {
+inline std::shared_ptr<MergePolicy> merge_policy(const std::string& name = "") {
   auto lower_name = name;
 
   boost::algorithm::to_lower(lower_name);

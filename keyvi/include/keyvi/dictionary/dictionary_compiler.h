@@ -126,13 +126,11 @@ class DictionaryCompiler final {
       throw compiler_exception("delete only available when using stable_inserts option");
     }
 
-    fsa::ValueHandle handle = {
-        0,         // offset of value
-        count_++,  // counter(order)
-        0,         // weight
-        false,     // minimization
-        true       // deleted flag
-    };
+    fsa::ValueHandle handle(0,         // offset of value
+                            count_++,  // counter(order)
+                            0,         // weight
+                            false,     // minimization
+                            true);     // deleted flag
 
     sorter_.push_back(key_value_t(std::move(input_key), handle));
   }
@@ -188,13 +186,13 @@ class DictionaryCompiler final {
 
             // check the counter to determine which key_value has been added
             // last
-            if (last_key_value.value.count < key_value.value.count) {
+            if (last_key_value.value.count_ < key_value.value.count_) {
               last_key_value = key_value;
             }
             continue;
           }
 
-          if (!last_key_value.value.deleted) {
+          if (!last_key_value.value.deleted_) {
             TRACE("adding to generator: %s", last_key_value.key.c_str());
             generator_->Add(std::move(last_key_value.key), last_key_value.value);
             ++added_key_values;
@@ -210,7 +208,7 @@ class DictionaryCompiler final {
 
         // add the last one
         TRACE("adding to generator: %s", last_key_value.key.c_str());
-        if (!last_key_value.value.deleted) {
+        if (!last_key_value.value.deleted_) {
           generator_->Add(std::move(last_key_value.key), last_key_value.value);
         }
 
@@ -276,13 +274,11 @@ class DictionaryCompiler final {
     bool no_minimization = false;
     uint64_t value_idx = value_store_->AddValue(value, &no_minimization);
 
-    fsa::ValueHandle handle = {
-        value_idx,                            // offset of value
-        count_++,                             // counter(order)
-        value_store_->GetWeightValue(value),  // weight
-        no_minimization,                      // minimization
-        false                                 // deleted flag
-    };
+    fsa::ValueHandle handle(value_idx,                            // offset of value
+                            count_++,                             // counter(order)
+                            value_store_->GetWeightValue(value),  // weight
+                            no_minimization,                      // minimization
+                            false);                               // deleted flag
 
     return handle;
   }
