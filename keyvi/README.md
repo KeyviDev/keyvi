@@ -14,7 +14,7 @@ For example on Ubuntu (14.04 to 16.04) should install all the dependencies you n
 
 In addition to a working build setup (Xcode) install the following libraries using Homebrew:
 
-    brew install boost --c++11
+    brew install boost
     brew install snappy
     brew install lzlib
     brew install cmake
