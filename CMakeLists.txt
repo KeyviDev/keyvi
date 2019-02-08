@@ -89,7 +89,11 @@ if (ZLIB_FOUND)
 else ()
     message(FATAL_ERROR "Can not find ZLib")
 endif (ZLIB_FOUND)
-set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} z")
+if (ZLIB_ROOT)
+  set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} z")
+else ()
+  set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} z")
+endif (ZLIB_ROOT)
 
 # snappy
 # currently reuses on tpies FindSnappy module
@@ -99,7 +103,7 @@ if(${Snappy_FOUND})
 else(${Snappy_FOUND})
     message(FATAL_ERROR "Can not find Snappy")
 endif(${Snappy_FOUND})
-set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} snappy")
+set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} snappy")
 
 # rapidjson
 include_directories(keyvi/3rdparty/rapidjson/include)

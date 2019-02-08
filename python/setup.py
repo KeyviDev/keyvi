@@ -145,8 +145,17 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
         set_additional_flags('define_macros', define_macros)
 
     # set link libraries
-    if cmake_flags['KEYVI_LINK_LIBRARIES_ALL']:
-        set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_ALL'].split(' '))
+    if cmake_flags['KEYVI_LINK_LIBRARIES_STATIC']:
+        extra_link_arguments = ['-Wl,-Bstatic']
+        for lib in cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '):
+            extra_link_arguments.append("-l{}".format(lib))
+
+        # reset to dynamic
+        extra_link_arguments.append('-Wl,-Bdynamic')
+        set_additional_flags('extra_link_args', extra_link_arguments)
+
+    if cmake_flags['KEYVI_LINK_LIBRARIES_DYNAMIC']:
+        set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_DYNAMIC'].split(' '))
 
     # set link args
     if cmake_flags['KEYVI_LINK_FLAGS']:
@@ -166,15 +175,8 @@ def patch_for_custom_zlib(zlib_root):
     for ext_m in ext_modules:
         include_dirs = [path.join(zlib_root, "include")] + getattr(ext_m, 'include_dirs')
         setattr(ext_m, 'include_dirs', include_dirs)
-        if sys.platform == 'darwin':
-            if not os.path.exists(mac_os_static_libs_dir):
-                os.makedirs(mac_os_static_libs_dir)
-            src_file = path.join(zlib_root, "lib", "libz.a")
-            dst_file = path.join(mac_os_static_libs_dir, "libz.a")
-            shutil.copyfile(src_file, dst_file)
-        else:
-            library_dirs = [path.join(zlib_root, "lib")] + getattr(ext_m, 'library_dirs')
-            setattr(ext_m, 'library_dirs', library_dirs)
+        library_dirs = [path.join(zlib_root, "lib")] + getattr(ext_m, 'library_dirs')
+        setattr(ext_m, 'library_dirs', library_dirs)
 
 
 with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
@@ -190,12 +192,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     if pykeyvi_source_path is not None:
         additional_compile_flags += ' -fdebug-prefix-map={}={}'.format(pykeyvi_source_path, keyvi_source_path)
 
-    extra_link_arguments = []
     link_library_dirs = [keyvi_build_dir]
-
-    if sys.platform == 'darwin':
-        link_library_dirs.append(mac_os_static_libs_dir)
-        extra_link_arguments.append('-L{}'.format(mac_os_static_libs_dir))
 
     #########################
     # Custom 'build' command
@@ -276,16 +273,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         def run(self):
             generate_pykeyvi_source()
 
-            # special linkage for OSX
-            if sys.platform == 'darwin':
-                if not os.path.exists(mac_os_static_libs_dir):
-                    os.makedirs(mac_os_static_libs_dir)
-                for lib in self.cmake_flags['KEYVI_LINK_LIBRARIES_ALL'].split(' '):
-                    lib_file_name = 'lib{}.a'.format(lib)
-                    src_file = path.join('/usr/local/lib', lib_file_name)
-                    dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
-                    shutil.copyfile(src_file, dst_file)
-
             # custom zlib location
             if 'zlib_root' in self.options:
                 patch_for_custom_zlib(self.options['zlib_root'])
@@ -318,7 +305,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                                            path.join(dictionary_sources, '3rdparty/xchange/src')],
                              language='c++',
                              sources=[pykeyvi_cpp],
-                             extra_link_args=extra_link_arguments,
                              library_dirs=link_library_dirs)]
 
     PACKAGE_NAME = 'keyvi'
