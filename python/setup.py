@@ -149,6 +149,9 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
         if sys.platform == 'darwin':
             # clang on OSX does not understand -Bstatic or an equivalent
             # workaround: copy files into an extra directory
+            if not os.path.exists(mac_os_static_libs_dir):
+                os.makedirs(mac_os_static_libs_dir)
+
             for lib in cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '):
                 lib_file_name = 'lib{}.a'.format(lib)
                 src_file = path.join('/usr/local/lib', lib_file_name)
