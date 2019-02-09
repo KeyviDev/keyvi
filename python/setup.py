@@ -146,13 +146,26 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
 
     # set link libraries
     if cmake_flags['KEYVI_LINK_LIBRARIES_STATIC']:
-        extra_link_arguments = ['-Wl,-Bstatic']
-        for lib in cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '):
-            extra_link_arguments.append("-l{}".format(lib))
+        if sys.platform == 'darwin':
+            # clang on OSX does not understand -Bstatic or an equivalent
+            # workaround: copy files into an extra directory
+            for lib in cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '):
+                lib_file_name = 'lib{}.a'.format(lib)
+                src_file = path.join('/usr/local/lib', lib_file_name)
+                dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
+                if os.path.exists(src_file):
+                    shutil.copyfile(src_file, dst_file)
 
-        # reset to dynamic
-        extra_link_arguments.append('-Wl,-Bdynamic')
-        set_additional_flags('extra_link_args', extra_link_arguments)
+            extra_link_arguments = ['-L{}'.format(mac_os_static_libs_dir)]
+            set_additional_flags('extra_link_args', extra_link_arguments)
+        else:
+            extra_link_arguments = ['-Wl,-Bstatic']
+            for lib in cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '):
+                extra_link_arguments.append("-l{}".format(lib))
+
+            # reset to dynamic
+            extra_link_arguments.append('-Wl,-Bdynamic')
+            set_additional_flags('extra_link_args', extra_link_arguments)
 
     if cmake_flags['KEYVI_LINK_LIBRARIES_DYNAMIC']:
         set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_DYNAMIC'].split(' '))
