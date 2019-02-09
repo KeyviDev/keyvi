@@ -161,6 +161,8 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
 
             extra_link_arguments = ['-L{}'.format(mac_os_static_libs_dir)]
             set_additional_flags('extra_link_args', extra_link_arguments)
+            set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '))
+
         else:
             extra_link_arguments = ['-Wl,-Bstatic']
             for lib in cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '):
