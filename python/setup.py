@@ -104,11 +104,6 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
     # needed for shared library
     CMAKE_CXX_FLAGS = additional_compile_flags + ' -fPIC'
 
-    # TODO: still needed?
-    # workaround for https://bitbucket.org/pypy/pypy/issues/2626/invalid-conversion-from-const-char-to-char
-    if os.environ.get('PYTHON_VERSION', '') == 'pypy2':
-        CMAKE_CXX_FLAGS += ' -fpermissive'
-
     cmake_configure_cmd = 'mkdir -p {}'.format(build_path)
     cmake_configure_cmd += ' && cd {}'.format(build_path)
     cmake_configure_cmd += ' && cmake' \
@@ -143,6 +138,10 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
                 define_macros.append(macro.split("=", 1))
 
         set_additional_flags('define_macros', define_macros)
+
+    # set includes
+    if cmake_flags['KEYVI_INCLUDES']:
+        set_additional_flags('include_dirs', cmake_flags['KEYVI_INCLUDES'].split(' '))
 
     # set link libraries
     if cmake_flags['KEYVI_LINK_LIBRARIES_STATIC']:
@@ -311,16 +310,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         user_options = build_cxx.user_options + custom_user_options
 
     ext_modules = [Extension('keyvi._core',
-                             include_dirs=[autowrap_data_dir,
-                                           path.join(dictionary_sources, '3rdparty/tpie'),
-                                           path.join(os.path.join(keyvi_build_dir, 'keyvi/3rdparty/tpie')),
-                                           path.join(dictionary_sources, 'include/keyvi'),
-                                           path.join(dictionary_sources, '3rdparty/rapidjson/include'),
-                                           path.join(dictionary_sources, '3rdparty/msgpack-c/include'),
-                                           path.join(dictionary_sources, '3rdparty/tiny-process-library'),
-                                           path.join(dictionary_sources, '3rdparty/utf8'),
-                                           path.join(dictionary_sources, '3rdparty/misc'),
-                                           path.join(dictionary_sources, '3rdparty/xchange/src')],
+                             include_dirs=[autowrap_data_dir],
                              language='c++',
                              sources=[pykeyvi_cpp],
                              library_dirs=link_library_dirs)]

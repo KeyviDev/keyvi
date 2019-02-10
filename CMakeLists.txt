@@ -175,6 +175,13 @@ add_custom_target(bindings
 #### Configuration file for integrations and bindings ####
 
 # expose all flags used
+
+# includes
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+get_directory_property(_KEYVI_INCLUDES INCLUDE_DIRECTORIES)
+string(REPLACE ";" " " _KEYVI_INCLUDES "${_KEYVI_INCLUDES}")
+
+# compile flags
 set(_KEYVI_CXX_FLAGS_ALL "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}} ${_KEYVI_CXX_FLAGS} ${_KEVYI_COMPILE_OPTIONS} -std=c++11")
 
 configure_file(keyvi/flags.cmake keyvi/flags)
