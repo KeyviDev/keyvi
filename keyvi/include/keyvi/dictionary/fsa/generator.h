@@ -108,18 +108,22 @@ class generator_exception final : public std::runtime_error {
  * Note: The input must be sorted according to a user-defined sort order.
  */
 struct ValueHandle final {
+  ValueHandle() : ValueHandle(0, 0, 0, false, false) {}
+  ValueHandle(uint64_t value_idx, size_t count, uint32_t weight, bool no_minimization, bool deleted)
+      : value_idx_(value_idx), count_(count), weight_(weight), no_minimization_(no_minimization), deleted_(deleted) {}
+
   bool operator==(const ValueHandle other) const {
-    return (value_idx == other.value_idx) && (count == other.count) && (weight == other.weight) &&
-           (no_minimization == other.no_minimization) && (deleted == other.deleted);
+    return (value_idx_ == other.value_idx_) && (count_ == other.count_) && (weight_ == other.weight_) &&
+           (no_minimization_ == other.no_minimization_) && (deleted_ == other.deleted_);
   }
 
   bool operator!=(const ValueHandle other) const { return !(*this == other); }
 
-  uint64_t value_idx;
-  size_t count;
-  uint32_t weight;
-  bool no_minimization;
-  bool deleted;
+  uint64_t value_idx_;
+  size_t count_;
+  uint32_t weight_;
+  bool no_minimization_;
+  bool deleted_;
 };
 
 template <class PersistenceT, class ValueStoreT = internal::NullValueStore, class OffsetTypeT = uint32_t,
@@ -232,14 +236,14 @@ class Generator final {
     // into the stack
     FeedStack(commonPrefixLength, input_key);
 
-    stack_->InsertFinalState(input_key.size(), handle.value_idx, handle.no_minimization);
+    stack_->InsertFinalState(input_key.size(), handle.value_idx_, handle.no_minimization_);
 
     // count number of entries
     ++number_of_keys_added_;
 
     // if inner weights are used update them
-    if (handle.weight > 0) {
-      stack_->UpdateWeights(0, input_key.size() + 1, handle.weight);
+    if (handle.weight_ > 0) {
+      stack_->UpdateWeights(0, input_key.size() + 1, handle.weight_);
     }
 
     last_key_ = input_key;

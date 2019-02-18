@@ -41,7 +41,7 @@ namespace keyvi {
 namespace compression {
 
 /** Returns an instance of a compression strategy by name. */
-inline CompressionStrategy* compression_strategy(const std::string& name = "") throw(std::invalid_argument) {
+inline CompressionStrategy* compression_strategy(const std::string& name = "") {
   // inline to avoid "multiple definition of" errors that come from defining
   // the function in a header file
   auto lower_name = name;

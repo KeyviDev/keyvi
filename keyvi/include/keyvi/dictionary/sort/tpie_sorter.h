@@ -30,6 +30,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
+#include "dictionary/fsa/generator.h"
 #include "dictionary/fsa/internal/constants.h"
 #include "dictionary/sort/sorter_common.h"
 #include "dictionary/sort/tpie_initializer.h"
@@ -47,17 +48,41 @@ namespace sort {
 /**
  * Tpie serialization and deserialization for sorting.
  */
-template <typename Dst, typename KeyValueT>
-void serialize(Dst& d, const KeyValueT& pt) {  // NOLINT
+
+// TPIE is not able to handle nested fields, so we have to flatten them
+template <typename Dst>
+void serialize(Dst& d, const key_value_pair<std::string, fsa::ValueHandle>& kv) {  // NOLINT
   using tpie::serialize;
-  serialize(d, pt.key);
-  serialize(d, pt.value);
+  serialize(d, kv.key);
+  serialize(d, kv.value.value_idx_);
+  serialize(d, kv.value.count_);
+  serialize(d, kv.value.weight_);
+  serialize(d, kv.value.no_minimization_);
+  serialize(d, kv.value.deleted_);
+}
+
+template <typename Src>
+void unserialize(Src& s, key_value_pair<std::string, fsa::ValueHandle>& kv) {  // NOLINT
+  using tpie::unserialize;
+  unserialize(s, kv.key);
+  unserialize(s, kv.value.value_idx_);
+  unserialize(s, kv.value.count_);
+  unserialize(s, kv.value.weight_);
+  unserialize(s, kv.value.no_minimization_);
+  unserialize(s, kv.value.deleted_);
+}
+
+template <typename Dst, typename KeyValueT>
+void serialize(Dst& d, const KeyValueT& kv) {  // NOLINT
+  using tpie::serialize;
+  serialize(d, kv.key);
+  serialize(d, kv.value);
 }
 template <typename Src, typename KeyValueT>
-void unserialize(Src& s, KeyValueT& pt) {  // NOLINT
+void unserialize(Src& s, KeyValueT& kv) {  // NOLINT
   using tpie::unserialize;
-  unserialize(s, pt.key);
-  unserialize(s, pt.value);
+  unserialize(s, kv.key);
+  unserialize(s, kv.value);
 }
 
 template <typename KeyValueT>

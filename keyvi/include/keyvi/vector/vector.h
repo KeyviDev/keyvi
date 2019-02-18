@@ -41,7 +41,7 @@ class Vector final {
       : vector_file_(filename, value_store_type),
         index_ptr_(static_cast<offset_type*>(vector_file_.index_region_.get_address())) {}
 
-  std::string Get(const size_t index) const throw(std::out_of_range) {
+  std::string Get(const size_t index) const {
     if (index >= vector_file_.size_) {
       throw std::out_of_range("out of range access");
     }
