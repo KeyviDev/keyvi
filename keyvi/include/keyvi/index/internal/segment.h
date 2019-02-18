@@ -38,7 +38,9 @@
 namespace keyvi {
 namespace index {
 namespace internal {
-
+namespace unit_test {
+class SegmentFriend;
+}
 class Segment final : public ReadOnlySegment {
  public:
   explicit Segment(const boost::filesystem::path& path, bool no_deletes = false)
@@ -89,7 +91,12 @@ class Segment final : public ReadOnlySegment {
 
   bool HasDeletedKeys() {
     LazyLoadDeletedKeys();
-    return ReadOnlySegment::HasDeletedKeys();
+    return deleted_keys_for_write_.size() + deleted_keys_during_merge_for_write_.size() > 0;
+  }
+
+  size_t DeletedKeysSize() {
+    LazyLoadDeletedKeys();
+    return deleted_keys_for_write_.size() + deleted_keys_during_merge_for_write_.size();
   }
 
   const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
@@ -175,6 +182,21 @@ class Segment final : public ReadOnlySegment {
   bool new_delete_;
   boost::filesystem::path deleted_keys_swap_filename_;
 
+  // friend for unit testing only
+  friend class unit_test::SegmentFriend;
+
+  explicit Segment(const dictionary::dictionary_properties_t& dictionary_properties, bool no_deletes = false)
+      : ReadOnlySegment(dictionary_properties, false, !no_deletes),
+        deleted_keys_for_write_(),
+        deleted_keys_during_merge_for_write_(),
+        dictionary_loaded(false),
+        deletes_loaded(no_deletes),
+        in_merge_(false),
+        new_delete_(false),
+        deleted_keys_swap_filename_(dictionary_properties->GetFileName()) {
+    deleted_keys_swap_filename_ += ".dk-swap";
+  }
+
   inline void LazyLoadDictionary() {
     if (!dictionary_loaded) {
       LoadDictionary();
@@ -215,6 +237,6 @@ typedef const std::shared_ptr<segment_vec_t> const_segments_t;
 
 }  // namespace internal
 }  // namespace index
-} /* namespace keyvi */
+}  // namespace keyvi
 
 #endif  // KEYVI_INDEX_INTERNAL_SEGMENT_H_

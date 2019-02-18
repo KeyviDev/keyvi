@@ -76,25 +76,28 @@ class Automata final {
  public:
   explicit Automata(const std::string& file_name,
                     loading_strategy_types loading_strategy = loading_strategy_types::lazy)
-      : Automata(file_name, loading_strategy, true) {}
+      : Automata(std::make_shared<DictionaryProperties>(DictionaryProperties::FromFile(file_name)), loading_strategy,
+                 true) {}
 
  private:
-  explicit Automata(const std::string& file_name, loading_strategy_types loading_strategy, const bool load_value_store)
-      : dictionary_properties_(DictionaryProperties::FromFile(file_name)) {
-    file_mapping_ = boost::interprocess::file_mapping(file_name.c_str(), boost::interprocess::read_only);
+  explicit Automata(const dictionary_properties_t& dictionary_properties, loading_strategy_types loading_strategy,
+                    const bool load_value_store)
+      : dictionary_properties_(dictionary_properties) {
+    file_mapping_ = boost::interprocess::file_mapping(dictionary_properties_->GetFileName().c_str(),
+                                                      boost::interprocess::read_only);
 
     const boost::interprocess::map_options_t map_options =
         internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
     TRACE("labels start offset: %d", dictionary_properties_.GetPersistenceOffset());
     labels_region_ = boost::interprocess::mapped_region(file_mapping_, boost::interprocess::read_only,
-                                                        dictionary_properties_.GetPersistenceOffset(),
-                                                        dictionary_properties_.GetSparseArraySize(), 0, map_options);
+                                                        dictionary_properties_->GetPersistenceOffset(),
+                                                        dictionary_properties_->GetSparseArraySize(), 0, map_options);
 
     TRACE("transitions start offset: %d", dictionary_properties_.GetTransitionsOffset());
     transitions_region_ = boost::interprocess::mapped_region(
-        file_mapping_, boost::interprocess::read_only, dictionary_properties_.GetTransitionsOffset(),
-        dictionary_properties_.GetTransitionsSize(), 0, map_options);
+        file_mapping_, boost::interprocess::read_only, dictionary_properties_->GetTransitionsOffset(),
+        dictionary_properties_->GetTransitionsSize(), 0, map_options);
 
     const auto advise = internal::MemoryMapFlags::FSAGetMemoryMapAdvices(loading_strategy);
 
@@ -106,8 +109,8 @@ class Automata final {
 
     if (load_value_store) {
       value_store_reader_.reset(
-          internal::ValueStoreFactory::MakeReader(dictionary_properties_.GetValueStoreType(), &file_mapping_,
-                                                  dictionary_properties_.GetValueStoreProperties(), loading_strategy));
+          internal::ValueStoreFactory::MakeReader(dictionary_properties_->GetValueStoreType(), &file_mapping_,
+                                                  dictionary_properties_->GetValueStoreProperties(), loading_strategy));
     }
   }
 
@@ -120,15 +123,15 @@ class Automata final {
    *
    * @return index of root state.
    */
-  uint64_t GetStartState() const { return dictionary_properties_.GetStartState(); }
+  uint64_t GetStartState() const { return dictionary_properties_->GetStartState(); }
 
-  uint64_t GetNumberOfKeys() const { return dictionary_properties_.GetNumberOfKeys(); }
+  uint64_t GetNumberOfKeys() const { return dictionary_properties_->GetNumberOfKeys(); }
 
   bool Empty() const { return 0 == GetNumberOfKeys(); }
 
-  size_t SparseArraySize() const { return dictionary_properties_.GetSparseArraySize(); }
+  size_t SparseArraySize() const { return dictionary_properties_->GetSparseArraySize(); }
 
-  internal::value_store_t GetValueStoreType() const { return dictionary_properties_.GetValueStoreType(); }
+  internal::value_store_t GetValueStoreType() const { return dictionary_properties_->GetValueStoreType(); }
 
   uint64_t TryWalkTransition(uint64_t starting_state, unsigned char c) const {
     if (labels_[starting_state + c] == c) {
@@ -378,12 +381,12 @@ class Automata final {
     return value_store_reader_->GetRawValueAsString(state_value);
   }
 
-  std::string GetStatistics() const { return dictionary_properties_.GetStatistics(); }
+  std::string GetStatistics() const { return dictionary_properties_->GetStatistics(); }
 
-  std::string GetManifest() const { return dictionary_properties_.GetManifest(); }
+  std::string GetManifest() const { return dictionary_properties_->GetManifest(); }
 
  private:
-  DictionaryProperties dictionary_properties_;
+  dictionary_properties_t dictionary_properties_;
   std::unique_ptr<internal::IValueStoreReader> value_store_reader_;
   boost::interprocess::file_mapping file_mapping_;
   boost::interprocess::mapped_region labels_region_;

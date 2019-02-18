@@ -29,7 +29,7 @@
 
 static const char INDEX_REFRESH_INTERVAL[] = "refresh_interval";
 static const char MERGE_POLICY[] = "merge_policy";
-static const char DEFAULT_MERGE_POLICY[] = "simple";
+static const char DEFAULT_MERGE_POLICY[] = "tiered";
 static const char KEYVIMERGER_BIN[] = "keyvimerger_bin";
 static const char INDEX_MAX_SEGMENTS[] = "max_segments";
 static const char SEGMENT_COMPILE_KEY_THRESHOLD[] = "segment_compile_key_threshold";

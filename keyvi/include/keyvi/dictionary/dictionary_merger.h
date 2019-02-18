@@ -141,7 +141,9 @@ class DictionaryMerger final {
 
     fsa::automata_t fsa;
     if (append_merge_) {
-      fsa.reset(new fsa::Automata(filename, loading_strategy_types::lazy, false));
+      // TODO(hendrik) https://github.com/KeyviDev/keyvi/issues/102
+      fsa.reset(new fsa::Automata(std::make_shared<DictionaryProperties>(DictionaryProperties::FromFile(filename)),
+                                  loading_strategy_types::lazy, false));
     } else {
       fsa.reset(new fsa::Automata(filename));
     }

@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <fstream>
+#include <memory>
 #include <string>
 
 #include <boost/lexical_cast.hpp>
@@ -300,6 +301,9 @@ class DictionaryProperties {
                                 value_store_properties, manifest);
   }
 };
+
+typedef std::shared_ptr<DictionaryProperties> dictionary_properties_t;
+
 }  // namespace dictionary
 }  // namespace keyvi
 

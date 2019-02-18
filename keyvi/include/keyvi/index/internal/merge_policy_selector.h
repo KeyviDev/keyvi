@@ -30,6 +30,7 @@
 
 #include "index/internal/merge_policy.h"
 #include "index/internal/simple_merge_policy.h"
+#include "index/internal/tiered_merge_policy.h"
 
 namespace keyvi {
 namespace index {
@@ -41,15 +42,17 @@ inline std::shared_ptr<MergePolicy> merge_policy(const std::string& name = "") {
   boost::algorithm::to_lower(lower_name);
   if (lower_name == "simple") {
     return std::make_shared<SimpleMergePolicy>();
+  } else if (lower_name == "tiered") {
+    return std::make_shared<TieredMergePolicy>();
   } else {
     throw std::invalid_argument(name + " is not a valid merge policy");
   }
-}
+}  // namespace internal
 
 typedef std::shared_ptr<MergePolicy> merge_policy_t;
 
-} /* namespace internal */
-} /* namespace index */
+}  // namespace internal
+}  // namespace index
 } /* namespace keyvi */
 
 #endif /* KEYVI_INDEX_INTERNAL_MERGE_POLICY_SELECTOR_H_ */

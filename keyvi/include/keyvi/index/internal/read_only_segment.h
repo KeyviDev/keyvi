@@ -51,6 +51,8 @@ class ReadOnlySegment {
  public:
   explicit ReadOnlySegment(const boost::filesystem::path& path)
       : dictionary_path_(path),
+        dictionary_properties_(std::make_shared<dictionary::DictionaryProperties>(
+            dictionary::DictionaryProperties::FromFile(path.string()))),
         deleted_keys_path_(path),
         deleted_keys_during_merge_path_(path),
         dictionary_filename_(path.filename().string()),
@@ -70,7 +72,16 @@ class ReadOnlySegment {
 
   dictionary::dictionary_t& GetDictionary() { return dictionary_; }
 
+  dictionary::dictionary_properties_t& GetDictionaryProperties() { return dictionary_properties_; }
+
   bool HasDeletedKeys() { return has_deleted_keys_; }
+
+  size_t DeletedKeysSize() {
+    if (has_deleted_keys_) {
+      return deleted_keys_->size();
+    }
+    return 0;
+  }
 
   const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
     if (!has_deleted_keys_) {
@@ -107,9 +118,35 @@ class ReadOnlySegment {
  protected:
   explicit ReadOnlySegment(const boost::filesystem::path& path, bool load_dictionary, bool load_deleted_keys)
       : dictionary_path_(path),
+        dictionary_properties_(std::make_shared<dictionary::DictionaryProperties>(
+            dictionary::DictionaryProperties::FromFile(path.string()))),
         deleted_keys_path_(path),
         deleted_keys_during_merge_path_(path),
         dictionary_filename_(path.filename().string()),
+        dictionary_(),
+        has_deleted_keys_(false),
+        deleted_keys_(),
+        last_modification_time_deleted_keys_(0),
+        last_modification_time_deleted_keys_during_merge_(0) {
+    deleted_keys_path_ += ".dk";
+    deleted_keys_during_merge_path_ += ".dkm";
+
+    if (load_dictionary) {
+      LoadDictionary();
+    }
+
+    if (load_deleted_keys) {
+      LoadDeletedKeys();
+    }
+  }
+
+  explicit ReadOnlySegment(const dictionary::dictionary_properties_t& dictionary_properties, bool load_dictionary,
+                           bool load_deleted_keys)
+      : dictionary_path_(dictionary_properties->GetFileName()),
+        dictionary_properties_(dictionary_properties),
+        deleted_keys_path_(dictionary_path_),
+        deleted_keys_during_merge_path_(dictionary_path_),
+        dictionary_filename_(dictionary_path_.filename().string()),
         dictionary_(),
         has_deleted_keys_(false),
         deleted_keys_(),
@@ -182,6 +219,9 @@ class ReadOnlySegment {
  private:
   //! path of the underlying dictionary
   boost::filesystem::path dictionary_path_;
+
+  //! the properties of the dictionary
+  dictionary::dictionary_properties_t dictionary_properties_;
 
   //! list of deleted keys
   boost::filesystem::path deleted_keys_path_;
