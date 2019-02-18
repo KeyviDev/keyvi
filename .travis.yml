@@ -88,7 +88,7 @@ install:
   - if [ "$DOCKER_IMAGE" != "" ]; then docker pull $DOCKER_IMAGE ; fi
 
 script:
-  - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm -v `pwd`:/io $DOCKER_IMAGE  /io/travis/build_linux.sh ; fi
+  - if [ "$BUILD_TYPE" == "linux" ]; then docker run --rm -v `pwd`:/io -e CONF $DOCKER_IMAGE  /io/travis/build_linux.sh ; fi
 
   - if [ "$BUILD_TYPE" == "python" ]; then
       docker run --rm -v `pwd`:/io -e CONF -e PYTHON_VERSION $DOCKER_IMAGE  /io/travis/build_python.sh ; fi
