@@ -40,6 +40,9 @@ namespace keyvi {
 namespace index {
 namespace internal {
 
+static const size_t TIERED_MERGE_MAX_SEGMENT_PER_MERGE = 20;
+static const size_t TIERED_MERGE_FLOOR_SEGMENT_KEY_SIZE = 10000;
+
 /*
  * Tiered merge policy, inspired by
  * https://github.com/apache/lucene-solr/blob/master/lucene/core/src/java/org/apache/lucene/index/TieredMergePolicy.java
@@ -73,7 +76,7 @@ class TieredMergePolicy final : public MergePolicy {
         candidate.push_back(current);
         totalSizeToMerge += current->GetDictionaryProperties()->GetNumberOfKeys();
 
-        if (candidate.size() == MAX_SEGMENT_PER_MERGE) {
+        if (candidate.size() == TIERED_MERGE_MAX_SEGMENT_PER_MERGE) {
           break;
         }
       }
@@ -105,9 +108,6 @@ class TieredMergePolicy final : public MergePolicy {
   }
 
  private:
-  static const size_t MAX_SEGMENT_PER_MERGE = 20;
-  static const size_t FLOOR_SEGMENT_KEY_SIZE = 10000;
-
   /*
    * Score a candidate vector, smaller means better
    */
@@ -122,7 +122,7 @@ class TieredMergePolicy final : public MergePolicy {
       size_t segment_key_size = segment->GetDictionaryProperties()->GetNumberOfKeys();
       total_size += segment_key_size;
       // floored sizes ensures a minimum size per segment to take fix costs of merging into account
-      size_t segment_key_size_floored = std::max(FLOOR_SEGMENT_KEY_SIZE, segment_key_size);
+      size_t segment_key_size_floored = std::max(TIERED_MERGE_FLOOR_SEGMENT_KEY_SIZE, segment_key_size);
       total_size_floored += segment_key_size_floored;
       total_deletes += segment->DeletedKeysSize();
       biggest_segment_key_size = std::max(biggest_segment_key_size, segment_key_size);
