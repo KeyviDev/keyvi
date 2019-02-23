@@ -53,6 +53,6 @@ typedef std::shared_ptr<MergePolicy> merge_policy_t;
 
 }  // namespace internal
 }  // namespace index
-} /* namespace keyvi */
+}  // namespace keyvi
 
-#endif /* KEYVI_INDEX_INTERNAL_MERGE_POLICY_SELECTOR_H_ */
+#endif  // KEYVI_INDEX_INTERNAL_MERGE_POLICY_SELECTOR_H_
