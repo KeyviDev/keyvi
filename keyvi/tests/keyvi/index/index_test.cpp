@@ -47,14 +47,15 @@ namespace keyvi {
 namespace index {
 BOOST_AUTO_TEST_SUITE(IndexTests)
 
-BOOST_AUTO_TEST_CASE(basic_writer) {
+// basic writer test, re-usable for testing different parameters
+void basic_writer_test(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path();
   {
-    Index writer(tmp_path.string(), {{KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+    Index writer(tmp_path.string(), params);
 
     writer.Set("a", "{\"id\":3}");
 
@@ -71,6 +72,14 @@ BOOST_AUTO_TEST_CASE(basic_writer) {
     BOOST_CHECK(writer.Contains("d"));
   }
   boost::filesystem::remove_all(tmp_path);
+}
+
+BOOST_AUTO_TEST_CASE(basic_writer_default) {
+  basic_writer_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+}
+
+BOOST_AUTO_TEST_CASE(basic_writer_simple_merge_policy) {
+  basic_writer_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}, {MERGE_POLICY, "simple"}});
 }
 
 BOOST_AUTO_TEST_CASE(bigger_feed) {
@@ -187,14 +196,14 @@ BOOST_AUTO_TEST_CASE(index_reopen_deleted_keys) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(index_delete_keys) {
+void index_with_deletes(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
   {
-    Index index(tmp_path.string(), {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+    Index index(tmp_path.string(), params);
 
     for (int i = 0; i < 100; ++i) {
       index.Set("a" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}");
@@ -246,6 +255,14 @@ BOOST_AUTO_TEST_CASE(index_delete_keys) {
   }
 
   boost::filesystem::remove_all(tmp_path);
+}
+
+BOOST_AUTO_TEST_CASE(index_delete_keys_defaults) {
+  index_with_deletes({{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+}
+
+BOOST_AUTO_TEST_CASE(index_delete_keys_simple_merge_policy) {
+  index_with_deletes({{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}, {MERGE_POLICY, "simple"}});
 }
 
 BOOST_AUTO_TEST_SUITE_END()
