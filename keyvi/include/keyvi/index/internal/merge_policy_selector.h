@@ -32,12 +32,17 @@
 #include "index/internal/simple_merge_policy.h"
 #include "index/internal/tiered_merge_policy.h"
 
+// #define ENABLE_TRACING
+#include "dictionary/util/trace.h"
+
 namespace keyvi {
 namespace index {
 namespace internal {
 
 inline std::shared_ptr<MergePolicy> merge_policy(const std::string& name = "") {
   auto lower_name = name;
+
+  TRACE("Merge Policy: %s", name.c_str());
 
   boost::algorithm::to_lower(lower_name);
   if (lower_name == "simple") {

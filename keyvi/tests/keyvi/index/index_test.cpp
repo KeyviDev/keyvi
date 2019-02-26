@@ -82,16 +82,14 @@ BOOST_AUTO_TEST_CASE(basic_writer_simple_merge_policy) {
   basic_writer_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}, {MERGE_POLICY, "simple"}});
 }
 
-BOOST_AUTO_TEST_CASE(bigger_feed) {
+void bigger_feed_test(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-test-temp-index-%%%%-%%%%-%%%%-%%%%");
   {
-    Index writer(
-        tmp_path.string(),
-        {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}, {"max_concurrent_merges", "2"}});
+    Index writer(tmp_path.string(), params);
 
     for (int i = 0; i < 10000; ++i) {
       writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
@@ -107,6 +105,19 @@ BOOST_AUTO_TEST_CASE(bigger_feed) {
     BOOST_CHECK_EQUAL("{\"id\":9999}", m.GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
+}
+
+BOOST_AUTO_TEST_CASE(bigger_feed) {
+  bigger_feed_test(
+      {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}, {"max_concurrent_merges", "2"}});
+}
+
+BOOST_AUTO_TEST_CASE(bigger_feed_simple_merge_policy) {
+  bigger_feed_test({{"refresh_interval", "100"},
+                    {KEYVIMERGER_BIN, get_keyvimerger_bin()},
+                    {"max_concurrent_merges", "2"},
+                    {KEYVIMERGER_BIN, get_keyvimerger_bin()},
+                    {MERGE_POLICY, "simple"}});
 }
 
 BOOST_AUTO_TEST_CASE(index_reopen) {
