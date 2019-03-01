@@ -152,8 +152,49 @@ BOOST_AUTO_TEST_CASE(segment_with_deletes) {
   BOOST_CHECK_EQUAL(100, selected_segments[0]->GetDictionaryProperties()->GetStartState());
 }
 
+BOOST_AUTO_TEST_CASE(adjacent_segment_mix) {
+  TieredMergePolicy tiered_merge_policy;
+
+  segments_t segments{std::make_shared<segment_vec_t>()};
+  std::vector<segment_t> selected_segments;
+  size_t id;
+
+  for (uint64_t i = 100; i < 120; ++i) {
+    segments->emplace_back(unit_test::SegmentFriend::CreateSegment(createDictionaryProperties(100000 + i, i)));
+  }
+
+  for (uint64_t i = 200; i < 220; ++i) {
+    segments->emplace_back(unit_test::SegmentFriend::CreateSegment(createDictionaryProperties(10000 + i, i)));
+  }
+
+  BOOST_CHECK(tiered_merge_policy.SelectMergeSegments(segments, &selected_segments, &id));
+  // expect that smaller 20 segments have been selected
+  BOOST_CHECK_EQUAL(20, selected_segments.size());
+  BOOST_CHECK_EQUAL(200, selected_segments[0]->GetDictionaryProperties()->GetStartState());
+
+  // mark some segments
+
+  for (uint64_t i = 24; i < 27; ++i) {
+    segments->operator[](i)->ElectedForMerge();
+  }
+
+  BOOST_CHECK(tiered_merge_policy.SelectMergeSegments(segments, &selected_segments, &id));
+  // expect that bigger 20 segments have been selected
+  BOOST_CHECK_EQUAL(20, selected_segments.size());
+  BOOST_CHECK_EQUAL(100, selected_segments[0]->GetDictionaryProperties()->GetStartState());
+
+  for (uint64_t i = 0; i < 20; ++i) {
+    segments->operator[](i)->ElectedForMerge();
+  }
+
+  BOOST_CHECK(tiered_merge_policy.SelectMergeSegments(segments, &selected_segments, &id));
+  // expect that smaller 13 segments have been selected
+  BOOST_CHECK_EQUAL(13, selected_segments.size());
+  BOOST_CHECK_EQUAL(207, selected_segments[0]->GetDictionaryProperties()->GetStartState());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
-} /* namespace internal */
-} /* namespace index */
-} /* namespace keyvi */
+}  // namespace internal
+}  // namespace index
+}  // namespace keyvi
