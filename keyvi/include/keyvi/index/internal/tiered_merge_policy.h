@@ -91,7 +91,7 @@ class TieredMergePolicy final : public MergePolicy {
         continue;
       }
 
-      double score = ScoreCandidate(candidate);
+      const double score = ScoreCandidate(candidate);
 
       if (best_score == -1 || score < best_score) {
         best_score = score;
@@ -119,16 +119,17 @@ class TieredMergePolicy final : public MergePolicy {
     size_t biggest_segment_key_size = 0;
 
     for (const segment_t segment : candidate) {
-      size_t segment_key_size = segment->GetDictionaryProperties()->GetNumberOfKeys();
+      const size_t segment_key_size = segment->GetDictionaryProperties()->GetNumberOfKeys();
       total_size += segment_key_size;
       // floored sizes ensures a minimum size per segment to take fix costs of merging into account
-      size_t segment_key_size_floored = std::max(TIERED_MERGE_FLOOR_SEGMENT_KEY_SIZE, segment_key_size);
+      const size_t segment_key_size_floored = std::max(TIERED_MERGE_FLOOR_SEGMENT_KEY_SIZE, segment_key_size);
       total_size_floored += segment_key_size_floored;
       total_deletes += segment->DeletedKeysSize();
       biggest_segment_key_size = std::max(biggest_segment_key_size, segment_key_size);
     }
-    double skew = static_cast<double>(biggest_segment_key_size) / total_size_floored;
-    double score = skew;
+
+    // calculate the skew
+    double score = static_cast<double>(biggest_segment_key_size) / total_size_floored;
 
     TRACE("skew: %.18g", total_size, candidate.size(), score);
 

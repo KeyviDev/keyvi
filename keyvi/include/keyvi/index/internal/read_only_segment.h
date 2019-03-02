@@ -76,7 +76,7 @@ class ReadOnlySegment {
 
   bool HasDeletedKeys() { return has_deleted_keys_; }
 
-  size_t DeletedKeysSize() {
+  size_t DeletedKeysSize() const {
     if (has_deleted_keys_) {
       return deleted_keys_->size();
     }
