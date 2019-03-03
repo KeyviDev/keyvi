@@ -41,7 +41,7 @@ class SimpleMergePolicy final : public MergePolicy {
     std::vector<segment_t> to_merge;
     for (segment_t& s : *segments) {
       if (!s->MarkedForMerge()) {
-        TRACE("Add to merge list %s", s->GetFilename().c_str());
+        TRACE("Add to merge list %s", s->GetDictionaryFilename().c_str());
         to_merge.push_back(s);
       }
 
