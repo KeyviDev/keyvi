@@ -113,6 +113,22 @@ BOOST_AUTO_TEST_CASE(GetBuffer) {
   boost::filesystem::remove_all(path);
 }
 
+BOOST_AUTO_TEST_CASE(GetBufferAndNumberOfChunks) {
+  size_t chunkSize = 1024;
+
+  boost::filesystem::path path = boost::filesystem::temp_directory_path();
+  path /= boost::filesystem::unique_path("dictionary-fsa-unittest-%%%%-%%%%-%%%%-%%%%");
+  boost::filesystem::create_directory(path);
+  MemoryMapManager m(chunkSize, path, "basic test");
+
+  char buf[8];
+  m.GetBuffer(10, buf, 8);
+
+  BOOST_CHECK_EQUAL(1, m.GetNumberOfChunks());
+
+  boost::filesystem::remove_all(path);
+}
+
 BOOST_AUTO_TEST_CASE(AppendLargeChunk) {
   size_t chunkSize = 4096;
 

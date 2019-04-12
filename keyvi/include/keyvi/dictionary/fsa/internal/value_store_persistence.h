@@ -118,10 +118,18 @@ struct RawPointerForCompare final {
     }
 
     // we do not know the length, first get it, then compare
-    char buf[8];
-    persistence_->GetBuffer(l.GetOffset(), buf, 8);
+    if (persistence_->GetAddressQuickTestOk(l.GetOffset(), 8)) {
+      length_l = keyvi::util::decodeVarint(reinterpret_cast<uint8_t*>(persistence_->GetAddress(l.GetOffset())));
+    } else {
+      char buf[8];
+      persistence_->GetBuffer(l.GetOffset(), buf, 8);
 
-    length_l = keyvi::util::decodeVarint(reinterpret_cast<uint8_t*>(buf));
+      length_l = keyvi::util::decodeVarint(reinterpret_cast<uint8_t*>(buf));
+    }
+
+    if (length_l != value_size_) {
+      return false;
+    }
 
     TRACE("check equality, 3rd buffer %d %d", l.GetOffset(), value_size_);
     return persistence_->Compare(l.GetOffset() + keyvi::util::getVarintLength(length_l),

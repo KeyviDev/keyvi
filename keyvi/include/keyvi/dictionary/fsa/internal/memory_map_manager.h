@@ -93,15 +93,17 @@ class MemoryMapManager final {
     size_t chunk_number = offset / chunk_size_;
     size_t chunk_offset = offset % chunk_size_;
 
-    void* chunk_address = GetChunk(chunk_number);
-    void* chunk_address_part2 = GetChunk(chunk_number + 1);
-
     size_t first_chunk_size = std::min(buffer_length, chunk_size_ - chunk_offset);
     size_t second_chunk_size = buffer_length - first_chunk_size;
 
+    void* chunk_address = GetChunk(chunk_number);
     std::memcpy(buffer, reinterpret_cast<char*>(chunk_address) + chunk_offset, first_chunk_size);
-    std::memcpy(reinterpret_cast<char*>(buffer) + first_chunk_size, reinterpret_cast<const char*>(chunk_address_part2),
-                second_chunk_size);
+
+    if (second_chunk_size > 0) {
+      void* chunk_address_part2 = GetChunk(chunk_number + 1);
+      std::memcpy(reinterpret_cast<char*>(buffer) + first_chunk_size,
+                  reinterpret_cast<const char*>(chunk_address_part2), second_chunk_size);
+    }
   }
 
   /**
@@ -230,6 +232,8 @@ class MemoryMapManager final {
   }
 
   size_t GetChunkSize() const { return chunk_size_; }
+
+  size_t GetNumberOfChunks() const { return number_of_chunks_; }
 
  private:
   struct mapping {
