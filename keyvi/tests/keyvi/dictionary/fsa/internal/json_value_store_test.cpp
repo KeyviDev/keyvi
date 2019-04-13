@@ -100,7 +100,6 @@ BOOST_AUTO_TEST_CASE(minimization_largevalue_small_memory) {
   BOOST_CHECK_EQUAL(w, values.AddValue("othervalue", &no_minimization));
 }
 
-
 BOOST_AUTO_TEST_CASE(minimization2) {
   JsonValueStore strings(keyvi::util::parameters_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
   bool no_minimization = false;
