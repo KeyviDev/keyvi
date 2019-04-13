@@ -54,22 +54,52 @@ BOOST_AUTO_TEST_CASE(minimization) {
   BOOST_CHECK_EQUAL(w, strings.AddValue("othervalue", &no_minimization));
 }
 
-BOOST_AUTO_TEST_CASE(minimization_longvalues) {
-  JsonValueStore strings(keyvi::util::parameters_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
+BOOST_AUTO_TEST_CASE(minimization_largevalues) {
+  JsonValueStore values(keyvi::util::parameters_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
   bool no_minimization = false;
+  // create a value that is longer than a ushort can store
   std::string value = "{\"";
-  value += std::string(60000, 'a');
+  value += std::string(70000, 'a');
   value += "\":42}";
 
-  uint32_t v = strings.AddValue(value, &no_minimization);
+  uint32_t v = values.AddValue(value, &no_minimization);
   BOOST_CHECK_EQUAL(v, 0);
-  uint32_t w = strings.AddValue("othervalue", &no_minimization);
+  uint32_t w = values.AddValue("othervalue", &no_minimization);
   BOOST_CHECK(v != w);
 
   BOOST_CHECK(w > 0);
-  BOOST_CHECK_EQUAL(v, strings.AddValue(value, &no_minimization));
-  BOOST_CHECK_EQUAL(w, strings.AddValue("othervalue", &no_minimization));
+  BOOST_CHECK_EQUAL(v, values.AddValue(value, &no_minimization));
+  BOOST_CHECK_EQUAL(w, values.AddValue("othervalue", &no_minimization));
 }
+
+BOOST_AUTO_TEST_CASE(minimization_largevalue_small_memory) {
+  // combination of small value store and large values, spawning more than 1 chunk
+  JsonValueStore values(keyvi::util::parameters_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit", "50000"}});
+  bool no_minimization = false;
+  // create a value that almost fills the 1st chunk
+  std::string padding_value = "{\"";
+  padding_value += std::string(49990, 'a');
+  padding_value += "\":33}";
+  values.AddValue(padding_value, &no_minimization);
+
+  std::string value = "{\"";
+  value += std::string(60000, 'a');
+  value += "\":42, ";
+  value += std::string(30000, 'b');
+  value += "\":99,";
+  value += std::string(4000, 'c');
+  value += "\":12}";
+
+  uint32_t v = values.AddValue(value, &no_minimization);
+  BOOST_CHECK_EQUAL(v, 49999);
+  uint32_t w = values.AddValue("othervalue", &no_minimization);
+  BOOST_CHECK(v != w);
+
+  BOOST_CHECK(w > 0);
+  BOOST_CHECK_EQUAL(v, values.AddValue(value, &no_minimization));
+  BOOST_CHECK_EQUAL(w, values.AddValue("othervalue", &no_minimization));
+}
+
 
 BOOST_AUTO_TEST_CASE(minimization2) {
   JsonValueStore strings(keyvi::util::parameters_t{{TEMPORARY_PATH_KEY, "/tmp"}, {"memory_limit_mb", "10"}});
