@@ -33,10 +33,10 @@
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/memory_map_manager.h"
-#include "dictionary/util/endian.h"
-#include "util/vint.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_manager.h"
+#include "keyvi/dictionary/util/endian.h"
+#include "keyvi/util/vint.h"
 
 // #define PERSISTENCE_DEBUG
 #ifdef PERSISTENCE_DEBUG
@@ -44,7 +44,7 @@
 #endif
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

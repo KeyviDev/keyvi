@@ -26,8 +26,8 @@
 #include <boost/make_shared.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "testing/temp_dictionary.h"
-#include "transform/fsa_transform.h"
+#include "keyvi/testing/temp_dictionary.h"
+#include "keyvi/transform/fsa_transform.h"
 
 namespace keyvi {
 namespace transform {

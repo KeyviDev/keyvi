@@ -25,10 +25,10 @@
 #ifndef KEYVI_DICTIONARY_FSA_TRAVERSER_TYPES_H_
 #define KEYVI_DICTIONARY_FSA_TRAVERSER_TYPES_H_
 
-#include "dictionary/fsa/state_traverser.h"
-#include "dictionary/fsa/traversal/bounded_weighted_traversal.h"
-#include "dictionary/fsa/traversal/near_traversal.h"
-#include "dictionary/fsa/traversal/weighted_traversal.h"
+#include "keyvi/dictionary/fsa/state_traverser.h"
+#include "keyvi/dictionary/fsa/traversal/bounded_weighted_traversal.h"
+#include "keyvi/dictionary/fsa/traversal/near_traversal.h"
+#include "keyvi/dictionary/fsa/traversal/weighted_traversal.h"
 
 namespace keyvi {
 namespace dictionary {

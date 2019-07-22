@@ -29,7 +29,7 @@
 #include <sstream>
 #include <string>
 
-#include "compression/compression_strategy.h"
+#include "keyvi/compression/compression_strategy.h"
 
 namespace keyvi {
 namespace compression {

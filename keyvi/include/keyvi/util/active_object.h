@@ -30,10 +30,10 @@
 #include <functional>
 #include <thread>  // NOLINT
 
-#include "util/single_producer_consumer_ringbuffer.h"
+#include "keyvi/util/single_producer_consumer_ringbuffer.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace util {

@@ -25,16 +25,16 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_SPARSE_ARRAY_BUILDER_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_SPARSE_ARRAY_BUILDER_H_
 
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/lru_generation_cache.h"
-#include "dictionary/fsa/internal/minimization_hash.h"
-#include "dictionary/fsa/internal/sliding_window_bit_vector_position_tracker.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/fsa/internal/unpacked_state.h"
-#include "util/vint.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/lru_generation_cache.h"
+#include "keyvi/dictionary/fsa/internal/minimization_hash.h"
+#include "keyvi/dictionary/fsa/internal/sliding_window_bit_vector_position_tracker.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/dictionary/fsa/internal/unpacked_state.h"
+#include "keyvi/util/vint.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

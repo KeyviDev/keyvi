@@ -28,11 +28,11 @@
 #include <string>
 #include <vector>
 
-#include "dictionary/fsa/internal/ivalue_store.h"
-#include "dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/dictionary/fsa/internal/ivalue_store.h"
+#include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

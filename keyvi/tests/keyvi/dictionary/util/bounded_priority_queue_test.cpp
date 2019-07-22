@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/util/bounded_priority_queue.h"
+#include "keyvi/dictionary/util/bounded_priority_queue.h"
 
 namespace keyvi {
 namespace dictionary {

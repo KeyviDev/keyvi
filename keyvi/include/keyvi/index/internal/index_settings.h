@@ -29,12 +29,12 @@
 
 #include <boost/variant.hpp>
 
-#include "index/constants.h"
-#include "index/internal/index_auto_config.h"
-#include "util/configuration.h"
+#include "keyvi/index/constants.h"
+#include "keyvi/index/internal/index_auto_config.h"
+#include "keyvi/util/configuration.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

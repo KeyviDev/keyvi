@@ -29,8 +29,8 @@
 
 #include <string>
 
-#include "dictionary/fsa/generator.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/fsa/generator.h"
+#include "keyvi/util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {

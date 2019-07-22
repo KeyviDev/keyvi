@@ -29,16 +29,16 @@
 #include <stdexcept>
 #include <string>
 
-#include "dictionary/dictionary_properties.h"
-#include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/fsa/internal/sparse_array_builder.h"
-#include "dictionary/fsa/internal/unpacked_state.h"
-#include "dictionary/fsa/internal/unpacked_state_stack.h"
-#include "util/configuration.h"
-#include "util/serialization_utils.h"
+#include "keyvi/dictionary/dictionary_properties.h"
+#include "keyvi/dictionary/fsa/internal/null_value_store.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_builder.h"
+#include "keyvi/dictionary/fsa/internal/unpacked_state.h"
+#include "keyvi/dictionary/fsa/internal/unpacked_state_stack.h"
+#include "keyvi/util/configuration.h"
+#include "keyvi/util/serialization_utils.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

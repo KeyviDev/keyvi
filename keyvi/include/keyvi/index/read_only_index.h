@@ -28,12 +28,12 @@
 
 #include <string>
 
-#include "index/internal/base_index_reader.h"
-#include "index/internal/index_reader_worker.h"
-#include "util/configuration.h"
+#include "keyvi/index/internal/base_index_reader.h"
+#include "keyvi/index/internal/index_reader_worker.h"
+#include "keyvi/util/configuration.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

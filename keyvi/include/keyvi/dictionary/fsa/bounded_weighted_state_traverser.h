@@ -31,11 +31,11 @@
 #include <utility>
 #include <vector>
 
-#include "dictionary/fsa/automata.h"
-#include "dictionary/util/bounded_priority_queue.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/util/bounded_priority_queue.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

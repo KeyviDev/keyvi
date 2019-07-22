@@ -21,11 +21,11 @@
 
 #include <vector>
 
-#include "index/internal/merge_policy.h"
-#include "index/internal/segment.h"
+#include "keyvi/index/internal/merge_policy.h"
+#include "keyvi/index/internal/segment.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

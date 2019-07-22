@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/util/transform.h"
+#include "keyvi/dictionary/util/transform.h"
 
 namespace keyvi {
 namespace dictionary {

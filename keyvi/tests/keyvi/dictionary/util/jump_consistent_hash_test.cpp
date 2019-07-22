@@ -26,7 +26,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/util/jump_consistent_hash.h"
+#include "keyvi/dictionary/util/jump_consistent_hash.h"
 
 namespace keyvi {
 namespace dictionary {

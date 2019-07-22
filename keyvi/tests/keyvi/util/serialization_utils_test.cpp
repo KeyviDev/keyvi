@@ -30,7 +30,7 @@
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 
-#include "util/serialization_utils.h"
+#include "keyvi/util/serialization_utils.h"
 
 namespace keyvi {
 namespace util {

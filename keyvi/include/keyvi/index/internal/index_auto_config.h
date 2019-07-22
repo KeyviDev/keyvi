@@ -29,13 +29,13 @@
 #include <thread>  // NOLINT
 #include <unordered_map>
 
-#include "index/constants.h"
+#include "keyvi/index/constants.h"
 
-#include "util/configuration.h"
-#include "util/os_utils.h"
+#include "keyvi/util/configuration.h"
+#include "keyvi/util/os_utils.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

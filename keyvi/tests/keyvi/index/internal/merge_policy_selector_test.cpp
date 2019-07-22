@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "index/internal/merge_policy_selector.h"
+#include "keyvi/index/internal/merge_policy_selector.h"
 
 namespace keyvi {
 namespace index {

@@ -31,18 +31,18 @@
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "dictionary/dictionary_properties.h"
-#include "dictionary/fsa/internal/ivalue_store.h"
-#include "dictionary/fsa/internal/lru_generation_cache.h"
-#include "dictionary/fsa/internal/memory_map_flags.h"
-#include "dictionary/fsa/internal/memory_map_manager.h"
-#include "dictionary/fsa/internal/minimization_hash.h"
-#include "dictionary/fsa/internal/value_store_persistence.h"
-#include "dictionary/fsa/internal/value_store_properties.h"
-#include "dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/dictionary/dictionary_properties.h"
+#include "keyvi/dictionary/fsa/internal/ivalue_store.h"
+#include "keyvi/dictionary/fsa/internal/lru_generation_cache.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_manager.h"
+#include "keyvi/dictionary/fsa/internal/minimization_hash.h"
+#include "keyvi/dictionary/fsa/internal/value_store_persistence.h"
+#include "keyvi/dictionary/fsa/internal/value_store_properties.h"
+#include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

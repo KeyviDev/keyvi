@@ -25,8 +25,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/bit_vector.h"
-#include "dictionary/fsa/internal/sliding_window_bit_vector_position_tracker.h"
+#include "keyvi/dictionary/fsa/internal/bit_vector.h"
+#include "keyvi/dictionary/fsa/internal/sliding_window_bit_vector_position_tracker.h"
 
 namespace keyvi {
 namespace dictionary {

@@ -32,7 +32,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
-#include "dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
 namespace util {

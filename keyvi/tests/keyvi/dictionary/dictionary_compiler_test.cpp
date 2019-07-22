@@ -25,16 +25,16 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/dictionary.h"
-#include "dictionary/dictionary_compiler.h"
-#include "dictionary/dictionary_types.h"
-#include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/entry_iterator.h"
-#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "dictionary/fsa/internal/int_value_store.h"
-#include "dictionary/fsa/internal/json_value_store.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/entry_iterator.h"
+#include "keyvi/dictionary/fsa/internal/int_inner_weights_value_store.h"
+#include "keyvi/dictionary/fsa/internal/int_value_store.h"
+#include "keyvi/dictionary/fsa/internal/json_value_store.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {

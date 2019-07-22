@@ -28,7 +28,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "vector/vector_types.h"
+#include "keyvi/vector/vector_types.h"
 
 namespace keyvi {
 namespace vector {

@@ -28,8 +28,8 @@
 #include <string>
 #include <vector>
 
-#include "dictionary/fsa/internal/ivalue_store.h"
-#include "dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/dictionary/fsa/internal/ivalue_store.h"
+#include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
 namespace keyvi {
 namespace dictionary {

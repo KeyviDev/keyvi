@@ -27,10 +27,10 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/dictionary_properties.h"
-#include "dictionary/dictionary_types.h"
-#include "index/internal/segment.h"
-#include "index/internal/tiered_merge_policy.h"
+#include "keyvi/dictionary/dictionary_properties.h"
+#include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/index/internal/segment.h"
+#include "keyvi/index/internal/tiered_merge_policy.h"
 
 namespace keyvi {
 namespace index {

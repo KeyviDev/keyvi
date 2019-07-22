@@ -29,10 +29,10 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/util/endian.h"
-#include "util/configuration.h"
-#include "vector/vector_file.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/util/endian.h"
+#include "keyvi/util/configuration.h"
+#include "keyvi/vector/vector_file.h"
 
 namespace keyvi {
 namespace vector {

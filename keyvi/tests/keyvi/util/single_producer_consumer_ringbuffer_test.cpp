@@ -29,7 +29,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "util/single_producer_consumer_ringbuffer.h"
+#include "keyvi/util/single_producer_consumer_ringbuffer.h"
 
 namespace keyvi {
 namespace util {

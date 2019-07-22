@@ -27,8 +27,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
 
-#include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/entry_iterator.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/entry_iterator.h"
 
 void dump(const std::string& input, const std::string& output, bool keys_only = false) {
   keyvi::dictionary::fsa::automata_t automata(new keyvi::dictionary::fsa::Automata(input.c_str()));

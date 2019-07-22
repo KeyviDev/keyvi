@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/packed_state.h"
+#include "keyvi/dictionary/fsa/internal/packed_state.h"
 
 namespace keyvi {
 namespace dictionary {

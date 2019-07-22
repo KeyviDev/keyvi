@@ -25,8 +25,8 @@
 #ifndef KEYVI_VECTOR_TYPES_H_
 #define KEYVI_VECTOR_TYPES_H_
 
-#include "dictionary/fsa/internal/memory_map_manager.h"
-#include "dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_manager.h"
+#include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
 namespace keyvi {
 namespace vector {

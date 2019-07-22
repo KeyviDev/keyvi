@@ -29,8 +29,8 @@
 #include <string>
 #include <vector>
 
-#include "dictionary/match.h"
-#include "index/internal/read_only_segment.h"
+#include "keyvi/dictionary/match.h"
+#include "keyvi/index/internal/read_only_segment.h"
 
 namespace keyvi {
 namespace index {

@@ -25,10 +25,10 @@
 #include <cstring>
 #include <iostream>
 
-#include "c_api/c_api.h"
-#include "dictionary/completion/multiword_completion.h"
-#include "dictionary/completion/prefix_completion.h"
-#include "dictionary/dictionary.h"
+#include "keyvi/c_api/c_api.h"
+#include "keyvi/dictionary/completion/multiword_completion.h"
+#include "keyvi/dictionary/completion/prefix_completion.h"
+#include "keyvi/dictionary/dictionary.h"
 
 using keyvi::dictionary::Dictionary;
 using keyvi::dictionary::Match;

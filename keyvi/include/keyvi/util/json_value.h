@@ -35,11 +35,11 @@
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
 #include "msgpack/type/rapidjson.hpp"
 
-#include "compression/compression_selector.h"
-#include "util/msgpack_util.h"
+#include "keyvi/compression/compression_selector.h"
+#include "keyvi/util/msgpack_util.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace util {

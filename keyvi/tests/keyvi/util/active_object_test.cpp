@@ -29,7 +29,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "util/active_object.h"
+#include "keyvi/util/active_object.h"
 
 namespace keyvi {
 namespace util {

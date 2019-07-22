@@ -47,18 +47,18 @@
 #include "rapidjson/ostreamwrapper.h"
 #include "rapidjson/writer.h"
 
-#include "dictionary/dictionary_compiler.h"
-#include "dictionary/dictionary_types.h"
-#include "index/constants.h"
-#include "index/internal/index_settings.h"
-#include "index/internal/merge_job.h"
-#include "index/internal/merge_policy_selector.h"
-#include "index/internal/segment.h"
-#include "util/active_object.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/index/constants.h"
+#include "keyvi/index/internal/index_settings.h"
+#include "keyvi/index/internal/merge_job.h"
+#include "keyvi/index/internal/merge_policy_selector.h"
+#include "keyvi/index/internal/segment.h"
+#include "keyvi/util/active_object.h"
+#include "keyvi/util/configuration.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

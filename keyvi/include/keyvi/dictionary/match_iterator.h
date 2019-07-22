@@ -27,11 +27,11 @@
 
 #include <boost/iterator/iterator_facade.hpp>
 
-#include "dictionary/match.h"
-#include "dictionary/util/iterator_utils.h"
+#include "keyvi/dictionary/match.h"
+#include "keyvi/dictionary/util/iterator_utils.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

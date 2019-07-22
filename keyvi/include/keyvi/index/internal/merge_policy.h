@@ -22,7 +22,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "index/internal/segment.h"
+#include "keyvi/index/internal/segment.h"
 
 namespace keyvi {
 namespace index {

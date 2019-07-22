@@ -28,7 +28,7 @@
 
 #include "utf8.h"
 
-#include "stringdistance/levenshtein.h"
+#include "keyvi/stringdistance/levenshtein.h"
 
 namespace keyvi {
 namespace stringdistance {

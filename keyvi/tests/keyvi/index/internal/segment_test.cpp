@@ -23,8 +23,8 @@
 
 #include <msgpack.hpp>
 
-#include "index/internal/segment.h"
-#include "testing/temp_dictionary.h"
+#include "keyvi/index/internal/segment.h"
+#include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace index {

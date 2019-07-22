@@ -27,7 +27,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/bit_vector.h"
+#include "keyvi/dictionary/fsa/internal/bit_vector.h"
 
 namespace keyvi {
 namespace dictionary {

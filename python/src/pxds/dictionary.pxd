@@ -8,7 +8,7 @@ from libcpp cimport bool
 from match cimport Match
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
 
-cdef extern from "dictionary/dictionary.h" namespace "keyvi::dictionary":
+cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
     ctypedef enum loading_strategy_types:
         default_os, # no special treatment, use whatever the OS/Boost has as default
         lazy, # load data as needed with some read-ahead

@@ -32,11 +32,11 @@
 #include <string>
 #include <vector>
 
-#include "stringdistance/distance_matrix.h"
+#include "keyvi/stringdistance/distance_matrix.h"
 #include "utf8.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace stringdistance {

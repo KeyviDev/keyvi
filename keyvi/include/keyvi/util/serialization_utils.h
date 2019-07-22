@@ -35,7 +35,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "dictionary/util/endian.h"
+#include "keyvi/dictionary/util/endian.h"
 
 namespace keyvi {
 namespace util {

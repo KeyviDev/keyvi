@@ -32,7 +32,7 @@
 
 #include <boost/filesystem.hpp>
 
-#include "testing/compilation_utils.h"
+#include "keyvi/testing/compilation_utils.h"
 
 namespace keyvi {
 namespace testing {

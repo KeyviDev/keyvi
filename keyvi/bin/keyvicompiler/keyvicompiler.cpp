@@ -36,9 +36,9 @@
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/iterator_range.hpp>
 
-#include "dictionary/dictionary_compiler.h"
-#include "dictionary/dictionary_types.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/util/configuration.h"
 
 void callback(size_t added, size_t overall, void*) {
   std::cout << "Processed " << added << "/" << overall << "(" << ((100 * added) / overall) << "%)." << std::endl;

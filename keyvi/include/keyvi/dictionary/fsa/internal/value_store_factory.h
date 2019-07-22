@@ -25,14 +25,14 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_FACTORY_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_FACTORY_H_
 
-#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "dictionary/fsa/internal/int_value_store.h"
-#include "dictionary/fsa/internal/ivalue_store.h"
-#include "dictionary/fsa/internal/json_value_store.h"
-#include "dictionary/fsa/internal/memory_map_flags.h"
-#include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/fsa/internal/string_value_store.h"
-#include "dictionary/fsa/internal/value_store_properties.h"
+#include "keyvi/dictionary/fsa/internal/int_inner_weights_value_store.h"
+#include "keyvi/dictionary/fsa/internal/int_value_store.h"
+#include "keyvi/dictionary/fsa/internal/ivalue_store.h"
+#include "keyvi/dictionary/fsa/internal/json_value_store.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
+#include "keyvi/dictionary/fsa/internal/null_value_store.h"
+#include "keyvi/dictionary/fsa/internal/string_value_store.h"
+#include "keyvi/dictionary/fsa/internal/value_store_properties.h"
 
 namespace keyvi {
 namespace dictionary {

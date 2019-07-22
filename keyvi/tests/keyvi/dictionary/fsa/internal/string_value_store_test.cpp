@@ -26,8 +26,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/string_value_store.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/fsa/internal/string_value_store.h"
+#include "keyvi/util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {

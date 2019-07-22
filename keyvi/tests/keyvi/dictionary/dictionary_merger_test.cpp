@@ -27,12 +27,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/dictionary.h"
-#include "dictionary/dictionary_merger.h"
-#include "dictionary/dictionary_types.h"
-#include "dictionary/fsa/traverser_types.h"
-#include "testing/temp_dictionary.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/dictionary_merger.h"
+#include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
+#include "keyvi/testing/temp_dictionary.h"
+#include "keyvi/util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {

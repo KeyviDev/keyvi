@@ -29,11 +29,11 @@
 
 #include <msgpack.hpp>
 
-#include "dictionary/dictionary.h"
-#include "index/internal/read_only_segment.h"
+#include "keyvi/dictionary/dictionary.h"
+#include "keyvi/index/internal/read_only_segment.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

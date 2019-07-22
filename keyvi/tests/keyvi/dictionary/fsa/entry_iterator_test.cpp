@@ -25,8 +25,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/entry_iterator.h"
-#include "testing/temp_dictionary.h"
+#include "keyvi/dictionary/fsa/entry_iterator.h"
+#include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {

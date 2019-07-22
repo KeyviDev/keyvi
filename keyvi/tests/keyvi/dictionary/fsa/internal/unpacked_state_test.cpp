@@ -26,8 +26,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/fsa/internal/unpacked_state.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/dictionary/fsa/internal/unpacked_state.h"
 
 namespace keyvi {
 namespace dictionary {

@@ -31,12 +31,12 @@
 
 #include "utf8.h"
 
-#include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/codepoint_state_traverser.h"
-#include "dictionary/fsa/traverser_types.h"
-#include "dictionary/match.h"
-#include "dictionary/util/utf8_utils.h"
-#include "stringdistance/levenshtein.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/codepoint_state_traverser.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
+#include "keyvi/dictionary/match.h"
+#include "keyvi/dictionary/util/utf8_utils.h"
+#include "keyvi/stringdistance/levenshtein.h"
 
 namespace keyvi {
 namespace dictionary {
