@@ -28,8 +28,8 @@
 #define KEYVI_DICTIONARY_FSA_GENERATOR_ADAPTER_H_
 
 #include <memory>
-#include <utility>
 #include <string>
+#include <utility>
 
 #include "keyvi/dictionary/fsa/generator.h"
 #include "keyvi/util/configuration.h"

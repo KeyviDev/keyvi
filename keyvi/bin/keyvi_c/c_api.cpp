@@ -31,11 +31,11 @@
 #include "keyvi/dictionary/dictionary.h"
 
 using keyvi::dictionary::Dictionary;
+using keyvi::dictionary::dictionary_t;
 using keyvi::dictionary::Match;
 using keyvi::dictionary::MatchIterator;
 using keyvi::dictionary::completion::MultiWordCompletion;
 using keyvi::dictionary::completion::PrefixCompletion;
-using keyvi::dictionary::dictionary_t;
 
 namespace {
 char* std_2_c_string(const std::string& str) {
