@@ -30,6 +30,7 @@
 #include <condition_variable>  //NOLINT
 #include <mutex>               //NOLINT
 #include <thread>              //NOLINT
+#include <utility>
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"

@@ -25,7 +25,9 @@
 #ifndef KEYVI_DICTIONARY_COMPLETION_MULTIWORD_COMPLETION_H_
 #define KEYVI_DICTIONARY_COMPLETION_MULTIWORD_COMPLETION_H_
 
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/dictionary.h"

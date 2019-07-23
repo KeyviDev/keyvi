@@ -26,7 +26,9 @@
 #define KEYVI_DICTIONARY_COMPLETION_PREFIX_COMPLETION_H_
 
 #include <algorithm>
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/dictionary.h"

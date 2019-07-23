@@ -25,6 +25,8 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_UNPACKED_STATE_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_UNPACKED_STATE_H_
 
+#include <utility>
+
 #include "keyvi/dictionary/fsa/internal/bit_vector.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/packed_state.h"

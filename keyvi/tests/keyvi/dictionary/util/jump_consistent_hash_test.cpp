@@ -23,7 +23,6 @@
  *      Author: hendrik
  */
 
-
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/util/jump_consistent_hash.h"
@@ -32,18 +31,14 @@ namespace keyvi {
 namespace dictionary {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE( JCHTests )
+BOOST_AUTO_TEST_SUITE(JCHTests)
 
-BOOST_AUTO_TEST_CASE( JCHHashTest ) {
+BOOST_AUTO_TEST_CASE(JCHHashTest) {
   BOOST_CHECK_EQUAL(3, JumpConsistentHashString("test", 10));
 }
-
 
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace util */
 } /* namespace dictionary */
 } /* namespace keyvi */
-
-
-

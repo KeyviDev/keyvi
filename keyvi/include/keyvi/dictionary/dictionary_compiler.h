@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <utility>
 
 #include "keyvi/dictionary/fsa/generator_adapter.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"

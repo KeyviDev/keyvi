@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_FSA_CODEPOINT_STATE_TRAVERSER_H_
 #define KEYVI_DICTIONARY_FSA_CODEPOINT_STATE_TRAVERSER_H_
 
+#include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/fsa/automata.h"

@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_MATCHING_FUZZY_MATCHING_H_
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 

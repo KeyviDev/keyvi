@@ -26,6 +26,7 @@
 #ifndef KEYVI_INDEX_INTERNAL_BASE_INDEX_READER_H_
 #define KEYVI_INDEX_INTERNAL_BASE_INDEX_READER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 

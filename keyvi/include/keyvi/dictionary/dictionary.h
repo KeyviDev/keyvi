@@ -25,8 +25,10 @@
 #ifndef KEYVI_DICTIONARY_DICTIONARY_H_
 #define KEYVI_DICTIONARY_DICTIONARY_H_
 
+#include <memory>
 #include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/fsa/automata.h"

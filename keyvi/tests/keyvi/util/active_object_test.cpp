@@ -36,7 +36,9 @@ namespace util {
 
 BOOST_AUTO_TEST_SUITE(ActiveObjectTests)
 
-void ScheduledTask(size_t* calls) { ++*calls; }
+void ScheduledTask(size_t* calls) {
+  ++*calls;
+}
 
 BOOST_AUTO_TEST_CASE(scheduledtasktimingemptyqueue) {
   std::ostringstream string_stream;

@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_
 
+#include <memory>
 #include <string>
 
 #include <boost/container/flat_map.hpp>

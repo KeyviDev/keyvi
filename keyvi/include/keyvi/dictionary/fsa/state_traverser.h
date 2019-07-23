@@ -25,6 +25,8 @@
 #ifndef KEYVI_DICTIONARY_FSA_STATE_TRAVERSER_H_
 #define KEYVI_DICTIONARY_FSA_STATE_TRAVERSER_H_
 
+#include <utility>
+
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/traversal/traversal_base.h"
 

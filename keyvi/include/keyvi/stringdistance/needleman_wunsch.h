@@ -30,6 +30,7 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "keyvi/stringdistance/distance_matrix.h"

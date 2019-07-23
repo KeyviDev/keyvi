@@ -27,6 +27,8 @@
 #ifndef KEYVI_DICTIONARY_FSA_GENERATOR_ADAPTER_H_
 #define KEYVI_DICTIONARY_FSA_GENERATOR_ADAPTER_H_
 
+#include <memory>
+#include <utility>
 #include <string>
 
 #include "keyvi/dictionary/fsa/generator.h"

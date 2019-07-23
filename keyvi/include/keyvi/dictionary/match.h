@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_MATCH_H_
 #define KEYVI_DICTIONARY_MATCH_H_
 
+#include <memory>
 #include <string>
 
 #include <boost/container/flat_map.hpp>

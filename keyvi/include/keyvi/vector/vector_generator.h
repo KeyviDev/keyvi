@@ -25,6 +25,7 @@
 #ifndef KEYVI_VECTOR_VECTOR_GENERATOR_H_
 #define KEYVI_VECTOR_VECTOR_GENERATOR_H_
 
+#include <memory>
 #include <string>
 
 #include <boost/filesystem/path.hpp>
