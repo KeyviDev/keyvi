@@ -27,7 +27,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "util/configuration.h"
+#include "keyvi/util/configuration.h"
 
 namespace keyvi {
 namespace util {

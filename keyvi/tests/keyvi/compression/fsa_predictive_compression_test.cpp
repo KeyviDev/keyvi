@@ -28,7 +28,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "compression/predictive_compression.h"
+#include "keyvi/compression/predictive_compression.h"
 
 namespace keyvi {
 namespace compression {

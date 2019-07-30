@@ -34,17 +34,17 @@
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
-#include "dictionary/dictionary_merger_fwd.h"
-#include "dictionary/dictionary_properties.h"
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/intrinsics.h"
-#include "dictionary/fsa/internal/memory_map_flags.h"
-#include "dictionary/fsa/internal/value_store_factory.h"
-#include "dictionary/fsa/traversal/traversal_base.h"
-#include "dictionary/fsa/traversal/weighted_traversal.h"
+#include "keyvi/dictionary/dictionary_merger_fwd.h"
+#include "keyvi/dictionary/dictionary_properties.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/intrinsics.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
+#include "keyvi/dictionary/fsa/internal/value_store_factory.h"
+#include "keyvi/dictionary/fsa/traversal/traversal_base.h"
+#include "keyvi/dictionary/fsa/traversal/weighted_traversal.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

@@ -25,9 +25,9 @@
 #ifndef KEYVI_VECTOR_VECTOR_TYPES_H_
 #define KEYVI_VECTOR_VECTOR_TYPES_H_
 
-#include "vector/types.h"
-#include "vector/vector.h"
-#include "vector/vector_generator.h"
+#include "keyvi/vector/types.h"
+#include "keyvi/vector/vector.h"
+#include "keyvi/vector/vector_generator.h"
 
 namespace keyvi {
 namespace vector {

@@ -30,16 +30,16 @@
 #include <boost/filesystem.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
-#include "dictionary/fsa/generator.h"
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/sort/sorter_common.h"
-#include "dictionary/sort/tpie_initializer.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/fsa/generator.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/sort/sorter_common.h"
+#include "keyvi/dictionary/sort/tpie_initializer.h"
+#include "keyvi/util/configuration.h"
 
 #include "tpie/serialization_sorter.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

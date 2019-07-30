@@ -25,9 +25,9 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/codepoint_state_traverser.h"
-#include "dictionary/fsa/state_traverser.h"
-#include "testing/temp_dictionary.h"
+#include "keyvi/dictionary/fsa/codepoint_state_traverser.h"
+#include "keyvi/dictionary/fsa/state_traverser.h"
+#include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {

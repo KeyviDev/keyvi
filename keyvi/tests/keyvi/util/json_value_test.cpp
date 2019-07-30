@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "util/json_value.h"
+#include "keyvi/util/json_value.h"
 
 namespace keyvi {
 namespace util {

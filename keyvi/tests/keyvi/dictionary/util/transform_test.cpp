@@ -25,21 +25,22 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/util/transform.h"
+#include "keyvi/dictionary/util/transform.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE( TransformTests )
+BOOST_AUTO_TEST_SUITE(TransformTests)
 
-BOOST_AUTO_TEST_CASE( BagOfWordsPartialTest ) {
+BOOST_AUTO_TEST_CASE(BagOfWordsPartialTest) {
   size_t number_of_tokens;
 
   BOOST_CHECK_EQUAL("angela dr merkel leb", Transform::BagOfWordsPartial("dr angela merkel leb", number_of_tokens));
   BOOST_CHECK_EQUAL(4, number_of_tokens);
 
-  BOOST_CHECK_EQUAL("angela lebenslauf merkel d", Transform::BagOfWordsPartial("angela merkel lebenslauf d", number_of_tokens));
+  BOOST_CHECK_EQUAL("angela lebenslauf merkel d",
+                    Transform::BagOfWordsPartial("angela merkel lebenslauf d", number_of_tokens));
   BOOST_CHECK_EQUAL(4, number_of_tokens);
 
   BOOST_CHECK_EQUAL("download facebook m", Transform::BagOfWordsPartial("download facebook m", number_of_tokens));
@@ -55,10 +56,8 @@ BOOST_AUTO_TEST_CASE( BagOfWordsPartialTest ) {
   BOOST_CHECK_EQUAL(2, number_of_tokens);
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace util */
 } /* namespace dictionary */
 } /* namespace keyvi */
-

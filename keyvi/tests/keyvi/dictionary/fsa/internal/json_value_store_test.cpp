@@ -27,10 +27,10 @@
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/json_value_store.h"
-#include "dictionary/fsa/internal/value_store_properties.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/json_value_store.h"
+#include "keyvi/dictionary/fsa/internal/value_store_properties.h"
+#include "keyvi/util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {

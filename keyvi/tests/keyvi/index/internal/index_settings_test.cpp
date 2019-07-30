@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "index/internal/index_settings.h"
+#include "keyvi/index/internal/index_settings.h"
 
 namespace keyvi {
 namespace index {

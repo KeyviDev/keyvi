@@ -34,10 +34,10 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "dictionary/fsa/internal/value_store_factory.h"
-#include "dictionary/fsa/internal/value_store_properties.h"
-#include "util/serialization_utils.h"
-#include "vector/types.h"
+#include "keyvi/dictionary/fsa/internal/value_store_factory.h"
+#include "keyvi/dictionary/fsa/internal/value_store_properties.h"
+#include "keyvi/util/serialization_utils.h"
+#include "keyvi/vector/types.h"
 
 static const char KEYVI_VECTOR_BEGIN[] = "KEYVI_VECTOR_BEGIN";
 static const size_t KEYVI_VECTOR_BEGIN_LEN = 18;

@@ -27,7 +27,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/memory_map_manager.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_manager.h"
 
 namespace keyvi {
 namespace dictionary {

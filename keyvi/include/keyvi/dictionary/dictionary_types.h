@@ -25,15 +25,15 @@
 #ifndef KEYVI_DICTIONARY_DICTIONARY_TYPES_H_
 #define KEYVI_DICTIONARY_DICTIONARY_TYPES_H_
 
-#include "dictionary/dictionary_compiler.h"
-#include "dictionary/dictionary_merger.h"
-#include "dictionary/fsa/generator.h"
-#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "dictionary/fsa/internal/int_value_store.h"
-#include "dictionary/fsa/internal/ivalue_store.h"
-#include "dictionary/fsa/internal/json_value_store.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/fsa/internal/string_value_store.h"
+#include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_merger.h"
+#include "keyvi/dictionary/fsa/generator.h"
+#include "keyvi/dictionary/fsa/internal/int_inner_weights_value_store.h"
+#include "keyvi/dictionary/fsa/internal/int_value_store.h"
+#include "keyvi/dictionary/fsa/internal/ivalue_store.h"
+#include "keyvi/dictionary/fsa/internal/json_value_store.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/dictionary/fsa/internal/string_value_store.h"
 
 namespace keyvi {
 namespace dictionary {

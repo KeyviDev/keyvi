@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/lru_generation_cache.h"
+#include "keyvi/dictionary/fsa/internal/lru_generation_cache.h"
 
 namespace keyvi {
 namespace dictionary {

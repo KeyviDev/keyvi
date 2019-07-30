@@ -27,10 +27,10 @@
 
 #include <vector>
 
-#include "dictionary/fsa/internal/unpacked_state.h"
+#include "keyvi/dictionary/fsa/internal/unpacked_state.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

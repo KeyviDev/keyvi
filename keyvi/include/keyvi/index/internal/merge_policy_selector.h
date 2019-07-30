@@ -28,12 +28,12 @@
 #include <memory>
 #include <string>
 
-#include "index/internal/merge_policy.h"
-#include "index/internal/simple_merge_policy.h"
-#include "index/internal/tiered_merge_policy.h"
+#include "keyvi/index/internal/merge_policy.h"
+#include "keyvi/index/internal/simple_merge_policy.h"
+#include "keyvi/index/internal/tiered_merge_policy.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

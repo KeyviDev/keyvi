@@ -25,13 +25,14 @@
 #ifndef KEYVI_DICTIONARY_FSA_CODEPOINT_STATE_TRAVERSER_H_
 #define KEYVI_DICTIONARY_FSA_CODEPOINT_STATE_TRAVERSER_H_
 
+#include <utility>
 #include <vector>
 
-#include "dictionary/fsa/automata.h"
-#include "dictionary/util/utf8_utils.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/util/utf8_utils.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

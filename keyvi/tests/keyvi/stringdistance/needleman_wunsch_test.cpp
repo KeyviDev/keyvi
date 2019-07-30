@@ -29,8 +29,8 @@
 
 #include "utf8.h"
 
-#include "stringdistance/costfunctions/damerau_levenshtein.h"
-#include "stringdistance/needleman_wunsch.h"
+#include "keyvi/stringdistance/costfunctions/damerau_levenshtein.h"
+#include "keyvi/stringdistance/needleman_wunsch.h"
 
 namespace keyvi {
 namespace stringdistance {

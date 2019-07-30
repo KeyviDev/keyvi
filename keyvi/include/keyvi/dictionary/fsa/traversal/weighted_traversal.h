@@ -28,10 +28,10 @@
 #include <algorithm>
 #include <cstdint>
 
-#include "dictionary/fsa/traversal/traversal_base.h"
+#include "keyvi/dictionary/fsa/traversal/traversal_base.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

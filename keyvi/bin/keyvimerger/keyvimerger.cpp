@@ -30,8 +30,8 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/program_options.hpp>
 
-#include "dictionary/dictionary_types.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/util/configuration.h"
 
 /** Extracts the parameters. */
 keyvi::util::parameters_t extract_parameters(const boost::program_options::variables_map& vm) {

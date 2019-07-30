@@ -28,11 +28,11 @@
 #include <algorithm>
 #include <vector>
 
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/sort/sorter_common.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/sort/sorter_common.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

@@ -25,19 +25,21 @@
 #ifndef KEYVI_DICTIONARY_DICTIONARY_H_
 #define KEYVI_DICTIONARY_DICTIONARY_H_
 
+#include <memory>
 #include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/state_traverser.h"
-#include "dictionary/fsa/traverser_types.h"
-#include "dictionary/match.h"
-#include "dictionary/match_iterator.h"
-#include "dictionary/matching/fuzzy_matching.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/state_traverser.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
+#include "keyvi/dictionary/match.h"
+#include "keyvi/dictionary/match_iterator.h"
+#include "keyvi/dictionary/matching/fuzzy_matching.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

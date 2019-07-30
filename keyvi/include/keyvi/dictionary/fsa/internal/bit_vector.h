@@ -28,9 +28,10 @@
 #include <algorithm>
 #include <array>
 #include <limits>
+#include <utility>
 
 #if defined(__GNUC__) || defined(__GNUG__)
-#include "dictionary/fsa/internal/bit_vector_64.h"
+#include "keyvi/dictionary/fsa/internal/bit_vector_64.h"
 #else
 
 namespace keyvi {

@@ -26,11 +26,12 @@
 #ifndef KEYVI_INDEX_INTERNAL_BASE_INDEX_READER_H_
 #define KEYVI_INDEX_INTERNAL_BASE_INDEX_READER_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "dictionary/match.h"
-#include "index/internal/read_only_segment.h"
+#include "keyvi/dictionary/match.h"
+#include "keyvi/index/internal/read_only_segment.h"
 
 namespace keyvi {
 namespace index {

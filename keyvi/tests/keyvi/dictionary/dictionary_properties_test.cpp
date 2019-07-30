@@ -21,8 +21,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/dictionary_properties.h"
-#include "dictionary/dictionary_types.h"
+#include "keyvi/dictionary/dictionary_properties.h"
+#include "keyvi/dictionary/dictionary_types.h"
 
 namespace keyvi {
 namespace dictionary {

@@ -26,7 +26,7 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/memory_map_flags.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
 
 namespace keyvi {
 namespace dictionary {

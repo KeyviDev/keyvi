@@ -26,12 +26,12 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/dictionary.h"
-#include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/generator.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "testing/temp_dictionary.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/generator.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/testing/temp_dictionary.h"
+#include "keyvi/util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {

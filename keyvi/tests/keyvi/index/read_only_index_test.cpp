@@ -28,8 +28,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "index/read_only_index.h"
-#include "testing/index_mock.h"
+#include "keyvi/index/read_only_index.h"
+#include "keyvi/testing/index_mock.h"
 
 namespace keyvi {
 namespace index {

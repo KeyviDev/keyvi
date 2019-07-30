@@ -22,15 +22,16 @@
  *      Author: hendrik
  */
 
-#ifndef BOUNDED_PRIORITY_QUEUE_H_
-#define BOUNDED_PRIORITY_QUEUE_H_
+#ifndef KEYVI_DICTIONARY_UTIL_BOUNDED_PRIORITY_QUEUE_H_
+#define KEYVI_DICTIONARY_UTIL_BOUNDED_PRIORITY_QUEUE_H_
 
+#include <algorithm>
+#include <functional>
 #include <queue>
 #include <stdexcept>
-#include <algorithm>
 
-//#define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+// #define ENABLE_TRACING
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -40,11 +41,9 @@ namespace util {
  * Bounded priority queue: a fixed size priority queue to hold the n best items.
  */
 
-template<typename T>
+template <typename T>
 struct BoundedPriorityQueue {
-  explicit BoundedPriorityQueue(size_t size)
-      : elements_(new T[size]),
-        size_(size) {
+  explicit BoundedPriorityQueue(size_t size) : elements_(new T[size]), size_(size) {
     std::fill(elements_, elements_ + size_, 0);
 
     std::make_heap(elements_, elements_ + size, std::greater<T>());
@@ -54,9 +53,7 @@ struct BoundedPriorityQueue {
   BoundedPriorityQueue& operator=(BoundedPriorityQueue<T> const&) = delete;
   BoundedPriorityQueue(const BoundedPriorityQueue<T>& that) = delete;
 
-  BoundedPriorityQueue(BoundedPriorityQueue&& other)
-      : elements_(other.elements_),
-        size_(other.size_) {
+  BoundedPriorityQueue(BoundedPriorityQueue&& other) : elements_(other.elements_), size_(other.size_) {
     other.elements_ = 0;
     other.size_ = 0;
   }
@@ -67,9 +64,7 @@ struct BoundedPriorityQueue {
     }
   }
 
-  T Back() const {
-    return elements_[0];
-  }
+  T Back() const { return elements_[0]; }
 
   void ReduceSize() {
     std::pop_heap(elements_, elements_ + size_, std::greater<T>());
@@ -83,8 +78,9 @@ struct BoundedPriorityQueue {
     elements_[size_ - 1] = value;
     std::push_heap(elements_, elements_ + size_, std::greater<T>());
   }
+
  private:
-  T * elements_;
+  T* elements_;
   size_t size_;
 };
 
@@ -92,4 +88,4 @@ struct BoundedPriorityQueue {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* BOUNDED_PRIORITY_QUEUE_H_ */
+#endif  // KEYVI_DICTIONARY_UTIL_BOUNDED_PRIORITY_QUEUE_H_

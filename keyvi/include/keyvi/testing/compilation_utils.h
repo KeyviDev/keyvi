@@ -30,17 +30,17 @@
 #include <utility>
 #include <vector>
 
-#include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/generator.h"
-#include "dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "dictionary/fsa/internal/int_value_store.h"
-#include "dictionary/fsa/internal/json_value_store.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "dictionary/fsa/internal/string_value_store.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/generator.h"
+#include "keyvi/dictionary/fsa/internal/int_inner_weights_value_store.h"
+#include "keyvi/dictionary/fsa/internal/int_value_store.h"
+#include "keyvi/dictionary/fsa/internal/json_value_store.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/dictionary/fsa/internal/string_value_store.h"
+#include "keyvi/util/configuration.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace testing {

@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_IVALUE_STORE_H_
 
+#include <memory>
 #include <string>
 
 #include <boost/container/flat_map.hpp>
@@ -32,11 +33,11 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/variant.hpp>
 
-#include "dictionary/dictionary_merger_fwd.h"
-#include "dictionary/fsa/internal/value_store_properties.h"
-#include "dictionary/fsa/internal/value_store_types.h"
-#include "util/configuration.h"
-#include "util/json_value.h"
+#include "keyvi/dictionary/dictionary_merger_fwd.h"
+#include "keyvi/dictionary/fsa/internal/value_store_properties.h"
+#include "keyvi/dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/util/configuration.h"
+#include "keyvi/util/json_value.h"
 
 namespace keyvi {
 namespace dictionary {

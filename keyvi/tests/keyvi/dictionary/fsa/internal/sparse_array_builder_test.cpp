@@ -28,8 +28,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/sparse_array_builder.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_builder.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
 
 namespace keyvi {
 namespace dictionary {

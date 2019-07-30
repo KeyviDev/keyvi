@@ -25,16 +25,15 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/util/bounded_priority_queue.h"
+#include "keyvi/dictionary/util/bounded_priority_queue.h"
 
 namespace keyvi {
 namespace dictionary {
 namespace util {
 
-BOOST_AUTO_TEST_SUITE( BoundedPriorityQueueTests )
+BOOST_AUTO_TEST_SUITE(BoundedPriorityQueueTests)
 
-BOOST_AUTO_TEST_CASE( simpleQueueTest ) {
-
+BOOST_AUTO_TEST_CASE(simpleQueueTest) {
   BoundedPriorityQueue<int> p(10);
   BOOST_CHECK_EQUAL(0, p.Back());
   p.Put(1);
@@ -50,7 +49,7 @@ BOOST_AUTO_TEST_CASE( simpleQueueTest ) {
   BOOST_CHECK_EQUAL(0, p.Back());
   p.Put(10);
   p.Put(11);
-  //BOOST_CHECK_EQUAL(11, p.Front());
+  // BOOST_CHECK_EQUAL(11, p.Front());
   BOOST_CHECK_EQUAL(2, p.Back());
   p.Put(12);
   BOOST_CHECK_EQUAL(3, p.Back());

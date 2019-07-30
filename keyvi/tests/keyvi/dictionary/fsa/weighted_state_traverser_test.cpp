@@ -25,13 +25,13 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/generator.h"
-#include "dictionary/fsa/traverser_types.h"
-#include "testing/temp_dictionary.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/generator.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
+#include "keyvi/testing/temp_dictionary.h"
 
 #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

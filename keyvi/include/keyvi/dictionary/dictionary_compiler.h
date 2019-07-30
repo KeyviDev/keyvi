@@ -28,21 +28,22 @@
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <utility>
 
-#include "dictionary/fsa/generator_adapter.h"
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/null_value_store.h"
-#include "dictionary/sort/in_memory_sorter.h"
-#include "dictionary/sort/sorter_common.h"
-#include "util/configuration.h"
-#include "util/serialization_utils.h"
+#include "keyvi/dictionary/fsa/generator_adapter.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/null_value_store.h"
+#include "keyvi/dictionary/sort/in_memory_sorter.h"
+#include "keyvi/dictionary/sort/sorter_common.h"
+#include "keyvi/util/configuration.h"
+#include "keyvi/util/serialization_utils.h"
 
 #if !defined(KEYVI_DISABLE_TPIE)
-#include "dictionary/sort/tpie_sorter.h"
+#include "keyvi/dictionary/sort/tpie_sorter.h"
 #endif
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

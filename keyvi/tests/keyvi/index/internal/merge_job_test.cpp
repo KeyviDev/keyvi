@@ -28,12 +28,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "index/constants.h"
-#include "index/internal/index_settings.h"
-#include "index/internal/merge_job.h"
-#include "index/internal/segment.h"
+#include "keyvi/index/constants.h"
+#include "keyvi/index/internal/index_settings.h"
+#include "keyvi/index/internal/merge_job.h"
+#include "keyvi/index/internal/segment.h"
 
-#include "testing/temp_dictionary.h"
+#include "keyvi/testing/temp_dictionary.h"
 
 inline std::string get_keyvimerger_bin() {
   boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};

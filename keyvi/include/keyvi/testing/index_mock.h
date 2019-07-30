@@ -37,8 +37,8 @@
 
 #include <msgpack.hpp>
 
-#include "dictionary/fsa/automata.h"
-#include "testing/compilation_utils.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/testing/compilation_utils.h"
 
 namespace keyvi {
 namespace testing {

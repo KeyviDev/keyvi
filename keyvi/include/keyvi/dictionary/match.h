@@ -25,16 +25,17 @@
 #ifndef KEYVI_DICTIONARY_MATCH_H_
 #define KEYVI_DICTIONARY_MATCH_H_
 
+#include <memory>
 #include <string>
 
 #include <boost/container/flat_map.hpp>
 #include <boost/variant.hpp>
 
-#include "dictionary/fsa/automata.h"
-#include "util/json_value.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/util/json_value.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

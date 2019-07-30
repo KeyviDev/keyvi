@@ -5,7 +5,7 @@ from libcpp.string cimport string as libcpp_utf8_output_string
 from libcpp cimport bool
 from cpython.ref cimport PyObject
 
-cdef extern from "dictionary/match.h" namespace "keyvi::dictionary":
+cdef extern from "keyvi/dictionary/match.h" namespace "keyvi::dictionary":
     cdef cppclass Match:
         Match()
         Match(Match& m)

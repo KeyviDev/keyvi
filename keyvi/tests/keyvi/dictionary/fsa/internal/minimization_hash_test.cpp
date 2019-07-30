@@ -21,8 +21,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/fsa/internal/minimization_hash.h"
-#include "dictionary/fsa/internal/packed_state.h"
+#include "keyvi/dictionary/fsa/internal/minimization_hash.h"
+#include "keyvi/dictionary/fsa/internal/packed_state.h"
 
 namespace keyvi {
 namespace dictionary {

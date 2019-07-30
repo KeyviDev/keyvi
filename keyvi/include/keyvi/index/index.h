@@ -39,13 +39,13 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
 
-#include "dictionary/dictionary.h"
-#include "index/internal/base_index_reader.h"
-#include "index/internal/index_writer_worker.h"
-#include "index/internal/segment.h"
+#include "keyvi/dictionary/dictionary.h"
+#include "keyvi/index/internal/base_index_reader.h"
+#include "keyvi/index/internal/index_writer_worker.h"
+#include "keyvi/index/internal/segment.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

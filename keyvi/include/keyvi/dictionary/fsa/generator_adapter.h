@@ -27,10 +27,12 @@
 #ifndef KEYVI_DICTIONARY_FSA_GENERATOR_ADAPTER_H_
 #define KEYVI_DICTIONARY_FSA_GENERATOR_ADAPTER_H_
 
+#include <memory>
 #include <string>
+#include <utility>
 
-#include "dictionary/fsa/generator.h"
-#include "util/configuration.h"
+#include "keyvi/dictionary/fsa/generator.h"
+#include "keyvi/util/configuration.h"
 
 namespace keyvi {
 namespace dictionary {

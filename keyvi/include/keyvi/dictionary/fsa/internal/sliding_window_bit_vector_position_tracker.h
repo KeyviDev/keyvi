@@ -34,11 +34,11 @@ static const size_t SLIDING_WINDOW_MASK = 2047;  // bit mask: SLIDING_WINDOW_SIZ
 static const size_t SLIDING_WINDOW_SHIFT = 11;   // same as /2048
 
 #include <utility>
-#include "dictionary/fsa/internal/bit_vector.h"
-#include "dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/bit_vector.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

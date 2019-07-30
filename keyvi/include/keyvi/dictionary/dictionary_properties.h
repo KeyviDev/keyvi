@@ -37,14 +37,14 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/value_store_properties.h"
-#include "dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/value_store_properties.h"
+#include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
-#include "util/serialization_utils.h"
+#include "keyvi/util/serialization_utils.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

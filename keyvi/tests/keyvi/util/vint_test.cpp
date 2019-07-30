@@ -25,7 +25,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "util/vint.h"
+#include "keyvi/util/vint.h"
 
 namespace keyvi {
 namespace util {

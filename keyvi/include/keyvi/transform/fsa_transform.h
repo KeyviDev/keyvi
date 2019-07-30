@@ -28,11 +28,11 @@
 #include <sstream>
 #include <string>
 
-#include "dictionary/dictionary.h"
-#include "dictionary/fsa/automata.h"
+#include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/fsa/automata.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace transform {

@@ -28,8 +28,8 @@
 #include <exception>
 #include <string>
 
-#include "dictionary/util/endian.h"
-#include "vector/vector_file.h"
+#include "keyvi/dictionary/util/endian.h"
+#include "keyvi/vector/vector_file.h"
 
 namespace keyvi {
 namespace vector {

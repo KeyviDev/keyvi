@@ -28,15 +28,15 @@
 
 #include "process.hpp"
 
-#include "dictionary/dictionary_merger.h"
-#include "dictionary/dictionary_types.h"
-#include "dictionary/fsa/internal/json_value_store.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "index/internal/index_settings.h"
-#include "index/internal/segment.h"
+#include "keyvi/dictionary/dictionary_merger.h"
+#include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/dictionary/fsa/internal/json_value_store.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/index/internal/index_settings.h"
+#include "keyvi/index/internal/segment.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {

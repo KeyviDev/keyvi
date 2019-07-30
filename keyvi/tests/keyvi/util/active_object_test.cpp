@@ -29,14 +29,16 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "util/active_object.h"
+#include "keyvi/util/active_object.h"
 
 namespace keyvi {
 namespace util {
 
 BOOST_AUTO_TEST_SUITE(ActiveObjectTests)
 
-void ScheduledTask(size_t* calls) { ++*calls; }
+void ScheduledTask(size_t* calls) {
+  ++*calls;
+}
 
 BOOST_AUTO_TEST_CASE(scheduledtasktimingemptyqueue) {
   std::ostringstream string_stream;

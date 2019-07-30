@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -34,11 +35,11 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#include "dictionary/completion/prefix_completion.h"
-#include "dictionary/util/bounded_priority_queue.h"
+#include "keyvi/dictionary/completion/prefix_completion.h"
+#include "keyvi/dictionary/util/bounded_priority_queue.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

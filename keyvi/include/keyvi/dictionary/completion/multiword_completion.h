@@ -25,21 +25,23 @@
 #ifndef KEYVI_DICTIONARY_COMPLETION_MULTIWORD_COMPLETION_H_
 #define KEYVI_DICTIONARY_COMPLETION_MULTIWORD_COMPLETION_H_
 
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "dictionary/dictionary.h"
-#include "dictionary/fsa/automata.h"
-#include "dictionary/fsa/bounded_weighted_state_traverser.h"
-#include "dictionary/fsa/codepoint_state_traverser.h"
-#include "dictionary/fsa/traverser_types.h"
-#include "dictionary/match_iterator.h"
-#include "dictionary/util/transform.h"
-#include "stringdistance/levenshtein.h"
+#include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/bounded_weighted_state_traverser.h"
+#include "keyvi/dictionary/fsa/codepoint_state_traverser.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
+#include "keyvi/dictionary/match_iterator.h"
+#include "keyvi/dictionary/util/transform.h"
+#include "keyvi/stringdistance/levenshtein.h"
 #include "utf8.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

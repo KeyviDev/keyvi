@@ -25,14 +25,16 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_UNPACKED_STATE_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_UNPACKED_STATE_H_
 
-#include "dictionary/fsa/internal/bit_vector.h"
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/packed_state.h"
-#include "dictionary/fsa/internal/sparse_array_persistence.h"
-#include "util/vint.h"
+#include <utility>
+
+#include "keyvi/dictionary/fsa/internal/bit_vector.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/packed_state.h"
+#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
+#include "keyvi/util/vint.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

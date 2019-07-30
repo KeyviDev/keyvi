@@ -1,5 +1,5 @@
 msgpack-python>=0.5.6
 autowrap>=0.16.0
-pytest
+pytest<5
 twine
 wheel

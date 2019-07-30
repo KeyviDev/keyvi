@@ -27,7 +27,7 @@
 #ifndef KEYVI_DICTIONARY_DICTIONARY_MERGER_FWD_H_
 #define KEYVI_DICTIONARY_DICTIONARY_MERGER_FWD_H_
 
-#include "dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
 namespace keyvi {
 namespace dictionary {

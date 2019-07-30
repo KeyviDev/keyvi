@@ -26,10 +26,11 @@
 #define KEYVI_DICTIONARY_FSA_INTERNAL_JSON_VALUE_STORE_H_
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
-#include "dictionary/fsa/internal/intrinsics.h"
+#include "keyvi/dictionary/fsa/internal/intrinsics.h"
 #if defined(KEYVI_SSE42)
 #define RAPIDJSON_SSE42
 #endif
@@ -44,21 +45,21 @@
 // from 3rdparty/xchange: msgpack <-> rapidjson converter
 #include "msgpack/type/rapidjson.hpp"
 
-#include "compression/compression_selector.h"
-#include "dictionary/dictionary_properties.h"
-#include "dictionary/fsa/internal/constants.h"
-#include "dictionary/fsa/internal/ivalue_store.h"
-#include "dictionary/fsa/internal/lru_generation_cache.h"
-#include "dictionary/fsa/internal/memory_map_flags.h"
-#include "dictionary/fsa/internal/memory_map_manager.h"
-#include "dictionary/fsa/internal/value_store_persistence.h"
-#include "dictionary/fsa/internal/value_store_properties.h"
-#include "dictionary/fsa/internal/value_store_types.h"
-#include "util/configuration.h"
-#include "util/json_value.h"
+#include "keyvi/compression/compression_selector.h"
+#include "keyvi/dictionary/dictionary_properties.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/dictionary/fsa/internal/ivalue_store.h"
+#include "keyvi/dictionary/fsa/internal/lru_generation_cache.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_manager.h"
+#include "keyvi/dictionary/fsa/internal/value_store_persistence.h"
+#include "keyvi/dictionary/fsa/internal/value_store_properties.h"
+#include "keyvi/dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/util/configuration.h"
+#include "keyvi/util/json_value.h"
 
 // #define ENABLE_TRACING
-#include "dictionary/util/trace.h"
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace dictionary {

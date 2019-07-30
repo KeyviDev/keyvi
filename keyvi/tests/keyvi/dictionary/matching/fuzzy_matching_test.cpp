@@ -24,8 +24,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "dictionary/dictionary.h"
-#include "testing/temp_dictionary.h"
+#include "keyvi/dictionary/dictionary.h"
+#include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
 namespace dictionary {
