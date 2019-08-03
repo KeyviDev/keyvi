@@ -30,7 +30,7 @@
 #include <functional>
 #include <thread>  // NOLINT
 
-#include "keyvi/util/single_producer_consumer_ringbuffer.h"
+#include "blockingconcurrentqueue.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -43,7 +43,7 @@ class ActiveObject final {
  public:
   explicit ActiveObject(T* resource, const std::function<void()>& scheduled_task,
                         const std::chrono::milliseconds& flush_interval = std::chrono::milliseconds(1000))
-      : queue_(),
+      : queue_(Tsize),
         resource_(resource),
         flush_interval_(flush_interval),
         scheduled_task_(scheduled_task),
@@ -52,7 +52,7 @@ class ActiveObject final {
     worker_ = std::thread([this] {
       std::function<void()> item;
       while (!done_) {
-        if (queue_.Pop(&item, scheduled_task_next_run_)) {
+        if (queue_.wait_dequeue_timed(item, flush_interval_)) {
           item();
         }
 
@@ -71,20 +71,19 @@ class ActiveObject final {
   }
 
   ~ActiveObject() {
-    queue_.Push([this] { done_ = true; });
-
+    queue_.enqueue([this] { done_ = true; });
     worker_.join();
   }
 
   template <typename F>
   void operator()(F f) {
-    queue_.Push([=] { f(*resource_); });
+    queue_.enqueue([=] { f(*resource_); });
   }
 
-  size_t Size() const { return queue_.Size(); }
+  size_t Size() const { return queue_.size_approx(); }
 
  private:
-  mutable SingeProducerSingleConsumerRingBuffer<std::function<void()>, Tsize> queue_;
+  moodycamel::BlockingConcurrentQueue<std::function<void()>> queue_;
 
   T* resource_;
 

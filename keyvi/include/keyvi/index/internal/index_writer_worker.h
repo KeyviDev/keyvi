@@ -220,7 +220,7 @@ class IndexWriterWorker final {
       compiler_active_object_([](IndexPayload& payload) { Compile(&payload); });
       payload_.write_counter_ = 0;
 
-      // worst case scenario, to0 many segments, throttle further writes until we are below the limit
+      // worst case scenario, to many segments, throttle further writes until we are below the limit
       while (compiler_active_object_.Size() + payload_.segments_->size() >= payload_.max_segments_) {
         // wait some time and then flush, which should give time to reduce the number of open file descriptors
         std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_FOR_SEGMENT_MERGES_MS));
