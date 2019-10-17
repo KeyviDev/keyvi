@@ -275,7 +275,8 @@ class MemoryMapManager final {
                         std::ios_base::in | std::ios_base::out | std::ios_base::trunc | std::ios_base::binary);
 
     if (!chunk) {
-      throw memory_map_manager_exception("failed to create chunk [" + filename.string() + "] (open)");
+      throw memory_map_manager_exception("failed to create chunk [" + filename.string() + "] (open) " +
+                                             std::strerror(errno));
     }
 
     // Set the size
