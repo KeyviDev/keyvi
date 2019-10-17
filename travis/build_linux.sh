@@ -6,6 +6,7 @@ cd /io
 df -h
 env
 ls -l /tmp
+ulimit -n
 
 mkdir build
 cd build
