@@ -3,6 +3,10 @@ set -ex
 
 cd /io
 
+df -h
+env
+ls -l /tmp
+
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=$CONF ..
