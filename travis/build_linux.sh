@@ -13,4 +13,6 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=$CONF ..
 make -j 4
 
+ ulimit -Hn && ulimit -Sn
+
 ./unit_test_all
