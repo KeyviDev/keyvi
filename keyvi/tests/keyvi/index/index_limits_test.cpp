@@ -80,6 +80,10 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
     BOOST_CHECK_EQUAL("{\"id\":4999}", m.GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
+
+  size_t increased_file_descriptors = keyvi::util::OsUtils::TryIncreaseFileDescriptors();
+  BOOST_CHECK(increased_file_descriptors > 20);
+
   limit_filedescriptors(old_limit);
 }
 
