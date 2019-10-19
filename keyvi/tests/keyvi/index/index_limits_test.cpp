@@ -40,14 +40,16 @@ inline std::string get_keyvimerger_bin() {
   return path.string();
 }
 
-inline void limit_filedescriptors(size_t file_descriptor_limit) {
+inline size_t limit_filedescriptors(size_t file_descriptor_limit) {
   struct rlimit limit;
 
   getrlimit(RLIMIT_NOFILE, &limit);
+  size_t old_limit = limit.rlim_cur;
   limit.rlim_cur = file_descriptor_limit;
   BOOST_CHECK(setrlimit(RLIMIT_NOFILE, &limit) == 0);
   getrlimit(RLIMIT_NOFILE, &limit);
   BOOST_CHECK_EQUAL(file_descriptor_limit, limit.rlim_cur);
+  return old_limit;
 }
 
 namespace keyvi {
@@ -58,7 +60,7 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
 
-  limit_filedescriptors(20);
+  size_t old_limit = limit_filedescriptors(20);
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-limits-test-temp-index-%%%%-%%%%-%%%%-%%%%");
@@ -78,6 +80,11 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
     BOOST_CHECK_EQUAL("{\"id\":4999}", m.GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
+
+  size_t increased_file_descriptors = keyvi::util::OsUtils::TryIncreaseFileDescriptors();
+  BOOST_CHECK(increased_file_descriptors > 20);
+
+  limit_filedescriptors(old_limit);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
