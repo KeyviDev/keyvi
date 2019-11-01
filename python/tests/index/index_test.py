@@ -63,7 +63,7 @@ def test_bulk_add():
             key_values.append(("key-{}".format(i), "value-{}".format(i)))
             if i % chunk_size == 0:
                 index.MSet(key_values)
-                key_values.clear()
+                key_values = []
         index.MSet(key_values)
         index.Flush()
 
