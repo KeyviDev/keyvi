@@ -5,6 +5,11 @@ from libc.stdint cimport uint64_t
 from libc.stdint cimport int32_t
 from cpython.version cimport PY_MAJOR_VERSION
 
+from libcpp.string  cimport string as libcpp_utf8_string
+from libcpp.vector cimport vector as libcpp_vector
+from libcpp.pair  cimport pair  as libcpp_pair
+from std_smart_ptr cimport shared_ptr as s_shared_ptr
+
 import json
 import msgpack
 import keyvi._pycore
