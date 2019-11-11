@@ -360,7 +360,9 @@ class IndexWriterWorker final {
     }
 
     payload_.merge_jobs_.emplace_back(to_merge, merge_policy_id, p, payload_.settings_);
-    payload_.merge_jobs_.back().Run();
+
+    // force external merge if low on filedescriptors
+    payload_.merge_jobs_.back().Run(payload_.segments_->size() + to_merge.size() + 10 > payload_.max_segments_);
   }
 
   void LoadIndex() {

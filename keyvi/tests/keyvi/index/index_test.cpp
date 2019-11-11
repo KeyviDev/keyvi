@@ -78,6 +78,10 @@ BOOST_AUTO_TEST_CASE(basic_writer_default) {
   basic_writer_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}});
 }
 
+BOOST_AUTO_TEST_CASE(basic_writer_external_merge) {
+  basic_writer_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}, {SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD, "0"}});
+}
+
 BOOST_AUTO_TEST_CASE(basic_writer_simple_merge_policy) {
   basic_writer_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}, {MERGE_POLICY, "simple"}});
 }
@@ -125,6 +129,10 @@ BOOST_AUTO_TEST_CASE(basic_writer_bulk_default) {
   basic_writer_bulk_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}});
 }
 
+BOOST_AUTO_TEST_CASE(basic_writer_bulk_external_merge) {
+  basic_writer_bulk_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}, {SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD, "0"}});
+}
+
 BOOST_AUTO_TEST_CASE(basic_writer_bulk_simple_merge_policy) {
   basic_writer_bulk_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}, {MERGE_POLICY, "simple"}});
 }
@@ -157,6 +165,13 @@ void bigger_feed_test(const keyvi::util::parameters_t& params = keyvi::util::par
 BOOST_AUTO_TEST_CASE(bigger_feed) {
   bigger_feed_test(
       {{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}, {"max_concurrent_merges", "2"}});
+}
+
+BOOST_AUTO_TEST_CASE(bigger_feed_external_merge) {
+  bigger_feed_test({{"refresh_interval", "100"},
+                    {KEYVIMERGER_BIN, get_keyvimerger_bin()},
+                    {"max_concurrent_merges", "2"},
+                    {SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD, "0"}});
 }
 
 BOOST_AUTO_TEST_CASE(bigger_feed_simple_merge_policy) {
