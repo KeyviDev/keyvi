@@ -82,6 +82,53 @@ BOOST_AUTO_TEST_CASE(basic_writer_simple_merge_policy) {
   basic_writer_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}, {MERGE_POLICY, "simple"}});
 }
 
+void basic_writer_bulk_test(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) {
+  using boost::filesystem::temp_directory_path;
+  using boost::filesystem::unique_path;
+
+  auto tmp_path = temp_directory_path();
+  tmp_path /= unique_path();
+  {
+    Index writer(tmp_path.string(), params);
+
+    key_values_ptr_t input_data = std::make_shared<key_value_vector_t>();
+    for (int i = 0; i < 100; ++i) {
+      input_data->push_back({"a" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}"});
+    }
+
+    writer.MSet(input_data);
+    writer.Flush();
+
+    BOOST_CHECK(writer.Contains("a0"));
+    BOOST_CHECK(writer.Contains("a11"));
+    BOOST_CHECK(writer.Contains("a99"));
+
+    input_data->clear();
+    for (int i = 0; i < 10; ++i) {
+      input_data->push_back({"b", "{\"id\":" + std::to_string(i) + "}"});
+    }
+
+    writer.MSet(input_data);
+    writer.Flush();
+
+    BOOST_CHECK(writer.Contains("a0"));
+    BOOST_CHECK(writer.Contains("b"));
+
+    // check that last one wins
+    dictionary::Match m = writer["b"];
+    BOOST_CHECK_EQUAL("{\"id\":9}", m.GetValueAsString());
+  }
+  boost::filesystem::remove_all(tmp_path);
+}
+
+BOOST_AUTO_TEST_CASE(basic_writer_bulk_default) {
+  basic_writer_bulk_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}});
+}
+
+BOOST_AUTO_TEST_CASE(basic_writer_bulk_simple_merge_policy) {
+  basic_writer_bulk_test({{KEYVIMERGER_BIN, get_keyvimerger_bin()}, {MERGE_POLICY, "simple"}});
+}
+
 void bigger_feed_test(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;

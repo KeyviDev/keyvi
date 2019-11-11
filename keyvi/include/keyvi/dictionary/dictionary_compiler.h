@@ -112,7 +112,9 @@ class DictionaryCompiler final {
     }
 
     size_of_keys_ += input_key.size();
-    sorter_.push_back(key_value_t(std::move(input_key), RegisterValue(value)));
+
+    // no move, we have no ownership
+    sorter_.push_back(key_value_t(input_key, RegisterValue(value)));
   }
 
 #ifdef Py_PYTHON_H

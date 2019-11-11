@@ -70,3 +70,24 @@
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r
         return py_result
+
+    def MSet(self, list key_values ):
+        assert isinstance(key_values, list), 'arg in_0 wrong type'
+        cdef s_shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]] cpp_key_values = s_shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]](new libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]())
+        cdef libcpp_pair[libcpp_utf8_string, libcpp_utf8_string] cpp_kv
+
+        for kv in key_values:
+            assert isinstance (kv, tuple), 'arg in_0 wrong type'
+            assert isinstance(kv[0], (bytes, unicode)), 'arg in_0 wrong type'
+            assert isinstance(kv[1], (bytes, unicode)), 'arg in_1 wrong type'
+            key = kv[0]
+            if isinstance(key, unicode):
+                key = key.encode('utf-8')
+            value = kv[1]
+            if isinstance(value, unicode):
+                value = value.encode('utf-8')
+            cpp_kv.first = key
+            cpp_kv.second = value
+            cpp_key_values.get().push_back(cpp_kv)
+
+        self.inst.get().MSet(cpp_key_values)

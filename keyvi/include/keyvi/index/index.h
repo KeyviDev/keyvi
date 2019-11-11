@@ -43,6 +43,7 @@
 #include "keyvi/index/internal/base_index_reader.h"
 #include "keyvi/index/internal/index_writer_worker.h"
 #include "keyvi/index/internal/segment.h"
+#include "keyvi/index/types.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -87,6 +88,8 @@ class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker
   }
 
   void Set(const std::string& key, const std::string& value) { Payload().Add(key, value); }
+
+  void MSet(const key_values_ptr_t& key_values) { Payload().Add(key_values); }
 
   void Delete(const std::string& key) { Payload().Delete(key); }
 

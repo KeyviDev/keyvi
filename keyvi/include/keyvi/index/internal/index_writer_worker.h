@@ -37,6 +37,7 @@
 #include <mutex>  //NOLINT
 #include <string>
 #include <thread>  //NOLINT
+#include <utility>
 #include <vector>
 
 #include <boost/filesystem.hpp>
@@ -54,6 +55,7 @@
 #include "keyvi/index/internal/merge_job.h"
 #include "keyvi/index/internal/merge_policy_selector.h"
 #include "keyvi/index/internal/segment.h"
+#include "keyvi/index/types.h"
 #include "keyvi/util/active_object.h"
 #include "keyvi/util/configuration.h"
 
@@ -142,19 +144,30 @@ class IndexWriterWorker final {
   // todo: rvalue version??
   void Add(const std::string& key, const std::string& value) {
     // push function
-    compiler_active_object_([key, value](IndexPayload& payload) {
-      // todo non-lazy?
-      if (!payload.compiler_) {
-        TRACE("recreate compiler");
-        keyvi::util::parameters_t params =
-            keyvi::util::parameters_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
+    TRACE("add key %s, pt: %p", key.c_str(), &key);
 
-        payload.compiler_.reset(new dictionary::JsonDictionaryCompilerSmallData(params));
-      }
-      TRACE("add key %s", key.c_str());
+    // strings are copied
+    compiler_active_object_([key, value](IndexPayload& payload) {
+      CreateCompilerIfNeeded(&payload);
+      TRACE("add_async key %s, pt: %p", key.c_str(), &key);
       payload.compiler_->Add(key, value);
     });
 
+    CompileIfThresholdIsHit();
+  }
+
+  void Add(const key_values_ptr_t& key_values) {
+    TRACE("bulk add keys: %ul", key_values->size());
+
+    // the shared pointer is copied (not the key/values)
+    compiler_active_object_([key_values](IndexPayload& payload) {
+      CreateCompilerIfNeeded(&payload);
+
+      for (auto key_value : *key_values) {
+        TRACE("add_async key %s, pt: %p", key_value.first.c_str(), &key_value.first);
+        payload.compiler_->Add(key_value.first, key_value.second);
+      }
+    });
     CompileIfThresholdIsHit();
   }
 
@@ -385,6 +398,15 @@ class IndexWriterWorker final {
 
     // clear delete flag
     payload->any_delete_ = false;
+  }
+
+  static inline void CreateCompilerIfNeeded(IndexPayload* payload) {
+    if (!payload->compiler_) {
+      TRACE("recreate compiler");
+      keyvi::util::parameters_t params = keyvi::util::parameters_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
+
+      payload->compiler_.reset(new dictionary::JsonDictionaryCompilerSmallData(params));
+    }
   }
 
   static inline void Compile(IndexPayload* payload) {
