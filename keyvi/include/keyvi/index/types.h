@@ -35,7 +35,7 @@ namespace keyvi {
 namespace index {
 
 using key_value_vector_t = std::vector<std::pair<std::string, std::string>>;
-using key_values_t = std::shared_ptr<key_value_vector_t>;
+using key_values_ptr_t = std::shared_ptr<key_value_vector_t>;
 
 } /* namespace index */
 } /* namespace keyvi */

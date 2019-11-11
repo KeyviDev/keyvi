@@ -91,7 +91,7 @@ void basic_writer_bulk_test(const keyvi::util::parameters_t& params = keyvi::uti
   {
     Index writer(tmp_path.string(), params);
 
-    key_values_t input_data = std::make_shared<key_value_vector_t>();
+    key_values_ptr_t input_data = std::make_shared<key_value_vector_t>();
     for (int i = 0; i < 100; ++i) {
       input_data->push_back({"a" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}"});
     }

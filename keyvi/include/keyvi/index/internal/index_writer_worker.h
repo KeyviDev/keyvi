@@ -156,7 +156,7 @@ class IndexWriterWorker final {
     CompileIfThresholdIsHit();
   }
 
-  void Add(const key_values_t& key_values) {
+  void Add(const key_values_ptr_t& key_values) {
     TRACE("bulk add keys: %ul", key_values->size());
 
     // the shared pointer is copied (not the key/values)
