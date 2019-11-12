@@ -8,4 +8,4 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=$CONF ..
 make -j 4
 
-./unit_test_all
+./unit_test_all --log_level=test_suite
