@@ -136,6 +136,8 @@ class MergeJob final {
       try {
         keyvi::util::parameters_t params;
 
+        // todo: make this configurable
+        params[MEMORY_LIMIT_KEY] = "5242880";
         keyvi::dictionary::JsonDictionaryMerger jsonDictionaryMerger(params);
         for (const segment_t s : payload_.segments_) {
           jsonDictionaryMerger.Add(s->GetDictionaryPath().string());
