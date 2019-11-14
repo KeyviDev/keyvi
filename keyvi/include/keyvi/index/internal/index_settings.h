@@ -69,6 +69,12 @@ class IndexSettings final {
     } else {
       settings_[INDEX_REFRESH_INTERVAL] = DEFAULT_REFRESH_INTERVAL;
     }
+    if (params.count(SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD)) {
+      settings_[SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD] =
+          keyvi::util::mapGet<size_t>(params, SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD);
+    } else {
+      settings_[SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD] = DEFAULT_EXTERNAL_MERGE_KEY_THRESHOLD;
+    }
   }
 
   const std::string& GetKeyviMergerBin() const { return boost::get<std::string>(settings_.at(KEYVIMERGER_BIN)); }
@@ -82,6 +88,10 @@ class IndexSettings final {
   const size_t GetMaxConcurrentMerges() const { return boost::get<size_t>(settings_.at(MAX_CONCURRENT_MERGES)); }
 
   const size_t GetRefreshInterval() const { return boost::get<size_t>(settings_.at(INDEX_REFRESH_INTERVAL)); }
+
+  const size_t GetSegmentExternalMergeKeyThreshold() const {
+    return boost::get<size_t>(settings_.at(SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD));
+  }
 
  private:
   std::unordered_map<std::string, boost::variant<std::string, size_t>> settings_;

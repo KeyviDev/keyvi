@@ -69,26 +69,38 @@ class MergeJob final {
 
   ~MergeJob() {
     if (payload_.process_finished_ == false) {
-      EndExternalProcess();
+      FinalizeMerge();
     }
   }
 
   MergeJob(MergeJob&&) = default;
   MergeJob& operator=(MergeJob&&) = default;
 
-  void Run() { DoExternalProcessMerge(); }
+  void Run(bool force_external_merge = false) {
+    uint64_t job_size = 0;
+
+    for (const segment_t segment : payload_.segments_) {
+      job_size += segment->GetDictionaryProperties()->GetNumberOfKeys();
+    }
+
+    if (force_external_merge == false && job_size < payload_.settings_.GetSegmentExternalMergeKeyThreshold()) {
+      DoInternalMerge();
+    } else {
+      DoExternalProcessMerge();
+    }
+  }
 
   bool TryFinalize() {
     // already finished?
     if (payload_.process_finished_ == true) {
       return true;
     }
-    return TryEndExternalProcess();
+    return TryFinalizeMerge();
   }
 
   void Finalize() {
     if (payload_.process_finished_ == false) {
-      EndExternalProcess();
+      FinalizeMerge();
     }
   }
 
@@ -115,6 +127,30 @@ class MergeJob final {
   MergeJobPayload payload_;
   size_t id_;
   std::shared_ptr<TinyProcessLib::Process> external_process_;
+  std::thread internal_merge_;
+
+  void DoInternalMerge() {
+    payload_.start_time_ = std::chrono::system_clock::now();
+
+    internal_merge_ = std::thread([this]() {
+      try {
+        keyvi::util::parameters_t params;
+
+        // todo: make this configurable
+        params[MEMORY_LIMIT_KEY] = "5242880";
+        keyvi::dictionary::JsonDictionaryMerger jsonDictionaryMerger(params);
+        for (const segment_t s : payload_.segments_) {
+          jsonDictionaryMerger.Add(s->GetDictionaryPath().string());
+        }
+
+        jsonDictionaryMerger.Merge(payload_.output_filename_.string());
+        payload_.exit_code_ = 0;
+      } catch (const std::exception& e) {
+        TRACE("internal merge failed with: %s", e.what());
+        payload_.exit_code_ = 1;
+      }
+    });
+  }
 
   void DoExternalProcessMerge() {
     payload_.start_time_ = std::chrono::system_clock::now();
@@ -132,17 +168,28 @@ class MergeJob final {
     external_process_.reset(new TinyProcessLib::Process(command.str()));
   }
 
-  bool TryEndExternalProcess() {
-    if (external_process_->try_get_exit_status(payload_.exit_code_)) {
-      payload_.end_time_ = std::chrono::system_clock::now();
+  bool TryFinalizeMerge() {
+    if (external_process_) {
+      if (external_process_->try_get_exit_status(payload_.exit_code_)) {
+        payload_.process_finished_ = true;
+        return true;
+      }
+    } else if (internal_merge_.joinable()) {
+      internal_merge_.join();
+      // exit code set by merge thread
       payload_.process_finished_ = true;
       return true;
     }
     return false;
   }
 
-  void EndExternalProcess() {
-    payload_.exit_code_ = external_process_->get_exit_status();
+  void FinalizeMerge() {
+    if (external_process_) {
+      payload_.exit_code_ = external_process_->get_exit_status();
+    } else {
+      internal_merge_.join();
+      // exit code set by merge thread
+    }
     payload_.end_time_ = std::chrono::system_clock::now();
     payload_.process_finished_ = true;
   }
