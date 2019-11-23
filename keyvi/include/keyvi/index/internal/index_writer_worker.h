@@ -91,6 +91,7 @@ class IndexWriterWorker final {
     compiler_t compiler_;
     std::atomic_size_t write_counter_;
     segments_t segments_;
+    std::weak_ptr<segment_vec_t> segments_weak_;
     std::mutex mutex_;
     const boost::filesystem::path index_directory_;
     const boost::filesystem::path index_toc_file_;
@@ -132,10 +133,11 @@ class IndexWriterWorker final {
   }
 
   const_segments_t Segments() {
-    segments_t segments = segments_weak_.lock();
+    segments_t segments = payload_.segments_weak_.lock();
     if (!segments) {
+      TRACE("recreate segments weak ptr");
       std::unique_lock<std::mutex> lock(payload_.mutex_);
-      segments_weak_ = payload_.segments_;
+      payload_.segments_weak_ = payload_.segments_;
       segments = payload_.segments_;
     }
     return segments;
@@ -222,9 +224,29 @@ class IndexWriterWorker final {
     c.wait(lock);
   }
 
+  void ForceMerge(const size_t max_segments) {
+    TRACE("force merge");
+
+    // 1st check the queue and empty it if necessary
+    if (compiler_active_object_.Size() > 0) {
+      Flush();
+    }
+
+    // spin until we reach the desired size
+    while (payload_.segments_->size() > max_segments) {
+      // wait some time for segments being merged
+      // todo improve this dependent on number and size of segments
+      std::this_thread::sleep_for(std::chrono::milliseconds(SPINLOCK_WAIT_FOR_SEGMENT_MERGES_MS));
+
+      // should we somehow got new data, flush again
+      if (compiler_active_object_.Size() > 0) {
+        Flush();
+      }
+    }
+  }
+
  private:
   IndexPayload payload_;
-  std::weak_ptr<segment_vec_t> segments_weak_;
   merge_policy_t merge_policy_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
 
@@ -306,9 +328,19 @@ class IndexWriterWorker final {
           }
           WriteToc(&payload_);
 
+          // reset as segments have been changed
+          payload_.segments_weak_.reset();
+
           // delete old segment files
           for (const segment_t& s : p.Segments()) {
             TRACE("delete old file: %s", s->GetDictionaryFilename().c_str());
+
+            // if the segment is somehow used, ensure file handles have access to it
+            // this should be safe because we swapped the old segments out and reseted the weak ptr
+            if (s.use_count() > 1) {
+              s->Load();
+            }
+            // if there are open file handles the OS defers real deletion for us
             s->RemoveFiles();
           }
 
@@ -443,6 +475,9 @@ class IndexWriterWorker final {
     }
 
     WriteToc(payload);
+
+    // reset as segments have been changed
+    payload->segments_weak_.reset();
   }
 
   static void WriteToc(const IndexPayload* payload) {
