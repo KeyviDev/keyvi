@@ -101,7 +101,7 @@ class DictionaryProperties {
     std::ifstream file_stream(file_name, std::ios::binary);
 
     if (!file_stream.good()) {
-      throw std::invalid_argument("file not found");
+      throw std::invalid_argument("dictionary file not found");
     }
 
     char magic[KEYVI_FILE_MAGIC_LEN];
