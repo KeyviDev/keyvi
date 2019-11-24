@@ -22,7 +22,6 @@ ENV PATH "/root/.pyenv/shims/:/root/.pyenv/bin:$PATH"
 
 # install python versions
 RUN pyenv install 2.7.16
-RUN pyenv install 3.4.9
 RUN pyenv install 3.5.7
 RUN pyenv install 3.6.9
 RUN pyenv install 3.7.4
