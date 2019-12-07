@@ -60,7 +60,7 @@ If you like to go deep down in the basics, keyvi is inspired by the following 2 
   * Incremental, which means minimization is done on the fly (See Incremental Construction of Minimal Acyclic Finite-State Automata, J. Daciuk et al.: http://www.mitpressjournals.org/doi/pdf/10.1162/089120100561601)
 
 ## Release procedure
-  * [How to make a release](doc/Release_Process.md)
+  * [How to make a release](doc/RELEASE_PROCESS.md)
   
 ## Licence and 3rdparty dependencies
 
