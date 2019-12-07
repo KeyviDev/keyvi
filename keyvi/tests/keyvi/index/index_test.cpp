@@ -32,6 +32,7 @@
 
 #include "keyvi/index/constants.h"
 #include "keyvi/index/index.h"
+#include "keyvi/index/internal/segment.h"
 #include "keyvi/testing/index_mock.h"
 
 inline std::string get_keyvimerger_bin() {
@@ -45,6 +46,26 @@ inline std::string get_keyvimerger_bin() {
 
 namespace keyvi {
 namespace index {
+namespace unit_test {
+class IndexFriend {
+ public:
+  static internal::const_segments_t GetSegments(Index* index) {
+    // due to the friend declaration we can not use make_shared in this place
+    return index->payload_.Segments();
+  }
+
+  static bool Contains(const std::shared_ptr<internal::segment_vec_t>& segments, const std::string& key) {
+    for (auto it = segments->crbegin(); it != segments->crend(); it++) {
+      if ((*it)->GetDictionary()->Contains(key)) {
+        return !(*it)->IsDeleted(key);
+      }
+    }
+
+    return false;
+  }
+};
+}  // namespace unit_test
+
 BOOST_AUTO_TEST_SUITE(IndexTests)
 
 // basic writer test, re-usable for testing different parameters
@@ -336,6 +357,62 @@ BOOST_AUTO_TEST_CASE(index_delete_keys_defaults) {
 
 BOOST_AUTO_TEST_CASE(index_delete_keys_simple_merge_policy) {
   index_with_deletes({{"refresh_interval", "100"}, {KEYVIMERGER_BIN, get_keyvimerger_bin()}, {MERGE_POLICY, "simple"}});
+}
+
+BOOST_AUTO_TEST_CASE(segment_invalidation) {
+  using boost::filesystem::temp_directory_path;
+  using boost::filesystem::unique_path;
+
+  auto tmp_path = temp_directory_path();
+  tmp_path /= unique_path();
+  {
+    Index index(tmp_path.string());
+    int j = 0;
+
+    // push 100 key-value pairs in
+    key_values_ptr_t input_data = std::make_shared<key_value_vector_t>();
+    for (int i = 0; i < 100; ++i) {
+      input_data->push_back({"a" + std::to_string(j), "{\"id\":" + std::to_string(j) + "}"});
+      j++;
+    }
+
+    index.MSet(input_data);
+    index.Flush();
+
+    internal::const_segments_t segments = unit_test::IndexFriend::GetSegments(&index);
+
+    // push more data and let it merge behind the scenes
+    input_data = std::make_shared<key_value_vector_t>();
+    for (int i = 0; i < 1000; ++i) {
+      input_data->push_back({"a" + std::to_string(j), "{\"id\":" + std::to_string(j) + "}"});
+      j++;
+      if (i % 50 == 0) {
+        index.MSet(input_data);
+        index.FlushAsync();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        input_data = std::make_shared<key_value_vector_t>();
+      }
+    }
+
+    index.MSet(input_data);
+    index.Flush();
+    index.ForceMerge();
+
+    BOOST_CHECK(index.Contains("a433"));
+    BOOST_CHECK(index.Contains("a4"));
+    BOOST_CHECK(index.Contains("a999"));
+    BOOST_CHECK(index.Contains("a222"));
+    BOOST_CHECK(index.Contains("a890"));
+    BOOST_CHECK(index.Contains("a579"));
+
+    BOOST_CHECK(unit_test::IndexFriend::Contains(segments, "a1"));
+    BOOST_CHECK(unit_test::IndexFriend::Contains(segments, "a22"));
+    BOOST_CHECK(unit_test::IndexFriend::Contains(segments, "a99"));
+    BOOST_CHECK(!unit_test::IndexFriend::Contains(segments, "a100"));
+    BOOST_CHECK(!unit_test::IndexFriend::Contains(segments, "a345"));
+  }
+
+  boost::filesystem::remove_all(tmp_path);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -144,7 +144,7 @@ class IndexReaderWorker final {
     TRACE("rereading %s", index_toc_file_.string().c_str());
 
     if (!toc_fstream.good()) {
-      throw std::invalid_argument("file not found");
+      throw std::invalid_argument("toc file not found");
     }
 
     rapidjson::Document index_toc;

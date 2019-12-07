@@ -50,6 +50,9 @@
 
 namespace keyvi {
 namespace index {
+namespace unit_test {
+class IndexFriend;
+}
 
 class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker, internal::Segment> {
  public:
@@ -103,11 +106,21 @@ class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker
     Payload().FlushAsync();
   }
 
+  void ForceMerge(const size_t max_segments = 1) {
+    if (max_segments < 1) {
+      throw std::invalid_argument("max_segments must be > 1");
+    }
+    Payload().ForceMerge(max_segments);
+  }
+
  private:
   boost::filesystem::path index_directory_;
   boost::filesystem::path index_toc_file_;
   std::ofstream lock_file_;
   boost::interprocess::file_lock index_lock_;
+
+  // friend for unit testing only
+  friend class unit_test::IndexFriend;
 };
 
 } /* namespace index */

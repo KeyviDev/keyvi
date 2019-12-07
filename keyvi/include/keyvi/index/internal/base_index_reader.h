@@ -35,6 +35,9 @@
 
 namespace keyvi {
 namespace index {
+namespace unit_test {
+class IndexFriend;
+}
 namespace internal {
 
 template <class PayloadT, class SegmentT = ReadOnlySegment>
@@ -77,6 +80,9 @@ class BaseIndexReader {
 
  private:
   PayloadT payload_;
+
+  // friend for unit testing only
+  friend class keyvi::index::unit_test::IndexFriend;
 };
 
 } /* namespace internal */

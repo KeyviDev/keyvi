@@ -130,6 +130,11 @@ class Segment final : public ReadOnlySegment {
 
   bool MarkedForMerge() const { return in_merge_; }
 
+  void Load() {
+    LazyLoadDictionary();
+    LazyLoadDeletedKeys();
+  }
+
   void RemoveFiles() {
     // delete files, not all files might exist, therefore ignore the output
     std::remove(GetDictionaryPath().c_str());

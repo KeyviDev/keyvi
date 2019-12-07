@@ -166,7 +166,7 @@ class VectorFile {
  private:
   void CheckValidity(std::ifstream* in_stream) const {
     if (!in_stream->good()) {
-      throw std::invalid_argument("file not found");
+      throw std::invalid_argument("vector file not found");
     }
     char magic_start[KEYVI_VECTOR_BEGIN_LEN];
     in_stream->read(magic_start, KEYVI_VECTOR_BEGIN_LEN);
