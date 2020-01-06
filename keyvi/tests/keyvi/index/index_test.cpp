@@ -136,12 +136,25 @@ void basic_writer_bulk_test(const keyvi::util::parameters_t& params = keyvi::uti
     writer.MSet(input_data);
     writer.Flush();
 
+    std::shared_ptr<std::map<std::string, std::string>> input_data_map =
+        std::make_shared<std::map<std::string, std::string>>();
+
+    for (int i = 0; i < 10; ++i) {
+      input_data_map->emplace(std::make_pair("c" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}"));
+    }
+
+    writer.MSet(input_data_map);
+    writer.Flush();
+
     BOOST_CHECK(writer.Contains("a0"));
     BOOST_CHECK(writer.Contains("b"));
+    BOOST_CHECK(writer.Contains("c5"));
 
     // check that last one wins
     dictionary::Match m = writer["b"];
     BOOST_CHECK_EQUAL("{\"id\":9}", m.GetValueAsString());
+    m = writer["c5"];
+    BOOST_CHECK_EQUAL("{\"id\":5}", m.GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
 }
@@ -170,7 +183,7 @@ void bigger_feed_test(const keyvi::util::parameters_t& params = keyvi::util::par
     for (int i = 0; i < 10000; ++i) {
       writer.Set("a", "{\"id\":" + std::to_string(i) + "}");
       if (i % 50 == 0) {
-        writer.FlushAsync();
+        writer.Flush(true);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
     }
@@ -302,7 +315,7 @@ void index_with_deletes(const keyvi::util::parameters_t& params = keyvi::util::p
     for (int i = 0; i < 100; ++i) {
       index.Set("a" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}");
     }
-    index.FlushAsync();
+    index.Flush(true);
 
     // delete keys, also some non-existing ones
     for (int i = 20; i < 120; ++i) {
@@ -388,7 +401,7 @@ BOOST_AUTO_TEST_CASE(segment_invalidation) {
       j++;
       if (i % 50 == 0) {
         index.MSet(input_data);
-        index.FlushAsync();
+        index.Flush(true);
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         input_data = std::make_shared<key_value_vector_t>();
       }

@@ -14,6 +14,6 @@ cdef extern from "keyvi/index/index.h" namespace "keyvi::index":
         void MSet(s_shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string, libcpp_utf8_string]]]) # wrap-ignore
         void Delete(libcpp_utf8_string) except+
         void Flush() except+
-        void FlushAsync() except+
+        void Flush(bool) except+
         bool Contains(libcpp_utf8_string) # wrap-ignore
         Match operator[](libcpp_utf8_string) # wrap-ignore
