@@ -94,7 +94,7 @@ class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker
   void Set(const std::string& key, const std::string& value) { Payload().Add(key, value); }
 
   template <typename ContainerType>
-  void MSet(const std::shared_ptr<ContainerType> key_values) {
+  void MSet(const std::shared_ptr<ContainerType>& key_values) {
     Payload().Add(key_values);
   }
 
