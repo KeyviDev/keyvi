@@ -158,7 +158,8 @@ class IndexWriterWorker final {
     CompileIfThresholdIsHit();
   }
 
-  void Add(const key_values_ptr_t& key_values) {
+  template <typename ContainerType>
+  void Add(const std::shared_ptr<ContainerType>& key_values) {
     TRACE("bulk add keys: %ul", key_values->size());
 
     // the shared pointer is copied (not the key/values)
@@ -193,35 +194,30 @@ class IndexWriterWorker final {
   }
 
   /**
-   * FlushAsync for external use.
-   */
-  void FlushAsync() {
-    TRACE("flush");
-
-    compiler_active_object_([](IndexPayload& payload) {
-      PersistDeletes(&payload);
-      Compile(&payload);
-    });
-  }
-
-  /**
    * Flush for external use.
    */
-  void Flush() {
+  void Flush(const bool async = false) {
     TRACE("flush");
 
-    std::mutex m;
-    std::condition_variable c;
-    std::unique_lock<std::mutex> lock(m);
+    if (async) {
+      compiler_active_object_([](IndexPayload& payload) {
+        PersistDeletes(&payload);
+        Compile(&payload);
+      });
+    } else {
+      std::mutex m;
+      std::condition_variable c;
+      std::unique_lock<std::mutex> lock(m);
 
-    compiler_active_object_([&m, &c](IndexPayload& payload) {
-      PersistDeletes(&payload);
-      Compile(&payload);
-      std::unique_lock<std::mutex> waitLock(m);
-      c.notify_all();
-    });
+      compiler_active_object_([&m, &c](IndexPayload& payload) {
+        PersistDeletes(&payload);
+        Compile(&payload);
+        std::unique_lock<std::mutex> waitLock(m);
+        c.notify_all();
+      });
 
-    c.wait(lock);
+      c.wait(lock);
+    }
   }
 
   void ForceMerge(const size_t max_segments) {

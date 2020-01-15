@@ -31,6 +31,7 @@
 #include <chrono>              //NOLINT
 #include <condition_variable>  //NOLINT
 #include <ctime>
+#include <memory>
 #include <string>
 #include <thread>  //NOLINT
 #include <vector>
@@ -92,18 +93,16 @@ class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker
 
   void Set(const std::string& key, const std::string& value) { Payload().Add(key, value); }
 
-  void MSet(const key_values_ptr_t& key_values) { Payload().Add(key_values); }
+  template <typename ContainerType>
+  void MSet(const std::shared_ptr<ContainerType>& key_values) {
+    Payload().Add(key_values);
+  }
 
   void Delete(const std::string& key) { Payload().Delete(key); }
 
-  void Flush() {
+  void Flush(const bool async = false) {
     TRACE("Flush (manually)");
-    Payload().Flush();
-  }
-
-  void FlushAsync() {
-    TRACE("Flush (manually)");
-    Payload().FlushAsync();
+    Payload().Flush(async);
   }
 
   void ForceMerge(const size_t max_segments = 1) {
