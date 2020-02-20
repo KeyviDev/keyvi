@@ -28,9 +28,11 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/match.h"
+#include "keyvi/dictionary/match_iterator.h"
 #include "keyvi/index/internal/read_only_segment.h"
 
 namespace keyvi {
@@ -63,6 +65,20 @@ class BaseIndexReader {
     }
 
     return match;
+  }
+
+  dictionary::MatchIterator::MatchIteratorPair GetFuzzy(const std::string& key, const size_t max_edit_distance) {
+    dictionary::Match match;
+    const_segments_t segments = payload_.Segments();
+
+    struct data_delegate_fuzzy {
+      data_delegate_fuzzy(const_segments_t&& s) : segments(std::move(s)) {}
+
+      const_segments_t segments;
+    };
+
+    // for (auto it = segments->crbegin(); it != segments->crend(); ++it) {
+    return dictionary::MatchIterator::EmptyIteratorPair();
   }
 
   bool Contains(const std::string& key) {

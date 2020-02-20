@@ -44,11 +44,13 @@ class Damerau_Levenshtein final {
     return 0;
   }
 
-  int32_t GetInsertionCost() { return 1; }
+  int32_t GetCompletionCost() { return 1; }
 
-  int32_t GetDeletionCost() { return 1; }
+  int32_t GetInsertionCost(uint32_t codepoint_to_insert) { return 1; }
 
-  int32_t GetTranspositionCost() { return 1; }
+  int32_t GetDeletionCost(uint32_t codepoint_to_delete) { return 1; }
+
+  int32_t GetTranspositionCost(uint32_t codepoint_first, uint32_t codepoint_second) { return 1; }
 };
 
 } /* namespace costfunctions */
