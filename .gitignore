@@ -33,6 +33,8 @@
 # cmake build dir
 build/*
 */cmake-build-debug/*
+build_dir_debug/
+cmake-build-debug/
 
 # IDE project files
 .idea
