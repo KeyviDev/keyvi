@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ex
+set -x
 
 diskutil erasevolume HFS+ 'ram-disk' `hdiutil attach -nomount ram://6165430`
 df -h
