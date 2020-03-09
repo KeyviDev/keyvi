@@ -205,13 +205,8 @@ class NeedlemanWunsch final {
 
   std::string GetCandidate() {
     std::vector<unsigned char> utf8result;
-    try {
-      utf8::utf32to8(compare_sequence_.begin(), compare_sequence_.end(), back_inserter(utf8result));
-    } catch (utf8::invalid_code_point& e) {
-      // todo: this makes no sense
-      TRACE("invalid codepoint: %ld ", e.code_point());
-      return "utf8 support not implemented yet";
-    }
+    utf8::utf32to8(compare_sequence_.begin(), compare_sequence_.end(), back_inserter(utf8result));
+
     return std::string(utf8result.begin(), utf8result.end());
   }
 

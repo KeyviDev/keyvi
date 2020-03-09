@@ -201,8 +201,6 @@ class PrefixCompletion final {
                 return m;
               }
             }
-
-            TRACE("go deeper");
             data->traverser++;
           } else {
             TRACE("StateTraverser exhausted.");
