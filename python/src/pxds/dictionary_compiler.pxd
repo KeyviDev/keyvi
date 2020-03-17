@@ -18,7 +18,7 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
     cdef cppclass IntDictionaryCompiler:
         IntDictionaryCompiler() except +
         IntDictionaryCompiler(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string, int) except +
+        void Add(libcpp_utf8_string, long) except +
         void __setitem__ (libcpp_utf8_string, int) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
@@ -28,7 +28,7 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
     cdef cppclass IntDictionaryCompilerSmallData:
         IntDictionaryCompilerSmallData() except +
         IntDictionaryCompilerSmallData(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string, int) except +
+        void Add(libcpp_utf8_string, long) except +
         void __setitem__ (libcpp_utf8_string, int) except +
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
