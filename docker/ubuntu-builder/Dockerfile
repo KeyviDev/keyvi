@@ -32,3 +32,21 @@ RUN pyenv install pypy3.6-7.2.0
 # install rust
 RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y
 ENV PATH "~/.cargo/bin:$PATH"
+
+# install keyviserver build dependencies
+RUN set -ex \
+    && apt-get update \
+    && apt-get install -y unzip libssl-dev libgflags-dev libleveldb-dev libgoogle-perftools-dev
+
+ENV PROTO_MAJOR=3 PROTO_MINOR=11 PROTO_PATCH=4
+# Make sure you grab the latest version
+RUN curl -OL https://github.com/google/protobuf/releases/download/v${PROTO_MAJOR}.${PROTO_MINOR}.${PROTO_PATCH}/protoc-${PROTO_MAJOR}.${PROTO_MINOR}.${PROTO_PATCH}-linux-x86_64.zip
+
+# Unzip
+RUN unzip protoc-${PROTO_MAJOR}.${PROTO_MINOR}.${PROTO_PATCH}-linux-x86_64.zip -d protoc3
+
+# Move protoc to /usr/local/bin/
+RUN mv protoc3/bin/* /usr/local/bin/
+
+# Move protoc3/include to /usr/local/include/
+RUN mv protoc3/include/* /usr/local/include/
