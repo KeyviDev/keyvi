@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(DictGet) {
   bool matched = false;
   for (auto m : d->Get("test")) {
     BOOST_CHECK_EQUAL("test", m.GetMatchedString());
-    BOOST_CHECK_EQUAL(std::string("32"), boost::get<std::string>(m.GetAttribute("weight")));
+    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m.GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
