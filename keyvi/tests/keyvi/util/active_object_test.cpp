@@ -47,8 +47,8 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingemptyqueue) {
 
   {
     ActiveObject<std::ostringstream> wrapped_stream(&string_stream, std::bind(ScheduledTask, &calls),
-                                                    std::chrono::milliseconds(10));
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                                                    std::chrono::milliseconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 
   // relaxed checks for slow machines, e.g. travis osx
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingfullqueue) {
   size_t expected_min_calls = (duration / 8) > 5 ? ((duration - duration / 10) / 8) - 5 : 0;
 
   // relax check for slow machines, e.g. travis osx
-  expected_min_calls -= expected_min_calls / 8;
+  expected_min_calls -= expected_min_calls / 6;
 
   BOOST_CHECK_GT(expected_min_calls, 0);
   BOOST_CHECK_GT(calls, expected_min_calls);
