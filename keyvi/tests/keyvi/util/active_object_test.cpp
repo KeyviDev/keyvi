@@ -52,8 +52,8 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingemptyqueue) {
   }
 
   // relaxed checks for slow machines, e.g. travis osx
-  BOOST_CHECK(calls > 6);
-  BOOST_CHECK(calls < 11 + 1);
+  BOOST_CHECK_GT(calls, 5);
+  BOOST_CHECK_LT(calls, 11 + 1);
 }
 
 BOOST_AUTO_TEST_CASE(scheduledtasktimingfullqueue) {
@@ -78,11 +78,11 @@ BOOST_AUTO_TEST_CASE(scheduledtasktimingfullqueue) {
   size_t expected_min_calls = (duration / 8) > 5 ? ((duration - duration / 10) / 8) - 5 : 0;
 
   // relax check for slow machines, e.g. travis osx
-  expected_min_calls -=  expected_min_calls / 10;
+  expected_min_calls -= expected_min_calls / 8;
 
-  BOOST_CHECK(expected_min_calls > 0);
-  BOOST_CHECK(calls > expected_min_calls);
-  BOOST_CHECK(calls < (duration / 8) + 1 + 1);
+  BOOST_CHECK_GT(expected_min_calls, 0);
+  BOOST_CHECK_GT(calls, expected_min_calls);
+  BOOST_CHECK_LT(calls, (duration / 8) + 1 + 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
