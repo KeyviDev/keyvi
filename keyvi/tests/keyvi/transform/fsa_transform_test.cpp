@@ -23,7 +23,8 @@
  *      Author: hendrik
  */
 
-#include <boost/make_shared.hpp>
+#include <memory>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/testing/temp_dictionary.h"
@@ -66,7 +67,7 @@ BOOST_AUTO_TEST_CASE(NormalizePartialAtEnd) {
 
   testing::TempDictionary dictionary(&test_data);
 
-  boost::shared_ptr<dictionary::Dictionary> d = boost::make_shared<dictionary::Dictionary>(dictionary.GetFsa());
+  std::shared_ptr<dictionary::Dictionary> d = std::make_shared<dictionary::Dictionary>(dictionary.GetFsa());
   auto transformer = FsaTransform(d);
 
   std::string input = "aab";
