@@ -27,8 +27,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/completion/prefix_completion.h"
-#include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/generator.h"
 #include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
 #include "keyvi/testing/temp_dictionary.h"
