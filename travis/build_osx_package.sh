@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-set -ex
+set -x
 
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=release -DZLIB_ROOT=/usr/local/opt/zlib ..
-make -j 4
+make -j 4 || travis_terminate 1;
 
-./unit_test_all --log_level=test_suite
+./unit_test_all --log_level=test_suite || travis_terminate 1;
 cd ..
 
 
@@ -20,6 +20,6 @@ brew remove zlib
 brew remove snappy
 
 sudo -H pip install wheelhouse/*.whl
-py.test tests
-py.test integration-tests
+py.test tests || travis_terminate 1;
+py.test integration-tests || travis_terminate 1;
 cd ..

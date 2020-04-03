@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 
+#include <memory>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/testing/temp_dictionary.h"
