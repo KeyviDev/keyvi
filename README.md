@@ -1,5 +1,5 @@
 ##
-[![Travis](https://travis-ci.org/KeyviDev/keyvi.svg?branch=master  "Travis build status")](https://travis-ci.org/KeyviDev/keyvi)
+[![Travis](https://travis-ci.com/KeyviDev/keyvi.svg?branch=master  "Travis build status")](https://travis-ci.org/KeyviDev/keyvi)
 [![C++](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](/keyvi/README.md)
 [![PythonVersions](https://img.shields.io/pypi/pyversions/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PythonImpl](https://img.shields.io/pypi/implementation/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
