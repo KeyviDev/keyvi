@@ -1,4 +1,4 @@
-FROM quay.io/pypa/manylinux1_x86_64
+FROM quay.io/pypa/manylinux2014_x86_64
 
 RUN yum -y update; yum clean all
 
@@ -6,8 +6,6 @@ RUN yum -y install  bzip2-devel \
                     snappy-devel \
                     python-devel && \
                     yum clean all
-
-RUN yum remove cmake28 -y
 
 ENV ZLIB_MAJOR=1 ZLIB_MINOR=2 ZLIB_PATCH=11
 

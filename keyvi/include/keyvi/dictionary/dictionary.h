@@ -397,8 +397,7 @@ class Dictionary final {
 };
 
 // shared pointer
-// typedef std::shared_ptr<Dictionary> dictionary_t;
-typedef boost::shared_ptr<Dictionary> dictionary_t;
+typedef std::shared_ptr<Dictionary> dictionary_t;
 
 } /* namespace dictionary */
 } /* namespace keyvi */
