@@ -354,7 +354,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             'Programming Language :: C++',
             'Programming Language :: Cython',
             'Programming Language :: Python',
-            'Programming Language :: Python :: 2.7',
             'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
