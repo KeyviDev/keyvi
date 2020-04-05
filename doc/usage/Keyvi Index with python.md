@@ -3,9 +3,7 @@
 A keyvi index is a simple key value store that lets you read and write. As keyvi's data structure is immutable, writes are not
 immediate, but "near realtime". This means the data is available after a refresh in the background (default every `1s`) or after an explicit `Flush`.
 
-A keyvi index creates so called segments in the background, reads have to lookup data in all segments, that's why segments get merged. Eventually a keyvi index consists of 1 segment, which is 1 keyvi file.
-
-The way it works is similar to [Lucene](https://lucene.apache.org/).
+A keyvi index creates so called segments in the background, reads have to lookup data in all segments, that's why segments get merged. Eventually a keyvi index consists of 1 segment, which is 1 keyvi file. However, this happens all magically in the background. If you look for more information, you can read how [Lucene](https://lucene.apache.org/) works, keyvi index works similar.
 
 ### Getting started
 
@@ -60,12 +58,12 @@ index.Flush()
 
 ### Thread Safety / Multi Processing
 
-You can only have one index that _writes_, within the same python process you can use the same index instance and write from multiple threads. If you want to use the index from another process you can open it read-only:
+You can only have one index that _writes_, within the same python process you can use the same index instance and write from multiple threads (keyvi internally queues all write requests). If you want to use the index from another process you can open it read-only:
 
 ```
 index = keyvi.index.ReadOnlyIndex("test-index")
 ```
 
-A readonly index only has only read methods, e.g. `Get` but no write methods. As for the index, writes are _near realtime_, which means a write from the process that has the write index open is not immediatly visible in the _readonly_ index but after a _flush_ in the write and a _refresh_ in the read index (default `1s` for each).
+A readonly index only has only read methods, e.g. `Get` but no write methods. As for a _read-write_ index, writes are _near realtime_, which means a write from the process that has the _read-write_ index open is not immediatly visible in the _readonly_ index, but after a _flush_ in the _read-write_ and a _refresh_ in the _read-only_ index (The default `1s` for each, which means worst-case a write takes `2s` to be visible).
 
-Because keyvi uses _memory mapping_, opening an index in several processes does not increase memory consumption for the index, but only some negligible small data structures as holders.
+Because keyvi uses _memory mapping_, opening an index in several processes does not increase memory consumption for the index, but only requires some negligible small data structures as holders.
