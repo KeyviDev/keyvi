@@ -1,4 +1,4 @@
-## Index using python
+## Index with python
 
 A keyvi index is a simple key value store that lets you read and write. As keyvi's data structure is immutable, writes are not
 immediate, but "near realtime". This means the data is available after a refresh in the background or after an explicit `Flush`.
