@@ -76,9 +76,14 @@ def generate_pykeyvi_source():
     max_modification_time = max([path.getmtime(fn) for fn in addons + pxds + converter_files])
 
     if not path.exists(pykeyvi_cpp) or max_modification_time > path.getmtime(pykeyvi_cpp):
-        import autowrap.Main
-        autowrap.Main.run(pxds, addons, [converters], pykeyvi_pyx)
-
+        try:
+            import autowrap.Main
+            autowrap.Main.run(pxds, addons, [converters], pykeyvi_pyx)
+        except:
+            if not path.exists(pykeyvi_cpp):
+                raise
+            else:
+                print ("Could find autowrap, probably running from sdist environment")
 
 @contextmanager
 def symlink_keyvi():
