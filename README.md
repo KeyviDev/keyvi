@@ -43,7 +43,7 @@ For the python extension of keyvi check the [Readme](/python/README.md) file in 
     * [Compiling Dictionaries/Indexes](/doc/usage/Building%20keyvi%20dictionaries.md)
     * Python version of keyvi
       * [Compiling](/doc/usage/Building%20keyvi%20dictionaries%20with%20python.md)
-      * [Index](/doc/usage/Index%20using%20python.md)
+      * [Index](/doc/usage/Keyvi%20Index%20with%20python.md)
   * [Crashcourse](/doc/usage/Crashcourse.md)
   * [Using python keyvi with EMR (mrjob or pyspark)](/doc/usage/Using%20pykeyvi%20in%20EMR.md)  
 
