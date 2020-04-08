@@ -83,7 +83,7 @@ def generate_pykeyvi_source():
             if not path.exists(pykeyvi_cpp):
                 raise
             else:
-                print ("Could find autowrap, probably running from sdist environment")
+                print ("Could not find autowrap, probably running from sdist environment")
 
 @contextmanager
 def symlink_keyvi():
