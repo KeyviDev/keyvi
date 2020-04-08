@@ -14,7 +14,7 @@ from test_tools import tmp_dictionary
 
 
 def test_input_output_keys():
-    compiler = keyvi.JsonDictionaryCompiler({'compression_threshold': '32', 'compression': 'zlib'})
+    compiler = keyvi.JsonDictionaryCompiler({'compression_threshold': '32', 'compression': 'zlib', "memory_limit_mb":"10"})
     input_keys_count = 0
     with open(os.path.join(root, 'var_length_short_calculation_test_data.tsv')) as f_in:
         for line in f_in:

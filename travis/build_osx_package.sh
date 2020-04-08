@@ -19,7 +19,7 @@ python setup.py bdist_wheel -d wheelhouse --zlib-root /usr/local/opt/zlib
 brew remove zlib
 brew remove snappy
 
-sudo -H pip install wheelhouse/*.whl
-py.test tests || travis_terminate 1;
-py.test integration-tests || travis_terminate 1;
+python -m pip install --user wheelhouse/*.whl
+python -m pytest tests || travis_terminate 1;
+python -m pytest integration-tests || travis_terminate 1;
 cd ..
