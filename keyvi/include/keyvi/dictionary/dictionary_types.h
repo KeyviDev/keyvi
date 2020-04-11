@@ -48,8 +48,8 @@ using CompletionDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dicti
 
 using IntDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT>;
 
-using IntDictionaryCompilerSmallData = keyvi::dictionary::DictionaryCompiler<
-        dictionary_type_t::INT, keyvi::dictionary::sort::InMemorySorter<key_value_t>>;
+using IntDictionaryCompilerSmallData =
+    keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT, keyvi::dictionary::sort::InMemorySorter<key_value_t>>;
 
 using KeyOnlyDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::KEY_ONLY>;
 
