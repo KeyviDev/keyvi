@@ -19,5 +19,6 @@ limitations under the License.
 
 from keyvi._core import CompletionDictionaryCompiler, CompletionDictionaryMerger, IntDictionaryCompiler, IntDictionaryMerger
 from keyvi._core import JsonDictionaryCompiler, JsonDictionaryCompilerSmallData, JsonDictionaryMerger
+from keyvi._core import IntDictionaryCompilerSmallData
 from keyvi._core import KeyOnlyDictionaryCompiler, KeyOnlyDictionaryGenerator, KeyOnlyDictionaryMerger
 from keyvi._core import StringDictionaryCompiler, StringDictionaryMerger
