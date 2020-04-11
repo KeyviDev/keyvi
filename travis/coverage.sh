@@ -6,7 +6,7 @@ cd /io
 export CONF=coverage
 travis/build_linux.sh
 
-export PYTHON_VERSION=2.7.16
+export PYTHON_VERSION=3.5.7
 travis/build_python.sh
 
 pip install coveralls-merge cpp-coveralls --upgrade

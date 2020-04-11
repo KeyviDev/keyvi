@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 set -ex
 
-pyenv global 2.7.16
+pyenv global 3.5.7
 
 cd /io/python
 
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 
 python setup.py sdist -d wheelhouse
 
-pip uninstall -y autowrap
-pip install wheelhouse/*.tar.gz
-py.test tests
-py.test integration-tests
+python -m pip uninstall -y autowrap
+python -m pip install wheelhouse/*.tar.gz
+python -m pytest tests
+python -m pytest integration-tests
 cd ..

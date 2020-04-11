@@ -15,4 +15,5 @@ export PATH="${HOME}/.pyenv/shims/:/root/.pyenv/bin:${PATH}"
 pyenv install ${PYTHON_VERSION} || travis_terminate 1;
 pyenv global ${PYTHON_VERSION} || travis_terminate 1;
 
-pip install -r python/requirements.txt || travis_terminate 1;
+python -m pip install --upgrade pip
+python -m pip install -r python/requirements.txt || travis_terminate 1;
