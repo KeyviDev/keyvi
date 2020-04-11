@@ -16,14 +16,14 @@
  */
 
 /*
- * damerau_levenshtein.h
+ * damerau_levenshtein_completion.h
  *
- *  Created on: Jul 16, 2014
+ *  Created on: Feb 6, 2020
  *      Author: hendrik
  */
 
-#ifndef KEYVI_STRINGDISTANCE_COSTFUNCTIONS_DAMERAU_LEVENSHTEIN_H_
-#define KEYVI_STRINGDISTANCE_COSTFUNCTIONS_DAMERAU_LEVENSHTEIN_H_
+#ifndef KEYVI_STRINGDISTANCE_COSTFUNCTIONS_DAMERAU_LEVENSHTEIN_COMPLETION_H_
+#define KEYVI_STRINGDISTANCE_COSTFUNCTIONS_DAMERAU_LEVENSHTEIN_COMPLETION_H_
 
 #include <cstdint>
 
@@ -32,9 +32,10 @@ namespace stringdistance {
 namespace costfunctions {
 
 /**
- * A Damerau Levenshtein cost function which returns 1 for mismatch, insertion, deletion and transposition.
+ * A Damerau Levenshtein cost function which returns 1 for mismatch, insertion, deletion and transposition, except for
+ * inserting characters after the we reached the end of the input. With other words, completion.
  */
-class Damerau_Levenshtein final {
+class Damerau_LevenshteinCompletion final {
  public:
   int32_t GetSubstitutionCost(uint32_t codepoint_from, uint32_t codepoint_to) {
     if (codepoint_from != codepoint_to) {
@@ -44,7 +45,7 @@ class Damerau_Levenshtein final {
     return 0;
   }
 
-  int32_t GetCompletionCost() { return 1; }
+  int32_t GetCompletionCost() { return 0; }
 
   int32_t GetInsertionCost(uint32_t codepoint_to_insert) { return 1; }
 
@@ -57,4 +58,4 @@ class Damerau_Levenshtein final {
 } /* namespace stringdistance */
 } /* namespace keyvi */
 
-#endif  // KEYVI_STRINGDISTANCE_COSTFUNCTIONS_DAMERAU_LEVENSHTEIN_H_
+#endif  // KEYVI_STRINGDISTANCE_COSTFUNCTIONS_DAMERAU_LEVENSHTEIN_COMPLETION_H_

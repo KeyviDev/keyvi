@@ -27,6 +27,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/completion/prefix_completion.h"
+#include "keyvi/dictionary/dictionary.h"
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/generator.h"
 #include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
@@ -122,18 +123,25 @@ BOOST_AUTO_TEST_CASE(approx1) {
 
   std::vector<std::string> expected_output;
   expected_output.push_back("aabc");
-  expected_output.push_back("aabcdefghijklmnop");
-  expected_output.push_back("aabcül");
+  // not matching aabcül because of last character mismatch
+  expected_output.push_back("aabcdefghijklmnop");  // this matches because aab_c_d, "c" is an insert
 
+  auto expected_it = expected_output.begin();
   for (auto m : prefix_completion.GetFuzzyCompletions("aabd", 2)) {
-    // BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-    TRACE("1 match: %s", m.GetMatchedString().c_str());
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
   }
+  BOOST_CHECK(expected_it == expected_output.end());
 
+  expected_output.clear();
+  expected_output.push_back("aabc");
+  expected_output.push_back("aabcül");
+  expected_output.push_back("aabcdefghijklmnop");
+
+  expected_it = expected_output.begin();
   for (auto m : prefix_completion.GetFuzzyCompletions("aabc", 2)) {
-    // BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-    TRACE("2 match: %s", m.GetMatchedString().c_str());
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
   }
+  BOOST_CHECK(expected_it == expected_output.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

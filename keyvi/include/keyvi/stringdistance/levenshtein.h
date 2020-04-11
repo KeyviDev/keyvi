@@ -28,6 +28,7 @@
 #include <memory>
 
 #include "keyvi/stringdistance/costfunctions/damerau_levenshtein.h"
+#include "keyvi/stringdistance/costfunctions/damerau_levenshtein_completion.h"
 #include "keyvi/stringdistance/needleman_wunsch.h"
 
 namespace keyvi {
@@ -35,6 +36,8 @@ namespace stringdistance {
 
 // Levenshtein is NeedlemanWunsch with constant cost of 1 for all operations
 typedef NeedlemanWunsch<costfunctions::Damerau_Levenshtein> Levenshtein;
+typedef NeedlemanWunsch<costfunctions::Damerau_LevenshteinCompletion> LevenshteinCompletion;
+
 typedef std::shared_ptr<Levenshtein> levenshtein_t;
 
 } /* namespace stringdistance */
