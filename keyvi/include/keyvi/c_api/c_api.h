@@ -30,10 +30,22 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include <stdint.h>
 
 struct keyvi_dictionary;
 struct keyvi_match;
 struct keyvi_match_iterator;
+
+struct keyvi_bytes {
+  const size_t data_size;
+  const uint8_t* const data_ptr;
+};
+
+//////////////////////
+//// Bytes
+//////////////////////
+
+void keyvi_bytes_destroy(keyvi_bytes bytes);
 
 //////////////////////
 //// String
@@ -74,6 +86,8 @@ bool keyvi_match_is_empty(const struct keyvi_match*);
 double keyvi_match_get_score(const struct keyvi_match*);
 
 char* keyvi_match_get_value_as_string(const struct keyvi_match*);
+
+keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match*);
 
 char* keyvi_match_get_matched_string(const struct keyvi_match*);
 
