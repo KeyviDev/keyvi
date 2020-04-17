@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
+
 import Queue
 import threading
-import keyvi
 import argparse
 import os
 import gzip
 import unicodedata, re
+
+from keyvi.compiler import JsonDictionaryCompiler
+from keyvi.util import JumpConsistentHashString
 
 control_chars = ''.join(map(unichr, range(0,32)))
 
@@ -31,7 +33,7 @@ def compile_file(input, output, jobs, shards):
 
     compilers = {}
     for i in range (0, shards):
-        compilers[i] = keyvi.JsonDictionaryCompiler()
+        compilers[i] = JsonDictionaryCompiler()
 
     if os.path.isdir(input):
         input_files = [os.path.join(input,d) for d in os.listdir(input)]
@@ -50,16 +52,16 @@ def compile_file(input, output, jobs, shards):
                 key = parts[0]
 
                 if key != remove_control_chars(key):
-                    print "skip key: " + ":".join("{:02x}".format(ord(c)) for c in key) + " due to containing control characters"
+                    print("skip key: " + ":".join("{:02x}".format(ord(c)) for c in key) + " due to containing control characters")
                     skipped_keys +=1
 
                 value = parts[1]
 
-                shard = keyvi.JumpConsistentHashString(key, shards)
+                shard = JumpConsistentHashString(key, shards)
                 compilers[shard].Add(key, value)
             except:
-                print "failed to add: " + line
-        print "Skipped keys " + str(skipped_keys)
+                print("failed to add: " + line)
+        print("Skipped keys " + str(skipped_keys))
 
     for i in range(jobs):
          t = threading.Thread(target=compile_worker)

@@ -1,8 +1,8 @@
-import keyvi
+from keyvi.dictionary import Dictionary
 
 query = ""
 
-d=keyvi.Dictionary("your-own.keyvi")
+d=Dictionary("your-own.keyvi")
 
 def get_lookup_key(query):
     return query
@@ -10,4 +10,4 @@ def get_lookup_key(query):
 while query!="exit":
     query = raw_input("Query:")
     for m in d.Get(get_lookup_key(query.strip())):
-        print "{} {}".format(m.GetMatchedString(), m.GetValueAsString())
+        print("{} {}".format(m.GetMatchedString(), m.GetValueAsString()))
