@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
+from keyvi.compiler import JsonDictionaryCompiler
 
 import sys
 import os
@@ -21,7 +21,7 @@ def memory_usage_ps():
     return mem
 
 def test_leak():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("something", '["a" : 2]')
 
     with tmp_dictionary(c, 'near_simple.kv') as d:

@@ -21,14 +21,3 @@ from keyvi._version import __version__
 
 # global keyvi concepts
 from keyvi._core import MatchIterator, Match
-
-# backwards compatibility for 0.2, deprecated, use sub-packages instead
-
-from keyvi._core import CompletionDictionaryCompiler, CompletionDictionaryMerger, Dictionary
-from keyvi._core import ForwardBackwardCompletion, FsaTransform, IntDictionaryCompiler, IntDictionaryMerger
-from keyvi._core import JsonDictionaryCompiler, JsonDictionaryCompilerSmallData, JsonDictionaryMerger, JumpConsistentHashString
-from keyvi._core import KeyOnlyDictionaryCompiler, KeyOnlyDictionaryGenerator, KeyOnlyDictionaryMerger
-from keyvi._core import MatchIterator, Match
-from keyvi._core import MultiWordCompletion, PredictiveCompression, PrefixCompletion, ReadOnlyIndex
-from keyvi._core import StringDictionaryCompiler, StringDictionaryMerger
-from keyvi._core import loading_strategy_types
