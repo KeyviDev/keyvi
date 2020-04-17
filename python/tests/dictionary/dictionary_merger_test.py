@@ -13,6 +13,7 @@ from os import path
 
 from keyvi.compiler import JsonDictionaryCompiler, JsonDictionaryMerger
 from keyvi.dictionary import Dictionary
+from keyvi import loading_strategy_types
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -73,7 +74,7 @@ def test_merge(merger):
         merger.Merge(merge_file)
 
 
-        merged_dictionary = Dictionary(merge_file)
+        merged_dictionary = Dictionary(merge_file, loading_strategy_types.populate_lazy)
 
         key_values = {}
         key_values.update(key_values_1)
