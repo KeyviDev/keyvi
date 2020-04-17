@@ -53,8 +53,12 @@ impl KeyviMatch {
 
     pub fn get_msgpacked_value(&self) -> Vec<u8> {
         let kv_bytes = unsafe { root::keyvi_match_get_msgpacked_value(self.match_ptr_) };
-        let msgpacked_value = unsafe {
-            slice::from_raw_parts(kv_bytes.data_ptr, kv_bytes.data_size as usize).to_vec()
+        let msgpacked_value = if kv_bytes.data_size == 0 {
+            Vec::new()
+        } else {
+            unsafe {
+                slice::from_raw_parts(kv_bytes.data_ptr, kv_bytes.data_size as usize).to_vec()
+            }
         };
         unsafe { root::keyvi_bytes_destroy(kv_bytes) };
 

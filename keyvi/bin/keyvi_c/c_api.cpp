@@ -71,7 +71,9 @@ struct keyvi_match_iterator {
 //////////////////////
 
 void keyvi_bytes_destroy(keyvi_bytes bytes) {
-  free(const_cast<uint8_t*>(bytes.data_ptr));
+  if (0 != bytes.data_size) {
+    free(const_cast<uint8_t*>(bytes.data_ptr));
+  }
 }
 
 //////////////////////
@@ -149,10 +151,17 @@ char* keyvi_match_get_value_as_string(const keyvi_match* match) {
 }
 
 keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
+  const keyvi_bytes empty_keyvi_bytes{0, nullptr};
   const std::string msgpacked_value = match->obj_.GetMsgPackedValueAsString();
 
   const size_t data_size = msgpacked_value.size();
+  if (0 == data_size) {
+    return empty_keyvi_bytes;
+  }
   auto data_ptr = malloc(data_size);
+  if (nullptr == data_ptr) {
+    return empty_keyvi_bytes;
+  }
   memcpy(data_ptr, msgpacked_value.c_str(), data_size);
 
   return keyvi_bytes{data_size, static_cast<const uint8_t*>(data_ptr)};

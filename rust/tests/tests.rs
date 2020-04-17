@@ -65,6 +65,14 @@ mod tests {
     }
 
     #[test]
+    fn match_msgpacked_value_non_existing_key() {
+        let m = dictionary::Dictionary::new("test_data/test.kv")
+            .unwrap()
+            .get("non-existing-key");
+        assert!(m.get_value_as_string().is_empty());
+    }
+
+    #[test]
     fn match_value() {
         let m = dictionary::Dictionary::new("test_data/test.kv").unwrap().get("a");
         assert_eq!(m.get_value_as_string(), "[12,13]");
