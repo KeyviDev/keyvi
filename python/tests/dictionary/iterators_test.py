@@ -2,6 +2,7 @@
 # Usage: py.test tests
 
 import keyvi
+from keyvi.compiler import JsonDictionaryCompiler
 
 import sys
 import os
@@ -21,7 +22,7 @@ key_values = [
 
 def generate_dictionary_compiler():
 
-    dictionary_compiler = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    dictionary_compiler = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     for key, value in key_values:
         dictionary_compiler.Add(key, json.dumps(value))
 

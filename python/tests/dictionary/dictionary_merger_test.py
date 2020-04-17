@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
+from keyvi.compiler import JsonDictionaryCompiler, JsonDictionaryMerger
+from keyvi.dictionary import Dictionary
 
 import sys
 import os
@@ -43,15 +44,15 @@ key_values_3 = {
 
 def generate_keyvi(key_values, filename):
 
-    dictionary_compiler = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    dictionary_compiler = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     for key, value in key_values.items():
         dictionary_compiler.Add(key, json.dumps(value))
 
     dictionary_compiler.Compile()
     dictionary_compiler.WriteToFile(filename)
 
-@pytest.mark.parametrize('merger', [keyvi.JsonDictionaryMerger({"memory_limit_mb":"10"}),
-                                    keyvi.JsonDictionaryMerger({"memory_limit_mb":"10", 'merge_mode': 'append'})])
+@pytest.mark.parametrize('merger', [JsonDictionaryMerger({"memory_limit_mb":"10"}),
+                                    JsonDictionaryMerger({"memory_limit_mb":"10", 'merge_mode': 'append'})])
 def test_merge(merger):
 
     tmp_dir = tempfile.mkdtemp()
@@ -72,7 +73,7 @@ def test_merge(merger):
         merger.Merge(merge_file)
 
 
-        merged_dictionary = keyvi.Dictionary(merge_file)
+        merged_dictionary = Dictionary(merge_file)
 
         key_values = {}
         key_values.update(key_values_1)

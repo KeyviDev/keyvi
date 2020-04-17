@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-from keyvi.compiler import JsonDictionaryCompiler
-
 import sys
 import os
 import gc
+
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../../tests"))

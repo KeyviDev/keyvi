@@ -5,11 +5,15 @@ import json
 import os
 import tempfile
 import keyvi
+
+from keyvi.compiler import KeyOnlyDictionaryCompiler, JsonDictionaryCompiler, JsonDictionaryMerger
+from keyvi.dictionary import Dictionary
+
 from test_tools import tmp_dictionary
 
 
 def test_size():
-    c = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
+    c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("Leela")
     c.Add("Kif")
     with tmp_dictionary(c, 'brannigan_size.kv') as d:
@@ -17,7 +21,7 @@ def test_size():
 
 
 def test_manifest():
-    c = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
+    c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("Leela")
     c.Add("Kif")
     c.SetManifest('{"author": "Zapp Brannigan"}')
@@ -26,7 +30,7 @@ def test_manifest():
         assert m['author'] == "Zapp Brannigan"
 
 def test_manifest_after_compile():
-    c = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
+    c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("Leela")
     c.Add("Kif")
     c.Compile()
@@ -34,7 +38,7 @@ def test_manifest_after_compile():
     file_name = os.path.join(tempfile.gettempdir(),'brannigan_manifest2.kv')
     try:
         c.WriteToFile(file_name)
-        d = keyvi.Dictionary(file_name)
+        d = Dictionary(file_name)
         m = json.loads(d.GetManifest())
         assert m['author'] == "Zapp Brannigan"
         del d
@@ -42,7 +46,7 @@ def test_manifest_after_compile():
         os.remove(file_name)
 
 def test_statistics():
-    c = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
+    c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("Leela")
     c.Add("Kif")
     c.SetManifest('{"author": "Zapp Brannigan"}')
@@ -56,25 +60,25 @@ def test_statistics():
 
 def test_manifest_for_merger():
     try:
-        c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+        c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
         c.Add("abc", '{"a" : 2}')
         c.Compile()
         c.SetManifest('{"author": "Zapp Brannigan"}')
         c.WriteToFile('manifest_json_merge1.kv')
         del c
 
-        c2 = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+        c2 = JsonDictionaryCompiler({"memory_limit_mb":"10"})
         c2.Add("abd", '{"a" : 3}')
         c2.Compile()
         c2.SetManifest('{"author": "Leela"}')
         c2.WriteToFile('manifest_json_merge2.kv')
         del c2
 
-        merger = keyvi.JsonDictionaryMerger({"memory_limit_mb":"10"})
+        merger = JsonDictionaryMerger({"memory_limit_mb":"10"})
         merger.SetManifest('{"author": "Fry"}')
         merger.Merge('manifest_json_merged.kv')
 
-        d = keyvi.Dictionary('manifest_json_merged.kv')
+        d = Dictionary('manifest_json_merged.kv')
         m = json.loads(d.GetManifest())
         assert m['author'] == "Fry"
         del d

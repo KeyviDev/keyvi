@@ -3,30 +3,32 @@
 
 import os
 import keyvi
+
+from keyvi.compiler import JsonDictionaryCompiler, KeyOnlyDictionaryCompiler
 import shutil
 import tempfile
 import test_tools
 from pytest import raises
 
 def test_compiler_no_compile_edge_case():
-    c = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
+    c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc")
     c.Add("abd")
     del c
 
 
 def test_compiler_no_compile_edge_case_empty():
-    c = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
+    c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     del c
 
 
 def test_compiler_empty():
-    c = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
+    c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     with test_tools.tmp_dictionary(c, 'empty.kv') as d:
         assert len(d) == 0
 
 def test_compiler_empty_json():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     with test_tools.tmp_dictionary(c, 'empty_json.kv') as d:
         assert len(d) == 0
 
@@ -37,7 +39,7 @@ def test_tmp_dir():
     try:
         os.mkdir("tmp_dir_test")
         os.chdir(os.path.join(tempfile.gettempdir(), "tmp_dir_test"))
-        c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+        c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
         c.Add("abc", "{'a':2}")
         assert os.listdir('.') == []
         c.Compile()
@@ -51,7 +53,7 @@ def test_tmp_dir():
 
 def test_tmp_dir_defined():
     def run_compile(tmpdir):
-        c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10", "temporary_path": tmpdir})
+        c = JsonDictionaryCompiler({"memory_limit_mb":"10", "temporary_path": tmpdir})
         c.Add("abc", "{'a':2}")
         c.Compile()
         assert os.listdir(test_dir) != []
@@ -61,12 +63,12 @@ def test_tmp_dir_defined():
         os.mkdir(test_dir)
         run_compile(test_dir)
     finally:
-        keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+        JsonDictionaryCompiler({"memory_limit_mb":"10"})
         shutil.rmtree(test_dir)
 
 
 def test_compile_step_missing():
-    c = keyvi.KeyOnlyDictionaryCompiler()
+    c = KeyOnlyDictionaryCompiler()
     c.Add("abc")
     c.Add("abd")
     with raises(RuntimeError):
