@@ -3,13 +3,27 @@ import keyvi
 
 from argparse import ArgumentParser
 
+from keyvi.compiler import (
+    JsonDictionaryCompiler,
+    StringDictionaryCompiler,
+    IntDictionaryCompiler,
+    CompletionDictionaryCompiler,
+    KeyOnlyDictionaryCompiler,
+    JsonDictionaryMerger,
+    StringDictionaryMerger,
+    IntDictionaryMerger,
+    CompletionDictionaryMerger,
+    KeyOnlyDictionaryMerger
+)
+from keyvi.dictionary import Dictionary
+
 
 def stats(input_file):
-    print (json.dumps(keyvi.Dictionary(input_file).GetStatistics(), indent=4, sort_keys=True))
+    print(json.dumps(Dictionary(input_file).GetStatistics(), indent=4, sort_keys=True))
 
 
 def dump(args):
-    dictionary = keyvi.Dictionary(args.input_file)
+    dictionary = Dictionary(args.input_file)
     with open(args.output_file, 'w') as file_out:
         for key, value in dictionary.GetAllItems():
             if args.json_dumps:
@@ -29,15 +43,15 @@ def compile(args):
 
     dict_type = args.dict_type
     if dict_type == 'json':
-        dictionary = keyvi.JsonDictionaryCompiler(params)
+        dictionary = JsonDictionaryCompiler(params)
     elif dict_type == 'string':
-        dictionary = keyvi.StringDictionaryCompiler(params)
+        dictionary = StringDictionaryCompiler(params)
     elif dict_type == 'int':
-        dictionary = keyvi.IntDictionaryCompiler(params)
+        dictionary = IntDictionaryCompiler(params)
     elif dict_type == 'completion':
-        dictionary = keyvi.CompletionDictionaryCompiler(params)
+        dictionary = CompletionDictionaryCompiler(params)
     elif dict_type == 'key-only':
-        dictionary = keyvi.KeyOnlyDictionaryCompiler(params)
+        dictionary = KeyOnlyDictionaryCompiler(params)
     else:
         return 'Must never reach here'
 
@@ -53,7 +67,7 @@ def compile(args):
                 else:
                     dictionary.Add(splits[0], splits[1])
             except:
-                print ('Can not parse line: {}'.format(line))
+                print('Can not parse line: {}'.format(line))
 
     dictionary.Compile()
     dictionary.WriteToFile(args.output_file)
@@ -64,15 +78,15 @@ def merge(args):
 
     dict_type = args.dict_type
     if dict_type == 'json':
-        merger = keyvi.JsonDictionaryMerger(params)
+        merger = JsonDictionaryMerger(params)
     elif dict_type == 'string':
-        merger = keyvi.StringDictionaryMerger(params)
+        merger = StringDictionaryMerger(params)
     elif dict_type == 'int':
-        merger = keyvi.IntDictionaryMerger(params)
+        merger = IntDictionaryMerger(params)
     elif dict_type == 'completion':
-        merger = keyvi.CompletionDictionaryMerger(params)
+        merger = CompletionDictionaryMerger(params)
     elif dict_type == 'key-only':
-        merger = keyvi.KeyOnlyDictionaryMerger(params)
+        merger = KeyOnlyDictionaryMerger(params)
     else:
         return 'Must never reach here'
 
