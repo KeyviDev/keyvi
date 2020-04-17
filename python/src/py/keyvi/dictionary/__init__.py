@@ -18,3 +18,4 @@ limitations under the License.
 '''
 
 from keyvi._core import Dictionary
+from keyvi._core import loading_strategy_types
