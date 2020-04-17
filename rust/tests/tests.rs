@@ -40,12 +40,36 @@ mod tests {
     }
 
     #[test]
+    fn match_msgpacked_value_int() {
+        let m = dictionary::Dictionary::new("test_data/completion_test.kv")
+            .unwrap()
+            .get("mozilla footprint");
+        assert_eq!(m.get_msgpacked_value(), vec![30]);
+    }
+
+    #[test]
     fn match_value_array() {
         let m = dictionary::Dictionary::new("test_data/test.kv").unwrap().get("a");
         match m.get_value() {
             Value::Array(n) => assert_eq!(n, vec![12, 13]),
             _ => assert!(false)
         }
+    }
+
+    #[test]
+    fn match_msgpacked_value_array() {
+        let m = dictionary::Dictionary::new("test_data/test.kv")
+            .unwrap()
+            .get("a");
+        assert_eq!(m.get_msgpacked_value(), vec![146, 12, 13]);
+    }
+
+    #[test]
+    fn match_msgpacked_value_non_existing_key() {
+        let m = dictionary::Dictionary::new("test_data/test.kv")
+            .unwrap()
+            .get("non-existing-key");
+        assert!(m.get_value_as_string().is_empty());
     }
 
     #[test]
