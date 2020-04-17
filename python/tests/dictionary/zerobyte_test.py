@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import contextlib
+import sys
 import os
 
 from keyvi.compiler import JsonDictionaryCompiler
-
-import sys
-import os
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))

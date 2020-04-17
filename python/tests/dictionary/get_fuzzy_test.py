@@ -2,8 +2,7 @@
 # Usage: py.test tests
 
 
-import keyvi
-from keyvi.compiler import CompletionDictionaryCompiler\
+from keyvi.compiler import CompletionDictionaryCompiler
 
 from test_tools import tmp_dictionary
 

@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
-
-from keyvi.compiler import StringDictionaryMerger, StringDictionaryCompiler
-from keyvi.dictionary import Dictionary
-
 import sys
 import os
 import json
@@ -15,6 +10,9 @@ import collections
 import pytest
 
 from os import path
+
+from keyvi.compiler import StringDictionaryMerger, StringDictionaryCompiler
+from keyvi.dictionary import Dictionary
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -55,7 +53,7 @@ def generate_keyvi(key_values, filename):
 
 
 @pytest.mark.parametrize('merger', [StringDictionaryMerger({"memory_limit_mb": "10"}),
-                                    # StringDictionaryMerger({"memory_limit_mb": "10", 'merge_mode': 'append'})
+                                    # keyvi.StringDictionaryMerger({"memory_limit_mb": "10", 'merge_mode': 'append'})
                                     ])
 def test_merge(merger):
     tmp_dir = tempfile.mkdtemp()

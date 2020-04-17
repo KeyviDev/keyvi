@@ -2,9 +2,14 @@
 # Usage: py.test tests
 
 import keyvi
-from keyvi.compiler import JsonDictionaryCompiler, CompletionDictionaryCompiler, KeyOnlyDictionaryCompiler, StringDictionaryCompiler
-
 from test_tools import tmp_dictionary
+
+from keyvi.compiler import (
+    JsonDictionaryCompiler,
+    CompletionDictionaryCompiler,
+    KeyOnlyDictionaryCompiler,
+    StringDictionaryCompiler,
+)
 
 def test_serialization():
     m = keyvi.Match()

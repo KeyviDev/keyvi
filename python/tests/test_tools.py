@@ -4,6 +4,7 @@
 import contextlib
 import os
 import tempfile
+
 from keyvi.dictionary import Dictionary
 
 

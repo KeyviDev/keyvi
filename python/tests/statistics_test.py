@@ -4,13 +4,10 @@
 import json
 import os
 import tempfile
-import keyvi
+from test_tools import tmp_dictionary
 
 from keyvi.compiler import KeyOnlyDictionaryCompiler, JsonDictionaryCompiler, JsonDictionaryMerger
 from keyvi.dictionary import Dictionary
-
-from test_tools import tmp_dictionary
-
 
 def test_size():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})

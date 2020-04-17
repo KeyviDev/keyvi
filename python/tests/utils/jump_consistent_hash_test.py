@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-from keyvi.util import JumpConsistentHashString
 import sys
 
+from keyvi.util import JumpConsistentHashString
 
 def test_jump_consistent_hash():
     assert JumpConsistentHashString('some string', 117) == 60

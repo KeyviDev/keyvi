@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
-
-from keyvi.dictionary import Dictionary
-from keyvi.compiler import JsonDictionaryCompiler
-
 import os
 import pytest
 import sys
 import tempfile
+
+from keyvi.dictionary import Dictionary
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))

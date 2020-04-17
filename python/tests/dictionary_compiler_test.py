@@ -2,13 +2,12 @@
 # Usage: py.test tests
 
 import os
-import keyvi
-
-from keyvi.compiler import JsonDictionaryCompiler, KeyOnlyDictionaryCompiler
 import shutil
 import tempfile
 import test_tools
 from pytest import raises
+
+from keyvi.compiler import JsonDictionaryCompiler, KeyOnlyDictionaryCompiler
 
 def test_compiler_no_compile_edge_case():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
