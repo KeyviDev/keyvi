@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
+from keyvi.compiler import CompletionDictionaryCompiler
+from keyvi.completion import PrefixCompletion
 
 import sys
 import os
@@ -13,7 +14,7 @@ from test_tools import tmp_dictionary
 
 # from https://github.com/KeyviDev/keyvi/issues/50
 def test_fuzzy_completion():
-    c = keyvi.CompletionDictionaryCompiler({"memory_limit_mb": "10"})
+    c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
     c.Add("turkei news", 23698)
     c.Add("turkei side", 18838)
     c.Add("turkei urlaub", 23424)
@@ -37,7 +38,7 @@ def test_fuzzy_completion():
     c.Add("tus öffnungszeiten", 15999)
 
     with tmp_dictionary(c, 'fuzzy_completion.kv') as d:
-        completer = keyvi.PrefixCompletion(d)
+        completer = PrefixCompletion(d)
         matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuv', 0)]
         assert len(matches) == 9
 
