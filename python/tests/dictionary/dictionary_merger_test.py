@@ -12,7 +12,8 @@ import pytest
 from os import path
 
 from keyvi.compiler import JsonDictionaryCompiler, JsonDictionaryMerger
-from keyvi.dictionary import Dictionary, loading_strategy_types
+from keyvi.dictionary import Dictionary
+from keyvi import loading_strategy_types
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
