@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
-
 import sys
 import os
+
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -12,7 +12,7 @@ sys.path.append(os.path.join(root, "../"))
 from test_tools import tmp_dictionary
 
 def test_unicode():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("öäü", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     # use python syntax ala __setitem__
@@ -26,7 +26,7 @@ def test_unicode():
         assert d.get(key).GetValue() == {"a" : 2}
 
 def test_unicode_lookup():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("Los Angeles", '{"country" : "USA"}')
     c.Add("Frankfurt am Main", '{"country" : "Germany"}')
     c.Add("Kirchheim bei München", '{"country" : "Germany"}')

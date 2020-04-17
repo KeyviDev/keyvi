@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import contextlib
-import os
-
-import keyvi
-
 import sys
 import os
+
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -15,7 +12,7 @@ sys.path.append(os.path.join(root, "../"))
 from test_tools import tmp_dictionary
 
 def test_zerobyte():
-    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("\x00abc", '["a" : 2]')
     c.Add("abc\x00def", '["a" : 3]')
     c.Add("cd\x00", '["a" : 4]')

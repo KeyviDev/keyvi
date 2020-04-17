@@ -1,11 +1,12 @@
-import keyvi
+from keyvi.dictionary import Dictionary
+from keyvi.completion import MultiWordCompletion
 
 MULTIWORD_QUERY_SEPARATOR = '\x1b'
 
 query = ""
 
-d=keyvi.Dictionary("mw-completion.keyvi")
-c=keyvi.MultiWordCompletion(d)
+d=Dictionary("mw-completion.keyvi")
+c=MultiWordCompletion(d)
 
 def get_lookup_key(query):
     l = query.split(" ")
@@ -17,4 +18,4 @@ def get_lookup_key(query):
 while query!="exit":
     query = raw_input("Query:")
     for m in c.GetCompletions(get_lookup_key(query.strip())):
-        print "{} {}".format(m.GetMatchedString(), m.GetAttribute("weight"))
+        print("{} {}".format(m.GetMatchedString(), m.GetAttribute("weight")))

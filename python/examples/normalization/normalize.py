@@ -1,9 +1,10 @@
 import sys
-import keyvi
+from keyvi.dictionary import Dictionary
+from keyvi.util import FsaTransform
 
-d=keyvi.Dictionary("normalization.keyvi")
-n=keyvi.FsaTransform(d)
+d=Dictionary("normalization.keyvi")
+n=FsaTransform(d)
 
 
 for line in sys.stdin:
-    print n.Normalize(line)
+    print(n.Normalize(line))

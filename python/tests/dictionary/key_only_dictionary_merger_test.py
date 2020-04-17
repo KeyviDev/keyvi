@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
-
 import sys
 import os
-import json
 import tempfile
 import shutil
-import collections
 import pytest
 
 from os import path
+
+from keyvi.compiler import KeyOnlyDictionaryMerger, KeyOnlyDictionaryCompiler
+from keyvi.dictionary import Dictionary
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -43,7 +42,7 @@ keys_3 = {
 
 
 def generate_keyvi(key_values, filename):
-    dictionary_compiler = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
+    dictionary_compiler = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
     for key in key_values:
         dictionary_compiler.Add(key)
 
@@ -51,8 +50,8 @@ def generate_keyvi(key_values, filename):
     dictionary_compiler.WriteToFile(filename)
 
 
-@pytest.mark.parametrize('merger', [keyvi.KeyOnlyDictionaryMerger({"memory_limit_mb": "10"}),
-                                    keyvi.KeyOnlyDictionaryMerger({"memory_limit_mb": "10", 'merge_mode': 'append'})])
+@pytest.mark.parametrize('merger', [KeyOnlyDictionaryMerger({"memory_limit_mb": "10"}),
+                                    KeyOnlyDictionaryMerger({"memory_limit_mb": "10", 'merge_mode': 'append'})])
 def test_merge(merger):
     tmp_dir = tempfile.mkdtemp()
     try:
@@ -70,7 +69,7 @@ def test_merge(merger):
         merger.Add(file_3)
         merger.Merge(merge_file)
 
-        merged_dictionary = keyvi.Dictionary(merge_file)
+        merged_dictionary = Dictionary(merge_file)
 
         keys = set()
         keys.update(keys_1)

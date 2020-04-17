@@ -4,7 +4,8 @@
 import contextlib
 import os
 import tempfile
-import keyvi
+
+from keyvi.dictionary import Dictionary
 
 
 @contextlib.contextmanager
@@ -14,7 +15,7 @@ def tmp_dictionary(compiler, file_name):
     compiler.Compile()
     compiler.WriteToFile(fq_file_name)
     del compiler
-    d = keyvi.Dictionary(fq_file_name)
+    d = Dictionary(fq_file_name)
     yield d
     del d
     os.remove(fq_file_name)

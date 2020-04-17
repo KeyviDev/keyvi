@@ -19,7 +19,7 @@ We do not require "messenger facebook deu" (1 0 3) due to the BOW reordering at 
 """
 
 import sys
-import keyvi
+from keyvi.compiler import CompletionDictionaryCompiler
 
 # permutation lookup table, number_of_tokens - > permutations_to_build
 # the table is build with scripts/build_bow_completion_permutations
@@ -102,7 +102,7 @@ class MultiWordPermutation:
 if __name__ == '__main__':
     pipeline = []
     pipeline.append(MultiWordPermutation())
-    c = keyvi.CompletionDictionaryCompiler()
+    c = CompletionDictionaryCompiler()
 
 
     for line in sys.stdin:

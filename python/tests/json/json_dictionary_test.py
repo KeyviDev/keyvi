@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
-
-import contextlib
-import os
-
-import keyvi
-
 import sys
 import os
+
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -15,7 +11,7 @@ sys.path.append(os.path.join(root, "../"))
 from test_tools import tmp_dictionary
 
 def test_simple():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     # use python syntax ala __setitem__
@@ -26,7 +22,7 @@ def test_simple():
         assert d["abd"].GetValueAsString() == '{"a":3}'
 
 def test_simple_zlib():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10", 'compression': 'z', 'compression_threshold': '0'})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10", 'compression': 'z', 'compression_threshold': '0'})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'simple_json_z.kv') as d:
@@ -37,7 +33,7 @@ def test_simple_zlib():
         assert m['__compression'] == "zlib"
 
 def test_simple_snappy():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10", 'compression': 'snappy', 'compression_threshold': '0'})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10", 'compression': 'snappy', 'compression_threshold': '0'})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'simple_json_snappy.kv') as d:
@@ -48,7 +44,7 @@ def test_simple_snappy():
         assert m['__compression'] == "snappy"
 
 def test_unicode_compile():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("üöä", '{"y" : 2}')
     c.Add("üüüüüüabd", '{"a" : 3}')
     c.Add(u"ääääädäd", '{"b" : 33}')
@@ -61,8 +57,8 @@ def test_unicode_compile():
         assert d["ääääädäd"].GetValueAsString() == '{"b":33}'
 
 def test_float_compaction():
-    cs = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10", 'floating_point_precision': 'single'})
-    cd = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    cs = JsonDictionaryCompiler({"memory_limit_mb":"10", 'floating_point_precision': 'single'})
+    cd = JsonDictionaryCompiler({"memory_limit_mb":"10"})
 
     # add a couple of floats to both
     cs.Add('aa', '[1.7008715758978892, 1.8094465532317732, 1.6098250864350536, 1.6369107966501981, 1.7736887965234107, 1.606682751740542, 1.6186427703265525, 1.7939763843449683, 1.5973550162469434, 1.6799721708726192, 1.8199786239525833, 1.7956178070065245, 1.7269879953863045]')

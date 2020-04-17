@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
-
 import sys
 import os
 import gc
+
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../../tests"))
@@ -21,7 +21,7 @@ def memory_usage_ps():
     return mem
 
 def test_leak():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("something", '["a" : 2]')
 
     with tmp_dictionary(c, 'near_simple.kv') as d:

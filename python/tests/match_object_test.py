@@ -4,6 +4,13 @@
 import keyvi
 from test_tools import tmp_dictionary
 
+from keyvi.compiler import (
+    JsonDictionaryCompiler,
+    CompletionDictionaryCompiler,
+    KeyOnlyDictionaryCompiler,
+    StringDictionaryCompiler,
+)
+
 def test_serialization():
     m = keyvi.Match()
     m.SetStart(22)
@@ -14,7 +21,7 @@ def test_serialization():
     assert m2.GetEnd() == 30
 
 def test_raw_serialization():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
@@ -55,7 +62,7 @@ def test_boolean_attributes():
     assert m.GetAttribute(bytes_key) == True
 
 def test_get_value():
-    c = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
@@ -65,7 +72,7 @@ def test_get_value():
         assert m.GetValue() == {"a":3}
 
 def test_get_value_int():
-    c = keyvi.CompletionDictionaryCompiler({"memory_limit_mb":"10"})
+    c = CompletionDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", 42)
     c.Add("abd", 21)
     with tmp_dictionary(c, 'match_object_int.kv') as d:
@@ -75,7 +82,7 @@ def test_get_value_int():
         assert m.GetValue() == 21
 
 def test_get_value_key_only():
-    c = keyvi.KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
+    c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc")
     c.Add("abd")
     with tmp_dictionary(c, 'match_object_key_only.kv') as d:
@@ -85,7 +92,7 @@ def test_get_value_key_only():
         assert m.GetValue() == ''
 
 def test_get_value_string():
-    c = keyvi.StringDictionaryCompiler({"memory_limit_mb":"10"})
+    c = StringDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("abc", "aaaaa")
     c.Add("abd", "bbbbb")
     with tmp_dictionary(c, 'match_object_string.kv') as d:

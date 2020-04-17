@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
-
 import sys
 import os
 import json
+
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -21,7 +21,7 @@ key_values = [
 
 def generate_dictionary_compiler():
 
-    dictionary_compiler = keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    dictionary_compiler = JsonDictionaryCompiler({"memory_limit_mb":"10"})
     for key, value in key_values:
         dictionary_compiler.Add(key, json.dumps(value))
 

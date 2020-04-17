@@ -2,13 +2,13 @@
 # Usage: py.test tests
 
 
-import keyvi
+from keyvi.compiler import CompletionDictionaryCompiler
 
 from test_tools import tmp_dictionary
 
 
 def test_get_fuzzy():
-    c = keyvi.CompletionDictionaryCompiler({"memory_limit_mb": "10"})
+    c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
     c.Add("türkei news", 23698)
     c.Add("türkei side", 18838)
     c.Add("türkei urlaub", 23424)

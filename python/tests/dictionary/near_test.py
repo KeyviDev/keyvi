@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import contextlib
-import os
-
-import keyvi
-
 import sys
 import os
+
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -15,7 +12,7 @@ sys.path.append(os.path.join(root, "../"))
 from test_tools import tmp_dictionary
 
 def test_near():
-    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("zahnarzt:u0we9yykdyum", '["a" : 2]')
     c.Add("zahnarzt:u1h2fde2kct3", '["a" : 3]')
     c.Add("zahnarzt:u1huf1q5cnxn", '["a" : 4]')
@@ -33,7 +30,7 @@ def test_near():
         assert(len(list(d.GetNear("zahnarzt:u0h0gkqsenhf", 10))) == 4)
 
 def test_near_greedy():
-    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("zahnarzt:u0we9yykdyum", '["a" : 2]')
     c.Add("zahnarzt:u1h2fde2kct3", '["a" : 3]')
     c.Add("zahnarzt:u1huf1q5cnxn", '["a" : 4]')
@@ -55,7 +52,7 @@ def test_near_greedy():
         assert greedy[:len(non_greedy)] == non_greedy
 
 def test_near_score():
-    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("zahnarzt:u0we9yykdyum", '["a" : 2]')
     c.Add("zahnarzt:u1h2fde2kct3", '["a" : 3]')
     c.Add("zahnarzt:u1huf1q5cnxn", '["a" : 4]')
@@ -77,7 +74,7 @@ def test_near_score():
             assert m.GetScore() == 10
 
 def test_near_less_precission():
-    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("zahnarzt:u0we9", '["a" : 2]')
     c.Add("zahnarzt:u1h2f", '["a" : 3]')
     c.Add("zahnarzt:u1huf", '["a" : 4]')
@@ -86,7 +83,7 @@ def test_near_less_precission():
         assert(len(list(d.GetNear("zahnarzt:u1h0gkqsenhf", 13))) == 0)
 
 def test_near_broken_input():
-    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("zahnarzt:u0we9", '["a" : 2]')
     c.Add("zahnarzt:u1h2f", '["a" : 3]')
     c.Add("zahnarzt:u1huf", '["a" : 4]')

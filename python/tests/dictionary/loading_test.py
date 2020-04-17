@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi
-
 import os
 import pytest
 import sys
 import tempfile
+
+from keyvi.dictionary import Dictionary
+from keyvi.compiler import JsonDictionaryCompiler
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
@@ -19,16 +20,16 @@ def test_invalid_filemagic():
     fd.close()
     exception_caught = False
     with pytest.raises(ValueError):
-        d=keyvi.Dictionary(os.path.join(tmp_dir, 'broken_file'))
+        d=Dictionary(os.path.join(tmp_dir, 'broken_file'))
     os.remove(os.path.join(tmp_dir, 'broken_file'))
 
 def test_non_existing_file():
     assert os.path.exists('non_existing_file') == False
     with pytest.raises(ValueError):
-        d=keyvi.Dictionary(os.path.join(tmp_dir, 'non_existing_file'))
+        d=Dictionary(os.path.join(tmp_dir, 'non_existing_file'))
 
 def test_truncated_file_json():
-    c=keyvi.JsonDictionaryCompiler({"memory_limit_mb":"10"})
+    c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add('a', '{1:2}')
     c.Add('b', '{2:4}')
     c.Add('c', '{4:4}')
@@ -48,9 +49,9 @@ def test_truncated_file_json():
     fd2.close()
 
     with pytest.raises(ValueError):
-        d=keyvi.Dictionary(os.path.join(tmp_dir, 'truncation_test1.kv'))
+        d=Dictionary(os.path.join(tmp_dir, 'truncation_test1.kv'))
     with pytest.raises(ValueError):
-        d=keyvi.Dictionary(os.path.join(tmp_dir, 'truncation_test2.kv'))
+        d=Dictionary(os.path.join(tmp_dir, 'truncation_test2.kv'))
     os.remove(os.path.join(tmp_dir, 'truncation_test2.kv'))
     os.remove(os.path.join(tmp_dir, 'truncation_test1.kv'))
     os.remove(os.path.join(tmp_dir, 'truncation_test.kv'))
