@@ -40,8 +40,8 @@ Check questions:
 
 Do:
 
-    import keyvi
-    d = keyvi.Dictionary("compiled.kv")
+    from keyvi.dictionary import Dictionary
+    d = Dictionary("compiled.kv")
     "keyvi" in d
     
 should return True
@@ -94,7 +94,7 @@ The output should be:
 
 Note: As we have compiled `key-only` dictionary there is no info regarding values.
 
-Similarly with python, on the `keyvi.Dictionary` object `d` the call `d.GetStatistics()` will return the same information.
+Similarly with python, on the `Dictionary` object `d` the call `d.GetStatistics()` will return the same information.
 
 ### Lookup and Extraction
 

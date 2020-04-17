@@ -32,7 +32,7 @@ Ensure you initialize the Dictionary e.g. in mapper_init (mrjob) or using a sing
 See this example loader for pyspark:
 
 ```
-import keyvi
+from keyvi.dictionary import Dictionary
 
 try:
     # only works if in spark
@@ -62,7 +62,7 @@ try:
                     hdfs_filename = hdfs_filename.encode('utf-8')
 
                 try:
-                    d=keyvi.Dictionary(hdfs_filename)
+                    d=Dictionary(hdfs_filename)
                 except Exception, e:
                     raise Exception("Failed to load keyvi dictionary {}: {}".format(name, e.message))
 
@@ -96,7 +96,7 @@ except:
             d = self.loaded_keyvi_dicts.get(name)
 
             if d is None:
-                d = keyvi.Dictionary(os.path.join("my_keyvi_files_folder", name))
+                d = Dictionary(os.path.join("my_keyvi_files_folder", name))
                 self.loaded_keyvi_dicts[name] = d
 
             return d
