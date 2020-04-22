@@ -6,6 +6,7 @@ import shutil
 import tempfile
 import test_tools
 from pytest import raises
+import gc
 
 from keyvi.compiler import JsonDictionaryCompiler, KeyOnlyDictionaryCompiler
 
@@ -55,13 +56,14 @@ def test_tmp_dir_defined():
         c = JsonDictionaryCompiler({"memory_limit_mb":"10", "temporary_path": tmpdir})
         c.Add("abc", "{'a':2}")
         c.Compile()
-        assert os.listdir(test_dir) != []
+        assert os.listdir(tmpdir) != []
 
     test_dir = os.path.join(tempfile.gettempdir(), "tmp_dir_test_defined")
     try:
         os.mkdir(test_dir)
         run_compile(test_dir)
     finally:
+        gc.collect()
         JsonDictionaryCompiler({"memory_limit_mb":"10"})
         shutil.rmtree(test_dir)
 
