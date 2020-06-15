@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(fuzzy_5) {
       {"tüs rhein", 462},
       {"tüs rheinland", 39131},
       {"tüs öffnungszeiten", 15999},
-  };
+      {"abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 42}};
   testing::TempDictionary dictionary(&test_data);
   dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
@@ -233,6 +233,17 @@ BOOST_AUTO_TEST_CASE(fuzzy_5) {
   }
 
   BOOST_CHECK(expected_it == expected_output.end());
+
+  std::vector<std::string> expected_output_long = {
+      "abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  };
+
+  auto expected_it_long = expected_output_long.begin();
+  for (auto m : d->GetFuzzy("abcdefghijXXmnopqrstuvqxyzXXXDEFGHIJKLMNOPQRSTUVWXYZ", 5)) {
+    BOOST_CHECK_EQUAL(*expected_it_long++, m.GetMatchedString());
+  }
+
+  BOOST_CHECK(expected_it_long == expected_output_long.end());
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_no_match) {
