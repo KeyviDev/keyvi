@@ -81,7 +81,6 @@ class NeedlemanWunsch final {
 
     // ensure that we have enough rows in the matrix
     EnsureCapacity(row + 1);
-    compare_sequence_.resize(position + 1);
     compare_sequence_[position] = codepoint;
 
     // reset completion row if we walked backwards
@@ -147,7 +146,7 @@ class NeedlemanWunsch final {
         if (row > completion_row_) {
           completion_result = distance_matrix_.Get(row - 1, column) + cost_function_.GetCompletionCost();
         } else if (column + 1 == columns && columns > 1 &&
-                   compare_sequence_[compare_sequence_.size() - 2] == input_sequence_.back()) {
+                   compare_sequence_[last_put_position_ - 1] == input_sequence_.back()) {
           completion_row_ = row;
           completion_result = distance_matrix_.Get(row - 1, column) + cost_function_.GetCompletionCost();
         }
@@ -205,7 +204,8 @@ class NeedlemanWunsch final {
 
   std::string GetCandidate() {
     std::vector<unsigned char> utf8result;
-    utf8::utf32to8(compare_sequence_.begin(), compare_sequence_.end(), back_inserter(utf8result));
+    utf8::utf32to8(compare_sequence_.begin(), compare_sequence_.begin() + last_put_position_ + 1,
+                   back_inserter(utf8result));
 
     return std::string(utf8result.begin(), utf8result.end());
   }
@@ -241,6 +241,13 @@ class NeedlemanWunsch final {
   void EnsureCapacity(size_t capacity) {
     // ensure that we have enough rows in the matrix
     distance_matrix_.EnsureRowCapacity(capacity + 1);
+
+    if (compare_sequence_.size() < capacity) {
+      compare_sequence_.resize(capacity);
+      compare_sequence_.resize(compare_sequence_.capacity());
+      intermediate_scores_.resize(capacity);
+      intermediate_scores_.resize(intermediate_scores_.capacity());
+    }
   }
 
   std::string GetMatrixAsString() {
