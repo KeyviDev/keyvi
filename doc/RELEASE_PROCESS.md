@@ -5,7 +5,7 @@ Create a release branch called `release-X.Y.Z`
 
 ## On the `release-X.Y.Z` branch
 
-### Update the `setup.py` file
+### Update the `python/setup.py` file
  - Update the flag `IS_RELEASED` to `True`
  - Commit to `release-X.Y.Z` and push it to https://github.com/KeyviDev/keyvi/
  - Wait for travis to build all targets
@@ -17,11 +17,16 @@ Create a release branch called `release-X.Y.Z`
 
 ## On the `master` branch
 
-### Update the `setup.py` file
+### Update the `python/setup.py` file
  - Update to the next release version 
 ```
 VERSION_MAJOR = X
 VERSION_MINOR = Y
 VERSION_PATCH = Z + 1
 VERSION_DEV = 0
+```
+### Update the `rust/Cargo.toml` file
+ - Update to the same version used in `python/setup.py`
+```
+ version = "X.Y.Z + 1"
 ```
