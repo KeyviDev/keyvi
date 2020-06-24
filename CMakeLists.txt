@@ -114,8 +114,12 @@ endif ()
 # rapidjson
 list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/rapidjson/include")
 
+# utfcpp
+add_subdirectory(keyvi/3rdparty/utfcpp EXCLUDE_FROM_ALL)
+list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/utfcpp/source")
+list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_BINARY_DIR}/keyvi/3rdparty/utfcpp/")
+
 # misc
-list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/utf8")
 list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/misc")
 list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/msgpack-c/include")
 list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/xchange/src")
