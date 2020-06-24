@@ -2,7 +2,7 @@ import sys
 from keyvi.dictionary import Dictionary
 from keyvi.util import FsaTransform
 
-d=Dictionary("normalization.keyvi")
+d=Dictionary("normalization.kv")
 n=FsaTransform(d)
 
 

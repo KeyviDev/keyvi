@@ -38,6 +38,8 @@ Check questions:
  
 #### Open the file in python
 
+All python examples assume python 3.
+
 Do:
 
     from keyvi.dictionary import Dictionary
@@ -102,7 +104,7 @@ Go to [lookup examples](/python/examples/lookup)
 
 Compile cities.tsv and run the tester:
     
-    keyvicompiler -i cities.tsv -o cities.keyvi -d key-only
+    keyvicompiler -i cities.tsv -o cities.kv -d key-only
     python text_lookup_tester.py
 
 Try queries like: "Fahrradwerkstatt München", "Berlin Alexanderplatz", "San Francisco Coffee Bar"
@@ -118,7 +120,7 @@ Try python/scripts/compile_json.py and compile your own JSON. The format should 
 Check statistics:
 
 
-     keyviinspector -i your-own.keyvi -s
+     keyviinspector -i your-own.kv -s
 
 
 Check questions:
@@ -128,7 +130,7 @@ Check questions:
      
 With sharding (for distributed data indexes):
 
-     compile_json.py -i your-input -o your-keyvi.keyvi -s 3
+     compile_json.py -i your-input -o your-keyvi.kv -s 3
 
 ### Completion
 
@@ -141,14 +143,14 @@ Have a look at the files completion-nw.tsv, completion.tsv it basically contains
 
 Compile and try:
 
-    keyvicompiler -i completion-nw.tsv -o prefix-completion.keyvi 
+    keyvicompiler -i completion-nw.tsv -o prefix-completion.kv
     python prefix_completion_tester.py
 
 Query: '80s'
  
 Now try:    
 
-    keyvicompiler -i completion.tsv -o prefix-completion.keyvi
+    keyvicompiler -i completion.tsv -o prefix-completion.kv
     python prefix_completion_tester.py
 
 Check questions:
@@ -189,7 +191,7 @@ Go to [normalization examples](/python/examples/normalization)
 
 Compile with:
 
-    keyvicompiler -i normalization.tsv -o normalization.keyvi -d string
+    keyvicompiler -i normalization.tsv -o normalization.kv -d string
     
 and try:
 

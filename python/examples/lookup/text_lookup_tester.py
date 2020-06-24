@@ -2,7 +2,7 @@ from keyvi.dictionary import Dictionary
 
 query = ""
 
-d=Dictionary("cities.keyvi")
+d=Dictionary("cities.kv")
 
 def get_lookup_key(query):
     return query
