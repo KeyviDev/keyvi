@@ -10,7 +10,7 @@ The compiler is also available from python keyvi:
     
     # finally compile
     compiler.Compile()
-    compiler.WriteToFile("/tmp/test.keyvi")
+    compiler.WriteToFile("/tmp/test.kv")
 
 Other available Compiler in `keyvi.compiler`
 

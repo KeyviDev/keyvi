@@ -21,7 +21,7 @@ keyvicompiler shall be available now:
 
 To compile simply run for example:
 
-    keyvicompiler -i test.txt -o test.keyvi
+    keyvicompiler -i test.txt -o test.kv
 
 
 #### The different formats
@@ -47,4 +47,4 @@ keyvi dictionary compiler needs more memory to persist the data.
 
 You can use keyviinspector to dump the data:
 
-    keyviinspector -i test.keyvi -o ../test-dump.txt
+    keyviinspector -i test.kv -o ../test-dump.txt
