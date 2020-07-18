@@ -66,6 +66,11 @@ impl Dictionary {
         KeyviMatch::new(match_ptr)
     }
 
+    pub fn get_all_items(&self) -> KeyviMatchIterator {
+        let ptr = unsafe { root::keyvi_dictionary_get_all_items(self.dict) };
+        KeyviMatchIterator::new(ptr)
+    }
+
     pub fn get_prefix_completions(&self, key: &str, cutoff: u64) -> KeyviMatchIterator {
         let key_c = CString::new(key).unwrap();
         let ptr = unsafe {

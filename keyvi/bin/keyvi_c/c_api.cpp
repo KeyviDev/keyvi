@@ -113,6 +113,10 @@ keyvi_match* keyvi_dictionary_get(const keyvi_dictionary* dict, const char* key)
   return new keyvi_match(dict->obj_->operator[](key));
 }
 
+keyvi_match_iterator* keyvi_dictionary_get_all_items(const keyvi_dictionary* dict) {
+  return new keyvi_match_iterator(dict->obj_->GetAllItems());
+}
+
 keyvi_match_iterator* keyvi_dictionary_get_prefix_completions(const keyvi_dictionary* dict, const char* key,
                                                               size_t cutoff) {
   PrefixCompletion prefixCompletion(dict->obj_);

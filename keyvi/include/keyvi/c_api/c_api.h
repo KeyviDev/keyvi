@@ -67,6 +67,8 @@ char* keyvi_dictionary_get_statistics(const struct keyvi_dictionary*);
 
 struct keyvi_match* keyvi_dictionary_get(const struct keyvi_dictionary*, const char*);
 
+struct keyvi_match_iterator* keyvi_dictionary_get_all_items(const struct keyvi_dictionary*);
+
 struct keyvi_match_iterator* keyvi_dictionary_get_prefix_completions(const struct keyvi_dictionary*, const char*,
                                                                      size_t);
 
