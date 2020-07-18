@@ -35,7 +35,7 @@
         if packed_value.empty():
             return None
 
-        return msgpack.loads(packed_value, raw=False)
+        return msgpack.loads(packed_value)
 
 
     def dumps(self):
