@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 /*
  *  dictionary.rs
  *
@@ -25,12 +24,12 @@
  *          Subu <subu@cliqz.com>
  */
 
-
 use std::ffi::CString;
-use keyvi_string::KeyviString;
+
+use bindings::*;
 use keyvi_match::KeyviMatch;
 use keyvi_match_iterator::KeyviMatchIterator;
-use bindings::*;
+use keyvi_string::KeyviString;
 
 pub struct Dictionary {
     dict: *mut root::keyvi_dictionary,
@@ -52,7 +51,8 @@ impl Dictionary {
     }
 
     pub fn statistics(&self) -> String {
-        let c_buf: *mut ::std::os::raw::c_char = unsafe { root::keyvi_dictionary_get_statistics(self.dict) };
+        let c_buf: *mut ::std::os::raw::c_char =
+            unsafe { root::keyvi_dictionary_get_statistics(self.dict) };
         KeyviString::new(c_buf).to_owned()
     }
 
