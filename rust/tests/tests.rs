@@ -113,6 +113,17 @@ mod tests {
     }
 
     #[test]
+    fn get_all_items() {
+        let expected_items = [("a", "[12,13]"), ("b", "[12,13]"), ("c", "[14,15]")];
+        let dict = dictionary::Dictionary::new("test_data/test.kv").unwrap();
+
+        for (item, expected_item) in dict.get_all_items().zip(&expected_items) {
+            assert_eq!(item.matched_string(), expected_item.0);
+            assert_eq!(item.get_value_as_string(), expected_item.1);
+        }
+    }
+
+    #[test]
     fn multi_word_completions() {
         let mut values = vec![
             ("80", "mozilla firefox"),
