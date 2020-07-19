@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 /*
  *  build.rs
  *
@@ -25,29 +24,31 @@
  *          Subu <subu@cliqz.com>
  */
 
-
 extern crate bindgen;
 extern crate cmake;
 
 use std::env;
 use std::path::PathBuf;
+
 use cmake::Config;
 
 fn main() {
-    let dst = Config::new("keyvi_core/")
-        .build_target("keyvi_c")
-        .build();
+    let dst = Config::new("keyvi_core/").build_target("keyvi_c").build();
 
     // Tell cargo to tell rustc to link keyvi
     println!("cargo:rustc-link-lib=dylib=keyvi_c");
-    println!("cargo:rustc-link-search=native={}", dst.join("build").display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dst.join("build").display()
+    );
 
     println!("Starting to generate bindings..");
 
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate bindings for.
         .header("keyvi_core/keyvi/include/keyvi/c_api/c_api.h")
-        .clang_arg("-x").clang_arg("c++")
+        .clang_arg("-x")
+        .clang_arg("c++")
         .enable_cxx_namespaces()
         .layout_tests(true)
         // Finish the builder and generate the bindings.

@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 /*
  *  keyvi_match_iterator.rs
  *
@@ -24,7 +23,6 @@
  *  Author: Narek Gharibyan <narekgharibyan@gmail.com>
  *          Subu <subu@cliqz.com>
  */
-
 
 use bindings::*;
 use keyvi_match::KeyviMatch;
@@ -47,7 +45,9 @@ impl Iterator for KeyviMatchIterator {
         if empty {
             return None;
         } else {
-            let ret = Some(KeyviMatch::new(unsafe { root::keyvi_match_iterator_dereference(self.ptr_) }));
+            let ret = Some(KeyviMatch::new(unsafe {
+                root::keyvi_match_iterator_dereference(self.ptr_)
+            }));
             unsafe { root::keyvi_match_iterator_increment(self.ptr_) };
             return ret;
         }

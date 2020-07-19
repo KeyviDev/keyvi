@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 /*
  *  keyvi_match.rs
  *
@@ -27,10 +26,10 @@
 
 use std::slice;
 
-use keyvi_string::KeyviString;
-use bindings::*;
-
 use serde_json;
+
+use bindings::*;
+use keyvi_string::KeyviString;
 
 pub struct KeyviMatch {
     match_ptr_: *mut root::keyvi_match,
@@ -38,7 +37,9 @@ pub struct KeyviMatch {
 
 impl KeyviMatch {
     pub fn new(match_ptr: *mut root::keyvi_match) -> KeyviMatch {
-        KeyviMatch { match_ptr_: match_ptr }
+        KeyviMatch {
+            match_ptr_: match_ptr,
+        }
     }
 
     pub fn get_value(&self) -> serde_json::Value {

@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 /*
  *  keyvi_string.rs
  *
@@ -25,11 +24,10 @@
  *          Subu <subu@cliqz.com>
  */
 
-
 use std::ffi::CStr;
 use std::ops::Deref;
-use bindings::*;
 
+use bindings::*;
 
 pub struct KeyviString {
     str_: *mut ::std::os::raw::c_char,

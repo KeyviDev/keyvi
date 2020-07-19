@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 /*
  * lib.rs
  *
@@ -25,7 +24,6 @@
  *          Subu <subu@cliqz.com>
  */
 
-
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -33,9 +31,8 @@
 
 extern crate serde_json;
 
-
+mod bindings;
 pub mod dictionary;
-pub mod keyvi_string;
 pub mod keyvi_match;
 pub mod keyvi_match_iterator;
-mod bindings;
+pub mod keyvi_string;
