@@ -27,6 +27,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include <memory>
 #include <string>
 
 #include <boost/lexical_cast.hpp>
@@ -46,9 +47,9 @@ class SerializationUtils {
     uint32_t header_size;
     stream.read(reinterpret_cast<char*>(&header_size), sizeof(int));
     header_size = be32toh(header_size);
-    char* buffer = new char[header_size];
-    stream.read(buffer, header_size);
-    record->Parse(buffer, header_size);
+    auto buffer_ptr = std::unique_ptr<char[]>(new char[header_size]);
+    stream.read(buffer_ptr.get(), header_size);
+    record->Parse(buffer_ptr.get(), header_size);
   }
 
   // utility methods to retrieve numeric values
