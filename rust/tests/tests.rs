@@ -17,6 +17,10 @@ mod tests {
     fn dictionary_error() {
         let dict = dictionary::Dictionary::new("test_data/fake_file_name.kv");
         assert!(dict.is_err());
+        assert_eq!(
+            dict.err().unwrap().to_string().as_str(),
+            "could not load file"
+        );
     }
 
     #[test]
