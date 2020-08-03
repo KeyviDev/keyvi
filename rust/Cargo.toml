@@ -1,6 +1,6 @@
 [package]
 name = "keyvi"
-version = "0.4.5"
+version = "0.4.6"
 build = "build.rs"
 authors = ["Hendrik Muhs<hendrik.muhs@gmail.com>", "Narek Gharibyan <narekgharibyan@gmail.com>", "Subu <subu@cliqz.com>"]
 license = "Apache-2.0"
@@ -10,12 +10,12 @@ categories = ["data-structures", "algorithms", "external-ffi-bindings", "memory-
 keywords = ["big-data", "keyvaluestore", "fst", "search"]
 
 [build-dependencies]
-bindgen = ">=0.30.0"
-cmake = ">=0.1.29"
+bindgen = ">=0.30"
+cmake = ">=0.1"
 
 [dependencies]
 serde_json = ">=1.0"
 
 [dev-dependencies]
 rayon = "0.9"
-rand = ">=0.4.2"
+rand = ">=0.4"
