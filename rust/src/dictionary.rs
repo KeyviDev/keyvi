@@ -25,6 +25,7 @@
  */
 
 use std::ffi::CString;
+use std::io;
 
 use bindings::*;
 use keyvi_match::KeyviMatch;
@@ -40,11 +41,14 @@ unsafe impl Send for Dictionary {}
 unsafe impl Sync for Dictionary {}
 
 impl Dictionary {
-    pub fn new(filename: &str) -> Result<Dictionary, &str> {
-        let fn_c = CString::new(filename).unwrap();
+    pub fn new(filename: &str) -> io::Result<Dictionary> {
+        let fn_c = CString::new(filename)?;
         let ptr = unsafe { root::keyvi_create_dictionary(fn_c.as_ptr()) };
         if ptr.is_null() {
-            Err("could not load file")
+            Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "could not load file",
+            ))
         } else {
             Ok(Dictionary { dict: ptr })
         }
