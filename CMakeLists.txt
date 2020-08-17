@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(keyvi)
 
+EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
+message( STATUS "Architecture: ${ARCHITECTURE}" )
+
 #### Build Type
 if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
@@ -22,8 +25,9 @@ endif()
 set (_KEVYI_COMPILE_OPTIONS "-Wall")
 set (_KEYVI_COMPILE_DEFINITIONS "RAPIDJSON_HAS_STDSTRING")
 
-# todo: add check for SSE4.2, make it optional
-set (_KEYVI_CXX_FLAGS "-msse4.2")
+if(NOT ${ARCHITECTURE} STREQUAL "aarch64")
+    set (_KEYVI_CXX_FLAGS "-msse4.2")
+endif()
 
 # OSX specifics
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
