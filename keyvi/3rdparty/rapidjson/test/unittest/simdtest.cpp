@@ -21,6 +21,8 @@
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
+#elif defined(__ARM_NEON)
+#  define RAPIDJSON_NEON
 #endif
 
 #define RAPIDJSON_NAMESPACE rapidjson_simd
@@ -41,6 +43,8 @@ using namespace rapidjson_simd;
 #define SIMD_SUFFIX(name) name##_SSE2
 #elif defined(RAPIDJSON_SSE42)
 #define SIMD_SUFFIX(name) name##_SSE42
+#elif defined(RAPIDJSON_NEON)
+#define SIMD_SUFFIX(name) name##_NEON
 #else
 #define SIMD_SUFFIX(name) name
 #endif
@@ -105,8 +109,8 @@ struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnesca
 
 template <unsigned parseFlags, typename StreamType>
 void TestScanCopyUnescapedString() {
-    char buffer[1024 + 5 + 32];
-    char backup[1024 + 5 + 32];
+    char buffer[1024u + 5 + 32];
+    char backup[1024u + 5 + 32];
 
     // Test "ABCDABCD...\\"
     for (size_t offset = 0; offset < 32; offset++) {
