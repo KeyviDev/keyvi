@@ -23,9 +23,9 @@
  *      Author: hendrik
  */
 
-#include <boost/test/unit_test.hpp>
-
 #include "keyvi/util/json_value.h"
+
+#include <boost/test/unit_test.hpp>
 
 namespace keyvi {
 namespace util {
@@ -33,12 +33,15 @@ namespace util {
 BOOST_AUTO_TEST_SUITE(JsonValueTests)
 
 BOOST_AUTO_TEST_CASE(EncodeDecodeTest) {
-  std::string input = "{'auto':'car','price':344,'features':[1,2,3]}";
+  std::string input =
+      "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3,4],\"d\":{\"k\":"
+      "\"v\"}}";
+
   std::string encoded = EncodeJsonValue(input);
 
   std::string output = DecodeJsonValue(encoded);
 
-  BOOST_CHECK_EQUAL('"' + input + '"', output);
+  BOOST_CHECK_EQUAL(input, output);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
