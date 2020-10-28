@@ -50,7 +50,7 @@ inline void JsonToMsgPack(const rapidjson::Value& value, msgpack::packer<msgpack
       }
       break;
     case rapidjson::kObjectType:
-      msgpack_packer->pack_map(value.Size());
+      msgpack_packer->pack_map(value.MemberCount());
       for (auto& v : value.GetObject()) {
         msgpack_packer->pack_str(v.name.GetStringLength());
         msgpack_packer->pack_str_body(v.name.GetString(), v.name.GetStringLength());
