@@ -112,10 +112,6 @@ inline void MsgPackDump(rapidjson::Writer<rapidjson::StringBuffer>* writer, cons
       writer->String(o.via.str.ptr, o.via.str.size);
       break;
 
-    case msgpack::type::BIN:
-      writer->String(o.via.bin.ptr, o.via.bin.size);
-      break;
-
     case msgpack::type::ARRAY:
       writer->StartArray();
       if (o.via.array.size != 0) {
@@ -140,6 +136,8 @@ inline void MsgPackDump(rapidjson::Writer<rapidjson::StringBuffer>* writer, cons
       writer->EndObject();
       break;
 
+    // there is no counterpart for binary and ext in json, this branch should never be executed
+    case msgpack::type::BIN:
     case msgpack::type::EXT:
     default:
       break;
