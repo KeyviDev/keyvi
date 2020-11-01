@@ -114,9 +114,9 @@ inline void MsgPackDump(rapidjson::Writer<rapidjson::StringBuffer>* writer, cons
 
     case msgpack::type::ARRAY:
       writer->StartArray();
-      if (o.via.array.size != 0) {
-        const msgpack::object* pend(o.via.array.ptr + o.via.array.size);
-        for (msgpack::object* p(o.via.array.ptr); p < pend; ++p) {
+      {
+        const msgpack::object* pend_array(o.via.array.ptr + o.via.array.size);
+        for (msgpack::object* p(o.via.array.ptr); p < pend_array; ++p) {
           MsgPackDump(writer, *p);
         }
       }
@@ -125,10 +125,9 @@ inline void MsgPackDump(rapidjson::Writer<rapidjson::StringBuffer>* writer, cons
 
     case msgpack::type::MAP:
       writer->StartObject();
-      if (o.via.map.size != 0) {
-        const msgpack::object_kv* pend(o.via.map.ptr + o.via.map.size);
-
-        for (msgpack::object_kv* p(o.via.map.ptr); p < pend; ++p) {
+      {
+        const msgpack::object_kv* pend_map(o.via.map.ptr + o.via.map.size);
+        for (msgpack::object_kv* p(o.via.map.ptr); p < pend_map; ++p) {
           writer->Key(p->key.via.str.ptr, p->key.via.str.size);
           MsgPackDump(writer, p->val);
         }
