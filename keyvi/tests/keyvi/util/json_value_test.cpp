@@ -23,14 +23,15 @@
  *      Author: hendrik
  */
 
-#include "keyvi/util/json_value.h"
-
-#include <boost/test/unit_test.hpp>
 #include <cmath>
 #include <limits>
 #include <sstream>
 
+#include <boost/test/unit_test.hpp>
+
 #include "rapidjson/document.h"
+
+#include "keyvi/util/json_value.h"
 
 namespace keyvi {
 namespace util {
