@@ -50,7 +50,9 @@ inline std::string DecodeJsonValue(const std::string& encoded_value) {
   msgpack::unpack(&doc, packed_string.data(), packed_string.size());
 
   rapidjson::StringBuffer buffer;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+  rapidjson::Writer<rapidjson::StringBuffer, rapidjson::UTF8<>, rapidjson::UTF8<>, rapidjson::CrtAllocator,
+                    rapidjson::kWriteNanAndInfFlag>
+      writer(buffer);
   MsgPackDump(&writer, doc.get());
   return buffer.GetString();
 }
@@ -63,7 +65,7 @@ inline void EncodeJsonValue(std::function<void(compression::buffer_t*, const cha
   msgpack_buffer->clear();
 
   rapidjson::Document json_document;
-  json_document.Parse(raw_value.c_str());
+  json_document.Parse<rapidjson::kParseNanAndInfFlag>(raw_value.c_str());
 
   if (!json_document.HasParseError()) {
     TRACE("Got json");

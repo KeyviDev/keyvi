@@ -24,6 +24,7 @@
 
 #ifndef KEYVI_UTIL_MSGPACK_UTIL_H_
 #define KEYVI_UTIL_MSGPACK_UTIL_H_
+#include <limits>
 
 #include "msgpack.hpp"
 #include "rapidjson/document.h"
@@ -59,10 +60,11 @@ inline void JsonToMsgPack(const rapidjson::Value& value, msgpack::packer<msgpack
       break;
     case rapidjson::kNumberType:
       if (value.IsDouble()) {
-        if (single_precision_float) {
-          msgpack_packer->pack_float(value.GetFloat());
-        } else {
+        if (single_precision_float == false || value.GetDouble() < std::numeric_limits<float>::min() ||
+            value.GetDouble() > std::numeric_limits<float>::max()) {
           msgpack_packer->pack_double(value.GetDouble());
+        } else {
+          msgpack_packer->pack_float(value.GetFloat());
         }
       } else if (value.IsUint64()) {
         msgpack_packer->pack_uint64(value.GetUint64());
@@ -86,7 +88,8 @@ inline void JsonToMsgPack(const rapidjson::Value& value, msgpack::packer<msgpack
   }
 }
 
-inline void MsgPackDump(rapidjson::Writer<rapidjson::StringBuffer>* writer, const msgpack::object& o) {
+template <typename Writer>
+inline void MsgPackDump(Writer* writer, const msgpack::object& o) {
   switch (o.type) {
     case msgpack::type::NIL:
       writer->Null();
