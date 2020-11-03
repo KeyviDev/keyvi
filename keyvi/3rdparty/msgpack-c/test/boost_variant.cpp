@@ -2,13 +2,21 @@
 #include <msgpack.hpp>
 #include <sstream>
 #include <iterator>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif //defined(__GNUC__)
+
 #include <gtest/gtest.h>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif //defined(__GNUC__)
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
-#if defined(MSGPACK_USE_BOOST)
 
 const double kEPS = 1e-10;
 
@@ -21,9 +29,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_nil)
     EXPECT_TRUE(val1.is_nil());
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_nil());
     EXPECT_NO_THROW(boost::get<msgpack::type::nil_t>(val2));
 }
@@ -59,9 +68,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_nil_default)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_nil());
     EXPECT_NO_THROW(boost::get<msgpack::type::nil_t>(val2));
 }
@@ -98,9 +108,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_bool)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_bool());
     EXPECT_TRUE(val2.as_bool());
     EXPECT_NO_THROW(boost::get<bool>(val2));
@@ -151,9 +162,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_positive_integer)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_uint64_t());
     EXPECT_EQ(val2.as_uint64_t(), 123U);
     EXPECT_NO_THROW(boost::get<uint64_t>(val2));
@@ -198,9 +210,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_negative_integer)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_int64_t());
     EXPECT_EQ(val2.as_int64_t(), -123);
     EXPECT_NO_THROW(boost::get<int64_t>(val2));
@@ -245,9 +258,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_float)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_double());
     EXPECT_TRUE(fabs(12.34 - val2.as_double()) <= kEPS);
     EXPECT_NO_THROW(boost::get<double>(val2));
@@ -292,9 +306,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_str)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_string());
     EXPECT_EQ(val2.as_string(), "ABC");
     EXPECT_NO_THROW(boost::get<std::string>(val2));
@@ -329,7 +344,7 @@ TEST(MSGPACK_BOOST, object_with_zone_variant_str_ref)
     EXPECT_EQ(val1.as_boost_string_ref(), "ABC");
     msgpack::object obj(val1, z);
     msgpack::type::variant val2 = obj.as<msgpack::type::variant>();
-    // Coverted as std::string.
+    // Converted as std::string.
     EXPECT_TRUE(val2.is_string());
     EXPECT_EQ(val2.as_string(), "ABC");
     EXPECT_NO_THROW(boost::get<std::string>(val2));
@@ -354,9 +369,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_bin)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_vector_char());
     EXPECT_EQ(val2.as_vector_char(), v);
     EXPECT_NO_THROW(boost::get<std::vector<char> >(val2));
@@ -393,13 +409,13 @@ TEST(MSGPACK_BOOST, object_with_zone_variant_raw_ref)
     v.push_back('a');
     v.push_back('b');
     v.push_back('c');
-    msgpack::type::raw_ref rr(&v.front(), v.size());
+    msgpack::type::raw_ref rr(&v.front(), static_cast<uint32_t>(v.size()));
     msgpack::type::variant val1 = rr;
     EXPECT_TRUE(val1.is_raw_ref());
-    EXPECT_EQ(val1.as_raw_ref(), msgpack::type::raw_ref(&v.front(), v.size()));
+    EXPECT_EQ(val1.as_raw_ref(), msgpack::type::raw_ref(&v.front(), static_cast<uint32_t>(v.size())));
     msgpack::object obj(val1, z);
     msgpack::type::variant val2 = obj.as<msgpack::type::variant>();
-    // Coverted as std::vector<char>.
+    // Converted as std::vector<char>.
     EXPECT_TRUE(val2.is_vector_char());
     EXPECT_EQ(val2.as_vector_char(), v);
     EXPECT_NO_THROW(boost::get<std::vector<char> >(val2));
@@ -418,16 +434,17 @@ TEST(MSGPACK_BOOST, pack_convert_variant_ext)
     v.push_back('a');
     v.push_back('b');
     v.push_back('c');
-    msgpack::type::ext e(42, v.data(), v.size());
+    msgpack::type::ext e(42, v.data(), static_cast<uint32_t>(v.size()));
     msgpack::type::variant val1(e);
     EXPECT_TRUE(val1.is_ext());
     EXPECT_EQ(val1.as_ext(), e);
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_ext());
     EXPECT_EQ(val2.as_ext(), e);
     EXPECT_NO_THROW(boost::get<msgpack::type::ext>(val2));
@@ -443,7 +460,7 @@ TEST(MSGPACK_BOOST, object_with_zone_variant_ext)
     v.push_back('a');
     v.push_back('b');
     v.push_back('c');
-    msgpack::type::ext e(42, v.data(), v.size());
+    msgpack::type::ext e(42, v.data(), static_cast<uint32_t>(v.size()));
     msgpack::type::variant val1(e);
     EXPECT_TRUE(val1.is_ext());
     EXPECT_EQ(val1.as_ext(), e);
@@ -463,13 +480,13 @@ TEST(MSGPACK_BOOST, object_with_zone_variant_ext_ref)
     v.push_back('a');
     v.push_back('b');
     v.push_back('c');
-    msgpack::type::ext_ref e(v.data(), v.size());
+    msgpack::type::ext_ref e(v.data(), static_cast<uint32_t>(v.size()));
     msgpack::type::variant val1(e);
     EXPECT_TRUE(val1.is_ext_ref());
     EXPECT_EQ(val1.as_ext_ref(), e);
     msgpack::object obj(val1, z);
     msgpack::type::variant val2 = obj.as<msgpack::type::variant>();
-    // Coverted as msgpack::type::ext.
+    // Converted as msgpack::type::ext.
     EXPECT_TRUE(val2.is_ext());
     EXPECT_EQ(val2.as_ext(), e);
     EXPECT_NO_THROW(boost::get<msgpack::type::ext>(val2));
@@ -492,9 +509,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_array)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_vector());
     EXPECT_EQ(val2.as_vector(), v);
     EXPECT_NO_THROW(boost::get<std::vector<msgpack::type::variant> >(val2));
@@ -534,9 +552,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_map)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant val2 = ret.get().as<msgpack::type::variant>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant val2 = oh.get().as<msgpack::type::variant>();
     EXPECT_TRUE(val2.is_multimap());
     EXPECT_EQ(val2.as_multimap(), v);
     EXPECT_NO_THROW(boost::get<multimap_t>(val2));
@@ -578,9 +597,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_ref_str)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant_ref val2 = ret.get().as<msgpack::type::variant_ref>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant_ref val2 = oh.get().as<msgpack::type::variant_ref>();
     EXPECT_TRUE(val2.is_boost_string_ref());
     EXPECT_EQ(val2.as_boost_string_ref(), sr);
     EXPECT_NO_THROW(boost::get<boost::string_ref>(val2));
@@ -616,16 +636,17 @@ TEST(MSGPACK_BOOST, pack_convert_variant_ref_bin)
     v.push_back('a');
     v.push_back('b');
     v.push_back('c');
-    msgpack::type::raw_ref rr(v.data(), v.size());
+    msgpack::type::raw_ref rr(v.data(), static_cast<uint32_t>(v.size()));
     msgpack::type::variant_ref val1 = rr;
     EXPECT_TRUE(val1.is_raw_ref());
     EXPECT_EQ(val1.as_raw_ref(), rr);
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant_ref val2 = ret.get().as<msgpack::type::variant_ref>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant_ref val2 = oh.get().as<msgpack::type::variant_ref>();
     EXPECT_TRUE(val2.is_raw_ref());
     EXPECT_EQ(val2.as_raw_ref(), rr);
     EXPECT_NO_THROW(boost::get<msgpack::type::raw_ref>(val2));
@@ -641,7 +662,7 @@ TEST(MSGPACK_BOOST, object_with_zone_variant_ref_bin)
     v.push_back('a');
     v.push_back('b');
     v.push_back('c');
-    msgpack::type::raw_ref rr(v.data(), v.size());
+    msgpack::type::raw_ref rr(v.data(), static_cast<uint32_t>(v.size()));
     msgpack::type::variant_ref val1 = rr;
     EXPECT_TRUE(val1.is_raw_ref());
     EXPECT_EQ(val1.as_raw_ref(), rr);
@@ -663,16 +684,17 @@ TEST(MSGPACK_BOOST, pack_convert_variant_ref_ext)
     v.push_back('a');
     v.push_back('b');
     v.push_back('c');
-    msgpack::type::ext_ref er(v.data(), v.size());
+    msgpack::type::ext_ref er(v.data(), static_cast<uint32_t>(v.size()));
     msgpack::type::variant_ref val1(er);
     EXPECT_TRUE(val1.is_ext_ref());
     EXPECT_EQ(val1.as_ext_ref(), er);
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant_ref val2 = ret.get().as<msgpack::type::variant_ref>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant_ref val2 = oh.get().as<msgpack::type::variant_ref>();
     EXPECT_NO_THROW(boost::get<msgpack::type::ext_ref>(val2));
     EXPECT_TRUE(val2.is_ext_ref());
     EXPECT_EQ(val2.as_ext_ref(), er);
@@ -688,7 +710,7 @@ TEST(MSGPACK_BOOST, object_with_zone_variant_ref_ext)
     v.push_back('a');
     v.push_back('b');
     v.push_back('c');
-    msgpack::type::ext_ref er(v.data(), v.size());
+    msgpack::type::ext_ref er(v.data(), static_cast<uint32_t>(v.size()));
     msgpack::type::variant_ref val1(er);
     EXPECT_TRUE(val1.is_ext_ref());
     EXPECT_EQ(val1.as_ext_ref(), er);
@@ -720,9 +742,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_ref_array)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant_ref val2 = ret.get().as<msgpack::type::variant_ref>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant_ref val2 = oh.get().as<msgpack::type::variant_ref>();
     EXPECT_TRUE(val2.is_vector());
     EXPECT_EQ(val2.as_vector(), v);
     EXPECT_NO_THROW(boost::get<std::vector<msgpack::type::variant_ref> >(val2));
@@ -773,9 +796,10 @@ TEST(MSGPACK_BOOST, pack_convert_variant_ref_map)
 
     msgpack::pack(ss, val1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, ss.str().data(), ss.str().size());
-    msgpack::type::variant_ref val2 = ret.get().as<msgpack::type::variant_ref>();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh =
+        msgpack::unpack(str.data(), str.size());
+    msgpack::type::variant_ref val2 = oh.get().as<msgpack::type::variant_ref>();
     EXPECT_TRUE(val2.is_multimap());
     EXPECT_EQ(val2.as_multimap(), v);
     EXPECT_NO_THROW(boost::get<multimap_t>(val2));
@@ -805,6 +829,3 @@ TEST(MSGPACK_BOOST, object_with_zone_variant_ref_map)
     EXPECT_NO_THROW(boost::get<multimap_t>(val2));
     EXPECT_TRUE(val1 == val2);
 }
-
-
-#endif // defined(MSGPACK_USE_BOOST)

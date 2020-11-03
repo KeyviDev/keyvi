@@ -1,5 +1,15 @@
 #include <msgpack.hpp>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif //defined(__GNUC__)
+
 #include <gtest/gtest.h>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif //defined(__GNUC__)
 
 class enum_member {
 public:
@@ -84,7 +94,7 @@ TEST(convert, return_value_ref)
     EXPECT_EQ(i, j);
 }
 
-#if !defined(MSGPACK_DISABLE_LEGACY_CONVERT)
+#if MSGPACK_DEFAULT_API_VERSION == 1 && !defined(MSGPACK_DISABLE_LEGACY_CONVERT)
 
 TEST(convert, return_value_ptr)
 {
@@ -92,11 +102,19 @@ TEST(convert, return_value_ptr)
     msgpack::object obj(1, z);
 
     int i;
+    // obsolete
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif // defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
     EXPECT_EQ(obj.convert(&i), &i);
+#if defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
+#pragma GCC diagnostic pop
+#endif // defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
     EXPECT_EQ(1, i);
 }
 
-#endif // !defined(MSGPACK_DISABLE_LEGACY_CONVERT)
+#endif // MSGPACK_DEFAULT_API_VERSION == 1 && !defined(MSGPACK_DISABLE_LEGACY_CONVERT)
 
 TEST(convert, if_not_nil_nil)
 {

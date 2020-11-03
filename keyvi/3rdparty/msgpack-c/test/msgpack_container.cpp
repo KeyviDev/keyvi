@@ -1,3 +1,4 @@
+#include <iostream>
 #include <msgpack.hpp>
 
 #include <cmath>
@@ -11,7 +12,16 @@
 
 #include "test_allocator.hpp"
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif //defined(__GNUC__)
+
 #include <gtest/gtest.h>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif //defined(__GNUC__)
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,10 +55,10 @@ TEST(MSGPACK_STL, simple_buffer_vector)
             val1.push_back(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        EXPECT_EQ(ret.get().type, msgpack::type::ARRAY);
-        type const& val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        EXPECT_EQ(oh.get().type, msgpack::type::ARRAY);
+        type const& val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -60,10 +70,10 @@ TEST(MSGPACK_STL, simple_buffer_vector_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    EXPECT_EQ(ret.get().type, msgpack::type::ARRAY);
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    EXPECT_EQ(oh.get().type, msgpack::type::ARRAY);
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -74,13 +84,13 @@ TEST(MSGPACK_STL, simple_buffer_vector_char)
     for (unsigned int k = 0; k < kLoop; k++) {
         type val1;
         for (unsigned int i = 0; i < kElements; i++)
-            val1.push_back(rand());
+            val1.push_back(static_cast<char>(rand()));
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        EXPECT_EQ(ret.get().type, msgpack::type::BIN);
-        type const& val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        EXPECT_EQ(oh.get().type, msgpack::type::BIN);
+        type const& val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -92,10 +102,10 @@ TEST(MSGPACK_STL, simple_buffer_vector_char_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    EXPECT_EQ(ret.get().type, msgpack::type::BIN);
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    EXPECT_EQ(oh.get().type, msgpack::type::BIN);
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -106,13 +116,13 @@ TEST(MSGPACK_STL, simple_buffer_vector_unsigned_char)
     for (unsigned int k = 0; k < kLoop; k++) {
         type val1;
         for (unsigned int i = 0; i < kElements; i++)
-            val1.push_back(rand());
+            val1.push_back(static_cast<unsigned char>(rand()));
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        EXPECT_EQ(ret.get().type, msgpack::type::BIN);
-        type const& val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        EXPECT_EQ(oh.get().type, msgpack::type::BIN);
+        type const& val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -124,10 +134,10 @@ TEST(MSGPACK_STL, simple_buffer_vector_unsigned_char_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    EXPECT_EQ(ret.get().type, msgpack::type::BIN);
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    EXPECT_EQ(oh.get().type, msgpack::type::BIN);
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -139,13 +149,13 @@ TEST(MSGPACK_STL, simple_buffer_vector_uint8_t)
     for (unsigned int k = 0; k < kLoop; k++) {
         type val1;
         for (unsigned int i = 0; i < kElements; i++)
-            val1.push_back(rand());
+            val1.push_back(static_cast<uint8_t>(rand()));
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        EXPECT_EQ(ret.get().type, msgpack::type::BIN);
-        type const& val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        EXPECT_EQ(oh.get().type, msgpack::type::BIN);
+        type const& val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -158,10 +168,10 @@ TEST(MSGPACK_STL, simple_buffer_vector_uint8_t_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    EXPECT_EQ(ret.get().type, msgpack::type::BIN);
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    EXPECT_EQ(oh.get().type, msgpack::type::BIN);
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -174,10 +184,10 @@ TEST(MSGPACK_STL, simple_buffer_vector_bool)
         val1.push_back(i % 2 ? false : true);
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    EXPECT_EQ(ret.get().type, msgpack::type::ARRAY);
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    EXPECT_EQ(oh.get().type, msgpack::type::ARRAY);
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -188,10 +198,10 @@ TEST(MSGPACK_STL, simple_buffer_vector_bool_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    EXPECT_EQ(ret.get().type, msgpack::type::ARRAY);
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    EXPECT_EQ(oh.get().type, msgpack::type::ARRAY);
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -207,9 +217,9 @@ TEST(MSGPACK_STL, simple_buffer_assoc_vector)
         val1.push_back(std::make_pair(5, 6));
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type const& val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type const& val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -221,9 +231,9 @@ TEST(MSGPACK_STL, simple_buffer_assoc_vector_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -237,9 +247,9 @@ TEST(MSGPACK_STL, simple_buffer_map)
             val1[rand()] = rand();
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type const& val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type const& val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -251,9 +261,9 @@ TEST(MSGPACK_STL, simple_buffer_map_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -267,9 +277,9 @@ TEST(MSGPACK_STL, simple_buffer_deque)
             val1.push_back(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type const& val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type const& val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -281,9 +291,9 @@ TEST(MSGPACK_STL, simple_buffer_deque_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -297,9 +307,9 @@ TEST(MSGPACK_STL, simple_buffer_list)
             val1.push_back(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type const& val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type const& val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -311,9 +321,9 @@ TEST(MSGPACK_STL, simple_buffer_list_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type const& val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type const& val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -327,9 +337,9 @@ TEST(MSGPACK_STL, simple_buffer_set)
             val1.insert(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
     }
@@ -341,9 +351,9 @@ TEST(MSGPACK_STL, simple_buffer_set_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
     EXPECT_TRUE(equal(val1.begin(), val1.end(), val2.begin()));
 }
@@ -354,12 +364,42 @@ TEST(MSGPACK_STL, simple_buffer_pair)
         pair<int, int> val1 = make_pair(rand(), rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        pair<int, int> val2 = ret.get().as<pair<int, int> >();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        pair<int, int> val2 = oh.get().as<pair<int, int> >();
         EXPECT_EQ(val1.first, val2.first);
         EXPECT_EQ(val1.second, val2.second);
     }
+}
+
+TEST(MSGPACK_STL, simple_buffer_complex_float)
+{
+    complex<float> val1 = complex<float>(1.23F, 4.56F);
+    msgpack::sbuffer sbuf;
+    msgpack::pack(sbuf, val1);
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    complex<float> val2 = oh.get().as<complex<float> >();
+    EXPECT_EQ(val1, val2);
+    complex<float> val3;
+    oh.get().convert(val3);
+    EXPECT_EQ(val1, val3);
+
+}
+
+TEST(MSGPACK_STL, simple_buffer_complex_double)
+{
+    complex<double> val1 = complex<double>(1.23, 4.56);
+    msgpack::sbuffer sbuf;
+    msgpack::pack(sbuf, val1);
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    complex<double> val2 = oh.get().as<complex<double> >();
+    EXPECT_EQ(val1, val2);
+    complex<double> val3;
+    oh.get().convert(val3);
+    EXPECT_EQ(val1, val3);
+
 }
 
 TEST(MSGPACK_STL, simple_buffer_multimap)
@@ -374,9 +414,9 @@ TEST(MSGPACK_STL, simple_buffer_multimap)
         }
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
 
         vector<pair<int, int> > v1, v2;
         type::const_iterator it;
@@ -398,9 +438,9 @@ TEST(MSGPACK_STL, simple_buffer_multimap_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -413,9 +453,9 @@ TEST(MSGPACK_STL, simple_buffer_multiset)
             val1.insert(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
 
         vector<int> v1, v2;
         type::const_iterator it;
@@ -437,9 +477,9 @@ TEST(MSGPACK_STL, simple_buffer_multiset_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -448,11 +488,11 @@ TEST(MSGPACK_TUPLE, simple_tuple)
     msgpack::sbuffer sbuf;
     msgpack::type::tuple<bool, std::string, double> val1(true, "kzk", 12.3);
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
     msgpack::type::tuple<bool, std::string, double> val2
-        = ret.get().as<msgpack::type::tuple<bool, std::string, double> >();
-    EXPECT_EQ(ret.get().via.array.size, 3u);
+        = oh.get().as<msgpack::type::tuple<bool, std::string, double> >();
+    EXPECT_EQ(oh.get().via.array.size, 3u);
     EXPECT_EQ(val1.get<0>(), val2.get<0>());
     EXPECT_EQ(val1.get<1>(), val2.get<1>());
     EXPECT_EQ(val1.get<2>(), val2.get<2>());
@@ -463,12 +503,81 @@ TEST(MSGPACK_TUPLE, simple_tuple_empty)
     msgpack::sbuffer sbuf;
     msgpack::type::tuple<> val1;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    ret.get().as<msgpack::type::tuple<> >();
-    EXPECT_EQ(ret.get().via.array.size, 0u);
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    oh.get().as<msgpack::type::tuple<> >();
+    EXPECT_EQ(oh.get().via.array.size, 0u);
 }
 
+TEST(MSGPACK_TUPLE, simple_tuple_grater_than_as)
+{
+    msgpack::sbuffer sbuf;
+    msgpack::type::tuple<bool, std::string, int> val1(true, "kzk", 42);
+    msgpack::pack(sbuf, val1);
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    msgpack::type::tuple<bool, std::string, int, int> val2
+        = oh.get().as<msgpack::type::tuple<bool, std::string, int, int> >();
+    EXPECT_EQ(oh.get().via.array.size, 3u);
+    EXPECT_EQ(val1.get<0>(), val2.get<0>());
+    EXPECT_EQ(val1.get<1>(), val2.get<1>());
+    EXPECT_EQ(val1.get<2>(), val2.get<2>());
+}
+
+TEST(MSGPACK_TUPLE, simple_tuple_grater_than_convert)
+{
+    msgpack::sbuffer sbuf;
+    msgpack::type::tuple<bool, std::string, int> val1(true, "kzk", 42);
+    msgpack::pack(sbuf, val1);
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    msgpack::type::tuple<bool, std::string, int, int> val2;
+    oh.get().convert(val2);
+    EXPECT_EQ(oh.get().via.array.size, 3u);
+    EXPECT_EQ(val1.get<0>(), val2.get<0>());
+    EXPECT_EQ(val1.get<1>(), val2.get<1>());
+    EXPECT_EQ(val1.get<2>(), val2.get<2>());
+}
+
+TEST(MSGPACK_TUPLE, simple_tuple_less_than_as)
+{
+    msgpack::sbuffer sbuf;
+    msgpack::type::tuple<bool, std::string, int> val1(true, "kzk", 42);
+    msgpack::pack(sbuf, val1);
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    msgpack::type::tuple<bool, std::string> val2
+        = oh.get().as<msgpack::type::tuple<bool, std::string> >();
+    EXPECT_EQ(oh.get().via.array.size, 3u);
+    EXPECT_EQ(val1.get<0>(), val2.get<0>());
+    EXPECT_EQ(val1.get<1>(), val2.get<1>());
+}
+
+TEST(MSGPACK_TUPLE, simple_tuple_less_than_convert)
+{
+    msgpack::sbuffer sbuf;
+    msgpack::type::tuple<bool, std::string, int> val1(true, "kzk", 42);
+    msgpack::pack(sbuf, val1);
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    msgpack::type::tuple<bool, std::string> val2;
+    oh.get().convert(val2);
+    EXPECT_EQ(oh.get().via.array.size, 3u);
+    EXPECT_EQ(val1.get<0>(), val2.get<0>());
+    EXPECT_EQ(val1.get<1>(), val2.get<1>());
+}
+
+TEST(MSGPACK_TUPLE, simple_tuple_nest)
+{
+    msgpack::sbuffer sbuf;
+    msgpack::type::tuple<msgpack::type::tuple<> > val1;
+    msgpack::pack(sbuf, val1);
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    msgpack::type::tuple<msgpack::type::tuple<> > val2;
+    oh.get().convert(val2);
+    EXPECT_EQ(oh.get().via.array.size, 1u);
+}
 
 // TR1
 
@@ -498,9 +607,9 @@ TEST(MSGPACK_TR1, simple_buffer_tr1_unordered_map)
             val1[rand()] = rand();
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         type::const_iterator it;
         for (it = val1.begin(); it != val1.end(); ++it) {
@@ -516,9 +625,9 @@ TEST(MSGPACK_TR1, simple_buffer_tr1_unordered_map_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -534,9 +643,9 @@ TEST(MSGPACK_TR1, simple_buffer_tr1_unordered_multimap)
         }
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
 
         vector<pair<int, int> > v1, v2;
         type::const_iterator it;
@@ -558,9 +667,9 @@ TEST(MSGPACK_TR1, simple_buffer_tr1_unordered_multimap_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -578,9 +687,9 @@ TEST(MSGPACK_TR1, simple_buffer_tr1_unordered_set)
             val1.insert(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         type::const_iterator it;
         for (it = val1.begin(); it != val1.end(); ++it)
@@ -594,9 +703,9 @@ TEST(MSGPACK_TR1, simple_buffer_tr1_unordered_set_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -609,9 +718,9 @@ TEST(MSGPACK_TR1, simple_buffer_tr1_unordered_multiset)
             val1.insert(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
 
         vector<int> v1, v2;
         type::const_iterator it;
@@ -633,9 +742,9 @@ TEST(MSGPACK_TR1, simple_buffer_tr1_unordered_multiset_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -667,9 +776,9 @@ TEST(MSGPACK_TR1, simple_buffer_unordered_map)
             val1[rand()] = rand();
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         type::const_iterator it;
         for (it = val1.begin(); it != val1.end(); ++it) {
@@ -685,9 +794,9 @@ TEST(MSGPACK_TR1, simple_buffer_unordered_map_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -703,9 +812,9 @@ TEST(MSGPACK_TR1, simple_buffer_unordered_multimap)
         }
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
 
         vector<pair<int, int> > v1, v2;
         type::const_iterator it;
@@ -727,9 +836,9 @@ TEST(MSGPACK_TR1, simple_buffer_unordered_multimap_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -748,9 +857,9 @@ TEST(MSGPACK_TR1, simple_buffer_unordered_set)
             val1.insert(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
         EXPECT_EQ(val1.size(), val2.size());
         type::const_iterator it;
         for (it = val1.begin(); it != val1.end(); ++it)
@@ -764,9 +873,9 @@ TEST(MSGPACK_TR1, simple_buffer_unordered_set_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 
@@ -779,9 +888,9 @@ TEST(MSGPACK_TR1, simple_buffer_unordered_multiset)
             val1.insert(rand());
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, val1);
-        msgpack::unpacked ret;
-        msgpack::unpack(ret, sbuf.data(), sbuf.size());
-        type val2 = ret.get().as<type>();
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
+        type val2 = oh.get().as<type>();
 
         vector<int> v1, v2;
         type::const_iterator it;
@@ -803,9 +912,9 @@ TEST(MSGPACK_TR1, simple_buffer_unordered_multiset_empty)
     type val1;
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, val1);
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
-    type val2 = ret.get().as<type>();
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
+    type val2 = oh.get().as<type>();
     EXPECT_EQ(val1.size(), val2.size());
 }
 

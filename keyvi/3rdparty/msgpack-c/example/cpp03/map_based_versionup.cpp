@@ -71,9 +71,10 @@ int main() {
 
         print(ss.str());
 
-        msgpack::unpacked unp = msgpack::unpack(ss.str().data(), ss.str().size());
+        std::string const& str = ss.str();
+        msgpack::object_handle oh = msgpack::unpack(str.data(), str.size());
 
-        msgpack::object obj = unp.get();
+        msgpack::object obj = oh.get();
         std::cout << obj << std::endl;
 
         v2 newv = obj.as<v2>();

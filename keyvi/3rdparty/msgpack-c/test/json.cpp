@@ -1,7 +1,17 @@
 #include <msgpack.hpp>
 #include <fstream>
 #include <sstream>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif //defined(__GNUC__)
+
 #include <gtest/gtest.h>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif //defined(__GNUC__)
 
 TEST(json, basic_elements)
 {
@@ -17,7 +27,7 @@ TEST(json, basic_elements)
     msgpack::object o(t1, z);
     std::stringstream ss;
     ss << o;
-    EXPECT_EQ(ss.str(), "[12, -34, 1.23, -4.56, true, false, \"ABC\", {\"Hello\":789, \"World\":-789}]");
+    EXPECT_EQ(ss.str(), "[12,-34,1.23,-4.56,true,false,\"ABC\",{\"Hello\":789,\"World\":-789}]");
 }
 
 TEST(json, escape)

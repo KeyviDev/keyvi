@@ -25,8 +25,9 @@ void array() {
     std::stringstream ss;
     msgpack::pack(ss, a);
 
-    msgpack::unpacked und = msgpack::unpack(ss.str().data(), ss.str().size());
-    msgpack::object obj = und.get();
+    auto const& str = ss.str();
+    auto oh = msgpack::unpack(str.data(), str.size());
+    auto obj = oh.get();
 
     std::cout << obj << std::endl;
     assert((obj.as<std::array<int, 5>>()) == a);
@@ -37,8 +38,9 @@ void tuple() {
     std::stringstream ss;
     msgpack::pack(ss, t);
 
-    auto und = msgpack::unpack(ss.str().data(), ss.str().size());
-    auto obj = und.get();
+    auto const& str = ss.str();
+    auto oh = msgpack::unpack(str.data(), str.size());
+    auto obj = oh.get();
 
     std::cout << obj << std::endl;
     assert(obj.as<decltype(t)>() == t);
@@ -49,8 +51,9 @@ void unordered_map() {
     std::stringstream ss;
     msgpack::pack(ss, m);
 
-    auto und = msgpack::unpack(ss.str().data(), ss.str().size());
-    msgpack::object obj = und.get();
+    auto const& str = ss.str();
+    auto oh = msgpack::unpack(str.data(), str.size());
+    msgpack::object obj = oh.get();
 
     std::cout << obj << std::endl;
     assert(obj.as<decltype(m)>() == m);
@@ -61,8 +64,9 @@ void unordered_set() {
     std::stringstream ss;
     msgpack::pack(ss, s);
 
-    auto und = msgpack::unpack(ss.str().data(), ss.str().size());
-    auto obj = und.get();
+    auto const& str = ss.str();
+    auto oh = msgpack::unpack(str.data(), str.size());
+    auto obj = oh.get();
 
     std::cout << obj << std::endl;
     assert(obj.as<decltype(s)>() == s);
@@ -74,8 +78,9 @@ void forward_list() {
     std::stringstream ss;
     msgpack::pack(ss, f);
 
-    auto und = msgpack::unpack(ss.str().data(), ss.str().size());
-    auto obj = und.get();
+    auto const& str = ss.str();
+    auto oh = msgpack::unpack(str.data(), str.size());
+    auto obj = oh.get();
 
     std::cout << obj << std::endl;
     assert(obj.as<type>() == f);
@@ -98,40 +103,45 @@ void combi() {
     std::size_t offset = 0;
     std::cout << "offset: " << offset << std::endl;
     {
-        auto und = msgpack::unpack(ss.str().data(), ss.str().size(), offset);
-        auto obj = und.get();
+        auto const& str = ss.str();
+        auto oh = msgpack::unpack(str.data(), str.size(), offset);
+        auto obj = oh.get();
 
         std::cout << obj << std::endl;
         assert(obj.as<decltype(a)>() == a);
     }
     std::cout << "offset: " << offset << std::endl;
     {
-        auto und = msgpack::unpack(ss.str().data(), ss.str().size(), offset);
-        auto obj = und.get();
+        auto const& str = ss.str();
+        auto oh = msgpack::unpack(str.data(), str.size(), offset);
+        auto obj = oh.get();
 
         std::cout << obj << std::endl;
         assert(obj.as<decltype(t)>() == t);
     }
     std::cout << "offset: " << offset << std::endl;
     {
-        auto und = msgpack::unpack(ss.str().data(), ss.str().size(), offset);
-        auto obj = und.get();
+        auto const& str = ss.str();
+        auto oh = msgpack::unpack(str.data(), str.size(), offset);
+        auto obj = oh.get();
 
         std::cout << obj << std::endl;
         assert(obj.as<decltype(m)>() == m);
     }
     std::cout << "offset: " << offset << std::endl;
     {
-        auto und = msgpack::unpack(ss.str().data(), ss.str().size(), offset);
-        auto obj = und.get();
+        auto const& str = ss.str();
+        auto oh = msgpack::unpack(str.data(), str.size(), offset);
+        auto obj = oh.get();
 
         std::cout << obj << std::endl;
         assert(obj.as<decltype(s)>() == s);
     }
     std::cout << "offset: " << offset << std::endl;
     {
-        auto und = msgpack::unpack(ss.str().data(), ss.str().size(), offset);
-        auto obj = und.get();
+        auto const& str = ss.str();
+        auto oh = msgpack::unpack(str.data(), str.size(), offset);
+        auto obj = oh.get();
 
         std::cout << obj << std::endl;
         assert(obj.as<decltype(f)>() == f);
