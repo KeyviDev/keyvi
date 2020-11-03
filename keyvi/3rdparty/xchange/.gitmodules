@@ -1,9 +1,0 @@
-[submodule "formats/rapidjson"]
-	path = formats/rapidjson
-	url = https://github.com/miloyip/rapidjson.git
-[submodule "formats/msgpack"]
-	path = formats/msgpack
-	url = https://github.com/msgpack/msgpack-c.git
-[submodule "formats/jsoncpp"]
-	path = formats/jsoncpp
-	url = https://github.com/open-source-parsers/jsoncpp.git

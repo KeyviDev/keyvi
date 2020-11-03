@@ -24,8 +24,11 @@
 
 #ifndef KEYVI_UTIL_MSGPACK_UTIL_H_
 #define KEYVI_UTIL_MSGPACK_UTIL_H_
+#include <limits>
 
 #include "msgpack.hpp"
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
 
 /**
  * Utility classes for msgpack.
@@ -38,69 +41,112 @@
 namespace keyvi {
 namespace util {
 
-class msgpack_buffer : public msgpack::sbuffer {
- public:
-  using msgpack::sbuffer::sbuffer;
+inline void JsonToMsgPack(const rapidjson::Value& value, msgpack::packer<msgpack::sbuffer>* msgpack_packer,
+                          bool single_precision_float) {
+  switch (value.GetType()) {
+    case rapidjson::kArrayType:
+      msgpack_packer->pack_array(value.Size());
+      for (auto& v : value.GetArray()) {
+        JsonToMsgPack(v, msgpack_packer, single_precision_float);
+      }
+      break;
+    case rapidjson::kObjectType:
+      msgpack_packer->pack_map(value.MemberCount());
+      for (auto& v : value.GetObject()) {
+        msgpack_packer->pack_str(v.name.GetStringLength());
+        msgpack_packer->pack_str_body(v.name.GetString(), v.name.GetStringLength());
+        JsonToMsgPack(v.value, msgpack_packer, single_precision_float);
+      }
+      break;
+    case rapidjson::kNumberType:
+      if (value.IsDouble()) {
+        if (single_precision_float == false || value.GetDouble() < std::numeric_limits<float>::min() ||
+            value.GetDouble() > std::numeric_limits<float>::max()) {
+          msgpack_packer->pack_double(value.GetDouble());
+        } else {
+          msgpack_packer->pack_float(value.GetFloat());
+        }
+      } else if (value.IsUint64()) {
+        msgpack_packer->pack_uint64(value.GetUint64());
+      } else {
+        msgpack_packer->pack_int64(value.GetInt64());
+      }
+      break;
+    case rapidjson::kStringType:
+      msgpack_packer->pack_str(value.GetStringLength());
+      msgpack_packer->pack_str_body(value.GetString(), value.GetStringLength());
+      break;
+    case rapidjson::kFalseType:
+      msgpack_packer->pack_false();
+      break;
+    case rapidjson::kTrueType:
+      msgpack_packer->pack_true();
+      break;
+    case rapidjson::kNullType:
+      msgpack_packer->pack_nil();
+      break;
+  }
+}
 
-  void set_single_precision_float() { single_precision_float_ = true; }
+template <typename Writer>
+inline void MsgPackDump(Writer* writer, const msgpack::object& o) {
+  switch (o.type) {
+    case msgpack::type::NIL:
+      writer->Null();
+      break;
 
-  bool get_single_precision_float() const { return single_precision_float_; }
+    case msgpack::type::BOOLEAN:
+      writer->Bool(o.via.boolean);
+      break;
 
- private:
-  bool single_precision_float_ = false;
-};
+    case msgpack::type::POSITIVE_INTEGER:
+      writer->Uint64(o.via.u64);
+      break;
+
+    case msgpack::type::NEGATIVE_INTEGER:
+      writer->Int64(o.via.i64);
+      break;
+
+    case msgpack::type::FLOAT:
+      writer->Double(o.via.f64);
+      break;
+
+    case msgpack::type::STR:
+      writer->String(o.via.str.ptr, o.via.str.size);
+      break;
+
+    case msgpack::type::ARRAY:
+      writer->StartArray();
+      {
+        const msgpack::object* pend_array(o.via.array.ptr + o.via.array.size);
+        for (msgpack::object* p(o.via.array.ptr); p < pend_array; ++p) {
+          MsgPackDump(writer, *p);
+        }
+      }
+      writer->EndArray();
+      break;
+
+    case msgpack::type::MAP:
+      writer->StartObject();
+      {
+        const msgpack::object_kv* pend_map(o.via.map.ptr + o.via.map.size);
+        for (msgpack::object_kv* p(o.via.map.ptr); p < pend_map; ++p) {
+          writer->Key(p->key.via.str.ptr, p->key.via.str.size);
+          MsgPackDump(writer, p->val);
+        }
+      }
+      writer->EndObject();
+      break;
+
+    // there is no counterpart for binary and ext in json, this branch should never be executed
+    case msgpack::type::BIN:
+    case msgpack::type::EXT:
+    default:
+      break;
+  }
+}
 
 } /* namespace util */
 } /* namespace keyvi */
-
-namespace msgpack {
-
-/// @cond
-MSGPACK_API_VERSION_NAMESPACE(v1) {
-  /// @endcond
-
-  /**
-   * Specialization to turn doubles into msgpack single or double precision floats based on the setting in the buffer.
-   *
-   * @param d the double to pack
-   * @return the packer instance
-   */
-
-  template <>
-  inline packer<keyvi::util::msgpack_buffer>& packer<keyvi::util::msgpack_buffer>::pack_double(double d) {
-    // taken from msgpack code
-    if (m_stream.get_single_precision_float()) {
-      union {
-        float f;
-        uint32_t i;
-      } mem;
-      mem.f = d;
-      char buf[5];
-      buf[0] = static_cast<char>(0xcau);
-      _msgpack_store32(&buf[1], mem.i);
-      append_buffer(buf, 5);
-    } else {
-      union {
-        double f;
-        uint64_t i;
-      } mem;
-      mem.f = d;
-      char buf[9];
-      buf[0] = static_cast<char>(0xcbu);
-
-#if defined(TARGET_OS_IPHONE)
-      // ok
-#elif defined(__arm__) && !(__ARM_EABI__)  // arm-oabi
-      // https://github.com/msgpack/msgpack-perl/pull/1
-      mem.i = (mem.i & 0xFFFFFFFFUL) << 32UL | (mem.i >> 32UL);
-#endif
-      _msgpack_store64(&buf[1], mem.i);
-      append_buffer(buf, 9);
-    }
-
-    return *this;
-  }
-}
-}  // namespace msgpack
 
 #endif  // KEYVI_UTIL_MSGPACK_UTIL_H_
