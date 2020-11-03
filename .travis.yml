@@ -42,7 +42,7 @@ env:
 
     - BUILD_TYPE=rust       DOCKER_IMAGE=keyvidev/ubuntu-builder
 
-    - BUILD_TYPE=coverage   DOCKER_IMAGE=keyvidev/ubuntu-builder
+    - BUILD_TYPE=coverage   DOCKER_IMAGE=keyvidev/ubuntu-builder:coverage.16.04
 
     - BUILD_TYPE=doc        DOCKER_IMAGE=keyvidev/ubuntu-builder
 
