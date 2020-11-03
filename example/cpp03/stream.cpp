@@ -16,6 +16,12 @@
 #include <errno.h>
 #include <pthread.h>
 
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#include <io.h>
+#include <fcntl.h>
+#define pipe(fds) _pipe(fds, 4096, _O_BINARY)
+#endif // _MSC_VER || __MINGW32__
+
 class Server {
 public:
     Server(int sock) : m_sock(sock) { }
@@ -43,10 +49,10 @@ public:
 
         m_pac.buffer_consumed(count);
 
-        msgpack::unpacked result;
-        while (m_pac.next(&result)) {
-            msgpack::object msg = result.get();
-            unique_zone& life = result.zone();
+        msgpack::object_handle oh;
+        while (m_pac.next(oh)) {
+            msgpack::object msg = oh.get();
+            unique_zone& life = oh.zone();
             process_message(msg, life);
         }
 

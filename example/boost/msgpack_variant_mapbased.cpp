@@ -45,7 +45,11 @@ struct proc:boost::static_visitor<void> {
                 // You can remove key-value pair from msgpack::type::variant_ref
 
 #if defined(MSGPACK_USE_CPP03)
+#  if MSGPACK_LIB_STD_CXX
+                v.erase(std::multimap<msgpack::type::variant_ref, msgpack::type::variant_ref>::const_iterator(it++));
+#  else  // MSGPACK_LIB_STD_CXX
                 v.erase(it++);
+#  endif // MSGPACK_LIB_STD_CXX
 #else  // defined(MSGPACK_USE_CPP03)
 #  if MSGPACK_LIB_STD_CXX
                 it = v.erase(std::multimap<msgpack::type::variant_ref, msgpack::type::variant_ref>::const_iterator(it));
@@ -79,8 +83,9 @@ int main() {
     u.address = "Tokyo";
     msgpack::pack(ss, u);
 
-    msgpack::unpacked unp = msgpack::unpack(ss.str().data(), ss.str().size());
-    msgpack::object const& obj = unp.get();
+    std::string const& str = ss.str();
+    msgpack::object_handle oh = msgpack::unpack(str.data(), str.size());
+    msgpack::object const& obj = oh.get();
     std::cout << "Unpacked msgpack object." << std::endl;
     std::cout << obj << std::endl;
     msgpack::type::variant_ref v = obj.as<msgpack::type::variant_ref>();

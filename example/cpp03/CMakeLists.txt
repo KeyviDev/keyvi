@@ -5,11 +5,16 @@ LIST (APPEND exec_PROGRAMS
     custom.cpp
     enum.cpp
     map_based_versionup.cpp
-    protocol.cpp
     protocol_new.cpp
     reuse_zone.cpp
     simple.cpp
 )
+
+IF (MSGPACK_DEFAULT_API_VERSION EQUAL 1)
+    LIST (APPEND exec_PROGRAMS
+        protocol.cpp
+    )
+ENDIF ()
 
 IF (NOT MSVC)
     LIST (APPEND with_pthread_PROGRAMS
@@ -17,14 +22,12 @@ IF (NOT MSVC)
     )
 ENDIF ()
 
-IF (MSGPACK_BOOST)
-    IF (NOT MSVC)
-        LIST (APPEND with_boost_lib_PROGRAMS
-            speed_test.cpp
-            speed_test_nested_array.cpp
-        )
-    ENDIF ()
-ENDIF ()
+if (Boost_TIMER_LIBRARY)
+    LIST (APPEND with_boost_lib_PROGRAMS
+        speed_test.cpp
+        speed_test_nested_array.cpp
+    )
+endif()
 
 FOREACH (source_file ${exec_PROGRAMS})
     GET_FILENAME_COMPONENT (source_file_we ${source_file} NAME_WE)
@@ -32,8 +35,12 @@ FOREACH (source_file ${exec_PROGRAMS})
         ${source_file_we}
         ${source_file}
     )
-    IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS "-Wall -Wextra -Werror -g -O3")
+    TARGET_INCLUDE_DIRECTORIES (${source_file_we}
+        PRIVATE
+            $<TARGET_PROPERTY:msgpackcxx,INTERFACE_INCLUDE_DIRECTORIES>
+    )
+    IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wall -Wextra")
     ENDIF ()
     IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         IF (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -50,11 +57,15 @@ FOREACH (source_file ${with_pthread_PROGRAMS})
         ${source_file_we}
         ${source_file}
     )
-    TARGET_LINK_LIBRARIES (${source_file_we}
-        pthread
+    TARGET_INCLUDE_DIRECTORIES (${source_file_we}
+        PRIVATE
+            $<TARGET_PROPERTY:msgpackcxx,INTERFACE_INCLUDE_DIRECTORIES>
     )
-    IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS "-Wall -Wextra -Werror -g -O3 -pthread")
+    TARGET_LINK_LIBRARIES (${source_file_we}
+        ${CMAKE_THREAD_LIBS_INIT}
+    )
+    IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wall -Wextra")
     ENDIF ()
     IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         IF (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -75,6 +86,10 @@ FOREACH (source_file ${with_boost_lib_PROGRAMS})
         ${source_file_we}
         ${source_file}
     )
+    TARGET_INCLUDE_DIRECTORIES (${source_file_we}
+        PRIVATE
+            $<TARGET_PROPERTY:msgpackcxx,INTERFACE_INCLUDE_DIRECTORIES>
+    )
     LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
     TARGET_LINK_LIBRARIES (${source_file_we}
         ${Boost_TIMER_LIBRARY}
@@ -87,19 +102,12 @@ FOREACH (source_file ${with_boost_lib_PROGRAMS})
         )
     ENDIF ()
 
-    IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS "-Wall -Wextra -Werror -O3")
     ENDIF ()
 
-    IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-mismatched-tags")
-    ENDIF ()
-
-    IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        IF ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER ${GNUCXX_NO_MISMATCHED_TAGS_SUPPORT_VERSION}) OR
-            (CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL   ${GNUCXX_NO_MISMATCHED_TAGS_SUPPORT_VERSION}))
-        SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wno-mismatched-tags")
-        ENDIF ()
     ENDIF ()
 
     IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

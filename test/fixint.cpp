@@ -1,5 +1,15 @@
 #include <msgpack.hpp>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif //defined(__GNUC__)
+
 #include <gtest/gtest.h>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif //defined(__GNUC__)
 
 template <typename T>
 void check_size(size_t size) {
@@ -25,19 +35,19 @@ TEST(fixint, size)
 
 template <typename T>
 void check_convert() {
-    T v1(-11);
+    T v1(typename T::value_type(-11));
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, v1);
 
-    msgpack::unpacked msg;
-    msgpack::unpack(&msg, sbuf.data(), sbuf.size());
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
 
     T v2;
-    msg.get().convert(v2);
+    oh.get().convert(v2);
 
     EXPECT_EQ(v1.get(), v2.get());
 
-    EXPECT_EQ(msg.get(), msgpack::object(T(v1.get())));
+    EXPECT_EQ(oh.get(), msgpack::object(T(v1.get())));
 }
 
 TEST(fixint, convert)

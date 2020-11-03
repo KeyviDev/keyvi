@@ -31,11 +31,11 @@ int main(void) {
         msgpack::pack(sbuf, vec);
 
         // deserialize it.
-        msgpack::unpacked msg;
-        msgpack::unpack(&msg, sbuf.data(), sbuf.size());
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
 
         // print the deserialized object.
-        msgpack::object obj = msg.get();
+        msgpack::object obj = oh.get();
         std::cout << obj << std::endl;  //=> ["Hello", "MessagePack"]
 
         // convert it into statically typed object.
@@ -47,12 +47,10 @@ int main(void) {
 Compile it as follows:
 
 ```
-$ g++ -Ipath_to_msgpack/include -DMSGPACK_DISABLE_LEGACY_NIL -DMSGPACK_DISABLE_LEGACY_CONVERT hello.cc -o hello
+$ g++ -Ipath_to_msgpack/include hello.cc -o hello
 $ ./hello
 ["Hello", "MessagePack"]
 ```
-
-See [MSGPACK_DISABLE_LEGACY_NIL](https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_configure#msgpack_disable_legacy_nil-since-140) and [MSGPACK_DISABLE_LEGACY_CONVERT](https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_configure#msgpack_disable_legacy_convert-since-140).
 
 ## Streaming feature
 
@@ -61,7 +59,7 @@ See [MSGPACK_DISABLE_LEGACY_NIL](https://github.com/msgpack/msgpack-c/wiki/v1_1_
 #include <iostream>
 #include <string>
 
-int main(void) {
+int main() {
         // serializes multiple objects using msgpack::packer.
         msgpack::sbuffer buffer;
 
@@ -79,21 +77,19 @@ int main(void) {
         pac.buffer_consumed(buffer.size());
 
         // now starts streaming deserialization.
-        msgpack::unpacked result;
-        while(pac.next(&result)) {
-            std::cout << result.get() << std::endl;
+        msgpack::object_handle oh;
+        while(pac.next(oh)) {
+            std::cout << oh.get() << std::endl;
         }
 
         // results:
-        // $ g++ -Ipath_to_msgpack/include -DMSGPACK_DISABLE_LEGACY_NIL -DMSGPACK_DISABLE_LEGACY_CONVERT stream.cc -o stream
+        // $ g++ -Ipath_to_msgpack/include stream.cc -o stream
         // $ ./stream
         // "Log message ... 1"
         // "Log message ... 2"
         // "Log message ... 3"
 }
 ```
-
-See [MSGPACK_DISABLE_LEGACY_NIL](https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_configure#msgpack_disable_legacy_nil-since-140) and [MSGPACK_DISABLE_LEGACY_CONVERT](https://github.com/msgpack/msgpack-c/wiki/v1_1_cpp_configure#msgpack_disable_legacy_convert-since-140).
 
 ### Streaming into an array or map
 
@@ -102,7 +98,7 @@ See [MSGPACK_DISABLE_LEGACY_NIL](https://github.com/msgpack/msgpack-c/wiki/v1_1_
 #include <iostream>
 #include <string>
 
-int main(void) {
+int main() {
         // serializes multiple objects into one message containing an array using msgpack::packer.
         msgpack::sbuffer buffer;
 
@@ -143,7 +139,7 @@ public:
     MSGPACK_DEFINE(m_str, m_vec);
 };
 
-int main(void) {
+int main() {
         std::vector<myclass> vec;
         // add some elements into vec...
 
@@ -151,10 +147,10 @@ int main(void) {
         msgpack::sbuffer sbuf;
         msgpack::pack(sbuf, vec);
 
-        msgpack::unpacked msg;
-        msgpack::unpack(&msg, sbuf.data(), sbuf.size());
+        msgpack::object_handle oh =
+            msgpack::unpack(sbuf.data(), sbuf.size());
 
-        msgpack::object obj = msg.get();
+        msgpack::object obj = oh.get();
 
         // you can convert object to myclass directly
         std::vector<myclass> rvec;
