@@ -40,10 +40,10 @@ void LoadDeletedKeys(const std::string& filename, std::vector<std::string>* dele
   std::stringstream buffer;
   buffer << deleted_keys_stream.rdbuf();
 
-  msgpack::unpacked unpacked_object;
+  msgpack::object_handle unpacked_object;
   msgpack::unpack(unpacked_object, buffer.str().data(), buffer.str().size());
 
-  unpacked_object.get().convert(deleted_keys);
+  unpacked_object.get().convert(*deleted_keys);
   std::sort(deleted_keys->begin(), deleted_keys->end());
 }
 
