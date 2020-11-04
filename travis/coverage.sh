@@ -11,13 +11,13 @@ travis/build_python.sh
 
 pip install coveralls-merge cpp-coveralls --upgrade
 
-coveralls   -r . -b build/ -i keyvi \
-            --gcov-options '\-lp' \
-            -E '.*/keyvi/3rdparty/.*' \
-            -e python \
-            -E '.*/keyvi/tests/.*' \
-            -E '.*/keyvi/bin/.*' \
-            --dump keyvi.cov_report > /dev/null
+#coveralls   -r . -b build/ -i keyvi \
+#            --gcov-options '\-lp' \
+#            -E '.*/keyvi/3rdparty/.*' \
+#            -e python \
+#            -E '.*/keyvi/tests/.*' \
+#            -E '.*/keyvi/bin/.*' \
+#            --dump keyvi.cov_report > /dev/null
 
 # workaround for coverage measurement: symlink keyvi
 cd python/
