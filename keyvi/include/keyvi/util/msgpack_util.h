@@ -107,7 +107,8 @@ inline void MsgPackDump(Writer* writer, const msgpack::object& o) {
       writer->Int64(o.via.i64);
       break;
 
-    case msgpack::type::FLOAT:
+    case msgpack::type::FLOAT32:
+    case msgpack::type::FLOAT64:
       writer->Double(o.via.f64);
       break;
 

@@ -1,6 +1,15 @@
 #include <msgpack.hpp>
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif //defined(__GNUC__)
+
 #include <gtest/gtest.h>
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif //defined(__GNUC__)
 
 enum enum_test {
     elem
@@ -68,11 +77,11 @@ TEST(object, convert)
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, m1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
 
     myclass m2;
-    ret.get().convert(m2);
+    oh.get().convert(m2);
 
     EXPECT_EQ(m1, m2);
 }
@@ -85,10 +94,10 @@ TEST(object, as)
     msgpack::sbuffer sbuf;
     msgpack::pack(sbuf, m1);
 
-    msgpack::unpacked ret;
-    msgpack::unpack(ret, sbuf.data(), sbuf.size());
+    msgpack::object_handle oh =
+        msgpack::unpack(sbuf.data(), sbuf.size());
 
-    EXPECT_EQ(m1, ret.get().as<myclass>());
+    EXPECT_EQ(m1, oh.get().as<myclass>());
 }
 
 TEST(object, cross_zone_copy)
@@ -181,7 +190,7 @@ TEST(object, cross_zone_copy_ext)
     msgpack::object::with_zone obj1(z1);
 
     obj1.type = msgpack::type::EXT;
-    char* ptr = static_cast<char*>(obj1.zone.allocate_align(2));
+    char* ptr = static_cast<char*>(obj1.zone.allocate_align(2, MSGPACK_ZONE_ALIGNOF(char)));
     ptr[0] = 1;
     ptr[1] = 2;
     obj1.via.ext.ptr = ptr;
@@ -204,7 +213,7 @@ TEST(object, cross_zone_copy_construct_ext)
     msgpack::object::with_zone obj1(z1);
 
     obj1.type = msgpack::type::EXT;
-    char* ptr = static_cast<char*>(obj1.zone.allocate_align(2));
+    char* ptr = static_cast<char*>(obj1.zone.allocate_align(2, MSGPACK_ZONE_ALIGNOF(char)));
     ptr[0] = 1;
     ptr[1] = 2;
     obj1.via.ext.ptr = ptr;
@@ -277,12 +286,17 @@ TEST(object, construct_primitive)
     EXPECT_EQ(msgpack::type::NEGATIVE_INTEGER, obj_int.type);
     EXPECT_EQ(-1, obj_int.via.i64);
 
-    msgpack::object obj_float(1.2);
-    EXPECT_EQ(msgpack::type::FLOAT, obj_float.type);
-    EXPECT_EQ(1.2, obj_float.via.f64);
+    msgpack::object obj_float(1.2F);
+    EXPECT_EQ(msgpack::type::FLOAT32, obj_float.type);
+    EXPECT_EQ(1.2F, obj_float.via.f64);
+
+    msgpack::object obj_double(1.2);
+    EXPECT_EQ(msgpack::type::FLOAT64, obj_double.type);
+    EXPECT_EQ(msgpack::type::FLOAT, obj_double.type);
+    EXPECT_EQ(1.2, obj_double.via.f64);
 #if defined(MSGPACK_USE_LEGACY_NAME_AS_FLOAT)
-    EXPECT_EQ(msgpack::type::DOUBLE, obj_float.type);
-    EXPECT_EQ(1.2, obj_float.via.dec);
+    EXPECT_EQ(msgpack::type::DOUBLE, obj_double.type);
+    EXPECT_EQ(1.2, obj_double.via.dec);
 #endif // MSGPACK_USE_LEGACY_NAME_AS_FLOAT
 
     msgpack::object obj_bool(true);
@@ -356,65 +370,122 @@ TEST(object, clone_int)
 
 TEST(object, clone_str)
 {
-    msgpack::zone z;
+    msgpack::object_handle oh;
     std::string v = "123456789";
-    msgpack::object obj(v, z);
-    std::size_t sz1 = msgpack::aligned_zone_size(obj);
-    msgpack::object_handle h = msgpack::clone(obj);
-    EXPECT_EQ(h.get(), obj);
-    EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
-    h = msgpack::clone(obj);
-    EXPECT_EQ(h.get(), obj);
-    EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+    {
+        msgpack::zone z;
+        msgpack::object obj(v, z);
+        std::size_t sz1 = msgpack::aligned_zone_size(obj);
+        msgpack::object_handle h = msgpack::clone(obj);
+        EXPECT_EQ(h.get(), obj);
+        EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+        h = msgpack::clone(obj);
+        EXPECT_EQ(h.get(), obj);
+        EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+        oh = msgpack::move(h);
+    }
+    EXPECT_EQ(v, oh.get().as<std::string>());
 }
 
 TEST(object, clone_bin)
 {
-    msgpack::zone z;
+    msgpack::object_handle oh;
     std::vector<char> v;
-    v.push_back('A');
-    v.push_back('B');
-    v.push_back('C');
-    msgpack::object obj(v, z);
-    std::size_t sz1 = msgpack::aligned_zone_size(obj);
-    msgpack::object_handle h = msgpack::clone(obj);
-    EXPECT_EQ(h.get(), obj);
-    EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
-    h = msgpack::clone(obj);
-    EXPECT_EQ(h.get(), obj);
-    EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+    {
+        msgpack::zone z;
+        v.push_back('A');
+        v.push_back('B');
+        v.push_back('C');
+        msgpack::object obj(v, z);
+        std::size_t sz1 = msgpack::aligned_zone_size(obj);
+        msgpack::object_handle h = msgpack::clone(obj);
+        EXPECT_EQ(h.get(), obj);
+        EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+        h = msgpack::clone(obj);
+        EXPECT_EQ(h.get(), obj);
+        EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+        oh = msgpack::move(h);
+    }
+    std::vector<char> v2 = oh.get().as<std::vector<char> >();
+    EXPECT_EQ(v.size(), v2.size());
+    EXPECT_TRUE(equal(v.begin(), v.end(), v2.begin()));
 }
 
 TEST(object, clone_array)
 {
-    msgpack::zone z;
+    msgpack::object_handle oh;
     std::vector<int> v;
-    v.push_back(1);
-    v.push_back(2);
-    v.push_back(3);
-    msgpack::object obj(v, z);
-    std::size_t sz1 = msgpack::aligned_zone_size(obj);
-    msgpack::object_handle h = msgpack::clone(obj);
-    EXPECT_EQ(h.get(), obj);
-    EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
-    h = msgpack::clone(obj);
-    EXPECT_EQ(h.get(), obj);
-    EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+    {
+        msgpack::zone z;
+        v.push_back(1);
+        v.push_back(2);
+        v.push_back(3);
+        msgpack::object obj(v, z);
+        std::size_t sz1 = msgpack::aligned_zone_size(obj);
+        msgpack::object_handle h = msgpack::clone(obj);
+        EXPECT_EQ(h.get(), obj);
+        EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+        h = msgpack::clone(obj);
+        EXPECT_EQ(h.get(), obj);
+        EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+        oh = msgpack::move(h);
+    }
+    std::vector<int> v2 = oh.get().as<std::vector<int> >();
+    EXPECT_EQ(v.size(), v2.size());
+    EXPECT_TRUE(equal(v.begin(), v.end(), v2.begin()));
 }
 
 TEST(object, clone_map)
 {
-    msgpack::zone z;
+    msgpack::object_handle oh;
     std::map<int, std::string> v;
-    v.insert(std::map<int, std::string>::value_type(1, "ABC"));
-    v.insert(std::map<int, std::string>::value_type(2, "DEF"));
-    v.insert(std::map<int, std::string>::value_type(3, "GHI"));
-    msgpack::object obj(v, z);
-    std::size_t sz1 = msgpack::aligned_zone_size(obj);
-    msgpack::object_handle h = msgpack::clone(obj);
-    EXPECT_EQ(h.get(), obj);
-    EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
-    h = msgpack::clone(obj);
-    EXPECT_EQ(h.get(), obj);
-    EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+    {
+        msgpack::zone z;
+        v.insert(std::map<int, std::string>::value_type(1, "ABC"));
+        v.insert(std::map<int, std::string>::value_type(2, "DEF"));
+        v.insert(std::map<int, std::string>::value_type(3, "GHI"));
+        msgpack::object obj(v, z);
+        std::size_t sz1 = msgpack::aligned_zone_size(obj);
+        msgpack::object_handle h = msgpack::clone(obj);
+        EXPECT_EQ(h.get(), obj);
+        EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+        h = msgpack::clone(obj);
+        EXPECT_EQ(h.get(), obj);
+        EXPECT_EQ(sz1, msgpack::aligned_zone_size(h.get()));
+        oh = msgpack::move(h);
+    }
+    std::map<int, std::string> v2 = oh.get().as<std::map<int, std::string> >();
+    EXPECT_EQ(v.size(), v2.size());
+    EXPECT_TRUE(equal(v.begin(), v.end(), v2.begin()));
+}
+
+TEST(object, pack_float)
+{
+    msgpack::object obj(1.2F);
+    std::stringstream ss1;
+    msgpack::pack(ss1, obj);
+    std::stringstream ss2;
+    msgpack::pack(ss2, 1.2F);
+    EXPECT_EQ(static_cast<size_t>(5), ss1.str().size());
+    EXPECT_EQ(ss1.str(), ss2.str());
+}
+
+TEST(object, pack_double)
+{
+    msgpack::object obj(1.2);
+    std::stringstream ss1;
+    msgpack::pack(ss1, obj);
+    std::stringstream ss2;
+    msgpack::pack(ss2, 1.2);
+    EXPECT_EQ(static_cast<size_t>(9), ss1.str().size());
+    EXPECT_EQ(ss1.str(), ss2.str());
+}
+
+TEST(object, handle_operators)
+{
+    int i = 1;
+    msgpack::object obj(i);
+    msgpack::object_handle oh = msgpack::clone(obj);
+    EXPECT_EQ(oh.get(), *oh);
+    EXPECT_EQ(oh->as<int>(), oh.get().as<int>());
 }

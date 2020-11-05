@@ -46,8 +46,8 @@ inline std::string DecodeJsonValue(const std::string& encoded_value) {
   std::string packed_string = decompressor(encoded_value);
   TRACE("unpacking %s", packed_string.c_str());
 
-  msgpack::unpacked doc;
-  msgpack::unpack(&doc, packed_string.data(), packed_string.size());
+  msgpack::object_handle doc;
+  msgpack::unpack(doc, packed_string.data(), packed_string.size());
 
   rapidjson::StringBuffer buffer;
   rapidjson::Writer<rapidjson::StringBuffer, rapidjson::UTF8<>, rapidjson::UTF8<>, rapidjson::CrtAllocator,
