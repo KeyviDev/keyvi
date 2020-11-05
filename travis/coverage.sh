@@ -30,10 +30,10 @@ coveralls   -r . -b python/ -i python \
             -E '.*/src/cpp/build-.*/.*' \
             -E '.*/autowrap_includes/autowrap_tools.hpp' \
             -E '.*/src/extra/attributes_converter.h' \
-            -E '.*/_core.cpp' \
-            --dump python.cov_report_tmp > /dev/null
+            -E '.*/_core.cpp'
+ #           --dump python.cov_report_tmp > /dev/null
 
 # workaround: remove 'python' from source path before merge
-sed s/"python\/src\/cpp\/keyvi"/"keyvi"/g python.cov_report_tmp > python.cov_report
+#sed s/"python\/src\/cpp\/keyvi"/"keyvi"/g python.cov_report_tmp > python.cov_report
 
-coveralls-merge python.cov_report
+#coveralls-merge python.cov_report
