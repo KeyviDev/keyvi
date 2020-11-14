@@ -117,13 +117,6 @@ class DictionaryCompiler final {
     sorter_.push_back(key_value_t(input_key, RegisterValue(value)));
   }
 
-#ifdef Py_PYTHON_H
-  template <typename StringType>
-  void __setitem__(StringType input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {
-    return Add(input_key, value);
-  }
-#endif
-
   void Delete(const std::string& input_key) {
     if (!stable_insert_) {
       throw compiler_exception("delete only available when using stable_inserts option");

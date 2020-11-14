@@ -9,7 +9,7 @@ from test_tools import tmp_dictionary
 def test_manifest():
     c = compiler.IntDictionaryCompiler({"memory_limit_mb":"10"})
     c.Add("Leela", 20)
-    c.Add("Kif", 2)
+    c["Kif"] = 2
     c.SetManifest('{"drink": "slurm"}')
     with tmp_dictionary(c, 'slurm.kv') as d:
         m = json.loads(d.GetManifest())
@@ -18,7 +18,7 @@ def test_manifest():
 def test_manifest():
     c = compiler.IntDictionaryCompilerSmallData({"memory_limit_mb":"10"})
     c.Add("Leela", 9223372036854775)
-    c.Add("Kif", 2)
+    c["Kif"] = 2
     c.SetManifest('{"drink": "slurm"}')
     with tmp_dictionary(c, 'slurm.kv') as d:
         m = json.loads(d.GetManifest())

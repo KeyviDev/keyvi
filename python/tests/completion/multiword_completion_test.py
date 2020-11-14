@@ -23,7 +23,7 @@ def test_mw_completion():
     c.Add("mozilla firebird" + '\x1b' + "mozilla firebird", 12)
     c.Add("internet microsoft explorer" + '\x1b' + "microsoft internet explorer", 21)
     c.Add("google chrome" + '\x1b' + "google chrome", 54)
-    c.Add("netscape navigator" + '\x1b' + "netscape navigator", 10)
+    c["netscape navigator" + '\x1b' + "netscape navigator"] = 10
     with tmp_dictionary(c, 'mw_completion.kv') as d:
         mw = MultiWordCompletion(d)
         matches = sorted([(match.GetAttribute('weight'), match.GetMatchedString())
@@ -57,7 +57,7 @@ def test_exact_match_without_completion():
     c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
     c.Add("mr" + '\x1b' + "mr", 80)
     c.Add("mozilla firefox" + '\x1b' + "mozilla firefox", 80)
-    c.Add("maa" + '\x1b' + "maa", 80)
+    c["maa" + '\x1b' + "maa"] = 80
     with tmp_dictionary(c, 'test_exact_match_without_completion.kv') as d:
         mw = MultiWordCompletion(d)
         for m in mw.GetCompletions("mr "):

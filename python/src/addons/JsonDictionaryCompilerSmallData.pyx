@@ -3,7 +3,11 @@
     def __enter__(self):
         return self
 
-    
+
+    def __setitem__(self, key, value):
+        self.Add(key, value)
+
+
     def __exit__(self, type, value, traceback):
         self.Compile()
 
