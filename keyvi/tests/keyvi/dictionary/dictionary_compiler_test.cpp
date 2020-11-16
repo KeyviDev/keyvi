@@ -57,9 +57,9 @@ class DCTTestHelper final {
   }
 };
 
-typedef boost::mpl::list<sort::InMemorySorter<key_value_t>, sort::TpieSorter<key_value_t>> sorter_types;
+// typedef boost::mpl::list<sort::InMemorySorter<key_value_t>, sort::TpieSorter<key_value_t>> sorter_types;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, SorterT, sorter_types) {
+BOOST_AUTO_TEST_CASE(minimizationIntInnerWeights) {
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"fb#fb msg downl de", 22},       {"msg#fb msg downl de", 22},       {"downl#fb msg downl de", 22},
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, SorterT, sorter_types
       {"de fb#fb msg downl de", 22},    {"de msg#fb msg downl de", 22},    {"de downl#fb msg downl de", 22},
   };
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS, SorterT> compiler(
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS> compiler(
       keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
@@ -109,13 +109,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, SorterT, sorter_types
   std::remove(file_name.c_str());
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(sortOrder, SorterT, sorter_types) {
+/*
+BOOST_AUTO_TEST_CASE(sortOrder) {
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"uboot", 22}, {"überfall", 33}, {"vielleicht", 43}, {"arbeit", 3}, {"zoo", 5}, {"ändern", 6},
   };
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS, SorterT> compiler(
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS> compiler(
       keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
@@ -183,15 +184,15 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sortOrder, SorterT, sorter_types) {
   BOOST_CHECK(it == end_it);
 
   std::remove(file_name.c_str());
-}
+}*/
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(compactSize, SorterT, sorter_types) {
+BOOST_AUTO_TEST_CASE(compactSize) {
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"uboot", 22}, {"überfall", 33}, {"vielleicht", 43}, {"arbeit", 3}, {"zoo", 5}, {"ändern", 6},
   };
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS, SorterT> compiler(
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS> compiler(
       keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
@@ -226,10 +227,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(compactSize, SorterT, sorter_types) {
   BOOST_CHECK_EQUAL("überfall", it.GetKey());
   ++it;
   BOOST_CHECK(it == end_it);
+
   std::remove(file_name.c_str());
 }
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(stableInsert, SorterT, sorter_types) {
+/*
+BOOST_AUTO_TEST_CASE(stableInsert) {
   // simulating  permutation
   std::vector<std::pair<std::string, std::string>> test_data = {
       {"aa", "\"{1:2}\""},  {"ab", "\"{2:44}\""}, {"bb", "\"{33:23}\""}, {"cc", "\"{3:24}\""},
@@ -238,7 +240,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(stableInsert, SorterT, sorter_types) {
 
   keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}, {STABLE_INSERTS, "true"}};
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON, SorterT> compiler(params);
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON> compiler(params);
 
   for (auto p : test_data) {
     compiler.Add(p.first, p.second);
@@ -277,12 +279,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(stableInsert, SorterT, sorter_types) {
   ++it;
   BOOST_CHECK(it == end_it);
   std::remove(file_name.c_str());
-}
+}*/
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(addAndDeletes, SorterT, sorter_types) {
+/*
+BOOST_AUTO_TEST_CASE(addAndDeletes) {
   keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}, {STABLE_INSERTS, "true"}};
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON, SorterT> compiler(params);
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON> compiler(params);
 
   // add, delete, add again
   compiler.Add("aa", "1");
@@ -326,19 +329,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(addAndDeletes, SorterT, sorter_types) {
 
   std::remove(file_name.c_str());
 }
+*/
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(DeleteUnsupported, SorterT, sorter_types) {
-  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}};
-
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON, SorterT> compiler(params);
-
-  // add, delete, add again
-  compiler.Add("aa", "1");
-  BOOST_CHECK_THROW(compiler.Delete("aa"), compiler_exception);
-}
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(MultipleKeyUpdateAndCompile, SorterT, sorter_types) {
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON, SorterT> compiler(
+BOOST_AUTO_TEST_CASE(MultipleKeyUpdateAndCompile) {
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON> compiler(
       keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   compiler.Add("a", "1");

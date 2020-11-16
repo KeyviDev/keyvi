@@ -1,6 +1,6 @@
 /* * keyvi - A key value store.
  *
- * Copyright 2015 Hendrik Muhs<hendrik.muhs@gmail.com>
+ * Copyright 2020 Hendrik Muhs<hendrik.muhs@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
  */
 
 /*
- * dictionary_compiler.h
+ * dictionary_index_compiler.h
  *
- *  Created on: Jul 17, 2014
+ *  Created on: Nov 17, 2020
  *      Author: hendrik
  */
 
-#ifndef KEYVI_DICTIONARY_DICTIONARY_COMPILER_H_
-#define KEYVI_DICTIONARY_DICTIONARY_COMPILER_H_
+#ifndef KEYVI_DICTIONARY_DICTIONARY_INDEX_COMPILER_H_
+#define KEYVI_DICTIONARY_DICTIONARY_INDEX_COMPILER_H_
 
 #include <algorithm>
 #include <functional>
@@ -32,10 +32,8 @@
 #include <vector>
 
 #include "keyvi/dictionary/dictionary_compiler_common.h"
-#include "keyvi/dictionary/dictionary_merger.h"
 #include "keyvi/dictionary/fsa/generator_adapter.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
-#include "keyvi/dictionary/fsa/internal/null_value_store.h"
 #include "keyvi/util/configuration.h"
 #include "keyvi/util/serialization_utils.h"
 
@@ -46,14 +44,18 @@ namespace keyvi {
 namespace dictionary {
 
 /**
- * Dictionary Compiler
+ * Dictionary Index Compiler
+ *
+ * specialized compiler to be used in keyvi index. The difference to the normal compiler
+ *
+ * - handling of order (stable sort)
+ * - support for delete
+ * - no merge as part of compilation, the index handles this
  */
 template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType = fsa::internal::value_store_t::KEY_ONLY>
-class DictionaryCompiler final {
+class DictionaryIndexCompiler final {
   using ValueStoreT = typename fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_writer_t;
-  using callback_t = std::function<void(size_t, size_t, void*)>;
   using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;
-  using Merger = DictionaryMerger<ValueStoreType>;
 
  public:
   /**
@@ -65,17 +67,15 @@ class DictionaryCompiler final {
    *
    * @param params compiler parameters
    */
-  explicit DictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) : params_(params) {
+  explicit DictionaryIndexCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
+      : params_(params) {
     params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
-
-    memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_TPIE_SORT);
-     memory_limit_ = 10;
     value_store_ = new ValueStoreT(params_);
   }
 
-  ~DictionaryCompiler() {
+  ~DictionaryIndexCompiler() {
     if (!generator_) {
       // if generator was not created we have to delete the value store
       // ourselves
@@ -83,8 +83,8 @@ class DictionaryCompiler final {
     }
   }
 
-  DictionaryCompiler& operator=(DictionaryCompiler const&) = delete;
-  DictionaryCompiler(const DictionaryCompiler& that) = delete;
+  DictionaryIndexCompiler& operator=(DictionaryIndexCompiler const&) = delete;
+  DictionaryIndexCompiler(const DictionaryIndexCompiler& that) = delete;
 
   void Add(const std::string& input_key, typename ValueStoreT::value_t value = ValueStoreT::no_value) {
     if (generator_) {
@@ -96,21 +96,64 @@ class DictionaryCompiler final {
     memory_estimate_ += EstimateMemory(input_key);
     // no move, we have no ownership
     key_values_.push_back(key_value_t(input_key, RegisterValue(value)));
-    TriggerSortAndChunkGenerationIfNeeded();
+  }
+
+  void Delete(const std::string& input_key) {
+    fsa::ValueHandle handle(0,         // offset of value
+                            count_++,  // counter(order)
+                            0,         // weight
+                            false,     // minimization
+                            true);     // deleted flag
+
+    memory_estimate_ += EstimateMemory(input_key);
+    key_values_.push_back(key_value_t(input_key, handle));
   }
 
   /**
    * Do the final compilation
    */
-  void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
+  void Compile() {
     value_store_->CloseFeeding();
+    Sort();
 
-    if (chunk_ == 0) {
-      CompileSingleChunk(progress_callback, user_data);
-    } else {
-      CompileByMergingChunks(progress_callback, user_data);
+    generator_ =
+        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
+            size_of_keys_, params_, value_store_);
+
+    // special mode for stable (incremental) inserts, in this case we have
+    // to respect the order and take
+    // the last value if keys are equal
+    if (key_values_.size() > 0) {
+      auto key_values_it = key_values_.begin();
+      key_value_t last_key_value = *key_values_it++;
+
+      while (key_values_it != key_values_.end()) {
+        key_value_t key_value = *key_values_it++;
+
+        // dedup with last one wins
+        if (last_key_value.key == key_value.key) {
+          last_key_value = key_value;
+          continue;
+        }
+
+        if (!last_key_value.value.deleted_) {
+          TRACE("adding to generator: %s", last_key_value.key.c_str());
+          generator_->Add(std::move(last_key_value.key), last_key_value.value);
+        } else {
+          TRACE("skipping deleted key: %s", last_key_value.key.c_str());
+        }
+
+        last_key_value = key_value;
+      }
+
+      // add the last one
+      TRACE("adding to generator: %s", last_key_value.key.c_str());
+      if (!last_key_value.value.deleted_) {
+        generator_->Add(std::move(last_key_value.key), last_key_value.value);
+      }
+      key_values_.clear();
     }
-
+    generator_->CloseFeeding();
     generator_->SetManifest(manifest_);
   }
 
@@ -149,112 +192,18 @@ class DictionaryCompiler final {
 
  private:
   keyvi::util::parameters_t params_;
-  key_values_t key_values_;
+  std::vector<key_value_t> key_values_;
   ValueStoreT* value_store_;
   typename GeneratorAdapter::AdapterPtr generator_;
   std::string manifest_;
-  size_t memory_limit_;
   size_t memory_estimate_ = 0;
-  size_t chunk_ = 0;
   size_t count_ = 0;
   size_t size_of_keys_ = 0;
   bool parallel_sort = true;
 
   inline void Sort() {
-    // todo: implement parallel sort option
-    std::sort(key_values_.begin(), key_values_.end());
-  }
-
-  inline void TriggerSortAndChunkGenerationIfNeeded() {
-    if (memory_estimate_ < memory_limit_) {
-      return;
-    }
-    CreateChunk();
-  }
-
-  inline void CreateChunk() {
-    TRACE("create chunk %ul", key_values_.size());
-    Sort();
-    fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>, fsa::internal::NullValueStore,
-                   uint32_t, int32_t>
-        generator(params_);
-
-    for (auto key_value : key_values_) {
-      TRACE("adding to generator: %s", key_value.key.c_str());
-      generator.Add(std::move(key_value.key), key_value.value);
-    }
-
-    key_values_.clear();
-    generator.CloseFeeding();
-
-    // todo: move into proper class
-    boost::filesystem::path filename("/tmp");
-    filename /= "fsa";
-    filename += "_";
-    filename += std::to_string(chunk_);
-    TRACE("write chunk to %s", filename.string().c_str());
-    generator.WriteToFile(filename.string());
-    ++chunk_;
-  }
-
-  inline void CompileSingleChunk(callback_t progress_callback = nullptr, void* user_data = nullptr) {
-    size_t added_key_values = 0;
-    size_t callback_trigger = 0;
-    Sort();
-
-    generator_ =
-        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
-            size_of_keys_, params_, value_store_);
-
-    if (key_values_.size() > 0) {
-      size_t number_of_items = key_values_.size();
-
-      callback_trigger = 1 + (number_of_items - 1) / 100;
-
-      if (callback_trigger > 100000) {
-        callback_trigger = 100000;
-      }
-
-      for (auto key_value : key_values_) {
-        TRACE("adding to generator: %s", key_value.key.c_str());
-
-        generator_->Add(std::move(key_value.key), key_value.value);
-        ++added_key_values;
-        if (progress_callback && (added_key_values % callback_trigger == 0)) {
-          progress_callback(added_key_values, number_of_items, user_data);
-        }
-      }
-      key_values_.clear();
-    }
-    generator_->CloseFeeding();
-  }
-
-  inline void CompileByMergingChunks(callback_t progress_callback = nullptr, void* user_data = nullptr) {
-    // create the last chunk
-    if (key_values_.size() > 0) {
-      CreateChunk();
-    }
-
-    TRACE("merge chunks");
-    keyvi::util::parameters_t params;
-    Merger merger = Merger(params);
-
-    // add all chunks
-    for (size_t i = 0; i < chunk_; ++i) {
-      boost::filesystem::path filename("/tmp");
-      filename /= "fsa";
-      filename += "_";
-      filename += std::to_string(i);
-      TRACE("add to merger %s", filename.string().c_str());
-      merger.Add(filename.string());
-    }
-
-    generator_ =
-        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
-            size_of_keys_, params_, value_store_);
-
-    merger.MergeInto(generator_, *value_store_);
-    generator_->CloseFeeding();
+    // todo: implement parallel stable sort
+    std::stable_sort(key_values_.begin(), key_values_.end());
   }
 
   /**
@@ -280,4 +229,4 @@ class DictionaryCompiler final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif  // KEYVI_DICTIONARY_DICTIONARY_COMPILER_H_
+#endif  // KEYVI_DICTIONARY_DICTIONARY_INDEX_COMPILER_H_
