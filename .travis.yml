@@ -21,13 +21,11 @@ env:
     - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/ubuntu-builder      CONF=release
     - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/ubuntu-builder      CONF=debug
 
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.5.7          CONF=release
     - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.6.9          CONF=release
     - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.7.4          CONF=release
     - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.8.0          CONF=release
     - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=pypy3.6-7.2.0  CONF=release
 
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.5.7          CONF=debug
     - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.6.9          CONF=debug
     - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.7.4          CONF=debug
     - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.8.0          CONF=debug
@@ -35,10 +33,10 @@ env:
 
     - BUILD_TYPE=sdist      DOCKER_IMAGE=keyvidev/ubuntu-builder
 
-    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp35-cp35m
     - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp36-cp36m
     - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp37-cp37m
     - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp38-cp38
+    - BUILD_TYPE=manylinux  DOCKER_IMAGE=keyvidev/manylinux-builder         PYTHON_PATH=cp39-cp39
 
     - BUILD_TYPE=rust       DOCKER_IMAGE=keyvidev/ubuntu-builder
 
@@ -51,28 +49,24 @@ env:
   global:
     - GITHUB_REPO='KeyviDev/keyvi'
 
-matrix:
-  include:
-    - os: osx
-      osx_image: xcode9.4
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=3.5.7
-    - os: osx
-      osx_image: xcode9.4
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=3.6.9
-    - os: osx
-      osx_image: xcode9.4
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=3.7.4
-    - os: osx
-      osx_image: xcode9.4
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=3.8.0
-    - os: osx
-      osx_image: xcode9.4
-      compiler: clang
-      env: BUILD_TYPE=osx PYTHON_VERSION=pypy3.6-7.2.0
+#matrix:
+#  include:
+#    - os: osx
+#      osx_image: xcode9.4
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=3.6.9
+#    - os: osx
+#      osx_image: xcode9.4
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=3.7.4
+#    - os: osx
+#      osx_image: xcode9.4
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=3.8.0
+#    - os: osx
+#      osx_image: xcode9.4
+#      compiler: clang
+#      env: BUILD_TYPE=osx PYTHON_VERSION=pypy3.6-7.2.0
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then source ./travis/setup_osx.sh ; fi
