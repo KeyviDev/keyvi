@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-pyenv global 2.7.16
+pyenv global 3.9.0
 pip install cpplint
 
 cd /io
