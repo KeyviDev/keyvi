@@ -70,10 +70,13 @@ class DictionaryCompiler final {
   explicit DictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) : params_(params) {
     params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
 
+    temporary_directory_ = keyvi::util::mapGetTemporaryPath(params);
+    temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-chunks-%%%%-%%%%-%%%%-%%%%");
+
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
     memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_COMPILER);
-    //memory_limit_ = 10;
+    memory_limit_ = 10;
     value_store_ = new ValueStoreT(params_);
   }
 
@@ -82,6 +85,9 @@ class DictionaryCompiler final {
       // if generator was not created we have to delete the value store
       // ourselves
       delete value_store_;
+    }
+    if (chunk_ > 0) {
+      boost::filesystem::remove_all(temporary_directory_);
     }
   }
 
@@ -159,7 +165,8 @@ class DictionaryCompiler final {
   size_t memory_estimate_ = 0;
   size_t chunk_ = 0;
   size_t size_of_keys_ = 0;
-  bool parallel_sort = true;
+  size_t parallel_sort_threshold_;
+  boost::filesystem::path temporary_directory_;
 
   inline void Sort() {
     // todo: implement parallel sort option
@@ -175,6 +182,10 @@ class DictionaryCompiler final {
 
   inline void CreateChunk() {
     TRACE("create chunk %ul", key_values_.size());
+    if (chunk_ == 0) {
+      boost::filesystem::create_directory(temporary_directory_);
+    }
+
     Sort();
     fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>, fsa::internal::NullValueStore,
                    uint32_t, int32_t>
@@ -188,10 +199,8 @@ class DictionaryCompiler final {
     key_values_.clear();
     generator.CloseFeeding();
 
-    // todo: move into proper class
-    boost::filesystem::path filename("/tmp");
-    filename /= "fsa";
-    filename += "_";
+    boost::filesystem::path filename(temporary_directory_);
+    filename /= "fsa_";
     filename += std::to_string(chunk_);
     TRACE("write chunk to %s", filename.string().c_str());
     generator.WriteToFile(filename.string());
@@ -243,10 +252,10 @@ class DictionaryCompiler final {
 
     // add all chunks
     for (size_t i = 0; i < chunk_; ++i) {
-      boost::filesystem::path filename("/tmp");
-      filename /= "fsa";
-      filename += "_";
+      boost::filesystem::path filename(temporary_directory_);
+      filename /= "fsa_";
       filename += std::to_string(i);
+
       TRACE("add for merge %s", filename.string().c_str());
 
       // todo: make shared
@@ -291,7 +300,9 @@ class DictionaryCompiler final {
       }
     }
 
-    // todo: cleanup
+    // free up disk space as early as possible
+    boost::filesystem::remove_all(temporary_directory_);
+    chunk_ = 0;
     generator_->CloseFeeding();
   }
 
