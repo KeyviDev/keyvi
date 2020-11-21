@@ -70,7 +70,7 @@ class DictionaryCompiler final {
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
-    memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_TPIE_SORT);
+    memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_COMPILER);
      memory_limit_ = 10;
     value_store_ = new ValueStoreT(params_);
   }

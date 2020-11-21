@@ -59,8 +59,8 @@ static const size_t COMPACT_SIZE_INNER_WEIGHT_MAX_VALUE = 0xffff;
 // the sparse array where the new state fits in
 static const size_t SPARSE_ARRAY_SEARCH_OFFSET = 151;
 
-// 1 GB default memory limit for the sorter (tpie)
-static const size_t DEFAULT_MEMORY_LIMIT_TPIE_SORT = 1 * 1024 * 1024 * 1024;
+// 1 GB default memory limit for the dictionary compiler
+static const size_t DEFAULT_MEMORY_LIMIT_COMPILER = 1 * 1024 * 1024 * 1024;
 
 // 1 GB default memory limit for the generator
 static const size_t DEFAULT_MEMORY_LIMIT_GENERATOR = 1 * 1024 * 1024 * 1024;
