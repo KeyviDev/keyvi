@@ -108,19 +108,18 @@ class generator_exception final : public std::runtime_error {
  * Note: The input must be sorted according to a user-defined sort order.
  */
 struct ValueHandle final {
-  ValueHandle() : ValueHandle(0, 0, 0, false, false) {}
-  ValueHandle(uint64_t value_idx, size_t count, uint32_t weight, bool no_minimization, bool deleted)
-      : value_idx_(value_idx), count_(count), weight_(weight), no_minimization_(no_minimization), deleted_(deleted) {}
+  ValueHandle() : ValueHandle(0, 0, false, false) {}
+  ValueHandle(uint64_t value_idx, uint32_t weight, bool no_minimization, bool deleted)
+      : value_idx_(value_idx), weight_(weight), no_minimization_(no_minimization), deleted_(deleted) {}
 
   bool operator==(const ValueHandle other) const {
-    return (value_idx_ == other.value_idx_) && (count_ == other.count_) && (weight_ == other.weight_) &&
+    return (value_idx_ == other.value_idx_) && (weight_ == other.weight_) &&
            (no_minimization_ == other.no_minimization_) && (deleted_ == other.deleted_);
   }
 
   bool operator!=(const ValueHandle other) const { return !(*this == other); }
 
   uint64_t value_idx_;
-  size_t count_;
   uint32_t weight_;
   bool no_minimization_;
   bool deleted_;

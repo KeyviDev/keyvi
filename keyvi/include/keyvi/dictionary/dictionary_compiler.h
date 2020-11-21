@@ -27,15 +27,18 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
+#include <queue>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/dictionary_compiler_common.h"
-#include "keyvi/dictionary/dictionary_merger.h"
+#include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/generator_adapter.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/null_value_store.h"
+#include "keyvi/dictionary/fsa/segment_iterator.h"
 #include "keyvi/util/configuration.h"
 #include "keyvi/util/serialization_utils.h"
 
@@ -53,7 +56,6 @@ class DictionaryCompiler final {
   using ValueStoreT = typename fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_writer_t;
   using callback_t = std::function<void(size_t, size_t, void*)>;
   using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;
-  using Merger = DictionaryMerger<ValueStoreType>;
 
  public:
   /**
@@ -71,7 +73,7 @@ class DictionaryCompiler final {
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
     memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_COMPILER);
-     memory_limit_ = 10;
+    memory_limit_ = 10;
     value_store_ = new ValueStoreT(params_);
   }
 
@@ -156,7 +158,6 @@ class DictionaryCompiler final {
   size_t memory_limit_;
   size_t memory_estimate_ = 0;
   size_t chunk_ = 0;
-  size_t count_ = 0;
   size_t size_of_keys_ = 0;
   bool parallel_sort = true;
 
@@ -237,7 +238,8 @@ class DictionaryCompiler final {
 
     TRACE("merge chunks");
     keyvi::util::parameters_t params;
-    Merger merger = Merger(params);
+
+    std::priority_queue<fsa::SegmentIterator> segments_pqueue;
 
     // add all chunks
     for (size_t i = 0; i < chunk_; ++i) {
@@ -245,15 +247,51 @@ class DictionaryCompiler final {
       filename /= "fsa";
       filename += "_";
       filename += std::to_string(i);
-      TRACE("add to merger %s", filename.string().c_str());
-      merger.Add(filename.string());
+      TRACE("add for merge %s", filename.string().c_str());
+
+      // todo: make shared
+      fsa::automata_t fsa(new fsa::Automata(filename.string()));
+      segments_pqueue.emplace(fsa::EntryIterator(fsa), segments_pqueue.size());
     }
 
     generator_ =
         GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
             size_of_keys_, params_, value_store_);
 
-    merger.MergeInto(generator_, *value_store_);
+    std::string top_key;
+    while (!segments_pqueue.empty()) {
+      auto segment_it = segments_pqueue.top();
+      segments_pqueue.pop();
+
+      top_key = segment_it.entryIterator().GetKey();
+
+      // check for same keys and merge only the most recent one
+      while (!segments_pqueue.empty() && segments_pqueue.top().entryIterator().operator==(top_key)) {
+        auto to_inc = segments_pqueue.top();
+
+        segments_pqueue.pop();
+        if (++to_inc) {
+          TRACE("push iterator");
+          segments_pqueue.push(to_inc);
+        }
+      }
+      fsa::ValueHandle handle;
+      handle.no_minimization_ = false;
+
+      // get the weight value, for now simple: does not require access to the
+      // value store itself
+      handle.weight_ = value_store_->GetMergeWeight(segment_it.entryIterator().GetValueId());
+      handle.value_idx_ = segment_it.entryIterator().GetValueId();
+
+      TRACE("Add key: %s", top_key.c_str());
+      generator_->Add(std::move(top_key), handle);
+
+      if (++segment_it) {
+        segments_pqueue.push(segment_it);
+      }
+    }
+
+    // todo: cleanup
     generator_->CloseFeeding();
   }
 
@@ -268,7 +306,6 @@ class DictionaryCompiler final {
     uint64_t value_idx = value_store_->AddValue(value, &no_minimization);
 
     fsa::ValueHandle handle(value_idx,                            // offset of value
-                            count_++,                             // counter(order)
                             value_store_->GetWeightValue(value),  // weight
                             no_minimization,                      // minimization
                             false);                               // deleted flag

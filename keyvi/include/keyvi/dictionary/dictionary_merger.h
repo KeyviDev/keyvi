@@ -147,48 +147,6 @@ class DictionaryMerger final {
     generator_->SetManifest(manifest_);
   }
 
-  // todo: make this private?
-  void MergeInto(typename GeneratorAdapter::AdapterPtr& generator, ValueStoreT& value_store) {
-    std::string top_key;
-
-    while (!segments_pqueue_.empty()) {
-      auto segment_it = segments_pqueue_.top();
-      segments_pqueue_.pop();
-
-      top_key = segment_it.entryIterator().GetKey();
-
-      // check for same keys and merge only the most recent one
-      while (!segments_pqueue_.empty() && segments_pqueue_.top().entryIterator().operator==(top_key)) {
-        ++stats_.updated_keys_;
-        auto to_inc = segments_pqueue_.top();
-
-        segments_pqueue_.pop();
-        if (++to_inc) {
-          TRACE("push iterator");
-          segments_pqueue_.push(to_inc);
-        }
-      }
-
-      if (KeyDeleted(segment_it.segmentIndex(), top_key) == false) {
-        fsa::ValueHandle handle;
-        handle.no_minimization_ = false;
-
-        // get the weight value, for now simple: does not require access to the
-        // value store itself
-        handle.weight_ = value_store.GetMergeWeight(segment_it.entryIterator().GetValueId());
-        handle.value_idx_ = segment_it.entryIterator().GetValueId();
-
-        TRACE("Add key: %s", top_key.c_str());
-        ++stats_.number_of_keys_;
-        generator->Add(std::move(top_key), handle);
-      }
-      if (++segment_it) {
-        segments_pqueue_.push(segment_it);
-      }
-    }
-    dicts_to_merge_.clear();
-  }
-
   void Write(std::ostream& stream) {
     if (!generator_) {
       throw merger_exception("not merged yet");

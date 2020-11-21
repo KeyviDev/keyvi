@@ -99,11 +99,10 @@ class DictionaryIndexCompiler final {
   }
 
   void Delete(const std::string& input_key) {
-    fsa::ValueHandle handle(0,         // offset of value
-                            count_++,  // counter(order)
-                            0,         // weight
-                            false,     // minimization
-                            true);     // deleted flag
+    fsa::ValueHandle handle(0,      // offset of value
+                            0,      // weight
+                            false,  // minimization
+                            true);  // deleted flag
 
     memory_estimate_ += EstimateMemory(input_key);
     key_values_.push_back(key_value_t(input_key, handle));
@@ -197,7 +196,6 @@ class DictionaryIndexCompiler final {
   typename GeneratorAdapter::AdapterPtr generator_;
   std::string manifest_;
   size_t memory_estimate_ = 0;
-  size_t count_ = 0;
   size_t size_of_keys_ = 0;
   bool parallel_sort = true;
 
@@ -217,7 +215,6 @@ class DictionaryIndexCompiler final {
     uint64_t value_idx = value_store_->AddValue(value, &no_minimization);
 
     fsa::ValueHandle handle(value_idx,                            // offset of value
-                            count_++,                             // counter(order)
                             value_store_->GetWeightValue(value),  // weight
                             no_minimization,                      // minimization
                             false);                               // deleted flag
