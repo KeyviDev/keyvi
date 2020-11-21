@@ -67,7 +67,7 @@ namespace index {
 namespace internal {
 
 class IndexWriterWorker final {
-  typedef std::shared_ptr<dictionary::JsonDictionaryIndexCompiler> compiler_t;
+  using compiler_t = std::shared_ptr<dictionary::JsonDictionaryIndexCompiler>;
   struct IndexPayload {
     explicit IndexPayload(const std::string& index_directory, const keyvi::util::parameters_t& params)
         : compiler_(),

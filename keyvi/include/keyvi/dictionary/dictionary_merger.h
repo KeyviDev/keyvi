@@ -69,7 +69,6 @@ struct MergeStats {
 
 template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType = fsa::internal::value_store_t::KEY_ONLY>
 class DictionaryMerger final {
-  using ValueStoreT = typename fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_writer_t;
   using ValueStoreMergeT = typename fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_merger_t;
   using ValueStoreAppendMergeT =
       typename fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_append_merger_t;
