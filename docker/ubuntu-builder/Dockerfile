@@ -36,16 +36,10 @@ RUN curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-instal
 ENV PATH "/root/.pyenv/shims/:/root/.pyenv/bin:$PATH"
 
 # install python versions
-RUN pyenv install 2.7.16
-RUN pyenv install 3.5.7
-RUN pyenv install 3.6.9
 RUN pyenv install 3.6.12
-RUN pyenv install 3.7.4
 RUN pyenv install 3.7.9
-RUN pyenv install 3.8.0
 RUN pyenv install 3.8.6
 RUN pyenv install 3.9.0
-RUN pyenv install pypy2.7-7.2.0
 RUN pyenv install pypy3.6-7.2.0
 
 # install rust

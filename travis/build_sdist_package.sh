@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ex
 
-pyenv global 3.5.7
+pyenv global 3.9.0
 
 cd /io/python
 
