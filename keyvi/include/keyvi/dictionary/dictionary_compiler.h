@@ -240,6 +240,10 @@ class DictionaryCompiler final {
   }
 
   inline void CompileByMergingChunks(callback_t progress_callback = nullptr, void* user_data = nullptr) {
+    size_t added_key_values = 0;
+    size_t callback_trigger = 0;
+    size_t number_of_items = key_values_.size();
+
     // create the last chunk
     if (key_values_.size() > 0) {
       CreateChunk();
@@ -261,6 +265,7 @@ class DictionaryCompiler final {
       // todo: make shared
       fsa::automata_t fsa(new fsa::Automata(filename.string()));
       segments_pqueue.emplace(fsa::EntryIterator(fsa), segments_pqueue.size());
+      number_of_items += fsa->GetNumberOfKeys();
     }
 
     generator_ =
@@ -283,6 +288,11 @@ class DictionaryCompiler final {
           TRACE("push iterator");
           segments_pqueue.push(to_inc);
         }
+
+        ++added_key_values;
+        if (progress_callback && (added_key_values % callback_trigger == 0)) {
+          progress_callback(added_key_values, number_of_items, user_data);
+        }
       }
       fsa::ValueHandle handle;
       handle.no_minimization_ = false;
@@ -297,6 +307,10 @@ class DictionaryCompiler final {
 
       if (++segment_it) {
         segments_pqueue.push(segment_it);
+      }
+      ++added_key_values;
+      if (progress_callback && (added_key_values % callback_trigger == 0)) {
+        progress_callback(added_key_values, number_of_items, user_data);
       }
     }
 
