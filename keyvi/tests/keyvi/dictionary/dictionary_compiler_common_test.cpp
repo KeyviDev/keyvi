@@ -26,7 +26,6 @@ namespace dictionary {
 BOOST_AUTO_TEST_SUITE(DictionaryCompilerCommonTests)
 
 BOOST_AUTO_TEST_CASE(MemoryUsage) {
-  // std::cout << sorter.memory() << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

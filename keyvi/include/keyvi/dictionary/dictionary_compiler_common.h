@@ -51,7 +51,6 @@ struct key_value_pair {
   ValueT value;
 };
 
-using sorter_param_t = std::map<std::string, std::string>;
 using key_value_t = key_value_pair<std::string, fsa::ValueHandle>;
 using key_values_t = std::vector<key_value_t>;
 /**

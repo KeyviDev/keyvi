@@ -33,6 +33,8 @@
 #include <utility>
 #include <vector>
 
+#include <boost/sort/sort.hpp>
+
 #include "keyvi/dictionary/dictionary_compiler_common.h"
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/generator_adapter.h"
@@ -76,7 +78,6 @@ class DictionaryCompiler final {
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
     memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_COMPILER);
-    memory_limit_ = 10;
     value_store_ = new ValueStoreT(params_);
   }
 
@@ -165,12 +166,15 @@ class DictionaryCompiler final {
   size_t memory_estimate_ = 0;
   size_t chunk_ = 0;
   size_t size_of_keys_ = 0;
-  size_t parallel_sort_threshold_;
+  size_t parallel_sort_threshold_ = 10000;
   boost::filesystem::path temporary_directory_;
 
   inline void Sort() {
-    // todo: implement parallel sort option
-    std::sort(key_values_.begin(), key_values_.end());
+    if (key_values_.size() > parallel_sort_threshold_ && parallel_sort_threshold_ != 0) {
+      boost::sort::block_indirect_sort(key_values_.begin(), key_values_.end());
+    } else {
+      std::sort(key_values_.begin(), key_values_.end());
+    }
   }
 
   inline void TriggerSortAndChunkGenerationIfNeeded() {
@@ -197,6 +201,7 @@ class DictionaryCompiler final {
     }
 
     key_values_.clear();
+    memory_estimate_ = 0;
     generator.CloseFeeding();
 
     boost::filesystem::path filename(temporary_directory_);
@@ -242,7 +247,7 @@ class DictionaryCompiler final {
   inline void CompileByMergingChunks(callback_t progress_callback = nullptr, void* user_data = nullptr) {
     size_t added_key_values = 0;
     size_t callback_trigger = 0;
-    size_t number_of_items = key_values_.size();
+    size_t number_of_items = 0;
 
     // create the last chunk
     if (key_values_.size() > 0) {
@@ -266,6 +271,12 @@ class DictionaryCompiler final {
       fsa::automata_t fsa(new fsa::Automata(filename.string()));
       segments_pqueue.emplace(fsa::EntryIterator(fsa), segments_pqueue.size());
       number_of_items += fsa->GetNumberOfKeys();
+    }
+
+    callback_trigger = 1 + (number_of_items - 1) / 100;
+
+    if (callback_trigger > 100000) {
+      callback_trigger = 100000;
     }
 
     generator_ =
