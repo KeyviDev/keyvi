@@ -41,6 +41,7 @@
 #include "keyvi/dictionary/fsa/internal/value_store_persistence.h"
 #include "keyvi/dictionary/fsa/internal/value_store_properties.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/util/configuration.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -80,7 +81,7 @@ class StringValueStoreMinimizationBase : public StringValueStoreBase {
   explicit StringValueStoreMinimizationBase(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : parameters_(parameters),
         hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
-    temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
+    temporary_directory_ = keyvi::util::mapGetTemporaryPath(parameters_);
 
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-string_value_store-%%%%-%%%%-%%%%-%%%%");
     boost::filesystem::create_directory(temporary_directory_);

@@ -70,14 +70,19 @@ class DictionaryCompiler final {
    * @param params compiler parameters
    */
   explicit DictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) : params_(params) {
-    params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
-
     temporary_directory_ = keyvi::util::mapGetTemporaryPath(params);
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-chunks-%%%%-%%%%-%%%%-%%%%");
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
     memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_COMPILER);
+
+    if (memory_limit_ == 0) {
+      memory_limit_ = DEFAULT_MEMORY_LIMIT_COMPILER;
+    } else if (memory_limit_ < 1024 * 1024) {
+      throw compiler_exception("Memory limit must be at least 1MB");
+    }
+
     value_store_ = new ValueStoreT(params_);
   }
 

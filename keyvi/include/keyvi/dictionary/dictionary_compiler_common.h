@@ -89,7 +89,7 @@ inline size_t EstimateMemory(const std::string& key) {
    *   Note: The vector estimate is not correct as a vector allocates more buckets in advance,
    *   we ignore this as we only want an estimate
    */
-  return sizeof(key) + sizeof(fsa::ValueHandle) + string_size + sizeof(key_values_t);
+  return sizeof(key) + string_size + sizeof(fsa::ValueHandle) + sizeof(key_values_t);
 }
 
 } /* namespace dictionary */

@@ -67,13 +67,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, DictT, int_with_weigh
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"fb#fb msg downl de", 22},       {"msg#fb msg downl de", 22},       {"downl#fb msg downl de", 22},
       {"de#fb msg downl de", 22},
-
       {"fb msg#fb msg downl de", 22},   {"fb downl#fb msg downl de", 22},  {"fb de#fb msg downl de", 22},
-
       {"msg fb#fb msg downl de", 22},   {"msg downl#fb msg downl de", 22}, {"msg de#fb msg downl de", 22},
-
       {"downl fb#fb msg downl de", 22}, {"downl msg#fb msg downl de", 22}, {"downl de#fb msg downl de", 22},
-
       {"de fb#fb msg downl de", 22},    {"de msg#fb msg downl de", 22},    {"de downl#fb msg downl de", 22},
   };
 
@@ -98,11 +94,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, DictT, int_with_weigh
   uint32_t reference_weight = DCTTestHelper::GetStateIdForPrefix(a, reference_value);
 
   std::vector<std::string> query_data = {"fb#", "msg#", "downl#", "fb msg#", "fb downl#", "downl fb#", "downl de#"};
-  std::cout << "test " << std::endl;
 
   size_t tested_values = 0;
   for (auto q : query_data) {
-    std::cout << "test " << q << std::endl;
     BOOST_CHECK(reference_weight == DCTTestHelper::GetStateIdForPrefix(a, q));
     ++tested_values;
   }
