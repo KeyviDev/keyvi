@@ -196,9 +196,13 @@ class DictionaryCompiler final {
     }
 
     Sort();
+
+    // disable minimization for faster compile
+    keyvi::util::parameters_t params(params_);
+    params[MINIMIZATION_KEY] = "off";
     fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>, fsa::internal::NullValueStore,
                    uint32_t, int32_t>
-        generator(params_);
+        generator(params);
 
     for (auto key_value : key_values_) {
       TRACE("adding to generator: %s", key_value.key.c_str());
