@@ -1,0 +1,104 @@
+# Build on Linux
+
+name: Build keyvi
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    name:  ${{ matrix.type }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        type: ['Release', 'Debug']
+        os: ['macos-latest', 'ubuntu-latest']
+    env:
+      BOOST_MAJOR: 1
+      BOOST_MINOR: 73
+      BOOST_PATCH: 0
+    steps:
+      - name: install Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev
+          sudo apt-get install ccache
+      - name: install macOS deps
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install zlib snappy openssl gnu-getopt coreutils
+          brew install ccache
+      - name: checkout from git
+        uses: actions/checkout@v2
+      
+      # Ccache https://cristianadam.eu/20200113/speeding-up-c-plus-plus-github-actions-using-ccache/
+    
+      - name: Prepare ccache timestamp
+        id: ccache_cache_timestamp
+        shell: cmake -P {0}
+        run: |
+          string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+          message("::set-output name=timestamp::${current_date}")
+      - name: ccache cache files
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ matrix.os }}-${{ matrix.type }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+          restore-keys: |
+            ${{ matrix.os }}-${{ matrix.type }}-ccache-
+      - name: Configure ccache
+        id: ccache_configure
+        run: |
+          ccache --set-config=cache_dir=$GITHUB_WORKSPACE/.ccache
+          ccache --set-config=max_size=500M
+          ccache --set-config=compression=true
+          ccache -p
+          ccache -z
+
+      # Build boost (cached)
+      - name: Cache Boost
+        id: cache_boost
+        uses: actions/cache@v2
+        with:
+          path: boost_${{ env.BOOST_MAJOR }}_${{ env.BOOST_MINOR }}_${{ env.BOOST_PATCH }}/installdir
+          key: ${{ runner.os }}-${{ env.BOOST_MAJOR }}.${{ env.BOOST_MINOR }}.${{ env.BOOST_PATCH }}-keyvi
+      - name: Install Boost
+        if: steps.cache_boost.outputs.cache-hit != 'true'
+        run: |
+          wget https://dl.bintray.com/boostorg/release/${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH}/source/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz
+          tar -zxf boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz
+          cd boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}
+          mkdir -p $GITHUB_WORKSPACE/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}/installdir
+          ./bootstrap.sh --without-libraries=graph_parallel,python
+          ./b2 --prefix=$GITHUB_WORKSPACE/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}/installdir install
+
+      - name: build with cmake
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          cmakeBuildType: ${{matrix.type}}
+          cmakeAppendedArgs: '-DBOOST_ROOT=${{ github.workspace }}/boost_${{ env.BOOST_MAJOR }}_${{ env.BOOST_MINOR }}_${{ env.BOOST_PATCH }}/installdir -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          buildWithCMake: true
+          buildDirectory: '${{ github.workspace }}/build'
+
+      - name: Unit tests
+        id: unit_tests
+        run: |
+         build/unit_test_all
+          
+      - name: Stats from ccache
+        id: ccache_stats
+        run: |
+         ccache -s
