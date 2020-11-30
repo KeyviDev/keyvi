@@ -1,0 +1,81 @@
+# Build python bindings
+name: Build python bindings
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
+        os: [ 'macos-latest', 'ubuntu-latest' ]
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }} build
+    steps:
+      - name: install Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+          sudo apt-get install ccache
+      - name: install macOS deps
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install zlib snappy boost
+          brew install ccache
+      - name: checkout from git
+        uses: actions/checkout@v2
+      
+      # Ccache https://cristianadam.eu/20200113/speeding-up-c-plus-plus-github-actions-using-ccache/
+    
+      - name: Prepare ccache timestamp
+        id: ccache_cache_timestamp
+        shell: cmake -P {0}
+        run: |
+          string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+          message("::set-output name=timestamp::${current_date}")
+      - name: ccache cache files
+        uses: actions/cache@v2
+        with:
+          path: .ccache
+          key: ${{ matrix.os }}-Release-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+          restore-keys: |
+            ${{ matrix.os }}-Release-ccache-
+      - name: Configure ccache
+        id: ccache_configure
+        run: |
+          ccache --set-config=cache_dir=$GITHUB_WORKSPACE/.ccache
+          ccache --set-config=max_size=500M
+          ccache --set-config=compression=true
+          ccache -p
+          ccache -z
+      
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          cd python
+          python -m pip install -r requirements.txt
+          python setup.py build --mode Release
+          python setup.py install --user
+          python -m pytest tests
+          python -m pytest integration-tests
+      
+      - name: Stats from ccache
+        id: ccache_stats
+        run: |
+          ccache -s
