@@ -32,7 +32,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install zlib snappy openssl gnu-getopt coreutils boost
+          brew install zlib snappy boost
           brew install ccache
       - name: checkout from git
         uses: actions/checkout@v2
