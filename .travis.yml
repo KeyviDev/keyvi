@@ -18,20 +18,20 @@ services:
 
 env:
   matrix:
-    - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/ubuntu-builder      CONF=release
-    - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/ubuntu-builder      CONF=debug
+#    - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/ubuntu-builder      CONF=release
+#    - BUILD_TYPE=linux      DOCKER_IMAGE=keyvidev/ubuntu-builder      CONF=debug
 
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.6.12         CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.7.9          CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.8.6          CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.9.0          CONF=release
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=pypy3.6-7.2.0  CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.6.12         CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.7.9          CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.8.6          CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.9.0          CONF=release
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=pypy3.6-7.2.0  CONF=release
 
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.6.12         CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.7.9          CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.8.6          CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.9.0          CONF=debug
-    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=pypy3.6-7.2.0  CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.6.12         CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.7.9          CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.8.6          CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=3.9.0          CONF=debug
+#    - BUILD_TYPE=python     DOCKER_IMAGE=keyvidev/ubuntu-builder      PYTHON_VERSION=pypy3.6-7.2.0  CONF=debug
 
     - BUILD_TYPE=sdist      DOCKER_IMAGE=keyvidev/ubuntu-builder
 
@@ -46,7 +46,7 @@ env:
 
     - BUILD_TYPE=doc        DOCKER_IMAGE=keyvidev/ubuntu-builder
 
-    - BUILD_TYPE=style      DOCKER_IMAGE=keyvidev/ubuntu-builder
+ #   - BUILD_TYPE=style      DOCKER_IMAGE=keyvidev/ubuntu-builder
 
   global:
     - GITHUB_REPO='KeyviDev/keyvi'
