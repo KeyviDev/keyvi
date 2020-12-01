@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(MergeKeyOnlyDicts) {
   keyvi::util::parameters_t merge_configurations[] = {{{"memory_limit_mb", "10"}},
                                                       {{"memory_limit_mb", "10"}, {"merge_mode", "append"}}};
 
-  for (const auto params : merge_configurations) {
+  for (const auto& params : merge_configurations) {
     DictionaryMerger<> merger(params);
     std::string filename("merged-dict-key-only.kv");
     merger.Add(dictionary.GetFileName());
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE(MergeStringDicts) {
   keyvi::util::parameters_t merge_configurations[] = {{{"memory_limit_mb", "10"}},
                                                       {{"memory_limit_mb", "10"}, {"merge_mode", "append"}}};
 
-  for (const auto params : merge_configurations) {
+  for (const auto& params : merge_configurations) {
     std::vector<std::pair<std::string, std::string>> test_data = {
         {"abc", "a"}, {"abbc", "b"}, {"abbcd", "c"}, {"abcde", "a"}, {"abdd", "b"}, {"bba", "c"},
     };
@@ -348,7 +348,7 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
   keyvi::util::parameters_t merge_configurations[] = {{{"memory_limit_mb", "10"}},
                                                       {{"memory_limit_mb", "10"}, {"merge_mode", "append"}}};
 
-  for (const auto params : merge_configurations) {
+  for (const auto& params : merge_configurations) {
     std::vector<std::pair<std::string, std::string>> test_data = {
         {"abc", "{a:1}"},   {"abbc", "{b:2}"}, {"abbcd", "{c:3}"},
         {"abcde", "{a:1}"}, {"abdd", "{b:2}"}, {"bba", "{c:3}"},

@@ -204,7 +204,7 @@ class DictionaryCompiler final {
                    uint32_t, int32_t>
         generator(params);
 
-    for (auto key_value : key_values_) {
+    for (const key_value_t& key_value : key_values_) {
       TRACE("adding to generator: %s", key_value.key.c_str());
       generator.Add(std::move(key_value.key), key_value.value);
     }
@@ -239,7 +239,7 @@ class DictionaryCompiler final {
         callback_trigger = 100000;
       }
 
-      for (auto key_value : key_values_) {
+      for (const key_value_t& key_value : key_values_) {
         TRACE("adding to generator: %s", key_value.key.c_str());
 
         generator_->Add(std::move(key_value.key), key_value.value);
