@@ -33,7 +33,6 @@ jobs:
           brew update
           brew install zlib snappy boost
           brew install ccache
-        # workaround build issue with xcode 12.2
           sudo xcode-select -s "/Applications/Xcode_12.0.app"
       - name: checkout from git
         uses: actions/checkout@v2
