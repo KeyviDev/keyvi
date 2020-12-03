@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(stableInsert) {
       {"aa", "\"{2:27}\""}, {"zz", "\"{3:21}\""}, {"zz", "\"{5:22}\""},  {"aa", "\"{3:24}\""},
   };
 
-  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}, {STABLE_INSERTS, "true"}};
+  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}};
 
   keyvi::dictionary::DictionaryIndexCompiler<dictionary_type_t::JSON> compiler(params);
 
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(stableInsert) {
 }
 
 BOOST_AUTO_TEST_CASE(addAndDeletes) {
-  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}, {STABLE_INSERTS, "true"}};
+  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}};
 
   keyvi::dictionary::DictionaryIndexCompiler<dictionary_type_t::JSON> compiler(params);
 

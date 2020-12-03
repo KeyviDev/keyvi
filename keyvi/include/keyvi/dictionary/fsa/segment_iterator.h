@@ -38,10 +38,9 @@ class SegmentIterator final {
 
  public:
   /**
+   * SegmentIterator
    *
-   * @param segment_index, merge segment index also used as a priority
-   * indicator
-   *                          when comparing two keys with the same value.
+   * wrapper around an entry iterator that stores a priority acting as tie breaker when merging
    */
   SegmentIterator(const fsa::EntryIterator& e, size_t segment_index)
       : entry_iterator_ptr_(std::make_shared<fsa::EntryIterator>(e)), segment_index_(segment_index) {}

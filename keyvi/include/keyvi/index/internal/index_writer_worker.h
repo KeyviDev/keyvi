@@ -433,7 +433,7 @@ class IndexWriterWorker final {
   static inline void CreateCompilerIfNeeded(IndexPayload* payload) {
     if (!payload->compiler_) {
       TRACE("recreate compiler");
-      keyvi::util::parameters_t params = keyvi::util::parameters_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
+      keyvi::util::parameters_t params = keyvi::util::parameters_t{{"memory_limit_mb", "5"}};
 
       payload->compiler_.reset(new dictionary::JsonDictionaryIndexCompiler(params));
     }

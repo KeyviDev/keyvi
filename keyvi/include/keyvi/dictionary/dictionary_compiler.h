@@ -71,17 +71,18 @@ class DictionaryCompiler final {
    */
   explicit DictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) : params_(params) {
     temporary_directory_ = keyvi::util::mapGetTemporaryPath(params);
-    temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-chunks-%%%%-%%%%-%%%%-%%%%");
+    temporary_directory_ /= boost::filesystem::unique_path("keyvi-fsa-chunks-%%%%-%%%%-%%%%-%%%%");
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
     memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_COMPILER);
 
-    if (memory_limit_ == 0) {
-      memory_limit_ = DEFAULT_MEMORY_LIMIT_COMPILER;
-    } else if (memory_limit_ < 1024 * 1024) {
+    if (memory_limit_ < 1024 * 1024) {
       throw compiler_exception("Memory limit must be at least 1MB");
     }
+
+    parallel_sort_threshold_ =
+        keyvi::util::mapGet(params_, PARALLEL_SORT_THRESHOLD_KEY, DEFAULT_PARALLEL_SORT_THRESHOLD);
 
     value_store_ = new ValueStoreT(params_);
   }
@@ -171,7 +172,7 @@ class DictionaryCompiler final {
   size_t memory_estimate_ = 0;
   size_t chunk_ = 0;
   size_t size_of_keys_ = 0;
-  size_t parallel_sort_threshold_ = 10000;
+  size_t parallel_sort_threshold_;
   boost::filesystem::path temporary_directory_;
 
   inline void Sort() {
@@ -206,7 +207,7 @@ class DictionaryCompiler final {
 
     for (const key_value_t& key_value : key_values_) {
       TRACE("adding to generator: %s", key_value.key.c_str());
-      generator.Add(std::move(key_value.key), key_value.value);
+      generator.Add(key_value.key, key_value.value);
     }
 
     key_values_.clear();
@@ -242,7 +243,7 @@ class DictionaryCompiler final {
       for (const key_value_t& key_value : key_values_) {
         TRACE("adding to generator: %s", key_value.key.c_str());
 
-        generator_->Add(std::move(key_value.key), key_value.value);
+        generator_->Add(key_value.key, key_value.value);
         ++added_key_values;
         if (progress_callback && (added_key_values % callback_trigger == 0)) {
           progress_callback(added_key_values, number_of_items, user_data);
