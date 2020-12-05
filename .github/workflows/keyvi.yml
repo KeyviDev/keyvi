@@ -83,6 +83,7 @@ jobs:
         if: matrix.type == 'Coverage'
         run: |
           sudo apt-get install -y lcov
+          ls build/CMakeFiles/unit_test_all.dir/keyvi/tests/keyvi/
           lcov -d build --capture --output-file coverage.info
 
       - name: Coveralls
