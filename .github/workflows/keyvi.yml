@@ -79,20 +79,18 @@ jobs:
         run: |
          build/unit_test_all
 
-      - name: Coverage
+      - name: lcov
         if: matrix.type == 'Coverage'
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          COVERALLS_PARALLEL: true
         run: |
-          python -m pip install git+https://github.com/hendrikmuhs/cpp-coveralls.git@gcov-template-coverage --user
-          export PATH="/home/runner/.local/bin:$PATH"
-          coveralls -r . -b build/ -i keyvi \
-            --gcov-options '\-lp' \
-            -E '.*/keyvi/3rdparty/.*' \
-            -e python \
-            -E '.*/keyvi/tests/.*' \
-            -E '.*/keyvi/bin/.*'
+          sudo apt-get install -y lcov
+          lcov -d build --capture --output-file coverage.info
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        if: matrix.type == 'Coverage'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage.info
 
       - name: Stats from ccache
         id: ccache_stats
