@@ -80,7 +80,7 @@ jobs:
          build/unit_test_all
 
       - name: Coverage
-        if: runner.type == 'Coverage'
+        if: matrix.type == 'Coverage'
         run: |
           python -m pip install git+https://github.com/hendrikmuhs/cpp-coveralls.git@gcov-template-coverage
           coveralls -r . -b build/ -i keyvi \
