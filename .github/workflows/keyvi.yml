@@ -21,6 +21,9 @@ jobs:
       matrix:
         type: ['Release', 'Debug']
         os: ['macos-latest', 'ubuntu-20.04']
+        include:
+          - os: 'ubuntu-20.04'
+            type: 'Coverage'
     steps:
       - name: install Linux deps
         if: runner.os == 'Linux'
@@ -75,7 +78,19 @@ jobs:
         id: unit_tests
         run: |
          build/unit_test_all
-          
+
+      - name: Coverage
+        if: runner.type == 'Coverage'
+        run: |
+          python -m pip install git+https://github.com/hendrikmuhs/cpp-coveralls.git@gcov-template-coverage
+          coveralls -r . -b build/ -i keyvi \
+            --gcov-options '\-lp' \
+            -E '.*/keyvi/3rdparty/.*' \
+            -e python \
+            -E '.*/keyvi/tests/.*' \
+            -E '.*/keyvi/bin/.*' \
+            --dump keyvi.cov_report > /dev/null
+
       - name: Stats from ccache
         id: ccache_stats
         run: |
