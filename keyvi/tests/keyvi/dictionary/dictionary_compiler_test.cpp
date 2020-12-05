@@ -65,12 +65,12 @@ typedef boost::mpl::list<keyvi::dictionary::DictionaryCompiler<dictionary_type_t
 BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, DictT, int_with_weight_types) {
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
-      {"fb#fb msg downl de", 22},       {"msg#fb msg downl de", 22},       {"downl#fb msg downl de", 22},
-      {"de#fb msg downl de", 22},
-      {"fb msg#fb msg downl de", 22},   {"fb downl#fb msg downl de", 22},  {"fb de#fb msg downl de", 22},
-      {"msg fb#fb msg downl de", 22},   {"msg downl#fb msg downl de", 22}, {"msg de#fb msg downl de", 22},
-      {"downl fb#fb msg downl de", 22}, {"downl msg#fb msg downl de", 22}, {"downl de#fb msg downl de", 22},
-      {"de fb#fb msg downl de", 22},    {"de msg#fb msg downl de", 22},    {"de downl#fb msg downl de", 22},
+      {"fb#fb msg downl de", 22},       {"msg#fb msg downl de", 22},      {"downl#fb msg downl de", 22},
+      {"de#fb msg downl de", 22},       {"fb msg#fb msg downl de", 22},   {"fb downl#fb msg downl de", 22},
+      {"fb de#fb msg downl de", 22},    {"msg fb#fb msg downl de", 22},   {"msg downl#fb msg downl de", 22},
+      {"msg de#fb msg downl de", 22},   {"downl fb#fb msg downl de", 22}, {"downl msg#fb msg downl de", 22},
+      {"downl de#fb msg downl de", 22}, {"de fb#fb msg downl de", 22},    {"de msg#fb msg downl de", 22},
+      {"de downl#fb msg downl de", 22},
   };
 
   DictT compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
@@ -235,6 +235,41 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(MultipleKeyUpdateAndCompile, DictT, json_types) {
   compiler.Add("b", "1");
   compiler.Compile();
   BOOST_CHECK_THROW(compiler.Add("a", "1"), compiler_exception);
+}
+
+void bigger_compile_test(const keyvi::util::parameters_t& params = keyvi::util::parameters_t(), size_t keys = 5000) {
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON> compiler(params);
+
+  for (size_t i = 0; i < keys; ++i) {
+    compiler.Add("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}");
+  }
+  compiler.Compile();
+
+  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
+  std::string file_name = temp_path.native();
+
+  compiler.WriteToFile(file_name);
+
+  Dictionary d(file_name.c_str());
+
+  for (size_t i = 0; i < keys; ++i) {
+    keyvi::dictionary::Match m = d["loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i)];
+    BOOST_CHECK_EQUAL("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), m.GetMatchedString());
+    BOOST_CHECK_EQUAL("{\"id\":" + std::to_string(i) + "}", m.GetValueAsString());
+  }
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile) {
+  bigger_compile_test({{"memory_limit_mb", "100"}});
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile_1MB_50k) {
+  bigger_compile_test({{MEMORY_LIMIT_KEY, std::to_string(1024 * 1024)}}, 50000);
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile_parallel_1MB) {
+  bigger_compile_test({{MEMORY_LIMIT_KEY, std::to_string(1024 * 1024)}, {PARALLEL_SORT_THRESHOLD_KEY, "1"}});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

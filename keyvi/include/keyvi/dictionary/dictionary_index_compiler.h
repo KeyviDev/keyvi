@@ -31,6 +31,8 @@
 #include <utility>
 #include <vector>
 
+#include <boost/sort/sort.hpp>
+
 #include "keyvi/dictionary/dictionary_compiler_common.h"
 #include "keyvi/dictionary/fsa/generator_adapter.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
@@ -70,6 +72,9 @@ class DictionaryIndexCompiler final {
   explicit DictionaryIndexCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
       : params_(params) {
     params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
+
+    parallel_sort_threshold_ =
+        keyvi::util::mapGet(params_, PARALLEL_SORT_THRESHOLD_KEY, DEFAULT_PARALLEL_SORT_THRESHOLD);
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
     value_store_ = new ValueStoreT(params_);
@@ -197,11 +202,14 @@ class DictionaryIndexCompiler final {
   std::string manifest_;
   size_t memory_estimate_ = 0;
   size_t size_of_keys_ = 0;
-  bool parallel_sort = true;
+  size_t parallel_sort_threshold_;
 
   inline void Sort() {
-    // todo: implement parallel stable sort
-    std::stable_sort(key_values_.begin(), key_values_.end());
+    if (key_values_.size() > parallel_sort_threshold_ && parallel_sort_threshold_ != 0) {
+      boost::sort::parallel_stable_sort(key_values_.begin(), key_values_.end());
+    } else {
+      std::stable_sort(key_values_.begin(), key_values_.end());
+    }
   }
 
   /**

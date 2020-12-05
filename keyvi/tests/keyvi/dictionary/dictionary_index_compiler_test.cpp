@@ -133,6 +133,42 @@ BOOST_AUTO_TEST_CASE(addAndDeletes) {
   std::remove(file_name.c_str());
 }
 
+void bigger_compile_test(const keyvi::util::parameters_t& params = keyvi::util::parameters_t(), size_t keys = 5000) {
+  keyvi::dictionary::DictionaryIndexCompiler<dictionary_type_t::JSON> compiler(params);
+
+  for (size_t i = 0; i < keys; ++i) {
+    compiler.Add("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i % 50),
+                 "{\"id\":" + std::to_string(i) + "}");
+  }
+  compiler.Compile();
+
+  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
+  std::string file_name = temp_path.native();
+
+  compiler.WriteToFile(file_name);
+
+  Dictionary d(file_name.c_str());
+
+  for (size_t i = 0; i < 50; ++i) {
+    keyvi::dictionary::Match m = d["loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i)];
+    BOOST_CHECK_EQUAL("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), m.GetMatchedString());
+    BOOST_CHECK_EQUAL("{\"id\":" + std::to_string(keys - 50 + i) + "}", m.GetValueAsString());
+  }
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile) {
+  bigger_compile_test({{"memory_limit_mb", "100"}});
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile_1MB_50k) {
+  bigger_compile_test({{MEMORY_LIMIT_KEY, std::to_string(1024 * 1024)}}, 50000);
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile_parallel_1MB) {
+  bigger_compile_test({{MEMORY_LIMIT_KEY, std::to_string(1024 * 1024)}, {PARALLEL_SORT_THRESHOLD_KEY, "1"}});
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */
