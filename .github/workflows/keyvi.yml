@@ -81,6 +81,9 @@ jobs:
 
       - name: Coverage
         if: matrix.type == 'Coverage'
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          COVERALLS_PARALLEL=true
         run: |
           python -m pip install git+https://github.com/hendrikmuhs/cpp-coveralls.git@gcov-template-coverage --user
           export PATH="/home/runner/.local/bin:$PATH"
@@ -89,8 +92,7 @@ jobs:
             -E '.*/keyvi/3rdparty/.*' \
             -e python \
             -E '.*/keyvi/tests/.*' \
-            -E '.*/keyvi/bin/.*' \
-            --dump keyvi.cov_report > /dev/null
+            -E '.*/keyvi/bin/.*'
 
       - name: Stats from ccache
         id: ccache_stats
