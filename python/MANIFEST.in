@@ -15,6 +15,4 @@ recursive-include src/cpp/keyvi/3rdparty CMakeLists.txt
 recursive-include src/cpp/keyvi/3rdparty *.cmake
 recursive-include src/cpp/keyvi/3rdparty *.cmake.in
 
-recursive-include src/cpp/keyvi/3rdparty/tpie *.md
-graft  src/cpp/keyvi/3rdparty/tpie/doc
 include src/cpp/CMakeLists.txt
