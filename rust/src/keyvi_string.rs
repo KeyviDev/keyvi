@@ -47,6 +47,8 @@ impl Drop for KeyviString {
     }
 }
 
+
+
 impl Deref for KeyviString {
     type Target = str;
 
