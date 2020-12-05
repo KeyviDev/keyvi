@@ -90,7 +90,7 @@ class JsonValueStoreMinimizationBase : public JsonValueStoreBase {
   explicit JsonValueStoreMinimizationBase(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : parameters_(parameters),
         hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
-    temporary_directory_ = parameters_[TEMPORARY_PATH_KEY];
+    temporary_directory_ = keyvi::util::mapGetTemporaryPath(parameters_);
 
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
     boost::filesystem::create_directory(temporary_directory_);

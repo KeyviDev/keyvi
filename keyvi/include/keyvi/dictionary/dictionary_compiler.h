@@ -27,20 +27,22 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
+#include <queue>
 #include <string>
 #include <utility>
+#include <vector>
 
+#include <boost/sort/sort.hpp>
+
+#include "keyvi/dictionary/dictionary_compiler_common.h"
+#include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/generator_adapter.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/null_value_store.h"
-#include "keyvi/dictionary/sort/in_memory_sorter.h"
-#include "keyvi/dictionary/sort/sorter_common.h"
+#include "keyvi/dictionary/fsa/segment_iterator.h"
 #include "keyvi/util/configuration.h"
 #include "keyvi/util/serialization_utils.h"
-
-#if !defined(KEYVI_DISABLE_TPIE)
-#include "keyvi/dictionary/sort/tpie_sorter.h"
-#endif
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -48,27 +50,10 @@
 namespace keyvi {
 namespace dictionary {
 
-typedef sort::key_value_pair<std::string, fsa::ValueHandle> key_value_t;
-
-/**
- * Exception class for generator, thrown when generator is used in the wrong
- * order.
- */
-
-struct compiler_exception : public std::runtime_error {
-  using std::runtime_error::runtime_error;
-};
-
 /**
  * Dictionary Compiler
  */
-template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType = fsa::internal::value_store_t::KEY_ONLY,
-#if !defined(KEYVI_DISABLE_TPIE)
-          class SorterT = sort::TpieSorter<key_value_t>
-#else
-          class SorterT = sort::InMemorySorter<key_value_t>
-#endif
-          >
+template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType = fsa::internal::value_store_t::KEY_ONLY>
 class DictionaryCompiler final {
   using ValueStoreT = typename fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_writer_t;
   using callback_t = std::function<void(size_t, size_t, void*)>;
@@ -84,13 +69,20 @@ class DictionaryCompiler final {
    *
    * @param params compiler parameters
    */
-  explicit DictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
-      : sorter_(params), params_(params) {
-    params_[TEMPORARY_PATH_KEY] = keyvi::util::mapGetTemporaryPath(params);
+  explicit DictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t()) : params_(params) {
+    temporary_directory_ = keyvi::util::mapGetTemporaryPath(params);
+    temporary_directory_ /= boost::filesystem::unique_path("keyvi-fsa-chunks-%%%%-%%%%-%%%%-%%%%");
 
     TRACE("tmp path set to %s", params_[TEMPORARY_PATH_KEY].c_str());
 
-    stable_insert_ = keyvi::util::mapGetBool(params_, STABLE_INSERTS, false);
+    memory_limit_ = keyvi::util::mapGetMemory(params_, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_COMPILER);
+
+    if (memory_limit_ < 1024 * 1024) {
+      throw compiler_exception("Memory limit must be at least 1MB");
+    }
+
+    parallel_sort_threshold_ =
+        keyvi::util::mapGet(params_, PARALLEL_SORT_THRESHOLD_KEY, DEFAULT_PARALLEL_SORT_THRESHOLD);
 
     value_store_ = new ValueStoreT(params_);
   }
@@ -100,6 +92,9 @@ class DictionaryCompiler final {
       // if generator was not created we have to delete the value store
       // ourselves
       delete value_store_;
+    }
+    if (chunk_ > 0) {
+      boost::filesystem::remove_all(temporary_directory_);
     }
   }
 
@@ -113,107 +108,25 @@ class DictionaryCompiler final {
 
     size_of_keys_ += input_key.size();
 
+    memory_estimate_ += EstimateMemory(input_key);
     // no move, we have no ownership
-    sorter_.push_back(key_value_t(input_key, RegisterValue(value)));
-  }
-
-  void Delete(const std::string& input_key) {
-    if (!stable_insert_) {
-      throw compiler_exception("delete only available when using stable_inserts option");
-    }
-
-    fsa::ValueHandle handle(0,         // offset of value
-                            count_++,  // counter(order)
-                            0,         // weight
-                            false,     // minimization
-                            true);     // deleted flag
-
-    sorter_.push_back(key_value_t(std::move(input_key), handle));
+    key_values_.push_back(key_value_t(input_key, RegisterValue(value)));
+    TriggerSortAndChunkGenerationIfNeeded();
   }
 
   /**
    * Do the final compilation
    */
   void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
-    size_t added_key_values = 0;
-    size_t callback_trigger = 0;
-
     value_store_->CloseFeeding();
-    sorter_.sort();
-    generator_ =
-        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
-            size_of_keys_, params_, value_store_);
-    generator_->SetManifest(manifest_);
 
-    if (sorter_.size() > 0) {
-      size_t number_of_items = sorter_.size();
-
-      callback_trigger = 1 + (number_of_items - 1) / 100;
-
-      if (callback_trigger > 100000) {
-        callback_trigger = 100000;
-      }
-
-      if (!stable_insert_) {
-        for (auto key_value : sorter_) {
-          TRACE("adding to generator: %s", key_value.key.c_str());
-
-          generator_->Add(std::move(key_value.key), key_value.value);
-          ++added_key_values;
-          if (progress_callback && (added_key_values % callback_trigger == 0)) {
-            progress_callback(added_key_values, number_of_items, user_data);
-          }
-        }
-
-      } else {
-        // special mode for stable (incremental) inserts, in this case we have
-        // to respect the order and take
-        // the last value if keys are equal
-
-        auto key_values_it = sorter_.begin();
-        key_value_t last_key_value = *key_values_it++;
-
-        while (key_values_it != sorter_.end()) {
-          key_value_t key_value = *key_values_it++;
-
-          // dedup with last one wins
-          if (last_key_value.key == key_value.key) {
-            TRACE("Detected duplicated keys, dedup them, last one wins.");
-
-            // check the counter to determine which key_value has been added
-            // last
-            if (last_key_value.value.count_ < key_value.value.count_) {
-              last_key_value = key_value;
-            }
-            continue;
-          }
-
-          if (!last_key_value.value.deleted_) {
-            TRACE("adding to generator: %s", last_key_value.key.c_str());
-            generator_->Add(std::move(last_key_value.key), last_key_value.value);
-            ++added_key_values;
-            if (progress_callback && (added_key_values % callback_trigger == 0)) {
-              progress_callback(added_key_values, number_of_items, user_data);
-            }
-          } else {
-            TRACE("skipping deleted key: %s", last_key_value.key.c_str());
-          }
-
-          last_key_value = key_value;
-        }
-
-        // add the last one
-        TRACE("adding to generator: %s", last_key_value.key.c_str());
-        if (!last_key_value.value.deleted_) {
-          generator_->Add(std::move(last_key_value.key), last_key_value.value);
-        }
-
-        ++added_key_values;
-      }
+    if (chunk_ == 0) {
+      CompileSingleChunk(progress_callback, user_data);
+    } else {
+      CompileByMergingChunks(progress_callback, user_data);
     }
 
-    sorter_.clear();
-    generator_->CloseFeeding();
+    generator_->SetManifest(manifest_);
   }
 
   /**
@@ -250,15 +163,183 @@ class DictionaryCompiler final {
   }
 
  private:
-  SorterT sorter_;
   keyvi::util::parameters_t params_;
+  key_values_t key_values_;
   ValueStoreT* value_store_;
   typename GeneratorAdapter::AdapterPtr generator_;
   std::string manifest_;
-  size_t count_ = 0;
+  size_t memory_limit_;
+  size_t memory_estimate_ = 0;
+  size_t chunk_ = 0;
   size_t size_of_keys_ = 0;
-  bool sort_finalized_ = false;
-  bool stable_insert_ = false;
+  size_t parallel_sort_threshold_;
+  boost::filesystem::path temporary_directory_;
+
+  inline void Sort() {
+    if (key_values_.size() > parallel_sort_threshold_ && parallel_sort_threshold_ != 0) {
+      boost::sort::block_indirect_sort(key_values_.begin(), key_values_.end());
+    } else {
+      std::sort(key_values_.begin(), key_values_.end());
+    }
+  }
+
+  inline void TriggerSortAndChunkGenerationIfNeeded() {
+    if (memory_estimate_ < memory_limit_) {
+      return;
+    }
+    CreateChunk();
+  }
+
+  inline void CreateChunk() {
+    TRACE("create chunk %ul", key_values_.size());
+    if (chunk_ == 0) {
+      boost::filesystem::create_directory(temporary_directory_);
+    }
+
+    Sort();
+
+    // disable minimization for faster compile
+    keyvi::util::parameters_t params(params_);
+    params[MINIMIZATION_KEY] = "off";
+    fsa::Generator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>, fsa::internal::NullValueStore,
+                   uint32_t, int32_t>
+        generator(params);
+
+    for (const key_value_t& key_value : key_values_) {
+      TRACE("adding to generator: %s", key_value.key.c_str());
+      generator.Add(key_value.key, key_value.value);
+    }
+
+    key_values_.clear();
+    memory_estimate_ = 0;
+    generator.CloseFeeding();
+
+    boost::filesystem::path filename(temporary_directory_);
+    filename /= "fsa_";
+    filename += std::to_string(chunk_);
+    TRACE("write chunk to %s", filename.string().c_str());
+    generator.WriteToFile(filename.string());
+    ++chunk_;
+  }
+
+  inline void CompileSingleChunk(callback_t progress_callback = nullptr, void* user_data = nullptr) {
+    size_t added_key_values = 0;
+    size_t callback_trigger = 0;
+    Sort();
+
+    generator_ =
+        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
+            size_of_keys_, params_, value_store_);
+
+    if (key_values_.size() > 0) {
+      size_t number_of_items = key_values_.size();
+
+      callback_trigger = 1 + (number_of_items - 1) / 100;
+
+      if (callback_trigger > 100000) {
+        callback_trigger = 100000;
+      }
+
+      for (const key_value_t& key_value : key_values_) {
+        TRACE("adding to generator: %s", key_value.key.c_str());
+
+        generator_->Add(key_value.key, key_value.value);
+        ++added_key_values;
+        if (progress_callback && (added_key_values % callback_trigger == 0)) {
+          progress_callback(added_key_values, number_of_items, user_data);
+        }
+      }
+      key_values_.clear();
+    }
+    generator_->CloseFeeding();
+  }
+
+  inline void CompileByMergingChunks(callback_t progress_callback = nullptr, void* user_data = nullptr) {
+    size_t added_key_values = 0;
+    size_t callback_trigger = 0;
+    size_t number_of_items = 0;
+
+    // create the last chunk
+    if (key_values_.size() > 0) {
+      CreateChunk();
+    }
+
+    TRACE("merge chunks");
+    keyvi::util::parameters_t params;
+
+    std::priority_queue<fsa::SegmentIterator> segments_pqueue;
+
+    // add all chunks
+    for (size_t i = 0; i < chunk_; ++i) {
+      boost::filesystem::path filename(temporary_directory_);
+      filename /= "fsa_";
+      filename += std::to_string(i);
+
+      TRACE("add for merge %s", filename.string().c_str());
+
+      // todo: make shared
+      fsa::automata_t fsa(new fsa::Automata(filename.string()));
+      segments_pqueue.emplace(fsa::EntryIterator(fsa), segments_pqueue.size());
+      number_of_items += fsa->GetNumberOfKeys();
+    }
+
+    callback_trigger = 1 + (number_of_items - 1) / 100;
+
+    if (callback_trigger > 100000) {
+      callback_trigger = 100000;
+    }
+
+    generator_ =
+        GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
+            size_of_keys_, params_, value_store_);
+
+    std::string top_key;
+    while (!segments_pqueue.empty()) {
+      auto segment_it = segments_pqueue.top();
+      segments_pqueue.pop();
+
+      top_key = segment_it.entryIterator().GetKey();
+
+      // check for same keys and merge only the most recent one
+      while (!segments_pqueue.empty() && segments_pqueue.top().entryIterator().operator==(top_key)) {
+        auto to_inc = segments_pqueue.top();
+
+        segments_pqueue.pop();
+        if (++to_inc) {
+          TRACE("push iterator");
+          segments_pqueue.push(to_inc);
+        }
+
+        ++added_key_values;
+        if (progress_callback && (added_key_values % callback_trigger == 0)) {
+          progress_callback(added_key_values, number_of_items, user_data);
+        }
+      }
+      fsa::ValueHandle handle;
+      handle.no_minimization_ = false;
+
+      // get the weight value, for now simple: does not require access to the
+      // value store itself
+      handle.weight_ = value_store_->GetMergeWeight(segment_it.entryIterator().GetValueId());
+      handle.value_idx_ = segment_it.entryIterator().GetValueId();
+
+      TRACE("Add key: %s", top_key.c_str());
+      generator_->Add(std::move(top_key), handle);
+
+      if (++segment_it) {
+        segments_pqueue.push(segment_it);
+      }
+      ++added_key_values;
+      if (progress_callback && (added_key_values % callback_trigger == 0)) {
+        progress_callback(added_key_values, number_of_items, user_data);
+      }
+    }
+
+    // free up disk space as early as possible
+    boost::filesystem::remove_all(temporary_directory_);
+    chunk_ = 0;
+    generator_->CloseFeeding();
+  }
 
   /**
    * Register a value before inserting the key(for optimization purposes).
@@ -271,7 +352,6 @@ class DictionaryCompiler final {
     uint64_t value_idx = value_store_->AddValue(value, &no_minimization);
 
     fsa::ValueHandle handle(value_idx,                            // offset of value
-                            count_++,                             // counter(order)
                             value_store_->GetWeightValue(value),  // weight
                             no_minimization,                      // minimization
                             false);                               // deleted flag

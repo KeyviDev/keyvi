@@ -48,7 +48,7 @@
 #include "rapidjson/ostreamwrapper.h"
 #include "rapidjson/writer.h"
 
-#include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_index_compiler.h"
 #include "keyvi/dictionary/dictionary_types.h"
 #include "keyvi/index/constants.h"
 #include "keyvi/index/internal/index_settings.h"
@@ -67,7 +67,7 @@ namespace index {
 namespace internal {
 
 class IndexWriterWorker final {
-  typedef std::shared_ptr<dictionary::JsonDictionaryCompilerSmallData> compiler_t;
+  using compiler_t = std::shared_ptr<dictionary::JsonDictionaryIndexCompiler>;
   struct IndexPayload {
     explicit IndexPayload(const std::string& index_directory, const keyvi::util::parameters_t& params)
         : compiler_(),
@@ -433,9 +433,9 @@ class IndexWriterWorker final {
   static inline void CreateCompilerIfNeeded(IndexPayload* payload) {
     if (!payload->compiler_) {
       TRACE("recreate compiler");
-      keyvi::util::parameters_t params = keyvi::util::parameters_t{{STABLE_INSERTS, "true"}, {"memory_limit_mb", "5"}};
+      keyvi::util::parameters_t params = keyvi::util::parameters_t{{"memory_limit_mb", "5"}};
 
-      payload->compiler_.reset(new dictionary::JsonDictionaryCompilerSmallData(params));
+      payload->compiler_.reset(new dictionary::JsonDictionaryIndexCompiler(params));
     }
   }
 

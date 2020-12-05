@@ -51,14 +51,6 @@ endif (CMAKE_BUILD_TYPE_UPPER MATCHES COVERAGE)
 
 #### Dependencies ####
 
-# TPIE settings (todo: make optional)
-set(COMPILE_TEST OFF CACHE BOOL "")
-set(TPIE_PARALLEL_SORT 1 CACHE BOOL "")
-add_subdirectory(keyvi/3rdparty/tpie EXCLUDE_FROM_ALL)
-list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/tpie")
-list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_BINARY_DIR}/keyvi/3rdparty/tpie")
-set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} tpie")
-
 # tiny process library
 add_subdirectory(keyvi/3rdparty/tiny-process-library)
 list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/tiny-process-library/")
@@ -101,11 +93,9 @@ else ()
 endif ()
 
 # snappy
-# currently reuses on tpies FindSnappy module
 find_package(Snappy REQUIRED)
 if(${Snappy_FOUND})
     list(APPEND KEYVI_INCLUDES "${Snappy_INCLUDE_DIR}")
-
 else(${Snappy_FOUND})
     message(FATAL_ERROR "Can not find Snappy")
 endif(${Snappy_FOUND})
@@ -140,7 +130,7 @@ string(REPLACE " " ";" _KEYVI_COMPILE_DEFINITIONS_LIST "${_KEYVI_COMPILE_DEFINIT
 
 # keyvicompiler
 add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
-target_link_libraries(keyvicompiler tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(keyvicompiler ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY})
 target_compile_options(keyvicompiler PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvicompiler PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvicompiler PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -149,7 +139,7 @@ install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
 
 # keyviinspector
 add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
-target_link_libraries(keyviinspector tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(keyviinspector ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY})
 target_compile_options(keyviinspector PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyviinspector PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyviinspector PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -158,7 +148,7 @@ install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
 
 # keyvimerger
 add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
-target_link_libraries(keyvimerger tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(keyvimerger ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY})
 target_compile_options(keyvimerger PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvimerger PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvimerger PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -167,7 +157,7 @@ install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
 
 # keyvi_c
 add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
-target_link_libraries(keyvi_c tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY})
 target_compile_options(keyvi_c PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -175,7 +165,7 @@ target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>
 # unit tests
 FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
 add_executable(unit_test_all ${UNIT_TEST_SOURCES})
-target_link_libraries(unit_test_all tiny-process-library tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(unit_test_all tiny-process-library ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY})
 target_compile_options(unit_test_all PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(unit_test_all PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -183,9 +173,8 @@ add_dependencies(unit_test_all keyvimerger)
 
 # bindings
 add_custom_target(bindings
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tpie> ${CMAKE_BINARY_DIR}
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tiny-process-library> ${CMAKE_BINARY_DIR}
-    DEPENDS tpie tiny-process-library
+    DEPENDS tiny-process-library
 )
 
 #### Configuration file for integrations and bindings ####
@@ -204,5 +193,4 @@ add_library(keyvi INTERFACE)
 
 target_include_directories(keyvi INTERFACE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 target_compile_definitions(keyvi INTERFACE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_link_libraries(keyvi INTERFACE tiny-process-library tpie ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
-add_dependencies(keyvi tpie)
+target_link_libraries(keyvi INTERFACE tiny-process-library ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY})

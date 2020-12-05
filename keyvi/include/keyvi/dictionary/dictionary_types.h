@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_DICTIONARY_TYPES_H_
 
 #include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_index_compiler.h"
 #include "keyvi/dictionary/dictionary_merger.h"
 #include "keyvi/dictionary/fsa/generator.h"
 #include "keyvi/dictionary/fsa/internal/int_inner_weights_value_store.h"
@@ -48,16 +49,9 @@ using CompletionDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dicti
 
 using IntDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT>;
 
-using IntDictionaryCompilerSmallData =
-    keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT, keyvi::dictionary::sort::InMemorySorter<key_value_t>>;
-
 using KeyOnlyDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::KEY_ONLY>;
 
 using JsonDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON>;
-
-using JsonDictionaryCompilerSmallData =
-    keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON,
-                                          keyvi::dictionary::sort::InMemorySorter<key_value_t>>;
 
 using StringDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::STRING>;
 
@@ -70,6 +64,14 @@ using IntDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_
 using StringDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_t::STRING>;
 
 using KeyOnlyDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_t::KEY_ONLY>;
+
+using JsonDictionaryIndexCompiler = keyvi::dictionary::DictionaryIndexCompiler<dictionary_type_t::JSON>;
+
+#ifndef KEYVI_REMOVE_DEPRECATED
+using IntDictionaryCompilerSmallData = IntDictionaryCompiler;
+
+using JsonDictionaryCompilerSmallData = JsonDictionaryCompiler;
+#endif
 
 } /* namespace dictionary */
 } /* namespace keyvi */

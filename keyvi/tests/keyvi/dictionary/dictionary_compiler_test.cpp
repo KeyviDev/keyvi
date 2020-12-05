@@ -27,6 +27,7 @@
 
 #include "keyvi/dictionary/dictionary.h"
 #include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_index_compiler.h"
 #include "keyvi/dictionary/dictionary_types.h"
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/entry_iterator.h"
@@ -57,25 +58,22 @@ class DCTTestHelper final {
   }
 };
 
-typedef boost::mpl::list<sort::InMemorySorter<key_value_t>, sort::TpieSorter<key_value_t>> sorter_types;
+typedef boost::mpl::list<keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS>,
+                         keyvi::dictionary::DictionaryIndexCompiler<dictionary_type_t::INT_WITH_WEIGHTS>>
+    int_with_weight_types;
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, SorterT, sorter_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, DictT, int_with_weight_types) {
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
-      {"fb#fb msg downl de", 22},       {"msg#fb msg downl de", 22},       {"downl#fb msg downl de", 22},
-      {"de#fb msg downl de", 22},
-
-      {"fb msg#fb msg downl de", 22},   {"fb downl#fb msg downl de", 22},  {"fb de#fb msg downl de", 22},
-
-      {"msg fb#fb msg downl de", 22},   {"msg downl#fb msg downl de", 22}, {"msg de#fb msg downl de", 22},
-
-      {"downl fb#fb msg downl de", 22}, {"downl msg#fb msg downl de", 22}, {"downl de#fb msg downl de", 22},
-
-      {"de fb#fb msg downl de", 22},    {"de msg#fb msg downl de", 22},    {"de downl#fb msg downl de", 22},
+      {"fb#fb msg downl de", 22},       {"msg#fb msg downl de", 22},      {"downl#fb msg downl de", 22},
+      {"de#fb msg downl de", 22},       {"fb msg#fb msg downl de", 22},   {"fb downl#fb msg downl de", 22},
+      {"fb de#fb msg downl de", 22},    {"msg fb#fb msg downl de", 22},   {"msg downl#fb msg downl de", 22},
+      {"msg de#fb msg downl de", 22},   {"downl fb#fb msg downl de", 22}, {"downl msg#fb msg downl de", 22},
+      {"downl de#fb msg downl de", 22}, {"de fb#fb msg downl de", 22},    {"de msg#fb msg downl de", 22},
+      {"de downl#fb msg downl de", 22},
   };
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS, SorterT> compiler(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictT compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
     compiler.Add(p.first, p.second);
@@ -96,11 +94,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, SorterT, sorter_types
   uint32_t reference_weight = DCTTestHelper::GetStateIdForPrefix(a, reference_value);
 
   std::vector<std::string> query_data = {"fb#", "msg#", "downl#", "fb msg#", "fb downl#", "downl fb#", "downl de#"};
-  std::cout << "test " << std::endl;
 
   size_t tested_values = 0;
   for (auto q : query_data) {
-    std::cout << "test " << q << std::endl;
     BOOST_CHECK(reference_weight == DCTTestHelper::GetStateIdForPrefix(a, q));
     ++tested_values;
   }
@@ -109,14 +105,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, SorterT, sorter_types
   std::remove(file_name.c_str());
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(sortOrder, SorterT, sorter_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(unsortedKeys, DictT, int_with_weight_types) {
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"uboot", 22}, {"überfall", 33}, {"vielleicht", 43}, {"arbeit", 3}, {"zoo", 5}, {"ändern", 6},
   };
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS, SorterT> compiler(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictT compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
     compiler.Add(p.first, p.second);
@@ -185,14 +180,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(sortOrder, SorterT, sorter_types) {
   std::remove(file_name.c_str());
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(compactSize, SorterT, sorter_types) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(compactSize, DictT, int_with_weight_types) {
   // simulating  permutation
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"uboot", 22}, {"überfall", 33}, {"vielleicht", 43}, {"arbeit", 3}, {"zoo", 5}, {"ändern", 6},
   };
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS, SorterT> compiler(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  DictT compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
     compiler.Add(p.first, p.second);
@@ -226,125 +220,56 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(compactSize, SorterT, sorter_types) {
   BOOST_CHECK_EQUAL("überfall", it.GetKey());
   ++it;
   BOOST_CHECK(it == end_it);
-  std::remove(file_name.c_str());
-}
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(stableInsert, SorterT, sorter_types) {
-  // simulating  permutation
-  std::vector<std::pair<std::string, std::string>> test_data = {
-      {"aa", "\"{1:2}\""},  {"ab", "\"{2:44}\""}, {"bb", "\"{33:23}\""}, {"cc", "\"{3:24}\""},
-      {"aa", "\"{2:27}\""}, {"zz", "\"{3:21}\""}, {"zz", "\"{5:22}\""},  {"aa", "\"{3:24}\""},
-  };
-
-  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}, {STABLE_INSERTS, "true"}};
-
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON, SorterT> compiler(params);
-
-  for (auto p : test_data) {
-    compiler.Add(p.first, p.second);
-  }
-
-  // test delete
-  compiler.Delete("ab");
-
-  compiler.Compile();
-
-  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
-
-  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
-
-  compiler.WriteToFile(file_name);
-
-  Dictionary d(file_name.c_str());
-
-  fsa::automata_t f(d.GetFsa());
-
-  fsa::EntryIterator it(f);
-  fsa::EntryIterator end_it;
-
-  BOOST_CHECK_EQUAL("aa", it.GetKey());
-  BOOST_CHECK_EQUAL("\"{3:24}\"", it.GetValueAsString());
-  ++it;
-  BOOST_CHECK_EQUAL("bb", it.GetKey());
-  BOOST_CHECK_EQUAL("\"{33:23}\"", it.GetValueAsString());
-  ++it;
-  BOOST_CHECK_EQUAL("cc", it.GetKey());
-  BOOST_CHECK_EQUAL("\"{3:24}\"", it.GetValueAsString());
-  ++it;
-  BOOST_CHECK_EQUAL("zz", it.GetKey());
-  BOOST_CHECK_EQUAL("\"{5:22}\"", it.GetValueAsString());
-  ++it;
-  BOOST_CHECK(it == end_it);
-  std::remove(file_name.c_str());
-}
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(addAndDeletes, SorterT, sorter_types) {
-  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}, {STABLE_INSERTS, "true"}};
-
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON, SorterT> compiler(params);
-
-  // add, delete, add again
-  compiler.Add("aa", "1");
-  compiler.Delete("aa");
-  compiler.Delete("aa");
-  compiler.Add("aa", "2");
-
-  // delete, add
-  compiler.Delete("bb");
-  compiler.Add("bb", "1");
-
-  // add, delete, last item
-  compiler.Add("zz", "1");
-  compiler.Delete("zz");
-
-  compiler.Compile();
-
-  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
-
-  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
-
-  compiler.WriteToFile(file_name);
-
-  Dictionary d(file_name.c_str());
-
-  fsa::automata_t f(d.GetFsa());
-
-  fsa::EntryIterator it(f);
-  fsa::EntryIterator end_it;
-
-  BOOST_CHECK_EQUAL("aa", it.GetKey());
-  BOOST_CHECK_EQUAL("2", it.GetValueAsString());
-  ++it;
-
-  BOOST_CHECK_EQUAL("bb", it.GetKey());
-  BOOST_CHECK_EQUAL("1", it.GetValueAsString());
-  ++it;
-
-  BOOST_CHECK(it == end_it);
 
   std::remove(file_name.c_str());
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(DeleteUnsupported, SorterT, sorter_types) {
-  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}};
+typedef boost::mpl::list<keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON>,
+                         keyvi::dictionary::DictionaryIndexCompiler<dictionary_type_t::JSON>>
+    json_types;
 
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON, SorterT> compiler(params);
-
-  // add, delete, add again
-  compiler.Add("aa", "1");
-  BOOST_CHECK_THROW(compiler.Delete("aa"), compiler_exception);
-}
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(MultipleKeyUpdateAndCompile, SorterT, sorter_types) {
-  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON, SorterT> compiler(
-      keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+BOOST_AUTO_TEST_CASE_TEMPLATE(MultipleKeyUpdateAndCompile, DictT, json_types) {
+  DictT compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   compiler.Add("a", "1");
   compiler.Add("b", "1");
   compiler.Compile();
   BOOST_CHECK_THROW(compiler.Add("a", "1"), compiler_exception);
+}
+
+void bigger_compile_test(const keyvi::util::parameters_t& params = keyvi::util::parameters_t(), size_t keys = 5000) {
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::JSON> compiler(params);
+
+  for (size_t i = 0; i < keys; ++i) {
+    compiler.Add("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), "{\"id\":" + std::to_string(i) + "}");
+  }
+  compiler.Compile();
+
+  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
+  std::string file_name = temp_path.native();
+
+  compiler.WriteToFile(file_name);
+
+  Dictionary d(file_name.c_str());
+
+  for (size_t i = 0; i < keys; ++i) {
+    keyvi::dictionary::Match m = d["loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i)];
+    BOOST_CHECK_EQUAL("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), m.GetMatchedString());
+    BOOST_CHECK_EQUAL("{\"id\":" + std::to_string(i) + "}", m.GetValueAsString());
+  }
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile) {
+  bigger_compile_test({{"memory_limit_mb", "100"}});
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile_1MB_50k) {
+  bigger_compile_test({{MEMORY_LIMIT_KEY, std::to_string(1024 * 1024)}}, 50000);
+}
+
+BOOST_AUTO_TEST_CASE(bigger_compile_parallel_1MB) {
+  bigger_compile_test({{MEMORY_LIMIT_KEY, std::to_string(1024 * 1024)}, {PARALLEL_SORT_THRESHOLD_KEY, "1"}});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

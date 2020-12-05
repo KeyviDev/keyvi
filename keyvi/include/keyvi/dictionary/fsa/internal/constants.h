@@ -59,14 +59,16 @@ static const size_t COMPACT_SIZE_INNER_WEIGHT_MAX_VALUE = 0xffff;
 // the sparse array where the new state fits in
 static const size_t SPARSE_ARRAY_SEARCH_OFFSET = 151;
 
-// 1 GB default memory limit for the sorter (tpie)
-static const size_t DEFAULT_MEMORY_LIMIT_TPIE_SORT = 1 * 1024 * 1024 * 1024;
+// 1 GB default memory limit for the dictionary compiler
+static const size_t DEFAULT_MEMORY_LIMIT_COMPILER = 1 * 1024 * 1024 * 1024;
 
 // 1 GB default memory limit for the generator
 static const size_t DEFAULT_MEMORY_LIMIT_GENERATOR = 1 * 1024 * 1024 * 1024;
 
 // 500MB default memory limit for value stores
 static const size_t DEFAULT_MEMORY_LIMIT_VALUE_STORE = 500 * 1024 * 1024;
+
+static const size_t DEFAULT_PARALLEL_SORT_THRESHOLD = 10000;
 
 // option key names
 static const char MEMORY_LIMIT_KEY[] = "memory_limit";
@@ -75,7 +77,7 @@ static const char COMPRESSION_KEY[] = "compression";
 static const char COMPRESSION_THRESHOLD_KEY[] = "compression_threshold";
 static const char MINIMIZATION_KEY[] = "minimization";
 static const char SINGLE_PRECISION_FLOAT_KEY[] = "floating_point_precision";
-static const char STABLE_INSERTS[] = "stable_insert";
+static const char PARALLEL_SORT_THRESHOLD_KEY[] = "parallel_sort_threshold";
 static const char MERGE_MODE[] = "merge_mode";
 static const char MERGE_APPEND[] = "append";
 
