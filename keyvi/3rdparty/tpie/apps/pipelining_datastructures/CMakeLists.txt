@@ -1,3 +1,0 @@
-add_executable(pipelining_datastructures pipelining_datastructures.cpp)
-set_target_properties(pipelining_datastructures PROPERTIES FOLDER tpie)
-target_link_libraries(pipelining_datastructures tpie)

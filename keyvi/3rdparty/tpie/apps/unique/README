@@ -1,4 +1,0 @@
-Read integers from standard in, remove duplicates and print the list to
-standard out in the same order. It is implemented by adding an index to each
-item, sorting by value, removing consecutive duplicates, sorting by index,
-removing the index and then printing.

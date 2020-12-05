@@ -1,4 +1,0 @@
-Two dimensional convex hull program using Graham's scan.  It is implemented
-using a scan management object that maintains the upper and lower hull
-as external memory stacks.
-
