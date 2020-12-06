@@ -53,8 +53,3 @@ jobs:
         id: unit_tests
         run: |
          build/unit_test_all
-          
-      - name: Stats from ccache
-        id: ccache_stats
-        run: |
-         ccache -s
