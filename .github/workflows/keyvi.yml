@@ -21,6 +21,9 @@ jobs:
       matrix:
         type: ['Release', 'Debug']
         os: ['macos-latest', 'ubuntu-20.04']
+        include:
+          - os: 'ubuntu-20.04'
+            type: 'Coverage'
     steps:
       - name: install Linux deps
         if: runner.os == 'Linux'
@@ -66,8 +69,7 @@ jobs:
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          cmakeBuildType: ${{matrix.type}}
-          cmakeAppendedArgs: '-D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          cmakeAppendedArgs: '-DCMAKE_BUILD_TYPE=${{ matrix.type }} -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache -D CMAKE_VERBOSE_MAKEFILE:BOOL=ON'
           buildWithCMake: true
           buildDirectory: '${{ github.workspace }}/build'
 
@@ -75,7 +77,21 @@ jobs:
         id: unit_tests
         run: |
          build/unit_test_all
-          
+
+      - name: lcov
+        if: matrix.type == 'Coverage'
+        run: |
+          sudo apt-get install -y lcov
+          ls build/CMakeFiles/unit_test_all.dir/keyvi/tests/keyvi/
+          lcov -d build --capture --include '*/keyvi/include/keyvi/*' --output-file coverage.info
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        if: matrix.type == 'Coverage'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage.info
+
       - name: Stats from ccache
         id: ccache_stats
         run: |
