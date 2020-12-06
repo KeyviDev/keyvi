@@ -1,0 +1,28 @@
+name: Rust
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install system packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+    - name: Code fomatting
+      run: cargo fmt --manifest-path rust/Cargo.toml -- --check
+    - name: Build
+      run: cargo build --verbose --manifest-path rust/Cargo.toml
+    - name: Run tests
+      run: cargo test --verbose --manifest-path rust/Cargo.toml
