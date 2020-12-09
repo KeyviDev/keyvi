@@ -71,7 +71,7 @@ jobs:
           cd python
           python setup.py sdist -d wheelhouse
           python -m pip uninstall -y autowrap
-          python -m pip install wheelhouse/*.tar.gz
+          python -m pip install wheelhouse/*.tar.gz -v
           python -m pytest tests
           python -m pip uninstall -y keyvi
 
