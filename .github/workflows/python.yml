@@ -62,7 +62,7 @@ jobs:
           python setup.py install --user
           python -m pytest tests
           python -m pytest integration-tests
-          python -m pip uninstall keyvi
+          python -m pip uninstall -y keyvi
 
       - name: sdist
         if: matrix.sdist
@@ -73,7 +73,7 @@ jobs:
           python -m pip uninstall -y autowrap
           python -m pip install wheelhouse/*.tar.gz
           python -m pytest tests
-          python -m pip uninstall keyvi
+          python -m pip uninstall -y keyvi
 
       - name: bdist
         run: |
