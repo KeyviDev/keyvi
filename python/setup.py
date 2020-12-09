@@ -1,7 +1,9 @@
+from distutils.dir_util import remove_tree
 from setuptools import setup, Extension
 import distutils.command.build as _build
 import distutils.command.bdist as _bdist
 import distutils.command.build_ext as _build_ext
+import distutils.command.clean as _clean
 import distutils.command.sdist as _sdist
 import json
 import os
@@ -21,6 +23,7 @@ keyvi_cpp_source = '../keyvi'
 keyvi_cpp = 'src/cpp'
 keyvi_cpp_link = path.join(keyvi_cpp, 'keyvi')
 mac_os_static_libs_dir = 'mac_os_static_libs'
+keyvi_build_dir = path.join(keyvi_cpp, 'build-{}'.format(platform.platform()))
 
 try:
     cpu_count = multiprocessing.cpu_count()
@@ -67,6 +70,9 @@ __version__ = '{}'
     with open(version_file_path, 'w') as f_out:
         f_out.write(content)
 
+def clean_pykeyvi_build_directory():
+    if os.path.exists(keyvi_build_dir):
+        remove_tree(keyvi_build_dir)
 
 def generate_pykeyvi_source():
     addons = glob.glob('src/addons/*')
@@ -206,7 +212,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     autowrap_data_dir = "autowrap_includes"
 
     dictionary_sources = path.abspath(keyvi_cpp_link)
-    keyvi_build_dir = path.join(keyvi_cpp, 'build-{}'.format(platform.platform()))
 
     additional_compile_flags = ''
 
@@ -269,12 +274,19 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     class sdist(_sdist.sdist):
 
         def run(self):
+            clean_pykeyvi_build_directory()
             generate_pykeyvi_source()
             _sdist.sdist.run(self)
 
     class bdist(custom_opts, _bdist.bdist):
         parent = _bdist.bdist
         user_options = _bdist.bdist.user_options + custom_user_options
+
+    class clean(_clean.clean):
+
+        def run(self):
+            clean_pykeyvi_build_directory()
+            _clean.clean.run(self)
 
     have_wheel = False
     try:
@@ -326,7 +338,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         'msgpack>=1.0.0',
     ]
 
-    commands = {'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist}
+    commands = {'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist, 'clean': clean}
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
 
