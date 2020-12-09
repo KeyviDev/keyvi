@@ -19,6 +19,11 @@ jobs:
       matrix:
         python-version: [ '3.6', '3.7', '3.8', '3.9' ]
         os: [ 'macos-latest', 'ubuntu-20.04' ]
+        include:
+          # test sdist on ubuntu only
+          - os: ubuntu-20.04
+            python-version: '3.9'
+            sdist: true
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }} build
     steps:
       - name: install Linux deps
@@ -47,7 +52,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-      - run: |
+        run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           cd python
           python -m pip install -r requirements.txt
@@ -55,3 +60,33 @@ jobs:
           python setup.py install --user
           python -m pytest tests
           python -m pytest integration-tests
+          python -m pip uninstall keyvi
+
+      - name: sdist
+        if: matrix.sdist
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          cd python
+          python setup.py sdist -d wheelhouse
+          python -m pip uninstall -y autowrap
+          python -m pip install wheelhouse/*.tar.gz
+          python -m pytest tests
+          python -m pip uninstall keyvi
+
+      - name: bdist
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          cd python
+          python setup.py bdist_wheel -d wheelhouse
+
+      - name: remove macos deps
+        if: runner.os == 'macOS'
+        run: |
+          brew remove zlib
+          brew remove snappy
+
+      - name: bdist test
+        run: |
+          cd python
+          python -m pip install --user wheelhouse/*.whl
+          python -m pytest tests
