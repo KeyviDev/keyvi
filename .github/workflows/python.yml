@@ -24,6 +24,7 @@ jobs:
           - os: ubuntu-20.04
             python-version: '3.9'
             sdist: true
+            build_direct: true
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }} build
     steps:
       - name: install Linux deps
@@ -54,6 +55,7 @@ jobs:
           architecture: x64
 
       - name: build and test python extension
+        if: matrix.build_direct
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           cd python
