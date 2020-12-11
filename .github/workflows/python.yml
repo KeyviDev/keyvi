@@ -98,3 +98,11 @@ jobs:
           cd python
           python -m pip install --user wheelhouse/*.whl
           python -m pytest tests
+
+      - name: Publish package
+        if: runner.os == 'macOS' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}
+          packages_dir: wheelhouse
