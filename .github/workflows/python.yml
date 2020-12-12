@@ -70,17 +70,6 @@ jobs:
           python -m pytest integration-tests
           python -m pip uninstall -y keyvi
 
-      - name: sdist
-        if: matrix.sdist
-        run: |
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          cd python
-          python setup.py sdist -d wheelhouse
-          python -m pip uninstall -y autowrap
-          python -m pip install wheelhouse/*.tar.gz -v
-          python -m pytest tests
-          python -m pip uninstall -y keyvi
-
       - name: bdist
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
@@ -98,11 +87,23 @@ jobs:
           cd python
           python -m pip install --user wheelhouse/*.whl
           python -m pytest tests
+          python -m pip uninstall -y keyvi
+
+      - name: sdist
+        if: matrix.sdist
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          cd python
+          rm -rf wheelhouse
+          python setup.py sdist -d wheelhouse
+          python -m pip uninstall -y autowrap
+          python -m pip install wheelhouse/*.tar.gz -v
+          python -m pytest tests
+          python -m pip uninstall -y keyvi
 
       - name: Publish package
-        if: runner.os == 'macOS' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: __token__
-          password: ${{ secrets.pypi_password }}
-          packages_dir: wheelhouse
+        if: ( matrix.sdist || runner.os == 'macOS' ) && github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        env:
+          PYPI_PASSWORD: ${{ secrets.pypi_password }}
+        run: |
+          python -m twine upload -u __token__ -p "${PYPI_PASSWORD}" python/wheelhouse/*
