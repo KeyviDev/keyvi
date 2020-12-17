@@ -19,6 +19,7 @@ from os import path
 
 pykeyvi_pyx = '_core.pyx'
 pykeyvi_cpp = '_core.cpp'
+pykeyvi_p_cpp = '_core_p.cpp'
 keyvi_cpp_source = '../keyvi'
 keyvi_cpp = 'src/cpp'
 keyvi_cpp_link = path.join(keyvi_cpp, 'keyvi')
@@ -85,6 +86,14 @@ def generate_pykeyvi_source():
         try:
             import autowrap.Main
             autowrap.Main.run(pxds, addons, [converters], pykeyvi_pyx)
+            # rewrite generated cpp to use std::shared_ptr instead of boost::shared_ptr
+            with open(pykeyvi_cpp, "rt") as fin:
+                with open(pykeyvi_p_cpp, "wt") as fout:
+                    for line in fin:
+                        if line.find("shared_ptr.hpp") > 0:
+                            continue
+                        fout.write(line.replace('boost::shared_ptr', 'std::shared_ptr'))
+
         except:
             if not path.exists(pykeyvi_cpp):
                 raise
@@ -329,7 +338,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     ext_modules = [Extension('keyvi._core',
                              include_dirs=[autowrap_data_dir],
                              language='c++',
-                             sources=[pykeyvi_cpp],
+                             sources=[pykeyvi_p_cpp],
                              library_dirs=link_library_dirs)]
 
     PACKAGE_NAME = 'keyvi'
