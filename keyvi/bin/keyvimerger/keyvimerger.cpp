@@ -24,6 +24,7 @@
  */
 
 #include <string>
+#include <type_traits>
 
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/device/file.hpp>
@@ -38,7 +39,7 @@ keyvi::util::parameters_t extract_parameters(const boost::program_options::varia
   keyvi::util::parameters_t ret;
   for (auto& v : vm["parameter"].as<std::vector<std::string>>()) {
     std::vector<std::string> key_value;
-    boost::split(key_value, v, std::bind1st(std::equal_to<char>(), '='));
+    boost::split(key_value, v, std::bind(std::equal_to<char>(), std::placeholders::_1, '='));
     if (key_value.size() == 2) {
       ret[key_value[0]] = key_value[1];
     } else {
