@@ -265,7 +265,7 @@ mod tests {
         let mut rng = rand::thread_rng();
         let mut keys = Vec::new();
         for _ in 0..10000 {
-            let letter: char = rng.gen_range(b'a', b'c') as char;
+            let letter: char = rng.gen_range(b'a'..b'c') as char;
             keys.push(letter.to_string())
         }
 
