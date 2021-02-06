@@ -108,6 +108,103 @@ BOOST_AUTO_TEST_CASE(basic) {
   BOOST_CHECK(!t);
 }
 
+std::vector<std::string> GetAllKeys(ZipStateTraverser<StateTraverser<>> *zip_traverser) {
+  std::vector<unsigned char> label_stack;
+  std::vector<std::string> keys;
+  std::cout << "get all keys" << std::endl;
+
+  while (*zip_traverser) {
+    label_stack.resize(zip_traverser->GetDepth() - 1);
+    label_stack.push_back(zip_traverser->GetStateLabel());
+    if (zip_traverser->IsFinalState()) {
+      std::cout << "final: " << std::string(label_stack.begin(), label_stack.end()) << std::endl;
+      keys.emplace_back(label_stack.begin(), label_stack.end());
+    }
+
+    zip_traverser->operator++(0);
+  }
+
+  return keys;
+}
+
+BOOST_AUTO_TEST_CASE(append) {
+  std::vector<std::string> test_data1 = {"aa", "bb", "cc", "dd", "ee"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::string> test_data2 = {"ff", "gg", "hh", "zz"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  ZipStateTraverser<StateTraverser<>> t({f1, f2});
+
+  auto actual = GetAllKeys(&t);
+  std::vector<std::string> expected{"aa", "bb", "cc", "dd", "ee", "ff", "gg", "hh", "zz"};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+
+  ZipStateTraverser<StateTraverser<>> t2({f2, f1});
+
+  actual = GetAllKeys(&t2);
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(mixed) {
+  std::vector<std::string> test_data1 = {"aa", "hh", "ii", "kk", "zz"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::string> test_data2 = {"bb", "ff", "hh", "jj"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  ZipStateTraverser<StateTraverser<>> t({f1, f2});
+
+  auto actual = GetAllKeys(&t);
+  std::vector<std::string> expected{"aa", "bb", "ff", "hh", "ii", "jj", "kk", "zz"};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+
+  ZipStateTraverser<StateTraverser<>> t2({f2, f1});
+
+  actual = GetAllKeys(&t2);
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(mixed2) {
+  std::vector<std::string> test_data1 = {"aa", "hh", "ii", "kk", "zz"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+  std::vector<std::string> test_data2 = {"bb", "ff", "hh", "jj"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+  std::vector<std::string> test_data3 = {"dd", "ee", "jj", "pp", "zz"};
+  testing::TempDictionary dictionary3(&test_data3);
+  automata_t f3 = dictionary3.GetFsa();
+  std::vector<std::string> test_data4 = {"cc", "qq", "rr", "tt"};
+  testing::TempDictionary dictionary4(&test_data4);
+  automata_t f4 = dictionary4.GetFsa();
+  std::vector<std::string> test_data5 = {"aa", "ee", "pp", "zz"};
+  testing::TempDictionary dictionary5(&test_data5);
+  automata_t f5 = dictionary5.GetFsa();
+  std::vector<std::string> test_data6 = {"jj"};
+  testing::TempDictionary dictionary6(&test_data6);
+  automata_t f6 = dictionary6.GetFsa();
+
+  ZipStateTraverser<StateTraverser<>> t({f1, f2, f3, f4, f5, f6});
+
+  auto actual = GetAllKeys(&t);
+  std::vector<std::string> expected{"aa", "bb", "cc", "dd", "ee", "ff", "hh", "ii",
+                                    "jj", "kk", "pp", "qq", "rr", "tt", "zz"};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+
+  ZipStateTraverser<StateTraverser<>> t2({f2, f1, f5, f6, f4, f3});
+
+  actual = GetAllKeys(&t2);
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */

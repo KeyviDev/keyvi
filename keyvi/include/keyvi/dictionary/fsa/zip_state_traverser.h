@@ -36,7 +36,7 @@
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/comparable_state_traverser.h"
 
-// #define ENABLE_TRACING
+#define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
@@ -59,22 +59,22 @@ class ZipStateTraverser final {
   explicit ZipStateTraverser(const std::vector<automata_t> &fsas, bool advance = true) {
     size_t order = 0;
     for (const automata_t &f : fsas) {
-      traverser_queue_.emplace(std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, true, order++));
+      traverser_queue_.emplace(std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++));
     }
 
     if (advance) {
-      this->operator++(0);
+      FillInValues();
     }
   }
 
   explicit ZipStateTraverser(const std::initializer_list<automata_t> fsas, bool advance = true) {
     size_t order = 0;
     for (auto f : fsas) {
-      traverser_queue_.emplace(std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, true, order++));
+      traverser_queue_.emplace(std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++));
     }
 
     if (advance) {
-      this->operator++(0);
+      FillInValues();
     }
   }
 
@@ -90,27 +90,15 @@ class ZipStateTraverser final {
       auto it = traverser_queue_.begin();
       it++;
 
-      final_ = t->IsFinalState();
-      depth_ = t->GetDepth();
-      state_value_ = t->GetStateValue();
-      inner_weight_ = t->GetInnerWeight();
-      state_id_ = t->GetStateId();
-      state_label_ = t->GetStateLabel();
+      if (it != traverser_queue_.end()) {
+        auto s1 = std::string(t->GetStateLabels().begin(), t->GetStateLabels().end());
+        auto s2 = std::string((*it)->GetStateLabels().begin(), (*it)->GetStateLabels().end());
+
+        TRACE("%s/%s %ld/%ld", s1.c_str(), s2.c_str(), t->GetOrder(), (*it)->GetOrder());
+      }
 
       while (it != traverser_queue_.end() && *t == *(*it)) {
         TRACE("advance 2nd: %ld", (*it)->GetOrder());
-
-        // if not final yet check if other states are final
-        if (!final_ && (*it)->IsFinalState()) {
-          final_ = true;
-          state_value_ = (*it)->GetStateValue();
-        }
-
-        // take the max from inner weights
-        if ((*it)->GetInnerWeight() > inner_weight_) {
-          inner_weight_ = (*it)->GetInnerWeight();
-        }
-
         (*it)->operator++(0);
         if (*(*it)) {
           traverser_queue_.decrease(heap_t::s_handle_from_iterator(it));
@@ -127,6 +115,8 @@ class ZipStateTraverser final {
       } else {
         traverser_queue_.erase(heap_t::s_handle_from_iterator(traverser_queue_.begin()));
       }
+
+      FillInValues();
     }
   }
 
@@ -155,6 +145,39 @@ class ZipStateTraverser final {
   uint32_t inner_weight_ = 0;
   uint64_t state_id_ = 0;
   label_t state_label_ = 0;
+
+  void FillInValues() {
+    TRACE("fill in");
+
+    if (!traverser_queue_.empty()) {
+      const traverser_t &t = traverser_queue_.top();
+
+      final_ = t->IsFinalState();
+      depth_ = t->GetDepth();
+      state_value_ = t->GetStateValue();
+      inner_weight_ = t->GetInnerWeight();
+      state_id_ = t->GetStateId();
+      state_label_ = t->GetStateLabel();
+
+      auto it = traverser_queue_.begin();
+      it++;
+
+      while (it != traverser_queue_.end() && *t == *(*it)) {
+        TRACE("dedup");
+        // if not final yet check if other states are final
+        if (!final_ && (*it)->IsFinalState()) {
+          final_ = true;
+          state_value_ = (*it)->GetStateValue();
+        }
+
+        // take the max from inner weights
+        if ((*it)->GetInnerWeight() > inner_weight_) {
+          inner_weight_ = (*it)->GetInnerWeight();
+        }
+        it++;
+      }
+    }
+  }
 };
 
 } /* namespace fsa */
