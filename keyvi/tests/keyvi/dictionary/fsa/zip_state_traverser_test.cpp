@@ -111,13 +111,11 @@ BOOST_AUTO_TEST_CASE(basic) {
 std::vector<std::string> GetAllKeys(ZipStateTraverser<StateTraverser<>> *zip_traverser) {
   std::vector<unsigned char> label_stack;
   std::vector<std::string> keys;
-  std::cout << "get all keys" << std::endl;
 
   while (*zip_traverser) {
     label_stack.resize(zip_traverser->GetDepth() - 1);
     label_stack.push_back(zip_traverser->GetStateLabel());
     if (zip_traverser->IsFinalState()) {
-      std::cout << "final: " << std::string(label_stack.begin(), label_stack.end()) << std::endl;
       keys.emplace_back(label_stack.begin(), label_stack.end());
     }
 

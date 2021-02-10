@@ -36,7 +36,7 @@
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/comparable_state_traverser.h"
 
-#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
@@ -83,41 +83,22 @@ class ZipStateTraverser final {
   ZipStateTraverser(const ZipStateTraverser &that) = delete;
 
   void operator++(int) {
-    TRACE("iterator++");
+    TRACE("iterator++, forwarding %ld inner traversers", equal_states_);
 
-    if (!traverser_queue_.empty()) {
-      const traverser_t &t = traverser_queue_.top();
+    while (equal_states_ > 0) {
+      // get the top element
       auto it = traverser_queue_.begin();
-      it++;
 
-      if (it != traverser_queue_.end()) {
-        auto s1 = std::string(t->GetStateLabels().begin(), t->GetStateLabels().end());
-        auto s2 = std::string((*it)->GetStateLabels().begin(), (*it)->GetStateLabels().end());
-
-        TRACE("%s/%s %ld/%ld", s1.c_str(), s2.c_str(), t->GetOrder(), (*it)->GetOrder());
-      }
-
-      while (it != traverser_queue_.end() && *t == *(*it)) {
-        TRACE("advance 2nd: %ld", (*it)->GetOrder());
-        (*it)->operator++(0);
-        if (*(*it)) {
-          traverser_queue_.decrease(heap_t::s_handle_from_iterator(it));
-        } else {
-          traverser_queue_.erase(heap_t::s_handle_from_iterator(it));
-        }
-        it = traverser_queue_.begin();
-        it++;
-      }
-
-      t->operator++(0);
-      if (*t) {
-        traverser_queue_.decrease(heap_t::s_handle_from_iterator(traverser_queue_.begin()));
+      // advance the inner traverser and update or remove it from the queue
+      (*it)->operator++(0);
+      if (*(*it)) {
+        traverser_queue_.decrease(heap_t::s_handle_from_iterator(it));
       } else {
-        traverser_queue_.erase(heap_t::s_handle_from_iterator(traverser_queue_.begin()));
+        traverser_queue_.erase(heap_t::s_handle_from_iterator(it));
       }
-
-      FillInValues();
+      --equal_states_;
     }
+    FillInValues();
   }
 
   operator bool() const { return !traverser_queue_.empty(); }
@@ -132,7 +113,21 @@ class ZipStateTraverser final {
 
   uint64_t GetStateId() const { return state_id_; }
 
-  void Prune() { /*todo*/
+  void Prune() {
+    while (equal_states_ > 0) {
+      // get the top element
+      auto it = traverser_queue_.begin();
+
+      // prune the inner traverser and update or remove it from the queue
+      (*it)->Prune();
+      if (*(*it)) {
+        traverser_queue_.decrease(heap_t::s_handle_from_iterator(it));
+      } else {
+        traverser_queue_.erase(heap_t::s_handle_from_iterator(it));
+      }
+      --equal_states_;
+    }
+    FillInValues();
   }
 
   label_t GetStateLabel() const { return state_label_; }
@@ -145,6 +140,7 @@ class ZipStateTraverser final {
   uint32_t inner_weight_ = 0;
   uint64_t state_id_ = 0;
   label_t state_label_ = 0;
+  size_t equal_states_ = 1;
 
   void FillInValues() {
     TRACE("fill in");
@@ -159,11 +155,16 @@ class ZipStateTraverser final {
       state_id_ = t->GetStateId();
       state_label_ = t->GetStateLabel();
 
-      auto it = traverser_queue_.begin();
+      // memorize how many inner traverser are at a equal inner state
+      equal_states_ = 1;
+
+      // traverse the queue in _sorted_ order
+      auto it = traverser_queue_.ordered_begin();
       it++;
 
-      while (it != traverser_queue_.end() && *t == *(*it)) {
+      while (traverser_queue_.size() > equal_states_ && *t == *(*it)) {
         TRACE("dedup");
+        equal_states_++;
         // if not final yet check if other states are final
         if (!final_ && (*it)->IsFinalState()) {
           final_ = true;
