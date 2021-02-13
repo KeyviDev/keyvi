@@ -203,6 +203,37 @@ BOOST_AUTO_TEST_CASE(mixed2) {
   BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
 }
 
+BOOST_AUTO_TEST_CASE(infixes) {
+  std::vector<std::string> test_data1 = {"aa", "bbb", "c", "zz"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+  std::vector<std::string> test_data2 = {"aaa", "bb", "hh", "jj"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+  std::vector<std::string> test_data3 = {"aaaa", "b", "ccc", "z"};
+  testing::TempDictionary dictionary3(&test_data3);
+  automata_t f3 = dictionary3.GetFsa();
+
+  ZipStateTraverser<StateTraverser<>> t({f1, f2, f3});
+
+  auto actual = GetAllKeys(&t);
+  std::vector<std::string> expected{"aa", "aaa", "aaaa", "b", "bb", "bbb", "c", "ccc", "hh", "jj", "z", "zz"};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+
+  ZipStateTraverser<StateTraverser<>> t2({f3, f2, f1});
+  actual = GetAllKeys(&t2);
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+
+  ZipStateTraverser<StateTraverser<>> t3({f3, f2, f1});
+  actual = GetAllKeys(&t3);
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+
+  ZipStateTraverser<StateTraverser<>> t4({f3, f2, f1});
+  actual = GetAllKeys(&t4);
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */
