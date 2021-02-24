@@ -234,6 +234,53 @@ BOOST_AUTO_TEST_CASE(infixes) {
   BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
 }
 
+BOOST_AUTO_TEST_CASE(after_prefix) {
+  std::vector<std::string> test_data1 = {"aa", "hh", "ii", "kk", "zz"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+  std::vector<std::string> test_data2 = {"bb", "ff", "hh", "jj"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+  std::vector<std::string> test_data3 = {"add", "ee", "jj", "pp", "zz"};
+  testing::TempDictionary dictionary3(&test_data3);
+  automata_t f3 = dictionary3.GetFsa();
+  std::vector<std::string> test_data4 = {"abcc", "aqq", "rr", "tt"};
+  testing::TempDictionary dictionary4(&test_data4);
+  automata_t f4 = dictionary4.GetFsa();
+  std::vector<std::string> test_data5 = {"aaaaaa", "aee", "pp", "zz"};
+  testing::TempDictionary dictionary5(&test_data5);
+  automata_t f5 = dictionary5.GetFsa();
+  std::vector<std::string> test_data6 = {"acjj"};
+  testing::TempDictionary dictionary6(&test_data6);
+  automata_t f6 = dictionary6.GetFsa();
+  std::vector<std::string> test_data7 = {"a"};
+  testing::TempDictionary dictionary7(&test_data7);
+  automata_t f7 = dictionary7.GetFsa();
+
+  ZipStateTraverser<StateTraverser<>> t({{f1, f1->TryWalkTransition(f1->GetStartState(), 'a')},
+                                         {f2, f2->TryWalkTransition(f2->GetStartState(), 'a')},
+                                         {f3, f3->TryWalkTransition(f3->GetStartState(), 'a')},
+                                         {f4, f4->TryWalkTransition(f4->GetStartState(), 'a')},
+                                         {f5, f5->TryWalkTransition(f5->GetStartState(), 'a')},
+                                         {f6, f6->TryWalkTransition(f6->GetStartState(), 'a')},
+                                         {f7, f7->TryWalkTransition(f7->GetStartState(), 'a')}});
+
+  auto actual = GetAllKeys(&t);
+  std::vector<std::string> expected{"a", "aaaaa", "bcc", "cjj", "dd", "ee", "qq"};
+
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual.begin(), actual.end(), expected.begin(), expected.end());
+  ZipStateTraverser<StateTraverser<>> t2({{f1, f1->TryWalkTransition(f1->GetStartState(), 'h')},
+                                          {f2, f2->TryWalkTransition(f2->GetStartState(), 'h')},
+                                          {f3, f3->TryWalkTransition(f3->GetStartState(), 'h')},
+                                          {f4, f4->TryWalkTransition(f4->GetStartState(), 'h')},
+                                          {f5, f5->TryWalkTransition(f5->GetStartState(), 'h')},
+                                          {f6, f6->TryWalkTransition(f6->GetStartState(), 'h')}});
+
+  auto actual2 = GetAllKeys(&t2);
+  std::vector<std::string> expected2{"h"};
+  BOOST_CHECK_EQUAL_COLLECTIONS(actual2.begin(), actual2.end(), expected2.begin(), expected2.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */

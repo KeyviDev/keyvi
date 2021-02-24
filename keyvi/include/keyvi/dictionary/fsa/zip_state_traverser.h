@@ -29,6 +29,7 @@
 #include <cstring>
 #include <initializer_list>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <boost/heap/skew_heap.hpp>
@@ -59,7 +60,11 @@ class ZipStateTraverser final {
   explicit ZipStateTraverser(const std::vector<automata_t> &fsas, bool advance = true) {
     size_t order = 0;
     for (const automata_t &f : fsas) {
-      traverser_queue_.emplace(std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++));
+      traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++);
+      // the traverser could be exhausted after it has been advanced
+      if (*traverser) {
+        traverser_queue_.push(traverser);
+      }
     }
 
     if (advance) {
@@ -70,7 +75,30 @@ class ZipStateTraverser final {
   explicit ZipStateTraverser(const std::initializer_list<automata_t> fsas, bool advance = true) {
     size_t order = 0;
     for (auto f : fsas) {
-      traverser_queue_.emplace(std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++));
+      traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++);
+      // the traverser could be exhausted after it has been advanced
+      if (*traverser) {
+        traverser_queue_.push(traverser);
+      }
+    }
+
+    if (advance) {
+      FillInValues();
+    }
+  }
+
+  explicit ZipStateTraverser(const std::vector<std::pair<automata_t, uint64_t>> &fsa_start_state_pairs,
+                             bool advance = true) {
+    size_t order = 0;
+    for (auto f : fsa_start_state_pairs) {
+      if (f.second > 0) {
+        traverser_t traverser =
+            std::make_shared<ComparableStateTraverser<innerTraverserType>>(f.first, f.second, advance, order++);
+        // the traverser could be exhausted after it has been advanced
+        if (*traverser) {
+          traverser_queue_.push(traverser);
+        }
+      }
     }
 
     if (advance) {
@@ -113,6 +141,8 @@ class ZipStateTraverser final {
 
   uint64_t GetStateId() const { return state_id_; }
 
+  size_t GetOrder() const { return order_; }
+
   void Prune() {
     while (equal_states_ > 0) {
       // get the top element
@@ -140,6 +170,8 @@ class ZipStateTraverser final {
   uint32_t inner_weight_ = 0;
   uint64_t state_id_ = 0;
   label_t state_label_ = 0;
+  size_t order_;
+  automata_t fsa_;
   size_t equal_states_ = 1;
 
   void FillInValues() {
@@ -154,7 +186,8 @@ class ZipStateTraverser final {
       inner_weight_ = t->GetInnerWeight();
       state_id_ = t->GetStateId();
       state_label_ = t->GetStateLabel();
-
+      fsa_ = t->GetFsa();
+      order_ = t->GetOrder();
       // memorize how many inner traverser are at a equal inner state
       equal_states_ = 1;
 
@@ -169,6 +202,8 @@ class ZipStateTraverser final {
         if (!final_ && (*it)->IsFinalState()) {
           final_ = true;
           state_value_ = (*it)->GetStateValue();
+          fsa_ = t->GetFsa();
+          order_ = t->GetOrder();
         }
 
         // take the max from inner weights

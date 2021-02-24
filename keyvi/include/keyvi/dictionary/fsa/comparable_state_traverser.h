@@ -59,12 +59,15 @@ class ComparableStateTraverser final {
     }
   }
 
-  explicit ComparableStateTraverser(const automata_t f, bool advance = true, size_t order = 0)
-      : state_traverser_(f, f->GetStartState(), false), order_(order) {
+  explicit ComparableStateTraverser(const automata_t f, uint64_t start_state, bool advance = true, size_t order = 0)
+      : state_traverser_(f, start_state, false), order_(order) {
     if (advance) {
       this->operator++(0);
     }
   }
+
+  explicit ComparableStateTraverser(const automata_t f, bool advance = true, size_t order = 0)
+      : ComparableStateTraverser(f, f->GetStartState(), advance, order) {}
 
   ComparableStateTraverser() = delete;
   ComparableStateTraverser &operator=(ComparableStateTraverser const &) = delete;
@@ -115,6 +118,8 @@ class ComparableStateTraverser final {
       label_stack_.push_back(state_traverser_.GetStateLabel());
     }
   }
+
+  automata_t GetFsa() const { return state_traverser_.GetFsa(); }
 
   bool IsFinalState() const { return state_traverser_.IsFinalState(); }
 
