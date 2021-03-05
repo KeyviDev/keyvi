@@ -110,6 +110,27 @@ class ZipStateTraverser final {
   ZipStateTraverser &operator=(ZipStateTraverser const &) = delete;
   ZipStateTraverser(const ZipStateTraverser &that) = delete;
 
+  ZipStateTraverser(ZipStateTraverser &&other)
+      : traverser_queue_(std::move(other.traverser_queue_)),
+        final_(other.final_),
+        depth_(other.depth_),
+        state_value_(other.state_value_),
+        inner_weight_(other.inner_weight_),
+        state_id_(other.state_id_),
+        state_label_(other.state_label_),
+        order_(other.order_),
+        fsa_(std::move(other.fsa_)),
+        equal_states_(other.equal_states_) {
+    other.final_ = false;
+    other.depth_ = 0;
+    other.state_value_ = 0;
+    other.inner_weight_ = 0;
+    other.state_id_ = 0;
+    other.state_label_ = 0;
+    other.order_ = 0;
+    other.equal_states_ = 1;
+  }
+
   void operator++(int) {
     TRACE("iterator++, forwarding %ld inner traversers", equal_states_);
 
@@ -130,6 +151,8 @@ class ZipStateTraverser final {
   }
 
   operator bool() const { return !traverser_queue_.empty(); }
+
+  automata_t GetFsa() const { return fsa_; }
 
   bool IsFinalState() const { return final_; }
 
