@@ -51,6 +51,11 @@ class CodePointStateTraverser final {
     this->operator++(0);
   }
 
+  explicit CodePointStateTraverser(const innerTraverserType&& traverser)
+      : wrapped_state_traverser_(std::move(traverser)) {
+    this->operator++(0);
+  }
+
   CodePointStateTraverser() = delete;
   CodePointStateTraverser& operator=(CodePointStateTraverser const&) = delete;
   CodePointStateTraverser(const CodePointStateTraverser& that) = delete;
