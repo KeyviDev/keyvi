@@ -73,8 +73,8 @@ class FuzzyMatching final {
     size_t query_char_length = codepoints.size();
     if (query_char_length < minimum_exact_prefix) {
       TRACE("query lengh < minimum exact prefix, returning empty iterator");
-      return FuzzyMatching<>(std::move(traverser), std::move(metric), std::move(first_match), minimum_exact_prefix,
-                             max_edit_distance);
+      return FuzzyMatching<innerTraverserType>(std::move(traverser), std::move(metric), std::move(first_match),
+                                               minimum_exact_prefix, max_edit_distance);
     }
     metric.reset(new stringdistance::Levenshtein(codepoints, 20, max_edit_distance));
 
@@ -102,13 +102,14 @@ class FuzzyMatching final {
     }
 
     TRACE("create iterator");
-    return FuzzyMatching<>(std::move(traverser), std::move(metric), std::move(first_match), minimum_exact_prefix,
-                           max_edit_distance);
+    return FuzzyMatching<innerTraverserType>(std::move(traverser), std::move(metric), std::move(first_match),
+                                             minimum_exact_prefix, max_edit_distance);
   }
 
   template <class innerTraverserType = fsa::WeightedStateTraverser>
-  static FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>> FromMulipleFsas(const std::vector<fsa::automata_t>& fsas, const std::string& query,
-                                       const int32_t max_edit_distance, const size_t minimum_exact_prefix = 2) {
+  static FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>> FromMulipleFsas(
+      const std::vector<fsa::automata_t>& fsas, const std::string& query, const int32_t max_edit_distance,
+      const size_t minimum_exact_prefix = 2) {
     std::unique_ptr<stringdistance::Levenshtein> metric;
     std::unique_ptr<fsa::CodePointStateTraverser<fsa::ZipStateTraverser<innerTraverserType>>> traverser;
     Match first_match;
@@ -139,6 +140,7 @@ class FuzzyMatching final {
             break;
           }
         }
+        TRACE("metric->put %lu  depth: %lu", codepoints[depth], depth);
         metric->Put(codepoints[depth], depth);
         ++depth;
       }
@@ -153,7 +155,7 @@ class FuzzyMatching final {
     }
 
     if (fsa_start_state_pairs.size() > 0) {
-      fsa::ZipStateTraverser<innerTraverserType> zip_state_traverser(fsa_start_state_pairs);
+      fsa::ZipStateTraverser<innerTraverserType> zip_state_traverser(fsa_start_state_pairs, false);
       traverser.reset(
           new fsa::CodePointStateTraverser<fsa::ZipStateTraverser<innerTraverserType>>(std::move(zip_state_traverser)));
     }
@@ -167,6 +169,7 @@ class FuzzyMatching final {
 
   Match NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
+      TRACE("metric->put %lu  depth: %lu", traverser_ptr_->GetStateLabel(), candidate_length() - 1);
       const int32_t intermediate_score = metric_ptr_->Put(traverser_ptr_->GetStateLabel(), candidate_length() - 1);
       // don't consider subtrees which can not be matched anyways
       if (metric_ptr_->GetInputSequence().size() > candidate_length() && intermediate_score > max_edit_distance_) {
