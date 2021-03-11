@@ -66,10 +66,7 @@ class ZipStateTraverser final {
         traverser_queue_.push(traverser);
       }
     }
-
-    if (advance) {
-      FillInValues();
-    }
+    FillInValues();
   }
 
   explicit ZipStateTraverser(const std::initializer_list<automata_t> fsas, bool advance = true) {
@@ -81,10 +78,7 @@ class ZipStateTraverser final {
         traverser_queue_.push(traverser);
       }
     }
-
-    if (advance) {
-      FillInValues();
-    }
+    FillInValues();
   }
 
   explicit ZipStateTraverser(const std::vector<std::pair<automata_t, uint64_t>> &fsa_start_state_pairs,
@@ -100,10 +94,7 @@ class ZipStateTraverser final {
         }
       }
     }
-
-    if (advance) {
-      FillInValues();
-    }
+    FillInValues();
   }
 
   ZipStateTraverser() = delete;
@@ -152,6 +143,8 @@ class ZipStateTraverser final {
 
   operator bool() const { return !traverser_queue_.empty(); }
 
+  bool AtEnd() const { return traverser_queue_.empty(); }
+
   automata_t GetFsa() const { return fsa_; }
 
   bool IsFinalState() const { return final_; }
@@ -167,20 +160,15 @@ class ZipStateTraverser final {
   size_t GetOrder() const { return order_; }
 
   void Prune() {
-    while (equal_states_ > 0) {
-      // get the top element
-      auto it = traverser_queue_.begin();
+    TRACE("pruning %ld inner traversers", equal_states_);
+    size_t to_prune = equal_states_;
 
-      // prune the inner traverser and update or remove it from the queue
-      (*it)->Prune();
-      if (*(*it)) {
-        traverser_queue_.decrease(heap_t::s_handle_from_iterator(it));
-      } else {
-        traverser_queue_.erase(heap_t::s_handle_from_iterator(it));
-      }
-      --equal_states_;
+    auto it = traverser_queue_.ordered_begin();
+    while (to_prune > 0) {
+      TRACE("prune traverser %lu", (*it)->GetOrder());
+      (*it++)->Prune();
+      --to_prune;
     }
-    FillInValues();
   }
 
   label_t GetStateLabel() const { return state_label_; }
@@ -198,10 +186,11 @@ class ZipStateTraverser final {
   size_t equal_states_ = 1;
 
   void FillInValues() {
-    TRACE("fill in");
+    TRACE("fill in values");
 
     if (!traverser_queue_.empty()) {
       const traverser_t &t = traverser_queue_.top();
+      TRACE("take values from traverser %lu", t->GetOrder());
 
       final_ = t->IsFinalState();
       depth_ = t->GetDepth();
@@ -235,6 +224,15 @@ class ZipStateTraverser final {
         }
         it++;
       }
+    } else {
+      // reset values
+      final_ = false;
+      depth_ = 0;
+      state_value_ = 0;
+      inner_weight_ = 0;
+      state_id_ = 0;
+      state_label_ = 0;
+      fsa_.reset();
     }
   }
 };

@@ -146,7 +146,8 @@ class FuzzyMatching final {
       }
 
       if (state) {
-        if (depth == query_char_length && fsa->IsFinalState(state) && first_match.IsEmpty() == false) {
+        if (depth == query_char_length && fsa->IsFinalState(state) && first_match.IsEmpty()) {
+          TRACE("prefix matched exact");
           first_match = Match(0, query_char_length, query, 0, fsa, fsa->GetStateValue(state));
         }
 
@@ -155,6 +156,8 @@ class FuzzyMatching final {
     }
 
     if (fsa_start_state_pairs.size() > 0) {
+      TRACE("create zip traverser with %ul inner traversers", fsa_start_state_pairs.size());
+
       fsa::ZipStateTraverser<innerTraverserType> zip_state_traverser(fsa_start_state_pairs, false);
       traverser.reset(
           new fsa::CodePointStateTraverser<fsa::ZipStateTraverser<innerTraverserType>>(std::move(zip_state_traverser)));

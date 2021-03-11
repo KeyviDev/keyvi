@@ -28,6 +28,285 @@ namespace fsa {
 
 BOOST_AUTO_TEST_SUITE(ComparableStateTraverserTests)
 
+BOOST_AUTO_TEST_CASE(StateTraverserCompatibility) {
+  std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
+  testing::TempDictionary dictionary(&test_data);
+  automata_t f = dictionary.GetFsa();
+
+  ComparableStateTraverser<StateTraverser<>> s(f);
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK(!s.AtEnd());
+  BOOST_CHECK(s);
+
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  // traverser shall be exhausted
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+}
+
+BOOST_AUTO_TEST_CASE(StateTraverserCompatSomeTraversalWithPrune) {
+  std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
+  testing::TempDictionary dictionary(&test_data);
+  automata_t f = dictionary.GetFsa();
+
+  ComparableStateTraverser<StateTraverser<>> s(f);
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK(!s.AtEnd());
+
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+
+  s.Prune();
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+
+  s.Prune();
+  s++;
+  BOOST_CHECK(!s.AtEnd());
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+
+  s.Prune();
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  s.Prune();
+  s++;
+
+  // traverser shall be exhausted
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+}
+
+BOOST_AUTO_TEST_CASE(StateTraverserCompatLongkeys) {
+  std::string a(1000, 'a');
+  std::string b(1000, 'b');
+
+  std::vector<std::string> test_data = {a, b};
+  testing::TempDictionary dictionary(&test_data);
+  automata_t f = dictionary.GetFsa();
+
+  ComparableStateTraverser<StateTraverser<>> s(f);
+
+  for (int i = 1; i <= 1000; ++i) {
+    BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+    BOOST_CHECK_EQUAL(i, s.GetDepth());
+    s++;
+    BOOST_CHECK(!s.AtEnd());
+  }
+
+  for (int i = 1; i <= 1000; ++i) {
+    BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+    BOOST_CHECK_EQUAL(i, s.GetDepth());
+    s++;
+    if (i != 1000) {
+      BOOST_CHECK(!s.AtEnd());
+    } else {
+      BOOST_CHECK(s.AtEnd());
+    }
+  }
+
+  // traverser shall be exhausted
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK(s.AtEnd());
+
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+}
+
+BOOST_AUTO_TEST_CASE(StateTraverserCompatZeroByte) {
+  std::vector<std::string> test_data = {std::string("\0aaaa", 5), std::string("aa\0bb", 5), "aabc", "aacd",
+                                        std::string("bbcd\0", 5)};
+  testing::TempDictionary dictionary(&test_data);
+  automata_t f = dictionary.GetFsa();
+
+  ComparableStateTraverser<StateTraverser<>> s(f);
+
+  BOOST_CHECK_EQUAL('\0', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK(!s.AtEnd());
+
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('\0', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+
+  s++;
+  BOOST_CHECK_EQUAL('\0', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  // traverser shall be exhausted
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+  BOOST_CHECK(s.AtEnd());
+
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+  BOOST_CHECK(s.AtEnd());
+}
+
 BOOST_AUTO_TEST_CASE(same_data) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
   testing::TempDictionary dictionary(&test_data);
