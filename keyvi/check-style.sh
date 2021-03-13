@@ -2,8 +2,10 @@
 
 clang-format -version
 
-if [ -n "${GITHUB_BASE_REF}" ]; then
-commit_range="${GITHUB_BASE_REF}...${GITHUB_SHA}"
+if [ -n "${GITHUB_PULL_REQUEST_BASE_SHA}" ]; then
+commit_range="${GITHUB_PULL_REQUEST_BASE_SHA}...${GITHUB_SHA}"
+elif [ -n "${GITHUB_PUSH_BASE_SHA}" ]; then
+commit_range="${GITHUB_PUSH_BASE_SHA}...${GITHUB_SHA}"
 else
 commit_range="upstream/master...HEAD"
 fi
