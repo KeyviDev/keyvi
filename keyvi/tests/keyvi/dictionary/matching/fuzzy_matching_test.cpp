@@ -349,8 +349,8 @@ BOOST_AUTO_TEST_CASE(fuzzy_cjk) {
   testing::TempDictionary dictionary(&test_data);
   dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  test_fuzzy_matching(&test_data, "あsだsっd", 2, std::vector<std::string>{"あsだs",
-      "あsだsっd", "あsだsっdさ", "あsだsdさ"});
+  test_fuzzy_matching(&test_data, "あsだsっd", 2,
+                      std::vector<std::string>{"あsだs", "あsだsっd", "あsだsっdさ", "あsだsdさ"});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

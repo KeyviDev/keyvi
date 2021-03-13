@@ -52,14 +52,16 @@ class ComparableStateTraverser final {
  public:
   using label_t = typename innerTraverserType::label_t;
 
-  explicit ComparableStateTraverser(const innerTraverserType &&traverser, bool advance = true, size_t order = 0)
+  explicit ComparableStateTraverser(const innerTraverserType &&traverser, const bool advance = true,
+                                    const size_t order = 0)
       : state_traverser_(std::move(traverser)), order_(order) {
     if (advance) {
       this->operator++(0);
     }
   }
 
-  explicit ComparableStateTraverser(const automata_t f, uint64_t start_state, bool advance = true, size_t order = 0)
+  explicit ComparableStateTraverser(const automata_t f, uint64_t start_state, const bool advance = true,
+                                    const size_t order = 0)
       : state_traverser_(f, start_state, false), order_(order) {
     if (advance) {
       this->operator++(0);
@@ -107,7 +109,7 @@ class ComparableStateTraverser final {
     return std::memcmp(label_stack_.data(), rhs.label_stack_.data(), label_stack_.size() * sizeof(label_t)) == 0;
   }
 
-  bool operator!=(const ComparableStateTraverser &rhs) { return !operator==(rhs); }
+  bool operator!=(const ComparableStateTraverser &rhs) const { return !operator==(rhs); }
 
   operator bool() const { return state_traverser_; }
 

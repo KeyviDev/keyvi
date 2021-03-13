@@ -44,6 +44,14 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+/**
+ * A traverser that wraps a list of inner traversers to traverse them as if they would be 1 traverser
+ *
+ * The order of inner traversers define the precedence. If 2 traversers have share a common traversal stack,
+ * the later dictionary is taken for reading out the value/weight etc.
+ *
+ * Note: wrapping weighted state traverser is not supported yet
+ */
 template <class innerTraverserType>
 class ZipStateTraverser final {
  private:
@@ -57,7 +65,7 @@ class ZipStateTraverser final {
   using label_t = typename innerTraverserType::label_t;
   using heap_t =
       boost::heap::skew_heap<traverser_t, boost::heap::compare<TraverserCompare>, boost::heap::mutable_<true>>;
-  explicit ZipStateTraverser(const std::vector<automata_t> &fsas, bool advance = true) {
+  explicit ZipStateTraverser(const std::vector<automata_t> &fsas, const bool advance = true) {
     size_t order = 0;
     for (const automata_t &f : fsas) {
       traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++);
@@ -69,7 +77,7 @@ class ZipStateTraverser final {
     FillInValues();
   }
 
-  explicit ZipStateTraverser(const std::initializer_list<automata_t> fsas, bool advance = true) {
+  explicit ZipStateTraverser(const std::initializer_list<automata_t> fsas, const bool advance = true) {
     size_t order = 0;
     for (auto f : fsas) {
       traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++);
@@ -82,7 +90,7 @@ class ZipStateTraverser final {
   }
 
   explicit ZipStateTraverser(const std::vector<std::pair<automata_t, uint64_t>> &fsa_start_state_pairs,
-                             bool advance = true) {
+                             const bool advance = true) {
     size_t order = 0;
     for (auto f : fsa_start_state_pairs) {
       if (f.second > 0) {
