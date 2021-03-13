@@ -2,9 +2,9 @@
 
 clang-format -version
 
+if [ -n "${GITHUB_BASE_REF}" ]; then
 commit_range="${GITHUB_BASE_REF}...${GITHUB_SHA}"
-
-if [ -n "${commit_range}" ]; then
+else
 commit_range="upstream/master...HEAD"
 fi
 
