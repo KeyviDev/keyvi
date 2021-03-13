@@ -33,4 +33,6 @@ jobs:
         env:
           GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
           GITHUB_PULL_REQUEST_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: ./keyvi/check-style.sh
+        run: |
+          export PATH="$HOME/.local/run:$PATH"
+          ./keyvi/check-style.sh
