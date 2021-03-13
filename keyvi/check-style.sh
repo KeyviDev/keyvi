@@ -2,7 +2,13 @@
 
 clang-format -version
 
-infiles=`git diff --name-only --diff-filter=ACMRT $(echo $TRAVIS_COMMIT_RANGE | sed 's/\.//') | grep -v "3rdparty" | grep -E "\.(cpp|h)$"`
+commit_range="${GITHUB_BASE_REF}...${GITHUB_SHA}"
+
+if [ -n "${commit_range}" ]; then
+commit_range="upstream/master...HEAD"
+fi
+
+infiles=`git diff --name-only --diff-filter=ACMRT $(echo ${commit_range} | sed 's/\.//') | grep -v "3rdparty" | grep -E "\.(cpp|h)$"`
 
 clang_format_files=()
 cpplint_files=()
