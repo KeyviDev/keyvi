@@ -47,8 +47,8 @@ namespace fsa {
 /**
  * A traverser that wraps a list of inner traversers to traverse them as if they would be 1 traverser
  *
- * The order of inner traversers define the precedence. If 2 traversers have share a common traversal stack,
- * the later dictionary is taken for reading out the value/weight etc.
+ * The order of inner traversers define the precedence. If 2 traversers have a common traversal stack,
+ * the later dictionary is taken for reading out the values/weights etc.
  *
  * Note: wrapping weighted state traverser is not supported yet
  */
