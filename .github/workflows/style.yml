@@ -19,6 +19,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # fetch all history so multiple commits can be scanned
       - name: install deps
         run: |
           sudo apt-get update
@@ -28,4 +30,9 @@ jobs:
         with:
           packages: cpplint
       - name: run the style script
-        run: ./keyvi/check-style.sh
+        env:
+          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+          GITHUB_PULL_REQUEST_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          ./keyvi/check-style.sh
