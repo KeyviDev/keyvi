@@ -80,7 +80,7 @@ class LeastRecentlyUsedGenerationsCache final {
    */
   void Add(EntryT key) {
     if (current_generation_->Size() >= size_per_generation_) {
-      MinimizationHash<EntryT> *newGeneration = NULL;
+      MinimizationHash<EntryT> *newGeneration = nullptr;
       if (generations_.size() + 1 == max_number_of_generations_) {
         // remove(free) the first generation
         newGeneration = generations_[0];
@@ -90,7 +90,7 @@ class LeastRecentlyUsedGenerationsCache final {
 
       generations_.push_back(current_generation_);
 
-      if (newGeneration == NULL) {
+      if (newGeneration == nullptr) {
         newGeneration = new MinimizationHash<EntryT>();
       }
 

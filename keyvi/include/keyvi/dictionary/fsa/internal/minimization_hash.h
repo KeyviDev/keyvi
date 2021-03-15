@@ -95,7 +95,7 @@ class MinimizationHash final {
 
     if (min_memory_limit > memory_limit) {
       throw std::invalid_argument("memory limit too low, for the given parameters the limit must be at least " +
-                                  std::to_string(min_memory_limit));
+                                  std::to_string(min_memory_limit) + " bytes");
     }
 
     // try to find a good number of generations (between given minimum and maximum) with equal size given the memory
