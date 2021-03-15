@@ -17,6 +17,8 @@
 //
 
 #include <iostream>
+#include <limits>
+#include <stdexcept>
 #include <string>
 
 #include <boost/test/unit_test.hpp>
@@ -77,6 +79,27 @@ BOOST_AUTO_TEST_CASE(memory_usage) {
   // some non-default
   MinimizationHash<PackedState<>> hash2(5);
   BOOST_CHECK_EQUAL(hash2.GetMemoryUsage(), (32749 + 8187) * sizeof(PackedState<>));
+}
+
+BOOST_AUTO_TEST_CASE(memory_calculation) {
+  MinimizationHash<PackedState<>> hash;
+
+  auto memoryConfiguration = hash.FindMemoryLimitConfigurationForLRUCache(1000000, 3, 6);
+  BOOST_CHECK(memoryConfiguration.best_fit_memory_limit < 1000000);
+  BOOST_CHECK(memoryConfiguration.best_fit_generations <= 6);
+  BOOST_CHECK(memoryConfiguration.best_fit_generations >= 3);
+
+  // max case
+  memoryConfiguration = hash.FindMemoryLimitConfigurationForLRUCache(std::numeric_limits<size_t>::max(), 3, 6);
+
+  BOOST_CHECK(memoryConfiguration.best_fit_memory_limit > 0);
+  BOOST_CHECK_EQUAL(6, memoryConfiguration.best_fit_generations);
+
+  // min case
+  BOOST_CHECK_THROW(hash.FindMemoryLimitConfigurationForLRUCache(0, 1, 1), std::invalid_argument);
+
+  // another min case
+  BOOST_CHECK_THROW(hash.FindMemoryLimitConfigurationForLRUCache(5, 10, 20), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
