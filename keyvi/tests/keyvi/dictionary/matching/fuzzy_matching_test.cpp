@@ -22,9 +22,12 @@
  *      Author: Narek Gharibyan <narekgharibyan@gmail.com>
  */
 
+#include <algorithm>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/matching/fuzzy_matching.h"
 #include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
@@ -32,6 +35,79 @@ namespace dictionary {
 namespace matching {
 
 BOOST_AUTO_TEST_SUITE(FuzzyMatchingTests)
+
+void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_data, const std::string& query,
+                         size_t max_edit_distance, const std::vector<std::string> expected) {
+  testing::TempDictionary dictionary(test_data);
+
+  // test using weights
+  auto matcher_weights = std::make_shared<matching::FuzzyMatching<>>(
+      matching::FuzzyMatching<>::FromSingleFsa<>(dictionary.GetFsa(), query, max_edit_distance));
+
+  MatchIterator::MatchIteratorPair it = MatchIterator::MakeIteratorPair(
+      [matcher_weights]() { return matcher_weights->NextMatch(); }, matcher_weights->FirstMatch());
+
+  auto expected_it = expected.begin();
+  for (auto m : it) {
+    BOOST_CHECK(expected_it != expected.end());
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  }
+
+  // test without weights
+  std::vector<std::string> expected_sorted = expected;
+  std::sort(expected_sorted.begin(), expected_sorted.end());
+
+  auto matcher_no_weights = std::make_shared<matching::FuzzyMatching<fsa::StateTraverser<>>>(
+      matching::FuzzyMatching<fsa::StateTraverser<>>::FromSingleFsa<fsa::StateTraverser<>>(dictionary.GetFsa(), query,
+                                                                                           max_edit_distance));
+  MatchIterator::MatchIteratorPair matcher_no_weights_it = MatchIterator::MakeIteratorPair(
+      [matcher_no_weights]() { return matcher_no_weights->NextMatch(); }, matcher_no_weights->FirstMatch());
+
+  expected_it = expected_sorted.begin();
+  for (auto m : matcher_no_weights_it) {
+    BOOST_CHECK(expected_it != expected_sorted.end());
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  }
+  BOOST_CHECK(expected_it == expected_sorted.end());
+
+  // test with multiple dictionaries
+  // note: weighted traversal with multiple dictionaries is not implemented yet
+
+  // split test matcher_zipped_no_weights into 3 groups with some duplication
+  std::vector<std::pair<std::string, uint32_t>> test_data_1;
+  std::vector<std::pair<std::string, uint32_t>> test_data_2;
+  std::vector<std::pair<std::string, uint32_t>> test_data_3;
+
+  for (size_t i = 0; i < test_data->size(); ++i) {
+    if (i % 1 == 0 || i % 5 == 0) {
+      test_data_1.push_back((*test_data)[i]);
+    }
+    if (i % 2 == 0 || i == 3) {
+      test_data_2.push_back((*test_data)[i]);
+    }
+    if (i % 3 == 0) {
+      test_data_3.push_back((*test_data)[i]);
+    }
+  }
+  testing::TempDictionary d1(&test_data_1);
+  testing::TempDictionary d2(&test_data_2);
+  testing::TempDictionary d3(&test_data_3);
+  std::vector<fsa::automata_t> fsas = {d1.GetFsa(), d2.GetFsa(), d3.GetFsa()};
+
+  auto matcher_zipped_no_weights =
+      std::make_shared<matching::FuzzyMatching<fsa::ZipStateTraverser<fsa::StateTraverser<>>>>(
+          matching::FuzzyMatching<fsa::ZipStateTraverser<fsa::StateTraverser<>>>::FromMulipleFsas<
+              fsa::StateTraverser<>>(fsas, query, max_edit_distance));
+  MatchIterator::MatchIteratorPair matcher_zipped_no_weights_it =
+      MatchIterator::MakeIteratorPair([matcher_zipped_no_weights]() { return matcher_zipped_no_weights->NextMatch(); },
+                                      matcher_zipped_no_weights->FirstMatch());
+  expected_it = expected_sorted.begin();
+  for (auto m : matcher_zipped_no_weights_it) {
+    BOOST_CHECK(expected_it != expected_sorted.end());
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  }
+  BOOST_CHECK(expected_it == expected_sorted.end());
+}
 
 BOOST_AUTO_TEST_CASE(fuzzy_0) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
@@ -55,17 +131,8 @@ BOOST_AUTO_TEST_CASE(fuzzy_0) {
       {"tüs rheinland", 39131},
       {"tüs öffnungszeiten", 15999},
   };
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  std::vector<std::string> expected_output = {"tüv i"};
-
-  auto expected_it = expected_output.begin();
-  for (auto m : d->GetFuzzy("tüv i", 0)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-  }
-
-  BOOST_CHECK(expected_it == expected_output.end());
+  test_fuzzy_matching(&test_data, "tüv i", 0, std::vector<std::string>{"tüv i"});
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_1) {
@@ -92,21 +159,8 @@ BOOST_AUTO_TEST_CASE(fuzzy_1) {
       {"tüs rheinland", 39131},
       {"tüs öffnungszeiten", 15999},
   };
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  std::vector<std::string> expected_output = {
-      "tüv i",
-      "tüv ib",
-      "tüv in",
-  };
-
-  auto expected_it = expected_output.begin();
-  for (auto m : d->GetFuzzy("tüv in", 1)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-  }
-
-  BOOST_CHECK(expected_it == expected_output.end());
+  test_fuzzy_matching(&test_data, "tüv in", 1, std::vector<std::string>{"tüv i", "tüv ib", "tüv in"});
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_2) {
@@ -136,20 +190,8 @@ BOOST_AUTO_TEST_CASE(fuzzy_2) {
       {"tüs rheinland", 39131},
       {"tüs öffnungszeiten", 15999},
   };
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  std::vector<std::string> expected_output = {
-      "türkisch",
-      "tülkisc",
-  };
-
-  auto expected_it = expected_output.begin();
-  for (auto m : d->GetFuzzy("türkisch", 2)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-  }
-
-  BOOST_CHECK(expected_it == expected_output.end());
+  test_fuzzy_matching(&test_data, "türkisch", 2, std::vector<std::string>{"türkisch", "tülkisc"});
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_2_exact_minimum_prefix) {
@@ -176,21 +218,8 @@ BOOST_AUTO_TEST_CASE(fuzzy_2_exact_minimum_prefix) {
       {"tüs rheinland", 39131},
       {"tüs öffnungszeiten", 15999},
   };
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  std::vector<std::string> expected_output = {
-      "tü",
-      "tüv i",
-      "tüvk",
-  };
-
-  auto expected_it = expected_output.begin();
-  for (auto m : d->GetFuzzy("tü", 3)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-  }
-
-  BOOST_CHECK(expected_it == expected_output.end());
+  test_fuzzy_matching(&test_data, "tü", 3, std::vector<std::string>{"tü", "tüv i", "tüvk"});
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_5) {
@@ -220,30 +249,20 @@ BOOST_AUTO_TEST_CASE(fuzzy_5) {
       {"tüs rheinland", 39131},
       {"tüs öffnungszeiten", 15999},
       {"abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 42}};
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  std::vector<std::string> expected_output = {
-      "tüv i", "tüv ib", "tüv in", "türkei side", "türkisch", "türkisch für", "tülkisc",
-  };
+  test_fuzzy_matching(&test_data, "türkisch", 5,
+                      std::vector<std::string>{
+                          "tüv i",
+                          "tüv ib",
+                          "tüv in",
+                          "türkei side",
+                          "türkisch",
+                          "türkisch für",
+                          "tülkisc",
+                      });
 
-  auto expected_it = expected_output.begin();
-  for (auto m : d->GetFuzzy("türkisch", 5)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-  }
-
-  BOOST_CHECK(expected_it == expected_output.end());
-
-  std::vector<std::string> expected_output_long = {
-      "abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  };
-
-  auto expected_it_long = expected_output_long.begin();
-  for (auto m : d->GetFuzzy("abcdefghijXXmnopqrstuvqxyzXXXDEFGHIJKLMNOPQRSTUVWXYZ", 5)) {
-    BOOST_CHECK_EQUAL(*expected_it_long++, m.GetMatchedString());
-  }
-
-  BOOST_CHECK(expected_it_long == expected_output_long.end());
+  test_fuzzy_matching(&test_data, "abcdefghijXXmnopqrstuvqxyzXXXDEFGHIJKLMNOPQRSTUVWXYZ", 5,
+                      std::vector<std::string>{"abcdefghijklmnopqrstuvqxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"});
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_no_match) {
@@ -268,11 +287,7 @@ BOOST_AUTO_TEST_CASE(fuzzy_no_match) {
       {"tüs rheinland", 39131},
       {"tüs öffnungszeiten", 15999},
   };
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
-
-  auto iter = d->GetFuzzy("türkisch", 2);
-  BOOST_CHECK(iter.begin() == iter.end());
+  test_fuzzy_matching(&test_data, "türkisch", 2, std::vector<std::string>{});
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_empty_input) {
@@ -297,11 +312,7 @@ BOOST_AUTO_TEST_CASE(fuzzy_empty_input) {
       {"tüs rheinland", 39131},
       {"tüs öffnungszeiten", 15999},
   };
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
-
-  auto iter = d->GetFuzzy("", 7);
-  BOOST_CHECK(iter.begin() == iter.end());
+  test_fuzzy_matching(&test_data, "", 7, std::vector<std::string>{});
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_short_prefix) {
@@ -326,14 +337,8 @@ BOOST_AUTO_TEST_CASE(fuzzy_short_prefix) {
       {"üüs rheinland", 39131},
       {"üüs öffnungszeiten", 15999},
   };
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
-
-  const auto iter1 = d->GetFuzzy("t", 2);
-  BOOST_CHECK(iter1.begin() == iter1.end());
-
-  const auto iter2 = d->GetFuzzy("ü", 2);
-  BOOST_CHECK(iter2.begin() == iter2.end());
+  test_fuzzy_matching(&test_data, "t", 2, std::vector<std::string>{});
+  test_fuzzy_matching(&test_data, "ü", 2, std::vector<std::string>{});
 }
 
 BOOST_AUTO_TEST_CASE(fuzzy_cjk) {
@@ -344,21 +349,8 @@ BOOST_AUTO_TEST_CASE(fuzzy_cjk) {
   testing::TempDictionary dictionary(&test_data);
   dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
-  std::vector<std::pair<std::string, uint32_t>> expected_output = {
-      {"あsだs", 2},
-      {"あsだsっd", 0},
-      {"あsだsっdさ", 1},
-      {"あsだsdさ", 2},
-  };
-
-  auto expected_it = expected_output.begin();
-  for (auto m : d->GetFuzzy("あsだsっd", 2)) {
-    BOOST_CHECK_EQUAL(expected_it->first, m.GetMatchedString());
-    BOOST_CHECK_EQUAL(expected_it->second, m.GetScore());
-    expected_it++;
-  }
-
-  BOOST_CHECK(expected_it == expected_output.end());
+  test_fuzzy_matching(&test_data, "あsだsっd", 2,
+                      std::vector<std::string>{"あsだs", "あsだsっd", "あsだsっdさ", "あsだsdさ"});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

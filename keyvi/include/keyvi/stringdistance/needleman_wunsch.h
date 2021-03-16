@@ -210,6 +210,8 @@ class NeedlemanWunsch final {
     return std::string(utf8result.begin(), utf8result.end());
   }
 
+  const std::vector<uint32_t> GetInputSequence() const { return input_sequence_; }
+
  private:
   int32_t max_distance_ = 0;
   std::vector<uint32_t> compare_sequence_;

@@ -41,11 +41,17 @@ namespace fsa {
 template <class innerTraverserType>
 class CodePointStateTraverser final {
  public:
+  using label_t = int;
+
   explicit CodePointStateTraverser(automata_t f) : wrapped_state_traverser_(f, f->GetStartState(), false) {
     this->operator++(0);
   }
 
   CodePointStateTraverser(automata_t f, uint64_t state) : wrapped_state_traverser_(f, state, false) {
+    this->operator++(0);
+  }
+
+  explicit CodePointStateTraverser(innerTraverserType&& traverser) : wrapped_state_traverser_(std::move(traverser)) {
     this->operator++(0);
   }
 
@@ -67,7 +73,7 @@ class CodePointStateTraverser final {
     int remaining_bytes = 0;
     do {
       wrapped_state_traverser_++;
-      int label = wrapped_state_traverser_.GetStateLabel();
+      label_t label = wrapped_state_traverser_.GetStateLabel();
 
       TRACE("CP traverser: wrapped traverser %x %d", label, wrapped_state_traverser_.GetDepth());
 
@@ -120,7 +126,7 @@ class CodePointStateTraverser final {
     PruneHistory(wrapped_state_traverser_.GetDepth());
   }
 
-  int GetStateLabel() { return codepoint_; }
+  label_t GetStateLabel() { return codepoint_; }
 
   operator bool() const { return wrapped_state_traverser_; }
 
@@ -128,7 +134,7 @@ class CodePointStateTraverser final {
   innerTraverserType wrapped_state_traverser_;
   std::vector<int> transitions_stack_;
   std::vector<int> utf8_length_stack_;
-  int codepoint_ = 0;
+  label_t codepoint_ = 0;
   size_t current_depth_ = 0;
 
   void PruneHistory(size_t new_history_top) {

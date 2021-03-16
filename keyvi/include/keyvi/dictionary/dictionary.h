@@ -385,7 +385,9 @@ class Dictionary final {
   }
 
   MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, size_t max_edit_distance) const {
-    auto data = std::make_shared<matching::FuzzyMatching>(fsa_, query, max_edit_distance);
+    auto data = std::make_shared<matching::FuzzyMatching<>>(
+        matching::FuzzyMatching<>::FromSingleFsa(fsa_, query, max_edit_distance));
+
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
   }

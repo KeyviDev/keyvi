@@ -40,6 +40,8 @@ namespace fsa {
 template <class TransitionT = traversal::Transition>
 class StateTraverser final {
  public:
+  using label_t = unsigned char;
+
   explicit StateTraverser(automata_t f)
       : fsa_(f), current_state_(f->GetStartState()), current_weight_(0), current_label_(0), at_end_(false), stack_() {
     TRACE("StateTraverser starting with Start state %d", current_state_);
@@ -48,8 +50,8 @@ class StateTraverser final {
     this->operator++(0);
   }
 
-  StateTraverser(automata_t f, uint64_t start_state, traversal::TraversalPayload<TransitionT>* payload,
-                 bool advance = true)
+  StateTraverser(automata_t f, const uint64_t start_state, traversal::TraversalPayload<TransitionT> *payload,
+                 const bool advance = true)
       : fsa_(f), current_weight_(0), current_label_(0), at_end_(false), stack_(*payload) {
     current_state_ = start_state;
 
@@ -61,7 +63,7 @@ class StateTraverser final {
     }
   }
 
-  StateTraverser(automata_t f, uint64_t start_state, bool advance = true)
+  StateTraverser(automata_t f, const uint64_t start_state, const bool advance = true)
       : fsa_(f), current_state_(start_state), current_weight_(0), current_label_(0), at_end_(false), stack_() {
     TRACE("StateTraverser starting with Start state %d", current_state_);
     f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload);
@@ -72,10 +74,10 @@ class StateTraverser final {
   }
 
   StateTraverser() = delete;
-  StateTraverser& operator=(StateTraverser const&) = delete;
-  StateTraverser(const StateTraverser& that) = delete;
+  StateTraverser &operator=(StateTraverser const &) = delete;
+  StateTraverser(const StateTraverser &that) = delete;
 
-  StateTraverser(StateTraverser&& other)
+  StateTraverser(StateTraverser &&other)
       : fsa_(other.fsa_),
         current_state_(other.current_state_),
         current_weight_(other.current_weight_),
@@ -97,7 +99,7 @@ class StateTraverser final {
 
   uint64_t GetStateValue() const { return fsa_->GetStateValue(current_state_); }
 
-  uint32_t GetInnerWeight() { return current_weight_; }
+  uint32_t GetInnerWeight() const { return current_weight_; }
 
   uint64_t GetStateId() const { return current_state_; }
 
@@ -145,9 +147,9 @@ class StateTraverser final {
     TRACE("found %ld outgoing states", stack_.GetStates().size());
   }
 
-  unsigned char GetStateLabel() const { return current_label_; }
+  label_t GetStateLabel() const { return current_label_; }
 
-  traversal::TraversalPayload<TransitionT>& GetTraversalPayload() { return stack_.traversal_stack_payload; }
+  traversal::TraversalPayload<TransitionT> &GetTraversalPayload() { return stack_.traversal_stack_payload; }
 
   operator bool() const { return !at_end_; }
 
@@ -157,7 +159,7 @@ class StateTraverser final {
   automata_t fsa_;
   uint64_t current_state_;
   uint32_t current_weight_;
-  unsigned char current_label_;
+  label_t current_label_;
   bool at_end_;
   traversal::TraversalStack<TransitionT> stack_;
 };
