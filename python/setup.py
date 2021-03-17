@@ -350,6 +350,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     commands = {'build_ext': build_ext, 'sdist': sdist, 'build': build, 'bdist': bdist, 'clean': clean}
     if have_wheel:
         commands['bdist_wheel'] = bdist_wheel
+    for e in ext_modules:
+        e.cython_directives = {"embedsignature": True}
 
     write_version_file()
     setup(

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.9)
 project(keyvi)
 
 EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
@@ -194,3 +194,28 @@ add_library(keyvi INTERFACE)
 target_include_directories(keyvi INTERFACE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 target_compile_definitions(keyvi INTERFACE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_link_libraries(keyvi INTERFACE tiny-process-library ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY})
+
+### docs
+find_package(Doxygen)
+find_package(Sphinx COMPONENTS breathe)
+
+if(Doxygen_FOUND AND Sphinx_FOUND)
+    message ("-- Found doxygen/sphinx, creating sphinx_doc target")
+    file(GLOB_RECURSE KEYVI_PUBLIC_HEADERS keyvi/include/keyvi/*.h)
+
+    set(DOXYGEN_GENERATE_LATEX NO)
+    set(DOXYGEN_GENERATE_HTML NO)
+    set(DOXYGEN_GENERATE_XML YES)
+
+    # for scanning the python extension
+    set(SPHINX_EXTENSIONS sphinx.ext.autodoc)
+
+    doxygen_add_docs(doxygen_keyvi ${KEYVI_PUBLIC_HEADERS})
+    sphinx_add_docs(
+    sphinx_doc
+    BREATHE_PROJECTS doxygen_keyvi
+    BUILDER html
+    SOURCE_DIRECTORY sphinx-docs)
+else()
+    message ("-- Skip doc target, doxygen/sphinx not found")
+endif()
