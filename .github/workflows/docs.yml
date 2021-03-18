@@ -1,0 +1,65 @@
+# Build on Linux
+name: Build keyvi documentation
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: 'ubuntu-20.04'
+    name:  'github pages'
+    type:  'Release'
+    python-version: '3.9'
+    strategy:
+      fail-fast: false
+    steps:
+      - name: install Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev doxygen
+      - name: checkout from git
+        uses: actions/checkout@v2
+
+        # re-use the cache from the linux build
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1
+        with:
+          key: ${{ runner.os }}-${{ type }}
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ python-version }}
+          architecture: x64
+
+      - name: Install python dependencies
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          python -m pip install -r python/requirements.txt
+          python -m pip install sphinx breathe
+          
+      - name: build python extension
+        if: matrix.build_direct
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          cd python
+          python setup.py build --mode ${{ type }}
+          python setup.py install --user
+    
+      - name: build with cmake
+        uses: lukka/run-cmake@v3
+        with:
+          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
+          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
+          cmakeAppendedArgs: '-DCMAKE_BUILD_TYPE=${{ type }} -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          buildWithCMake: true
+          buildDirectory: '${{ github.workspace }}/build'
+          buildWithCMakeArgs: --target sphinx_doc
