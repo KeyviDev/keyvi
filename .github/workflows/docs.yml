@@ -48,7 +48,6 @@ jobs:
           python -m pip install sphinx breathe
           
       - name: build python extension
-        if: matrix.build_direct
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           cd python
