@@ -5,6 +5,7 @@ name: Build keyvi documentation
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -63,3 +64,11 @@ jobs:
           buildWithCMake: true
           buildDirectory: '${{ github.workspace }}/build'
           buildWithCMakeArgs: --target sphinx_doc
+      - name: Publish docs
+        if: success() && github.event_name == 'push'
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: build/sphinx_doc
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
