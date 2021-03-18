@@ -64,6 +64,9 @@ jobs:
           buildWithCMake: true
           buildDirectory: '${{ github.workspace }}/build'
           buildWithCMakeArgs: --target sphinx_doc
+      - name: Disable jekyll
+        run: |
+          touch build/sphinx_doc/.nojekyll
       - name: Publish docs
         if: success() && github.event_name == 'push'
         uses: crazy-max/ghaction-github-pages@v2
