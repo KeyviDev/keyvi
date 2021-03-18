@@ -15,8 +15,9 @@ jobs:
   build:
     runs-on: 'ubuntu-20.04'
     name:  'github pages'
-    type:  'Release'
-    python-version: '3.9'
+    env:
+      BUILD_TYPE:  'Release'
+      PYTHON_VERSION: '3.9'
     strategy:
       fail-fast: false
     steps:
@@ -32,12 +33,12 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1
         with:
-          key: ${{ runner.os }}-${{ type }}
+          key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 
       - name: Setup python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ python-version }}
+          python-version: ${{ env.PYTHON_VERSION }}
           architecture: x64
 
       - name: Install python dependencies
@@ -51,7 +52,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           cd python
-          python setup.py build --mode ${{ type }}
+          python setup.py build --mode ${BUILD_TYPE}
           python setup.py install --user
     
       - name: build with cmake
@@ -59,7 +60,7 @@ jobs:
         with:
           cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
           cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          cmakeAppendedArgs: '-DCMAKE_BUILD_TYPE=${{ type }} -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache'
+          cmakeAppendedArgs: '-DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache'
           buildWithCMake: true
           buildDirectory: '${{ github.workspace }}/build'
           buildWithCMakeArgs: --target sphinx_doc
