@@ -41,6 +41,7 @@ The python extension can be compiled standalone, check the [Readme](/python/READ
       * [Compiling](/doc/usage/Building%20keyvi%20dictionaries%20with%20python.md)
       * [Index](/doc/usage/Keyvi%20Index%20with%20python.md)
   * [Crashcourse](/doc/usage/Crashcourse.md)
+  * [API docs](https://keyvidev.github.io/keyvi/index.html)
   * [Using python keyvi with EMR (mrjob or pyspark)](/doc/usage/Using%20pykeyvi%20in%20EMR.md)  
 
 ## Internals
