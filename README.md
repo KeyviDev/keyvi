@@ -5,7 +5,6 @@
 [![PythonImpl](https://img.shields.io/pypi/implementation/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PythonFormat](https://img.shields.io/pypi/format/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PyPIVersion](https://img.shields.io/pypi/v/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
-[![Coveralls](https://coveralls.io/repos/github/KeyviDev/keyvi/badge.svg?branch=master)](https://coveralls.io/github/KeyviDev/keyvi?branch=master)
 
 ##
 ![Keyvi](/doc/images/keyvi-small.png)
@@ -13,8 +12,8 @@
 Keyvi - the short form for "Key value index" is a key value store (KVS) optimized for size and lookup speed. The usage of shared memory makes it scalable and resistant. The biggest difference to other stores is the underlying data structure based on [finite state machine](https://en.wikipedia.org/wiki/Finite-state_machine). Storage is very space efficient, fast and by design makes various sorts of approximate matching be it fuzzy string matching or geo highly efficient. The immutable FST data structure can be used stand-alone for static datasets. If you need online writes, you can use keyvi index, a _near realtime index_. The index can be used as embedded key value store, e.g. if you already have a network stack in your application. A out of the box network enabled store is available with [keyvi-server](https://github.com/KeyviDev/keyvi-server).
 
 ## Introduction
+
   * [BBuzz2016 talk](https://www.youtube.com/watch?v=GBjisdmHe4g)
-  * [Announcement blog post](https://cliqz.com/en/aboutus/blog/keyvi)
   * [Search Meetup Munich Jan 2016](http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz)
   * [Progscon 2017 talk](https://www.infoq.com/presentations/keyvi)
   * [Search Meetup Munich Apr 2018](https://cdn.jsdelivr.net/gh/KeyviDev/keyvi/doc/presentations/searchmuc_apr_2018/keyvi-presentation-search-meetup-2018.svg#1_0)
