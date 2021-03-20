@@ -16,3 +16,4 @@ recursive-include src/cpp/keyvi/3rdparty *.cmake
 recursive-include src/cpp/keyvi/3rdparty *.cmake.in
 
 include src/cpp/CMakeLists.txt
+include description.md
