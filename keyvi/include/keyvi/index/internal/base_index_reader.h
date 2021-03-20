@@ -30,7 +30,10 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/match.h"
+#include "keyvi/dictionary/match_iterator.h"
+#include "keyvi/dictionary/matching/fuzzy_matching.h"
 #include "keyvi/index/internal/read_only_segment.h"
 
 namespace keyvi {
@@ -48,6 +51,11 @@ class BaseIndexReader {
   template <typename... Args>
   explicit BaseIndexReader(Args... args) : payload_(args...) {}
 
+  /**
+   * Get a match for the given key
+   *
+   * @param key the key
+   */
   dictionary::Match operator[](const std::string& key) {
     dictionary::Match match;
     const_segments_t segments = payload_.Segments();
@@ -65,6 +73,11 @@ class BaseIndexReader {
     return match;
   }
 
+  /**
+   * Check if an entry for a given key exists
+   *
+   * @param key the key
+   */
   bool Contains(const std::string& key) {
     const_segments_t segments = payload_.Segments();
     for (auto it = segments->crbegin(); it != segments->crend(); it++) {
@@ -76,6 +89,26 @@ class BaseIndexReader {
     return false;
   }
 
+  /**
+   * Match approximate given the query and edit distance
+   *
+   * @param query a query to match against
+   * @param max_edit_distance the max edit distance allowed for a single match
+   */
+  dictionary::MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, size_t max_edit_distance) const {
+    const_segments_t segments = payload_.Segments();
+    std::vector<dictionary::fsa::automata_t> fsas;
+    for (auto it = segments->cbegin(); it != segments->cend(); it++) {
+      fsas.push_back((*it)->GetDictionary()->GetFsa());
+    }
+    auto data = std::make_shared<dictionary::matching::FuzzyMatching<>>(
+        dictionary::matching::FuzzyMatching<>::FromMulipleFsas(fsas, query, max_edit_distance));
+
+    auto func = [data]() { return data->NextMatch(); };
+    return dictionary::MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+  }
+
+ protected:
   PayloadT& Payload() { return payload_; }
 
  private:
