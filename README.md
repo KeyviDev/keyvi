@@ -59,14 +59,13 @@ If you like to go deep down in the basics, keyvi is inspired by the following 2 
 ## Release procedure
   * [How to make a release](doc/RELEASE_PROCESS.md)
   
-## Licence and 3rdparty dependencies
+## License
 
-keyvi is licenced under apache license 2.0, see [licence](LICENSE) for details, all [3rdparty libraries](/keyvi/3rdparty) used which define their own licence. Keyvi uses (last updated: `0.5.0`). Except Boost, Snappy and zlib all
-3rdparty code can be exclusively found in the [3rdparty] (/keyvi/3rdparty) folder. The following information is provided without warranty.
+keyvi is licensed under Apache License 2.0("ALv2"), see [license](LICENSE) for details, all [3rdparty libraries](/keyvi/3rdparty) ship with their own license. Except Boost, Snappy and zlib all 3rdparty code can be exclusively found in the [3rdparty] (/keyvi/3rdparty) folder. The following licenses are used for the 3rdparty code (last updated: `0.5.0`, provided without warranty).
 
 ### C++ dependencies
 
-| Dependency                  | Licence                 |
+| Dependency                  | License                 |
 | --------------------------- | ----------------------- |
 | Boost                       | Boost Software License  |
 | moodycamel::ConcurrentQueue | Simplified BSD License  |
@@ -75,14 +74,14 @@ keyvi is licenced under apache license 2.0, see [licence](LICENSE) for details, 
 | RapidJSON                   | MIT License             |
 | Snappy                      | BSD                     |
 | tiny-process-library        | MIT License             |
-| Zlib                        | Zlib Licence            |
+| Zlib                        | Zlib License            |
 
 
 ### Python dependencies
 
 The python version ships with the same 3rdparty dependencies as the C++ code and additionaly depends on:
 
-| Dependency                  | Licence                      |
+| Dependency                  | License                      |
 | --------------------------- | ---------------------------- |
 | msgpack (for python)        | Apache License, Version 2.0  |
 
