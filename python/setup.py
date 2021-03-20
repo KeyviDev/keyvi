@@ -342,7 +342,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                              library_dirs=link_library_dirs)]
 
     PACKAGE_NAME = 'keyvi'
-    with open('description.md', "rt", encoding="utf-8")) as desc_f:
+    with open('description.md', "rt", encoding="utf-8") as desc_f:
         long_desc = desc_f.read()
 
     install_requires = [
