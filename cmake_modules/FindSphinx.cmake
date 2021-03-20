@@ -318,6 +318,15 @@ function(sphinx_add_docs _target)
       "\nbreathe_default_project = '${_breathe_default_project}'")
   endif()
 
+  if(SPHINX_CONF_IMPORT)
+    get_filename_component(extra_conf ${SPHINX_CONF_IMPORT} NAME_WE)
+    file(APPEND "${_cachedir}/conf.py"
+      "\nimport sys"
+      "\nsys.path.append(\"${_sourcedir}\")"
+      "\nfrom ${extra_conf} import *"
+      )
+  endif()
+
   add_custom_target(
     ${_target} ALL
     COMMAND ${SPHINX_BUILD_EXECUTABLE}

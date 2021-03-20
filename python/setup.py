@@ -25,6 +25,7 @@ keyvi_cpp = 'src/cpp'
 keyvi_cpp_link = path.join(keyvi_cpp, 'keyvi')
 mac_os_static_libs_dir = 'mac_os_static_libs'
 keyvi_build_dir = path.join(keyvi_cpp, 'build-{}'.format(platform.platform()))
+here = os.path.abspath(os.path.dirname(__file__))
 
 try:
     cpu_count = multiprocessing.cpu_count()
@@ -59,7 +60,6 @@ def run_once(f):
 
 
 def write_version_file():
-    here = os.path.abspath(os.path.dirname(__file__))
     version_file_path = os.path.join(here, 'src/py/keyvi/_version.py')
     content = """
 # THIS FILE IS GENERATED FROM KEYVI SETUP.PY
@@ -342,6 +342,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                              library_dirs=link_library_dirs)]
 
     PACKAGE_NAME = 'keyvi'
+    with open(os.path.join(here, 'description.md'), "rt", encoding="utf-8") as desc_f:
+        long_desc = desc_f.read()
 
     install_requires = [
         'msgpack>=1.0.0',
@@ -358,6 +360,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         name=PACKAGE_NAME,
         version=VERSION,
         description='Python package for keyvi',
+        long_description=long_desc,
+        long_description_content_type="text/markdown",
         author='Hendrik Muhs',
         author_email='hendrik.muhs@gmail.com',
         license="ASL 2.0",
