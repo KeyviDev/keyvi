@@ -49,6 +49,9 @@ namespace internal {
 
 class ReadOnlySegment {
  public:
+  using deleted_t = std::unordered_set<std::string>;
+  using deleted_ptr_t = std::shared_ptr<deleted_t>;
+
   explicit ReadOnlySegment(const boost::filesystem::path& path)
       : dictionary_path_(path),
         dictionary_properties_(std::make_shared<dictionary::DictionaryProperties>(
@@ -83,12 +86,12 @@ class ReadOnlySegment {
     return 0;
   }
 
-  const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
+  const deleted_ptr_t DeletedKeys() {
     if (!has_deleted_keys_) {
-      return std::shared_ptr<std::unordered_set<std::string>>();
+      return deleted_ptr_t();
     }
 
-    std::shared_ptr<std::unordered_set<std::string>> deleted_keys = deleted_keys_weak_.lock();
+    deleted_ptr_t deleted_keys = deleted_keys_weak_.lock();
     if (!deleted_keys) {
       std::unique_lock<std::mutex> lock(mutex_);
       deleted_keys_weak_ = deleted_keys_;
@@ -190,15 +193,13 @@ class ReadOnlySegment {
         last_write_dkm > last_modification_time_deleted_keys_during_merge_) {
       TRACE("found deleted keys");
 
-      std::shared_ptr<std::unordered_set<std::string>> deleted_keys =
-          std::make_shared<std::unordered_set<std::string>>();
-      std::unordered_set<std::string> deleted_keys_dk = LoadAndUnserializeDeletedKeys(deleted_keys_path_.string());
+      deleted_ptr_t deleted_keys = std::make_shared<deleted_t>();
+      deleted_t deleted_keys_dk = LoadAndUnserializeDeletedKeys(deleted_keys_path_.string());
       TRACE("Loaded deleted keys: %d", deleted_keys_dk.size());
 
       deleted_keys->swap(deleted_keys_dk);
       // deleted_keys->insert(deleted_keys_dk.begin(), deleted_keys_dk.end());
-      std::unordered_set<std::string> deleted_keys_dkm =
-          LoadAndUnserializeDeletedKeys(deleted_keys_during_merge_path_.string());
+      deleted_t deleted_keys_dkm = LoadAndUnserializeDeletedKeys(deleted_keys_during_merge_path_.string());
       TRACE("Loaded deleted keys m: %d", deleted_keys_dkm.size());
 
       deleted_keys->insert(deleted_keys_dkm.begin(), deleted_keys_dkm.end());
@@ -214,7 +215,7 @@ class ReadOnlySegment {
     }
   }
 
-  const std::unordered_set<std::string>& DeletedKeysDirect() const { return *deleted_keys_; }
+  const deleted_t& DeletedKeysDirect() const { return *deleted_keys_; }
 
  private:
   //! path of the underlying dictionary
@@ -239,10 +240,10 @@ class ReadOnlySegment {
   std::atomic_bool has_deleted_keys_;
 
   //! deleted keys
-  std::shared_ptr<std::unordered_set<std::string>> deleted_keys_;
+  deleted_ptr_t deleted_keys_;
 
   //! a weak ptr to deleted keys for access in the main thread
-  std::weak_ptr<std::unordered_set<std::string>> deleted_keys_weak_;
+  std::weak_ptr<deleted_t> deleted_keys_weak_;
 
   //! a mutex to secure access to the deleted keys shared pointer
   std::mutex mutex_;
@@ -253,10 +254,10 @@ class ReadOnlySegment {
   //! last modification time for the deleted keys file during a merge operation
   std::time_t last_modification_time_deleted_keys_during_merge_;
 
-  inline static std::unordered_set<std::string> LoadAndUnserializeDeletedKeys(const std::string& filename) {
+  inline static deleted_t LoadAndUnserializeDeletedKeys(const std::string& filename) {
     TRACE("loading deleted keys file %s", filename.c_str());
 
-    std::unordered_set<std::string> deleted_keys;
+    deleted_t deleted_keys;
     std::ifstream deleted_keys_stream(filename, std::ios::binary);
     if (deleted_keys_stream.good()) {
       std::stringstream buffer;

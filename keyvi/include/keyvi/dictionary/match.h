@@ -166,6 +166,9 @@ struct Match {
    */
   void SetRawValue(const std::string& value) { raw_value_ = value; }
 
+  // todo: make private + friend
+  fsa::automata_t& GetFsa() { return fsa_; }
+
  private:
   size_t start_ = 0;
   size_t end_ = 0;

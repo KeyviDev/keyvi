@@ -26,8 +26,10 @@
 #ifndef KEYVI_INDEX_INTERNAL_BASE_INDEX_READER_H_
 #define KEYVI_INDEX_INTERNAL_BASE_INDEX_READER_H_
 
+#include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/fsa/automata.h"
@@ -95,17 +97,69 @@ class BaseIndexReader {
    * @param query a query to match against
    * @param max_edit_distance the max edit distance allowed for a single match
    */
-  dictionary::MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, size_t max_edit_distance) const {
+  dictionary::MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, size_t max_edit_distance,
+                                                        const size_t minimum_exact_prefix = 2) const {
     const_segments_t segments = payload_.Segments();
+
+    // todo empty segments?
+    // todo single segment optimization shortcut
+
     std::vector<dictionary::fsa::automata_t> fsas;
     for (auto it = segments->cbegin(); it != segments->cend(); it++) {
       fsas.push_back((*it)->GetDictionary()->GetFsa());
     }
-    auto data = std::make_shared<dictionary::matching::FuzzyMatching<>>(
-        dictionary::matching::FuzzyMatching<>::FromMulipleFsas(fsas, query, max_edit_distance));
 
-    auto func = [data]() { return data->NextMatch(); };
-    return dictionary::MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    std::vector<std::pair<dictionary::fsa::automata_t, uint64_t>> fsa_start_state_pairs =
+        dictionary::matching::FuzzyMatching<>::FilterWithExactPrefix(fsas, query, minimum_exact_prefix);
+
+    // collect deleted keys
+    // segments and filtered fsa's must have the same order
+    std::map<dictionary::fsa::automata_t, typename SegmentT::deleted_ptr_t> deleted_keys_map;
+    auto segments_it = segments->cbegin();
+    for (auto fsa : fsa_start_state_pairs) {
+      while (fsa.first != (*segments_it)->GetDictionary()->GetFsa()) {
+        ++segments_it;
+        if (segments == segments->end()) {
+          // todo: throw, this should not be possible
+        }
+      }
+      if ((*segments_it)->DeletedKeys().size() > 0) {
+        deleted_keys_map.push(fsa.first, (*segments_it)->DeletedKeys());
+      }
+      ++segments_it;
+    }
+
+    auto fuzzy_matcher =
+        std::make_shared<dictionary::matching::FuzzyMatching<>>(dictionary::matching::FuzzyMatching<>::FromMulipleFsas(
+            fsa_start_state_pairs, query, max_edit_distance, minimum_exact_prefix));
+
+    auto func = [fuzzy_matcher, deleted_keys_map]() {
+      dictionary::Match m = fuzzy_matcher->NextMatch();
+      while (m.IsEmpty() == false) {
+        auto dk = deleted_keys_map.find(m.GetFsa());
+        if (dk != deleted_keys_map.end()) {
+          if (dk->second.Contains(m.GetMatchedString())) {
+            m = fuzzy_matcher->NextMatch();
+            continue;
+          }
+        }
+        break;
+      }
+      return m;
+    };
+
+    // check if first match is a deleted key and reset in case
+    dictionary::Match first_match = fuzzy_matcher->FirstMatch();
+    if (fuzzy_matcher->FirstMatch().IsEmpty() == false) {
+      auto dk = deleted_keys_map.find(first_match.GetFsa());
+      if (dk != deleted_keys_map.end()) {
+        if (dk->second.Contains(first_match.GetMatchedString())) {
+          first_match = dictionary::Match();
+        }
+      }
+    }
+
+    return dictionary::MatchIterator::MakeIteratorPair(func, first_match);
   }
 
  protected:
