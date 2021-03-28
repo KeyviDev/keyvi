@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import gc
 
+
 def test_open_index():
     test_dir = os.path.join(tempfile.gettempdir(), "index_open_index")
     try:
@@ -23,7 +24,8 @@ def test_open_index():
         del index
     finally:
         shutil.rmtree(test_dir, ignore_errors=True)
-    
+
+
 def test_some_indexing():
     test_dir = os.path.join(tempfile.gettempdir(), "index_some_indexing")
     iterations = 10000
@@ -49,6 +51,7 @@ def test_some_indexing():
     finally:
         shutil.rmtree(test_dir, ignore_errors=True)
 
+
 def test_bulk_add():
     test_dir = os.path.join(tempfile.gettempdir(), "index_bulk_add")
     iterations = 10
@@ -69,6 +72,44 @@ def test_bulk_add():
 
         for i in range(0, 50):
             assert "key-{}".format(random.randrange(0, chunk_size * iterations)) in index
+        del index
+    finally:
+        shutil.rmtree(test_dir, ignore_errors=True)
+
+
+def test_get_fuzzy():
+    test_dir = os.path.join(tempfile.gettempdir(), "index_test_fuzzy")
+    try:
+        if not os.path.exists(test_dir):
+            os.mkdir(test_dir)
+        index = Index(os.path.join(test_dir, "index"))
+        index.Set("apple", "{}")
+        index.Set("apples", "{}")
+        index.Set("banana", "{}")
+        index.Set("orange", "{}")
+        index.Set("avocado", "{}")
+        index.Set("peach", "{}")
+        index.Flush()
+        matches = list(index.GetFuzzy("appe", 1, 2))
+        assert len(matches) == 1
+        assert  u'apple' == matches[0].GetMatchedString()
+
+        matches = list(index.GetFuzzy("appes", 2, 2))
+        assert len(matches) == 2
+        assert  u'apple' == matches[0].GetMatchedString()
+        assert  u'apples' == matches[1].GetMatchedString()
+        matches = list(index.GetFuzzy("apples", 1, 2))
+        assert len(matches) == 2
+        assert  u'apple' == matches[0].GetMatchedString()
+        assert  u'apples' == matches[1].GetMatchedString()
+        matches = list(index.GetFuzzy("atocao", 2, 1))
+        assert len(matches) == 1
+        assert  u'avocado' == matches[0].GetMatchedString()
+        index.Delete("avocado")
+        index.Flush()
+        matches = list(index.GetFuzzy("atocao", 2, 1))
+        assert len(matches) == 0
+
         del index
     finally:
         shutil.rmtree(test_dir, ignore_errors=True)
