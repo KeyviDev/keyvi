@@ -28,6 +28,7 @@
 
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -37,6 +38,9 @@
 #include "keyvi/dictionary/match_iterator.h"
 #include "keyvi/dictionary/matching/fuzzy_matching.h"
 #include "keyvi/index/internal/read_only_segment.h"
+
+// #define ENABLE_TRACING
+#include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
 namespace index {
@@ -97,12 +101,15 @@ class BaseIndexReader {
    * @param query a query to match against
    * @param max_edit_distance the max edit distance allowed for a single match
    */
-  dictionary::MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, size_t max_edit_distance,
-                                                        const size_t minimum_exact_prefix = 2) const {
+  dictionary::MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const size_t max_edit_distance,
+                                                        const size_t minimum_exact_prefix = 2) {
+    TRACE("matching fuzzy: %s max edit distance %ld minimum prefix %ld", query.c_str(), max_edit_distance,
+          minimum_exact_prefix);
     const_segments_t segments = payload_.Segments();
 
-    // todo empty segments?
-    // todo single segment optimization shortcut
+    if (segments->size() == 0) {
+      return dictionary::MatchIterator::EmptyIteratorPair();
+    }
 
     std::vector<dictionary::fsa::automata_t> fsas;
     for (auto it = segments->cbegin(); it != segments->cend(); it++) {
@@ -112,33 +119,91 @@ class BaseIndexReader {
     std::vector<std::pair<dictionary::fsa::automata_t, uint64_t>> fsa_start_state_pairs =
         dictionary::matching::FuzzyMatching<>::FilterWithExactPrefix(fsas, query, minimum_exact_prefix);
 
-    // collect deleted keys
+    if (fsa_start_state_pairs.size() == 0) {
+      return dictionary::MatchIterator::EmptyIteratorPair();
+    }
+
+    if (fsa_start_state_pairs.size() == 1) {
+      auto fuzzy_matcher = std::make_shared<dictionary::matching::FuzzyMatching<>>(
+          dictionary::matching::FuzzyMatching<>::FromSingleFsa<>(fsa_start_state_pairs[0].first, query,
+                                                                 max_edit_distance, minimum_exact_prefix));
+
+      for (auto it = segments->crbegin(); it != segments->crend(); it++) {
+        if ((*it)->GetDictionary()->GetFsa() == fsa_start_state_pairs[0].first) {
+          typename SegmentT::deleted_ptr_t deleted_keys = (*it)->DeletedKeys();
+          if ((*it)->DeletedKeysSize() > 0) {
+            auto func = [fuzzy_matcher, deleted_keys]() {
+              dictionary::Match m = fuzzy_matcher->NextMatch();
+
+              TRACE("check if key is deleted");
+              while (m.IsEmpty() == false) {
+                if (deleted_keys->count(m.GetMatchedString()) > 0) {
+                  m = fuzzy_matcher->NextMatch();
+                  continue;
+                }
+
+                break;
+              }
+              return m;
+            };
+
+            // check if first match is a deleted key and reset in case
+            dictionary::Match first_match = fuzzy_matcher->FirstMatch();
+            if (fuzzy_matcher->FirstMatch().IsEmpty() == false) {
+              if (deleted_keys->count(first_match.GetMatchedString()) > 0) {
+                first_match = dictionary::Match();
+              }
+            }
+            return dictionary::MatchIterator::MakeIteratorPair(func, first_match);
+          }
+          break;  // else: found the fsa, but segments has no deletes
+        }
+      }
+
+      auto func = [fuzzy_matcher]() { return fuzzy_matcher->NextMatch(); };
+      return dictionary::MatchIterator::MakeIteratorPair(func, fuzzy_matcher->FirstMatch());
+    }
+
+    TRACE("collect deleted keys");
     // segments and filtered fsa's must have the same order
     std::map<dictionary::fsa::automata_t, typename SegmentT::deleted_ptr_t> deleted_keys_map;
     auto segments_it = segments->cbegin();
     for (auto fsa : fsa_start_state_pairs) {
       while (fsa.first != (*segments_it)->GetDictionary()->GetFsa()) {
         ++segments_it;
-        if (segments == segments->end()) {
-          // todo: throw, this should not be possible
+        // this should never happen
+        if (segments_it == segments->end()) {
+          throw std::runtime_error("order of segments do not match expected order");
         }
       }
-      if ((*segments_it)->DeletedKeys().size() > 0) {
-        deleted_keys_map.push(fsa.first, (*segments_it)->DeletedKeys());
+      TRACE("found corresponding sement");
+      if ((*segments_it)->DeletedKeysSize() > 0) {
+        deleted_keys_map.emplace(fsa.first, (*segments_it)->DeletedKeys());
       }
       ++segments_it;
     }
 
-    auto fuzzy_matcher =
-        std::make_shared<dictionary::matching::FuzzyMatching<>>(dictionary::matching::FuzzyMatching<>::FromMulipleFsas(
-            fsa_start_state_pairs, query, max_edit_distance, minimum_exact_prefix));
+    TRACE("create the fuzzy matcher");
+
+    auto fuzzy_matcher = std::make_shared<
+        dictionary::matching::FuzzyMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::StateTraverser<>>>>(
+        dictionary::matching::FuzzyMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::StateTraverser<>>>::
+            FromMulipleFsas<dictionary::fsa::StateTraverser<>>(fsa_start_state_pairs, query, max_edit_distance,
+                                                               minimum_exact_prefix));
+
+    if (deleted_keys_map.size() == 0) {
+      auto func = [fuzzy_matcher]() { return fuzzy_matcher->NextMatch(); };
+      return dictionary::MatchIterator::MakeIteratorPair(func, fuzzy_matcher->FirstMatch());
+    }
 
     auto func = [fuzzy_matcher, deleted_keys_map]() {
       dictionary::Match m = fuzzy_matcher->NextMatch();
+
+      TRACE("check if key is deleted");
       while (m.IsEmpty() == false) {
         auto dk = deleted_keys_map.find(m.GetFsa());
         if (dk != deleted_keys_map.end()) {
-          if (dk->second.Contains(m.GetMatchedString())) {
+          if (dk->second->count(m.GetMatchedString()) > 0) {
             m = fuzzy_matcher->NextMatch();
             continue;
           }
@@ -153,7 +218,8 @@ class BaseIndexReader {
     if (fuzzy_matcher->FirstMatch().IsEmpty() == false) {
       auto dk = deleted_keys_map.find(first_match.GetFsa());
       if (dk != deleted_keys_map.end()) {
-        if (dk->second.Contains(first_match.GetMatchedString())) {
+        if (dk->second->count(first_match.GetMatchedString()) > 0) {
+          // empty the first match
           first_match = dictionary::Match();
         }
       }

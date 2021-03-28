@@ -147,6 +147,60 @@ BOOST_AUTO_TEST_CASE(indexwithdeletedkeys) {
   BOOST_CHECK(!reader.Contains("störe"));
 }
 
+void testFuzzyMatching(ReadOnlyIndex* reader, const std::string& query, const size_t max_edit_distance,
+                       const size_t minimum_exact_prefix, const std::vector<std::string>& expected) {
+  auto expected_it = expected.begin();
+  auto matcher = reader->GetFuzzy(query, max_edit_distance, minimum_exact_prefix);
+  for (auto m : matcher) {
+    BOOST_REQUIRE(expected_it != expected.end());
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  }
+  BOOST_CHECK(expected_it == expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(fuzzyMatching) {
+  testing::IndexMock index;
+
+  std::vector<std::pair<std::string, std::string>> test_data = {{"abc", "{a:1}"},   {"abbc", "{b:2}"},
+                                                                {"abbcd", "{c:3}"}, {"abcde", "{a:1}"},
+                                                                {"abdd", "{b:2}"},  {"bbdd", "{b:2}"}};
+  index.AddSegment(&test_data);
+  std::vector<std::pair<std::string, std::string>> test_data_2 = {
+      {"abbcd", "{c:6}"}, {"abcde", "{x:1}"},  {"babc", "{a:1}"},
+      {"babbc", "{b:2}"}, {"babcde", "{a:1}"}, {"babdd", "{b:2}"},
+  };
+
+  index.AddSegment(&test_data_2);
+  ReadOnlyIndex reader_1(index.GetIndexFolder(), {{"refresh_interval", "400"}});
+  testFuzzyMatching(&reader_1, "abbc", 0, 2, {"abbc"});
+  testFuzzyMatching(&reader_1, "abbc", 1, 2, {"abbc", "abbcd", "abc"});
+  testFuzzyMatching(&reader_1, "cde", 2, 3, {});
+  testFuzzyMatching(&reader_1, "babbc", 0, 0, {"babbc"});
+  testFuzzyMatching(&reader_1, "babbc", 0, 3, {"babbc"});
+  testFuzzyMatching(&reader_1, "babbc", 3, 10, {});
+  testFuzzyMatching(&reader_1, "abbc", 4, 1, {"abbc", "abbcd", "abc", "abcde", "abdd"});
+
+  index.AddDeletedKeys({"abbcd", "abcde", "babbc"}, 1);
+  index.AddDeletedKeys({"abbcd", "bbdd"}, 0);
+
+  ReadOnlyIndex reader_2(index.GetIndexFolder(), {{"refresh_interval", "400"}});
+
+  testFuzzyMatching(&reader_2, "abbc", 0, 2, {"abbc"});
+  testFuzzyMatching(&reader_2, "abbc", 1, 2, {"abbc", "abc"});
+  testFuzzyMatching(&reader_2, "abbc", 2, 2, {"abbc", "abc", "abdd"});
+
+  testFuzzyMatching(&reader_2, "bbdd", 1, 2, {});
+  testFuzzyMatching(&reader_2, "bbdd", 2, 1, {"babdd"});
+
+  testFuzzyMatching(&reader_2, "babbc", 0, 0, {});
+  testFuzzyMatching(&reader_2, "babbc", 0, 3, {});
+  testFuzzyMatching(&reader_2, "babbc", 2, 3, {"babc", "babdd"});
+
+  testFuzzyMatching(&reader_2, "cde", 2, 3, {});
+  testFuzzyMatching(&reader_2, "abbc", 4, 4, {"abbc"});
+  testFuzzyMatching(&reader_2, "abbc", 4, 1, {"abbc", "abc", "abdd"});
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace index */
