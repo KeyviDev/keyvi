@@ -102,7 +102,7 @@ class BaseIndexReader {
    * @param max_edit_distance the max edit distance allowed for a single match
    * @param minimum_exact_prefix prefix length to be matched exact
    */
-  dictionary::MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const size_t max_edit_distance,
+  dictionary::MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const int32_t max_edit_distance,
                                                         const size_t minimum_exact_prefix = 2) {
     TRACE("matching fuzzy: %s max edit distance %ld minimum prefix %ld", query.c_str(), max_edit_distance,
           minimum_exact_prefix);
