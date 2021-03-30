@@ -30,3 +30,4 @@ API Documentation
    :caption: Python API
    
    python/dictionary
+   python/index

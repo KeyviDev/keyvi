@@ -16,9 +16,13 @@ index = keyvi.index.Index("test-index")
 
 index.Set('key', '{"answer": 42, "condition": "always"}')
 index.Flush()
+# get the entry for key
 m = index.Get('key')
 print(m.GetValue())
 
+# match fuzzy(levenshtein distance) with max edit distance 1, exact prefix 2
+m = index.GetFuzzy("kei", 1, 2)
+print(m.GetMatchedString())
 ```
 
 For more information visit http://keyvi.org
