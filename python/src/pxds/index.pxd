@@ -10,8 +10,8 @@ from std_smart_ptr cimport shared_ptr as s_shared_ptr
 
 cdef extern from "keyvi/index/index.h" namespace "keyvi::index":
     cdef cppclass Index:
-        Index(libcpp_utf8_string) # wrap-ignore
-        Index(libcpp_utf8_string, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] params) # wrap-ignore
+        Index(libcpp_utf8_string) except+ # wrap-ignore
+        Index(libcpp_utf8_string, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] params) except+ # wrap-ignore
         void Set(libcpp_utf8_string, libcpp_utf8_string) except+
         void MSet(s_shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string, libcpp_utf8_string]]]) # wrap-ignore
         _MatchIteratorPair GetFuzzy(libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except +
