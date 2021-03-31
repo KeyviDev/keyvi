@@ -118,7 +118,7 @@ class TieredMergePolicy final : public MergePolicy {
     size_t total_deletes = 0;
     size_t biggest_segment_key_size = 0;
 
-    for (const segment_t segment : candidate) {
+    for (const segment_t& segment : candidate) {
       const size_t segment_key_size = segment->GetDictionaryProperties()->GetNumberOfKeys();
       total_size += segment_key_size;
       // floored sizes ensures a minimum size per segment to take fix costs of merging into account

@@ -489,7 +489,7 @@ class IndexWriterWorker final {
       writer.StartObject();
       writer.Key("files");
       writer.StartArray();
-      for (const auto s : *(payload->segments_)) {
+      for (const auto& s : *(payload->segments_)) {
         TRACE("put %s", s->GetDictionaryFilename().c_str());
         writer.String(s->GetDictionaryFilename());
       }

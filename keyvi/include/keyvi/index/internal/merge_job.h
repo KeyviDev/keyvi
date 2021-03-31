@@ -51,6 +51,10 @@ class MergeJob final {
     MergeJobPayload(MergeJobPayload&&) = default;
     MergeJobPayload& operator=(MergeJobPayload&&) = default;
 
+    MergeJobPayload() = delete;
+    MergeJobPayload& operator=(MergeJobPayload const&) = delete;
+    MergeJobPayload(const MergeJobPayload& that) = delete;
+
     std::vector<segment_t> segments_;
     boost::filesystem::path output_filename_;
     const IndexSettings& settings_;
