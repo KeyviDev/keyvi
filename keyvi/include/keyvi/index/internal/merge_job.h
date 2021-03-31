@@ -74,8 +74,9 @@ class MergeJob final {
     }
   }
 
-  MergeJob(MergeJob&&) = default;
-  MergeJob& operator=(MergeJob&&) = default;
+  MergeJob() = delete;
+  MergeJob& operator=(MergeJob const&) = delete;
+  MergeJob(const MergeJob& that) = delete;
 
   void Run(bool force_external_merge = false) {
     uint64_t job_size = 0;
