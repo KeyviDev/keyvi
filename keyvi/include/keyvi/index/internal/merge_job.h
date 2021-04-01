@@ -48,8 +48,9 @@ class MergeJob final {
                              const IndexSettings& settings)
         : segments_(segments), output_filename_(output_filename), settings_(settings), process_finished_(false) {}
 
-    MergeJobPayload(MergeJobPayload&&) = default;
-    MergeJobPayload& operator=(MergeJobPayload&&) = default;
+    MergeJobPayload() = delete;
+    MergeJobPayload& operator=(MergeJobPayload const&) = delete;
+    MergeJobPayload(const MergeJobPayload& that) = delete;
 
     std::vector<segment_t> segments_;
     boost::filesystem::path output_filename_;
@@ -73,13 +74,14 @@ class MergeJob final {
     }
   }
 
-  MergeJob(MergeJob&&) = default;
-  MergeJob& operator=(MergeJob&&) = default;
+  MergeJob() = delete;
+  MergeJob& operator=(MergeJob const&) = delete;
+  MergeJob(const MergeJob& that) = delete;
 
   void Run(bool force_external_merge = false) {
     uint64_t job_size = 0;
 
-    for (const segment_t segment : payload_.segments_) {
+    for (const segment_t& segment : payload_.segments_) {
       job_size += segment->GetDictionaryProperties()->GetNumberOfKeys();
     }
 
@@ -139,7 +141,7 @@ class MergeJob final {
         // todo: make this configurable
         params[MEMORY_LIMIT_KEY] = "5242880";
         keyvi::dictionary::JsonDictionaryMerger jsonDictionaryMerger(params);
-        for (const segment_t s : payload_.segments_) {
+        for (const segment_t& s : payload_.segments_) {
           jsonDictionaryMerger.Add(s->GetDictionaryPath().string());
         }
 
