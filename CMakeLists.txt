@@ -209,6 +209,7 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/sphinx-docs)
         set(DOXYGEN_GENERATE_LATEX NO)
         set(DOXYGEN_GENERATE_HTML NO)
         set(DOXYGEN_GENERATE_XML YES)
+        set(DOXYGEN_INLINE_INHERITED_MEMB YES)
 
         # for scanning the python extension
         set(SPHINX_EXTENSIONS sphinx.ext.autodoc)

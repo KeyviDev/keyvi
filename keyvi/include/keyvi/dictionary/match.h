@@ -38,6 +38,12 @@
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
+namespace index {
+namespace internal {
+template <class PayloadT, class SegmentT>
+class BaseIndexReader;
+}
+}  // namespace index
 namespace dictionary {
 
 #ifdef Py_PYTHON_H
@@ -175,6 +181,12 @@ struct Match {
   fsa::automata_t fsa_ = 0;
   uint64_t state_ = 0;
   attributes_t attributes_ = 0;
+
+  // friend for accessing the fsa
+  template <class PayloadT, class SegmentT>
+  friend class index::internal::BaseIndexReader;
+
+  fsa::automata_t& GetFsa() { return fsa_; }
 };
 
 } /* namespace dictionary */

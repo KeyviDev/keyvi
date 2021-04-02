@@ -91,20 +91,47 @@ class Index final : public internal::BaseIndexReader<internal::IndexWriterWorker
     }
   }
 
+  /**
+   * Set key to given value
+   *
+   * @param key the key
+   * @param value the value
+   */
   void Set(const std::string& key, const std::string& value) { Payload().Add(key, value); }
 
+  /**
+   * Set multiple keys and to multiple values
+   *
+   * @param key_values a set of keys and values, the container must implement an iterator where each entry
+   * has uses `.first` for the key and `.second` for the value, e.g. `std::map`
+   */
   template <typename ContainerType>
   void MSet(const std::shared_ptr<ContainerType>& key_values) {
     Payload().Add(key_values);
   }
 
+  /**
+   * Delete a key
+   *
+   * @param key the key
+   */
   void Delete(const std::string& key) { Payload().Delete(key); }
 
+  /**
+   * Flush the index, persists all pending writes and makes the accessible.
+   *
+   * @param async if true only trigger a flush, if false(default) wait until flush has been executed.
+   */
   void Flush(const bool async = false) {
     TRACE("Flush (manually)");
     Payload().Flush(async);
   }
 
+  /**
+   * Force merge all segment to the number of segments given (default 1)
+   *
+   * @param max_segments maximum number of segments the index should have afterwards
+   */
   void ForceMerge(const size_t max_segments = 1) {
     if (max_segments < 1) {
       throw std::invalid_argument("max_segments must be > 1");

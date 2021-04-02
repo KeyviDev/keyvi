@@ -44,6 +44,9 @@ class SegmentFriend;
 }
 class Segment final : public ReadOnlySegment {
  public:
+  using deleted_t = ReadOnlySegment::deleted_t;
+  using deleted_ptr_t = ReadOnlySegment::deleted_ptr_t;
+
   explicit Segment(const boost::filesystem::path& path, bool no_deletes = false)
       : ReadOnlySegment(path, false, !no_deletes),
         deleted_keys_for_write_(),
@@ -101,7 +104,7 @@ class Segment final : public ReadOnlySegment {
     return deleted_keys_for_write_.size() + deleted_keys_during_merge_for_write_.size();
   }
 
-  const std::shared_ptr<std::unordered_set<std::string>> DeletedKeys() {
+  const deleted_ptr_t DeletedKeys() {
     LazyLoadDeletedKeys();
     return ReadOnlySegment::DeletedKeys();
   }
@@ -181,8 +184,8 @@ class Segment final : public ReadOnlySegment {
   }
 
  private:
-  std::unordered_set<std::string> deleted_keys_for_write_;
-  std::unordered_set<std::string> deleted_keys_during_merge_for_write_;
+  deleted_t deleted_keys_for_write_;
+  deleted_t deleted_keys_during_merge_for_write_;
   std::mutex lazy_load_mutex_;
   bool dictionary_loaded;
   bool deletes_loaded;
@@ -237,7 +240,7 @@ class Segment final : public ReadOnlySegment {
     }
   }
 
-  void SaveDeletedKeys(const std::string& filename, const std::unordered_set<std::string>& deleted_keys) {
+  void SaveDeletedKeys(const std::string& filename, const deleted_t& deleted_keys) {
     // write to swap file, than rename it
     {
       std::ofstream out_stream(deleted_keys_swap_filename_.string(), std::ios::binary);

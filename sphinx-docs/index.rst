@@ -23,9 +23,11 @@ API Documentation
    :caption: C++ API
 
    cpp/dictionary_compiler
+   cpp/index
 
 .. toctree::
    :maxdepth: 2
    :caption: Python API
    
    python/dictionary
+   python/index

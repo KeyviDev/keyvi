@@ -51,35 +51,19 @@ namespace matching {
 template <class codepointInnterTraverserType = fsa::WeightedStateTraverser>
 class FuzzyMatching final {
  public:
-  FuzzyMatching(std::unique_ptr<fsa::CodePointStateTraverser<codepointInnterTraverserType>>&& traverser,
-                std::unique_ptr<stringdistance::Levenshtein>&& metric, Match&& first_match,
-                const size_t minimum_exact_prefix, int32_t max_edit_distance)
-      : metric_ptr_(std::move(metric)),
-        traverser_ptr_(std::move(traverser)),
-        minimum_exact_prefix_(minimum_exact_prefix),
-        max_edit_distance_(max_edit_distance),
-        first_match_(std::move(first_match)) {}
-
+  /**
+   * Create a fuzzy matcher from a single Fsa
+   *
+   * @param fsa the fsa
+   * @param query the query
+   * @param max_edit_distance the maximum allowed edit distance
+   * @param minimum_exact_prefix the minimum exact prefix to match before matching approximate
+   */
   template <class innerTraverserType = fsa::WeightedStateTraverser>
   static FuzzyMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query,
                                      const int32_t max_edit_distance, const size_t minimum_exact_prefix = 2) {
-    std::unique_ptr<stringdistance::Levenshtein> metric;
-    std::unique_ptr<fsa::CodePointStateTraverser<innerTraverserType>> traverser;
-    Match first_match;
-
-    std::vector<uint32_t> codepoints;
-    utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
-
-    size_t query_char_length = codepoints.size();
-    if (query_char_length < minimum_exact_prefix) {
-      TRACE("query lengh < minimum exact prefix, returning empty iterator");
-      return FuzzyMatching<innerTraverserType>(std::move(traverser), std::move(metric), std::move(first_match),
-                                               minimum_exact_prefix, max_edit_distance);
-    }
-    metric.reset(new stringdistance::Levenshtein(codepoints, 20, max_edit_distance));
-
-    // match exact prefix
     uint64_t state = fsa->GetStartState();
+
     size_t depth = 0;
     size_t utf8_depth = 0;
     while (state != 0 && depth < minimum_exact_prefix) {
@@ -90,42 +74,131 @@ class FuzzyMatching final {
           break;
         }
       }
-      metric->Put(codepoints[depth], depth);
       ++depth;
     }
 
-    if (state) {
-      if (depth == query_char_length && fsa->IsFinalState(state)) {
-        first_match = Match(0, query_char_length, query, 0, fsa, fsa->GetStateValue(state));
-      }
-      traverser.reset(new fsa::CodePointStateTraverser<innerTraverserType>(fsa, state));
+    if (depth != minimum_exact_prefix) {
+      return FuzzyMatching<innerTraverserType>();
     }
 
-    TRACE("create iterator");
-    return FuzzyMatching<innerTraverserType>(std::move(traverser), std::move(metric), std::move(first_match),
-                                             minimum_exact_prefix, max_edit_distance);
+    return FromSingleFsa<innerTraverserType>(fsa, state, query, max_edit_distance, minimum_exact_prefix);
   }
 
+  /**
+   * Create a fuzzy matcher from a single Fsa
+   *
+   * @param fsa the fsa
+   * @param start_state the state to start from
+   * @param query the query
+   * @param max_edit_distance the maximum allowed edit distance
+   * @param exact_prefix the exact prefix that already matched
+   */
   template <class innerTraverserType = fsa::WeightedStateTraverser>
-  static FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>> FromMulipleFsas(
-      const std::vector<fsa::automata_t>& fsas, const std::string& query, const int32_t max_edit_distance,
-      const size_t minimum_exact_prefix = 2) {
+  static FuzzyMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state, const std::string& query,
+                                     const int32_t max_edit_distance, const size_t exact_prefix) {
+    if (start_state == 0) {
+      return FuzzyMatching<innerTraverserType>();
+    }
+
     std::unique_ptr<stringdistance::Levenshtein> metric;
-    std::unique_ptr<fsa::CodePointStateTraverser<fsa::ZipStateTraverser<innerTraverserType>>> traverser;
+    std::unique_ptr<fsa::CodePointStateTraverser<innerTraverserType>> traverser;
     Match first_match;
 
     std::vector<uint32_t> codepoints;
     utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
 
-    size_t query_char_length = codepoints.size();
-    if (query_char_length < minimum_exact_prefix) {
+    if (start_state == 0) {
       TRACE("query lengh < minimum exact prefix, returning empty iterator");
-      return FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>>(
-          std::move(traverser), std::move(metric), std::move(first_match), minimum_exact_prefix, max_edit_distance);
+      return FuzzyMatching<innerTraverserType>();
     }
 
+    // initialize the distance metric with the exact prefix
     metric.reset(new stringdistance::Levenshtein(codepoints, 20, max_edit_distance));
+    for (size_t i = 0; i < exact_prefix; ++i) {
+      metric->Put(codepoints[i], i);
+    }
 
+    traverser.reset(new fsa::CodePointStateTraverser<innerTraverserType>(fsa, start_state));
+
+    if (fsa->IsFinalState(start_state)) {
+      first_match = Match(0, codepoints.size(), query, 0, fsa, fsa->GetStateValue(start_state));
+    }
+
+    TRACE("create iterator");
+    return FuzzyMatching<innerTraverserType>(std::move(traverser), std::move(metric), std::move(first_match),
+                                             max_edit_distance, exact_prefix);
+  }
+
+  /**
+   * Create a fuzzy matcher from multiple Fsas
+   *
+   * @param fsas a vector of fsas
+   * @param query the query
+   * @param max_edit_distance the maximum allowed edit distance
+   * @param minimum_exact_prefix the minimum exact prefix to match before matching approximate
+   */
+  template <class innerTraverserType = fsa::WeightedStateTraverser>
+  static FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>> FromMulipleFsas(
+      const std::vector<fsa::automata_t>& fsas, const std::string& query, const int32_t max_edit_distance,
+      const size_t minimum_exact_prefix = 2) {
+    std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs =
+        FilterWithExactPrefix(fsas, query, minimum_exact_prefix);
+
+    return FromMulipleFsas<innerTraverserType>(fsa_start_state_pairs, query, max_edit_distance, minimum_exact_prefix);
+  }
+
+  /**
+   * Create a fuzzy matcher with already matched exact prefix.
+   *
+   * @param fsa_start_state_pairs pairs of fsa and current state
+   * @param query the query
+   * @param max_edit_distance the maximum allowed edit distance
+   * @param exact_prefix the exact prefix that already matched
+   */
+  template <class innerTraverserType = fsa::WeightedStateTraverser>
+  static FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>> FromMulipleFsas(
+      const std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs, const std::string& query,
+      const int32_t max_edit_distance, const size_t exact_prefix) {
+    // if the list of fsa's is empty return an empty matcher
+    if (fsa_start_state_pairs.size() == 0) {
+      return FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>>();
+    }
+
+    std::unique_ptr<stringdistance::Levenshtein> metric;
+    std::unique_ptr<fsa::CodePointStateTraverser<fsa::ZipStateTraverser<innerTraverserType>>> traverser;
+    Match first_match;
+
+    // decode the utf8 query into single codepoints
+    std::vector<uint32_t> codepoints;
+    utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
+
+    // initialize the distance metric with the exact prefix
+    metric.reset(new stringdistance::Levenshtein(codepoints, 20, max_edit_distance));
+    for (size_t i = 0; i < exact_prefix; ++i) {
+      metric->Put(codepoints[i], i);
+    }
+
+    // check for an exact match given the exact prefix
+    for (auto fsa_state : fsa_start_state_pairs) {
+      if (fsa_state.first->IsFinalState(fsa_state.second)) {
+        first_match =
+            Match(0, codepoints.size(), query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
+        break;
+      }
+    }
+
+    TRACE("create zip traverser with %ul inner traversers", fsa_start_state_pairs.size());
+    fsa::ZipStateTraverser<innerTraverserType> zip_state_traverser(fsa_start_state_pairs, false);
+    traverser.reset(
+        new fsa::CodePointStateTraverser<fsa::ZipStateTraverser<innerTraverserType>>(std::move(zip_state_traverser)));
+
+    TRACE("create iterator");
+    return FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>>(
+        std::move(traverser), std::move(metric), std::move(first_match), max_edit_distance, exact_prefix);
+  }
+
+  static inline std::vector<std::pair<fsa::automata_t, uint64_t>> FilterWithExactPrefix(
+      const std::vector<fsa::automata_t>& fsas, const std::string& query, const size_t minimum_exact_prefix = 2) {
     std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs;
 
     for (const fsa::automata_t& fsa : fsas) {
@@ -140,32 +213,14 @@ class FuzzyMatching final {
             break;
           }
         }
-        TRACE("metric->put %lu  depth: %lu", codepoints[depth], depth);
-        metric->Put(codepoints[depth], depth);
         ++depth;
       }
 
-      if (state) {
-        if (depth == query_char_length && fsa->IsFinalState(state) && first_match.IsEmpty()) {
-          TRACE("prefix matched exact");
-          first_match = Match(0, query_char_length, query, 0, fsa, fsa->GetStateValue(state));
-        }
-
+      if (state && depth == minimum_exact_prefix) {
         fsa_start_state_pairs.emplace_back(fsa, state);
       }
     }
-
-    if (fsa_start_state_pairs.size() > 0) {
-      TRACE("create zip traverser with %ul inner traversers", fsa_start_state_pairs.size());
-
-      fsa::ZipStateTraverser<innerTraverserType> zip_state_traverser(fsa_start_state_pairs, false);
-      traverser.reset(
-          new fsa::CodePointStateTraverser<fsa::ZipStateTraverser<innerTraverserType>>(std::move(zip_state_traverser)));
-    }
-
-    TRACE("create iterator");
-    return FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>>(
-        std::move(traverser), std::move(metric), std::move(first_match), minimum_exact_prefix, max_edit_distance);
+    return fsa_start_state_pairs;
   }
 
   Match FirstMatch() const { return first_match_; }
@@ -196,17 +251,28 @@ class FuzzyMatching final {
   }
 
  private:
+  FuzzyMatching(std::unique_ptr<fsa::CodePointStateTraverser<codepointInnterTraverserType>>&& traverser,
+                std::unique_ptr<stringdistance::Levenshtein>&& metric, Match&& first_match,
+                const int32_t max_edit_distance, const size_t minimum_exact_prefix)
+      : metric_ptr_(std::move(metric)),
+        traverser_ptr_(std::move(traverser)),
+        max_edit_distance_(max_edit_distance),
+        exact_prefix_(minimum_exact_prefix),
+        first_match_(std::move(first_match)) {}
+
   size_t candidate_length() const {
     assert(traverser_ptr_);
-    return minimum_exact_prefix_ + traverser_ptr_->GetDepth();
+    return exact_prefix_ + traverser_ptr_->GetDepth();
   }
+
+  FuzzyMatching() : max_edit_distance_(0), exact_prefix_(0) {}
 
  private:
   std::unique_ptr<stringdistance::Levenshtein> metric_ptr_;
   std::unique_ptr<fsa::CodePointStateTraverser<codepointInnterTraverserType>> traverser_ptr_;
-  const size_t minimum_exact_prefix_;
   const int32_t max_edit_distance_;
-  Match first_match_;
+  const size_t exact_prefix_;
+  const Match first_match_;
 };
 
 } /* namespace matching */
