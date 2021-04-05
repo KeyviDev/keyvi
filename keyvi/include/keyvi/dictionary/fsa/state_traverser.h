@@ -41,6 +41,7 @@ template <class TransitionT = traversal::Transition>
 class StateTraverser final {
  public:
   using label_t = unsigned char;
+  using transition_t = TransitionT;
 
   explicit StateTraverser(automata_t f)
       : fsa_(f), current_state_(f->GetStartState()), current_weight_(0), current_label_(0), at_end_(false), stack_() {
@@ -150,6 +151,12 @@ class StateTraverser final {
   label_t GetStateLabel() const { return current_label_; }
 
   traversal::TraversalPayload<TransitionT> &GetTraversalPayload() { return stack_.traversal_stack_payload; }
+
+  // todo: maybe make it private/friend?
+  traversal::TraversalState<transition_t> &GetStates() { return stack_.GetStates(); }
+
+  // todo: only for comparable traverser, make private/friend?
+  const traversal::TraversalStack<TransitionT> &GetStack() const { return stack_; }
 
   operator bool() const { return !at_end_; }
 

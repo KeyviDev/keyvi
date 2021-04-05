@@ -71,9 +71,7 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
   BOOST_CHECK(expected_it == expected_sorted.end());
 
   // test with multiple dictionaries
-  // note: weighted traversal with multiple dictionaries is not implemented yet
-
-  // split test matcher_zipped_no_weights into 3 groups with some duplication
+  // split test data into 3 groups with some duplication
   std::vector<std::pair<std::string, uint32_t>> test_data_1;
   std::vector<std::pair<std::string, uint32_t>> test_data_2;
   std::vector<std::pair<std::string, uint32_t>> test_data_3;
@@ -93,6 +91,18 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
   testing::TempDictionary d2(&test_data_2);
   testing::TempDictionary d3(&test_data_3);
   std::vector<fsa::automata_t> fsas = {d1.GetFsa(), d2.GetFsa(), d3.GetFsa()};
+
+  auto matcher_zipped = std::make_shared<matching::FuzzyMatching<fsa::ZipStateTraverser<fsa::WeightedStateTraverser>>>(
+      matching::FuzzyMatching<fsa::ZipStateTraverser<fsa::WeightedStateTraverser>>::FromMulipleFsas<
+          fsa::WeightedStateTraverser>(fsas, query, max_edit_distance));
+  MatchIterator::MatchIteratorPair matcher_zipped_it = MatchIterator::MakeIteratorPair(
+      [matcher_zipped]() { return matcher_zipped->NextMatch(); }, matcher_zipped->FirstMatch());
+  expected_it = expected.begin();
+  for (auto m : matcher_zipped_it) {
+    BOOST_CHECK(expected_it != expected.end());
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  }
+  BOOST_CHECK(expected_it == expected.end());
 
   auto matcher_zipped_no_weights =
       std::make_shared<matching::FuzzyMatching<fsa::ZipStateTraverser<fsa::StateTraverser<>>>>(

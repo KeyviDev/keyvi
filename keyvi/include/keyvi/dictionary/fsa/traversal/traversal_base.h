@@ -114,6 +114,10 @@ struct TraversalStack {
 
   TraversalState<TransitionT>& GetStates() { return traversal_states[traversal_stack_payload.current_depth]; }
 
+  const TraversalState<TransitionT>& GetStates() const {
+    return traversal_states[traversal_stack_payload.current_depth];
+  }
+
   size_t GetDepth() const { return traversal_stack_payload.current_depth; }
 
   size_t& operator++() {
