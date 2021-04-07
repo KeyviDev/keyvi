@@ -168,7 +168,7 @@ target_include_directories(keyvimerger PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUD
 install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
 
 # keyvi_c
-add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
+add_library(keyvi_c keyvi/bin/keyvi_c/c_api.cpp)
 target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
 target_compile_options(keyvi_c PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})

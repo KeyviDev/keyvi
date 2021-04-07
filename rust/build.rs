@@ -36,13 +36,15 @@ fn main() {
     let dst = Config::new("keyvi_core/").build_target("keyvi_c").build();
 
     // Tell cargo to tell rustc to link keyvi
-    println!("cargo:rustc-link-lib=dylib=keyvi_c");
+    println!("cargo:rustc-link-lib=static=keyvi_c");
     println!(
         "cargo:rustc-link-search=native={}",
         dst.join("build").display()
     );
 
-    println!("Starting to generate bindings..");
+    println!("cargo:rustc-link-lib=dylib=stdc++");
+    println!("cargo:rustc-link-lib=dylib=z");
+    println!("cargo:rustc-link-lib=dylib=snappy");
 
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate bindings for.
