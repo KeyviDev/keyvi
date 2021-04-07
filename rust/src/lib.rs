@@ -23,7 +23,6 @@
  *  Author: Narek Gharibyan <narekgharibyan@gmail.com>
  *          Subu <subu@cliqz.com>
  */
-#![feature(static_nobundle)]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]

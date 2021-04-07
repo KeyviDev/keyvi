@@ -36,12 +36,12 @@ fn main() {
     let keyvi_c_path = dst.join("build").display().to_string();
 
     // link dependencies
-    println!("cargo:rustc-link-lib=static-nobundle=keyvi_c");
-    println!("cargo:rustc-link-lib=static-nobundle=z");
-    println!("cargo:rustc-link-lib=static-nobundle=snappy");
+    println!("cargo:rustc-link-lib=static=keyvi_c");
+    println!("cargo:rustc-link-lib=dylib=z");
+    println!("cargo:rustc-link-lib=dylib=snappy");
     println!("cargo:rustc-link-lib=dylib=stdc++");
 
-    // find lib
+    // find libs
     println!("cargo:rustc-link-search=native={}", keyvi_c_path);
 
     // trigger rebuild
