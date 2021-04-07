@@ -23,28 +23,29 @@
  *  Author: Narek Gharibyan <narekgharibyan@gmail.com>
  *          Subu <subu@cliqz.com>
  */
-
 extern crate bindgen;
 extern crate cmake;
 
 use std::env;
 use std::path::PathBuf;
 
-use cmake::Config;
-
 fn main() {
-    let dst = Config::new("keyvi_core/").build_target("keyvi_c").build();
+    let dst = cmake::Config::new("keyvi_core/")
+        .build_target("keyvi_c")
+        .build();
+    let keyvi_c_path = dst.join("build").display().to_string();
 
-    // Tell cargo to tell rustc to link keyvi
-    println!("cargo:rustc-link-lib=static=keyvi_c");
-    println!(
-        "cargo:rustc-link-search=native={}",
-        dst.join("build").display()
-    );
-
+    // link dependencies
+    println!("cargo:rustc-link-lib=static-nobundle=keyvi_c");
+    println!("cargo:rustc-link-lib=static-nobundle=z");
+    println!("cargo:rustc-link-lib=static-nobundle=snappy");
     println!("cargo:rustc-link-lib=dylib=stdc++");
-    println!("cargo:rustc-link-lib=dylib=z");
-    println!("cargo:rustc-link-lib=dylib=snappy");
+
+    // find lib
+    println!("cargo:rustc-link-search=native={}", keyvi_c_path);
+
+    // trigger rebuild
+    println!("cargo:rerun-if-changed=keyvi_core/CMakeLists.txt");
 
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate bindings for.
