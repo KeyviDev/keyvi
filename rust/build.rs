@@ -35,17 +35,31 @@ fn main() {
         .build();
     let keyvi_c_path = dst.join("build").display().to_string();
 
+    // trigger rebuild
+    println!("cargo:rerun-if-changed=keyvi_core/");
+    println!("cargo:rerun-if-env-changed=STATIC_ZLIB_PATH");
+    println!("cargo:rerun-if-env-changed=STATIC_SNAPPY_PATH");
+
     // link dependencies
     println!("cargo:rustc-link-lib=static=keyvi_c");
-    println!("cargo:rustc-link-lib=dylib=z");
-    println!("cargo:rustc-link-lib=dylib=snappy");
-    println!("cargo:rustc-link-lib=dylib=stdc++");
-
-    // find libs
     println!("cargo:rustc-link-search=native={}", keyvi_c_path);
 
-    // trigger rebuild
-    println!("cargo:rerun-if-changed=keyvi_core/CMakeLists.txt");
+    // using nightly-only feature static-bundle would make this unnecessary
+    if let Ok(zlib_path) = env::var("STATIC_ZLIB_PATH") {
+        println!("cargo:rustc-link-lib=static=z");
+        println!("cargo:rustc-link-search=native={}", zlib_path);
+    } else {
+        println!("cargo:rustc-link-lib=dylib=z");
+    }
+
+    if let Ok(snappy_path) = env::var("STATIC_SNAPPY_PATH") {
+        println!("cargo:rustc-link-lib=static=snappy");
+        println!("cargo:rustc-link-search=native={}", snappy_path);
+    } else {
+        println!("cargo:rustc-link-lib=dylib=snappy");
+    }
+
+    println!("cargo:rustc-link-lib=dylib=stdc++");
 
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate bindings for.
