@@ -33,19 +33,21 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
+// disable clang formatting, because it does not handle prama properly 
+// clang-format off
 #ifdef _MSC_VER
 __pragma(pack(push, 1))
 #endif
 
-    /**
-     * Represents a state in the state hashtable. Since we'll need to save millions of these,
-     * we aim to make each object very small.
-     *
-     *  @tparam OffsetTypeT
-     *  @tparam HashCodeTypeT
-     */
-    template <class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
-    struct PackedState final {
+/**
+ * Represents a state in the state hashtable. Since we'll need to save millions of these,
+ * we aim to make each object very small.
+ *
+ *  @tparam OffsetTypeT
+ *  @tparam HashCodeTypeT
+ */
+template <class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
+struct PackedState final {
  public:
   PackedState() : PackedState(0, 0, 0) {}
   PackedState(OffsetTypeT offset, HashCodeTypeT hashcode, int num_outgoing)
@@ -82,6 +84,8 @@ __pragma(pack(push, 1))
 };
 __pragma(pack(pop))
 #endif
+
+// clang-format on
 
 } /* namespace internal */
 } /* namespace fsa */
