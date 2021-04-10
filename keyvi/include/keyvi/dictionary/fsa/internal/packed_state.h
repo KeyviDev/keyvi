@@ -33,7 +33,7 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-// disable clang formatting, because it does not handle prama properly 
+// disable clang formatting, because it does not handle prama properly
 // clang-format off
 #ifdef _MSC_VER
 __pragma(pack(push, 1))
