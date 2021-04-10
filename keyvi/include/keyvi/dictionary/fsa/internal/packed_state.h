@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef PACKED_STATE_H_
-#define PACKED_STATE_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_PACKED_STATE_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_PACKED_STATE_H_
 
 #include <algorithm>
 #include <string>
@@ -105,4 +105,4 @@ final {
   } /* namespace dictionary */
   } /* namespace keyvi */
 
-#endif /* PACKED_STATE_H_ */
+#endif // KEYVI_DICTIONARY_FSA_INTERNAL_PACKED_STATE_H_
