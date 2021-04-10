@@ -17,7 +17,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake_mo
 # configure C++11
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)
-	
+
 # keyvi specific compile options, definitions and flags
 set (_KEVYI_COMPILE_OPTIONS "-Wall")
 set (_KEYVI_COMPILE_DEFINITIONS "RAPIDJSON_HAS_STDSTRING")
