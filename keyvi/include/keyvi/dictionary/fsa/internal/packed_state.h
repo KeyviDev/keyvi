@@ -96,8 +96,10 @@ final {
 
   }
   // this is __very__ size critical, so disable any padding
-  __attribute__ ((packed));
-
+#ifdef __GNUC__
+  __attribute__ ((packed))
+#endif
+      ;
   } /* namespace internal */
   } /* namespace fsa */
   } /* namespace dictionary */

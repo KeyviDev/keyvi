@@ -288,7 +288,7 @@ class MemoryMapManager final {
     }
 
     new_mapping.mapping_ =
-        new boost::interprocess::file_mapping(filename.native().c_str(), boost::interprocess::read_write);
+        new boost::interprocess::file_mapping(filename.string().c_str(), boost::interprocess::read_write);
 
     new_mapping.region_ =
         new boost::interprocess::mapped_region(*new_mapping.mapping_, boost::interprocess::read_write);

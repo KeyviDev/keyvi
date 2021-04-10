@@ -25,8 +25,6 @@
 #ifndef KEYVI_DICTIONARY_FSA_AUTOMATA_H_
 #define KEYVI_DICTIONARY_FSA_AUTOMATA_H_
 
-#include <sys/mman.h>
-
 #include <memory>
 #include <string>
 
