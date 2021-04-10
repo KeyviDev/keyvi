@@ -33,15 +33,20 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
-/**
- * Represents a state in the state hashtable. Since we'll need to save millions of these,
- * we aim to make each object very small.
- *
- *  @tparam OffsetTypeT
- *  @tparam HashCodeTypeT
- */
-template <class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
-struct PackedState final {
+#ifdef _MSC_VER
+__pragma(pack(push, 1))
+#endif
+    struct name __pragma(pack(pop))
+
+    /**
+     * Represents a state in the state hashtable. Since we'll need to save millions of these,
+     * we aim to make each object very small.
+     *
+     *  @tparam OffsetTypeT
+     *  @tparam HashCodeTypeT
+     */
+    template <class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
+    struct PackedState final {
  public:
   PackedState() : PackedState(0, 0, 0) {}
   PackedState(OffsetTypeT offset, HashCodeTypeT hashcode, int num_outgoing)
@@ -71,13 +76,14 @@ struct PackedState final {
   OffsetTypeT offset_;
   HashCodeTypeT hashcode_;
   uint32_t num_outgoing_and_cookie_;
-
-}
 // this is __very__ size critical, so disable any padding
 #ifdef __GNUC__
-__attribute__((packed))
+} __attribute__((packed));
+#elif _MSC_VER
+};
+__pragma(pack(pop))
 #endif
-;
+
 } /* namespace internal */
 } /* namespace fsa */
 } /* namespace dictionary */
