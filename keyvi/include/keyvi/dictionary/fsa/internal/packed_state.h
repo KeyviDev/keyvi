@@ -79,7 +79,7 @@ __pragma(pack(push, 1))
 // this is __very__ size critical, so disable any padding
 #ifdef __GNUC__
 } __attribute__((packed));
-#elif _MSC_VER
+#elif defined(_MSC_VER)
 };
 __pragma(pack(pop))
 #endif
