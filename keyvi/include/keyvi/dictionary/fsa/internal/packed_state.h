@@ -36,7 +36,6 @@ namespace internal {
 #ifdef _MSC_VER
 __pragma(pack(push, 1))
 #endif
-    struct name __pragma(pack(pop))
 
     /**
      * Represents a state in the state hashtable. Since we'll need to save millions of these,
