@@ -62,7 +62,7 @@ If you like to go deep down in the basics, keyvi is inspired by the following 2 
   
 ## License
 
-keyvi is licensed under Apache License 2.0("ALv2"), see [license](LICENSE) for details, all [3rdparty libraries](/keyvi/3rdparty) ship with their own license. Except Boost, Snappy and zlib all 3rdparty code can be exclusively found in the [3rdparty] (/keyvi/3rdparty) folder. The following licenses are used for the 3rdparty code (last updated: `0.5.0`, provided without warranty).
+keyvi is licensed under Apache License 2.0("ALv2"), see [license](LICENSE) for details, all [3rdparty libraries](/keyvi/3rdparty) ship with their own license. Except Boost, Snappy and zlib all 3rdparty code can be exclusively found in the [3rdparty](/keyvi/3rdparty) folder. The following licenses are used for the 3rdparty code (last updated: `0.5.0`, provided without warranty).
 
 ### C++ dependencies
 
