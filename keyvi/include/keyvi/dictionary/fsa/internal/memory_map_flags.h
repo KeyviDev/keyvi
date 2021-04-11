@@ -25,7 +25,9 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_MEMORY_MAP_FLAGS_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_MEMORY_MAP_FLAGS_H_
 
+#if !defined(_WIN32)
 #include <sys/mman.h>
+#endif
 
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
@@ -63,11 +65,10 @@ class MemoryMapFlags final {
    * @return flags to be used for mmap (via boost).
    */
   static int FSAGetMemoryMapOptions(const loading_strategy_types strategy) {
-#ifdef _Win32
-
+#if defined(_WIN32)
     // there is no comparable fine-grained control on windows, so simply use the defaults
     return boost::interprocess::default_map_options;
-#else  // not _Win32
+#else  // not _WIN32
 
     if (strategy == loading_strategy_types::default_os) {
       return boost::interprocess::default_map_options;
@@ -92,7 +93,7 @@ class MemoryMapFlags final {
     }
 
     return flags;
-#endif  // not _Win32
+#endif  // not _WIN32
   }
 
   /**
@@ -102,11 +103,11 @@ class MemoryMapFlags final {
    * @return flags to be used for mmap (via boost).
    */
   static int ValuesGetMemoryMapOptions(const loading_strategy_types strategy) {
-#ifdef _Win32
+#if defined(_WIN32)
 
     // there is no comparable fine-grained control on windows, so simply use the defaults
     return boost::interprocess::default_map_options;
-#else  // not _Win32
+#else  // not _WIN32
 
     if (strategy == loading_strategy_types::default_os) {
       return boost::interprocess::default_map_options;
@@ -139,11 +140,11 @@ class MemoryMapFlags final {
    */
   static boost::interprocess::mapped_region::advice_types FSAGetMemoryMapAdvices(
       const loading_strategy_types strategy) {
-#ifdef _Win32
+#if defined(_WIN32)
 
     // there is no madvise on windows, so simply use the default
     return boost::interprocess::mapped_region::advice_types::advice_normal;
-#else  // _Win32
+#else  // _WIN32
     switch (strategy) {
       case loading_strategy_types::lazy_no_readahead:
         return boost::interprocess::mapped_region::advice_types::advice_random;
@@ -168,11 +169,11 @@ class MemoryMapFlags final {
    */
   static boost::interprocess::mapped_region::advice_types ValuesGetMemoryMapAdvices(
       const loading_strategy_types strategy) {
-#ifdef _Win32
+#if defined(_WIN32)
 
     // there is no madvise on windows, so simply use the default
     return boost::interprocess::mapped_region::advice_types::advice_normal;
-#else  // _Win32
+#else  // _WIN32
     switch (strategy) {
       case loading_strategy_types::lazy_no_readahead:
       case loading_strategy_types::lazy_no_readahead_value_part:

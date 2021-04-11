@@ -70,6 +70,31 @@
 #define le64toh(x) (x)
 #define htobe32(x) htonl(x)
 #define be32toh(x) ntohl(x)
+#elif defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
+#include <winsock2.h>
+
+// windows.h define GetObject which clashes in rapidjson
+// see https://github.com/Tencent/rapidjson/issues/1448
+#undef GetObject
+
+#if BYTE_ORDER == LITTLE_ENDIAN
+#define KEYVI_LITTLE_ENDIAN
+#define htole16(x) (x)
+#define le16toh(x) (x)
+#define htole64(x) (x)
+#define le64toh(x) (x)
+#define htobe32(x) htonl(x)
+#define be32toh(x) ntohl(x)
+
+#elif BYTE_ORDER == BIG_ENDIAN
+
+#define htole16(x) __builtin_bswap16(x)
+#define le16toh(x) __builtin_bswap16(x)
+#define htole64(x) __builtin_bswap64(x)
+#define le64toh(x) __builtin_bswap64(x)
+#define htobe32(x) (x)
+#define be32toh(x) (x)
+#endif
 
 #else
 #include <endian.h>
@@ -83,4 +108,4 @@
 
 #endif
 
-#endif  // KEYVI_DICTIONARY_UTIL_ENDIAN_H_"
+#endif  // KEYVI_DICTIONARY_UTIL_ENDIAN_H_

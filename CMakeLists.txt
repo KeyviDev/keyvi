@@ -15,11 +15,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake_mo
 #### Compiler Flags ####
 
 # configure C++11
-if(NOT CMAKE_VERSION VERSION_LESS 3.1)
-    set(CMAKE_CXX_STANDARD 11)
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # keyvi specific compile options, definitions and flags
 set (_KEVYI_COMPILE_OPTIONS "-Wall")
@@ -60,7 +57,12 @@ set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} tiny-process-l
 # BOOST
 set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "system" "regex" "thread")
 set (_KEYVI_BOOST_LIBRARIES_TEST "unit_test_framework")
+if (WIN32)
+set(Boost_USE_STATIC_LIBS ON)
+else ()
 set(Boost_USE_STATIC_LIBS OFF)
+endif()
+
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})

@@ -33,6 +33,10 @@
 #include <utility>
 #include <vector>
 
+#ifdef _MSC_VER
+// workaround for https://github.com/boostorg/sort/issues/43
+#include <ciso646>
+#endif
 #include <boost/sort/sort.hpp>
 
 #include "keyvi/dictionary/dictionary_compiler_common.h"

@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef PACKED_STATE_H_
-#define PACKED_STATE_H_
+#ifndef KEYVI_DICTIONARY_FSA_INTERNAL_PACKED_STATE_H_
+#define KEYVI_DICTIONARY_FSA_INTERNAL_PACKED_STATE_H_
 
 #include <algorithm>
 #include <string>
@@ -33,6 +33,12 @@ namespace dictionary {
 namespace fsa {
 namespace internal {
 
+// disable clang formatting, because it does not handle prama properly
+// clang-format off
+#ifdef _MSC_VER
+__pragma(pack(push, 1))
+#endif
+
 /**
  * Represents a state in the state hashtable. Since we'll need to save millions of these,
  * we aim to make each object very small.
@@ -40,67 +46,50 @@ namespace internal {
  *  @tparam OffsetTypeT
  *  @tparam HashCodeTypeT
  */
-template<class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
-struct PackedState
-final {
-   public:
-    PackedState()
-        : PackedState(0, 0, 0) {
-    }
-    PackedState(OffsetTypeT offset, HashCodeTypeT hashcode, int num_outgoing)
-        : offset_(offset),
-          hashcode_(hashcode),
-          num_outgoing_and_cookie_((uint32_t) (num_outgoing & 0x1FF)) {
-    }
+template <class OffsetTypeT = uint32_t, class HashCodeTypeT = int32_t>
+struct PackedState final {
+ public:
+  PackedState() : PackedState(0, 0, 0) {}
+  PackedState(OffsetTypeT offset, HashCodeTypeT hashcode, int num_outgoing)
+      : offset_(offset), hashcode_(hashcode), num_outgoing_and_cookie_((uint32_t)(num_outgoing & 0x1FF)) {}
 
-    HashCodeTypeT GetHashcode() const {
-      return hashcode_;
-    }
+  HashCodeTypeT GetHashcode() const { return hashcode_; }
 
-    int GetNumberOfOutgoingTransitions() const {
-      return static_cast<int>(this->num_outgoing_and_cookie_ & 0x1FF);
-    }
+  int GetNumberOfOutgoingTransitions() const { return static_cast<int>(this->num_outgoing_and_cookie_ & 0x1FF); }
 
-    int GetCookie() const {
-      return static_cast<int>((this->num_outgoing_and_cookie_ & 0xFFFFFE00)
-          >> 9);
-    }
+  int GetCookie() const { return static_cast<int>((this->num_outgoing_and_cookie_ & 0xFFFFFE00) >> 9); }
 
-    void SetCookie(int value) {
-      this->num_outgoing_and_cookie_ = (this->num_outgoing_and_cookie_
-          & 0x1FF) | (uint32_t) (value << 9);
-    }
-
-    OffsetTypeT GetOffset() const {
-      return offset_;
-    }
-
-    static size_t GetMaxCookieSize(){
-      return MaxCookieSize;
-    }
-
-    bool IsEmpty() const {
-      return offset_ == 0 && hashcode_ == 0;
-    }
-
-    bool operator==(const PackedState& rhs) const {
-      return offset_ == rhs.offset_;
-    }
-
-   private:
-    static const size_t MaxCookieSize = 0x7FFFFE;
-
-    OffsetTypeT offset_;
-    HashCodeTypeT hashcode_;
-    uint32_t num_outgoing_and_cookie_;
-
+  void SetCookie(int value) {
+    this->num_outgoing_and_cookie_ = (this->num_outgoing_and_cookie_ & 0x1FF) | (uint32_t)(value << 9);
   }
-  // this is __very__ size critical, so disable any padding
-  __attribute__ ((packed));
 
-  } /* namespace internal */
-  } /* namespace fsa */
-  } /* namespace dictionary */
-  } /* namespace keyvi */
+  OffsetTypeT GetOffset() const { return offset_; }
 
-#endif /* PACKED_STATE_H_ */
+  static size_t GetMaxCookieSize() { return MaxCookieSize; }
+
+  bool IsEmpty() const { return offset_ == 0 && hashcode_ == 0; }
+
+  bool operator==(const PackedState& rhs) const { return offset_ == rhs.offset_; }
+
+ private:
+  static const size_t MaxCookieSize = 0x7FFFFE;
+
+  OffsetTypeT offset_;
+  HashCodeTypeT hashcode_;
+  uint32_t num_outgoing_and_cookie_;
+// this is __very__ size critical, so disable any padding
+#ifdef __GNUC__
+} __attribute__((packed));
+#elif defined(_MSC_VER)
+};
+__pragma(pack(pop))
+#endif
+
+// clang-format on
+
+} /* namespace internal */
+} /* namespace fsa */
+} /* namespace dictionary */
+} /* namespace keyvi */
+
+#endif  // KEYVI_DICTIONARY_FSA_INTERNAL_PACKED_STATE_H_

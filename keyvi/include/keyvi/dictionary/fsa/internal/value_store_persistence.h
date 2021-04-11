@@ -46,8 +46,8 @@ struct RawPointer final {
 
   RawPointer(uint64_t offset, HashCodeTypeT hashcode, size_t length)
       : offset_(offset), hashcode_(hashcode), length_(length) {
-    if (length > std::numeric_limits<ushort>::max()) {
-      length_ = std::numeric_limits<ushort>::max();
+    if (length > std::numeric_limits<uint16_t>::max()) {
+      length_ = std::numeric_limits<uint16_t>::max();
     }
   }
 
@@ -55,11 +55,11 @@ struct RawPointer final {
 
   uint64_t GetOffset() const { return offset_; }
 
-  ushort GetLength() const { return length_; }
+  uint16_t GetLength() const { return length_; }
 
   int GetCookie() const { return cookie_; }
 
-  void SetCookie(int value) { cookie_ = static_cast<ushort>(value); }
+  void SetCookie(int value) { cookie_ = static_cast<uint16_t>(value); }
 
   bool IsEmpty() const { return offset_ == 0 && hashcode_ == 0 && length_ == 0; }
 
@@ -72,8 +72,8 @@ struct RawPointer final {
 
   uint64_t offset_;
   HashCodeTypeT hashcode_;
-  ushort length_;
-  ushort cookie_ = 0;
+  uint16_t length_;
+  uint16_t cookie_ = 0;
 };
 
 template <class PersistenceT, class HashCodeTypeT = int32_t>
@@ -106,7 +106,7 @@ struct RawPointerForCompare final {
     TRACE("check equality, 2nd length");
     size_t length_l = l.GetLength();
 
-    if (length_l < std::numeric_limits<ushort>::max()) {
+    if (length_l < std::numeric_limits<uint16_t>::max()) {
       if (length_l != value_size_) {
         return false;
       }
