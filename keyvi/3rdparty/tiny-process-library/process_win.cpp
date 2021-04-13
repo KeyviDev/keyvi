@@ -1,22 +1,24 @@
 #include "process.hpp"
+// clang-format off
 #include <windows.h>
+// clang-format on
+#include <tlhelp32.h>
 #include <cstring>
-#include <TlHelp32.h>
 #include <stdexcept>
 
 namespace TinyProcessLib {
 
-Process::Data::Data() noexcept : id(0), handle(NULL) {}
+Process::Data::Data() noexcept : id(0) {}
 
 // Simple HANDLE wrapper to close it automatically from the destructor.
 class Handle {
 public:
-  Handle() noexcept : handle(INVALID_HANDLE_VALUE) { }
+  Handle() noexcept : handle(INVALID_HANDLE_VALUE) {}
   ~Handle() noexcept {
     close();
   }
   void close() noexcept {
-    if (handle != INVALID_HANDLE_VALUE)
+    if(handle != INVALID_HANDLE_VALUE)
       CloseHandle(handle);
   }
   HANDLE detach() noexcept {
@@ -25,7 +27,8 @@ public:
     return old_handle;
   }
   operator HANDLE() const noexcept { return handle; }
-  HANDLE* operator&() noexcept { return &handle; }
+  HANDLE *operator&() noexcept { return &handle; }
+
 private:
   HANDLE handle;
 };
@@ -33,14 +36,25 @@ private:
 //Based on the discussion thread: https://www.reddit.com/r/cpp/comments/3vpjqg/a_new_platform_independent_process_library_for_c11/cxq1wsj
 std::mutex create_process_mutex;
 
+Process::id_type Process::open(const std::vector<string_type> &arguments, const string_type &path, const environment_type *environment) noexcept {
+  string_type command;
+  for(auto &argument : arguments)
+#ifdef UNICODE
+    command += (command.empty() ? L"" : L" ") + argument;
+#else
+    command += (command.empty() ? "" : " ") + argument;
+#endif
+  return open(command, path, environment);
+}
+
 //Based on the example at https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx.
-Process::id_type Process::open(const string_type &command, const string_type &path) noexcept {
+Process::id_type Process::open(const string_type &command, const string_type &path, const environment_type *environment) noexcept {
   if(open_stdin)
-    stdin_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
+    stdin_fd = std::unique_ptr<fd_type>(new fd_type(nullptr));
   if(read_stdout)
-    stdout_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
+    stdout_fd = std::unique_ptr<fd_type>(new fd_type(nullptr));
   if(read_stderr)
-    stderr_fd=std::unique_ptr<fd_type>(new fd_type(NULL));
+    stderr_fd = std::unique_ptr<fd_type>(new fd_type(nullptr));
 
   Handle stdin_rd_p;
   Handle stdin_wr_p;
@@ -57,19 +71,19 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
 
   std::lock_guard<std::mutex> lock(create_process_mutex);
   if(stdin_fd) {
-    if (!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0) ||
-        !SetHandleInformation(stdin_wr_p, HANDLE_FLAG_INHERIT, 0))
+    if(!CreatePipe(&stdin_rd_p, &stdin_wr_p, &security_attributes, 0) ||
+       !SetHandleInformation(stdin_wr_p, HANDLE_FLAG_INHERIT, 0))
       return 0;
   }
   if(stdout_fd) {
-    if (!CreatePipe(&stdout_rd_p, &stdout_wr_p, &security_attributes, 0) ||
-        !SetHandleInformation(stdout_rd_p, HANDLE_FLAG_INHERIT, 0)) {
+    if(!CreatePipe(&stdout_rd_p, &stdout_wr_p, &security_attributes, 0) ||
+       !SetHandleInformation(stdout_rd_p, HANDLE_FLAG_INHERIT, 0)) {
       return 0;
     }
   }
   if(stderr_fd) {
-    if (!CreatePipe(&stderr_rd_p, &stderr_wr_p, &security_attributes, 0) ||
-        !SetHandleInformation(stderr_rd_p, HANDLE_FLAG_INHERIT, 0)) {
+    if(!CreatePipe(&stderr_rd_p, &stderr_wr_p, &security_attributes, 0) ||
+       !SetHandleInformation(stderr_rd_p, HANDLE_FLAG_INHERIT, 0)) {
       return 0;
     }
   }
@@ -87,54 +101,74 @@ Process::id_type Process::open(const string_type &command, const string_type &pa
   if(stdin_fd || stdout_fd || stderr_fd)
     startup_info.dwFlags |= STARTF_USESTDHANDLES;
 
-  string_type process_command=command;
-#ifdef MSYS_PROCESS_USE_SH
-  size_t pos=0;
-  while((pos=process_command.find('\\', pos))!=string_type::npos) {
-    process_command.replace(pos, 1, "\\\\\\\\");
-    pos+=4;
+  if(config.show_window != Config::ShowWindow::show_default) {
+    startup_info.dwFlags |= STARTF_USESHOWWINDOW;
+    startup_info.wShowWindow = static_cast<WORD>(config.show_window);
   }
-  pos=0;
-  while((pos=process_command.find('\"', pos))!=string_type::npos) {
+
+  auto process_command = command;
+#ifdef MSYS_PROCESS_USE_SH
+  size_t pos = 0;
+  while((pos = process_command.find('\\', pos)) != string_type::npos) {
+    process_command.replace(pos, 1, "\\\\\\\\");
+    pos += 4;
+  }
+  pos = 0;
+  while((pos = process_command.find('\"', pos)) != string_type::npos) {
     process_command.replace(pos, 1, "\\\"");
-    pos+=2;
+    pos += 2;
   }
   process_command.insert(0, "sh -c \"");
-  process_command+="\"";
+  process_command += "\"";
 #endif
 
-  BOOL bSuccess = CreateProcess(nullptr, process_command.empty()?nullptr:&process_command[0], nullptr, nullptr, TRUE, 0,
-                                nullptr, path.empty()?nullptr:path.c_str(), &startup_info, &process_info);
+  string_type environment_str;
+  if(environment) {
+#ifdef UNICODE
+    for(const auto &e : *environment)
+      environment_str += e.first + L'=' + e.second + L'\0';
+    environment_str += L'\0';
+#else
+    for(const auto &e : *environment)
+      environment_str += e.first + '=' + e.second + '\0';
+    environment_str += '\0';
+#endif
+  }
+  BOOL bSuccess = CreateProcess(nullptr, process_command.empty() ? nullptr : &process_command[0], nullptr, nullptr,
+                                stdin_fd || stdout_fd || stderr_fd || config.inherit_file_descriptors, // Cannot be false when stdout, stderr or stdin is used
+                                stdin_fd || stdout_fd || stderr_fd ? CREATE_NO_WINDOW : 0,             // CREATE_NO_WINDOW cannot be used when stdout or stderr is redirected to parent process
+                                environment_str.empty() ? nullptr : &environment_str[0],
+                                path.empty() ? nullptr : path.c_str(),
+                                &startup_info, &process_info);
 
-  if(!bSuccess) {
-    CloseHandle(process_info.hProcess);
-    CloseHandle(process_info.hThread);
+  if(!bSuccess)
     return 0;
-  }
-  else {
+  else
     CloseHandle(process_info.hThread);
-  }
 
-  if(stdin_fd) *stdin_fd=stdin_wr_p.detach();
-  if(stdout_fd) *stdout_fd=stdout_rd_p.detach();
-  if(stderr_fd) *stderr_fd=stderr_rd_p.detach();
+  if(stdin_fd)
+    *stdin_fd = stdin_wr_p.detach();
+  if(stdout_fd)
+    *stdout_fd = stdout_rd_p.detach();
+  if(stderr_fd)
+    *stderr_fd = stderr_rd_p.detach();
 
-  closed=false;
-  data.id=process_info.dwProcessId;
-  data.handle=process_info.hProcess;
+  closed = false;
+  data.id = process_info.dwProcessId;
+  data.handle = process_info.hProcess;
   return process_info.dwProcessId;
 }
 
 void Process::async_read() noexcept {
-  if(data.id==0)
+  if(data.id == 0)
     return;
 
   if(stdout_fd) {
-    stdout_thread=std::thread([this](){
+    stdout_thread = std::thread([this]() {
       DWORD n;
-      std::unique_ptr<char[]> buffer(new char[buffer_size]);
-      for (;;) {
-        BOOL bSuccess = ReadFile(*stdout_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, nullptr);
+      std::unique_ptr<char[]> buffer(new char[config.buffer_size]);
+      for(;;) {
+        BOOL bSuccess = ReadFile(*stdout_fd, static_cast<CHAR *>(buffer.get()), static_cast<DWORD>(config.buffer_size), &n, nullptr);
         if(!bSuccess || n == 0)
           break;
         read_stdout(buffer.get(), static_cast<size_t>(n));
@@ -142,11 +176,11 @@ void Process::async_read() noexcept {
     });
   }
   if(stderr_fd) {
-    stderr_thread=std::thread([this](){
+    stderr_thread = std::thread([this]() {
       DWORD n;
-      std::unique_ptr<char[]> buffer(new char[buffer_size]);
-      for (;;) {
-        BOOL bSuccess = ReadFile(*stderr_fd, static_cast<CHAR*>(buffer.get()), static_cast<DWORD>(buffer_size), &n, nullptr);
+      std::unique_ptr<char[]> buffer(new char[config.buffer_size]);
+      for(;;) {
+        BOOL bSuccess = ReadFile(*stderr_fd, static_cast<CHAR *>(buffer.get()), static_cast<DWORD>(config.buffer_size), &n, nullptr);
         if(!bSuccess || n == 0)
           break;
         read_stderr(buffer.get(), static_cast<size_t>(n));
@@ -156,43 +190,59 @@ void Process::async_read() noexcept {
 }
 
 int Process::get_exit_status() noexcept {
-  if(data.id==0)
+  if(data.id == 0)
     return -1;
 
-  DWORD exit_status;
+  if(!data.handle)
+    return data.exit_status;
+
   WaitForSingleObject(data.handle, INFINITE);
+
+  DWORD exit_status;
   if(!GetExitCodeProcess(data.handle, &exit_status))
-    exit_status=-1;
+    data.exit_status = -1; // Store exit status for future calls
+  else
+    data.exit_status = static_cast<int>(exit_status); // Store exit status for future calls
+
   {
     std::lock_guard<std::mutex> lock(close_mutex);
     CloseHandle(data.handle);
-    closed=true;
+    data.handle = nullptr;
+    closed = true;
   }
   close_fds();
 
-  return static_cast<int>(exit_status);
+  return data.exit_status;
 }
 
 bool Process::try_get_exit_status(int &exit_status) noexcept {
-  if(data.id==0)
+  if(data.id == 0)
     return false;
+
+  if(!data.handle) {
+    exit_status = data.exit_status;
+    return true;
+  }
 
   DWORD wait_status = WaitForSingleObject(data.handle, 0);
-
-  if (wait_status == WAIT_TIMEOUT)
+  if(wait_status == WAIT_TIMEOUT)
     return false;
 
-  DWORD exit_status_win;
-  if(!GetExitCodeProcess(data.handle, &exit_status_win))
-    exit_status_win=-1;
+  DWORD exit_status_tmp;
+  if(!GetExitCodeProcess(data.handle, &exit_status_tmp))
+    exit_status = -1;
+  else
+    exit_status = static_cast<int>(exit_status_tmp);
+  data.exit_status = exit_status; // Store exit status for future calls
+
   {
     std::lock_guard<std::mutex> lock(close_mutex);
     CloseHandle(data.handle);
-    closed=true;
+    data.handle = nullptr;
+    closed = true;
   }
   close_fds();
 
-  exit_status = static_cast<int>(exit_status_win);
   return true;
 }
 
@@ -201,15 +251,17 @@ void Process::close_fds() noexcept {
     stdout_thread.join();
   if(stderr_thread.joinable())
     stderr_thread.join();
-  
+
   if(stdin_fd)
     close_stdin();
   if(stdout_fd) {
-    if(*stdout_fd!=NULL) CloseHandle(*stdout_fd);
+    if(*stdout_fd != nullptr)
+      CloseHandle(*stdout_fd);
     stdout_fd.reset();
   }
   if(stderr_fd) {
-    if(*stderr_fd!=NULL) CloseHandle(*stderr_fd);
+    if(*stderr_fd != nullptr)
+      CloseHandle(*stderr_fd);
     stderr_fd.reset();
   }
 }
@@ -221,8 +273,8 @@ bool Process::write(const char *bytes, size_t n) {
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
     DWORD written;
-    BOOL bSuccess=WriteFile(*stdin_fd, bytes, static_cast<DWORD>(n), &written, nullptr);
-    if(!bSuccess || written==0) {
+    BOOL bSuccess = WriteFile(*stdin_fd, bytes, static_cast<DWORD>(n), &written, nullptr);
+    if(!bSuccess || written == 0) {
       return false;
     }
     else {
@@ -235,7 +287,8 @@ bool Process::write(const char *bytes, size_t n) {
 void Process::close_stdin() noexcept {
   std::lock_guard<std::mutex> lock(stdin_mutex);
   if(stdin_fd) {
-    if(*stdin_fd!=NULL) CloseHandle(*stdin_fd);
+    if(*stdin_fd != nullptr)
+      CloseHandle(*stdin_fd);
     stdin_fd.reset();
   }
 }
@@ -243,7 +296,7 @@ void Process::close_stdin() noexcept {
 //Based on http://stackoverflow.com/a/1173396
 void Process::kill(bool /*force*/) noexcept {
   std::lock_guard<std::mutex> lock(close_mutex);
-  if(data.id>0 && !closed) {
+  if(data.id > 0 && !closed) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if(snapshot) {
       PROCESSENTRY32 process;
@@ -251,14 +304,14 @@ void Process::kill(bool /*force*/) noexcept {
       process.dwSize = sizeof(process);
       if(Process32First(snapshot, &process)) {
         do {
-          if(process.th32ParentProcessID==data.id) {
+          if(process.th32ParentProcessID == data.id) {
             HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
             if(process_handle) {
               TerminateProcess(process_handle, 2);
               CloseHandle(process_handle);
             }
           }
-        } while (Process32Next(snapshot, &process));
+        } while(Process32Next(snapshot, &process));
       }
       CloseHandle(snapshot);
     }
@@ -268,7 +321,7 @@ void Process::kill(bool /*force*/) noexcept {
 
 //Based on http://stackoverflow.com/a/1173396
 void Process::kill(id_type id, bool /*force*/) noexcept {
-  if(id==0)
+  if(id == 0)
     return;
 
   HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -278,19 +331,20 @@ void Process::kill(id_type id, bool /*force*/) noexcept {
     process.dwSize = sizeof(process);
     if(Process32First(snapshot, &process)) {
       do {
-        if(process.th32ParentProcessID==id) {
+        if(process.th32ParentProcessID == id) {
           HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, process.th32ProcessID);
           if(process_handle) {
             TerminateProcess(process_handle, 2);
             CloseHandle(process_handle);
           }
         }
-      } while (Process32Next(snapshot, &process));
+      } while(Process32Next(snapshot, &process));
     }
     CloseHandle(snapshot);
   }
   HANDLE process_handle = OpenProcess(PROCESS_TERMINATE, FALSE, id);
-  if(process_handle) TerminateProcess(process_handle, 2);
+  if(process_handle)
+    TerminateProcess(process_handle, 2);
 }
 
-} // TinyProsessLib
+} // namespace TinyProcessLib
