@@ -25,7 +25,10 @@
 #ifndef KEYVI_UTIL_OS_UTILS_H_
 #define KEYVI_UTIL_OS_UTILS_H_
 
+#if defined(_WIN32)
+#else
 #include <sys/resource.h>
+#endif
 
 #include <cstddef>
 #include <vector>
@@ -36,6 +39,11 @@ namespace util {
 class OsUtils {
  public:
   static size_t TryIncreaseFileDescriptors() {
+#if defined(_WIN32)
+    // see https://docs.microsoft.com/de-de/archive/blogs/markrussinovich/pushing-the-limits-of-windows-handles
+    // this shouldn't be a problem on windows
+    return 16 * 1024 * 1024;
+#else
     rlimit limit;
 
     getrlimit(RLIMIT_NOFILE, &limit);
@@ -54,6 +62,7 @@ class OsUtils {
     getrlimit(RLIMIT_NOFILE, &limit);
 
     return limit.rlim_cur;
+#endif
   }
 };
 

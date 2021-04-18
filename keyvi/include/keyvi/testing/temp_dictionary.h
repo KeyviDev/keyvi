@@ -85,7 +85,7 @@ class TempDictionary final {
     boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
     temp_path /= boost::filesystem::unique_path("dictionary-unit-test-temp-dictionary-%%%%-%%%%-%%%%-%%%%");
-    file_name_ = temp_path.native();
+    file_name_ = temp_path.string();
   }
 };
 

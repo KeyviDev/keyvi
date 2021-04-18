@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(persistence) {
 
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-temp-dictionary-%%%%-%%%%-%%%%-%%%%");
 
-  std::string filename = temp_path.native();
+  std::string filename = temp_path.string();
 
   std::ofstream out_stream(filename, std::ios::binary);
   json_value_store.Write(out_stream);

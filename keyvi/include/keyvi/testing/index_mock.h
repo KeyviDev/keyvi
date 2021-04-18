@@ -84,7 +84,7 @@ class IndexMock final {
       std::ofstream out_stream(tmp_filename.string(), std::ios::binary);
       msgpack::pack(out_stream, deleted_keys);
     }
-    std::rename(tmp_filename.c_str(), filename.c_str());
+    std::rename(tmp_filename.string().c_str(), filename.string().c_str());
   }
 
   std::string GetIndexFolder() const { return mock_index_.string(); }

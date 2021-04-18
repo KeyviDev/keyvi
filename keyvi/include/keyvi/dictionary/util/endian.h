@@ -71,10 +71,11 @@
 #define htobe32(x) htonl(x)
 #define be32toh(x) ntohl(x)
 #elif defined(_WIN16) || defined(_WIN32) || defined(_WIN64)
-#include <winsock2.h>
 
-// windows.h define GetObject which clashes in rapidjson
-// see https://github.com/Tencent/rapidjson/issues/1448
+// windows.h breaks std::min/max
+#define NOMINMAX
+#include <winsock2.h>
+#undef NOMINMAX
 #undef GetObject
 
 #if BYTE_ORDER == LITTLE_ENDIAN

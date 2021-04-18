@@ -57,14 +57,12 @@ set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} tiny-process-l
 # BOOST
 set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "system" "regex" "thread")
 set (_KEYVI_BOOST_LIBRARIES_TEST "unit_test_framework")
-if (WIN32)
-set(Boost_USE_STATIC_LIBS ON)
-else ()
-set(Boost_USE_STATIC_LIBS OFF)
-endif()
 
+set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
+set(BOOST_ALL_DYN_LINK ON)
+
 find_package(Boost REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})
 if (Boost_FOUND)
     list(APPEND KEYVI_INCLUDES "${Boost_INCLUDE_DIRS}")
@@ -76,6 +74,13 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 else ()
     set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem boost_system boost_regex boost_thread")
 endif ()
+
+if (WIN32)
+  # required for libboost_zlib
+  # disable autolinking in boost
+  add_definitions( -DBOOST_ALL_NO_LIB )
+  link_directories (${Boost_LIBRARY_DIRS})
+endif (WIN32)
 
 # Zlib
 find_package(ZLIB REQUIRED)
@@ -172,6 +177,17 @@ target_compile_options(unit_test_all PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(unit_test_all PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 add_dependencies(unit_test_all keyvimerger)
+
+if (WIN32)
+  # copies the dlls required to run to the build folder
+  foreach(LIB ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE} ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+    get_filename_component(UTF_BASE_NAME ${LIB} NAME_WE)
+    get_filename_component(UTF_PATH ${LIB} PATH)
+    add_custom_command(TARGET unit_test_all POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy "${UTF_PATH}/${UTF_BASE_NAME}.dll" ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
+      )
+  endforeach()
+endif (WIN32)
 
 # bindings
 add_custom_target(bindings
