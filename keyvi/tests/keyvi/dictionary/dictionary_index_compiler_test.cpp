@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(stableInsert) {
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
+  std::string file_name = temp_path.string();
 
   compiler.WriteToFile(file_name);
 
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(addAndDeletes) {
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
+  std::string file_name = temp_path.string();
 
   compiler.WriteToFile(file_name);
 
@@ -144,7 +144,7 @@ void bigger_compile_test(const keyvi::util::parameters_t& params = keyvi::util::
 
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
+  std::string file_name = temp_path.string();
 
   compiler.WriteToFile(file_name);
 

@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(property_tree_bwc) {
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-properties-test-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
+  std::string file_name = temp_path.string();
 
   {
     std::ofstream out_stream(file_name, std::ios::binary);

@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(minimizationIntInnerWeights, DictT, int_with_weigh
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
+  std::string file_name = temp_path.string();
 
   compiler.WriteToFile(file_name);
 
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(unsortedKeys, DictT, int_with_weight_types) {
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
+  std::string file_name = temp_path.string();
 
   compiler.WriteToFile(file_name);
 
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(compactSize, DictT, int_with_weight_types) {
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
 
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
+  std::string file_name = temp_path.string();
 
   compiler.WriteToFile(file_name);
 
@@ -247,7 +247,7 @@ void bigger_compile_test(const keyvi::util::parameters_t& params = keyvi::util::
 
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
-  std::string file_name = temp_path.native();
+  std::string file_name = temp_path.string();
 
   compiler.WriteToFile(file_name);
 

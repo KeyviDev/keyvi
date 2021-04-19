@@ -142,7 +142,7 @@ class Segment final : public ReadOnlySegment {
 
   void RemoveFiles() {
     // delete files, not all files might exist, therefore ignore the output
-    std::remove(GetDictionaryPath().c_str());
+    std::remove(GetDictionaryPath().string().c_str());
     std::remove(GetDeletedKeysDuringMergePath().string().c_str());
     std::remove(GetDeletedKeysPath().string().c_str());
   }
