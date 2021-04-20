@@ -37,8 +37,7 @@
 
 inline std::string get_keyvimerger_bin() {
   boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};
-  path /= "keyvimerger";
-
+  path /= DEFAULT_KEYVIMERGER_BIN;
   BOOST_CHECK(boost::filesystem::is_regular_file(path));
 
   return path.string();

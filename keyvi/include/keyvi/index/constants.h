@@ -40,7 +40,11 @@ static const char MAX_CONCURRENT_MERGES[] = "max_concurrent_merges";
 static const size_t DEFAULT_REFRESH_INTERVAL = 1000ul;
 static const size_t DEFAULT_COMPILE_KEY_THRESHOLD = 10000ul;
 static const size_t DEFAULT_EXTERNAL_MERGE_KEY_THRESHOLD = 100000ul;
+#if defined(_WIN32)
+static const char DEFAULT_KEYVIMERGER_BIN[] = "keyvimerger.exe";
+#else
 static const char DEFAULT_KEYVIMERGER_BIN[] = "keyvimerger";
+#endif
 
 // spinlock wait time if there are too many segments
 static const size_t SPINLOCK_WAIT_FOR_SEGMENT_MERGES_MS = 10;
