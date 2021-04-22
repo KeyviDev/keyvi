@@ -46,6 +46,11 @@ int main(int argc, char* argv[], char* envp[]) {
   std::cout << "Running unit tests from path: " << base_path.string() << std::endl;
 
   // set an environment variable, to be used in tests
+#if defined(_WIN32)
+  _putenv_s("KEYVI_UNITTEST_BASEPATH", base_path.string().c_str());
+#else
   setenv("KEYVI_UNITTEST_BASEPATH", base_path.string().c_str(), 1);
+#endif
+
   return boost::unit_test::unit_test_main(&init_unit_test, argc, argv);
 }
