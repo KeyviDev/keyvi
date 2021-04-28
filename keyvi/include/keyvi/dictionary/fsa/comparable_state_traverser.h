@@ -49,7 +49,11 @@ class ZipStateTraverser;
  * - track/record all states
  * - compare 2 traverser objects based on lexicographic order
  *
- * This traverser ignores inner weights, wrapping weighted state traverser for comparison is unspecified
+ * Specializations:
+ * - inner weights: compare 2 traverser objects based on inner weights
+ *
+ * Unsupported (yet):
+ * - near traverser
  */
 template <class innerTraverserType>
 class ComparableStateTraverser final {
