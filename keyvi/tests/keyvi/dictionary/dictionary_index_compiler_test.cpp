@@ -169,6 +169,26 @@ BOOST_AUTO_TEST_CASE(bigger_compile_parallel_1MB) {
   bigger_compile_test({{MEMORY_LIMIT_KEY, std::to_string(1024 * 1024)}, {PARALLEL_SORT_THRESHOLD_KEY, "1"}});
 }
 
+// see gh#215
+BOOST_AUTO_TEST_CASE(parallel_sort_bug) {
+  keyvi::util::parameters_t params = {{"memory_limit_mb", "10"}};
+  keyvi::dictionary::DictionaryIndexCompiler<dictionary_type_t::JSON> compiler(params);
+
+  for (size_t i = 0; i < 100000; ++i) {
+    compiler.Add(std::to_string(i), "test");
+  }
+  compiler.Compile();
+
+  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
+  std::string file_name = temp_path.string();
+
+  compiler.WriteToFile(file_name);
+
+  Dictionary d(file_name.c_str());
+  BOOST_CHECK(d.Contains("42"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */
