@@ -226,7 +226,7 @@ class ZipStateTraverser final {
       it++;
 
       while (traverser_queue_.size() > equal_states_ && *t == *(*it)) {
-        TRACE("dedup top: %ld dup: %ld", order_, (*it)->GetOrder());
+        TRACE("dedup");
         equal_states_++;
         // if not final yet check if other states are final
         if (!final_ && (*it)->IsFinalState()) {
@@ -258,11 +258,14 @@ inline void ZipStateTraverser<WeightedStateTraverser>::PreIncrement() {
 
   // don't patch weight if prune has been called before
   if (pruned) {
-    TRACE("prune called before, skipping");
+    TRACE("traverser has been pruned, skipping preincrement");
     return;
   }
 
   // patch weights if necessary
+  // there are 2 or more traverser with different weights, we are creating a global weights map
+  // and patch every traverser with the same weight, afterwards we re-sort the transitions, so that
+  // we get consistent order
   if (equal_states_ > 1) {
     std::map<label_t, uint32_t> global_weights;
 
@@ -404,7 +407,6 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(const std::v
 template <>
 inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(
     const std::vector<std::pair<automata_t, uint64_t>> &fsa_start_state_pairs, const bool advance) {
-  TRACE("construct  (weighted state specialization)");
   size_t order = 0;
 
   if (fsa_start_state_pairs.size() < 2) {
@@ -419,34 +421,27 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(
       }
     }
   } else {
+    // there is more than 1 inner traverser
     std::map<label_t, uint32_t> global_weights;
     std::vector<traverser_t> traversers;
     for (auto f : fsa_start_state_pairs) {
       if (f.second > 0) {
-        TRACE("create traverser %ld %ld", f.first->GetStartState(), f.second);
         traverser_t traverser =
             std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(f.first, f.second, false, order++);
         traversers.push_back(traverser);
       }
     }
-    TRACE("1st pass");
     // 1st pass collect all weights per label
     for (const auto &t : traversers) {
-      TRACE("reading %ld", t->GetOrder());
-
       for (const transition_t &transition : t->GetStates().traversal_state_payload.transitions) {
         if (global_weights.count(transition.label) == 0 || global_weights.at(transition.label) < transition.weight) {
           global_weights[transition.label] = transition.weight;
         }
       }
     }
-    TRACE("2nd pass");
     // 2nd pass apply global weights
     for (const auto &t : traversers) {
-      TRACE("patching %ld", t->GetOrder());
-
       for (transition_t &transition : t->GetStates().traversal_state_payload.transitions) {
-        TRACE("patching %c from %ld to %ld", transition.label, transition.weight, global_weights.at(transition.label));
         transition.weight = global_weights.at(transition.label);
       }
       TRACE("resort %ld", t->GetOrder());
@@ -458,17 +453,13 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(
       if (advance) {
         t->operator++(0);
       }
-      TRACE("push %ld", t->GetOrder());
 
       // the traverser could be exhausted after it has been advanced
       if (*t) {
-        TRACE("push now %ld", t->GetOrder());
         traverser_queue_.push(t);
       }
-      TRACE("done push %ld", t->GetOrder());
     }
   }
-  TRACE("constructed");
   FillInValues();
 }
 
