@@ -40,6 +40,9 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+template <class zipInnerTraverserType>
+class ZipStateTraverser;
+
 /**
  * Traverser wrapper that can be used to
  *
@@ -150,12 +153,14 @@ class ComparableStateTraverser final {
 
   traversal::TraversalPayload<transition_t> &GetTraversalPayload() { return state_traverser_.GetTraversalPayload(); }
 
-  traversal::TraversalState<transition_t> &GetStates() { return state_traverser_.GetStates(); }
-
  private:
   innerTraverserType state_traverser_;
   std::vector<label_t> label_stack_;
   size_t order_;
+
+  template <class zipInnerTraverserType>
+  friend class ZipStateTraverser;
+  traversal::TraversalState<transition_t> &GetStates() { return state_traverser_.GetStates(); }
 };
 
 inline bool CompareWeights(const traversal::TraversalState<traversal::WeightedTransition> &i,

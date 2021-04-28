@@ -37,6 +37,9 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+template <class innerTraverserType>
+class ComparableStateTraverser;
+
 template <class TransitionT = traversal::Transition>
 class StateTraverser final {
  public:
@@ -152,12 +155,6 @@ class StateTraverser final {
 
   traversal::TraversalPayload<TransitionT> &GetTraversalPayload() { return stack_.traversal_stack_payload; }
 
-  // todo: maybe make it private/friend?
-  traversal::TraversalState<transition_t> &GetStates() { return stack_.GetStates(); }
-
-  // todo: only for comparable traverser, make private/friend?
-  const traversal::TraversalStack<TransitionT> &GetStack() const { return stack_; }
-
   operator bool() const { return !at_end_; }
 
   bool AtEnd() const { return at_end_; }
@@ -169,6 +166,12 @@ class StateTraverser final {
   label_t current_label_;
   bool at_end_;
   traversal::TraversalStack<TransitionT> stack_;
+
+  template <class innerTraverserType>
+  friend class ComparableStateTraverser;
+  const traversal::TraversalStack<TransitionT> &GetStack() const { return stack_; }
+
+  traversal::TraversalState<transition_t> &GetStates() { return stack_.GetStates(); }
 };
 
 } /* namespace fsa */
