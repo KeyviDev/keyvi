@@ -683,6 +683,547 @@ BOOST_AUTO_TEST_CASE(after_prefix) {
   BOOST_CHECK_EQUAL_COLLECTIONS(actual2.begin(), actual2.end(), expected2.begin(), expected2.end());
 }
 
+BOOST_AUTO_TEST_CASE(weightedTraversal) {
+  std::vector<std::pair<std::string, uint32_t>> test_data1 = {
+      {"aabc", 412},
+      {"aabde", 22},
+      {"efde", 24},
+  };
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data2 = {
+      {"cdbde", 444},
+      {"cdef", 34},
+      {"cdzzz", 56},
+      {"efde", 10},
+  };
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  ZipStateTraverser<WeightedStateTraverser> s({f1, f2});
+
+  // we should get 'c' first
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  // traverser at the end
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+}
+
+BOOST_AUTO_TEST_CASE(weightedTraversal2) {
+  std::vector<std::pair<std::string, uint32_t>> test_data1 = {
+      {"aabc", 412},
+      {"aabde", 22},
+      {"efde", 24},
+  };
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data2 = {
+      {"cdbde", 444},
+      {"cdef", 34},
+      {"cdzzz", 56},
+      {"efde", 10},
+  };
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data3 = {
+      {"xyz", 99},
+      {"efde", 18},
+  };
+  testing::TempDictionary dictionary3(&test_data3);
+  automata_t f3 = dictionary3.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data4 = {
+      {"pag", 2},
+      {"efde", 10},
+  };
+  testing::TempDictionary dictionary4(&test_data4);
+  automata_t f4 = dictionary4.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data5 = {
+      {"efac", 21},
+  };
+  testing::TempDictionary dictionary5(&test_data5);
+  automata_t f5 = dictionary5.GetFsa();
+
+  ZipStateTraverser<WeightedStateTraverser> s({f1, f2, f3, f4, f5});
+
+  // we should get 'c' first
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('x', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('y', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('p', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('g', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  // traverser at the end
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+}
+
+BOOST_AUTO_TEST_CASE(weightedTraversal3) {
+  std::vector<std::pair<std::string, uint32_t>> test_data1 = {
+      {"aabc", 42},
+      {"aabde", 42},
+      {"efde", 42},
+  };
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data2 = {
+      {"cdbde", 42},
+      {"cdef", 42},
+      {"cdzzz", 42},
+      {"efde", 10},
+  };
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  ZipStateTraverser<WeightedStateTraverser> s({f1, f2});
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  // traverser at the end
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+}
+
+BOOST_AUTO_TEST_CASE(weightedTraversal4) {
+  std::vector<std::pair<std::string, uint32_t>> test_data1 = {
+      {"aabc", 42},
+      {"aabde", 42},
+      {"efde", 42},
+  };
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data2 = {
+      {"aabc", 99},
+      {"aabde", 99},
+      {"efde", 99},
+  };
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  ZipStateTraverser<WeightedStateTraverser> s({f1, f2});
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  // traverser at the end
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+}
+
+BOOST_AUTO_TEST_CASE(weightedTraversal_with_prune) {
+  std::vector<std::pair<std::string, uint32_t>> test_data1 = {
+      {"aabc", 412},
+      {"aabde", 22},
+      {"efde", 24},
+  };
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data2 = {
+      {"cdbde", 444},
+      {"cdef", 10},
+      {"cdzzz", 56},
+      {"efde", 5},
+  };
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data3 = {
+      {"cdbde", 333},
+      {"cdef", 34},
+      {"cdzzz", 15},
+      {"efde", 10},
+  };
+  testing::TempDictionary dictionary3(&test_data3);
+  automata_t f3 = dictionary3.GetFsa();
+
+  std::vector<std::pair<std::string, uint32_t>> test_data4 = {
+      {"aabc", 1}, {"aabde", 2}, {"cdbde", 3}, {"cdef", 4}, {"cdzzz", 5}, {"efde", 6},
+  };
+  testing::TempDictionary dictionary4(&test_data4);
+  automata_t f4 = dictionary4.GetFsa();
+
+  ZipStateTraverser<WeightedStateTraverser> s({f1, f2, f3, f4});
+
+  // we should get 'c' first
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('z', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  s.Prune();
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  s.Prune();
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  s.Prune();
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('f', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  s.Prune();
+  s++;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */

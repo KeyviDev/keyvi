@@ -37,10 +37,14 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+template <class innerTraverserType>
+class ComparableStateTraverser;
+
 template <class TransitionT = traversal::Transition>
 class StateTraverser final {
  public:
   using label_t = unsigned char;
+  using transition_t = TransitionT;
 
   explicit StateTraverser(automata_t f)
       : fsa_(f), current_state_(f->GetStartState()), current_weight_(0), current_label_(0), at_end_(false), stack_() {
@@ -162,6 +166,12 @@ class StateTraverser final {
   label_t current_label_;
   bool at_end_;
   traversal::TraversalStack<TransitionT> stack_;
+
+  template <class innerTraverserType>
+  friend class ComparableStateTraverser;
+  const traversal::TraversalStack<TransitionT> &GetStack() const { return stack_; }
+
+  traversal::TraversalState<transition_t> &GetStates() { return stack_.GetStates(); }
 };
 
 } /* namespace fsa */

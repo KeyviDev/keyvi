@@ -31,6 +31,7 @@
 #include <vector>
 
 #include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -39,18 +40,26 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
+template <class zipInnerTraverserType>
+class ZipStateTraverser;
+
 /**
  * Traverser wrapper that can be used to
  *
  * - track/record all states
  * - compare 2 traverser objects based on lexicographic order
  *
- * This traverser ignores inner weights, wrapping weighted state traverser for comparison is unspecified
+ * Specializations:
+ * - inner weights: compare 2 traverser objects based on inner weights
+ *
+ * Unsupported (yet):
+ * - near traverser
  */
 template <class innerTraverserType>
 class ComparableStateTraverser final {
  public:
   using label_t = typename innerTraverserType::label_t;
+  using transition_t = typename innerTraverserType::transition_t;
 
   explicit ComparableStateTraverser(const innerTraverserType &&traverser, const bool advance = true,
                                     const size_t order = 0)
@@ -135,7 +144,10 @@ class ComparableStateTraverser final {
 
   uint64_t GetStateId() const { return state_traverser_.GetStateId(); }
 
-  void Prune() { state_traverser_.Prune(); }
+  void Prune() {
+    state_traverser_.Prune();
+    label_stack_.pop_back();
+  }
 
   label_t GetStateLabel() const { return state_traverser_.GetStateLabel(); }
 
@@ -143,11 +155,53 @@ class ComparableStateTraverser final {
 
   size_t GetOrder() const { return order_; }
 
+  traversal::TraversalPayload<transition_t> &GetTraversalPayload() { return state_traverser_.GetTraversalPayload(); }
+
  private:
   innerTraverserType state_traverser_;
   std::vector<label_t> label_stack_;
   size_t order_;
+
+  template <class zipInnerTraverserType>
+  friend class ZipStateTraverser;
+  traversal::TraversalState<transition_t> &GetStates() { return state_traverser_.GetStates(); }
 };
+
+inline bool CompareWeights(const traversal::TraversalState<traversal::WeightedTransition> &i,
+                           const traversal::TraversalState<traversal::WeightedTransition> &j) {
+  return i.GetNextInnerWeight() == j.GetNextInnerWeight();
+}
+
+template <>
+inline bool ComparableStateTraverser<WeightedStateTraverser>::operator<(const ComparableStateTraverser &rhs) const {
+  TRACE("operator< (weighted state specialization)");
+
+  TRACE("depth %ld %ld", state_traverser_.GetDepth(), rhs.state_traverser_.GetDepth());
+
+  if (state_traverser_.GetDepth() > 0 && rhs.state_traverser_.GetDepth() > 0) {
+    auto compare_weights = std::mismatch(state_traverser_.GetStack().traversal_states.begin(),
+                                         state_traverser_.GetStack().traversal_states.begin() +
+                                             std::min(state_traverser_.GetDepth(), rhs.state_traverser_.GetDepth()) - 1,
+                                         rhs.state_traverser_.GetStack().traversal_states.begin(), CompareWeights);
+    if ((*compare_weights.first).GetNextInnerWeight() != (*compare_weights.second).GetNextInnerWeight()) {
+      return (*compare_weights.first).GetNextInnerWeight() > (*compare_weights.second).GetNextInnerWeight();
+    }
+  }
+
+  int compare = std::memcmp(label_stack_.data(), rhs.label_stack_.data(),
+                            std::min(label_stack_.size(), rhs.label_stack_.size()) * sizeof(label_t));
+  if (compare != 0) {
+    return compare < 0;
+  }
+
+  if (label_stack_.size() != rhs.label_stack_.size()) {
+    TRACE("different sizes %ld vs %ld", label_stack_.size(), rhs.label_stack_.size());
+    return label_stack_.size() < rhs.label_stack_.size();
+  }
+
+  return order_ > rhs.order_;
+}
+
 } /* namespace fsa */
 } /* namespace dictionary */
 } /* namespace keyvi */

@@ -125,12 +125,16 @@ BOOST_AUTO_TEST_CASE(StateTraverserCompatSomeTraversalWithPrune) {
   BOOST_CHECK_EQUAL(3, s.GetDepth());
 
   s.Prune();
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK_EQUAL(2, s.GetStateLabels().size());
   s++;
 
   BOOST_CHECK_EQUAL('b', s.GetStateLabel());
   BOOST_CHECK_EQUAL(3, s.GetDepth());
 
   s.Prune();
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK_EQUAL(2, s.GetStateLabels().size());
   s++;
   BOOST_CHECK(!s.AtEnd());
 
@@ -138,6 +142,8 @@ BOOST_AUTO_TEST_CASE(StateTraverserCompatSomeTraversalWithPrune) {
   BOOST_CHECK_EQUAL(3, s.GetDepth());
 
   s.Prune();
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK_EQUAL(2, s.GetStateLabels().size());
   s++;
 
   BOOST_CHECK_EQUAL('b', s.GetStateLabel());
@@ -148,6 +154,8 @@ BOOST_AUTO_TEST_CASE(StateTraverserCompatSomeTraversalWithPrune) {
   s++;
 
   s.Prune();
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK_EQUAL(2, s.GetStateLabels().size());
   s++;
 
   // traverser shall be exhausted
