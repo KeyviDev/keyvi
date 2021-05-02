@@ -8,7 +8,7 @@ Create a release branch called `release-X.Y.Z`
 ### Update the `python/setup.py` file
  - Update the flag `IS_RELEASED` to `True`
  - Commit to `release-X.Y.Z` and push it to https://github.com/KeyviDev/keyvi/
- - Wait for travis to build all targets
+ - Wait for CI to build all targets
 
 ### Create tag 
  - Draft a new release tagged vX.Y.Z with `release-X.Y.Z` as the target branch
