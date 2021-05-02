@@ -82,9 +82,9 @@ class ComparableStateTraverser final {
 
   // todo: change the way the payload is passed, e.g. move unique pointer?
   explicit ComparableStateTraverser(const automata_t f, const uint64_t start_state,
-                                    traversal::TraversalPayload<transition_t> *payload, const bool advance = true,
+                                    traversal::TraversalPayload<transition_t> &&payload, const bool advance = true,
                                     const size_t order = 0)
-      : state_traverser_(f, start_state, payload, false), order_(order) {
+      : state_traverser_(f, start_state, std::move(payload), false), order_(order) {
     if (advance) {
       this->operator++(0);
     }

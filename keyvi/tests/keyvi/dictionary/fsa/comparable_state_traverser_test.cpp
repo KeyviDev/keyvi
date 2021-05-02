@@ -16,6 +16,8 @@
 // limitations under the License.
 //
 
+#include <utility>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/fsa/comparable_state_traverser.h"
@@ -455,8 +457,8 @@ BOOST_AUTO_TEST_CASE(nearTraversalSpecialization) {
   auto payload1 = traversal::TraversalPayload<traversal::NearTransition>("aace");
   auto payload2 = traversal::TraversalPayload<traversal::NearTransition>("aace");
 
-  ComparableStateTraverser<StateTraverser<traversal::NearTransition>> t1(f1, f1->GetStartState(), &payload1, true, 0);
-  ComparableStateTraverser<StateTraverser<traversal::NearTransition>> t2(f2, f2->GetStartState(), &payload2, true, 1);
+  ComparableStateTraverser<NearStateTraverser> t1(f1, f1->GetStartState(), std::move(payload1), true, 0);
+  ComparableStateTraverser<NearStateTraverser> t2(f2, f2->GetStartState(), std::move(payload2), true, 1);
 
   BOOST_CHECK(t2 < t1);
   BOOST_CHECK_EQUAL('a', t1.GetStateLabel());

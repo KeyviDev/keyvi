@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 
+#include <utility>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/fsa/automata.h"
@@ -44,7 +46,7 @@ BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
 
   auto payload = traversal::TraversalPayload<traversal::NearTransition>("aace");
 
-  StateTraverser<traversal::NearTransition> s(f, f->GetStartState(), &payload);
+  StateTraverser<traversal::NearTransition> s(f, f->GetStartState(), std::move(payload));
 
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
