@@ -80,6 +80,16 @@ class ComparableStateTraverser final {
   explicit ComparableStateTraverser(const automata_t f, bool advance = true, size_t order = 0)
       : ComparableStateTraverser(f, f->GetStartState(), advance, order) {}
 
+  // todo: change the way the payload is passed, e.g. move unique pointer?
+  explicit ComparableStateTraverser(const automata_t f, const uint64_t start_state,
+                                    traversal::TraversalPayload<transition_t> *payload, const bool advance = true,
+                                    const size_t order = 0)
+      : state_traverser_(f, start_state, payload, false), order_(order) {
+    if (advance) {
+      this->operator++(0);
+    }
+  }
+
   ComparableStateTraverser() = delete;
   ComparableStateTraverser &operator=(ComparableStateTraverser const &) = delete;
   ComparableStateTraverser(const ComparableStateTraverser &that) = delete;
@@ -155,8 +165,6 @@ class ComparableStateTraverser final {
 
   size_t GetOrder() const { return order_; }
 
-  traversal::TraversalPayload<transition_t> &GetTraversalPayload() { return state_traverser_.GetTraversalPayload(); }
-
  private:
   innerTraverserType state_traverser_;
   std::vector<label_t> label_stack_;
@@ -165,6 +173,12 @@ class ComparableStateTraverser final {
   template <class zipInnerTraverserType>
   friend class ZipStateTraverser;
   traversal::TraversalState<transition_t> &GetStates() { return state_traverser_.GetStates(); }
+
+  traversal::TraversalPayload<transition_t> &GetTraversalPayload() { return state_traverser_.GetTraversalPayload(); }
+
+  const traversal::TraversalPayload<transition_t> &GetTraversalPayload() const {
+    return state_traverser_.GetTraversalPayload();
+  }
 };
 
 inline bool CompareWeights(const traversal::TraversalState<traversal::WeightedTransition> &i,
@@ -196,6 +210,26 @@ inline bool ComparableStateTraverser<WeightedStateTraverser>::operator<(const Co
 
   if (label_stack_.size() != rhs.label_stack_.size()) {
     TRACE("different sizes %ld vs %ld", label_stack_.size(), rhs.label_stack_.size());
+    return label_stack_.size() < rhs.label_stack_.size();
+  }
+
+  return order_ > rhs.order_;
+}
+
+template <>
+inline bool ComparableStateTraverser<NearStateTraverser>::operator<(const ComparableStateTraverser &rhs) const {
+  TRACE("operator< (near state specialization)");
+  if (GetTraversalPayload().exact_depth != rhs.GetTraversalPayload().exact_depth) {
+    return GetTraversalPayload().exact_depth < rhs.GetTraversalPayload().exact_depth;
+  }
+
+  int compare = std::memcmp(label_stack_.data(), rhs.label_stack_.data(),
+                            std::min(label_stack_.size(), rhs.label_stack_.size()) * sizeof(label_t));
+  if (compare != 0) {
+    return compare < 0;
+  }
+
+  if (label_stack_.size() != rhs.label_stack_.size()) {
     return label_stack_.size() < rhs.label_stack_.size();
   }
 

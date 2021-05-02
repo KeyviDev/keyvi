@@ -443,6 +443,89 @@ BOOST_AUTO_TEST_CASE(interleave2) {
   BOOST_CHECK_EQUAL(3, t2.GetDepth());
 }
 
+BOOST_AUTO_TEST_CASE(nearTraversalSpecialization) {
+  std::vector<std::string> test_data1 = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "cdefgh"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::string> test_data2 = {"abbb", "aabc", "bbcd", "aaceh", "cdefgh"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>("aace");
+  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>("aace");
+
+  ComparableStateTraverser<StateTraverser<traversal::NearTransition>> t1(f1, f1->GetStartState(), &payload1, true, 0);
+  ComparableStateTraverser<StateTraverser<traversal::NearTransition>> t2(f2, f2->GetStartState(), &payload2, true, 1);
+
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, t1.GetDepth());
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK(t1 != t2);
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, t1.GetDepth());
+  BOOST_CHECK_EQUAL('a', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, t2.GetDepth());
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('c', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
+  BOOST_CHECK_EQUAL('c', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  // inc to aacd (not exact)
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  // inc to aace (exact match)
+  t2++;
+  // order change: t2 because is exact
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('d', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t1.GetDepth());
+  BOOST_CHECK(t1.IsFinalState());
+  BOOST_CHECK_EQUAL('e', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  t2++;
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('h', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, t2.GetDepth());
+  BOOST_CHECK(t2.IsFinalState());
+
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('b', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t1.GetDepth());
+  BOOST_CHECK(t1.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('b', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */

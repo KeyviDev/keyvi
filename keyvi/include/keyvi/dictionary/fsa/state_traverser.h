@@ -172,6 +172,8 @@ class StateTraverser final {
   const traversal::TraversalStack<TransitionT> &GetStack() const { return stack_; }
 
   traversal::TraversalState<transition_t> &GetStates() { return stack_.GetStates(); }
+
+  const traversal::TraversalPayload<TransitionT> &GetTraversalPayload() const { return stack_.traversal_stack_payload; }
 };
 
 } /* namespace fsa */
