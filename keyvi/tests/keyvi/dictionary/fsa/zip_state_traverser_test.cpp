@@ -1224,6 +1224,45 @@ BOOST_AUTO_TEST_CASE(weightedTraversal_with_prune) {
   s++;
 }
 
+BOOST_AUTO_TEST_CASE(nearTraversal) {
+  std::vector<std::string> test_data1 = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "cdefgh"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::string> test_data2 = {"abbb", "aabc", "bbcd", "aaceh", "cdefgh"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>("aace");
+  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>("aace");
+
+  // ZipStateTraverser<NearStateTraverser> s(
+  //    {{f1, f1->GetStartState(), std::move(payload1)}, {f2, f2->GetStartState(), std::move(payload2)}});
+  // ZipStateTraverser<NearStateTraverser> s({std::make_tuple(f1, f1->GetStartState(), std::move(payload1)),
+  //                                         std::make_tuple(f2, f2->GetStartState(), std::move(payload2))});
+  std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<traversal::NearTransition>>> v;
+
+  v.emplace_back(f1, f1->GetStartState(), std::move(payload1));
+  v.emplace_back(f2, f2->GetStartState(), std::move(payload2));
+
+  ZipStateTraverser<NearStateTraverser> s(v);
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('h', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  s++;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */

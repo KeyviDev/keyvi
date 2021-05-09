@@ -30,6 +30,7 @@
 #include <initializer_list>
 #include <map>
 #include <memory>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -99,6 +100,26 @@ class ZipStateTraverser final {
       if (f.second > 0) {
         traverser_t traverser =
             std::make_shared<ComparableStateTraverser<innerTraverserType>>(f.first, f.second, advance, order++);
+        // the traverser could be exhausted after it has been advanced
+        if (*traverser) {
+          traverser_queue_.push(traverser);
+        }
+      }
+    }
+    FillInValues();
+  }
+
+  explicit ZipStateTraverser(std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<transition_t>>>
+                                 &fsa_start_state_payloads,
+                             const bool advance = true) {
+    size_t order = 0;
+
+    for (auto &f : fsa_start_state_payloads) {
+      if (std::get<1>(f) > 0) {
+        TRACE("create %ld, %s", order, std::get<2>(f).lookup_key.c_str());
+        traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(
+            std::get<0>(f), std::get<1>(f), std::move(std::get<2>(f)), advance, order++);
+
         // the traverser could be exhausted after it has been advanced
         if (*traverser) {
           traverser_queue_.push(traverser);
@@ -224,6 +245,8 @@ class ZipStateTraverser final {
       // traverse the queue in _sorted_ order
       auto it = traverser_queue_.ordered_begin();
       it++;
+
+      TRACE("label: %c", state_label_);
 
       while (traverser_queue_.size() > equal_states_ && *t == *(*it)) {
         TRACE("dedup");

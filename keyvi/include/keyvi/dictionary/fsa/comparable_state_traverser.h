@@ -80,7 +80,6 @@ class ComparableStateTraverser final {
   explicit ComparableStateTraverser(const automata_t f, bool advance = true, size_t order = 0)
       : ComparableStateTraverser(f, f->GetStartState(), advance, order) {}
 
-  // todo: change the way the payload is passed, e.g. move unique pointer?
   explicit ComparableStateTraverser(const automata_t f, const uint64_t start_state,
                                     traversal::TraversalPayload<transition_t> &&payload, const bool advance = true,
                                     const size_t order = 0)
@@ -217,20 +216,44 @@ inline bool ComparableStateTraverser<WeightedStateTraverser>::operator<(const Co
 }
 
 template <>
+inline bool ComparableStateTraverser<NearStateTraverser>::operator==(const ComparableStateTraverser &rhs) const {
+  if (label_stack_.size() != rhs.label_stack_.size()) {
+    return false;
+  }
+
+  if (GetTraversalPayload().exact != rhs.GetTraversalPayload().exact) {
+    return false;
+  }
+
+  return std::memcmp(label_stack_.data(), rhs.label_stack_.data(), label_stack_.size() * sizeof(label_t)) == 0;
+}
+
+template <>
 inline bool ComparableStateTraverser<NearStateTraverser>::operator<(const ComparableStateTraverser &rhs) const {
   TRACE("operator< (near state specialization)");
-  if (GetTraversalPayload().exact_depth != rhs.GetTraversalPayload().exact_depth) {
-    return GetTraversalPayload().exact_depth < rhs.GetTraversalPayload().exact_depth;
+
+  if (GetTraversalPayload().exact != rhs.GetTraversalPayload().exact) {
+    return GetTraversalPayload().exact;
   }
 
-  int compare = std::memcmp(label_stack_.data(), rhs.label_stack_.data(),
-                            std::min(label_stack_.size(), rhs.label_stack_.size()) * sizeof(label_t));
-  if (compare != 0) {
-    return compare < 0;
-  }
+  if (GetTraversalPayload().exact) {
+    if (GetTraversalPayload().exact_depth != rhs.GetTraversalPayload().exact_depth) {
+      return GetTraversalPayload().exact_depth < rhs.GetTraversalPayload().exact_depth;
+    }
+  } else {
+    if (GetTraversalPayload().exact_depth != rhs.GetTraversalPayload().exact_depth) {
+      return GetTraversalPayload().exact_depth > rhs.GetTraversalPayload().exact_depth;
+    }
 
-  if (label_stack_.size() != rhs.label_stack_.size()) {
-    return label_stack_.size() < rhs.label_stack_.size();
+    int compare = std::memcmp(label_stack_.data(), rhs.label_stack_.data(),
+                              std::min(label_stack_.size(), rhs.label_stack_.size()) * sizeof(label_t));
+    if (compare != 0) {
+      return compare < 0;
+    }
+
+    if (label_stack_.size() != rhs.label_stack_.size()) {
+      return label_stack_.size() < rhs.label_stack_.size();
+    }
   }
 
   return order_ > rhs.order_;
