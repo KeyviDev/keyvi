@@ -1236,10 +1236,6 @@ BOOST_AUTO_TEST_CASE(nearTraversal) {
   auto payload1 = traversal::TraversalPayload<traversal::NearTransition>("aace");
   auto payload2 = traversal::TraversalPayload<traversal::NearTransition>("aace");
 
-  // ZipStateTraverser<NearStateTraverser> s(
-  //    {{f1, f1->GetStartState(), std::move(payload1)}, {f2, f2->GetStartState(), std::move(payload2)}});
-  // ZipStateTraverser<NearStateTraverser> s({std::make_tuple(f1, f1->GetStartState(), std::move(payload1)),
-  //                                         std::make_tuple(f2, f2->GetStartState(), std::move(payload2))});
   std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<traversal::NearTransition>>> v;
 
   v.emplace_back(f1, f1->GetStartState(), std::move(payload1));
