@@ -42,7 +42,6 @@ mod tests {
         let m = dictionary::Dictionary::new("test_data/test.kv")
             .unwrap()
             .get("abc\0d");
-
         assert!(m.get_value_as_string().is_empty());
     }
 
