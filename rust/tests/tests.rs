@@ -38,6 +38,15 @@ mod tests {
     }
 
     #[test]
+   fn dictionary_get_nulerror() { 
+        let m = dictionary::Dictionary::new("test_data/test.kv")
+            .unwrap()
+            .get("abc\0d");
+
+        assert!(m.get_value_as_string().is_empty());
+    }
+
+    #[test]
     fn match_value_int() {
         let m = dictionary::Dictionary::new("test_data/completion_test.kv")
             .unwrap()

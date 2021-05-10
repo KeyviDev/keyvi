@@ -65,7 +65,7 @@ impl Dictionary {
     }
 
     pub fn get(&self, key: &str) -> KeyviMatch {
-        let key_c = CString::new(key).unwrap();
+        let key_c = CString::new(key).unwrap_or_default();
         let match_ptr = unsafe { root::keyvi_dictionary_get(self.dict, key_c.as_ptr()) };
         KeyviMatch::new(match_ptr)
     }
