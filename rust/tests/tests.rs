@@ -38,7 +38,7 @@ mod tests {
     }
 
     #[test]
-   fn dictionary_get_nulerror() { 
+    fn dictionary_get_nulerror() {
         let m = dictionary::Dictionary::new("test_data/test.kv")
             .unwrap()
             .get("abc\0d");
