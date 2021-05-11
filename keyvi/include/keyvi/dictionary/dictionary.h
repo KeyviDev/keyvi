@@ -337,7 +337,9 @@ class Dictionary final {
       size_t matched_depth = 0;
     };
 
-    auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(key.substr(minimum_prefix_length));
+    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(key.substr(minimum_prefix_length));
+
+    auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
     std::shared_ptr<delegate_payload> data(
         new delegate_payload(fsa::NearStateTraverser(fsa_, state, std::move(payload)), traversal_stack));
 

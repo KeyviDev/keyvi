@@ -44,7 +44,8 @@ BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
   testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
-  auto payload = traversal::TraversalPayload<traversal::NearTransition>("aace");
+  std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
+  auto payload = traversal::TraversalPayload<traversal::NearTransition>(near_key);
 
   StateTraverser<traversal::NearTransition> s(f, f->GetStartState(), std::move(payload));
 

@@ -1233,8 +1233,10 @@ BOOST_AUTO_TEST_CASE(nearTraversal) {
   testing::TempDictionary dictionary2(&test_data2);
   automata_t f2 = dictionary2.GetFsa();
 
-  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>("aace");
-  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>("aace");
+  std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
+
+  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
 
   std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<traversal::NearTransition>>> v;
 

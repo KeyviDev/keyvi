@@ -16,6 +16,7 @@
 // limitations under the License.
 //
 
+#include <memory>
 #include <utility>
 
 #include <boost/test/unit_test.hpp>
@@ -454,8 +455,10 @@ BOOST_AUTO_TEST_CASE(nearTraversalSpecialization) {
   testing::TempDictionary dictionary2(&test_data2);
   automata_t f2 = dictionary2.GetFsa();
 
-  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>("aace");
-  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>("aace");
+  std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
+
+  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
 
   ComparableStateTraverser<NearStateTraverser> t1(f1, f1->GetStartState(), std::move(payload1), true, 0);
   ComparableStateTraverser<NearStateTraverser> t2(f2, f2->GetStartState(), std::move(payload2), true, 1);
@@ -540,8 +543,10 @@ BOOST_AUTO_TEST_CASE(nearTraversalSpecialization2) {
   testing::TempDictionary dictionary2(&test_data2);
   automata_t f2 = dictionary2.GetFsa();
 
-  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>("aace");
-  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>("aace");
+  std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
+
+  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
 
   ComparableStateTraverser<NearStateTraverser> t1(f1, f1->GetStartState(), std::move(payload1), true, 0);
   ComparableStateTraverser<NearStateTraverser> t2(f2, f2->GetStartState(), std::move(payload2), true, 1);
