@@ -26,7 +26,7 @@ mod tests {
     #[test]
     fn dictionary_size() {
         let dict = dictionary::Dictionary::new("test_data/test.kv").unwrap();
-        assert_eq!(dict.size(), 3);
+        assert_eq!(dict.size(), 5);
     }
 
     #[test]
@@ -35,14 +35,6 @@ mod tests {
             .unwrap()
             .get("a");
         assert_eq!(m.matched_string(), "a");
-    }
-
-    #[test]
-    fn dictionary_get_nulerror() {
-        let m = dictionary::Dictionary::new("test_data/test.kv")
-            .unwrap()
-            .get("abc\0d");
-        assert!(m.get_value_as_string().is_empty());
     }
 
     #[test]
@@ -85,18 +77,25 @@ mod tests {
 
     #[test]
     fn match_msgpacked_value_non_existing_key() {
-        let m = dictionary::Dictionary::new("test_data/test.kv")
-            .unwrap()
-            .get("non-existing-key");
+        let d = dictionary::Dictionary::new("test_data/test.kv").unwrap();
+        let m = d.get("non-existing-key");
+        assert!(m.get_value_as_string().is_empty());
+
+        let m = d.get("non-existing-key-with-\0-in-middle");
         assert!(m.get_value_as_string().is_empty());
     }
 
     #[test]
     fn match_value() {
-        let m = dictionary::Dictionary::new("test_data/test.kv")
-            .unwrap()
-            .get("a");
+        let d = dictionary::Dictionary::new("test_data/test.kv").unwrap();
+        let m = d.get("a");
         assert_eq!(m.get_value_as_string(), "[12,13]");
+
+        let m = d.get("d\0");
+        assert_eq!(m.get_value_as_string(), "[1,2]");
+
+        let m = d.get("e\0f");
+        assert_eq!(m.get_value_as_string(), "[3,4]");
     }
 
     #[test]
