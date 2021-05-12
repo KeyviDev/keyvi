@@ -109,10 +109,8 @@ char* keyvi_dictionary_get_statistics(const keyvi_dictionary* dict) {
   return std_2_c_string(dict->obj_->GetStatistics());
 }
 
-keyvi_match* keyvi_dictionary_get(const keyvi_dictionary* dict, const keyvi_bytes key) {
-  return new keyvi_match(
-    dict->obj_->operator[](
-      std::string(reinterpret_cast<const char*>(key.data_ptr), key.data_size)));
+keyvi_match* keyvi_dictionary_get(const keyvi_dictionary* dict, const char* key, const size_t key_len) {
+  return new keyvi_match(dict->obj_->operator[](std::string(key, key_len)));
 }
 
 keyvi_match_iterator* keyvi_dictionary_get_all_items(const keyvi_dictionary* dict) {

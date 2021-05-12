@@ -65,11 +65,9 @@ impl Dictionary {
     }
 
     pub fn get(&self, key: &str) -> KeyviMatch {
-        let key_c = root::keyvi_bytes {
-            data_size: key.len() as u64,
-            data_ptr: key.as_ptr(),
+        let match_ptr = unsafe {
+            root::keyvi_dictionary_get(self.dict, key.as_ptr() as *const i8, key.len() as u64)
         };
-        let match_ptr = unsafe { root::keyvi_dictionary_get(self.dict, key_c) };
         KeyviMatch::new(match_ptr)
     }
 
