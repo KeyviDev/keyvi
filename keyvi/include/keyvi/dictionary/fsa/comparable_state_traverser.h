@@ -38,6 +38,12 @@
 
 namespace keyvi {
 namespace dictionary {
+namespace matching {
+
+template <class nearInnerTraverserType>
+class NearMatching;
+}
+
 namespace fsa {
 
 template <class zipInnerTraverserType>
@@ -51,8 +57,6 @@ class ZipStateTraverser;
  *
  * Specializations:
  * - inner weights: compare 2 traverser objects based on inner weights
- *
- * Unsupported (yet):
  * - near traverser
  */
 template <class innerTraverserType>
@@ -171,6 +175,10 @@ class ComparableStateTraverser final {
 
   template <class zipInnerTraverserType>
   friend class ZipStateTraverser;
+
+  template <class nearInnerTraverserType>
+  friend class matching::NearMatching;
+
   traversal::TraversalState<transition_t> &GetStates() { return state_traverser_.GetStates(); }
 
   traversal::TraversalPayload<transition_t> &GetTraversalPayload() { return state_traverser_.GetTraversalPayload(); }

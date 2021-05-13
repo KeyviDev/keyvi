@@ -37,6 +37,7 @@
 #include "keyvi/dictionary/match.h"
 #include "keyvi/dictionary/match_iterator.h"
 #include "keyvi/dictionary/matching/fuzzy_matching.h"
+#include "keyvi/dictionary/matching/near_matching.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -305,85 +306,13 @@ class Dictionary final {
    * @param greedy if true matches everything below minimum prefix
    * @return
    */
-  MatchIterator::MatchIteratorPair GetNear(const std::string& key, size_t minimum_prefix_length, bool greedy = false) {
-    uint64_t state = fsa_->GetStartState();
+  MatchIterator::MatchIteratorPair GetNear(const std::string& key, const size_t minimum_prefix_length,
+                                           const bool greedy = false) const {
+    auto data = std::make_shared<matching::NearMatching<>>(
+        matching::NearMatching<>::FromSingleFsa(fsa_, key, minimum_prefix_length, greedy));
 
-    if (key.size() < minimum_prefix_length) {
-      return MatchIterator::EmptyIteratorPair();
-    }
-
-    TRACE("GetNear %s, matching prefix first", key.substr(0, minimum_prefix_length).c_str());
-    for (size_t i = 0; i < minimum_prefix_length; ++i) {
-      state = fsa_->TryWalkTransition(state, key[i]);
-
-      if (!state) {
-        return MatchIterator::EmptyIteratorPair();
-      }
-    }
-
-    std::vector<unsigned char> traversal_stack;
-    traversal_stack.reserve(20);
-
-    TRACE("Match prefix, doing near traversal now start state: %ld, remaining key: %s", state,
-          key.substr(minimum_prefix_length).c_str());
-
-    // data which is required for the callback as well
-    struct delegate_payload {
-      delegate_payload(fsa::NearStateTraverser&& t, const std::vector<unsigned char>& stack)
-          : traverser(std::move(t)), traversal_stack(std::move(stack)) {}
-
-      fsa::NearStateTraverser traverser;
-      std::vector<unsigned char> traversal_stack;
-      size_t matched_depth = 0;
-    };
-
-    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(key.substr(minimum_prefix_length));
-
-    auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
-    std::shared_ptr<delegate_payload> data(
-        new delegate_payload(fsa::NearStateTraverser(fsa_, state, std::move(payload)), traversal_stack));
-
-    auto tfunc = [data, key, minimum_prefix_length, greedy]() {
-      TRACE("prefix completion callback called");
-
-      for (;;) {
-        // check minimum depth
-        if (!data->traverser.AtEnd() && data->traverser.GetDepth() > data->matched_depth) {
-          data->traversal_stack.resize(data->traverser.GetDepth() - 1);
-          data->traversal_stack.push_back(data->traverser.GetStateLabel());
-          TRACE("Current depth %d (%d)", minimum_prefix_length + data->traverser.GetDepth() - 1,
-                data->traversal_stack.size());
-          if (data->traverser.IsFinalState()) {
-            // optimize? fill vector upfront?
-            std::string match_str =
-                key.substr(0, minimum_prefix_length) +
-                std::string(reinterpret_cast<char*>(&data->traversal_stack[0]), data->traverser.GetDepth());
-            TRACE("found final state at depth %d %s", minimum_prefix_length + data->traverser.GetDepth(),
-                  match_str.c_str());
-            Match m(0, data->traverser.GetDepth() + key.size(), match_str,
-                    minimum_prefix_length + data->traverser.GetTraversalPayload().exact_depth, data->traverser.GetFsa(),
-                    data->traverser.GetStateValue());
-
-            if (!greedy) {
-              // remember the depth
-              TRACE("found a match, remember depth, only allow matches with same depth %ld",
-                    data->traverser.GetTraversalPayload().exact_depth);
-              data->matched_depth = data->traverser.GetTraversalPayload().exact_depth;
-            }
-
-            data->traverser++;
-
-            return m;
-          }
-          data->traverser++;
-        } else {
-          TRACE("StateTraverser exhausted.");
-          return Match();
-        }
-      }
-    };
-
-    return MatchIterator::MakeIteratorPair(tfunc);
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
   }
 
   MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const int32_t max_edit_distance) const {

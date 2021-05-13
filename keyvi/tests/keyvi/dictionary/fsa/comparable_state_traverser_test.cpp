@@ -23,6 +23,7 @@
 
 #include "keyvi/dictionary/fsa/comparable_state_traverser.h"
 #include "keyvi/dictionary/fsa/state_traverser.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
 #include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
