@@ -48,7 +48,7 @@ namespace keyvi {
 namespace dictionary {
 namespace matching {
 
-template <class codepointInnterTraverserType = fsa::WeightedStateTraverser>
+template <class codepointInnerTraverserType = fsa::WeightedStateTraverser>
 class FuzzyMatching final {
  public:
   /**
@@ -157,7 +157,7 @@ class FuzzyMatching final {
    */
   template <class innerTraverserType = fsa::WeightedStateTraverser>
   static FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>> FromMulipleFsas(
-      const std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs, const std::string& query,
+      const std::vector<std::pair<fsa::automata_t, uint64_t>>& fsa_start_state_pairs, const std::string& query,
       const int32_t max_edit_distance, const size_t exact_prefix) {
     // if the list of fsa's is empty return an empty matcher
     if (fsa_start_state_pairs.size() == 0) {
@@ -179,7 +179,7 @@ class FuzzyMatching final {
     }
 
     // check for an exact match given the exact prefix
-    for (auto fsa_state : fsa_start_state_pairs) {
+    for (const auto& fsa_state : fsa_start_state_pairs) {
       if (fsa_state.first->IsFinalState(fsa_state.second)) {
         first_match =
             Match(0, codepoints.size(), query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
@@ -251,7 +251,7 @@ class FuzzyMatching final {
   }
 
  private:
-  FuzzyMatching(std::unique_ptr<fsa::CodePointStateTraverser<codepointInnterTraverserType>>&& traverser,
+  FuzzyMatching(std::unique_ptr<fsa::CodePointStateTraverser<codepointInnerTraverserType>>&& traverser,
                 std::unique_ptr<stringdistance::Levenshtein>&& metric, Match&& first_match,
                 const int32_t max_edit_distance, const size_t minimum_exact_prefix)
       : metric_ptr_(std::move(metric)),
@@ -269,7 +269,7 @@ class FuzzyMatching final {
 
  private:
   std::unique_ptr<stringdistance::Levenshtein> metric_ptr_;
-  std::unique_ptr<fsa::CodePointStateTraverser<codepointInnterTraverserType>> traverser_ptr_;
+  std::unique_ptr<fsa::CodePointStateTraverser<codepointInnerTraverserType>> traverser_ptr_;
   const int32_t max_edit_distance_;
   const size_t exact_prefix_;
   const Match first_match_;

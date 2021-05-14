@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -38,8 +39,12 @@ namespace keyvi {
 namespace dictionary {
 namespace matching {
 
-template <class innerTraverserType = fsa::NearStateTraverser>
+template <class innerTraverserType = fsa::ComparableStateTraverser<fsa::NearStateTraverser>>
 class NearMatching final {
+ private:
+  using fsa_start_state_payloads_t = std::vector<
+      std::tuple<fsa::automata_t, uint64_t, fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>>>;
+
  public:
   /**
    * Create a near matcher from a single Fsa
@@ -49,7 +54,7 @@ class NearMatching final {
    * @param minimum_exact_prefix the minimum exact prefix to match before matching approximate
    */
   static NearMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query,
-                                    const size_t minimum_exact_prefix, bool greedy = false) {
+                                    const size_t minimum_exact_prefix, const bool greedy = false) {
     uint64_t state = fsa->GetStartState();
 
     if (query.size() < minimum_exact_prefix) {
@@ -65,12 +70,13 @@ class NearMatching final {
       }
     }
 
+    // todo: check if the prefix is already an exact match
     Match first_match;
     std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(minimum_exact_prefix));
 
     auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
 
-    // todo: swith to make_unique, requires C++14
+    // todo: switch to make_unique, requires C++14
     std::unique_ptr<fsa::ComparableStateTraverser<fsa::NearStateTraverser>> traverser;
     traverser.reset(
         new fsa::ComparableStateTraverser<fsa::NearStateTraverser>(fsa, state, std::move(payload), true, 0));
@@ -84,34 +90,60 @@ class NearMatching final {
    * @param fsas a vector of fsas
    * @param query the query
    * @param minimum_exact_prefix the minimum exact prefix to match before matching approximate
+   * @param greedy if true matches everything below minimum prefix, if false everything at the longest matched prefix
    */
   static NearMatching FromMulipleFsas(const std::vector<fsa::automata_t>& fsas, const std::string& query,
-                                      const size_t minimum_exact_prefix = 2) {}
+                                      const size_t minimum_exact_prefix = 2, const bool greedy = false) {
+    fsa_start_state_payloads_t fsa_start_state_payloads = FilterWithExactPrefix(fsas, query, minimum_exact_prefix);
+  }
 
-  static inline std::vector<std::pair<fsa::automata_t, uint64_t>> FilterWithExactPrefix(
-      const std::vector<fsa::automata_t>& fsas, const std::string& query, const size_t minimum_exact_prefix = 2) {
-    std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs;
+  /**
+   * Create a near matcher with already matched exact prefix.
+   *
+   * @param fsa_start_state_pairs pairs of fsa and current state
+   * @param query the query
+   * @param exact_prefix the exact prefix that already matched
+   * @param greedy if true matches everything below minimum prefix, if false everything at the longest matched prefix
+   */
+
+  static NearMatching FromMulipleFsas(fsa_start_state_payloads_t& fsa_start_state_payloads, const std::string& query,
+                                      const size_t exact_prefix, const bool greedy = false) {
+    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(exact_prefix));
+    std::vector<std::tuple<fsa::automata_t, uint64_t, fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>>>
+        fsas_with_payload;
+    Match first_match;
+
+    /*for (auto fsa_state : fsa_start_state_pairs) {
+      // todo: check if the prefix is already an exact match
+
+    }*/
+
+    // todo: switch to make_unique, requires C++14
+    std::unique_ptr<fsa::ZipStateTraverser<fsa::NearStateTraverser>> traverser;
+    traverser.reset(new fsa::ZipStateTraverser<fsa::NearStateTraverser>(fsa_start_state_payloads));
+
+    return NearMatching(std::move(traverser), std::move(first_match), query.substr(0, exact_prefix), greedy);
+  }
+
+  static inline fsa_start_state_payloads_t FilterWithExactPrefix(const std::vector<fsa::automata_t>& fsas,
+                                                                 const std::string& query,
+                                                                 const size_t minimum_exact_prefix = 2) {
+    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(minimum_exact_prefix));
+    fsa_start_state_payloads_t fsa_start_state_payloads;
 
     for (const fsa::automata_t& fsa : fsas) {
       uint64_t state = fsa->GetStartState();
       size_t depth = 0;
-      size_t utf8_depth = 0;
       while (state != 0 && depth < minimum_exact_prefix) {
-        const size_t code_point_length = util::Utf8Utils::GetCharLength(query[utf8_depth]);
-        for (size_t i = 0; i < code_point_length; ++i, ++utf8_depth) {
-          state = fsa->TryWalkTransition(state, query[utf8_depth]);
-          if (0 == state) {
-            break;
-          }
-        }
-        ++depth;
+        state = fsa->TryWalkTransition(state, query[depth++]);
       }
 
       if (state && depth == minimum_exact_prefix) {
-        fsa_start_state_pairs.emplace_back(fsa, state);
+        auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
+        fsa_start_state_payloads.emplace_back(fsa, state, std::move(payload));
       }
     }
-    return fsa_start_state_pairs;
+    return fsa_start_state_payloads;
   }
 
   Match FirstMatch() const { return first_match_; }
@@ -146,7 +178,7 @@ class NearMatching final {
   }
 
  private:
-  NearMatching(std::unique_ptr<fsa::ComparableStateTraverser<innerTraverserType>>&& traverser, Match&& first_match,
+  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match,
                const std::string& minimum_exact_prefix, const bool greedy)
       : traverser_ptr_(std::move(traverser)),
         exact_prefix_(minimum_exact_prefix),
@@ -156,7 +188,7 @@ class NearMatching final {
   NearMatching() {}
 
  private:
-  std::unique_ptr<fsa::ComparableStateTraverser<innerTraverserType>> traverser_ptr_;
+  std::unique_ptr<innerTraverserType> traverser_ptr_;
   const std::string exact_prefix_;
   const Match first_match_;
   const bool greedy_ = false;

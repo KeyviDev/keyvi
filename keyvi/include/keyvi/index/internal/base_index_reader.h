@@ -96,6 +96,28 @@ class BaseIndexReader {
   }
 
   /**
+   * Match a key near:  Match as much as possible exact given the minimum prefix length and then return everything
+   * below.
+   *
+   * If greedy is True it matches everything below the minimum_prefix_length, but in the order of exact first.
+   *
+   * @param query a query to match against
+   * @param minimum_exact_prefix prefix length to be matched exact
+   * @param greedy if true matches everything below minimum prefix
+   *
+   */
+  dictionary::MatchIterator::MatchIteratorPair GetNear(const std::string& query, const size_t minimum_exact_prefix = 2,
+                                                       const bool greedy = false) {
+    TRACE("matching near: %s minimum prefix %ld", query.c_str(), minimum_exact_prefix);
+    const_segments_t segments = payload_.Segments();
+
+    if (segments->size() == 0) {
+      return dictionary::MatchIterator::EmptyIteratorPair();
+    }
+    return dictionary::MatchIterator::EmptyIteratorPair();
+  }
+
+  /**
    * Match approximate given the query and edit distance
    *
    * @param query a query to match against

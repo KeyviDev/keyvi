@@ -201,6 +201,35 @@ BOOST_AUTO_TEST_CASE(fuzzyMatching) {
   testFuzzyMatching(&reader_2, "abbc", 4, 1, {"abbc", "abc", "abdd"});
 }
 
+void testNearMatching(ReadOnlyIndex* reader, const std::string& query, const size_t minimum_exact_prefix,
+                      const bool greedy, const std::vector<std::string>& expected) {
+  auto expected_it = expected.begin();
+  auto matcher = reader->GetNear(query, minimum_exact_prefix, greedy);
+  for (auto m : matcher) {
+    BOOST_REQUIRE(expected_it != expected.end());
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  }
+  BOOST_CHECK(expected_it == expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(nearMatching) {
+  testing::IndexMock index;
+
+  std::vector<std::pair<std::string, std::string>> test_data = {{"pizzeria:u281z7hfvzq9", "pizzeria in Munich"},
+                                                                {"pizzeria:u0vu7uqfyqkg", "pizzeria in Mainz"},
+                                                                {"pizzeria:u281wu8bmmzq", "pizzeria in Munich"}};
+
+  index.AddSegment(&test_data);
+  std::vector<std::pair<std::string, std::string>> test_data_2 = {{"pizzeria:u33db8mmzj1t", "pizzeria in Berlin"},
+                                                                  {"pizzeria:u0yjjd65eqy0", "pizzeria in Frankfurt"},
+                                                                  {"pizzeria:u28db8mmzj1t", "pizzeria in Munich"},
+                                                                  {"pizzeria:u2817uqfyqkg", "pizzeria in Munich"}};
+
+  index.AddSegment(&test_data_2);
+  ReadOnlyIndex reader_1(index.GetIndexFolder(), {{"refresh_interval", "400"}});
+  testNearMatching(&reader_1, "abbc", 0, 2, {"abbc"});
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace index */
