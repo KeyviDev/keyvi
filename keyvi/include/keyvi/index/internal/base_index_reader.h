@@ -49,6 +49,65 @@ class IndexFriend;
 }
 namespace internal {
 
+template <class MatcherT, class DeletedT>
+inline keyvi::dictionary::Match nextFilteredMatchSingle(const MatcherT& matcher, const DeletedT& deleted_keys) {
+  keyvi::dictionary::Match m = matcher->NextMatch();
+
+  TRACE("check if key is deleted");
+  while (m.IsEmpty() == false) {
+    if (deleted_keys->count(m.GetMatchedString()) > 0) {
+      m = matcher->NextMatch();
+      continue;
+    }
+
+    break;
+  }
+  return m;
+}
+
+template <class MatcherT, class DeletedT>
+inline keyvi::dictionary::Match firstFilteredMatchSingle(const MatcherT& matcher, const DeletedT& deleted_keys) {
+  dictionary::Match first_match = matcher->FirstMatch();
+  if (first_match.IsEmpty() == false) {
+    if (deleted_keys->count(first_match.GetMatchedString()) > 0) {
+      return dictionary::Match();
+    }
+  }
+  return first_match;
+}
+
+template <class MatcherT, class DeletedT>
+inline keyvi::dictionary::Match nextFilteredMatch(const MatcherT& matcher, const DeletedT& deleted_keys_map) {
+  keyvi::dictionary::Match m = matcher->NextMatch();
+
+  TRACE("check if key is deleted");
+  while (m.IsEmpty() == false) {
+    auto dk = deleted_keys_map.find(m.GetFsa());
+    if (dk != deleted_keys_map.end()) {
+      if (dk->second->count(m.GetMatchedString()) > 0) {
+        m = matcher->NextMatch();
+        continue;
+      }
+    }
+    break;
+  }
+  return m;
+}
+
+template <class MatcherT, class DeletedT>
+inline keyvi::dictionary::Match firstFilteredMatch(const MatcherT& matcher, const DeletedT& deleted_keys_map) {
+  dictionary::Match first_match = matcher->FirstMatch();
+  if (first_match.IsEmpty() == false) {
+    auto dk = deleted_keys_map.find(first_match.GetFsa());
+    if (dk != deleted_keys_map.end()) {
+      if (dk->second->count(first_match.GetMatchedString()) > 0) {
+        return dictionary::Match();
+      }
+    }
+  }
+  return first_match;
+}
+
 template <class PayloadT, class SegmentT = ReadOnlySegment>
 class BaseIndexReader {
  public:
@@ -156,28 +215,12 @@ class BaseIndexReader {
           typename SegmentT::deleted_ptr_t deleted_keys = (*it)->DeletedKeys();
           if ((*it)->DeletedKeysSize() > 0) {
             auto func = [fuzzy_matcher, deleted_keys]() {
-              dictionary::Match m = fuzzy_matcher->NextMatch();
-
-              TRACE("check if key is deleted");
-              while (m.IsEmpty() == false) {
-                if (deleted_keys->count(m.GetMatchedString()) > 0) {
-                  m = fuzzy_matcher->NextMatch();
-                  continue;
-                }
-
-                break;
-              }
-              return m;
+              return nextFilteredMatchSingle(fuzzy_matcher, deleted_keys);
             };
 
             // check if first match is a deleted key and reset in case
-            dictionary::Match first_match = fuzzy_matcher->FirstMatch();
-            if (fuzzy_matcher->FirstMatch().IsEmpty() == false) {
-              if (deleted_keys->count(first_match.GetMatchedString()) > 0) {
-                first_match = dictionary::Match();
-              }
-            }
-            return dictionary::MatchIterator::MakeIteratorPair(func, first_match);
+            return dictionary::MatchIterator::MakeIteratorPair(func,
+                                                               firstFilteredMatchSingle(fuzzy_matcher, deleted_keys));
           }
           break;  // else: found the fsa, but segments has no deletes
         }
@@ -191,7 +234,7 @@ class BaseIndexReader {
     // segments and filtered fsa's must have the same order
     std::map<dictionary::fsa::automata_t, typename SegmentT::deleted_ptr_t> deleted_keys_map;
     auto segments_it = segments->cbegin();
-    for (auto fsa : fsa_start_state_pairs) {
+    for (const auto& fsa : fsa_start_state_pairs) {
       while (fsa.first != (*segments_it)->GetDictionary()->GetFsa()) {
         ++segments_it;
         // this should never happen
@@ -219,36 +262,9 @@ class BaseIndexReader {
       return dictionary::MatchIterator::MakeIteratorPair(func, fuzzy_matcher->FirstMatch());
     }
 
-    auto func = [fuzzy_matcher, deleted_keys_map]() {
-      dictionary::Match m = fuzzy_matcher->NextMatch();
-
-      TRACE("check if key is deleted");
-      while (m.IsEmpty() == false) {
-        auto dk = deleted_keys_map.find(m.GetFsa());
-        if (dk != deleted_keys_map.end()) {
-          if (dk->second->count(m.GetMatchedString()) > 0) {
-            m = fuzzy_matcher->NextMatch();
-            continue;
-          }
-        }
-        break;
-      }
-      return m;
-    };
-
+    auto func = [fuzzy_matcher, deleted_keys_map]() { return nextFilteredMatch(fuzzy_matcher, deleted_keys_map); };
     // check if first match is a deleted key and reset in case
-    dictionary::Match first_match = fuzzy_matcher->FirstMatch();
-    if (fuzzy_matcher->FirstMatch().IsEmpty() == false) {
-      auto dk = deleted_keys_map.find(first_match.GetFsa());
-      if (dk != deleted_keys_map.end()) {
-        if (dk->second->count(first_match.GetMatchedString()) > 0) {
-          // empty the first match
-          first_match = dictionary::Match();
-        }
-      }
-    }
-
-    return dictionary::MatchIterator::MakeIteratorPair(func, first_match);
+    return dictionary::MatchIterator::MakeIteratorPair(func, firstFilteredMatch(fuzzy_matcher, deleted_keys_map));
   }
 
  protected:
