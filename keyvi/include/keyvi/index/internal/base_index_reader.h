@@ -157,7 +157,7 @@ class BaseIndexReader {
     auto near_matcher = std::make_shared<
         dictionary::matching::NearMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::NearStateTraverser>>>(
         dictionary::matching::NearMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::NearStateTraverser>>::
-            FromMulipleFsas(fsa_start_state_payloads, query, minimum_exact_prefix, greedy));
+            FromMulipleFsas(std::move(fsa_start_state_payloads), query, minimum_exact_prefix, greedy));
 
     if (deleted_keys_map.size() == 0) {
       auto func = [near_matcher]() { return near_matcher->NextMatch(); };

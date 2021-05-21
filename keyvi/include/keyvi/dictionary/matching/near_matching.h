@@ -110,7 +110,7 @@ class NearMatching final {
                                       const size_t minimum_exact_prefix = 2, const bool greedy = false) {
     fsa_start_state_payloads_t fsa_start_state_payloads = FilterWithExactPrefix(fsas, query, minimum_exact_prefix);
 
-    return FromMulipleFsas(fsa_start_state_payloads, query, minimum_exact_prefix, greedy);
+    return FromMulipleFsas(std::move(fsa_start_state_payloads), query, minimum_exact_prefix, greedy);
   }
 
   /**
@@ -122,7 +122,7 @@ class NearMatching final {
    * @param greedy if true matches everything below minimum prefix, if false everything at the longest matched prefix
    */
 
-  static NearMatching FromMulipleFsas(fsa_start_state_payloads_t& fsa_start_state_payloads, const std::string& query,
+  static NearMatching FromMulipleFsas(fsa_start_state_payloads_t&& fsa_start_state_payloads, const std::string& query,
                                       const size_t exact_prefix, const bool greedy = false) {
     if (fsa_start_state_payloads.size() == 0) {
       return NearMatching();
