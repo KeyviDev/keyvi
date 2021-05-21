@@ -227,7 +227,7 @@ BOOST_AUTO_TEST_CASE(nearMatching) {
 
   index.AddSegment(&test_data_2);
   ReadOnlyIndex reader_1(index.GetIndexFolder(), {{"refresh_interval", "400"}});
-  testNearMatching(&reader_1, "abbc", 0, 2, {"abbc"});
+  testNearMatching(&reader_1, "pizzeria:u281wu88kekq", 12, false, {"pizzeria:u281wu8bmmzq"});
 }
 
 BOOST_AUTO_TEST_SUITE_END()

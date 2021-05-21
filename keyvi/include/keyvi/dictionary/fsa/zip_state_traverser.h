@@ -45,6 +45,11 @@
 
 namespace keyvi {
 namespace dictionary {
+namespace matching {
+
+template <class nearInnerTraverserType>
+class NearMatching;
+}
 namespace fsa {
 
 /**
@@ -208,6 +213,8 @@ class ZipStateTraverser final {
 
   label_t GetStateLabel() const { return state_label_; }
 
+  const std::vector<label_t> &GetStateLabels() const { return traverser_queue_.top()->GetStateLabels(); }
+
  private:
   heap_t traverser_queue_;
   bool final_ = false;
@@ -272,6 +279,13 @@ class ZipStateTraverser final {
       state_label_ = 0;
       fsa_.reset();
     }
+  }
+
+  template <class nearInnerTraverserType>
+  friend class matching::NearMatching;
+
+  const traversal::TraversalPayload<transition_t> &GetTraversalPayload() const {
+    return traverser_queue_.top()->GetTraversalPayload();
   }
 };
 
