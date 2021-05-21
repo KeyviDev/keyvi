@@ -140,7 +140,7 @@ class NearMatching final {
 
     // todo: switch to make_unique, requires C++14
     std::unique_ptr<fsa::ZipStateTraverser<fsa::NearStateTraverser>> traverser;
-    traverser.reset(new fsa::ZipStateTraverser<fsa::NearStateTraverser>(fsa_start_state_payloads));
+    traverser.reset(new fsa::ZipStateTraverser<fsa::NearStateTraverser>(std::move(fsa_start_state_payloads)));
 
     return NearMatching<fsa::ZipStateTraverser<fsa::NearStateTraverser>>(std::move(traverser), std::move(first_match),
                                                                          query.substr(0, exact_prefix), greedy);
@@ -199,10 +199,10 @@ class NearMatching final {
   }
 
  private:
-  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match,
-               const std::string& minimum_exact_prefix, const bool greedy)
+  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match, std::string&& minimum_exact_prefix,
+               const bool greedy)
       : traverser_ptr_(std::move(traverser)),
-        exact_prefix_(minimum_exact_prefix),
+        exact_prefix_(std::move(minimum_exact_prefix)),
         first_match_(std::move(first_match)),
         greedy_(greedy) {}
 

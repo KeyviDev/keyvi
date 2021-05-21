@@ -115,7 +115,7 @@ class ZipStateTraverser final {
   }
 
   explicit ZipStateTraverser(std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<transition_t>>>
-                                 &fsa_start_state_payloads,
+                                 &&fsa_start_state_payloads,
                              const bool advance = true) {
     size_t order = 0;
 

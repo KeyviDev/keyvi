@@ -1243,7 +1243,7 @@ BOOST_AUTO_TEST_CASE(nearTraversal) {
   v.emplace_back(f1, f1->GetStartState(), std::move(payload1));
   v.emplace_back(f2, f2->GetStartState(), std::move(payload2));
 
-  ZipStateTraverser<NearStateTraverser> s(v);
+  ZipStateTraverser<NearStateTraverser> s(std::move(v));
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
   s++;
