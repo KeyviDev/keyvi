@@ -40,6 +40,7 @@ inline keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT& matcher,
   TRACE("check if key is deleted");
   while (m.IsEmpty() == false) {
     if (deleted_keys->count(m.GetMatchedString()) > 0) {
+      matcher->ResetLastMatch();
       m = matcher->NextMatch();
       continue;
     }
@@ -69,6 +70,7 @@ inline keyvi::dictionary::Match NextFilteredMatch(const MatcherT& matcher, const
     auto dk = deleted_keys_map.find(m.GetFsa());
     if (dk != deleted_keys_map.end()) {
       if (dk->second->count(m.GetMatchedString()) > 0) {
+        matcher->ResetLastMatch();
         m = matcher->NextMatch();
         continue;
       }

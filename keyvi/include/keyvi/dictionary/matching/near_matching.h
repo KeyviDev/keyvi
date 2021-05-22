@@ -38,6 +38,14 @@
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
+namespace index {
+namespace internal {
+template <class MatcherT, class DeletedT>
+keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+template <class MatcherT, class DeletedT>
+keyvi::dictionary::Match NextFilteredMatch(const MatcherT&, const DeletedT&);
+}  // namespace internal
+}  // namespace index
 namespace dictionary {
 namespace matching {
 
@@ -64,7 +72,7 @@ class NearMatching final {
       return NearMatching();
     }
 
-    TRACE("GetNear %s, matching prefix first", key.substr(0, minimum_prefix_length).c_str());
+    TRACE("GetNear %s, matching prefix first", query.substr(0, minimum_exact_prefix).c_str());
     for (size_t i = 0; i < minimum_exact_prefix; ++i) {
       state = fsa->TryWalkTransition(state, query[i]);
 
@@ -179,6 +187,7 @@ class NearMatching final {
   Match FirstMatch() const { return first_match_; }
 
   Match NextMatch() {
+    TRACE("call next match %lu", matched_depth_);
     for (; traverser_ptr_ && traverser_ptr_->GetDepth() > matched_depth_;) {
       if (traverser_ptr_->IsFinalState()) {
         // optimize? fill vector upfront?
@@ -208,6 +217,12 @@ class NearMatching final {
   }
 
  private:
+  std::unique_ptr<innerTraverserType> traverser_ptr_;
+  const std::string exact_prefix_;
+  const Match first_match_;
+  const bool greedy_ = false;
+  size_t matched_depth_ = 0;
+
   NearMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match, std::string&& minimum_exact_prefix,
                const bool greedy)
       : traverser_ptr_(std::move(traverser)),
@@ -217,12 +232,13 @@ class NearMatching final {
 
   NearMatching() {}
 
- private:
-  std::unique_ptr<innerTraverserType> traverser_ptr_;
-  const std::string exact_prefix_;
-  const Match first_match_;
-  const bool greedy_ = false;
-  size_t matched_depth_ = 0;
+  // reset method for the index in the special case the match is deleted
+  template <class MatcherT, class DeletedT>
+  friend Match index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+  template <class MatcherT, class DeletedT>
+  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+
+  void ResetLastMatch() { matched_depth_ = 0; }
 };
 
 } /* namespace matching */

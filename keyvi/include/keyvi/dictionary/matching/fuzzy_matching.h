@@ -45,6 +45,14 @@
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
+namespace index {
+namespace internal {
+template <class MatcherT, class DeletedT>
+keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+template <class MatcherT, class DeletedT>
+keyvi::dictionary::Match NextFilteredMatch(const MatcherT&, const DeletedT&);
+}  // namespace internal
+}  // namespace index
 namespace dictionary {
 namespace matching {
 
@@ -274,6 +282,14 @@ class FuzzyMatching final {
   const int32_t max_edit_distance_;
   const size_t exact_prefix_;
   const Match first_match_;
+
+  // reset method for the index in the special case the match is deleted
+  template <class MatcherT, class DeletedT>
+  friend Match index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+  template <class MatcherT, class DeletedT>
+  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+
+  void ResetLastMatch() {}
 };
 
 } /* namespace matching */
