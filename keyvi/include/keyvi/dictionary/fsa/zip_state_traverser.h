@@ -121,7 +121,6 @@ class ZipStateTraverser final {
 
     for (auto &f : fsa_start_state_payloads) {
       if (std::get<1>(f) > 0) {
-        TRACE("create %ld, %s", order, std::get<2>(f).lookup_key.c_str());
         traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(
             std::get<0>(f), std::get<1>(f), std::move(std::get<2>(f)), advance, order++);
 
@@ -260,10 +259,11 @@ class ZipStateTraverser final {
         equal_states_++;
         // if not final yet check if other states are final
         if (!final_ && (*it)->IsFinalState()) {
+          TRACE("found final state in traverser %lu", (*it)->GetOrder());
           final_ = true;
           state_value_ = (*it)->GetStateValue();
-          fsa_ = t->GetFsa();
-          order_ = t->GetOrder();
+          fsa_ = (*it)->GetFsa();
+          order_ = (*it)->GetOrder();
         }
 
         it++;

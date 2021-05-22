@@ -25,6 +25,8 @@
 #include <utility>
 #include <vector>
 
+#include <boost/range/adaptor/reversed.hpp>
+
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/codepoint_state_traverser.h"
 #include "keyvi/dictionary/fsa/comparable_state_traverser.h"
@@ -84,8 +86,11 @@ class NearMatching final {
    */
   static NearMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state, const std::string& query,
                                     const size_t exact_prefix, const bool greedy = false) {
-    // todo: check if the prefix is already an exact match
     Match first_match;
+    if (fsa->IsFinalState(start_state)) {
+      first_match = Match(0, query.size(), query, exact_prefix, fsa, fsa->GetStateValue(start_state));
+    }
+
     std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(exact_prefix));
 
     auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
@@ -133,10 +138,14 @@ class NearMatching final {
         fsas_with_payload;
     Match first_match;
 
-    /*for (auto fsa_state : fsa_start_state_pairs) {
-      // todo: check if the prefix is already an exact match
-
-    }*/
+    // check if the prefix is already an exact match
+    for (const auto& fsa_state : boost::adaptors::reverse(fsa_start_state_payloads)) {
+      if (std::get<0>(fsa_state)->IsFinalState(std::get<1>(fsa_state))) {
+        first_match = Match(0, query.size(), query, exact_prefix, std::get<0>(fsa_state),
+                            std::get<0>(fsa_state)->GetStateValue(std::get<1>(fsa_state)));
+        break;
+      }
+    }
 
     // todo: switch to make_unique, requires C++14
     std::unique_ptr<fsa::ZipStateTraverser<fsa::NearStateTraverser>> traverser;

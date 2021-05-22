@@ -241,6 +241,7 @@ class FuzzyMatching final {
       }
 
       if (traverser_ptr_->IsFinalState() && metric_ptr_->GetScore() <= max_edit_distance_) {
+        TRACE("found match %s %lu", metric_ptr_->GetCandidate().c_str(), traverser_ptr_->GetStateValue());
         Match m = Match(0, candidate_length(), metric_ptr_->GetCandidate(), metric_ptr_->GetScore(),
                         traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
         (*traverser_ptr_)++;
