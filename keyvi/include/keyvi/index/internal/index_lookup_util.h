@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+/**
+ * Shared index lookup code for special matchers like fuzzy and near, mainly handlinge deletes in the index.
+ */
+
 #ifndef KEYVI_INDEX_INTERNAL_INDEX_LOOKUP_UTIL_H_
 #define KEYVI_INDEX_INTERNAL_INDEX_LOOKUP_UTIL_H_
 
@@ -33,6 +37,9 @@ namespace keyvi {
 namespace index {
 namespace internal {
 
+/**
+ * Filters matches and drops results for deleted keys for a single FSA.
+ */
 template <class MatcherT, class DeletedT>
 inline keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT& matcher, const DeletedT& deleted_keys) {
   keyvi::dictionary::Match m = matcher->NextMatch();
@@ -50,6 +57,9 @@ inline keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT& matcher,
   return m;
 }
 
+/**
+ * Checks if a first match is marked as deleted. Single FSA case.
+ */
 template <class MatcherT, class DeletedT>
 inline keyvi::dictionary::Match FirstFilteredMatchSingle(const MatcherT& matcher, const DeletedT& deleted_keys) {
   dictionary::Match first_match = matcher->FirstMatch();
@@ -61,6 +71,9 @@ inline keyvi::dictionary::Match FirstFilteredMatchSingle(const MatcherT& matcher
   return first_match;
 }
 
+/**
+ * Filters matches and drops results for deleted keys for a multiple FSA's.
+ */
 template <class MatcherT, class DeletedT>
 inline keyvi::dictionary::Match NextFilteredMatch(const MatcherT& matcher, const DeletedT& deleted_keys_map) {
   keyvi::dictionary::Match m = matcher->NextMatch();
@@ -80,6 +93,9 @@ inline keyvi::dictionary::Match NextFilteredMatch(const MatcherT& matcher, const
   return m;
 }
 
+/**
+ * Checks if a first match is marked as deleted. Multi FSA case.
+ */
 template <class MatcherT, class DeletedT>
 inline keyvi::dictionary::Match FirstFilteredMatch(const MatcherT& matcher, const DeletedT& deleted_keys_map) {
   dictionary::Match first_match = matcher->FirstMatch();
