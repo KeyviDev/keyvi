@@ -14,6 +14,8 @@ cdef extern from "keyvi/index/index.h" namespace "keyvi::index":
         Index(libcpp_utf8_string, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] params) except+ # wrap-ignore
         void Set(libcpp_utf8_string, libcpp_utf8_string) except+
         void MSet(s_shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string, libcpp_utf8_string]]]) # wrap-ignore
+        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except +
+        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except +
         _MatchIteratorPair GetFuzzy(libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except +
         void Delete(libcpp_utf8_string) except+
         void Flush() except+
