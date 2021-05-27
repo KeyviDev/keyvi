@@ -129,8 +129,8 @@ keyvi_match_iterator* keyvi_dictionary_get_all_prefix_completions(const keyvi_di
   return new keyvi_match_iterator(prefixCompletion.GetCompletions(std::string(key, key_len)));
 }
 
-keyvi_match_iterator* keyvi_dictionary_get_fuzzy(const keyvi_dictionary* dict, const char* key,
-                                                 const size_t key_len, const size_t max_edit_distance) {
+keyvi_match_iterator* keyvi_dictionary_get_fuzzy(const keyvi_dictionary* dict, const char* key, const size_t key_len,
+                                                 const size_t max_edit_distance) {
   return new keyvi_match_iterator(dict->obj_->GetFuzzy(std::string(key, key_len), max_edit_distance));
 }
 
