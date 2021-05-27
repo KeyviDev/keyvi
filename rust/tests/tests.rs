@@ -181,17 +181,30 @@ mod tests {
     fn prefix_completions_with_and_without_cutoff() {
         let d = dictionary::Dictionary::new("test_data/completion_test.kv").unwrap();
 
-        let mut all_prefix_completions: Vec<String> = d.get_all_prefix_completions("m")
+        let mut all_prefix_completions: Vec<String> = d
+            .get_all_prefix_completions("m")
             .map(|m| (m.matched_string()))
             .collect();
         all_prefix_completions.sort();
-        assert_eq!(all_prefix_completions, vec!["mozilla fans", "mozilla firebird", "mozilla firefox", "mozilla footprint"]);
+        assert_eq!(
+            all_prefix_completions,
+            vec![
+                "mozilla fans",
+                "mozilla firebird",
+                "mozilla firefox",
+                "mozilla footprint"
+            ]
+        );
 
-        let mut some_prefix_completions: Vec<String> = d.get_prefix_completions("m", 2)
+        let mut some_prefix_completions: Vec<String> = d
+            .get_prefix_completions("m", 2)
             .map(|m| (m.matched_string()))
             .collect();
         some_prefix_completions.sort();
-        assert_eq!(some_prefix_completions, vec!["mozilla fans", "mozilla firefox"]);
+        assert_eq!(
+            some_prefix_completions,
+            vec!["mozilla fans", "mozilla firefox"]
+        );
     }
 
     #[test]

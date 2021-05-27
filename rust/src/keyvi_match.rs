@@ -49,7 +49,7 @@ impl KeyviMatch {
             Err(e) => {
                 eprintln!("Err: {}", e);
                 serde_json::json!(null)
-            },
+            }
         };
         json
     }
