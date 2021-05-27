@@ -85,6 +85,15 @@ impl Dictionary {
         KeyviMatchIterator::new(ptr)
     }
 
+    pub fn get_all_prefix_completions(&self, key: &str) -> KeyviMatchIterator {
+        let ptr = unsafe {
+            root::keyvi_dictionary_get_all_prefix_completions(
+                self.dict, key.as_ptr() as *const i8, key.len() as u64
+            )
+        };
+        KeyviMatchIterator::new(ptr)
+    }
+
     pub fn get_fuzzy(&self, key: &str, max_edit_distance: u64) -> KeyviMatchIterator {
         let ptr = unsafe {
             root::keyvi_dictionary_get_fuzzy(

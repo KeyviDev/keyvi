@@ -60,6 +60,7 @@ fn main() {
         .whitelist_function("keyvi_dictionary_get_fuzzy")
         .whitelist_function("keyvi_dictionary_get_multi_word_completions")
         .whitelist_function("keyvi_dictionary_get_prefix_completions")
+        .whitelist_function("keyvi_dictionary_get_all_prefix_completions")
         .whitelist_function("keyvi_dictionary_get_size")
         .whitelist_function("keyvi_dictionary_get_statistics")
         .whitelist_function("keyvi_match_destroy")
