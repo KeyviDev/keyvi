@@ -178,11 +178,11 @@ mod tests {
     }
 
     #[test]
-    fn prefix_completions_with_and_without_cutoff() {
+    fn prefix_completions() {
         let d = dictionary::Dictionary::new("test_data/completion_test.kv").unwrap();
 
         let mut all_prefix_completions: Vec<String> = d
-            .get_all_prefix_completions("m")
+            .get_prefix_completions("m", 10000)
             .map(|m| (m.matched_string()))
             .collect();
         all_prefix_completions.sort();
