@@ -118,20 +118,20 @@ keyvi_match_iterator* keyvi_dictionary_get_all_items(const keyvi_dictionary* dic
 }
 
 keyvi_match_iterator* keyvi_dictionary_get_prefix_completions(const keyvi_dictionary* dict, const char* key,
-                                                              size_t cutoff) {
+                                                              const size_t key_len, const size_t cutoff) {
   PrefixCompletion prefixCompletion(dict->obj_);
-  return new keyvi_match_iterator(prefixCompletion.GetCompletions(key, cutoff));
+  return new keyvi_match_iterator(prefixCompletion.GetCompletions(std::string(key, key_len), cutoff));
 }
 
-keyvi_match_iterator* keyvi_dictionary_get_fuzzy(const keyvi_dictionary* dict, const char* key,
-                                                 size_t max_edit_distance) {
-  return new keyvi_match_iterator(dict->obj_->GetFuzzy(key, max_edit_distance));
+keyvi_match_iterator* keyvi_dictionary_get_fuzzy(const keyvi_dictionary* dict, const char* key, const size_t key_len,
+                                                 const size_t max_edit_distance) {
+  return new keyvi_match_iterator(dict->obj_->GetFuzzy(std::string(key, key_len), max_edit_distance));
 }
 
 keyvi_match_iterator* keyvi_dictionary_get_multi_word_completions(const keyvi_dictionary* dict, const char* key,
-                                                                  size_t cutoff) {
+                                                                  const size_t key_len, const size_t cutoff) {
   MultiWordCompletion multiWordCompletion(dict->obj_);
-  return new keyvi_match_iterator(multiWordCompletion.GetCompletions(key, cutoff));
+  return new keyvi_match_iterator(multiWordCompletion.GetCompletions(std::string(key, key_len), cutoff));
 }
 
 //////////////////////

@@ -44,7 +44,14 @@ impl KeyviMatch {
 
     pub fn get_value(&self) -> serde_json::Value {
         let value_str = self.get_value_as_string();
-        serde_json::from_str(value_str.as_str()).unwrap()
+        let json = match serde_json::from_str(value_str.as_str()) {
+            Ok(j) => j,
+            Err(e) => {
+                eprintln!("Err: {}", e);
+                serde_json::json!(null)
+            }
+        };
+        json
     }
 
     pub fn get_value_as_string(&self) -> String {

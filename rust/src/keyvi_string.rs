@@ -52,6 +52,12 @@ impl Deref for KeyviString {
 
     fn deref<'a>(&'a self) -> &'a str {
         let c_str = unsafe { CStr::from_ptr(self.str_) };
-        c_str.to_str().unwrap()
+        match c_str.to_str() {
+            Ok(s) => s,
+            Err(e) => {
+                eprintln!("Err: {}", e);
+                ""
+            }
+        }
     }
 }

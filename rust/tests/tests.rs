@@ -178,6 +178,36 @@ mod tests {
     }
 
     #[test]
+    fn prefix_completions() {
+        let d = dictionary::Dictionary::new("test_data/completion_test.kv").unwrap();
+
+        let mut all_prefix_completions: Vec<String> = d
+            .get_prefix_completions("m", 10000)
+            .map(|m| (m.matched_string()))
+            .collect();
+        all_prefix_completions.sort();
+        assert_eq!(
+            all_prefix_completions,
+            vec![
+                "mozilla fans",
+                "mozilla firebird",
+                "mozilla firefox",
+                "mozilla footprint"
+            ]
+        );
+
+        let mut some_prefix_completions: Vec<String> = d
+            .get_prefix_completions("m", 2)
+            .map(|m| (m.matched_string()))
+            .collect();
+        some_prefix_completions.sort();
+        assert_eq!(
+            some_prefix_completions,
+            vec!["mozilla fans", "mozilla firefox"]
+        );
+    }
+
+    #[test]
     fn multi_word_completions_cutoff() {
         let mut values = vec![("80", "mozilla firefox")];
         values.sort();
