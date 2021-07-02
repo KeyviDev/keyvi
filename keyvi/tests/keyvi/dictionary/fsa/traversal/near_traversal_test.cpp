@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 
+#include <utility>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/fsa/automata.h"
@@ -42,9 +44,10 @@ BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
   testing::TempDictionary dictionary(&test_data);
   automata_t f = dictionary.GetFsa();
 
-  auto payload = traversal::TraversalPayload<traversal::NearTransition>("aace");
+  std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
+  auto payload = traversal::TraversalPayload<traversal::NearTransition>(near_key);
 
-  StateTraverser<traversal::NearTransition> s(f, f->GetStartState(), &payload);
+  StateTraverser<traversal::NearTransition> s(f, f->GetStartState(), std::move(payload));
 
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());

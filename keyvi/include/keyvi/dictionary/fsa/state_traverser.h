@@ -54,9 +54,9 @@ class StateTraverser final {
     this->operator++(0);
   }
 
-  StateTraverser(automata_t f, const uint64_t start_state, traversal::TraversalPayload<TransitionT> *payload,
+  StateTraverser(automata_t f, const uint64_t start_state, traversal::TraversalPayload<TransitionT> &&payload,
                  const bool advance = true)
-      : fsa_(f), current_weight_(0), current_label_(0), at_end_(false), stack_(*payload) {
+      : fsa_(f), current_weight_(0), current_label_(0), at_end_(false), stack_(std::move(payload)) {
     current_state_ = start_state;
 
     TRACE("StateTraverser starting with Start state %d", current_state_);
@@ -172,6 +172,8 @@ class StateTraverser final {
   const traversal::TraversalStack<TransitionT> &GetStack() const { return stack_; }
 
   traversal::TraversalState<transition_t> &GetStates() { return stack_.GetStates(); }
+
+  const traversal::TraversalPayload<TransitionT> &GetTraversalPayload() const { return stack_.traversal_stack_payload; }
 };
 
 } /* namespace fsa */

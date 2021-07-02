@@ -38,11 +38,16 @@
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
+namespace dictionary {
+struct Match;
+}
 namespace index {
 namespace internal {
-template <class PayloadT, class SegmentT>
-class BaseIndexReader;
-}
+template <class MatcherT, class DeletedT>
+keyvi::dictionary::Match NextFilteredMatch(const MatcherT&, const DeletedT&);
+template <class MatcherT, class DeletedT>
+keyvi::dictionary::Match FirstFilteredMatch(const MatcherT&, const DeletedT&);
+}  // namespace internal
 }  // namespace index
 namespace dictionary {
 
@@ -183,8 +188,10 @@ struct Match {
   attributes_t attributes_ = 0;
 
   // friend for accessing the fsa
-  template <class PayloadT, class SegmentT>
-  friend class index::internal::BaseIndexReader;
+  template <class MatcherT, class DeletedT>
+  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+  template <class MatcherT, class DeletedT>
+  friend Match index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
 
   fsa::automata_t& GetFsa() { return fsa_; }
 };

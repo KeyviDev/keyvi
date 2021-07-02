@@ -164,6 +164,33 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
   }
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
+
+  // check exact match
+  expected_matches = {"pizzeria:u281wu8bmmzq"};
+
+  i = 0;
+
+  // check near match for pizzeria:u28, it should only return 1 match "281wu" is the closest
+  for (auto m : d->GetNear("pizzeria:u281wu8bmmzq", 12)) {
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
+    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+  }
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
+
+  i = 0;
+
+  // check near match for the full location pizzeria:u281wu8bmmzq
+  for (auto m : d->GetNear("pizzeria:u281wu8bmmzq", 21)) {
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
+    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+  }
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
 }
 
 BOOST_AUTO_TEST_CASE(DictGetZerobyte) {

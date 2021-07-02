@@ -34,10 +34,9 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-// weighted state traverser
-typedef StateTraverser<traversal::WeightedTransition> WeightedStateTraverser;
-typedef StateTraverser<traversal::BoundedWeightedTransition> BoundedWeightedStateTraverser2;
-typedef StateTraverser<traversal::NearTransition> NearStateTraverser;
+using BoundedWeightedStateTraverser2 = StateTraverser<traversal::BoundedWeightedTransition>;
+using NearStateTraverser = StateTraverser<traversal::NearTransition>;
+using WeightedStateTraverser = StateTraverser<traversal::WeightedTransition>;
 
 } /* namespace fsa */
 } /* namespace dictionary */

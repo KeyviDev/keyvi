@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_FSA_TRAVERSAL_NEAR_TRAVERSAL_H_
 #define KEYVI_DICTIONARY_FSA_TRAVERSAL_NEAR_TRAVERSAL_H_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -45,10 +46,10 @@ struct NearTransition : public Transition {
 template <>
 struct TraversalPayload<NearTransition> {
   TraversalPayload() : current_depth(0), lookup_key() {}
-  explicit TraversalPayload(const std::string& lookup_key) : current_depth(0), lookup_key(lookup_key) {}
+  explicit TraversalPayload(std::shared_ptr<std::string>& lookup_key) : current_depth(0), lookup_key(lookup_key) {}
 
   size_t current_depth;
-  std::string lookup_key;
+  std::shared_ptr<std::string> lookup_key;
   size_t exact_depth = 0;
   bool exact = true;
 };
@@ -80,8 +81,8 @@ inline void TraversalState<NearTransition>::Add(uint64_t s, unsigned char l,
   // check exact match
   TRACE("Add %c depth %d, exact %c", l, payload->current_depth, payload->lookup_key[payload->current_depth]);
 
-  if (payload->exact && payload->current_depth < payload->lookup_key.size() &&
-      payload->lookup_key[payload->current_depth] == l) {
+  if (payload->exact && payload->current_depth < payload->lookup_key->size() &&
+      payload->lookup_key->operator[](payload->current_depth) == l) {
     // fill in and set position 0, so that we start traversal there
     TRACE("Found exact match");
     traversal_state_payload.position = 0;

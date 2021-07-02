@@ -45,10 +45,18 @@
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
+namespace index {
+namespace internal {
+template <class MatcherT, class DeletedT>
+keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+template <class MatcherT, class DeletedT>
+keyvi::dictionary::Match NextFilteredMatch(const MatcherT&, const DeletedT&);
+}  // namespace internal
+}  // namespace index
 namespace dictionary {
 namespace matching {
 
-template <class codepointInnterTraverserType = fsa::WeightedStateTraverser>
+template <class codepointInnerTraverserType = fsa::WeightedStateTraverser>
 class FuzzyMatching final {
  public:
   /**
@@ -157,7 +165,7 @@ class FuzzyMatching final {
    */
   template <class innerTraverserType = fsa::WeightedStateTraverser>
   static FuzzyMatching<fsa::ZipStateTraverser<innerTraverserType>> FromMulipleFsas(
-      const std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs, const std::string& query,
+      const std::vector<std::pair<fsa::automata_t, uint64_t>>& fsa_start_state_pairs, const std::string& query,
       const int32_t max_edit_distance, const size_t exact_prefix) {
     // if the list of fsa's is empty return an empty matcher
     if (fsa_start_state_pairs.size() == 0) {
@@ -179,7 +187,7 @@ class FuzzyMatching final {
     }
 
     // check for an exact match given the exact prefix
-    for (auto fsa_state : fsa_start_state_pairs) {
+    for (const auto& fsa_state : fsa_start_state_pairs) {
       if (fsa_state.first->IsFinalState(fsa_state.second)) {
         first_match =
             Match(0, codepoints.size(), query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
@@ -241,6 +249,7 @@ class FuzzyMatching final {
       }
 
       if (traverser_ptr_->IsFinalState() && metric_ptr_->GetScore() <= max_edit_distance_) {
+        TRACE("found match %s %lu", metric_ptr_->GetCandidate().c_str(), traverser_ptr_->GetStateValue());
         Match m = Match(0, candidate_length(), metric_ptr_->GetCandidate(), metric_ptr_->GetScore(),
                         traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
         (*traverser_ptr_)++;
@@ -251,7 +260,7 @@ class FuzzyMatching final {
   }
 
  private:
-  FuzzyMatching(std::unique_ptr<fsa::CodePointStateTraverser<codepointInnterTraverserType>>&& traverser,
+  FuzzyMatching(std::unique_ptr<fsa::CodePointStateTraverser<codepointInnerTraverserType>>&& traverser,
                 std::unique_ptr<stringdistance::Levenshtein>&& metric, Match&& first_match,
                 const int32_t max_edit_distance, const size_t minimum_exact_prefix)
       : metric_ptr_(std::move(metric)),
@@ -269,10 +278,18 @@ class FuzzyMatching final {
 
  private:
   std::unique_ptr<stringdistance::Levenshtein> metric_ptr_;
-  std::unique_ptr<fsa::CodePointStateTraverser<codepointInnterTraverserType>> traverser_ptr_;
+  std::unique_ptr<fsa::CodePointStateTraverser<codepointInnerTraverserType>> traverser_ptr_;
   const int32_t max_edit_distance_;
   const size_t exact_prefix_;
   const Match first_match_;
+
+  // reset method for the index in the special case the match is deleted
+  template <class MatcherT, class DeletedT>
+  friend Match index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+  template <class MatcherT, class DeletedT>
+  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+
+  void ResetLastMatch() {}
 };
 
 } /* namespace matching */

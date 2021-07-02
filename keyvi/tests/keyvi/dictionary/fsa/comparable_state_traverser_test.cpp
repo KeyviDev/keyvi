@@ -16,10 +16,14 @@
 // limitations under the License.
 //
 
+#include <memory>
+#include <utility>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/fsa/comparable_state_traverser.h"
 #include "keyvi/dictionary/fsa/state_traverser.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
 #include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
@@ -441,6 +445,203 @@ BOOST_AUTO_TEST_CASE(interleave2) {
   BOOST_CHECK(t2 < t1);
   BOOST_CHECK_EQUAL(t1, t2);
   BOOST_CHECK_EQUAL(3, t2.GetDepth());
+}
+
+BOOST_AUTO_TEST_CASE(nearTraversalSpecialization) {
+  std::vector<std::string> test_data1 = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "cdefgh"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::string> test_data2 = {"abbb", "aabc", "bbcd", "aaceh", "cdefgh"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
+
+  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+
+  ComparableStateTraverser<NearStateTraverser> t1(f1, f1->GetStartState(), std::move(payload1), true, 0);
+  ComparableStateTraverser<NearStateTraverser> t2(f2, f2->GetStartState(), std::move(payload2), true, 1);
+
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, t1.GetDepth());
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK(t1 != t2);
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, t1.GetDepth());
+  BOOST_CHECK_EQUAL('a', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, t2.GetDepth());
+  BOOST_CHECK(t1 == t2);
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('c', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
+  BOOST_CHECK_EQUAL('c', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+  BOOST_CHECK(t1 != t2);
+
+  // inc to aacd (not exact)
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  // inc to aace (exact match)
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('d', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t1.GetDepth());
+  BOOST_CHECK(t1.IsFinalState());
+  BOOST_CHECK_EQUAL('e', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+  BOOST_CHECK(t1 != t2);
+
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('h', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, t2.GetDepth());
+  BOOST_CHECK(t2.IsFinalState());
+
+  t2++;
+  // order change: t2 because exact matching for t2 finished
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('b', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t1.GetDepth());
+  BOOST_CHECK(t1.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('b', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
+}
+
+BOOST_AUTO_TEST_CASE(nearTraversalSpecialization2) {
+  std::vector<std::string> test_data1 = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "cdefgh"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::string> test_data2 = {"abbb", "aabc", "bbcd", "aaceh", "aacexyz", "aacexz", "cdefgh"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
+
+  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+
+  ComparableStateTraverser<NearStateTraverser> t1(f1, f1->GetStartState(), std::move(payload1), true, 0);
+  ComparableStateTraverser<NearStateTraverser> t2(f2, f2->GetStartState(), std::move(payload2), true, 1);
+
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, t1.GetDepth());
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK(t1 != t2);
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, t1.GetDepth());
+  BOOST_CHECK_EQUAL('a', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, t2.GetDepth());
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('c', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
+  BOOST_CHECK_EQUAL('c', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  // inc to aacd (not exact)
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  // inc to aace (exact match)
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('d', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t1.GetDepth());
+  BOOST_CHECK(t1.IsFinalState());
+  BOOST_CHECK_EQUAL('e', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('h', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, t2.GetDepth());
+  BOOST_CHECK(t2.IsFinalState());
+
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('x', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('y', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(6, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('z', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(7, t2.GetDepth());
+  BOOST_CHECK(t2.IsFinalState());
+
+  t2++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('z', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(6, t2.GetDepth());
+  BOOST_CHECK(t2.IsFinalState());
+
+  t2++;
+  // order change: t2 because exact matching for t2 finished
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('b', t2.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t2.GetDepth());
+  BOOST_CHECK(!t2.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 > t1);
+  BOOST_CHECK_EQUAL('a', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, t1.GetDepth());
+  BOOST_CHECK(t1.IsFinalState());
+
+  t1++;
+  BOOST_CHECK(t2 < t1);
+  BOOST_CHECK_EQUAL('b', t1.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, t1.GetDepth());
+  BOOST_CHECK(!t1.IsFinalState());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

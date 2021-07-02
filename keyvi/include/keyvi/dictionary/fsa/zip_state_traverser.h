@@ -30,6 +30,7 @@
 #include <initializer_list>
 #include <map>
 #include <memory>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -44,6 +45,11 @@
 
 namespace keyvi {
 namespace dictionary {
+namespace matching {
+
+template <class nearInnerTraverserType>
+class NearMatching;
+}
 namespace fsa {
 
 /**
@@ -99,6 +105,25 @@ class ZipStateTraverser final {
       if (f.second > 0) {
         traverser_t traverser =
             std::make_shared<ComparableStateTraverser<innerTraverserType>>(f.first, f.second, advance, order++);
+        // the traverser could be exhausted after it has been advanced
+        if (*traverser) {
+          traverser_queue_.push(traverser);
+        }
+      }
+    }
+    FillInValues();
+  }
+
+  explicit ZipStateTraverser(std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<transition_t>>>
+                                 &&fsa_start_state_payloads,
+                             const bool advance = true) {
+    size_t order = 0;
+
+    for (auto &f : fsa_start_state_payloads) {
+      if (std::get<1>(f) > 0) {
+        traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(
+            std::get<0>(f), std::get<1>(f), std::move(std::get<2>(f)), advance, order++);
+
         // the traverser could be exhausted after it has been advanced
         if (*traverser) {
           traverser_queue_.push(traverser);
@@ -187,6 +212,8 @@ class ZipStateTraverser final {
 
   label_t GetStateLabel() const { return state_label_; }
 
+  const std::vector<label_t> &GetStateLabels() const { return traverser_queue_.top()->GetStateLabels(); }
+
  private:
   heap_t traverser_queue_;
   bool final_ = false;
@@ -225,15 +252,18 @@ class ZipStateTraverser final {
       auto it = traverser_queue_.ordered_begin();
       it++;
 
+      TRACE("label: %c", state_label_);
+
       while (traverser_queue_.size() > equal_states_ && *t == *(*it)) {
         TRACE("dedup");
         equal_states_++;
         // if not final yet check if other states are final
         if (!final_ && (*it)->IsFinalState()) {
+          TRACE("found final state in traverser %lu", (*it)->GetOrder());
           final_ = true;
           state_value_ = (*it)->GetStateValue();
-          fsa_ = t->GetFsa();
-          order_ = t->GetOrder();
+          fsa_ = (*it)->GetFsa();
+          order_ = (*it)->GetOrder();
         }
 
         it++;
@@ -249,6 +279,13 @@ class ZipStateTraverser final {
       state_label_ = 0;
       fsa_.reset();
     }
+  }
+
+  template <class nearInnerTraverserType>
+  friend class matching::NearMatching;
+
+  const traversal::TraversalPayload<transition_t> &GetTraversalPayload() const {
+    return traverser_queue_.top()->GetTraversalPayload();
   }
 };
 
