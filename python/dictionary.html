@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Dictionary &#8212; keyvi  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Index" href="index.html" />
+    <link rel="prev" title="Index" href="../cpp/index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="dictionary">
+<h1>Dictionary<a class="headerlink" href="#dictionary" title="Permalink to this headline">¶</a></h1>
+<p>The Dictionary provides read access to a singkle keyvi file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">keyvi.dictionary</span> <span class="kn">import</span> <span class="n">Dictionary</span>
+
+<span class="n">d</span><span class="o">=</span><span class="n">Dictionary</span><span class="p">(</span><span class="s2">&quot;data.kv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">keyvi.dictionary.</span></span><span class="sig-name descname"><span class="pre">Dictionary</span></span><a class="headerlink" href="#keyvi.dictionary.Dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython implementation of _Dictionary</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.Get">
+<span class="sig-name descname"><span class="pre">Get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.Get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: _MatchIteratorPair Get(libcpp_utf8_string)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.GetFuzzy">
+<span class="sig-name descname"><span class="pre">GetFuzzy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.GetFuzzy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: _MatchIteratorPair GetFuzzy(libcpp_utf8_string, int32_t max_edit_distance)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.GetManifest">
+<span class="sig-name descname"><span class="pre">GetManifest</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.GetManifest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: libcpp_utf8_output_string GetManifest()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.GetNear">
+<span class="sig-name descname"><span class="pre">GetNear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.GetNear" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>Cython signature: _MatchIteratorPair GetNear(libcpp_utf8_string, size_t minimum_prefix_length)</p></li>
+<li><p>Cython signature: _MatchIteratorPair GetNear(libcpp_utf8_string, size_t minimum_prefix_length, bool greedy)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.Lookup">
+<span class="sig-name descname"><span class="pre">Lookup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.Lookup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: _MatchIteratorPair Lookup(libcpp_utf8_string)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.LookupText">
+<span class="sig-name descname"><span class="pre">LookupText</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.LookupText" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: _MatchIteratorPair LookupText(libcpp_utf8_string)</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/logo.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">keyvi</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=keyvidev&repo=keyvi&type=star&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../cpp/index.html" title="previous chapter">Index</a></li>
+      <li>Next: <a href="index.html" title="next chapter">Index</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, keyvi committers.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/python/dictionary.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

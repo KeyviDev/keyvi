@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Index &#8212; keyvi  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Dictionary" href="dictionary.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="index">
+<h1>Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h1>
+<p>An index is a near-realtime updateable data structure with full CRUD functionality.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">keyvi.index</span> <span class="kn">import</span> <span class="n">Index</span>
+<span class="kn">from</span> <span class="nn">keyvi.index</span> <span class="kn">import</span> <span class="n">ReadOnlyIndex</span>
+
+<span class="n">index</span> <span class="o">=</span> <span class="n">Index</span><span class="p">(</span><span class="s2">&quot;/tmp/index-directory&quot;</span><span class="p">)</span>
+<span class="n">index</span><span class="o">.</span><span class="n">Set</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;{&#39;b&#39;: 3}&quot;</span><span class="p">)</span>
+<span class="n">index</span><span class="o">.</span><span class="n">Flush</span><span class="p">()</span>
+
+<span class="n">ri</span> <span class="o">=</span> <span class="n">ReadOnlyIndex</span><span class="p">(</span><span class="s2">&quot;/tmp/index-directory&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="keyvi.index.Index">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">keyvi.index.</span></span><span class="sig-name descname"><span class="pre">Index</span></span><a class="headerlink" href="#keyvi.index.Index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython implementation of _Index</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.Index.Delete">
+<span class="sig-name descname"><span class="pre">Delete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.Index.Delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: void Delete(libcpp_utf8_string)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.Index.Flush">
+<span class="sig-name descname"><span class="pre">Flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.Index.Flush" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>Cython signature: void Flush()</p></li>
+<li><p>Cython signature: void Flush(bool)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.Index.Get">
+<span class="sig-name descname"><span class="pre">Get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.Index.Get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value for key if key is in the dictionary, else default.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.Index.GetFuzzy">
+<span class="sig-name descname"><span class="pre">GetFuzzy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.Index.GetFuzzy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: _MatchIteratorPair GetFuzzy(libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.Index.GetNear">
+<span class="sig-name descname"><span class="pre">GetNear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.Index.GetNear" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>Cython signature: _MatchIteratorPair GetNear(libcpp_utf8_string, size_t minimum_prefix_length)</p></li>
+<li><p>Cython signature: _MatchIteratorPair GetNear(libcpp_utf8_string, size_t minimum_prefix_length, bool greedy)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.Index.Set">
+<span class="sig-name descname"><span class="pre">Set</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.Index.Set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: void Set(libcpp_utf8_string, libcpp_utf8_string)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="keyvi.index.ReadOnlyIndex">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">keyvi.index.</span></span><span class="sig-name descname"><span class="pre">ReadOnlyIndex</span></span><a class="headerlink" href="#keyvi.index.ReadOnlyIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython implementation of _ReadOnlyIndex</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.ReadOnlyIndex.Get">
+<span class="sig-name descname"><span class="pre">Get</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.ReadOnlyIndex.Get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value for key if key is in the dictionary, else default.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.ReadOnlyIndex.GetFuzzy">
+<span class="sig-name descname"><span class="pre">GetFuzzy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.ReadOnlyIndex.GetFuzzy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cython signature: _MatchIteratorPair GetFuzzy(libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.index.ReadOnlyIndex.GetNear">
+<span class="sig-name descname"><span class="pre">GetNear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.index.ReadOnlyIndex.GetNear" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>Cython signature: _MatchIteratorPair GetNear(libcpp_utf8_string, size_t minimum_prefix_length)</p></li>
+<li><p>Cython signature: _MatchIteratorPair GetNear(libcpp_utf8_string, size_t minimum_prefix_length, bool greedy)</p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/logo.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">keyvi</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=keyvidev&repo=keyvi&type=star&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dictionary.html">Dictionary</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Index</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="dictionary.html" title="previous chapter">Dictionary</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, keyvi committers.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/python/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
