@@ -2,6 +2,7 @@
 # Usage: py.test tests
 
 import os
+from pytest import raises
 
 import keyvi.vector
 
@@ -55,3 +56,10 @@ def test_basic_manifest():
     assert 'manifest' == vector.Manifest()
 
     os.remove('vector_manifest.kv')
+
+
+def test_basic_write_to_invalid_file():
+    generator = keyvi.vector.StringVectorGenerator()
+    generator.SetManifest('manifest')
+    with raises(ValueError):
+        generator.WriteToFile(os.path.join("invalid", "sub", "directory", "file.kv"))

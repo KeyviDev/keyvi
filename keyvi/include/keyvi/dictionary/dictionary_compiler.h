@@ -162,6 +162,11 @@ class DictionaryCompiler final {
     }
 
     std::ofstream out_stream(filename, std::ios::binary);
+
+    if (!out_stream.good()) {
+      throw std::invalid_argument("failed to open file");
+    }
+
     generator_->Write(out_stream);
     out_stream.close();
   }

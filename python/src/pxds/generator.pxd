@@ -7,4 +7,4 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
         KeyOnlyDictionaryGenerator() except +
         void Add(libcpp_utf8_string) except +
         void CloseFeeding()
-        void WriteToFile(libcpp_utf8_string)
+        void WriteToFile(libcpp_utf8_string) except +

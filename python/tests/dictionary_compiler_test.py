@@ -74,3 +74,12 @@ def test_compile_step_missing():
     c.Add("abd")
     with raises(RuntimeError):
         c.WriteToFile("compile_step_missing.kv")
+
+
+def test_compile_write_to_invalid_file():
+    c = KeyOnlyDictionaryCompiler()
+    c.Add("abc")
+    c.Add("abd")
+    c.Compile()
+    with raises(ValueError):
+        c.WriteToFile(os.path.join("invalid", "sub", "directory", "file.kv"))

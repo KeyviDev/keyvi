@@ -116,6 +116,9 @@ class VectorFile {
                           const std::unique_ptr<MemoryMapManager>& index_store, const size_t size,
                           const std::unique_ptr<ValueStoreT>& value_store) {
     std::ofstream out_stream(filename, std::ios::binary);
+    if (!out_stream.good()) {
+      throw std::invalid_argument("failed to open file");
+    }
 
     out_stream.write(KEYVI_VECTOR_BEGIN, KEYVI_VECTOR_BEGIN_LEN);
 
