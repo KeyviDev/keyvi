@@ -4,13 +4,14 @@
 import sys
 import os
 
-from keyvi.compiler import CompletionDictionaryCompiler
+from keyvi.compiler import CompletionDictionaryCompiler, KeyOnlyDictionaryCompiler
 from keyvi.completion import PrefixCompletion
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
 
 from test_tools import tmp_dictionary
+
 
 # from https://github.com/KeyviDev/keyvi/issues/50
 def test_fuzzy_completion():
@@ -67,4 +68,21 @@ def test_fuzzy_completion():
         assert len(matches) == 1
 
         matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuk ffnung', 2)]
+        assert len(matches) == 1
+
+
+def test_fuzzy_completion_utf8():
+    c = KeyOnlyDictionaryCompiler()
+    c.Add("mß")
+
+    with tmp_dictionary(c, 'fuzzy_completion_utf8.kv') as d:
+        completer = PrefixCompletion(d)
+
+        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('mß', 1)]
+        assert len(matches) == 1
+
+        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('mß', 1, 0)]
+        assert len(matches) == 1
+
+        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('mß', 1, 4)]
         assert len(matches) == 1

@@ -127,10 +127,10 @@ class PrefixCompletion final {
     return MatchIterator::EmptyIteratorPair();
   }
 
-  MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query, const int32_t max_edit_distance) {
+  MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query, const int32_t max_edit_distance,
+                                                       const size_t minimum_exact_prefix = 2) {
     uint64_t state = fsa_->GetStartState();
     size_t depth = 0;
-    const size_t minimum_exact_prefix = 2;
     std::vector<uint32_t> codepoints;
 
     utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
