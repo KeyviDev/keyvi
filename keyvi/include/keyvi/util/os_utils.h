@@ -73,7 +73,7 @@ class OsUtils {
     std::ofstream stream(filename, std::ios::binary);
 
     if (!stream.good()) {
-      throw std::invalid_argument((boost::format("Failed to open stream for %1") % filename).str());
+      throw std::invalid_argument((boost::format("Failed to open stream for %1%") % filename).str());
     }
     return stream;
   }
