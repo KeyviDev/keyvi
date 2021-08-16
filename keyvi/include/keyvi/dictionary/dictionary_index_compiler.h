@@ -41,6 +41,7 @@
 #include "keyvi/dictionary/fsa/generator_adapter.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/util/configuration.h"
+#include "keyvi/util/os_utils.h"
 #include "keyvi/util/serialization_utils.h"
 
 // #define ENABLE_TRACING
@@ -193,10 +194,7 @@ class DictionaryIndexCompiler final {
       throw compiler_exception("not compiled yet");
     }
 
-    std::ofstream out_stream(filename, std::ios::binary);
-    if (!out_stream.good()) {
-      throw std::invalid_argument("failed to open file");
-    }
+    std::ofstream out_stream = keyvi::util::OsUtils::OpenFileStream(filename);
 
     generator_->Write(out_stream);
     out_stream.close();
