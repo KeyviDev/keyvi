@@ -116,7 +116,7 @@ class VectorFile {
   static void WriteToFile(const std::string& filename, const std::string& manifest,
                           const std::unique_ptr<MemoryMapManager>& index_store, const size_t size,
                           const std::unique_ptr<ValueStoreT>& value_store) {
-    std::ofstream out_stream = keyvi::util::OsUtils::OpenFileStream(filename);
+    std::ofstream out_stream = keyvi::util::OsUtils::OpenOutFileStream(filename);
 
     out_stream.write(KEYVI_VECTOR_BEGIN, KEYVI_VECTOR_BEGIN_LEN);
 

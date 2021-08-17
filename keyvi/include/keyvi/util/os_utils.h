@@ -69,7 +69,7 @@ class OsUtils {
 #endif
   }
 
-  static inline std::ofstream OpenFileStream(const std::string& filename) {
+  static inline std::ofstream OpenOutFileStream(const std::string& filename) {
     std::ofstream stream(filename, std::ios::binary);
 
     if (!stream.good()) {

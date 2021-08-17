@@ -308,7 +308,7 @@ class Generator final {
   }
 
   void WriteToFile(const std::string& filename) {
-    std::ofstream out_stream = keyvi::util::OsUtils::OpenFileStream(filename);
+    std::ofstream out_stream = keyvi::util::OsUtils::OpenOutFileStream(filename);
 
     Write(out_stream);
     out_stream.close();

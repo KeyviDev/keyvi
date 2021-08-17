@@ -162,7 +162,7 @@ class DictionaryCompiler final {
       throw compiler_exception("not compiled yet");
     }
 
-    std::ofstream out_stream = keyvi::util::OsUtils::OpenFileStream(filename);
+    std::ofstream out_stream = keyvi::util::OsUtils::OpenOutFileStream(filename);
 
     generator_->Write(out_stream);
     out_stream.close();
