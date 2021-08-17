@@ -11,5 +11,6 @@ cdef extern from "keyvi/dictionary/completion/prefix_completion.h" namespace "ke
         _MatchIteratorPair GetCompletions(libcpp_utf8_string)
         _MatchIteratorPair GetCompletions(libcpp_utf8_string, int)
         _MatchIteratorPair GetFuzzyCompletions(libcpp_utf8_string, int32_t max_edit_distance)
+        _MatchIteratorPair GetFuzzyCompletions(libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix)
 
 

@@ -127,10 +127,10 @@ class PrefixCompletion final {
     return MatchIterator::EmptyIteratorPair();
   }
 
-  MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query, const int32_t max_edit_distance) {
+  MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query, const int32_t max_edit_distance,
+                                                       const size_t minimum_exact_prefix = 2) {
     uint64_t state = fsa_->GetStartState();
     size_t depth = 0;
-    const size_t minimum_exact_prefix = 2;
     std::vector<uint32_t> codepoints;
 
     utf8::unchecked::utf8to32(query.begin(), query.end(), back_inserter(codepoints));
@@ -141,11 +141,22 @@ class PrefixCompletion final {
 
     stringdistance::LevenshteinCompletion metric(codepoints, 20, max_edit_distance);
 
+    size_t utf8_depth = 0;
     // match exact
     while (state != 0 && depth != exact_prefix) {
-      state = fsa_->TryWalkTransition(state, query[depth]);
+      const size_t code_point_length = util::Utf8Utils::GetCharLength(query[utf8_depth]);
+      for (size_t i = 0; i < code_point_length; ++i, ++utf8_depth) {
+        state = fsa_->TryWalkTransition(state, query[utf8_depth]);
+        if (0 == state) {
+          break;
+        }
+      }
       metric.Put(codepoints[depth], depth);
       ++depth;
+    }
+
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
     }
 
     struct data_delegate_fuzzy {
@@ -162,57 +173,53 @@ class PrefixCompletion final {
 
     TRACE("state %d", state);
 
-    if (state) {
-      Match first_match;
-      TRACE("matched prefix");
+    Match first_match;
+    TRACE("matched prefix");
 
-      if (depth == query_length && fsa_->IsFinalState(state)) {
-        TRACE("prefix matched depth %d %s", query_length + data->traverser.GetDepth(),
-              std::string(query, query_length).c_str());
-        first_match = Match(0, query_length, query, 0, fsa_, fsa_->GetStateValue(state));
-      }
-
-      auto tfunc = [data, query_length, max_edit_distance, exact_prefix]() {
-        TRACE("prefix completion callback called");
-        for (;;) {
-          if (data->traverser) {
-            size_t depth = exact_prefix + data->traverser.GetDepth() - 1;
-            TRACE("Current depth %d", depth);
-
-            int32_t intermediate_score = data->metric.Put(data->traverser.GetStateLabel(), depth);
-            depth++;
-
-            TRACE("Candidate: [%s] %ld/%ld intermediate score: %d", data->metric.GetCandidate().c_str(), query_length,
-                  depth, intermediate_score);
-
-            if (intermediate_score > max_edit_distance) {
-              data->traverser.Prune();
-              data->traverser++;
-              continue;
-            }
-
-            if (data->traverser.IsFinalState()) {
-              if (query_length < depth || data->metric.GetScore() <= max_edit_distance) {
-                TRACE("found final state at depth %d %s", depth, data->metric.GetCandidate().c_str());
-                Match m(0, depth, data->metric.GetCandidate(), data->metric.GetScore(), data->traverser.GetFsa(),
-                        data->traverser.GetStateValue());
-
-                data->traverser++;
-                return m;
-              }
-            }
-            data->traverser++;
-          } else {
-            TRACE("StateTraverser exhausted.");
-            return Match();
-          }
-        }
-      };
-
-      return MatchIterator::MakeIteratorPair(tfunc, first_match);
+    if (depth == query_length && fsa_->IsFinalState(state)) {
+      TRACE("prefix matched depth %d %s", query_length + data->traverser.GetDepth(),
+            std::string(query, query_length).c_str());
+      first_match = Match(0, query_length, query, 0, fsa_, fsa_->GetStateValue(state));
     }
 
-    return MatchIterator::EmptyIteratorPair();
+    auto tfunc = [data, query_length, max_edit_distance, exact_prefix]() {
+      TRACE("prefix completion callback called");
+      for (;;) {
+        if (data->traverser) {
+          size_t depth = exact_prefix + data->traverser.GetDepth() - 1;
+          TRACE("Current depth %d", depth);
+
+          int32_t intermediate_score = data->metric.Put(data->traverser.GetStateLabel(), depth);
+          depth++;
+
+          TRACE("Candidate: [%s] %ld/%ld intermediate score: %d", data->metric.GetCandidate().c_str(), query_length,
+                depth, intermediate_score);
+
+          if (intermediate_score > max_edit_distance) {
+            data->traverser.Prune();
+            data->traverser++;
+            continue;
+          }
+
+          if (data->traverser.IsFinalState()) {
+            if (query_length < depth || data->metric.GetScore() <= max_edit_distance) {
+              TRACE("found final state at depth %d %s", depth, data->metric.GetCandidate().c_str());
+              Match m(0, depth, data->metric.GetCandidate(), data->metric.GetScore(), data->traverser.GetFsa(),
+                      data->traverser.GetStateValue());
+
+              data->traverser++;
+              return m;
+            }
+          }
+          data->traverser++;
+        } else {
+          TRACE("StateTraverser exhausted.");
+          return Match();
+        }
+      }
+    };
+
+    return MatchIterator::MakeIteratorPair(tfunc, first_match);
   }
 
  private:

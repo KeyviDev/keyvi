@@ -144,6 +144,30 @@ BOOST_AUTO_TEST_CASE(approx1) {
   BOOST_CHECK(expected_it == expected_output.end());
 }
 
+// see gh#234
+BOOST_AUTO_TEST_CASE(approxWithExactPrefix) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {{"mß", 22}};
+
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+  PrefixCompletion prefix_completion(d);
+
+  std::vector<std::string> expected_output;
+  expected_output.push_back("mß");
+
+  auto expected_it = expected_output.begin();
+  for (auto m : prefix_completion.GetFuzzyCompletions("mß", 1)) {
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  }
+  BOOST_CHECK(expected_it == expected_output.end());
+
+  expected_it = expected_output.begin();
+  for (auto m : prefix_completion.GetFuzzyCompletions("mß", 2)) {
+    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+  }
+  BOOST_CHECK(expected_it == expected_output.end());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace completion */
