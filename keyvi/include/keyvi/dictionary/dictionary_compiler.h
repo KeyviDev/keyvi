@@ -46,6 +46,7 @@
 #include "keyvi/dictionary/fsa/internal/null_value_store.h"
 #include "keyvi/dictionary/fsa/segment_iterator.h"
 #include "keyvi/util/configuration.h"
+#include "keyvi/util/os_utils.h"
 #include "keyvi/util/serialization_utils.h"
 
 // #define ENABLE_TRACING
@@ -161,7 +162,8 @@ class DictionaryCompiler final {
       throw compiler_exception("not compiled yet");
     }
 
-    std::ofstream out_stream(filename, std::ios::binary);
+    std::ofstream out_stream = keyvi::util::OsUtils::OpenOutFileStream(filename);
+
     generator_->Write(out_stream);
     out_stream.close();
   }

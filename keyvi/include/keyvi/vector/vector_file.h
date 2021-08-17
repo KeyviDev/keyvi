@@ -36,6 +36,7 @@
 
 #include "keyvi/dictionary/fsa/internal/value_store_factory.h"
 #include "keyvi/dictionary/fsa/internal/value_store_properties.h"
+#include "keyvi/util/os_utils.h"
 #include "keyvi/util/serialization_utils.h"
 #include "keyvi/vector/types.h"
 
@@ -115,7 +116,7 @@ class VectorFile {
   static void WriteToFile(const std::string& filename, const std::string& manifest,
                           const std::unique_ptr<MemoryMapManager>& index_store, const size_t size,
                           const std::unique_ptr<ValueStoreT>& value_store) {
-    std::ofstream out_stream(filename, std::ios::binary);
+    std::ofstream out_stream = keyvi::util::OsUtils::OpenOutFileStream(filename);
 
     out_stream.write(KEYVI_VECTOR_BEGIN, KEYVI_VECTOR_BEGIN_LEN);
 

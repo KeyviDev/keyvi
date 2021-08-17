@@ -31,7 +31,11 @@
 #endif
 
 #include <cstddef>
+#include <stdexcept>
+#include <string>
 #include <vector>
+
+#include <boost/format.hpp>
 
 namespace keyvi {
 namespace util {
@@ -63,6 +67,15 @@ class OsUtils {
 
     return limit.rlim_cur;
 #endif
+  }
+
+  static inline std::ofstream OpenOutFileStream(const std::string& filename) {
+    std::ofstream stream(filename, std::ios::binary);
+
+    if (!stream.good()) {
+      throw std::invalid_argument((boost::format("Failed to open stream for %1%") % filename).str());
+    }
+    return stream;
   }
 };
 

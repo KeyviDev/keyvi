@@ -35,6 +35,7 @@
 #include "keyvi/dictionary/fsa/internal/unpacked_state.h"
 #include "keyvi/dictionary/fsa/internal/unpacked_state_stack.h"
 #include "keyvi/util/configuration.h"
+#include "keyvi/util/os_utils.h"
 #include "keyvi/util/serialization_utils.h"
 
 // #define ENABLE_TRACING
@@ -307,7 +308,8 @@ class Generator final {
   }
 
   void WriteToFile(const std::string& filename) {
-    std::ofstream out_stream(filename, std::ios::binary);
+    std::ofstream out_stream = keyvi::util::OsUtils::OpenOutFileStream(filename);
+
     Write(out_stream);
     out_stream.close();
   }
