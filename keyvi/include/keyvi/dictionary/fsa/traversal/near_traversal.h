@@ -79,10 +79,11 @@ template <>
 inline void TraversalState<NearTransition>::Add(uint64_t s, unsigned char l,
                                                 TraversalPayload<NearTransition>* payload) {
   // check exact match
-  TRACE("Add %c depth %d, exact %c", l, payload->current_depth, payload->lookup_key[payload->current_depth]);
+  TRACE("Add %d depth %d, exact %d", l, payload->current_depth,
+        static_cast<const unsigned char>(payload->lookup_key->operator[](payload->current_depth)));
 
   if (payload->exact && payload->current_depth < payload->lookup_key->size() &&
-      payload->lookup_key->operator[](payload->current_depth) == l) {
+      static_cast<const unsigned char>(payload->lookup_key->operator[](payload->current_depth)) == l) {
     // fill in and set position 0, so that we start traversal there
     TRACE("Found exact match");
     traversal_state_payload.position = 0;
