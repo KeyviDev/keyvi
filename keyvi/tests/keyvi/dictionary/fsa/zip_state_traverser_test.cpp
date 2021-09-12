@@ -1261,6 +1261,90 @@ BOOST_AUTO_TEST_CASE(nearTraversal) {
   s++;
 }
 
+BOOST_AUTO_TEST_CASE(nonAscii) {
+  std::vector<std::string> test_data1 = {"aaaa", "aa\xa0\x62\x62"};
+  testing::TempDictionary dictionary1(&test_data1);
+  automata_t f1 = dictionary1.GetFsa();
+
+  std::vector<std::string> test_data2 = {"abbb", "aa\xff\x62\x63"};
+  testing::TempDictionary dictionary2(&test_data2);
+  automata_t f2 = dictionary2.GetFsa();
+
+  std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aa\xa0\x63\x64");
+
+  auto payload1 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+  auto payload2 = traversal::TraversalPayload<traversal::NearTransition>(near_key);
+
+  std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<traversal::NearTransition>>> v;
+
+  v.emplace_back(f1, f1->GetStartState(), std::move(payload1));
+  v.emplace_back(f2, f2->GetStartState(), std::move(payload2));
+
+  ZipStateTraverser<NearStateTraverser> s(std::move(v));
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL(0xa0, s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL(0xff, s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(5, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  BOOST_CHECK(!s.IsFinalState());
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK(s.IsFinalState());
+
+  // traverser shall be exhausted
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */
