@@ -62,7 +62,7 @@ namespace internal {
 
 class JsonValueStoreBase {
  public:
-  typedef std::string value_t;
+  using value_t = std::string;
   static const std::string no_value;
   static const bool inner_weight = false;
 
@@ -88,9 +88,8 @@ class JsonValueStoreBase {
 class JsonValueStoreMinimizationBase : public JsonValueStoreBase {
  public:
   explicit JsonValueStoreMinimizationBase(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
-      : parameters_(parameters),
-        hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
-    temporary_directory_ = keyvi::util::mapGetTemporaryPath(parameters_);
+      : hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
+    temporary_directory_ = keyvi::util::mapGetTemporaryPath(parameters);
 
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-json_value_store-%%%%-%%%%-%%%%-%%%%");
     boost::filesystem::create_directory(temporary_directory_);
@@ -116,7 +115,6 @@ class JsonValueStoreMinimizationBase : public JsonValueStoreBase {
   }
 
  protected:
-  keyvi::util::parameters_t parameters_;
   boost::filesystem::path temporary_directory_;
   std::unique_ptr<MemoryMapManager> values_extern_;
   LeastRecentlyUsedGenerationsCache<RawPointer<>> hash_;
@@ -129,10 +127,10 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
  public:
   explicit JsonValueStore(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : JsonValueStoreMinimizationBase(parameters) {
-    compression_threshold_ = keyvi::util::mapGet(parameters_, COMPRESSION_THRESHOLD_KEY, 32);
-    std::string compressor = keyvi::util::mapGet<std::string>(parameters_, COMPRESSION_KEY, {});
-    minimize_ = keyvi::util::mapGetBool(parameters_, MINIMIZATION_KEY, true);
-    std::string float_mode = keyvi::util::mapGet<std::string>(parameters_, SINGLE_PRECISION_FLOAT_KEY, {});
+    compression_threshold_ = keyvi::util::mapGet(parameters, COMPRESSION_THRESHOLD_KEY, 32);
+    std::string compressor = keyvi::util::mapGet<std::string>(parameters, COMPRESSION_KEY, {});
+    minimize_ = keyvi::util::mapGetBool(parameters, MINIMIZATION_KEY, true);
+    std::string float_mode = keyvi::util::mapGet<std::string>(parameters, SINGLE_PRECISION_FLOAT_KEY, {});
 
     if (float_mode == "single") {
       single_precision_float_ = true;
