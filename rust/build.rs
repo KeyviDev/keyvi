@@ -59,7 +59,7 @@ fn main() {
         println!("cargo:rustc-link-lib=dylib=snappy");
     }
 
-    println!("cargo:rustc-link-lib=dylib=stdc++");
+    println!("cargo:rustc-link-lib=dylib=c++");
 
     let bindings = bindgen::Builder::default()
         // The input header we would like to generate bindings for.
