@@ -271,7 +271,7 @@ inline void UnpackedState<SparseArrayPersistence<uint16_t>>::AddFinalState(uint6
 
   outgoing_[used_++].set(FINAL_OFFSET_TRANSITION, transition_value);
 
-  size_t vshort_size = keyvi::util::getVarshortLength(transition_value);
+  size_t vshort_size = keyvi::util::getVarShortLength(transition_value);
   for (size_t i = 0; i < vshort_size; ++i) {
     bitvector_.Set(FINAL_OFFSET_TRANSITION + i);
   }

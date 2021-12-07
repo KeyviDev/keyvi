@@ -353,7 +353,7 @@ class Automata final {
   }
 
   uint64_t GetStateValue(uint64_t state) const {
-    return keyvi::util::decodeVarshort(transitions_compact_ + state + FINAL_OFFSET_TRANSITION);
+    return keyvi::util::decodeVarShort(transitions_compact_ + state + FINAL_OFFSET_TRANSITION);
   }
 
   uint32_t GetWeightValue(uint64_t state) const {
@@ -424,7 +424,7 @@ class Automata final {
 
       TRACE("Compact Transition found overflow bucket %d", overflow_bucket);
 
-      resolved_ptr = keyvi::util::decodeVarshort(transitions_compact_ + overflow_bucket);
+      resolved_ptr = keyvi::util::decodeVarShort(transitions_compact_ + overflow_bucket);
       resolved_ptr = (resolved_ptr << 3) + (pt & 0x7);
 
       if (pt & 0x8) {
