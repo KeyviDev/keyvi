@@ -399,7 +399,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     uint16_t vshort_pointer[8];
     size_t vshort_size = 0;
 
-    keyvi::util::encodeVarshort(transitionPointer_high, vshort_pointer, &vshort_size);
+    keyvi::util::encodeVarShort(transitionPointer_high, vshort_pointer, &vshort_size);
 
     // find free spots in the sparse array where the pointer fits in
     size_t start_position = offset > COMPACT_SIZE_WINDOW ? offset - COMPACT_SIZE_WINDOW : 0;
@@ -498,7 +498,7 @@ class SparseArrayBuilder<SparseArrayPersistence<uint16_t>, OffsetTypeT, HashCode
     uint16_t vshort_pointer[8];
     size_t vshort_size = 0;
 
-    keyvi::util::encodeVarshort(value, vshort_pointer, &vshort_size);
+    keyvi::util::encodeVarShort(value, vshort_pointer, &vshort_size);
 
     for (size_t i = 0; i < vshort_size; ++i) {
       persistence_->WriteTransition(offset + FINAL_OFFSET_TRANSITION + i,

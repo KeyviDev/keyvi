@@ -113,18 +113,18 @@ struct RawPointerForCompare final {
 
       TRACE("check equality, 3rd buffer %d %d %d", l.GetOffset(), value_size_, keyvi::util::getVarintLength(length_l));
       // we know the length, skip the length byte and compare the value
-      return persistence_->Compare(l.GetOffset() + keyvi::util::getVarintLength(length_l),
+      return persistence_->Compare(l.GetOffset() + keyvi::util::getVarIntLength(length_l),
                                    reinterpret_cast<const void*>(value_), value_size_);
     }
 
     // we do not know the length, first get it, then compare
     if (persistence_->GetAddressQuickTestOk(l.GetOffset(), 8)) {
-      length_l = keyvi::util::decodeVarint(reinterpret_cast<uint8_t*>(persistence_->GetAddress(l.GetOffset())));
+      length_l = keyvi::util::decodeVarInt(reinterpret_cast<uint8_t*>(persistence_->GetAddress(l.GetOffset())));
     } else {
       char buf[8];
       persistence_->GetBuffer(l.GetOffset(), buf, 8);
 
-      length_l = keyvi::util::decodeVarint(reinterpret_cast<uint8_t*>(buf));
+      length_l = keyvi::util::decodeVarInt(reinterpret_cast<uint8_t*>(buf));
     }
 
     if (length_l != value_size_) {
@@ -132,7 +132,7 @@ struct RawPointerForCompare final {
     }
 
     TRACE("check equality, 3rd buffer %d %d", l.GetOffset(), value_size_);
-    return persistence_->Compare(l.GetOffset() + keyvi::util::getVarintLength(length_l),
+    return persistence_->Compare(l.GetOffset() + keyvi::util::getVarIntLength(length_l),
                                  reinterpret_cast<const void*>(value_), value_size_);
   }
 

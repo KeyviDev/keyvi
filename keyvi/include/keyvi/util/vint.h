@@ -39,23 +39,23 @@ namespace util {
  * @param value The input value. Any standard integer type is allowed.
  * @param output A pointer to a piece of reserved memory. Should have a minimum size dependent on the input size (32 bit
  * = 5 bytes, 64 bit = 10 bytes).
- * @parma outputSizePtr A pointer to a single integer that is set to the number of bytes used in the output memory.
+ * @parma output_size_ptr A pointer to a single integer that is set to the number of bytes used in the output memory.
  */
 template <typename int_t = uint64_t>
-void encodeVarint(int_t value, uint8_t* output, size_t* outputSizePtr) {
-  size_t outputSize = 0;
+void encodeVarInt(int_t value, uint8_t* output, size_t* output_size_ptr) {
+  size_t output_size = 0;
   // While more than 7 bits of data are left, occupy the last output byte
   // and set the next byte flag
   while (value > 127) {
     // |128: Set the next byte flag
-    output[outputSize] = ((uint8_t)(value & 127)) | 128;
+    output[output_size] = ((uint8_t)(value & 127)) | 128;
 
     // Remove the seven bits we just wrote
     value >>= 7;
-    outputSize++;
+    output_size++;
   }
-  output[outputSize++] = ((uint8_t)value) & 127;
-  *outputSizePtr = outputSize;
+  output[output_size++] = ((uint8_t)value) & 127;
+  *output_size_ptr = output_size;
 }
 
 /**
@@ -63,23 +63,23 @@ void encodeVarint(int_t value, uint8_t* output, size_t* outputSizePtr) {
  * @param value The input value. Any standard integer type is allowed.
  * @param output A pointer to a piece of reserved memory. Should have a minimum size dependent on the input size (32 bit
  * = 5 bytes, 64 bit = 10 bytes).
- * @parma outputSizePtr A pointer to a single integer that is set to the number of bytes used in the output memory.
+ * @parma output_size_ptr A pointer to a single integer that is set to the number of bytes used in the output memory.
  */
 template <typename int_t = uint64_t>
-void encodeVarshort(int_t value, uint16_t* output, size_t* outputSizePtr) {
-  size_t outputSize = 0;
+void encodeVarShort(int_t value, uint16_t* output, size_t* output_size_ptr) {
+  size_t output_size = 0;
   // While more than 15 bits of data are left, occupy the last output byte
   // and set the next byte flag
   while (value > 32767) {
     // |32768: Set the next byte flag
-    output[outputSize] = ((uint16_t)(value & 32767)) | 32768;
+    output[output_size] = ((uint16_t)(value & 32767)) | 32768;
 
     // Remove the 15 bits we just wrote
     value >>= 15;
-    outputSize++;
+    output_size++;
   }
-  output[outputSize++] = ((uint16_t)value) & 32767;
-  *outputSizePtr = outputSize;
+  output[output_size++] = ((uint16_t)value) & 32767;
+  *output_size_ptr = output_size;
 }
 
 /**
@@ -88,7 +88,7 @@ void encodeVarshort(int_t value, uint16_t* output, size_t* outputSizePtr) {
  * @return required size
  */
 template <typename int_t = uint64_t>
-size_t getVarintLength(int_t value) {
+size_t getVarIntLength(int_t value) {
   size_t length = 1;
   while (value > 127) {
     ++length;
@@ -99,14 +99,21 @@ size_t getVarintLength(int_t value) {
   return length;
 }
 
+// this specialization is roughly twice as fast as the loop
+template <>
+inline size_t getVarIntLength(uint64_t value) {
+  uint32_t log2value = 63 ^ static_cast<uint32_t>(__builtin_clzll(value | 0x1));
+  return static_cast<size_t>((log2value * 9 + 73) / 64);
+}
+
 /**
  * Get required length of variable short.
  * @param value
  * @return required size
  */
 template <typename int_t = uint64_t>
-size_t getVarshortLength(int_t value) {
-  return (value > 0x1fffffffffff) ? 4 : (value < 0x40000000) ? (value < 0x8000) ? 1 : 2 : 3;
+size_t getVarShortLength(int_t value) {
+  return (value < 0x8000) ? 1 : (value < 0x40000000) ? 2 : (value > 0x1fffffffffff) ? 4 : 3;
 }
 
 /**
@@ -115,7 +122,7 @@ size_t getVarshortLength(int_t value) {
  * @param output the buffer to write to
  */
 template <typename int_t = uint64_t, typename buffer_t>
-void encodeVarint(int_t value, buffer_t* output, size_t* written_bytes) {
+void encodeVarInt(int_t value, buffer_t* output, size_t* written_bytes) {
   // While more than 7 bits of data are left, occupy the last output byte
   // and set the next byte flag
   size_t length = 0;
@@ -135,7 +142,7 @@ void encodeVarint(int_t value, buffer_t* output, size_t* written_bytes) {
  * @param value The input value. Any standard integer type is allowed.
  */
 template <typename int_t = uint64_t>
-int_t decodeVarint(const uint8_t* input) {
+int_t decodeVarInt(const uint8_t* input) {
   int_t ret = 0;
   for (uint8_t i = 0;; i++) {
     ret |= (int_t)(input[i] & 127) << (7 * i);
@@ -153,7 +160,7 @@ int_t decodeVarint(const uint8_t* input) {
  * @param value The input value. Any standard integer type is allowed.
  */
 template <typename int_t = uint64_t>
-int_t decodeVarshort(const uint16_t* input) {
+int_t decodeVarShort(const uint16_t* input) {
   int_t ret = 0;
   for (uint8_t i = 0;; i++) {
     ret |= (int_t)(input[i] & 32767) << (15 * i);
@@ -166,7 +173,7 @@ int_t decodeVarshort(const uint16_t* input) {
   return ret;
 }
 
-inline size_t skipVarint(const char* input) {
+inline size_t skipVarInt(const char* input) {
   size_t i = 0;
 
   for (;; i++) {
@@ -178,7 +185,7 @@ inline size_t skipVarint(const char* input) {
   return i + 1;
 }
 
-inline std::string decodeVarintString(const char* input) {
+inline std::string decodeVarIntString(const char* input) {
   uint64_t length = 0;
   size_t i = 0;
 
@@ -194,7 +201,7 @@ inline std::string decodeVarintString(const char* input) {
   return std::string(input + i + 1, length);
 }
 
-inline const char* decodeVarintString(const char* input, size_t* length_ptr) {
+inline const char* decodeVarIntString(const char* input, size_t* length_ptr) {
   size_t length = 0;
   size_t i = 0;
 

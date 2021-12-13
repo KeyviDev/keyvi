@@ -215,7 +215,7 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
     size_t length;
 
-    keyvi::util::encodeVarint(string_buffer_.size(), values_extern_.get(), &length);
+    keyvi::util::encodeVarInt(string_buffer_.size(), values_extern_.get(), &length);
     values_buffer_size_ += length;
     values_extern_->Append(reinterpret_cast<const void*>(string_buffer_.data()), string_buffer_.size());
     values_buffer_size_ += string_buffer_.size();
@@ -233,7 +233,7 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
     size_t buffer_size;
 
     const char* full_buf = payload + fsa_value;
-    const char* buf_ptr = keyvi::util::decodeVarintString(full_buf, &buffer_size);
+    const char* buf_ptr = keyvi::util::decodeVarIntString(full_buf, &buffer_size);
 
     const RawPointerForCompare<MemoryMapManager> stp(buf_ptr, buffer_size, values_extern_.get());
     const RawPointer<> p = hash_.Get(stp);
@@ -340,7 +340,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override {
     attributes_t attributes(new attributes_raw_t());
 
-    std::string raw_value = keyvi::util::decodeVarintString(strings_ + fsa_value);
+    std::string raw_value = keyvi::util::decodeVarIntString(strings_ + fsa_value);
 
     // auto length = keyvi::util::decodeVarint((uint8_t*) strings_ + fsa_value);
     // std::string raw_value(strings_ + fsa_value, length);
@@ -350,12 +350,12 @@ class JsonValueStoreReader final : public IValueStoreReader {
   }
 
   std::string GetRawValueAsString(uint64_t fsa_value) const override {
-    return keyvi::util::decodeVarintString(strings_ + fsa_value);
+    return keyvi::util::decodeVarIntString(strings_ + fsa_value);
   }
 
   std::string GetValueAsString(uint64_t fsa_value) const override {
     TRACE("JsonValueStoreReader GetValueAsString");
-    std::string packed_string = keyvi::util::decodeVarintString(strings_ + fsa_value);
+    std::string packed_string = keyvi::util::decodeVarIntString(strings_ + fsa_value);
 
     return keyvi::util::DecodeJsonValue(packed_string);
   }

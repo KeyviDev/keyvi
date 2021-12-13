@@ -73,7 +73,7 @@ class SparseArrayPersistence final {
     boost::filesystem::create_directory(temporary_directory_);
 
     // size of external memory chunk: not more than 1GB + 2GB
-    size_t external_memory_chunk_size = std::min(flush_size_ * 2, (size_t)1073741824);
+    size_t external_memory_chunk_size = std::min(flush_size_ * 2, static_cast<size_t>(1073741824L));
 
     // the chunk size must be a multiplier of the flush_size
     external_memory_chunk_size = external_memory_chunk_size - (external_memory_chunk_size % flush_size_);
@@ -287,20 +287,20 @@ inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t 
     const size_t overflow_bucket = (pt >> 4) + offset - COMPACT_SIZE_WINDOW;
 
     if (overflow_bucket >= in_memory_buffer_offset_) {
-      resolved_ptr = keyvi::util::decodeVarshort(transitions_ + overflow_bucket - in_memory_buffer_offset_);
+      resolved_ptr = keyvi::util::decodeVarShort(transitions_ + overflow_bucket - in_memory_buffer_offset_);
     } else {
       // value needs to be read from external storage, which in 99.9% is a trivial access to the mmap'ed area
       // but in rare cases might be spread across 2 chunks, for the chunk border test we assume worst case 3 varshorts
       // to be read, that is a maximum of 2**45, so together with shifting 2**48 == 256 TB of addressable space
       if (transitions_extern_->GetAddressQuickTestOk(overflow_bucket * sizeof(uint16_t), 3 * sizeof(uint16_t))) {
-        resolved_ptr = keyvi::util::decodeVarshort(
+        resolved_ptr = keyvi::util::decodeVarShort(
             reinterpret_cast<uint16_t*>(transitions_extern_->GetAddress(overflow_bucket * sizeof(uint16_t))));
       } else {
         // value might be on the chunk border, read it into a buffer and read from there
         uint16_t buffer[3 * sizeof(uint16_t)];
         transitions_extern_->GetBuffer(overflow_bucket * sizeof(uint16_t), buffer, 3 * sizeof(uint16_t));
 
-        resolved_ptr = keyvi::util::decodeVarshort(buffer);
+        resolved_ptr = keyvi::util::decodeVarShort(buffer);
       }
     }
 
@@ -321,20 +321,20 @@ inline uint64_t SparseArrayPersistence<uint16_t>::ResolveTransitionValue(size_t 
 template <>
 inline uint64_t SparseArrayPersistence<uint16_t>::ReadFinalValue(size_t offset) const {
   if (offset + FINAL_OFFSET_TRANSITION >= in_memory_buffer_offset_) {
-    return keyvi::util::decodeVarshort(transitions_ + offset - in_memory_buffer_offset_ + FINAL_OFFSET_TRANSITION);
+    return keyvi::util::decodeVarShort(transitions_ + offset - in_memory_buffer_offset_ + FINAL_OFFSET_TRANSITION);
   }
 
   if (transitions_extern_->GetAddressQuickTestOk((offset + FINAL_OFFSET_TRANSITION) * sizeof(uint16_t), 5)) {
     uint16_t* ptr = reinterpret_cast<uint16_t*>(
         transitions_extern_->GetAddress((offset + FINAL_OFFSET_TRANSITION) * sizeof(uint16_t)));
-    return keyvi::util::decodeVarshort(ptr);
+    return keyvi::util::decodeVarShort(ptr);
   }
 
   // value might be on the chunk border, take a secure approach
   uint16_t buffer[10];
   transitions_extern_->GetBuffer((offset + FINAL_OFFSET_TRANSITION) * sizeof(uint16_t), buffer, 10 * sizeof(uint16_t));
 
-  return keyvi::util::decodeVarshort(buffer);
+  return keyvi::util::decodeVarShort(buffer);
 }
 
 } /* namespace internal */
