@@ -23,7 +23,6 @@ pykeyvi_p_cpp = '_core_p.cpp'
 keyvi_cpp_source = '../keyvi'
 keyvi_cpp = 'src/cpp'
 keyvi_cpp_link = path.join(keyvi_cpp, 'keyvi')
-mac_os_static_libs_dir = 'mac_os_static_libs'
 keyvi_build_dir = path.join(keyvi_cpp, 'build-{}'.format(platform.platform()))
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -166,20 +165,6 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags)
     # set link libraries
     if cmake_flags['KEYVI_LINK_LIBRARIES_STATIC']:
         if sys.platform == 'darwin':
-            # clang on OSX does not understand -Bstatic or an equivalent
-            # workaround: copy files into an extra directory
-            if not os.path.exists(mac_os_static_libs_dir):
-                os.makedirs(mac_os_static_libs_dir)
-
-            for lib in cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '):
-                lib_file_name = 'lib{}.a'.format(lib)
-                src_file = path.join('/usr/local/lib', lib_file_name)
-                dst_file = path.join(mac_os_static_libs_dir, lib_file_name)
-                if os.path.exists(src_file):
-                    shutil.copyfile(src_file, dst_file)
-
-            extra_link_arguments = ['-L{}'.format(mac_os_static_libs_dir)]
-            set_additional_flags('extra_link_args', extra_link_arguments)
             set_additional_flags('libraries', cmake_flags['KEYVI_LINK_LIBRARIES_STATIC'].split(' '))
 
         else:
@@ -324,9 +309,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
             print ("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)
-
-            if sys.platform == 'darwin':
-                os.environ['ARCHFLAGS'] = '-arch x86_64'
 
             _build_ext.build_ext.run(self)
 
