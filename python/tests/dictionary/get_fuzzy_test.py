@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-
-from keyvi.compiler import CompletionDictionaryCompiler
+from keyvi.compiler import CompletionDictionaryCompiler, IntDictionaryCompiler
 
 from test_tools import tmp_dictionary
 
@@ -41,3 +40,18 @@ def test_get_fuzzy():
             assert base_value == m.GetValue()
 
         assert len(list(d.GetFuzzy('tüv koid', 2))) == 2
+
+
+def test_get_fuzzy_minimum_prefix():
+    c = IntDictionaryCompiler({"memory_limit_mb": "10"})
+    c.Add("a", 0)
+    c.Add("apple", 1)
+    with tmp_dictionary(c, 'get_fuzzy_mp.kv') as d:
+        matches = list(d.GetFuzzy("app", 0, 1))
+        assert len(matches) == 0
+        matches = list(d.GetFuzzy("ap", 1, 1))
+        assert len(matches) == 1
+        assert matches[0].GetValue() == 0
+        assert matches[0].GetMatchedString() == "a"
+        assert matches[0].GetScore() == 1
+

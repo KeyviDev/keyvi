@@ -214,6 +214,21 @@ BOOST_AUTO_TEST_CASE(fuzzyMatching) {
   testFuzzyMatching(&reader_2, "abbc", 4, 1, {"abbc", "abc", "abdd"}, {"\"{b:2}\"", "\"{a:1}\"", "\"{b:3}\""});
 }
 
+BOOST_AUTO_TEST_CASE(fuzzyMatchingExactPrefix) {
+  testing::IndexMock index;
+
+  std::vector<std::pair<std::string, std::string>> test_data = {{"a", "{a:1}"}, {"bc", "{b:2}"}};
+  index.AddSegment(&test_data);
+  std::vector<std::pair<std::string, std::string>> test_data_2 = {{"apple", "{c:6}"}, {"cde", "{x:1}"}};
+  index.AddSegment(&test_data_2);
+  ReadOnlyIndex reader_1(index.GetIndexFolder(), {{"refresh_interval", "400"}});
+
+  testFuzzyMatching(&reader_1, "app", 0, 1, {}, {});
+  testFuzzyMatching(&reader_1, "ap", 1, 1, {"a"}, {"\"{a:1}\""});
+  index.AddDeletedKeys({"a"}, 0);
+  testFuzzyMatching(&reader_1, "ap", 1, 1, {"a"}, {"\"{a:1}\""});
+}
+
 void testNearMatching(ReadOnlyIndex* reader, const std::string& query, const size_t minimum_exact_prefix,
                       const bool greedy, const std::vector<std::string>& expected_matches,
                       const std::vector<std::string>& expected_values) {
