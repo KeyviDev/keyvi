@@ -16,4 +16,6 @@ do
    py.test -vv tests/
    py.test -vv integration-tests/
 
+   pyenv uninstall -f keyvi-"${PY_VERSION}"
+
 done

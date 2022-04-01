@@ -2,6 +2,8 @@
 .cache
 .pytest_cache
 
+.python-version
+
 # build artifacts
 keyvi.egg-info/
 build/
@@ -12,6 +14,8 @@ __pycache__/
 *.so
 *.egg-info
 MANIFEST
+_core.pyi
+_core_p.cpp
 
 # autowrap artifacts
 _core.pyx
