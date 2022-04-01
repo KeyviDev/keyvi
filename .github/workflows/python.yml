@@ -75,11 +75,13 @@ jobs:
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           cd python
           python setup.py bdist_wheel -d wheelhouse
-          if: runner.os == 'macOS'
-          run: |
-            delocate-listdeps wheelhouse/keyvi*.whl
-            delocate-wheel wheelhouse/keyvi*.whl
-            delocate-listdeps wheelhouse/keyvi*.whl
+
+      - name: run-delocate
+        if: runner.os == 'macOS'
+        run: |
+          delocate-listdeps wheelhouse/keyvi*.whl
+          delocate-wheel wheelhouse/keyvi*.whl
+          delocate-listdeps wheelhouse/keyvi*.whl
 
       - name: remove macos deps
         if: runner.os == 'macOS'
