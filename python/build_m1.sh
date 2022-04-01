@@ -11,11 +11,17 @@ do
    python --version
 
    pip install -r requirements.txt
+
    pip wheel . -w wheelhouse/ --no-deps -vvv
+   delocate-wheel wheelhouse/*.whl
+
    pip install keyvi --no-index -f wheelhouse/
    py.test -vv tests/
    py.test -vv integration-tests/
 
+   delocate-listdeps wheelhouse/*.whl
+
    pyenv uninstall -f keyvi-"${PY_VERSION}"
+   rm .python-version
 
 done

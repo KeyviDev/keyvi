@@ -79,6 +79,7 @@ jobs:
       - name: run-delocate
         if: runner.os == 'macOS'
         run: |
+          cd python
           delocate-listdeps wheelhouse/keyvi*.whl
           delocate-wheel wheelhouse/keyvi*.whl
           delocate-listdeps wheelhouse/keyvi*.whl
