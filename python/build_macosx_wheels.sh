@@ -6,10 +6,12 @@ for PYTHON_VERSION in "3.8.13" "3.9.11" "3.10.3";
 do
     echo "Building on Python: ${PYTHON_VERSION}"
     pyenv install -s "${PYTHON_VERSION}"
+    
+    PYENV_VENV="keyvi-${PYTHON_VERSION}"
 
-    echo "Installing pyenv-venv: keyvi-${PYTHON_VERSION}"
-    pyenv virtualenv -f "${PYTHON_VERSION}" "keyvi-${PYTHON_VERSION}"
-    pyenv local "keyvi-${PYTHON_VERSION}"
+    echo "Installing pyenv-venv: ${PYENV_VENV}"
+    pyenv virtualenv -f "${PYTHON_VERSION}" "${PYENV_VENV}"
+    pyenv local "${PYENV_VENV}"
     python --version
 
     echo "Installing keyvi python deps..."
@@ -26,8 +28,8 @@ do
     py.test -vv tests/
     py.test -vv integration-tests/
 
-    echo "Uninstalling pyenv-venv: keyvi-${PYTHON_VERSION}"
-    pyenv uninstall -f "keyvi-${PYTHON_VERSION}"
+    echo "Uninstalling pyenv-venv: ${PYENV_VENV}"
+    pyenv uninstall -f "${PYENV_VENV}"
     rm .python-version
 
 done
