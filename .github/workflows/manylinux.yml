@@ -21,6 +21,10 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build manylinux package
         run: |
+
+          uname -p
+          uname -m
+
           cd python
 
           PYBIN=/opt/python/${PYTHON_PATH}/bin

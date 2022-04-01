@@ -56,10 +56,12 @@ jobs:
 
       - name: Install python dependencies
         run: |
+          uname -p
+          uname -m
+          
+          python -m pip install pip==21.3.1
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           python -m pip install -r python/requirements.txt
-          python -m pip --version
-          python -m pip install pip==21.3.1
 
       - name: build and test python extension
         if: matrix.build_direct
@@ -78,7 +80,7 @@ jobs:
           cd python
           python setup.py bdist_wheel -d wheelhouse
 
-      - name: run-delocate
+      - name: delocate
         if: runner.os == 'macOS'
         run: |
           cd python

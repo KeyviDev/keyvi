@@ -2,12 +2,12 @@
 
 set -e
 
-for PY_VERSION in "3.8.13" "3.9.11" "3.10.3";
+for PYTHON_VERSION in "3.8.13" "3.9.11" "3.10.3";
 do
-   echo "${PY_VERSION}"
-   pyenv install -s "${PY_VERSION}"
-   pyenv virtualenv -f "${PY_VERSION}" keyvi-"${PY_VERSION}"
-   pyenv local keyvi-"${PY_VERSION}"
+   echo "${PYTHON_VERSION}"
+   pyenv install -s "${PYTHON_VERSION}"
+   pyenv virtualenv -f "${PYTHON_VERSION}" keyvi-"${PYTHON_VERSION}"
+   pyenv local keyvi-"${PYTHON_VERSION}"
    python --version
 
    pip install -r requirements.txt
@@ -21,7 +21,7 @@ do
 
    delocate-listdeps wheelhouse/*.whl
 
-   pyenv uninstall -f keyvi-"${PY_VERSION}"
+   pyenv uninstall -f keyvi-"${PYTHON_VERSION}"
    rm .python-version
 
 done
