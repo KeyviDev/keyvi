@@ -8,8 +8,8 @@ do
     pyenv install -s "${PYTHON_VERSION}"
 
     echo "Installing pyenv-venv: keyvi-${PYTHON_VERSION}"
-    pyenv virtualenv -f "${PYTHON_VERSION}" keyvi-"${PYTHON_VERSION}"
-    pyenv local keyvi-"${PYTHON_VERSION}"
+    pyenv virtualenv -f "${PYTHON_VERSION}" "keyvi-${PYTHON_VERSION}"
+    pyenv local "keyvi-${PYTHON_VERSION}"
     python --version
 
     echo "Installing keyvi python deps..."
@@ -27,7 +27,7 @@ do
     py.test -vv integration-tests/
 
     echo "Uninstalling pyenv-venv: keyvi-${PYTHON_VERSION}"
-    pyenv uninstall -f keyvi-"${PYTHON_VERSION}"
+    pyenv uninstall -f "keyvi-${PYTHON_VERSION}"
     rm .python-version
 
 done
