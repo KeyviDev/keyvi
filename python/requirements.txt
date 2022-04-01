@@ -4,4 +4,3 @@ pytest
 twine
 wheel
 delocate>=0.10.2
-cython>=3.0.0a10

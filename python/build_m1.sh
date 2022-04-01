@@ -12,4 +12,8 @@ do
 
    pip install -r requirements.txt
    pip wheel . -w wheelhouse/ --no-deps -vvv
+   pip install keyvi --no-index -f wheelhouse/
+   py.test -vv tests/
+   py.test -vv integration-tests/
+
 done
