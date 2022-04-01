@@ -1,5 +1,6 @@
-msgpack>=1.0.0
 autowrap>=0.16.0
-pytest
-twine
-wheel
+delocate>=0.10.2
+msgpack>=1.0.0
+pytest>=7.1.1
+twine>=4.0.0
+wheel>=0.37.1

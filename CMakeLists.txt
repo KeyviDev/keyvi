@@ -22,8 +22,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set (_KEVYI_COMPILE_OPTIONS "-Wall")
 set (_KEYVI_COMPILE_DEFINITIONS "RAPIDJSON_HAS_STDSTRING")
 
-if(NOT ${ARCHITECTURE} STREQUAL "aarch64")
+if(${ARCHITECTURE} STREQUAL "x86_64")
     set (_KEYVI_CXX_FLAGS "-msse4.2")
+    message( STATUS "Architecture: ${ARCHITECTURE} detected: added -msse4.2 compile flag")
 endif()
 
 set (_OS_LIBRARIES "")

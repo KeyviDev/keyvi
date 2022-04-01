@@ -2,6 +2,9 @@
 .cache
 .pytest_cache
 
+# Python local version
+.python-version
+
 # build artifacts
 keyvi.egg-info/
 build/
@@ -16,5 +19,7 @@ MANIFEST
 # autowrap artifacts
 _core.pyx
 _core.cpp
+_core_p.cpp
+_core.pyi
 
 src/py/keyvi/_version.py

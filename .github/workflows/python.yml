@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
+        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
         os: [ 'macos-latest', 'ubuntu-20.04' ]
         include:
           # test sdist on ubuntu only
@@ -56,6 +56,9 @@ jobs:
 
       - name: Install python dependencies
         run: |
+          # Apparently the pre-installed version of pip on Python 3.9 runner has something broken.
+          # This can be removed later-on if removing it doesn't fail tests.
+          python -m pip install pip==21.3.1
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           python -m pip install -r python/requirements.txt
 
@@ -75,6 +78,14 @@ jobs:
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           cd python
           python setup.py bdist_wheel -d wheelhouse
+
+      - name: delocate
+        if: runner.os == 'macOS'
+        run: |
+          cd python
+          delocate-listdeps wheelhouse/keyvi*.whl
+          delocate-wheel wheelhouse/keyvi*.whl
+          delocate-listdeps wheelhouse/keyvi*.whl
 
       - name: remove macos deps
         if: runner.os == 'macOS'
