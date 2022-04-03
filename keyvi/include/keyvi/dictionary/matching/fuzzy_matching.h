@@ -128,8 +128,10 @@ class FuzzyMatching final {
 
     traverser.reset(new fsa::CodePointStateTraverser<innerTraverserType>(fsa, start_state));
 
-    if (fsa->IsFinalState(start_state)) {
-      first_match = Match(0, codepoints.size(), query, 0, fsa, fsa->GetStateValue(start_state));
+    if (fsa->IsFinalState(start_state) && metric->GetScore() <= max_edit_distance) {
+      TRACE("exact prefix matched");
+      first_match =
+          Match(0, exact_prefix, metric->GetCandidate(), metric->GetScore(), fsa, fsa->GetStateValue(start_state));
     }
 
     TRACE("create iterator");
@@ -186,11 +188,11 @@ class FuzzyMatching final {
       metric->Put(codepoints[i], i);
     }
 
-    // check for an exact match given the exact prefix
+    // check for a match given the exact prefix
     for (const auto& fsa_state : fsa_start_state_pairs) {
-      if (fsa_state.first->IsFinalState(fsa_state.second)) {
-        first_match =
-            Match(0, codepoints.size(), query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
+      if (fsa_state.first->IsFinalState(fsa_state.second) && metric->GetScore() <= max_edit_distance) {
+        first_match = Match(0, exact_prefix, metric->GetCandidate(), metric->GetScore(), fsa_state.first,
+                            fsa_state.first->GetStateValue(fsa_state.second));
         break;
       }
     }

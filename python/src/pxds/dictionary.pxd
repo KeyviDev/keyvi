@@ -28,6 +28,7 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except +
         _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except +
         _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance) except +
+        _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except +
         _MatchIteratorPair GetAllItems () # wrap-ignore
         _MatchIteratorPair Lookup(libcpp_utf8_string)
         _MatchIteratorPair LookupText(libcpp_utf8_string)
