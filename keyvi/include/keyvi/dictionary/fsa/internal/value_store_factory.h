@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_FACTORY_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_FACTORY_H_
 
+#include "keyvi/dictionary/fsa/internal/float_vector_value_store.h"
 #include "keyvi/dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "keyvi/dictionary/fsa/internal/int_value_store.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
@@ -60,6 +61,8 @@ class ValueStoreFactory final {
       case value_store_t::INT_WITH_WEIGHTS:
         return new ValueStoreComponents<value_store_t::INT_WITH_WEIGHTS>::value_store_reader_t(file_mapping,
                                                                                                properties);
+      case value_store_t::FLOAT_VECTOR:
+        return new ValueStoreComponents<value_store_t::FLOAT_VECTOR>::value_store_reader_t(file_mapping, properties);
       default:
         throw std::invalid_argument("Unknown Value Storage type");
     }

@@ -26,12 +26,14 @@
 #define KEYVI_TESTING_COMPILATION_UTILS_H_
 
 #include <algorithm>
+#include <array>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/generator.h"
+#include "keyvi/dictionary/fsa/internal/float_vector_value_store.h"
 #include "keyvi/dictionary/fsa/internal/int_inner_weights_value_store.h"
 #include "keyvi/dictionary/fsa/internal/int_value_store.h"
 #include "keyvi/dictionary/fsa/internal/json_value_store.h"
@@ -146,6 +148,30 @@ class CompilationUtils {
     dictionary::fsa::Generator<dictionary::fsa::internal::SparseArrayPersistence<>,
                                dictionary::fsa::internal::IntValueStore>
         g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+
+    for (const auto& pair : *input) {
+      g.Add(pair.first, pair.second);
+    }
+
+    g.CloseFeeding();
+    std::ofstream out_stream(file_name, std::ios::binary);
+    g.Write(out_stream);
+    out_stream.close();
+
+    dictionary::fsa::automata_t f(new dictionary::fsa::Automata(file_name.c_str()));
+    return f;
+  }
+
+  static dictionary::fsa::automata_t CompileFloatVector(std::vector<std::pair<std::string, std::vector<float>>>* input,
+                                                        const std::string& file_name) {
+    std::sort(input->begin(), input->end());
+
+    dictionary::fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
+
+    dictionary::fsa::Generator<dictionary::fsa::internal::SparseArrayPersistence<>,
+                               dictionary::fsa::internal::FloatVectorValueStore>
+        g(keyvi::util::parameters_t(
+            {{"memory_limit_mb", "10"}, {VECTOR_SIZE_KEY, std::to_string(input->at(0).second.size())}}));
 
     for (const auto& pair : *input) {
       g.Add(pair.first, pair.second);

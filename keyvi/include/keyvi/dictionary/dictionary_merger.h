@@ -106,6 +106,11 @@ class DictionaryMerger final {
       throw std::invalid_argument("Dictionaries must have the same type.");
     }
 
+    // check if value stores are compatible, TODO: how to check for append merge?
+    if (!append_merge_ && dicts_to_merge_.size() > 0) {
+      dicts_to_merge_[0]->GetValueStore()->CheckCompatibility(*(fsa->GetValueStore()));
+    }
+
     // check whether dictionary is completely empty
     const auto segment_iterator = fsa::SegmentIterator(fsa::EntryIterator(fsa), segments_pqueue_.size());
     if (!segment_iterator) {

@@ -69,6 +69,13 @@ class TempDictionary final {
     return t;
   }
 
+  static TempDictionary makeTempDictionaryFromFloats(std::vector<std::pair<std::string, std::vector<float>>>* input) {
+    TempDictionary t;
+    t.CreateFileName();
+    t.fsa_ = CompilationUtils::CompileFloatVector(input, t.file_name_);
+    return t;
+  }
+
   dictionary::fsa::automata_t GetFsa() const { return fsa_; }
 
   const std::string& GetFileName() const { return file_name_; }
