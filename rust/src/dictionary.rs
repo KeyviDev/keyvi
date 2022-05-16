@@ -80,7 +80,7 @@ impl Dictionary {
         let ptr = unsafe {
             root::keyvi_dictionary_get_prefix_completions(
                 self.dict,
-                key.as_ptr() as *const i8,
+                key.as_ptr() as *const ::std::os::raw::c_char,
                 key.len() as u64,
                 cutoff,
             )
@@ -92,7 +92,7 @@ impl Dictionary {
         let ptr = unsafe {
             root::keyvi_dictionary_get_fuzzy(
                 self.dict,
-                key.as_ptr() as *const i8,
+                key.as_ptr() as *const ::std::os::raw::c_char,
                 key.len() as u64,
                 max_edit_distance,
             )
@@ -104,7 +104,7 @@ impl Dictionary {
         let ptr = unsafe {
             root::keyvi_dictionary_get_multi_word_completions(
                 self.dict,
-                key.as_ptr() as *const i8,
+                key.as_ptr() as *const ::std::os::raw::c_char,
                 key.len() as u64,
                 cutoff,
             )
