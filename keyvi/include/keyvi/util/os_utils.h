@@ -31,6 +31,7 @@
 #endif
 
 #include <cstddef>
+#include <fstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
