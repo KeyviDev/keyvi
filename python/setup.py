@@ -215,7 +215,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     link_library_dirs = [
         keyvi_build_dir,
-        '/usr/local/lib/',
+        '/usr/local/lib/',  # as of 17/07/2022 Python 3.10 build on GH actions needs this link library dir
     ]
 
     #########################
