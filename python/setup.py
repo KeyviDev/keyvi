@@ -213,7 +213,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     if pykeyvi_source_path is not None:
         additional_compile_flags += ' -fdebug-prefix-map={}={}'.format(pykeyvi_source_path, keyvi_source_path)
 
-    link_library_dirs = [keyvi_build_dir]
+    link_library_dirs = [
+        keyvi_build_dir,
+        '/usr/local/lib/',  # as of 17/07/2022 Python 3.10 build on GH actions needs '/usr/local/lib/' link library dir
+    ]
 
     #########################
     # Custom 'build' command
