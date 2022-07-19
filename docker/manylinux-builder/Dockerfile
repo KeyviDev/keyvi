@@ -1,4 +1,5 @@
-FROM quay.io/pypa/manylinux2014_x86_64
+ARG base_image
+FROM $base_image
 
 RUN yum -y update; yum clean all
 
@@ -7,11 +8,12 @@ RUN yum -y install  bzip2-devel \
                     python-devel && \
                     yum clean all
 
-ENV ZLIB_MAJOR=1 ZLIB_MINOR=2 ZLIB_PATCH=11
+ENV ZLIB_MAJOR=1 ZLIB_MINOR=2 ZLIB_PATCH=12
 
-RUN curl -sSL https://zlib.net/zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz | tar -xz && \
+RUN curl https://zlib.net/zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz --output zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz && \
+    tar -xvf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz && \
     cd zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} && ./configure && make -j4 && make install && \
-    cd .. && rm -rf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}
+    cd .. && rm -rf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz
 
 ENV BOOST_MAJOR=1 BOOST_MINOR=74 BOOST_PATCH=0
 RUN curl -s -SL http://sourceforge.net/projects/boost/files/boost/${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH}/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz | tar xz && \
