@@ -14,39 +14,43 @@ jobs:
         arch_image: [ keyvidev/manylinux-builder-x86_64, keyvidev/manylinux-builder-aarch64 ]
 
     runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.arch_image }}
-      env:
-        PYTHON_PATH: ${{ matrix.python_path }}
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
       - uses: actions/checkout@v2
       - name: Build manylinux package
-        run: |
-          cd python
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ${{ matrix.arch_image }}
+          options: -v ${{ github.workspace }}:/repo -e PYTHON_PATH=${{ matrix.python_path }}
 
-          PYBIN=/opt/python/${PYTHON_PATH}/bin
+          run: |
+            cd /repo/python
 
-          ${PYBIN}/pip install -r requirements.txt
+            PYBIN=/opt/python/${PYTHON_PATH}/bin
 
-          # Build
-          ${PYBIN}/python setup.py bdist_wheel -d dist
+            ${PYBIN}/pip install -r requirements.txt
 
-          # Bundle external shared libraries into the wheels
-          for wheel in dist/*.whl; do
-              auditwheel repair ${wheel} -w wheelhouse/
-          done
+            # Build
+            ${PYBIN}/python setup.py bdist_wheel -d dist
 
-          # Install and test
-          ${PYBIN}/pip install keyvi --no-index -f wheelhouse/
+            # Bundle external shared libraries into the wheels
+            for wheel in dist/*.whl; do
+                auditwheel repair ${wheel} -w wheelhouse/
+            done
 
-          cd ~
-          ${PYBIN}/py.test ${GITHUB_WORKSPACE}/python/tests/
-          ${PYBIN}/py.test ${GITHUB_WORKSPACE}/python/integration-tests/
+            # Install and test
+            ${PYBIN}/pip install keyvi --no-index -f wheelhouse/
+
+            cd ~
+            ${PYBIN}/py.test /repo/python/tests/
+            ${PYBIN}/py.test /repo/python/integration-tests/
 
       - name: Publish package
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         env:
           PYPI_PASSWORD: ${{ secrets.pypi_password }}
+          PYTHON_PATH: ${{ matrix.python_path }}
         run: |
           PYBIN=/opt/python/${PYTHON_PATH}/bin
           ${PYBIN}/python -m twine upload -u __token__ -p "${PYPI_PASSWORD}" python/wheelhouse/*
