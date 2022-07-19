@@ -11,10 +11,11 @@ jobs:
     strategy:
       matrix:
         python_path: [ cp37-cp37m, cp38-cp38, cp39-cp39, cp310-cp310 ]
+        arch_image: [ keyvidev/manylinux-builder-x86_64 keyvidev/manylinux-builder-aarch64 ]
 
     runs-on: ubuntu-latest
     container:
-      image: keyvidev/manylinux-builder
+      image: ${{ matrix.arch_image }}
       env:
         PYTHON_PATH: ${{ matrix.python_path }}
     steps:
