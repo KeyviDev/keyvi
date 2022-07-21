@@ -52,7 +52,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ matrix.manylinux_image }}
-          options: -v ${{ github.workspace }}:/repo -e PYTHON_PATH=${{ matrix.python_path }} -e PYPI_PASSWORD=${{ secrets.pypi_password }} -e PYTHON_PATH=${{ matrix.python_path }}
+          options: -v ${{ github.workspace }}:/repo -e PYTHON_PATH=${{ matrix.python_path }} -e PYPI_PASSWORD=${{ secrets.pypi_password }}
           run: |
             PYBIN=/opt/python/${PYTHON_PATH}/bin
             ${PYBIN}/pip install twine
