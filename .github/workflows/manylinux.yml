@@ -54,4 +54,5 @@ jobs:
           options: -v ${{ github.workspace }}:/repo -e PYTHON_PATH=${{ matrix.python_path }} -e PYPI_PASSWORD=${{ secrets.pypi_password }} -e PYTHON_PATH=${{ matrix.python_path }}
           run: |
             PYBIN=/opt/python/${PYTHON_PATH}/bin
+            ${PYBIN}/pip install twine
             ${PYBIN}/python -m twine upload --repository testpypi -u __token__ -p "${PYPI_PASSWORD}" /repo/python/wheelhouse/*
