@@ -48,11 +48,10 @@ jobs:
 
 
       - name: Publish package
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: addnab/docker-run-action@v3
         with:
           image: ${{ matrix.manylinux_image }}
-          options: -v ${{ github.workspace }}:/repo -e PYTHON_PATH=${{ matrix.python_path }} PYPI_PASSWORD=${{ secrets.pypi_password }} PYTHON_PATH=${{ matrix.python_path }}
+          options: -v ${{ github.workspace }}:/repo -e PYTHON_PATH=${{ matrix.python_path }} -e PYPI_PASSWORD=${{ secrets.pypi_password }} -e PYTHON_PATH=${{ matrix.python_path }}
           run: |
             PYBIN=/opt/python/${PYTHON_PATH}/bin
-            ${PYBIN}/python -m twine upload -u __token__ -p "${PYPI_PASSWORD}" /repo/python/wheelhouse/*
+            ${PYBIN}/python -m twine upload --repository testpypi -u __token__ -p "${PYPI_PASSWORD}" /repo/python/wheelhouse/*
