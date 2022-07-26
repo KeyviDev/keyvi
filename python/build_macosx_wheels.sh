@@ -17,6 +17,9 @@ do
     echo "Installing keyvi python deps..."
     pip install -r requirements.txt
 
+    echo "Removing existing build artifacts..."
+    rm -rf _core.cpp _core.pyi _core.pyx _core_p.cpp .pytest_cache/ build/
+
     echo "Building binary wheels..."
     pip wheel . -w wheelhouse/ --no-deps -vvv
     delocate-wheel wheelhouse/*.whl
