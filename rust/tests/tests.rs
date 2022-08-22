@@ -156,7 +156,7 @@ mod tests {
     fn get_all_items_empty() {
         let dict = dictionary::Dictionary::new("test_data/empty-key-dict.kv").unwrap();
 
-        let all_items:Vec<_> = dict.get_all_items().collect();
+        let all_items: Vec<_> = dict.get_all_items().collect();
         assert!(all_items.is_empty());
     }
 
