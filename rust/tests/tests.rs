@@ -153,6 +153,14 @@ mod tests {
     }
 
     #[test]
+    fn get_all_items_empty() {
+        let dict = dictionary::Dictionary::new("test_data/empty-key-dict.kv").unwrap();
+
+        let all_items:Vec<_> = dict.get_all_items().collect();
+        assert!(all_items.is_empty());
+    }
+
+    #[test]
     fn multi_word_completions() {
         let mut values = vec![
             ("80", "mozilla firefox"),
