@@ -60,7 +60,7 @@ impl Dictionary {
         KeyviString::new(c_buf).to_owned()
     }
 
-    pub fn size(&self) -> u64 {
+    pub fn size(&self) -> usize {
         unsafe { root::keyvi_dictionary_get_size(self.dict) }
     }
 
@@ -69,7 +69,7 @@ impl Dictionary {
             root::keyvi_dictionary_get(
                 self.dict,
                 key.as_ptr() as *const ::std::os::raw::c_char,
-                key.len() as u64,
+                key.len() as usize,
             )
         };
         KeyviMatch::new(match_ptr)
@@ -80,36 +80,36 @@ impl Dictionary {
         KeyviMatchIterator::new(ptr)
     }
 
-    pub fn get_prefix_completions(&self, key: &str, cutoff: u64) -> KeyviMatchIterator {
+    pub fn get_prefix_completions(&self, key: &str, cutoff: usize) -> KeyviMatchIterator {
         let ptr = unsafe {
             root::keyvi_dictionary_get_prefix_completions(
                 self.dict,
                 key.as_ptr() as *const ::std::os::raw::c_char,
-                key.len() as u64,
+                key.len() as usize,
                 cutoff,
             )
         };
         KeyviMatchIterator::new(ptr)
     }
 
-    pub fn get_fuzzy(&self, key: &str, max_edit_distance: u64) -> KeyviMatchIterator {
+    pub fn get_fuzzy(&self, key: &str, max_edit_distance: usize) -> KeyviMatchIterator {
         let ptr = unsafe {
             root::keyvi_dictionary_get_fuzzy(
                 self.dict,
                 key.as_ptr() as *const ::std::os::raw::c_char,
-                key.len() as u64,
+                key.len() as usize,
                 max_edit_distance,
             )
         };
         KeyviMatchIterator::new(ptr)
     }
 
-    pub fn get_multi_word_completions(&self, key: &str, cutoff: u64) -> KeyviMatchIterator {
+    pub fn get_multi_word_completions(&self, key: &str, cutoff: usize) -> KeyviMatchIterator {
         let ptr = unsafe {
             root::keyvi_dictionary_get_multi_word_completions(
                 self.dict,
                 key.as_ptr() as *const ::std::os::raw::c_char,
-                key.len() as u64,
+                key.len() as usize,
                 cutoff,
             )
         };
