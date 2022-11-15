@@ -10,7 +10,7 @@ categories = ["data-structures", "algorithms", "external-ffi-bindings", "memory-
 keywords = ["big-data", "keyvaluestore", "fst", "search"]
 
 [build-dependencies]
-bindgen = ">=0.30"
+bindgen = ">=0.58"
 cmake = ">=0.1"
 
 [dependencies]

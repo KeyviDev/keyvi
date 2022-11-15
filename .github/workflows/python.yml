@@ -91,7 +91,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew remove zlib
-          brew remove snappy
+          brew remove --ignore-dependencies snappy
 
       - name: bdist test
         run: |
