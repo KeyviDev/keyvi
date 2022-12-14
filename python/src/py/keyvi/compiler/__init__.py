@@ -22,3 +22,4 @@ from keyvi._core import JsonDictionaryCompiler, JsonDictionaryCompilerSmallData,
 from keyvi._core import IntDictionaryCompilerSmallData
 from keyvi._core import KeyOnlyDictionaryCompiler, KeyOnlyDictionaryGenerator, KeyOnlyDictionaryMerger
 from keyvi._core import StringDictionaryCompiler, StringDictionaryMerger
+from keyvi._core import FloatVectorDictionaryCompiler

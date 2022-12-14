@@ -70,6 +70,9 @@ static const size_t DEFAULT_MEMORY_LIMIT_VALUE_STORE = 500 * 1024 * 1024;
 
 static const size_t DEFAULT_PARALLEL_SORT_THRESHOLD = 10000;
 
+// default for vector values
+static const size_t DEFAULT_VECTOR_SIZE = 10;
+
 // option key names
 static const char MEMORY_LIMIT_KEY[] = "memory_limit";
 static const char TEMPORARY_PATH_KEY[] = "temporary_path";
@@ -78,6 +81,7 @@ static const char COMPRESSION_THRESHOLD_KEY[] = "compression_threshold";
 static const char MINIMIZATION_KEY[] = "minimization";
 static const char SINGLE_PRECISION_FLOAT_KEY[] = "floating_point_precision";
 static const char PARALLEL_SORT_THRESHOLD_KEY[] = "parallel_sort_threshold";
+static const char VECTOR_SIZE_KEY[] = "vector_size";
 static const char MERGE_MODE[] = "merge_mode";
 static const char MERGE_APPEND[] = "append";
 

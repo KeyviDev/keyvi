@@ -42,6 +42,7 @@ enum class value_store_t {
   JSON_DEPRECATED = 4,   //!< deprecated, not used
   JSON = 5,              //!< JsonValueStore
   INT_WITH_WEIGHTS = 6,  //!< IntInnerWeightsValueStore
+  FLOAT_VECTOR = 7,      //!< FloatVectorValueStore
 };
 
 } /* namespace internal */

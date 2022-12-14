@@ -47,6 +47,8 @@ using KeyOnlyDictionaryGenerator =
 
 using CompletionDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS>;
 
+using FloatVectorDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::FLOAT_VECTOR>;
+
 using IntDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::INT>;
 
 using KeyOnlyDictionaryCompiler = keyvi::dictionary::DictionaryCompiler<dictionary_type_t::KEY_ONLY>;

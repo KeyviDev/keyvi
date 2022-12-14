@@ -36,6 +36,7 @@
 #include "keyvi/dictionary/fsa/internal/json_value_store.h"
 #include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
 #include "keyvi/util/configuration.h"
+#include "keyvi/util/float_vector_value.h"
 
 namespace keyvi {
 namespace dictionary {
@@ -270,6 +271,37 @@ BOOST_AUTO_TEST_CASE(bigger_compile_1MB_50k) {
 
 BOOST_AUTO_TEST_CASE(bigger_compile_parallel_1MB) {
   bigger_compile_test({{MEMORY_LIMIT_KEY, std::to_string(1024 * 1024)}, {PARALLEL_SORT_THRESHOLD_KEY, "1"}});
+}
+
+BOOST_AUTO_TEST_CASE(float_dictionary) {
+  DictionaryCompiler<dictionary_type_t::FLOAT_VECTOR> compiler(
+      keyvi::util::parameters_t({{"memory_limit_mb", "10"}, {VECTOR_SIZE_KEY, "5"}}));
+
+  compiler.Add("abbe", {3.1, 0.2, 1.3, 0.4, 0.5});
+
+  compiler.Compile();
+  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+
+  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
+  std::string file_name = temp_path.string();
+
+  compiler.WriteToFile(file_name);
+
+  Dictionary d(file_name.c_str());
+
+  bool matched = false;
+  for (auto m : d.Get("abbe")) {
+    BOOST_CHECK_EQUAL("3.1, 0.2, 1.3, 0.4, 0.5", m.GetValueAsString());
+    std::vector<float> float_vector = keyvi::util::DecodeFloatVector(m.GetRawValueAsString());
+    BOOST_CHECK_EQUAL(5, float_vector.size());
+    BOOST_CHECK_EQUAL(3.1f, float_vector[0]);
+    BOOST_CHECK_EQUAL(1.3f, float_vector[2]);
+    BOOST_CHECK_EQUAL(0.5f, float_vector[4]);
+    matched = true;
+  }
+  BOOST_CHECK(matched);
+
+  std::remove(file_name.c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

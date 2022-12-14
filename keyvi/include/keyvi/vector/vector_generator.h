@@ -38,6 +38,12 @@
 namespace keyvi {
 namespace vector {
 
+/**
+ * Vector generator
+ *
+ * @tparam ValueStoreType The type of the value store to use
+ * @tparam N Array size for fixed size value vectors, ignored otherwise
+ */
 template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType>
 class VectorGenerator final {
   static const size_t INDEX_EXTERNAL_MEMORY_CHUNK_SIZE = sizeof(offset_type) * 100 * 1000 * 1000;
