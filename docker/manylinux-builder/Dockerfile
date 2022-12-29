@@ -10,7 +10,7 @@ RUN yum -y install  bzip2-devel \
 
 ENV ZLIB_MAJOR=1 ZLIB_MINOR=2 ZLIB_PATCH=12
 
-RUN curl https://zlib.net/zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz --output zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz && \
+RUN curl https://zlib.net/fossils/zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz --output zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz && \
     tar -xvf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz && \
     cd zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} && ./configure && make -j4 && make install && \
     cd .. && rm -rf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz
