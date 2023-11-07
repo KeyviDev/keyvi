@@ -39,7 +39,6 @@ jobs:
           brew update
           brew install zlib snappy boost
           brew install ccache
-          sudo xcode-select -s "/Applications/Xcode_12.4.app"
       - name: checkout from git
         uses: actions/checkout@v2
       
