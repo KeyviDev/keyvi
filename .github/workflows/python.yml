@@ -55,9 +55,6 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          # Apparently the pre-installed version of pip on Python 3.9 runner has something broken.
-          # This can be removed later-on if removing it doesn't fail tests.
-          python -m pip install pip==21.3.1
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           python -m pip install -r python/requirements.txt
 
