@@ -17,12 +17,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.7', '3.8', '3.9', '3.10' ]
-        os: [ 'macos-latest', 'ubuntu-20.04' ]
+        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
+        os: [ 'macos-latest', 'ubuntu-22.04' ]
         include:
           # test sdist on ubuntu only
-          - os: ubuntu-20.04
-            python-version: '3.9'
+          - os: ubuntu-22.04
+            python-version: '3.11'
             sdist: true
             build_direct: true
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }} build
@@ -55,9 +55,6 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          # Apparently the pre-installed version of pip on Python 3.9 runner has something broken.
-          # This can be removed later-on if removing it doesn't fail tests.
-          python -m pip install pip==21.3.1
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           python -m pip install -r python/requirements.txt
 
