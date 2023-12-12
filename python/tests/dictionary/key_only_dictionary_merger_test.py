@@ -78,7 +78,7 @@ def test_merge(merger):
 
         keys_ordered = sorted(keys)
 
-        for base_key, keyvi_key in zip(keys_ordered, merged_dictionary.GetAllKeys()):
+        for base_key, keyvi_key in zip(keys_ordered, merged_dictionary.get_all_keys()):
             assert base_key == keyvi_key
 
     finally:

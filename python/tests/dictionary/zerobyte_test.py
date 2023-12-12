@@ -20,4 +20,4 @@ def test_zerobyte():
         assert d["\x00abc"].GetValue() == '["a" : 2]'
         assert d["abc\x00def"].GetValue() == '["a" : 3]'
         assert d["cd\x00"].GetValue() == '["a" : 4]'
-        assert len([(k, v) for k, v in d.GetAllItems()]) == 3
+        assert len([(k, v) for k, v in d.get_all_items()]) == 3

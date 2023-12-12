@@ -35,11 +35,11 @@ def test_get_fuzzy():
     ]
 
     with tmp_dictionary(c, 'get_fuzzy.kv') as d:
-        for (base_key, base_value), m in zip(key_values, d.GetFuzzy('tüv koid', 2)):
+        for (base_key, base_value), m in zip(key_values, d.get_fuzzy('tüv koid', 2)):
             assert base_key == m.GetMatchedString()
             assert base_value == m.GetValue()
 
-        assert len(list(d.GetFuzzy('tüv koid', 2))) == 2
+        assert len(list(d.get_fuzzy('tüv koid', 2))) == 2
 
 
 def test_get_fuzzy_minimum_prefix():
@@ -47,11 +47,11 @@ def test_get_fuzzy_minimum_prefix():
     c.Add("a", 0)
     c.Add("apple", 1)
     with tmp_dictionary(c, 'get_fuzzy_mp.kv') as d:
-        matches = list(d.GetFuzzy("app", 0, 1))
+        matches = list(d.get_fuzzy("app", 0, 1))
         assert len(matches) == 0
-        matches = list(d.GetFuzzy("ap", 1, 1))
+        matches = list(d.get_fuzzy("ap", 1, 1))
         assert len(matches) == 1
         assert matches[0].GetValue() == 0
         assert matches[0].GetMatchedString() == "a"
-        assert matches[0].GetScore() == 1
+        assert matches[0].score == 1
 

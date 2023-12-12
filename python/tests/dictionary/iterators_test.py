@@ -30,20 +30,20 @@ def generate_dictionary_compiler():
 def test_get_all_keys():
 
     with tmp_dictionary(generate_dictionary_compiler(), 'test_get_all_keys.kv') as keyvi_dictionary:
-        for (base_key, _), keyvi_key in zip(key_values, keyvi_dictionary.GetAllKeys()):
+        for (base_key, _), keyvi_key in zip(key_values, keyvi_dictionary.get_all_keys()):
             assert base_key == keyvi_key
 
 
 def test_get_all_values():
 
     with tmp_dictionary(generate_dictionary_compiler(), 'test_get_all_values.kv') as keyvi_dictionary:
-        for (_, base_value), keyvi_value in zip(key_values, keyvi_dictionary.GetAllValues()):
+        for (_, base_value), keyvi_value in zip(key_values, keyvi_dictionary.get_all_values()):
             assert base_value == keyvi_value
 
 
 def test_get_all_items():
 
     with tmp_dictionary(generate_dictionary_compiler(), 'test_get_all_items.kv') as keyvi_dictionary:
-        for (base_key, base_value), (keyvi_key, keyvi_value) in zip(key_values, keyvi_dictionary.GetAllItems()):
+        for (base_key, base_value), (keyvi_key, keyvi_value) in zip(key_values, keyvi_dictionary.get_all_items()):
             assert base_key == keyvi_key
             assert base_value == keyvi_value

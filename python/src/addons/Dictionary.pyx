@@ -50,30 +50,60 @@
         for m in iterator:
             yield (m.GetMatchedString(), m.GetValue())
 
-    def GetAllKeys(self):
+    def get_all_keys(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return self._key_iterator_wrapper(py_result)
 
-    def GetAllValues(self):
+    def GetAllKeys(self):
+        return call_deprecated_method("GetAllKeys", "get_all_keys", self.get_all_keys)
+
+    def get_all_values(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return self._value_iterator_wrapper(py_result)
 
-    def GetAllItems(self):
+    def GetAllValues(self):
+        return call_deprecated_method("GetAllValues", "get_all_values", self.get_all_values)
+
+    def get_all_items(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
         py_result.end = _r.end()
         return self._item_iterator_wrapper(py_result)
 
-    def GetStatistics(self):
+    def GetAllItems(self):
+        return call_deprecated_method("GetAllItems", "get_all_items", self.get_all_items)
+
+    def get_statistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()
         cdef bytes py_result = _r
         py_result_unicode = _r.decode('utf-8')
 
         return json.loads(py_result_unicode)
+
+    def GetStatistics(self):
+        return call_deprecated_method("GetStatistics", "get_statistics", self.get_statistics)
+
+    def GetNear(self, *args):
+        return call_deprecated_method("GetNear", "get_near", self.get_near, *args)
+
+    def Get(self, *args):
+        return call_deprecated_method("Get", "get_values", self.get_values, *args)
+
+    def GetFuzzy(self, *args):
+        return call_deprecated_method("GetFuzzy", "get_fuzzy", self.get_fuzzy, *args)
+
+    def Lookup(self, *args):
+        return call_deprecated_method("Lookup", "lookup", self.lookup, *args)
+
+    def LookupText(self, *args):
+        return call_deprecated_method("LookupText", "lookup_text", self.lookup_text, *args)
+
+    def GetManifest(self, *args):
+        return call_deprecated_method("GetManifest", "get_manifest", self.get_manifest, *args)

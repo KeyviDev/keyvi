@@ -29,7 +29,7 @@ def test_simple_zlib():
         assert len(d) == 2
         assert d["abc"].GetValueAsString() == '{"a":2}'
         assert d["abd"].GetValueAsString() == '{"a":3}'
-        m = d.GetStatistics()['Value Store']
+        m = d.get_statistics()['Value Store']
         assert m['__compression'] == "zlib"
 
 def test_simple_snappy():
@@ -40,7 +40,7 @@ def test_simple_snappy():
         assert len(d) == 2
         assert d["abc"].GetValueAsString() == '{"a":2}'
         assert d["abd"].GetValueAsString() == '{"a":3}'
-        m = d.GetStatistics()['Value Store']
+        m = d.get_statistics()['Value Store']
         assert m['__compression'] == "snappy"
 
 def test_unicode_compile():
@@ -70,6 +70,6 @@ def test_float_compaction():
             assert len(ds) == 1
             assert len(dd) == 1
             # simple test the length of the value store which shall be smaller for single floats
-            stats_s = ds.GetStatistics()
-            stats_d = dd.GetStatistics()
+            stats_s = ds.get_statistics()
+            stats_d = dd.get_statistics()
             assert int(stats_s['Value Store']['size']) < int(stats_d['Value Store']['size'])

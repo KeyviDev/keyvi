@@ -23,7 +23,7 @@ def test_manifest():
     c.Add("Kif")
     c.SetManifest('{"author": "Zapp Brannigan"}')
     with tmp_dictionary(c, 'brannigan_manifest.kv') as d:
-        m = json.loads(d.GetManifest())
+        m = json.loads(d.get_manifest())
         assert m['author'] == "Zapp Brannigan"
 
 def test_manifest_after_compile():
@@ -36,7 +36,7 @@ def test_manifest_after_compile():
     try:
         c.WriteToFile(file_name)
         d = Dictionary(file_name)
-        m = json.loads(d.GetManifest())
+        m = json.loads(d.get_manifest())
         assert m['author'] == "Zapp Brannigan"
         del d
     finally:
@@ -48,9 +48,9 @@ def test_statistics():
     c.Add("Kif")
     c.SetManifest('{"author": "Zapp Brannigan"}')
     with tmp_dictionary(c, 'brannigan_statistics.kv') as d:
-        stats = d.GetStatistics()
+        stats = d.get_statistics()
         gen = stats.get('General', {})
-        man = json.loads(d.GetManifest())
+        man = json.loads(d.get_manifest())
         size = int(gen.get('number_of_keys', 0))
         assert size == 2
         assert man.get('author') == "Zapp Brannigan"
@@ -76,7 +76,7 @@ def test_manifest_for_merger():
         merger.Merge('manifest_json_merged.kv')
 
         d = Dictionary('manifest_json_merged.kv')
-        m = json.loads(d.GetManifest())
+        m = json.loads(d.get_manifest())
         assert m['author'] == "Fry"
         del d
 
