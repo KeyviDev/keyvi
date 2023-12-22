@@ -17,7 +17,7 @@ cdef extern from "keyvi/dictionary/match.h" namespace "keyvi::dictionary":
         void SetScore(float score)
         libcpp_utf8_output_string GetMatchedString()
         void SetMatchedString (libcpp_utf8_string matched_string)
-        PyObject* GetAttributePy(libcpp_utf8_string) nogil except + # wrap-ignore
+        PyObject* GetAttributePy(libcpp_utf8_string) except + nogil # wrap-ignore
         libcpp_utf8_output_string GetValueAsString() except +
         libcpp_string GetRawValueAsString() except +
         libcpp_string GetMsgPackedValueAsString() except + # wrap-ignore
