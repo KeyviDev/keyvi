@@ -12,6 +12,7 @@ do
     echo "Installing pyenv-venv: ${PYENV_VENV}"
     pyenv virtualenv -f "${PYTHON_VERSION}" "${PYENV_VENV}"
     pyenv local "${PYENV_VENV}"
+    eval "$(pyenv init --path)"
     python --version
 
     echo "Installing keyvi python deps..."
