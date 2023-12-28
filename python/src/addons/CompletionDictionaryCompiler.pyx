@@ -20,9 +20,4 @@
 
         cdef void* callback = <void*> args[0]
         with nogil:
-            self.inst.get().Compile(callback_wrapper, callback)
-
-
-# definition for all compilers
-cdef void callback_wrapper(size_t a, size_t b, void* py_callback) with gil:
-    (<object>py_callback)(a, b)
+            self.inst.get().Compile(progress_compiler_callback, callback)

@@ -35,5 +35,5 @@
 
         cdef void* callback = <void*> args[0]
         with nogil:
-            self.inst.get().Compile(callback_wrapper, callback)
+            self.inst.get().Compile(progress_compiler_callback, callback)
 
