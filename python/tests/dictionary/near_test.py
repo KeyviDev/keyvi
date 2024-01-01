@@ -48,9 +48,9 @@ def test_near_greedy():
         assert (len(list(d.get_near("zahnarzt:u1h0gkqsenhf", 13, True))) == 0)
         assert (len(list(d.get_near("zahnarzt:u0h0gkqsenhf", 10, True))) == 10)
 
-        greedy = [x.GetMatchedString()
+        greedy = [x.matched_string
                   for x in d.get_near("zahnarzt:u0h0gkqsenhf", 10, True)]
-        non_greedy = [x.GetMatchedString()
+        non_greedy = [x.matched_string
                       for x in d.get_near("zahnarzt:u0h0gkqsenhf", 10, False)]
         assert greedy[:len(non_greedy)] == non_greedy
 

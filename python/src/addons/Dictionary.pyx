@@ -40,15 +40,15 @@
 
     def _key_iterator_wrapper(self, iterator):
         for m in iterator:
-            yield m.GetMatchedString()
+            yield m.matched_string
 
     def _value_iterator_wrapper(self, iterator):
         for m in iterator:
-            yield m.GetValue()
+            yield m.value
 
     def _item_iterator_wrapper(self, iterator):
         for m in iterator:
-            yield (m.GetMatchedString(), m.GetValue())
+            yield (m.matched_string, m.value)
 
     def get_all_keys(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()

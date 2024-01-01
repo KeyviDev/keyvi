@@ -17,7 +17,7 @@ def test_zerobyte():
     c.Add("abc\x00def", '["a" : 3]')
     c.Add("cd\x00", '["a" : 4]')
     with tmp_dictionary(c, 'zerobyte.kv') as d:
-        assert d["\x00abc"].GetValue() == '["a" : 2]'
-        assert d["abc\x00def"].GetValue() == '["a" : 3]'
-        assert d["cd\x00"].GetValue() == '["a" : 4]'
+        assert d["\x00abc"].value == '["a" : 2]'
+        assert d["abc\x00def"].value == '["a" : 3]'
+        assert d["cd\x00"].value == '["a" : 4]'
         assert len([(k, v) for k, v in d.get_all_items()]) == 3

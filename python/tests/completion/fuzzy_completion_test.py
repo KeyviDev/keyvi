@@ -40,34 +40,34 @@ def test_fuzzy_completion():
 
     with tmp_dictionary(c, 'fuzzy_completion.kv') as d:
         completer = PrefixCompletion(d)
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuv', 0)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuv', 0)]
         assert len(matches) == 9
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tue', 1)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tue', 1)]
         assert len(matches) == 1
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuv h', 1)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuv h', 1)]
         assert len(matches) == 2
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuv h', 2)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuv h', 2)]
         assert len(matches) == 7
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuk töffnungszeiten', 2)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuk töffnungszeiten', 2)]
         assert len(matches) == 1
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuk töffnung', 2)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuk töffnung', 2)]
         assert len(matches) == 1
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuk txyzöff', 5)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuk txyzöff', 5)]
         assert len(matches) == 1
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuk txyzöffnung', 5)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuk txyzöffnung', 5)]
         assert len(matches) == 1
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuk txyzvöffnung', 6)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuk txyzvöffnung', 6)]
         assert len(matches) == 1
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('tuk ffnung', 2)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuk ffnung', 2)]
         assert len(matches) == 1
 
 
@@ -78,11 +78,11 @@ def test_fuzzy_completion_utf8():
     with tmp_dictionary(c, 'fuzzy_completion_utf8.kv') as d:
         completer = PrefixCompletion(d)
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('mß', 1)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('mß', 1)]
         assert len(matches) == 1
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('mß', 1, 0)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('mß', 1, 0)]
         assert len(matches) == 1
 
-        matches = [m.GetMatchedString() for m in completer.GetFuzzyCompletions('mß', 1, 4)]
+        matches = [m.matched_string for m in completer.GetFuzzyCompletions('mß', 1, 4)]
         assert len(matches) == 1

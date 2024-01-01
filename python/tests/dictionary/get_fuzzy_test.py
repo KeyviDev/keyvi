@@ -36,8 +36,8 @@ def test_get_fuzzy():
 
     with tmp_dictionary(c, 'get_fuzzy.kv') as d:
         for (base_key, base_value), m in zip(key_values, d.get_fuzzy('tüv koid', 2)):
-            assert base_key == m.GetMatchedString()
-            assert base_value == m.GetValue()
+            assert base_key == m.matched_string
+            assert base_value == m.value
 
         assert len(list(d.get_fuzzy('tüv koid', 2))) == 2
 
@@ -51,7 +51,7 @@ def test_get_fuzzy_minimum_prefix():
         assert len(matches) == 0
         matches = list(d.get_fuzzy("ap", 1, 1))
         assert len(matches) == 1
-        assert matches[0].GetValue() == 0
-        assert matches[0].GetMatchedString() == "a"
+        assert matches[0].value == 0
+        assert matches[0].matched_string == "a"
         assert matches[0].score == 1
 

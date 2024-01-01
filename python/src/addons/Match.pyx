@@ -29,13 +29,18 @@
             raise Exception("Unsupported Value Type")
 
 
-    def GetValue(self):
-        """Decodes a keyvi value and returns it."""
+    @property
+    def value(self):
         cdef libcpp_string packed_value = self.inst.get().GetMsgPackedValueAsString()
         if packed_value.empty():
             return None
 
         return msgpack.loads(packed_value)
+
+
+    def GetValue(self, *args):
+        """deprecated, use value property"""        
+        return call_deprecated_method_getter("GetValue", "value", self.value, *args)
 
 
     def dumps(self):
@@ -74,7 +79,7 @@
         if number_of_fields > 0:
             m.__SetRawValue(unserialized[0])
             if number_of_fields > 1:
-                m.SetMatchedString(unserialized[1])
+                m.matched_string = unserialized[1]
                 if number_of_fields > 2:
                     m.start = unserialized[2]
                     if number_of_fields > 3:
@@ -138,7 +143,7 @@
 
     @matched_string.setter
     def matched_string(self, value):
-        self.inst.get().SetMatchedString(value.encode("utf-8"))
+        self.inst.get().SetMatchedString(value)
 
     def GetMatchedString(self, *args):
         """deprecated, use matched_string property"""
@@ -147,3 +152,18 @@
     def SetMatchedString(self, value):
         """deprecated, use matched_string property"""
         return call_deprecated_method_setter("SetMatchedString", "matched_string", lambda x : self.inst.get().SetMatchedString(x), value)
+
+    def GetValueAsString(self, *args):
+        """deprecated, use get_value_as_string"""
+        return call_deprecated_method("GetValueAsString", "get_value_as_string", self.get_value_as_string, *args)
+
+    def GetRawValueAsString(self, *args):
+        """deprecated, use get_raw_value_as_string"""
+        return call_deprecated_method("GetRawValueAsString", "get_raw_value_as_string", self.get_raw_value_as_string, *args)
+
+    def __bool__(self):
+        return not self.inst.get().IsEmpty()
+
+    def IsEmpty(self, *args):
+        """deprecated, use bool operator"""
+        return not call_deprecated_method("IsEmpty", "__bool__", self.__bool__, *args)

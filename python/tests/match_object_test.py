@@ -32,10 +32,15 @@ def test_raw_serialization():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
         m = d["abc"]
-        assert m.GetValueAsString() == '{"a":2}'
+        assert m.get_value_as_string() == '{"a":2}'
         d = m.dumps()
         m2 = keyvi.Match.loads(d)
-        assert m2.GetValueAsString() == '{"a":2}'
+        assert m2.get_value_as_string() == '{"a":2}'
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            assert m.GetValueAsString() == '{"a":2}'
+            assert len(w) == 1
+            assert issubclass(w[-1].category, DeprecationWarning)
 
 
 def test_unicode_attributes():
@@ -114,9 +119,9 @@ def test_get_value():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
         m = d["abc"]
-        assert m.GetValue() == {"a": 2}
+        assert m.value == {"a": 2}
         m = d["abd"]
-        assert m.GetValue() == {"a": 3}
+        assert m.value == {"a": 3}
 
 
 def test_get_value_int():
@@ -125,9 +130,9 @@ def test_get_value_int():
     c.Add("abd", 21)
     with tmp_dictionary(c, 'match_object_int.kv') as d:
         m = d["abc"]
-        assert m.GetValue() == 42
+        assert m.value == 42
         m = d["abd"]
-        assert m.GetValue() == 21
+        assert m.value == 21
 
 
 def test_get_value_key_only():
@@ -136,9 +141,9 @@ def test_get_value_key_only():
     c.Add("abd")
     with tmp_dictionary(c, 'match_object_key_only.kv') as d:
         m = d["abc"]
-        assert m.GetValue() == ''
+        assert m.value == ''
         m = d["abd"]
-        assert m.GetValue() == ''
+        assert m.value == ''
 
 
 def test_get_value_string():
@@ -147,6 +152,30 @@ def test_get_value_string():
     c.Add("abd", "bbbbb")
     with tmp_dictionary(c, 'match_object_string.kv') as d:
         m = d["abc"]
-        assert m.GetValue() == "aaaaa"
+        assert m.value == "aaaaa"
         m = d["abd"]
-        assert m.GetValue() == "bbbbb"
+        assert m.value == "bbbbb"
+
+
+def test_matched_string():
+    m = keyvi.Match()
+    m.matched_string = "match"
+    assert m.matched_string == "match"
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        m.SetMatchedString("other_match")
+        assert m.matched_string == "other_match"
+        assert len(w) == 1
+        assert issubclass(w[-1].category, DeprecationWarning)
+
+
+def test_bool_operator():
+    m = keyvi.Match()
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        assert m.IsEmpty()
+        assert issubclass(w[-1].category, DeprecationWarning)
+    assert not m
+    m.end = 42
+    assert not m is False
+    assert m

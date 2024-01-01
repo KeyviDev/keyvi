@@ -26,7 +26,7 @@ def test_mw_completion():
     c["netscape navigator" + '\x1b' + "netscape navigator"] = 10
     with tmp_dictionary(c, 'mw_completion.kv') as d:
         mw = MultiWordCompletion(d)
-        matches = sorted([(match.GetAttribute('weight'), match.GetMatchedString())
+        matches = sorted([(match.GetAttribute('weight'), match.matched_string)
                           for match in mw.GetCompletions("mozilla f")], reverse=True)
         assert len(matches) == 4
         assert matches[0][1] == 'mozilla firefox'
@@ -45,7 +45,7 @@ def test_overlong_completion():
           , 23732)
     with tmp_dictionary(c, 'mw_overlong_completion.kv') as d:
         mw = MultiWordCompletion(d)
-        matches = sorted([(match.GetAttribute('weight'), match.GetMatchedString())
+        matches = sorted([(match.GetAttribute('weight'), match.matched_string)
                           for match in mw.GetCompletions("html dis")], reverse=True)
         assert len(matches) == 3
         assert matches[0][1] == 'html disable'
@@ -61,4 +61,4 @@ def test_exact_match_without_completion():
     with tmp_dictionary(c, 'test_exact_match_without_completion.kv') as d:
         mw = MultiWordCompletion(d)
         for m in mw.GetCompletions("mr "):
-            assert m.GetMatchedString() == b'mr'
+            assert m.matched_string == b'mr'
