@@ -37,7 +37,7 @@ jobs:
             brew update &&
             brew install zlib snappy boost &&
             brew install ccache
-          CIBW_ENVIRONMENT_MACOS: PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
+          CIBW_ENVIRONMENT: PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
         with:
           package-dir: python
