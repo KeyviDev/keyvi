@@ -15,12 +15,17 @@ jobs:
         os: [ubuntu-22.04, macos-12]
     steps:
       - uses: actions/checkout@v4
-
+      - name: Set up QEMU
+        if: runner.os == 'Linux'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_BUILD: 'cp37-*'
-          CIBW_ARCHS: auto64
+          CIBW_ARCHS_LINUX: auto64 aarch64
+          CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_SKIP: "*-musllinux_*"
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
