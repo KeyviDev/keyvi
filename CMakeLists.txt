@@ -51,12 +51,6 @@ endif (CMAKE_BUILD_TYPE_UPPER MATCHES COVERAGE)
 
 #### Dependencies ####
 
-# tiny process library
-add_subdirectory(keyvi/3rdparty/tiny-process-library)
-list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/tiny-process-library/")
-list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_BINARY_DIR}/keyvi/3rdparty/tiny-process-library/")
-set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} tiny-process-library")
-
 # BOOST
 set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "system" "regex" "thread")
 set (_KEYVI_BOOST_LIBRARIES_TEST "unit_test_framework")
@@ -178,7 +172,7 @@ target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>
 # unit tests
 FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
 add_executable(unit_test_all ${UNIT_TEST_SOURCES})
-target_link_libraries(unit_test_all tiny-process-library ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(unit_test_all ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
 target_compile_options(unit_test_all PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(unit_test_all PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -205,8 +199,7 @@ endif (WIN32)
 
 # bindings
 add_custom_target(bindings
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:tiny-process-library> ${CMAKE_BINARY_DIR}
-    DEPENDS tiny-process-library
+    COMMAND ${CMAKE_COMMAND} ${CMAKE_BINARY_DIR}
 )
 
 #### Configuration file for integrations and bindings ####
@@ -225,7 +218,7 @@ add_library(keyvi INTERFACE)
 
 target_include_directories(keyvi INTERFACE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 target_compile_definitions(keyvi INTERFACE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_link_libraries(keyvi INTERFACE tiny-process-library ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvi INTERFACE ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
 
 ### docs
 

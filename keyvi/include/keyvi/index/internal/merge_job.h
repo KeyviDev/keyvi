@@ -26,7 +26,7 @@
 #include <thread>  // NOLINT
 #include <vector>
 
-#include "process.hpp"
+#include <boost/process.hpp>
 
 #include "keyvi/dictionary/dictionary_merger.h"
 #include "keyvi/dictionary/dictionary_types.h"
@@ -128,7 +128,7 @@ class MergeJob final {
  private:
   MergeJobPayload payload_;
   size_t id_;
-  std::shared_ptr<TinyProcessLib::Process> external_process_;
+  std::shared_ptr<boost::process::child> external_process_;
   std::thread internal_merge_;
 
   void DoInternalMerge() {
@@ -157,22 +157,25 @@ class MergeJob final {
   void DoExternalProcessMerge() {
     payload_.start_time_ = std::chrono::system_clock::now();
 
-    std::stringstream command;
-
-    command << payload_.settings_.GetKeyviMergerBin();
-    command << " -m 5242880";
+    std::vector<std::string> args;
+    args.push_back("-m");
+    args.push_back("5242880");
 
     for (auto s : payload_.segments_) {
-      command << " -i " << s->GetDictionaryPath().string();
+      args.push_back("-i");
+      args.push_back(s->GetDictionaryPath().string());
     }
 
-    command << " -o " << payload_.output_filename_.string();
-    external_process_.reset(new TinyProcessLib::Process(command.str()));
+    args.push_back("-o");
+    args.push_back(payload_.output_filename_.string());
+
+    external_process_.reset(new boost::process::child(payload_.settings_.GetKeyviMergerBin(), args));
   }
 
   bool TryFinalizeMerge() {
     if (external_process_) {
-      if (external_process_->try_get_exit_status(payload_.exit_code_)) {
+      if (!external_process_->running()) {
+        payload_.exit_code_ = external_process_->exit_code();
         payload_.process_finished_ = true;
         return true;
       }
@@ -187,7 +190,8 @@ class MergeJob final {
 
   void FinalizeMerge() {
     if (external_process_) {
-      payload_.exit_code_ = external_process_->get_exit_status();
+      external_process_->wait();
+      payload_.exit_code_ = external_process_->exit_code();
     } else {
       internal_merge_.join();
       // exit code set by merge thread
