@@ -1,6 +1,11 @@
 
 
     def GetAttribute(self, key):
+        """deprecated, use index based access"""
+        return call_deprecated_method("GetAttribute", "[\"{key}\"]", self.__getitem__, *args)
+
+
+    def __getitem__(self, key):
         if isinstance(key, unicode):
             key = key.encode("utf-8")
 
@@ -9,6 +14,11 @@
 
 
     def SetAttribute(self, key, value):
+        """deprecated, use index based access"""
+        return call_deprecated_method("SetAttribute", "[\"{key}\"]", self.__setitem__, *args)
+
+
+    def __setitem__(self, key, value):
         if isinstance(key, unicode):
             key = key.encode("utf-8")
 
