@@ -2,6 +2,8 @@
 
 // The example validates JSON text from stdin with a JSON schema specified in the argument.
 
+#define RAPIDJSON_HAS_STDSTRING 1
+
 #include "rapidjson/error/en.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/schema.h"
@@ -39,7 +41,8 @@ static std::string GetString(const ValueType& val) {
     s << "false";
   else if (val.IsFloat())
     s << val.GetFloat();
-  return s.str();}
+  return s.str();
+}
 
 // Create the error message for a named error
 // The error object can either be empty or contain at least member properties:
