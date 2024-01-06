@@ -25,8 +25,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
           CIBW_BEFORE_ALL_MACOS: >
-            brew update
-            brew install zlib snappy boost
+            brew update &&
+            brew install zlib snappy boost &&
             brew install ccache
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
         with:
