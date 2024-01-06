@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_SUITE(JsonValueTests)
 
 BOOST_AUTO_TEST_CASE(EncodeDecodeTest) {
   std::string input =
-      "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"j\":-123,\"pi\":3.1415998935699465,\"a\":[1,"
+      "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"j\":-123,\"pi\":3.1415998935699463,\"a\":[1,"
       "2,3,4],\"d\":{\"k\":\"v\"}}";
 
   std::string encoded = EncodeJsonValue(input);
