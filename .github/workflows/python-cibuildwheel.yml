@@ -1,0 +1,31 @@
+name: Python cibuildwheel
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.16.2
+        env:
+          CIBW_BUILD: 'cp37-*'
+          CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
+          CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
+          CIBW_BEFORE_BUILD: pip install -r requirements.txt
+        with:
+          package-dir: python
+        
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./python/wheelhouse/*.whl
