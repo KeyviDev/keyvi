@@ -25,7 +25,7 @@ jobs:
         env:
           CIBW_BUILD: 'cp37-*'
           CIBW_ARCHS_LINUX: auto64 aarch64
-          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_MACOS: x86_64 universal2 arm64
           CIBW_SKIP: "*-musllinux_*"
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
