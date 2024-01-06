@@ -1,6 +1,6 @@
 
 
-    def GetAttribute(self, key):
+    def GetAttribute(self, *args):
         """deprecated, use index based access"""
         return call_deprecated_method("GetAttribute", "[\"{key}\"]", self.__getitem__, *args)
 
@@ -13,7 +13,7 @@
         return <object>py_result
 
 
-    def SetAttribute(self, key, value):
+    def SetAttribute(self, *args):
         """deprecated, use index based access"""
         return call_deprecated_method("SetAttribute", "[\"{key}\"]", self.__setitem__, *args)
 

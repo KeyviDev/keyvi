@@ -45,36 +45,44 @@ def test_raw_serialization():
 
 def test_unicode_attributes():
     m = keyvi.Match()
-    m.SetAttribute("küy", 22)
-    assert m.GetAttribute("küy") == 22
-    m.SetAttribute("k2", " 吃饭了吗")
+    m["küy"] = 22
+    assert m["küy"] == 22
+    m["k2"] = " 吃饭了吗"
     m.score = 99
-    assert m.GetAttribute("k2") == " 吃饭了吗"
+    assert m["k2"] == " 吃饭了吗"
     assert m.score == 99.0
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        m.SetAttribute("k2", "öäü")
+        assert m["k2"] == "öäü"
+        assert m.GetAttribute("k2") == "öäü"
+        assert len(w) == 2
+        assert issubclass(w[0].category, DeprecationWarning)
+        assert issubclass(w[1].category, DeprecationWarning)
 
 
 def test_bytes_attributes():
     m = keyvi.Match()
     bytes_key = bytes(u"äöü".encode('utf-8'))
     bytes_value = bytes(u"äöüöäü".encode('utf-8'))
-    m.SetAttribute(bytes_key, 22)
-    assert m.GetAttribute(bytes_key) == 22
-    m.SetAttribute("k2", bytes_value)
-    assert m.GetAttribute("k2") == "äöüöäü"
+    m[bytes_key] = 22
+    assert m[bytes_key] == 22
+    m["k2"] = bytes_value
+    assert m["k2"] == "äöüöäü"
 
 
 def test_double_attributes():
     m = keyvi.Match()
     bytes_key = bytes("abc".encode('utf-8'))
-    m.SetAttribute(bytes_key, 42.0)
-    assert m.GetAttribute(bytes_key) == 42.0
+    m[bytes_key] = 42.0
+    assert m[bytes_key] == 42.0
 
 
 def test_boolean_attributes():
     m = keyvi.Match()
     bytes_key = bytes("def".encode('utf-8'))
-    m.SetAttribute(bytes_key, True)
-    assert m.GetAttribute(bytes_key) == True
+    m[bytes_key] = True
+    assert m[bytes_key] == True
 
 
 def test_start():
