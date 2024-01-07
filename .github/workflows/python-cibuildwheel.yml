@@ -37,6 +37,8 @@ jobs:
           # (many)linux build environment
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
+          CIBW_BEFORE_ALL_LINUX: ccache -s
+          CIBW_BEFORE_TEST_LINUX: ccache -s
 
           # macos build environment
           CIBW_BEFORE_ALL_MACOS: >
