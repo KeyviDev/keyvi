@@ -37,7 +37,7 @@ jobs:
           # (many)linux build environment
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
-          CIBW_BEFORE_ALL_LINUX: ccache -s && ls /host/home/runner/work/keyvi/keyvi/.ccache && ccache -p && which c++ && which ccache && ls -l /usr/local/bin
+          CIBW_BEFORE_ALL_LINUX: ccache -s && ls /host/home/runner/work/keyvi/keyvi/.ccache && ccache -p && which c++ && which ccache && env && ls -l /usr/local/bin
           CIBW_BEFORE_TEST_LINUX: ccache -s
 
           # macos build environment
@@ -48,7 +48,7 @@ jobs:
           
           # ccache with paths on: musl & manylinux image, ubuntu, mac
           CIBW_ENVIRONMENT: PATH=/usr/local/bin:/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
-          CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache
+          CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
           CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_WORKSPACE
           
           # python dependencies
