@@ -46,7 +46,7 @@ jobs:
           
           # ccache
           CIBW_ENVIRONMENT: PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
-          CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host/$GITHUB_WORKSPACE/.ccache
+          CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host/${{ github.workspace }}/.ccache
           CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_WORKSPACE
           
           # python dependencies
