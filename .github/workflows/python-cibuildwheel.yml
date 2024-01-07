@@ -48,7 +48,7 @@ jobs:
           
           # ccache with paths on: musl & manylinux image, ubuntu, mac
           CIBW_ENVIRONMENT: PATH=/usr/local/bin:/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
-          CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
+          CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
           CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_WORKSPACE
           
           # python dependencies
