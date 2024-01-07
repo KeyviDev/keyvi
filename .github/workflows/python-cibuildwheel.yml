@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04, macos-12]
-        arch: [ 'x86' ]
+        arch: [ 'x86_64' ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up QEMU
@@ -25,8 +25,8 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: ${{ matrix.os }}-${{ matrix.arch }}-python
-      - name: Build wheels on x86
-        if: runner.arch == 'x86'
+      - name: Build wheels on x86_64
+        if: matrix.arch == 'x86_64'
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_BUILD: 'cp311-*'
@@ -60,8 +60,8 @@ jobs:
             
         with:
           package-dir: python
-      - name: Build wheels on arm
-        if: runner.arch == 'arm'
+      - name: Build wheels on arm64
+        if: matrix.arch == 'arm64'
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_BUILD: 'cp311-*'
