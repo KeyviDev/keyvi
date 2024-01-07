@@ -46,8 +46,8 @@ jobs:
             brew install zlib snappy boost &&
             brew install ccache
           
-          # ccache
-          CIBW_ENVIRONMENT: PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
+          # ccache with paths on: musl, manylinux, ubuntu, mac
+          CIBW_ENVIRONMENT: PATH=/usr/lib/ccache/bin/:/usr/lib64/ccache:/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
           CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host/${{ github.workspace }}/.ccache
           CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_WORKSPACE
           
