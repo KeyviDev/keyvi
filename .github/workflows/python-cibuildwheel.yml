@@ -49,6 +49,7 @@ jobs:
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
           
           # testing
+          CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: >
             python -m pytest {package}/tests
             python -m pytest {package}/integration-tests
