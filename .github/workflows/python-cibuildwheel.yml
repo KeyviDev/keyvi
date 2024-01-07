@@ -13,6 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04, macos-12]
+        arch: [ 'x86' ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up QEMU
@@ -23,13 +24,14 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
-          key: ${{ matrix.os }}-python
-      - name: Build wheels
+          key: ${{ matrix.os }}-${{ matrix.arch }}-python
+      - name: Build wheels on x86
+        if: runner.arch == 'x86'
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_BUILD: 'cp311-*'
-          CIBW_ARCHS_LINUX: auto64 aarch64
-          CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_ARCHS_LINUX: auto64
+          CIBW_ARCHS_MACOS: x86_64
           CIBW_SKIP: "*-musllinux_*"
 
           # (many)linux build environment
@@ -44,6 +46,43 @@ jobs:
           
           # ccache
           CIBW_ENVIRONMENT: PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
+          CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host/$GITHUB_WORKSPACE/.ccache
+          CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_WORKSPACE
+          
+          # python dependencies
+          CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
+          
+          # testing
+          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_COMMAND: >
+            python -m pytest {package}/tests &&
+            python -m pytest {package}/integration-tests
+            
+        with:
+          package-dir: python
+      - name: Build wheels on arm
+        if: runner.arch == 'arm'
+        uses: pypa/cibuildwheel@v2.16.2
+        env:
+          CIBW_BUILD: 'cp311-*'
+          CIBW_ARCHS_LINUX: aarch64
+          CIBW_ARCHS_MACOS: arm64
+          CIBW_SKIP: "*-musllinux_*"
+
+          # (many)linux build environment
+          CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
+          CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
+
+          # macos build environment
+          CIBW_BEFORE_ALL_MACOS: >
+            brew update &&
+            brew install zlib snappy boost &&
+            brew install ccache
+          
+          # ccache
+          CIBW_ENVIRONMENT: PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
+          CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host/$GITHUB_WORKSPACE/.ccache
+          CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_WORKSPACE
           
           # python dependencies
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
