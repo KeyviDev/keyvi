@@ -31,14 +31,28 @@ jobs:
           CIBW_ARCHS_LINUX: auto64 aarch64
           CIBW_ARCHS_MACOS: x86_64 arm64
           CIBW_SKIP: "*-musllinux_*"
+
+          # (many)linux build environment
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
+
+          # macos build environment
           CIBW_BEFORE_ALL_MACOS: >
             brew update &&
             brew install zlib snappy boost &&
             brew install ccache
+          
+          # ccache
           CIBW_ENVIRONMENT: PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
+          
+          # python dependencies
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
+          
+          # testing
+          CIBW_TEST_COMMAND: >
+            python -m pytest {package}/tests
+            python -m pytest {package}/integration-tests
+            
         with:
           package-dir: python
         
