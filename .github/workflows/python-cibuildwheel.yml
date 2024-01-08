@@ -40,7 +40,7 @@ jobs:
           echo "ARCHS_MACOS=arm64" >> $GITHUB_ENV
         if: matrix.arch == 'arm64'
           
-      - name: Build wheels
+      - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_BUILD: 'cp311-*'
