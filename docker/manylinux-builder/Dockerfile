@@ -3,12 +3,15 @@ FROM $base_image
 
 RUN \
     if which yum; then \
-        yum -y update; \
-        yum clean all; \
-        yum -y install bzip2-devel snappy-devel python-devel hiredis-devel libzstd-devel; \
+        yum -y update && \
+        yum clean all && \
+        yum -y install bzip2-devel snappy-devel python-devel && \
+        if [ $AUDITWHEEL_ARCH != "aarch64" ]; then \
+          yum -y install hiredis-devel libzstd-devel; \
+        fi && \
         yum clean all; \
     elif which apk; then \
-        apk upgrade --no-cache; \
+        apk upgrade --no-cache && \
         apk add --no-cache bzip2-dev snappy-dev python3-dev hiredis-dev zstd-dev; \
     else \
         echo "unsupported os"; \
