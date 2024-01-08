@@ -30,28 +30,27 @@ jobs:
 
       - name: Sets env for x86_64
         run: |
-          echo "ARCHS_LINUX=auto64" >> $GITHUB_ENV
-          echo "ARCHS_MACOS=x86_64" >> $GITHUB_ENV
+          echo "CIBW_ARCHS_LINUX=auto64" >> $GITHUB_ENV
+          echo "CIBW_ARCHS_MACOS=x86_64" >> $GITHUB_ENV
         if: matrix.arch == 'x86_64'
 
       - name: Sets env for arm64
         run: |
-          echo "ARCHS_LINUX=aarch64" >> $GITHUB_ENV
-          echo "ARCHS_MACOS=arm64" >> $GITHUB_ENV
+          echo "CIBW_ARCHS_LINUX=aarch64" >> $GITHUB_ENV
+          echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
         if: matrix.arch == 'arm64'
           
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_BUILD: 'cp311-*'
-          CIBW_ARCHS_LINUX: ${{env.ARCHS_LINUX}}
-          CIBW_ARCHS_MACOS: ${{env.ARCHS_MACOS}}
-          
+
           # (many)linux custom docker images
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
           CIBW_MUSLLINUX_X86_64_IMAGE: 'keyvidev/musllinux-builder-x86_64'
           CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
+          CIBW_SKIP: "*-musllinux_*"
           
           # macos build requirements
           CIBW_BEFORE_ALL_MACOS: >
