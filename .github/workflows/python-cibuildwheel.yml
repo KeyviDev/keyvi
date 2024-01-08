@@ -50,7 +50,6 @@ jobs:
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
           CIBW_MUSLLINUX_X86_64_IMAGE: 'keyvidev/musllinux-builder-x86_64'
           CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
-          CIBW_SKIP: "*-musllinux_*"
           
           # macos build requirements
           CIBW_BEFORE_ALL_MACOS: >
