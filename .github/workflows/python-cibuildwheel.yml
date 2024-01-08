@@ -13,7 +13,9 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04, macos-12]
-        arch: [ 'x86_64' ]
+        # separate archs, so they use individual caches
+        arch: [ 'x86_64', 'arm64' ]
+
     steps:
       - uses: actions/checkout@v4
       - name: Set up QEMU
@@ -25,20 +27,33 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: ${{ matrix.os }}-${{ matrix.arch }}-python
-      - name: Build wheels on x86_64
+
+      - name: Sets env for x86_64
+        run: |
+          echo "ARCHS_LINUX=auto64" >> $GITHUB_ENV
+          echo "ARCHS_MACOS=x86_64" >> $GITHUB_ENV
         if: matrix.arch == 'x86_64'
+
+      - name: Sets env for arm64
+        run: |
+          echo "ARCHS_LINUX=aarch64" >> $GITHUB_ENV
+          echo "ARCHS_MACOS=arm64" >> $GITHUB_ENV
+        if: matrix.arch == 'arm64'
+          
+      - name: Build wheels
         uses: pypa/cibuildwheel@v2.16.2
         env:
           CIBW_BUILD: 'cp311-*'
-          CIBW_ARCHS_LINUX: auto64
-          CIBW_ARCHS_MACOS: x86_64
-          CIBW_SKIP: "*-musllinux_*"
-
-          # (many)linux build environment
+          CIBW_ARCHS_LINUX: ${{env.ARCHS_LINUX}}
+          CIBW_ARCHS_MACOS: ${{env.ARCHS_MACOS}}
+          
+          # (many)linux custom docker images
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
-
-          # macos build environment
+          CIBW_MUSLLINUX_X86_64_IMAGE: 'keyvidev/musllinux-builder-x86_64'
+          CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
+          
+          # macos build requirements
           CIBW_BEFORE_ALL_MACOS: >
             brew update &&
             brew install zlib snappy boost &&
@@ -47,42 +62,6 @@ jobs:
           # ccache using path
           CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
           CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
-          CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_WORKSPACE
-          
-          # python dependencies
-          CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
-          
-          # testing
-          CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: >
-            python -m pytest {package}/tests &&
-            python -m pytest {package}/integration-tests
-            
-        with:
-          package-dir: python
-      - name: Build wheels on arm64
-        if: matrix.arch == 'arm64'
-        uses: pypa/cibuildwheel@v2.16.2
-        env:
-          CIBW_BUILD: 'cp311-*'
-          CIBW_ARCHS_LINUX: aarch64
-          CIBW_ARCHS_MACOS: arm64
-          CIBW_SKIP: "*-musllinux_*"
-
-          # (many)linux build environment
-          CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
-          CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
-
-          # macos build environment
-          CIBW_BEFORE_ALL_MACOS: >
-            brew update &&
-            brew install zlib snappy boost &&
-            brew install ccache
-          
-          # ccache
-          CIBW_ENVIRONMENT: PATH=/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH
-          CIBW_ENVIRONMENT_LINUX: CCACHE_DIR=/host/$GITHUB_WORKSPACE/.ccache
-          CIBW_ENVIRONMENT_PASS_LINUX: GITHUB_WORKSPACE
           
           # python dependencies
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
