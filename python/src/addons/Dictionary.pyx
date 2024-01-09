@@ -58,7 +58,7 @@
         return self._key_iterator_wrapper(py_result)
 
     def GetAllKeys(self):
-        return call_deprecated_method("GetAllKeys", "get_all_keys", self.get_all_keys)
+        return call_deprecated_method("GetAllKeys", "keys", self.keys)
 
     def values(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
@@ -68,7 +68,7 @@
         return self._value_iterator_wrapper(py_result)
 
     def GetAllValues(self):
-        return call_deprecated_method("GetAllValues", "get_all_values", self.get_all_values)
+        return call_deprecated_method("GetAllValues", "values", self.values)
 
     def items(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
@@ -78,7 +78,7 @@
         return self._item_iterator_wrapper(py_result)
 
     def GetAllItems(self):
-        return call_deprecated_method("GetAllItems", "get_all_items", self.get_all_items)
+        return call_deprecated_method("GetAllItems", "items", self.items)
 
     def get_statistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()
