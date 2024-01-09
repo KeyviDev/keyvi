@@ -46,6 +46,9 @@ namespace internal {
 
 /*
  * Template that hold information about dictionary types, to be specialized.
+ *
+ * @tparam ValueStoreType The type of the value store to use
+ * @tparam N Array size for fixed size value vectors, ignored otherwise
  */
 
 template <value_store_t>
@@ -122,6 +125,20 @@ class IValueStoreReader {
    * @return the value as string
    */
   virtual std::string GetValueAsString(uint64_t fsa_value) const = 0;
+
+  /**
+   * Test whether this value store is compatible to the given value store.
+   * Throws if they are not compatible.
+   *
+   * This can be overwritten by value stores, for specialization.
+   *
+   * @param other other value store
+   */
+  virtual void CheckCompatibility(const IValueStoreReader& other) {
+    if (other.GetValueStoreType() != GetValueStoreType()) {
+      throw std::invalid_argument("Dictionaries must have the same value store type");
+    }
+  }
 
  private:
   template <keyvi::dictionary::fsa::internal::value_store_t>

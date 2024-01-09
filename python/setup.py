@@ -35,7 +35,7 @@ except:
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 5
-VERSION_PATCH = 7
+VERSION_PATCH = 8
 VERSION_DEV = 0
 IS_RELEASED = False
 
@@ -216,6 +216,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     link_library_dirs = [
         keyvi_build_dir,
         '/usr/local/lib/',  # as of 17/07/2022 Python 3.10 build on GH actions needs '/usr/local/lib/' link library dir
+        '/opt/homebrew/lib'
     ]
 
     #########################

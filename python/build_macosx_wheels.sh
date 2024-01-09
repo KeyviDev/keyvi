@@ -2,7 +2,7 @@
 
 set -e
 
-for PYTHON_VERSION in "3.8.13" "3.9.11" "3.10.3";
+for PYTHON_VERSION in "3.8.13" "3.9.11" "3.10.3" "3.11.1" "3.12.0";
 do
     echo "Building on Python: ${PYTHON_VERSION}"
     pyenv install -s "${PYTHON_VERSION}"
@@ -12,6 +12,7 @@ do
     echo "Installing pyenv-venv: ${PYENV_VENV}"
     pyenv virtualenv -f "${PYTHON_VERSION}" "${PYENV_VENV}"
     pyenv local "${PYENV_VENV}"
+    eval "$(pyenv init --path)"
     python --version
 
     echo "Installing keyvi python deps..."

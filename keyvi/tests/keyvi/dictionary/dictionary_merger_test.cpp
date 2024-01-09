@@ -408,12 +408,89 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
   }
 }
 
+BOOST_AUTO_TEST_CASE(MergeFloatVectorDicts, *boost::unit_test::tolerance(0.00001)) {
+  keyvi::util::parameters_t merge_configurations[] = {{{"memory_limit_mb", "10"}},
+                                                      {{"memory_limit_mb", "10"}, {"merge_mode", "append"}}};
+
+  for (const auto& params : merge_configurations) {
+    std::vector<std::pair<std::string, std::vector<float>>> test_data = {
+        {"abc", {0.1, 0.2, 0.3, 0.4, 0.5}},   {"abbc", {0.1, 1.2, 0.3, 0.4, 0.5}}, {"abbcd", {0.1, 2.2, 0.3, 0.4, 0.5}},
+        {"abcde", {0.1, 3.2, 0.3, 0.4, 0.5}}, {"abdd", {0.1, 4.2, 0.3, 0.4, 0.5}}, {"bba", {0.1, 5.2, 0.3, 0.4, 0.5}},
+    };
+    testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromFloats(&test_data);
+
+    std::vector<std::pair<std::string, std::vector<float>>> test_data2 = {
+        {"abbe", {3.1, 0.2, 1.3, 0.4, 0.5}},
+        {"abbc", {3.1, 0.2, 2.3, 0.4, 0.5}},
+        {"abcd", {3.1, 0.2, 3.3, 0.4, 0.5}},
+        {"bbacd", {3.1, 0.2, 4.3, 0.4, 0.5}},
+    };
+
+    testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromFloats(&test_data2);
+    std::string filename("merged-dict-float-vector.kv");
+    DictionaryMerger<dictionary_type_t::FLOAT_VECTOR> merger(params);
+    merger.Add(dictionary.GetFileName());
+    merger.Add(dictionary2.GetFileName());
+
+    merger.Merge(filename);
+
+    fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
+    dictionary_t d(new Dictionary(fsa));
+
+    BOOST_CHECK(d->Contains("abc"));
+    BOOST_CHECK(d->Contains("abbc"));
+    BOOST_CHECK(d->Contains("abbcd"));
+    BOOST_CHECK(d->Contains("abbe"));
+    BOOST_CHECK(d->Contains("abcd"));
+    BOOST_CHECK(d->Contains("abcde"));
+    BOOST_CHECK(d->Contains("abdd"));
+    BOOST_CHECK(d->Contains("bba"));
+    BOOST_CHECK(d->Contains("bbacd"));
+
+    auto v = keyvi::util::DecodeFloatVector(d->operator[]("abc").GetRawValueAsString());
+    BOOST_CHECK_EQUAL(5, v.size());
+    BOOST_TEST(0.4 == v[3]);
+    BOOST_TEST(0.2 == v[1]);
+
+    v = keyvi::util::DecodeFloatVector(d->operator[]("abbc").GetRawValueAsString());
+    BOOST_CHECK_EQUAL(5, v.size());
+    BOOST_TEST(3.1 == v[0]);
+    BOOST_TEST(2.3 == v[2]);
+
+    BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
+    BOOST_CHECK_EQUAL(1, merger.GetStats().updated_keys_);
+    BOOST_CHECK_EQUAL(9, merger.GetStats().number_of_keys_);
+
+    std::remove(filename.c_str());
+  }
+}
+
 BOOST_AUTO_TEST_CASE(MergeIncompatible) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "aaceh", "cdefgh"};
   testing::TempDictionary dictionary(&test_data);
+
   DictionaryMerger<dictionary_type_t::INT_WITH_WEIGHTS> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   BOOST_CHECK_THROW(merger.Add(dictionary.GetFileName()), std::invalid_argument);
+}
+
+BOOST_AUTO_TEST_CASE(MergeIncompatibleFloatVectorDicts, *boost::unit_test::tolerance(0.00001)) {
+  std::vector<std::pair<std::string, std::vector<float>>> test_data = {
+      {"abc", {0.1, 0.2, 0.3, 0.4, 0.5}},
+      {"abbc", {0.1, 1.2, 0.3, 0.4, 0.5}},
+      {"abbcd", {0.1, 2.2, 0.3, 0.4, 0.5}},
+  };
+  testing::TempDictionary dictionary = testing::TempDictionary::makeTempDictionaryFromFloats(&test_data);
+
+  std::vector<std::pair<std::string, std::vector<float>>> test_data2 = {
+      {"abbe", {3.1, 0.2, 1.3, 0.4, 0.5, 3.1, 0.2, 2.3, 0.4, 0.5}},
+  };
+
+  testing::TempDictionary dictionary2 = testing::TempDictionary::makeTempDictionaryFromFloats(&test_data2);
+  std::string filename("merged-dict-float-vector.kv");
+  DictionaryMerger<dictionary_type_t::FLOAT_VECTOR> merger(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+  merger.Add(dictionary.GetFileName());
+  BOOST_CHECK_THROW(merger.Add(dictionary2.GetFileName()), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
@@ -767,4 +844,4 @@ BOOST_AUTO_TEST_CASE(WriteWithoutMerge) {
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */
-} /* namespace keyvi */
+}  // namespace keyvi

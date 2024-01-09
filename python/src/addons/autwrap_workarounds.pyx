@@ -33,3 +33,8 @@ def get_interpreter_executable():
         executable = executable.encode('utf-8')
 
     return executable
+
+
+# definition for all compilers
+cdef void progress_compiler_callback(size_t a, size_t b, void* py_callback) noexcept with gil:
+    (<object>py_callback)(a, b)

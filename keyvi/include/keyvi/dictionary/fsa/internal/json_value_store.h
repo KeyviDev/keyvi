@@ -87,7 +87,7 @@ class JsonValueStoreBase {
 
 class JsonValueStoreMinimizationBase : public JsonValueStoreBase {
  public:
-  explicit JsonValueStoreMinimizationBase(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+  explicit JsonValueStoreMinimizationBase(const keyvi::util::parameters_t& parameters)
       : hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
     temporary_directory_ = keyvi::util::mapGetTemporaryPath(parameters);
 

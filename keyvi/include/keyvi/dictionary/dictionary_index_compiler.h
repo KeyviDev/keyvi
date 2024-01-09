@@ -58,6 +58,10 @@ namespace dictionary {
  * - handling of order (stable sort)
  * - support for delete
  * - no merge as part of compilation, the index handles this
+ *
+ * @tparam ValueStoreType The type of the value store to use
+ * @tparam N Array size for fixed size value vectors, ignored otherwise
+ *
  */
 template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType = fsa::internal::value_store_t::KEY_ONLY>
 class DictionaryIndexCompiler final {

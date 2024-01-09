@@ -288,7 +288,7 @@ int main(int argc, char** argv) {
       } else if (dictionary_type == "json") {
         compile_json(input_files, output_file, manifest, value_store_params);
       } else if (dictionary_type == "completion") {
-        compile_integer(input_files, output_file, manifest, value_store_params);
+        compile_completion(input_files, output_file, manifest, value_store_params);
       } else {
         std::cout << "ERROR: unknown dictionary type." << std::endl << std::endl;
         std::cout << description;
