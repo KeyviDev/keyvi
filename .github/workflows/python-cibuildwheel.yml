@@ -43,8 +43,6 @@ jobs:
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
         uses: pypa/cibuildwheel@v2.16.2
         env:
-          CIBW_BUILD: 'cp311-*'
-
           # (many)linux custom docker images
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
