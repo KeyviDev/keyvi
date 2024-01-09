@@ -1,3 +1,69 @@
+# 2023-07-08 version 6.1.0
+  * Remove dependency on boost in chrono.hpp (#1076)
+  * Add support for std::variant behavior (#1075)
+  * Fix msgpack::type::variant behavior to respect MessagePack format (#1071)
+  * Add rebind allocators (#1065)
+
+# 2023-03-02 version 6.0.0
+## << breaking changes >>
+  * Change CMake package name of C++ library to msgpack-cxx (#1054)
+    Unified all C++ package, library, cmake, tarball name become msgpack-cxx.
+
+# 2023-01-10 version 5.0.0 for C++
+ * Fix config for new MSVC preprocessor (#1040)
+## << breaking changes >>
+ * Change CMake package name of C++ library to msgpackc-cxx (#1045, #1048)
+
+# 2022-11-02 version 4.1.3 for C++
+  * Fix compile error that direct inclusion of chrono with `MSGPACK_NO_BOOST` (#1038))
+
+# 2022-09-07 version 4.1.2 for C++
+  * Fix noexcept on zone (#1030)
+  * Improve cmake support (#1028, #1032)
+  * Improve CI (#1023)
+  * Improve supporting platform (#1021)
+  * Refine double/float packing (#1018)
+  * Refine include files dependency (#1011)
+
+# 2022-03-09 version 4.1.1 for C++
+  * Remove chrono support on `MSGPACK_NO_BOOST` to fix  compile error.
+  * Improve build system (#1003)
+
+# 2022-02-12 version 4.1.0 for C++
+  * Add experimental support for no boost dependency (#1001)
+    * For cmake, add `-DMSGPACK_USE_BOOST=OFF`. For C++ compiler add `-DMSGPACK_NO_BOOST`.
+  * Improve BIN console output (#995)
+  * Fix include notation (#991)
+
+# 2021-10-23 version 4.0.3 for C++
+  * Remove Enabler2 template parameter from object adaptor (#987)
+  * Add MSGPACK_BUILD_DOCS cmake option (#983, #984)
+
+# 2021-08-31 version 4.0.2 for C++
+  * Fix fuzzer interface function name (#972)
+  * Fix boost test link error and support both dynamin(default) and static link boost (#971)
+
+# 2021-08-30 version 4.0.1 for C++
+  * Fix release tarball and its generation script (#967)
+
+# 2021-08-29 version 4.0.0 for C++
+  * Improve zone alignment logic (#965)
+  * Fix v1 unpack logic for STR and BIN (#957, #951)
+  * Fix UB on memcmp with size 0 (#954)
+  * Fix `iovec` name conflict (#952)
+  * Add `std::array<std::byte>` `std::span<char>` `std::span<unsigned char>` `std::span<std::byte>` adaptors (#951)
+  * Improve documents (#918, #919, #951)
+  * Improve tests (#916)
+  * Introduce BOOST_ASSERT (#898)
+  * Improve build system (#897, #905, #924, #951)
+  * Improve Boost.Fusion support (#894)
+  * Check nullptr before call memcpy (#891)
+  * Refine and bugfix `std::chrono::time_point` adaptor (#888, #893)
+  * Improve CI (#884, #892, #895, #951, #955)
+## << breaking changes >>
+  * Separate C++ part of the msgpack-c  from C/C++ mixed msgpack-c (#876, #878)
+  * Require boost libraries. See README.md Dependency(#912)
+
 # 2020-06-05 version 3.3.0
   * Add json example for C (#870)
   * Add both header and body packing functions for C (#870)

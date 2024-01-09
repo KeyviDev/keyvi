@@ -18,6 +18,7 @@
 #include "msgpack/unpack_define.hpp"
 #include "msgpack/cpp_config.hpp"
 #include "msgpack/sysdep.hpp"
+#include "msgpack/assert.hpp"
 
 #include <memory>
 
@@ -25,8 +26,6 @@
 #if !defined(MSGPACK_USE_CPP03)
 #include <atomic>
 #endif
-
-#include <boost/assert.hpp>
 
 #if defined(_MSC_VER)
 // avoiding confliction std::max, std::min, and macro in windows.h
@@ -171,11 +170,14 @@ inline void unpack_str(unpack_user& u, const char* p, uint32_t l, msgpack::objec
         o.via.str.ptr = p;
         u.set_referenced(true);
     }
-    else {
+    else if (l > 0) {
         if (l > u.limit().str()) throw msgpack::str_size_overflow("str size overflow");
         char* tmp = static_cast<char*>(u.zone().allocate_align(l, MSGPACK_ZONE_ALIGNOF(char)));
         std::memcpy(tmp, p, l);
         o.via.str.ptr = tmp;
+    }
+    else {
+        o.via.str.ptr = MSGPACK_NULLPTR;
     }
     o.via.str.size = l;
 }
@@ -187,11 +189,14 @@ inline void unpack_bin(unpack_user& u, const char* p, uint32_t l, msgpack::objec
         o.via.bin.ptr = p;
         u.set_referenced(true);
     }
-    else {
+    else if (l > 0) {
         if (l > u.limit().bin()) throw msgpack::bin_size_overflow("bin size overflow");
         char* tmp = static_cast<char*>(u.zone().allocate_align(l, MSGPACK_ZONE_ALIGNOF(char)));
         std::memcpy(tmp, p, l);
         o.via.bin.ptr = tmp;
+    }
+    else {
+        o.via.bin.ptr = MSGPACK_NULLPTR;
     }
     o.via.bin.size = l;
 }
@@ -460,7 +465,7 @@ inline void context::check_ext_size<4>(std::size_t size) {
 
 inline int context::execute(const char* data, std::size_t len, std::size_t& off)
 {
-    BOOST_ASSERT(len >= off);
+    MSGPACK_ASSERT(len >= off);
 
     m_start = data;
     m_current = data + off;

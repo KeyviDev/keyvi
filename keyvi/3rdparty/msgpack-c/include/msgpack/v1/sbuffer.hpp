@@ -10,12 +10,12 @@
 #ifndef MSGPACK_V1_SBUFFER_HPP
 #define MSGPACK_V1_SBUFFER_HPP
 
+#include "msgpack/v1/cpp_config_decl.hpp"
 #include "msgpack/v1/sbuffer_decl.hpp"
+#include "msgpack/assert.hpp"
 
 #include <stdexcept>
 #include <cstring>
-
-#include <boost/assert.hpp>
 
 namespace msgpack {
 
@@ -70,7 +70,7 @@ public:
 
     void write(const char* buf, size_t len)
     {
-        BOOST_ASSERT(buf || len == 0);
+        MSGPACK_ASSERT(buf || len == 0);
 
         if (!buf) return;
 
