@@ -74,7 +74,6 @@ keyvi is licensed under Apache License 2.0("ALv2"), see [license](LICENSE) for d
 | msgpack-c                   | Boost Software License  |
 | RapidJSON                   | MIT License             |
 | Snappy                      | BSD                     |
-| tiny-process-library        | MIT License             |
 | Zlib                        | Zlib License            |
 
 
