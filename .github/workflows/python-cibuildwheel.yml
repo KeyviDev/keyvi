@@ -46,8 +46,9 @@ jobs:
           # Skip CPython 3.6 and CPython 3.7
           CIBW_SKIP: cp36-* cp37-*
 
+          # skip testing all python versions on linux arm, only test 3.12
           # skip tests on pypy, currently fails for indexer tests
-          CIBW_TEST_SKIP: pp*
+          CIBW_TEST_SKIP: "*p{38,39,310,311}-m*linux_aarch64 pp*"
 
           # (many)linux custom docker images
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
