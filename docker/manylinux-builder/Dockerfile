@@ -12,7 +12,7 @@ RUN \
         yum clean all; \
     elif which apk; then \
         apk upgrade --no-cache && \
-        apk add --no-cache bzip2-dev snappy-dev python3-dev hiredis-dev zstd-dev; \
+        apk add --no-cache procps bzip2-dev snappy-dev python3-dev hiredis-dev zstd-dev; \
     else \
         echo "unsupported os"; \
         exit 1; \
