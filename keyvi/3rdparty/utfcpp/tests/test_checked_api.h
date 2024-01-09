@@ -1,4 +1,6 @@
-#include "gtest/gtest.h"
+#ifndef UTF8_FOR_CPP_TEST_CHECKED_H_2675DCD0_9480_4c0c_B92A_CC14C027B731
+#define UTF8_FOR_CPP_TEST_CHECKED_H_2675DCD0_9480_4c0c_B92A_CC14C027B731
+
 #include "utf8.h"
 
 #include <string>
@@ -37,13 +39,35 @@ TEST(CheckedAPITests, test_append)
     EXPECT_EQ (u[2], 0x8d);
     EXPECT_EQ (u[3], 0x86);
     EXPECT_EQ (u[4], 0);
+
+    // Ensure no warnings with plain char
+    char c[2] = {0,0};
+    append('a', c);
+    EXPECT_EQ (c[0], 'a');
+    EXPECT_EQ (c[1], 0);
+}
+
+TEST(CheckedAPITests, test_append16)
+{
+    utfchar16_t u[5] = {0,0};
+    append16(0x0448, u);
+    EXPECT_EQ (u[0], 0x0448);
+    EXPECT_EQ (u[1], 0x0000);
+
+    append16(0x65e5, u);
+    EXPECT_EQ (u[0], 0x65e5);
+    EXPECT_EQ (u[1], 0x0000);
+
+    append16(0x10346, u);
+    EXPECT_EQ (u[0], 0xd800);
+    EXPECT_EQ (u[1], 0xdf46);
 }
 
 TEST(CheckedAPITests, test_next)
 {
     const char* twochars = "\xe6\x97\xa5\xd1\x88";
     const char* w = twochars;
-    int cp = next(w, twochars + 6);
+    unsigned int cp = next(w, twochars + 6);
     EXPECT_EQ (cp, 0x65e5);
     EXPECT_EQ (w, twochars + 3);
 
@@ -63,10 +87,23 @@ TEST(CheckedAPITests, test_next)
     EXPECT_EQ (w, threechars + 9);
 }
 
+TEST(CheckedAPITests, test_next16)
+{
+    const utfchar16_t u[3] = {0x65e5, 0xd800, 0xdf46};
+    const utfchar16_t* w = u;
+    utf8::utfchar32_t cp = next16(w, w + 3);
+    EXPECT_EQ (cp, 0x65e5);
+    EXPECT_EQ (w, u + 1);
+
+    cp = next16(w, w + 2);
+    EXPECT_EQ (cp, 0x10346);
+    EXPECT_EQ (w, u + 3);
+}
+
 TEST(CheckedAPITests, test_peek_next)
 {
     const char* const cw = "\xe6\x97\xa5\xd1\x88";
-    int cp = peek_next(cw, cw + 6);
+    unsigned int cp = peek_next(cw, cw + 6);
     EXPECT_EQ (cp, 0x65e5);
 }
 
@@ -74,7 +111,7 @@ TEST(CheckedAPITests, test_prior)
 {
     const char* twochars = "\xe6\x97\xa5\xd1\x88";
     const char* w = twochars + 3;
-    int cp = prior (w, twochars);
+    unsigned int cp = prior (w, twochars);
     EXPECT_EQ (cp, 0x65e5);
     EXPECT_EQ (w, twochars);
 
@@ -110,13 +147,13 @@ TEST(CheckedAPITests, test_advance)
 TEST(CheckedAPITests, test_distance)
 {
     const char* twochars = "\xe6\x97\xa5\xd1\x88";
-    size_t dist = utf8::distance(twochars, twochars + 5);
+    size_t dist = static_cast<size_t>(utf8::distance(twochars, twochars + 5));
     EXPECT_EQ (dist, 2);
 }
 
 TEST(CheckedAPITests, test_utf32to8)
 {
-    int utf32string[] = {0x448, 0x65E5, 0x10346, 0};
+    unsigned int utf32string[] = {0x448, 0x65E5, 0x10346, 0};
     string utf8result;
     utf32to8(utf32string, utf32string + 3, back_inserter(utf8result));
     EXPECT_EQ (utf8result.size(), 9);
@@ -125,7 +162,7 @@ TEST(CheckedAPITests, test_utf32to8)
 TEST(CheckedAPITests, test_utf8to32)
 {
     const char* twochars = "\xe6\x97\xa5\xd1\x88";
-    vector<int> utf32result;
+    vector<unsigned int> utf32result;
     utf8to32(twochars, twochars + 5, back_inserter(utf32result));
     EXPECT_EQ (utf32result.size(), 2);
 }
@@ -163,7 +200,9 @@ TEST(CheckedAPITests, test_replace_invalid)
 TEST(CheckedAPITests, test_find_invalid)
 {
     char utf_invalid[] = "\xe6\x97\xa5\xd1\x88\xfa";
-    char* invalid = find_invalid(utf_invalid, utf_invalid + 6);
+    const char* invalid = find_invalid(utf_invalid, utf_invalid + 6);
+    EXPECT_EQ (invalid, utf_invalid + 5);
+    invalid = find_invalid(utf_invalid);
     EXPECT_EQ (invalid, utf_invalid + 5);
 }
 
@@ -172,8 +211,12 @@ TEST(CheckedAPITests, test_is_valid)
     char utf_invalid[] = "\xe6\x97\xa5\xd1\x88\xfa";
     bool bvalid = is_valid(utf_invalid, utf_invalid + 6);
     EXPECT_FALSE (bvalid);
+    bvalid = is_valid(utf_invalid);
+    EXPECT_FALSE (bvalid);
     char utf8_with_surrogates[] = "\xe6\x97\xa5\xd1\x88\xf0\x9d\x84\x9e";
     bvalid = is_valid(utf8_with_surrogates, utf8_with_surrogates + 9);
+    EXPECT_TRUE (bvalid);
+    bvalid = is_valid(utf8_with_surrogates);
     EXPECT_TRUE (bvalid);
 }
 
@@ -186,3 +229,5 @@ TEST(CheckedAPITests, test_starts_with_bom)
     bool no_bbom = starts_with_bom(threechars, threechars + sizeof(threechars));
     EXPECT_FALSE (no_bbom);
 }
+
+#endif
