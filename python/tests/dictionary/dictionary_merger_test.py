@@ -83,7 +83,7 @@ def test_merge(merger):
 
         key_values_ordered = collections.OrderedDict(sorted(key_values.items()))
 
-        for (base_key, base_value), (keyvi_key, keyvi_value) in zip(key_values_ordered.items(), merged_dictionary.get_all_items()):
+        for (base_key, base_value), (keyvi_key, keyvi_value) in zip(key_values_ordered.items(), merged_dictionary.items()):
             assert base_key == keyvi_key
             assert base_value == keyvi_value
 

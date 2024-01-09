@@ -27,23 +27,23 @@ def generate_dictionary_compiler():
 
     return dictionary_compiler
 
-def test_get_all_keys():
+def test_keys():
 
-    with tmp_dictionary(generate_dictionary_compiler(), 'test_get_all_keys.kv') as keyvi_dictionary:
-        for (base_key, _), keyvi_key in zip(key_values, keyvi_dictionary.get_all_keys()):
+    with tmp_dictionary(generate_dictionary_compiler(), 'test_keys.kv') as keyvi_dictionary:
+        for (base_key, _), keyvi_key in zip(key_values, keyvi_dictionary.keys()):
             assert base_key == keyvi_key
 
 
-def test_get_all_values():
+def test_values():
 
-    with tmp_dictionary(generate_dictionary_compiler(), 'test_get_all_values.kv') as keyvi_dictionary:
-        for (_, base_value), keyvi_value in zip(key_values, keyvi_dictionary.get_all_values()):
+    with tmp_dictionary(generate_dictionary_compiler(), 'test_values.kv') as keyvi_dictionary:
+        for (_, base_value), keyvi_value in zip(key_values, keyvi_dictionary.values()):
             assert base_value == keyvi_value
 
 
-def test_get_all_items():
+def test_items():
 
-    with tmp_dictionary(generate_dictionary_compiler(), 'test_get_all_items.kv') as keyvi_dictionary:
-        for (base_key, base_value), (keyvi_key, keyvi_value) in zip(key_values, keyvi_dictionary.get_all_items()):
+    with tmp_dictionary(generate_dictionary_compiler(), 'test_items.kv') as keyvi_dictionary:
+        for (base_key, base_value), (keyvi_key, keyvi_value) in zip(key_values, keyvi_dictionary.items()):
             assert base_key == keyvi_key
             assert base_value == keyvi_value

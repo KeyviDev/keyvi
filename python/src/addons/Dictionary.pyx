@@ -50,7 +50,7 @@
         for m in iterator:
             yield (m.matched_string, m.value)
 
-    def get_all_keys(self):
+    def keys(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
@@ -60,7 +60,7 @@
     def GetAllKeys(self):
         return call_deprecated_method("GetAllKeys", "get_all_keys", self.get_all_keys)
 
-    def get_all_values(self):
+    def values(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()
@@ -70,7 +70,7 @@
     def GetAllValues(self):
         return call_deprecated_method("GetAllValues", "get_all_values", self.get_all_values)
 
-    def get_all_items(self):
+    def items(self):
         cdef _MatchIteratorPair _r = self.inst.get().GetAllItems()
         cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
         py_result.it = _r.begin()

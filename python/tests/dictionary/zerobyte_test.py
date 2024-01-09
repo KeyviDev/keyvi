@@ -20,4 +20,4 @@ def test_zerobyte():
         assert d["\x00abc"].value == '["a" : 2]'
         assert d["abc\x00def"].value == '["a" : 3]'
         assert d["cd\x00"].value == '["a" : 4]'
-        assert len([(k, v) for k, v in d.get_all_items()]) == 3
+        assert len([(k, v) for k, v in d.items()]) == 3
