@@ -80,7 +80,7 @@
     def GetAllItems(self):
         return call_deprecated_method("GetAllItems", "items", self.items)
 
-    def get_statistics(self):
+    def statistics(self):
         cdef libcpp_string _r = self.inst.get().GetStatistics()
         cdef bytes py_result = _r
         py_result_unicode = _r.decode('utf-8')
@@ -88,22 +88,22 @@
         return json.loads(py_result_unicode)
 
     def GetStatistics(self):
-        return call_deprecated_method("GetStatistics", "get_statistics", self.get_statistics)
+        return call_deprecated_method("GetStatistics", "statistics", self.statistics)
 
     def GetNear(self, *args):
-        return call_deprecated_method("GetNear", "get_near", self.get_near, *args)
+        return call_deprecated_method("GetNear", "match_near", self.match_near, *args)
 
     def Get(self, *args):
-        return call_deprecated_method("Get", "get_values", self.get_values, *args)
+        return call_deprecated_method("Get", "match", self.match, *args)
 
     def GetFuzzy(self, *args):
-        return call_deprecated_method("GetFuzzy", "get_fuzzy", self.get_fuzzy, *args)
+        return call_deprecated_method("GetFuzzy", "match_fuzzy", self.match_fuzzy, *args)
 
     def Lookup(self, *args):
-        return call_deprecated_method("Lookup", "lookup", self.lookup, *args)
+        return call_deprecated_method("Lookup", "search", self.search, *args)
 
     def LookupText(self, *args):
-        return call_deprecated_method("LookupText", "lookup_text", self.lookup_text, *args)
+        return call_deprecated_method("LookupText", "search_tokenized", self.search_tokenized, *args)
 
     def GetManifest(self, *args):
-        return call_deprecated_method("GetManifest", "get_manifest", self.get_manifest, *args)
+        return call_deprecated_method("GetManifest", "manifest", self.manifest, *args)

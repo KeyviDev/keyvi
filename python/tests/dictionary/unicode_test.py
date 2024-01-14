@@ -36,7 +36,7 @@ def test_unicode_lookup():
     text = "From Los Angeles via Frankfurt am Main to Kirchheim bei München it should just work"
     with tmp_dictionary(c, 'unicode_json_lookup.kv') as d:
         assert "Kirchheim bei München" in d
-        matched_strings = [x.matched_string for x in d.lookup_text(text)]
+        matched_strings = [x.matched_string for x in d.search_tokenized(text)]
         assert len(matched_strings) == 3
         assert u"Kirchheim bei München" in matched_strings
         assert u"Los Angeles" in matched_strings
