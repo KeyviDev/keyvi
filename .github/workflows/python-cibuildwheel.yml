@@ -80,9 +80,9 @@ jobs:
           PACKAGES=( zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
           do
-            response=$(brew fetch --force --bottle-tag=arm64_monterey $PACKAGE | grep Downloaded )
+            response=$(arm-brew fetch --force --bottle-tag=arm64_monterey $PACKAGE | grep Downloaded )
             download_path=$(echo $response | xargs -n 1 | tail -1)
-            brew reinstall -vd $download_path
+            arm-brew reinstall -vd $download_path
           done
 
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
