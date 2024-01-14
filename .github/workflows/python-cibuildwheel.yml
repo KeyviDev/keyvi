@@ -8,7 +8,7 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels for ${{ matrix.os }} on ${{ matrix.arch }}
+    name: Build wheels for ${{ matrix.os }} on ${{ matrix.arch }} (Linux target: ${{ matrix.target }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
