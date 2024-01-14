@@ -89,7 +89,9 @@ jobs:
           CIBW_TEST_COMMAND: >
             python -m pytest {package}/tests &&
             python -m pytest {package}/integration-tests
-            
+
+          # for debugging set this to 1,2 or 3
+          CIBW_BUILD_VERBOSITY: 2
         with:
           package-dir: python
         
