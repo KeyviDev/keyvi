@@ -74,7 +74,7 @@ jobs:
           PACKAGES=( zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
           do
-            response=$(brew fetch --force --bottle-tag=arm64_monterey $i | grep Downloaded )
+            response=$(brew fetch --force --bottle-tag=arm64_monterey $PACKAGE | grep Downloaded )
             download_path=$(echo $response | xargs -n 1 | tail -1)
             brew install $download_path
           done
@@ -94,12 +94,6 @@ jobs:
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
           CIBW_MUSLLINUX_X86_64_IMAGE: 'keyvidev/musllinux-builder-x86_64'
           CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
-          
-          # macos build requirements
-          CIBW_BEFORE_ALL_MACOS: >
-            brew update &&
-            brew install zlib snappy boost &&
-            brew install ccache
           
           # ccache using path
           CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
