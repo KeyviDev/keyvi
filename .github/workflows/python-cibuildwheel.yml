@@ -15,6 +15,11 @@ jobs:
         os: [ubuntu-22.04, macos-12]
         # separate archs, so they use individual caches
         arch: [ 'x86_64', 'arm64' ]
+        # separate musl and many on linux, for mac we just skip one of those
+        target: [ 'many', 'musl' ]
+        exclude:
+          - os: macos-12
+            target: musl
 
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +31,7 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
-          key: ${{ matrix.os }}-${{ matrix.arch }}-python
+          key: ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.target }}-python
 
       - name: Sets env for x86_64
         run: |
@@ -39,12 +44,22 @@ jobs:
           echo "CIBW_ARCHS_LINUX=aarch64" >> $GITHUB_ENV
           echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
         if: matrix.arch == 'arm64'
-          
+
+      - name: Skip manylinux for musllinux target
+        if: ${{ matrix.target == 'musl' }}
+        run: |
+          echo "CIBW_SKIP=*manylinux*" >> $GITHUB_ENV
+
+      - name: Skip musllinux for manylinux target
+        if: ${{ matrix.target == 'many' }}
+        run: |
+          echo "CIBW_SKIP=*musllinux*" >> $GITHUB_ENV
+
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
         uses: pypa/cibuildwheel@v2.16.2
         env:
           # Skip CPython 3.6 and CPython 3.7
-          CIBW_SKIP: cp36-* cp37-*
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-*
 
           # skip testing all python versions on linux arm, only test 3.12
           # skip tests on pypy, currently fails for indexer tests
