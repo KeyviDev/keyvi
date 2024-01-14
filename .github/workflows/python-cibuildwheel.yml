@@ -71,7 +71,7 @@ jobs:
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'arm64') }}
         run: |
           set -e
-          echo "MACOSX_DEPLOYMENT_TARGET=12.5 >> $GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET='10.13' >> $GITHUB_ENV"
           PACKAGES=( zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
           do
