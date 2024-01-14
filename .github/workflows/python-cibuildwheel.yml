@@ -71,7 +71,6 @@ jobs:
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'arm64') }}
         run: |
           set -e
-          echo "MACOSX_DEPLOYMENT_TARGET='10.13' >> $GITHUB_ENV"
           PACKAGES=( zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
           do
@@ -97,7 +96,7 @@ jobs:
           CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
           
           # ccache using path
-          CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
+          CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH MACOSX_DEPLOYMENT_TARGET='10.14'
           CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
           
           # python dependencies
