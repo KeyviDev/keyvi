@@ -287,14 +287,15 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         def run(self):
             self.load_options()
 
-            print("CMAKE_OSX_ARCHITECTURES: " +
-                  os.environ.get("CMAKE_OSX_ARCHITECTURES", "not set"))
-            print("ARCHFLAGS: " + os.environ.get("ARCHFLAGS", "not set"))
-            print("_PYTHON_HOST_PLATFORM: " +
-                  os.environ.get("_PYTHON_HOST_PLATFORM", "not set"))
+            # cross-compilation support for cibuildwheel for building M1 targets on x86_64
+            osx_architectures = None
+            archflags = os.environ.get("ARCHFLAGS")
+            if archflags is not None:
+                osx_architectures = ";".join(
+                    set(archflags.split()) & {"x86_64", "arm64"})
 
             self.cmake_flags = cmake_configure(keyvi_build_dir, self.options['mode'], self.options.get(
-                'zlib_root'), additional_compile_flags)
+                'zlib_root'), additional_compile_flags, osx_architectures)
             self.save_options()
             self.parent.run(self)
 
