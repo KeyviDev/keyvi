@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 project(keyvi)
 
-EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
-message( STATUS "Architecture: ${ARCHITECTURE}" )
-
 #### Build Type
 if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
@@ -22,9 +19,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set (_KEVYI_COMPILE_OPTIONS "-Wall")
 set (_KEYVI_COMPILE_DEFINITIONS "RAPIDJSON_HAS_STDSTRING")
 
-if(${ARCHITECTURE} STREQUAL "x86_64")
+if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
     set (_KEYVI_CXX_FLAGS "-msse4.2")
-    message( STATUS "Architecture: ${ARCHITECTURE} detected: added -msse4.2 compile flag")
+    message( STATUS "Architecture: ${CMAKE_SYSTEM_PROCESSOR} detected: added -msse4.2 compile flag")
 endif()
 
 set (_OS_LIBRARIES "")

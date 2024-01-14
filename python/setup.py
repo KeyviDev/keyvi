@@ -141,7 +141,7 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags,
         BUILD_TYPE=build_type)
 
     if osx_architectures is not None:
-        cmake_configure_cmd += ' -D CMAKE_OSX_ARCHITECTURES={OSX_ARCH}'.format(
+        cmake_configure_cmd += ' -D CMAKE_OSX_ARCHITECTURES="{OSX_ARCH}"'.format(
             OSX_ARCH=osx_architectures)
 
     if zlib_root is not None:
