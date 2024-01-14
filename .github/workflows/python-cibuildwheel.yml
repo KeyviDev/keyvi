@@ -81,6 +81,7 @@ jobs:
             download_path=$(echo $response | xargs -n 1 | tail -1)
             arm-homebrew/bin/brew reinstall -vd $download_path
           done
+          arm-homebrew/bin/brew config
 
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
         uses: pypa/cibuildwheel@v2.16.2
