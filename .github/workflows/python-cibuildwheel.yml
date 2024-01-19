@@ -83,9 +83,7 @@ jobs:
             arm64-homebrew/bin/brew reinstall -vd $download_path
           done
           arm64-homebrew/bin/brew config
-          ls ${{ github.workspace }}/arm64-homebrew/include
-          ls ${{ github.workspace }}/arm64-homebrew/lib
-          ls ${{ github.workspace }}/arm64-homebrew/
+          ls /Users/runner/work/keyvi/keyvi/arm64-homebrew
 
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
         uses: pypa/cibuildwheel@v2.16.2
@@ -108,7 +106,7 @@ jobs:
           CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
           
           # python dependencies
-          CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
+          CIBW_BEFORE_BUILD: ls /Users/runner/work/keyvi/keyvi/arm64-homebrew && pip install -r python/requirements.txt
           
           # testing
           CIBW_TEST_REQUIRES: pytest
