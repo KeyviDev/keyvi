@@ -269,7 +269,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             self.parent.initialize_options(self)
             self.mode = None
             self.zlib_root = None
-            self.cmake_module_path = None
             self.options = {}
 
         def load_options(self):
@@ -284,8 +283,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             self.options['mode'] = "release" if not self.mode else self.mode
             if self.zlib_root:
                 self.options['zlib_root'] = self.zlib_root
-            if self.cmake_module_path:
-                self.options['cmake_module_path'] = self.cmake_module_path
 
         def save_options(self):
             # store the options
@@ -302,8 +299,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                 osx_architectures = ";".join(
                     set(archflags.split()) & {"x86_64", "arm64"})
 
+            cmake_module_path = os.environ.get('_CMAKE_MODULE_PATH')
+
             self.cmake_flags = cmake_configure(keyvi_build_dir, self.options['mode'], self.options.get(
-                'zlib_root'), additional_compile_flags, osx_architectures, self.options.get('cmake_module_path'))
+                'zlib_root'), additional_compile_flags, osx_architectures, cmake_module_path)
             self.save_options()
             self.parent.run(self)
 
