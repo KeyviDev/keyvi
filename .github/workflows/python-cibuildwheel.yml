@@ -73,16 +73,16 @@ jobs:
           set -e
           echo "_PYTHON_HOST_PLATFORM='macosx-12.0-arm64'" >> $GITHUB_ENV
           echo "MACOSX_DEPLOYMENT_TARGET='12.0'" >> $GITHUB_ENV
-          echo "CIBW_CONFIG_SETTINGS='--build-option='--cmake-module-path=$GITHUB_WORKSPACE/brew-arm64' >> $GITHUB_ENV"
-          mkdir arm-homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm-homebrew 
+          echo "CIBW_CONFIG_SETTINGS='--build-option='--cmake-module-path=$GITHUB_WORKSPACE/arm64-homebrew' >> $GITHUB_ENV"
+          mkdir arm64-homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm64-homebrew
           PACKAGES=( zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
           do
-            response=$(HOMEBREW_PREFIX=$GITHUB_WORKSPACE/brew-arm64 arm-homebrew/bin/brew fetch --force --bottle-tag=arm64_monterey $PACKAGE | grep Downloaded )
+            response=$(arm64-homebrew/bin/brew fetch --force --bottle-tag=arm64_monterey $PACKAGE | grep Downloaded )
             download_path=$(echo $response | xargs -n 1 | tail -1)
-            HOMEBREW_PREFIX=$GITHUB_WORKSPACE/brew-arm64 arm-homebrew/bin/brew reinstall -vd $download_path
+            arm64-homebrew/bin/brew reinstall -vd $download_path
           done
-          HOMEBREW_PREFIX=$GITHUB_WORKSPACE/brew-arm64 arm-homebrew/bin/brew config
+          arm64-homebrew/bin/brew config
 
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
         uses: pypa/cibuildwheel@v2.16.2
