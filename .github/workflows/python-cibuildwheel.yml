@@ -73,7 +73,7 @@ jobs:
           set -e
           echo "_PYTHON_HOST_PLATFORM='macosx-12.0-arm64'" >> $GITHUB_ENV
           echo "MACOSX_DEPLOYMENT_TARGET='12.0'" >> $GITHUB_ENV
-          echo "CIBW_CONFIG_SETTINGS='--build-option='--cmake-module-path=$GITHUB_WORKSPACE/arm64-homebrew' >> $GITHUB_ENV"
+          echo "CIBW_CONFIG_SETTINGS='--build-option='--cmake-module-path=${{ github.workspace }}/arm64-homebrew'" >> $GITHUB_ENV
           mkdir arm64-homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm64-homebrew
           PACKAGES=( zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
