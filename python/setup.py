@@ -128,7 +128,7 @@ def symlink_keyvi():
 
 
 @run_once
-def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags, osx_architectures=None):
+def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags, osx_architectures=None, cmake_module_path=None):
     # needed for shared library
     CMAKE_CXX_FLAGS = additional_compile_flags + ' -fPIC'
 
@@ -147,6 +147,9 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags,
     if zlib_root is not None:
         cmake_configure_cmd += ' -D ZLIB_ROOT={ZLIB_ROOT}'.format(
             ZLIB_ROOT=zlib_root)
+    if cmake_module_path is not None:
+        cmake_configure_cmd += ' -D CMAKE_MODULE_PATH={CMAKE_MODULE_PATH}'.format(
+            CMAKE_MODULE_PATH=cmake_module_path)
     cmake_configure_cmd += ' ..'
 
     print("Building in {0} mode".format(build_type))
@@ -254,6 +257,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                            ('zlib-root=',
                             None,
                             "zlib installation root"),
+                           ('cmake-module-path=', None,
+                            "Semicolon-separated list of directories, specifying a search path for CMake modules")
                            ]
 
     class custom_opts:
@@ -264,6 +269,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             self.parent.initialize_options(self)
             self.mode = None
             self.zlib_root = None
+            self.cmake_module_path = None
             self.options = {}
 
         def load_options(self):
@@ -278,6 +284,8 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             self.options['mode'] = "release" if not self.mode else self.mode
             if self.zlib_root:
                 self.options['zlib_root'] = self.zlib_root
+            if self.cmake_module_path:
+                self.options['cmake_module_path'] = self.cmake_module_path
 
         def save_options(self):
             # store the options
@@ -295,7 +303,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                     set(archflags.split()) & {"x86_64", "arm64"})
 
             self.cmake_flags = cmake_configure(keyvi_build_dir, self.options['mode'], self.options.get(
-                'zlib_root'), additional_compile_flags, osx_architectures)
+                'zlib_root'), additional_compile_flags, osx_architectures, self.options.get('cmake_module_path'))
             self.save_options()
             self.parent.run(self)
 
@@ -412,10 +420,11 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             'Programming Language :: C++',
             'Programming Language :: Cython',
             'Programming Language :: Python',
-            'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
+            'Programming Language :: Python :: 3.11',
+            'Programming Language :: Python :: 3.12',
             'Programming Language :: Python :: Implementation :: CPython',
             'Programming Language :: Python :: Implementation :: PyPy',
             'Operating System :: MacOS :: MacOS X',
