@@ -8,7 +8,7 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels for ${{ matrix.os }}/${{ matrix.arch }}/${{ matrix.flavor }}/${{ matrix.target }}
+    name: cibuildwheel ${{ matrix.os }}/${{ matrix.arch }}/${{ matrix.flavor }}/${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -59,12 +59,12 @@ jobs:
       - name: Skip pypy for cpython
         if: ${{ matrix.flavor == 'cpython' }}
         run: |
-          echo "CIBW_SKIP: ${{ env.CIBW_SKIP }} pp*" >> $GITHUB_ENV
+          echo "CIBW_SKIP=${{ env.CIBW_SKIP }} pp*" >> $GITHUB_ENV
 
       - name: Skip cpython for pypy
         if: ${{ matrix.flavor == 'pypy' }}
         run: |
-          echo "CIBW_SKIP: ${{ env.CIBW_SKIP }} cp*" >> $GITHUB_ENV
+          echo "CIBW_SKIP=${{ env.CIBW_SKIP }} cp*" >> $GITHUB_ENV
 
       - name: install mac dependencies
         if: ${{ runner.os == 'macOS' }}
