@@ -147,16 +147,26 @@ jobs:
     - name: install Linux deps
       run: |
         sudo apt-get update && \
-        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
+    - name: ccache
+      uses: hendrikmuhs/ccache-action@v1.2.11
+      with:
+        key: ${{ matrix.os }}-sdist-python
+
     - name: Build SDist
       run: |
+        export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
         cd python && \
         python -m pip install -r requirements.txt && \
-        pipx run build --sdist
+        python setup.py sdist -d wheelhouse && \
+        python -m pip uninstall -y autowrap && \
+        python -m pip install wheelhouse/*.tar.gz -v && \
+        python -m pytest tests && \
+        python -m pip uninstall -y keyvi
 
     - uses: actions/upload-artifact@v3
       with:
-        path: dist/*.tar.gz
+        path: wheelhouse/*.tar.gz
 
   upload_all:
     needs: [build_wheels, build_sdist]
