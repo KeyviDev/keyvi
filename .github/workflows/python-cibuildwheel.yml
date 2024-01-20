@@ -8,7 +8,7 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels for ${{ matrix.os }} on ${{ matrix.arch }} (Linux target ${{ matrix.target }})
+    name: Build wheels for ${{ matrix.os }} on ${{ matrix.arch }} (if Linux target ${{ matrix.target }})
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -46,12 +46,12 @@ jobs:
         if: matrix.arch == 'arm64'
 
       - name: Skip manylinux for musllinux target
-        if: ${{ matrix.target == 'musl' }}
+        if: ${{ (runner.os == 'Linux') && (matrix.target == 'musl') }}
         run: |
           echo "CIBW_SKIP=*manylinux*" >> $GITHUB_ENV
 
       - name: Skip musllinux for manylinux target
-        if: ${{ matrix.target == 'many' }}
+        if: ${{ (runner.os == 'Linux') && (matrix.target == 'many') }}
         run: |
           echo "CIBW_SKIP=*musllinux*" >> $GITHUB_ENV
 
@@ -74,8 +74,7 @@ jobs:
           echo "IGNORED###_PYTHON_HOST_PLATFORM=macosx-12.0-arm64" >> $GITHUB_ENV
           echo "MACOSX_DEPLOYMENT_TARGET=12.3.0" >> $GITHUB_ENV
           echo "_CMAKE_PREFIX_PATH=${{ github.workspace }}/arm64-homebrew" >> $GITHUB_ENV
-          echo "CIBW_REPAIR_WHEEL_COMMAND_MACOS=DYLD_LIBRARY_PATH=${{ github.workspace }}/arm64-homebrew delocate-listdeps --depending {wheel} && DYLD_LIBRARY_PATH=${{ github.workspace }}/arm64-homebrew delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}" >> $GITHUB_ENV
-          rm -rf $(brew --cache)
+          echo "CIBW_REPAIR_WHEEL_COMMAND_MACOS=DYLD_LIBRARY_PATH=${{ github.workspace }}/arm64-homebrew delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}" >> $GITHUB_ENV
           mkdir arm64-homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm64-homebrew
           PACKAGES=( icu4c xz lz4 zstd zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
@@ -117,7 +116,7 @@ jobs:
             python -m pytest {package}/integration-tests
 
           # for debugging set this to 1,2 or 3
-          CIBW_BUILD_VERBOSITY: 2
+          # CIBW_BUILD_VERBOSITY: 2
         with:
           package-dir: python
         
