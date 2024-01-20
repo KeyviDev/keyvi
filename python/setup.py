@@ -128,7 +128,7 @@ def symlink_keyvi():
 
 
 @run_once
-def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags, osx_architectures=None, cmake_module_path=None):
+def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags, osx_architectures=None, cmake_prefix_path=None):
     # needed for shared library
     CMAKE_CXX_FLAGS = additional_compile_flags + ' -fPIC'
 
@@ -147,9 +147,9 @@ def cmake_configure(build_path, build_type, zlib_root, additional_compile_flags,
     if zlib_root is not None:
         cmake_configure_cmd += ' -D ZLIB_ROOT={ZLIB_ROOT}'.format(
             ZLIB_ROOT=zlib_root)
-    if cmake_module_path is not None:
-        cmake_configure_cmd += ' -D CMAKE_MODULE_PATH={CMAKE_MODULE_PATH}'.format(
-            CMAKE_MODULE_PATH=cmake_module_path)
+    if cmake_prefix_path is not None:
+        cmake_configure_cmd += ' -D CMAKE_PREFIX_PATH={CMAKE_PREFIX_PATH}'.format(
+            CMAKE_PREFIX_PATH=cmake_prefix_path)
     cmake_configure_cmd += ' ..'
 
     print("Building in {0} mode".format(build_type))
@@ -299,10 +299,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                 osx_architectures = ";".join(
                     set(archflags.split()) & {"x86_64", "arm64"})
 
-            cmake_module_path = os.environ.get('_CMAKE_MODULE_PATH')
+            cmake_prefix_path = os.environ.get('_CMAKE_PREFIX_PATH')
 
             self.cmake_flags = cmake_configure(keyvi_build_dir, self.options['mode'], self.options.get(
-                'zlib_root'), additional_compile_flags, osx_architectures, cmake_module_path)
+                'zlib_root'), additional_compile_flags, osx_architectures, cmake_prefix_path)
             self.save_options()
             self.parent.run(self)
 
