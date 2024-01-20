@@ -144,7 +144,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build SDist
-      run: pipx run build --sdist
+      run: |
+        cd python && \
+        pipx run build --sdist
 
     - uses: actions/upload-artifact@v3
       with:
