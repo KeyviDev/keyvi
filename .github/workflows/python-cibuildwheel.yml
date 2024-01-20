@@ -21,6 +21,10 @@ jobs:
         exclude:
           - os: macos-12
             target: musl
+          - os: ubuntu-22.04
+            target: musl
+            flavor: pypy
+
 
     steps:
       - uses: actions/checkout@v4
