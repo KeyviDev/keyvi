@@ -8,13 +8,14 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels for ${{ matrix.os }} on ${{ matrix.arch }} (if Linux target ${{ matrix.target }})
+    name: Build wheels for ${{ matrix.os }}/${{ matrix.arch }}/${{ matrix.flavor }}/${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-22.04, macos-12]
         # separate archs, so they use individual caches
         arch: [ 'x86_64', 'arm64' ]
+        flavor: ['cpython', 'pypy']
         # separate musl and many on linux, for mac we just skip one of those
         target: [ 'many', 'musl' ]
         exclude:
@@ -55,6 +56,16 @@ jobs:
         run: |
           echo "CIBW_SKIP=*musllinux*" >> $GITHUB_ENV
 
+      - name: Skip pypy for cpython
+        if: ${{ matrix.flavor == 'cpython' }}
+        run: |
+          echo "CIBW_SKIP: ${{ env.CIBW_SKIP }} pp*" >> $GITHUB_ENV
+
+      - name: Skip cpython for pypy
+        if: ${{ matrix.flavor == 'pypy' }}
+        run: |
+          echo "CIBW_SKIP: ${{ env.CIBW_SKIP }} cp*" >> $GITHUB_ENV
+
       - name: install mac dependencies
         if: ${{ runner.os == 'macOS' }}
         run: |
@@ -71,7 +82,6 @@ jobs:
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'arm64') }}
         run: |
           set -e
-          echo "IGNORED###_PYTHON_HOST_PLATFORM=macosx-12.0-arm64" >> $GITHUB_ENV
           echo "MACOSX_DEPLOYMENT_TARGET=12.3.0" >> $GITHUB_ENV
           echo "_CMAKE_PREFIX_PATH=${{ github.workspace }}/arm64-homebrew" >> $GITHUB_ENV
           echo "CIBW_REPAIR_WHEEL_COMMAND_MACOS=DYLD_LIBRARY_PATH=${{ github.workspace }}/arm64-homebrew delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}" >> $GITHUB_ENV
