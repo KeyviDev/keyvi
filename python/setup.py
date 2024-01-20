@@ -247,6 +247,12 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         '/opt/homebrew/lib'
     ]
 
+    # if _CMAKE_PREFIX_PATH is set, append the lib subfolder for linking
+    cmake_prefix_path = os.environ.get('_CMAKE_PREFIX_PATH')
+
+    if cmake_prefix_path is not None:
+        link_library_dirs.append(os.path.join(cmake_prefix_path, 'lib'))
+
     #########################
     # Custom 'build' command
     #########################
