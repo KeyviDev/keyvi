@@ -143,9 +143,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: install Linux deps
+      run: |
+        sudo apt-get update && \
+        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
     - name: Build SDist
       run: |
         cd python && \
+        python -m pip install -r python/requirements.txt && \
         pipx run build --sdist
 
     - uses: actions/upload-artifact@v3
