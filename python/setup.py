@@ -241,10 +241,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             pykeyvi_source_path, keyvi_source_path)
 
     link_library_dirs = [
-        keyvi_build_dir,
-        # as of 17/07/2022 Python 3.10 build on GH actions needs '/usr/local/lib/' link library dir
-        '/usr/local/lib/',
-        '/opt/homebrew/lib'
+        keyvi_build_dir
     ]
 
     # if _CMAKE_PREFIX_PATH is set, append the lib subfolder for linking
@@ -252,6 +249,10 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
 
     if cmake_prefix_path is not None:
         link_library_dirs.append(os.path.join(cmake_prefix_path, 'lib'))
+    else:
+        # as of 17/07/2022 Python 3.10 build on GH actions needs '/usr/local/lib/' link library dir
+        link_library_dirs.append('/usr/local/lib/')
+        link_library_dirs.append('/opt/homebrew/lib')
 
     #########################
     # Custom 'build' command
