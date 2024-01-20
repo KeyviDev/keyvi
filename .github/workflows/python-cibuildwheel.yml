@@ -21,10 +21,12 @@ jobs:
         exclude:
           - os: macos-12
             target: musl
-          - target: musl
+          - os: ubuntu-22.04
+            target: musl
             flavor: pypy
-
-
+          - os: macos-12
+            arch: arm64
+            flavor: pypy
     steps:
       - uses: actions/checkout@v4
       - name: Set up QEMU
