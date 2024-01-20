@@ -21,8 +21,7 @@ jobs:
         exclude:
           - os: macos-12
             target: musl
-          - os: ubuntu-22.04
-            target: musl
+          - target: musl
             flavor: pypy
 
 
