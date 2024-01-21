@@ -264,8 +264,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
                            ('zlib-root=',
                             None,
                             "zlib installation root"),
-                           ('cmake-module-path=', None,
-                            "Semicolon-separated list of directories, specifying a search path for CMake modules")
                            ]
 
     class custom_opts:
