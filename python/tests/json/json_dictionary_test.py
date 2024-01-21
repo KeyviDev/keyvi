@@ -18,8 +18,8 @@ def test_simple():
     c["abd"] = '{"a" : 3}'
     with tmp_dictionary(c, 'simple_json.kv') as d:
         assert len(d) == 2
-        assert d["abc"].get_value_as_string() == '{"a":2}'
-        assert d["abd"].get_value_as_string() == '{"a":3}'
+        assert d["abc"].value_as_string() == '{"a":2}'
+        assert d["abd"].value_as_string() == '{"a":3}'
 
 
 def test_simple_zlib():
@@ -29,8 +29,8 @@ def test_simple_zlib():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'simple_json_z.kv') as d:
         assert len(d) == 2
-        assert d["abc"].get_value_as_string() == '{"a":2}'
-        assert d["abd"].get_value_as_string() == '{"a":3}'
+        assert d["abc"].value_as_string() == '{"a":2}'
+        assert d["abd"].value_as_string() == '{"a":3}'
         m = d.statistics()['Value Store']
         assert m['__compression'] == "zlib"
 
@@ -42,8 +42,8 @@ def test_simple_snappy():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'simple_json_snappy.kv') as d:
         assert len(d) == 2
-        assert d["abc"].get_value_as_string() == '{"a":2}'
-        assert d["abd"].get_value_as_string() == '{"a":3}'
+        assert d["abc"].value_as_string() == '{"a":2}'
+        assert d["abd"].value_as_string() == '{"a":3}'
         m = d.statistics()['Value Store']
         assert m['__compression'] == "snappy"
 
@@ -56,10 +56,10 @@ def test_unicode_compile():
 
     with tmp_dictionary(c, 'simple_json.kv') as d:
         assert len(d) == 3
-        assert d["üöä"].get_value_as_string() == '{"y":2}'
-        assert d[u"üöä"].get_value_as_string() == '{"y":2}'
-        assert d["üüüüüüabd"].get_value_as_string() == '{"a":3}'
-        assert d["ääääädäd"].get_value_as_string() == '{"b":33}'
+        assert d["üöä"].value_as_string() == '{"y":2}'
+        assert d[u"üöä"].value_as_string() == '{"y":2}'
+        assert d["üüüüüüabd"].value_as_string() == '{"a":3}'
+        assert d["ääääädäd"].value_as_string() == '{"b":33}'
 
 
 def test_float_compaction():

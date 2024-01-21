@@ -32,10 +32,10 @@ def test_raw_serialization():
     c.Add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
         m = d["abc"]
-        assert m.get_value_as_string() == '{"a":2}'
+        assert m.value_as_string() == '{"a":2}'
         d = m.dumps()
         m2 = keyvi.Match.loads(d)
-        assert m2.get_value_as_string() == '{"a":2}'
+        assert m2.value_as_string() == '{"a":2}'
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             assert m.GetValueAsString() == '{"a":2}'

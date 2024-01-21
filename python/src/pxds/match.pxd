@@ -18,8 +18,8 @@ cdef extern from "keyvi/dictionary/match.h" namespace "keyvi::dictionary":
         libcpp_utf8_output_string GetMatchedString() # wrap-ignore
         void SetMatchedString (libcpp_utf8_string matched_string) # wrap-ignore
         PyObject* GetAttributePy(libcpp_utf8_string) except + nogil # wrap-ignore
-        libcpp_utf8_output_string GetValueAsString() except + # wrap-as:get_value_as_string
-        libcpp_string GetRawValueAsString() except + # wrap-as:get_raw_value_as_string
+        libcpp_utf8_output_string GetValueAsString() except + # wrap-as:value_as_string
+        libcpp_string GetRawValueAsString() except + # wrap-as:raw_value_as_string
         libcpp_string GetMsgPackedValueAsString() except + # wrap-ignore
         void SetRawValue(libcpp_utf8_string) except + # wrap-ignore
         void SetAttribute(libcpp_utf8_string, libcpp_utf8_string) except + # wrap-ignore

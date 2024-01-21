@@ -165,11 +165,11 @@
 
     def GetValueAsString(self, *args):
         """deprecated, use get_value_as_string"""
-        return call_deprecated_method("GetValueAsString", "get_value_as_string", self.get_value_as_string, *args)
+        return call_deprecated_method("GetValueAsString", "value_as_string", self.value_as_string, *args)
 
     def GetRawValueAsString(self, *args):
         """deprecated, use get_raw_value_as_string"""
-        return call_deprecated_method("GetRawValueAsString", "get_raw_value_as_string", self.get_raw_value_as_string, *args)
+        return call_deprecated_method("GetRawValueAsString", "raw_value_as_string", self.raw_value_as_string, *args)
 
     def __bool__(self):
         return not self.inst.get().IsEmpty()
