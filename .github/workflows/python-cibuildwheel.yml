@@ -166,7 +166,7 @@ jobs:
 
     - uses: actions/upload-artifact@v3
       with:
-        path: wheelhouse/*.tar.gz
+        path: python/wheelhouse/*.tar.gz
 
   upload_all:
     needs: [build_wheels, build_sdist]
