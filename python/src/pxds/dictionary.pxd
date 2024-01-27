@@ -24,14 +24,14 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         Dictionary (libcpp_utf8_string filename, loading_strategy_types) except +
         bool Contains (libcpp_utf8_string) # wrap-ignore
         Match operator[](libcpp_utf8_string) # wrap-ignore
-        _MatchIteratorPair Get (libcpp_utf8_string)
-        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except +
-        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except +
-        _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance) except +
-        _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except +
+        _MatchIteratorPair Get (libcpp_utf8_string) # wrap-as:match
+        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except + # wrap-as:match_near
+        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except + # wrap-as:match_near
+        _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance) except + # wrap-as:match_fuzzy
+        _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:match_fuzzy
         _MatchIteratorPair GetAllItems () # wrap-ignore
-        _MatchIteratorPair Lookup(libcpp_utf8_string)
-        _MatchIteratorPair LookupText(libcpp_utf8_string)
-        libcpp_utf8_output_string GetManifest() except +
+        _MatchIteratorPair Lookup(libcpp_utf8_string) # wrap-as:search
+        _MatchIteratorPair LookupText(libcpp_utf8_string) # wrap-as:search_tokenized
+        libcpp_utf8_output_string GetManifest() except + # wrap-as:manifest
         libcpp_string GetStatistics() # wrap-ignore
         uint64_t GetSize() # wrap-ignore
