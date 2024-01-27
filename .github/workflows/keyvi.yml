@@ -33,7 +33,7 @@ jobs:
           brew update
           brew install zlib snappy boost
       - name: checkout from git
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.11
