@@ -136,7 +136,7 @@ jobs:
         with:
           package-dir: python
         
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: ./wheelhouse/*.whl
 
@@ -165,7 +165,7 @@ jobs:
         python -m pytest tests && \
         python -m pip uninstall -y keyvi
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         path: python/wheelhouse/*.tar.gz
 
