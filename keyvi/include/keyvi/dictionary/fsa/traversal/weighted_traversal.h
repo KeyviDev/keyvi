@@ -53,6 +53,20 @@ static bool WeightedTransitionCompare(const WeightedTransition& a, const Weighte
 }
 
 template <>
+struct TraversalPayload<WeightedTransition> {
+  size_t current_depth;
+  uint32_t min_weight = 0;
+};
+
+template <>
+inline void TraversalState<WeightedTransition>::Add(uint64_t s, uint32_t weight, unsigned char l,
+                                                    TraversalPayload<WeightedTransition>* payload) {
+  if (weight >= payload->min_weight) {
+    traversal_state_payload.transitions.push_back(WeightedTransition(s, weight, l));
+  }
+}
+
+template <>
 inline void TraversalState<WeightedTransition>::PostProcess(TraversalPayload<WeightedTransition>* payload) {
   if (traversal_state_payload.transitions.size() > 0) {
     std::sort(traversal_state_payload.transitions.begin(), traversal_state_payload.transitions.end(),

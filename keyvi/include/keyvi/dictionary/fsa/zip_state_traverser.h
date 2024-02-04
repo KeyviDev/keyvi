@@ -214,6 +214,15 @@ class ZipStateTraverser final {
 
   const std::vector<label_t> &GetStateLabels() const { return traverser_queue_.top()->GetStateLabels(); }
 
+  /**
+   * Set the minimum weight states must be greater or equal to.
+   *
+   * Only available for WeightedTransition specialization.
+   *
+   * @param weight minimum transition weight
+   */
+  inline void SetMinWeight(uint32_t weight) = delete;
+
  private:
   heap_t traverser_queue_;
   bool final_ = false;
@@ -226,6 +235,8 @@ class ZipStateTraverser final {
   automata_t fsa_;
   size_t equal_states_ = 1;
   bool pruned = false;
+  // this field only used for weighted traversal, ignored otherwise
+  uint32_t min_weight_ = 0;
 
   inline void PreIncrement() {}
 
@@ -498,6 +509,18 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(
     }
   }
   FillInValues();
+}
+
+/**
+ * Set the minimum weight states must be greater or equal to.
+ *
+ * @param weight minimum transition weight
+ */
+template <>
+inline void ZipStateTraverser<WeightedStateTraverser>::SetMinWeight(uint32_t weight) {
+  for (auto t : traverser_queue_) {
+    t->SetMinWeight(weight);
+  }
 }
 
 }  // namespace fsa

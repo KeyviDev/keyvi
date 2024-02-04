@@ -29,6 +29,7 @@
 
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/traversal/traversal_base.h"
+#include "keyvi/dictionary/fsa/traversal/weighted_traversal.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -119,13 +120,16 @@ class StateTraverser final {
 
   void operator++(int) {
     TRACE("statetraverser++");
+
+    PreIncrement();
+
     // ignore cases where we are already at the end
     if (current_state_ == 0) {
       TRACE("at the end");
       return;
     }
 
-    current_state_ = stack_.GetStates().GetNextState();
+    current_state_ = FilterByMinWeight(stack_.GetStates().GetNextState());
     TRACE("next state: %ld depth: %ld", current_state_, stack_.GetDepth());
 
     while (current_state_ == 0) {
@@ -139,7 +143,7 @@ class StateTraverser final {
       TRACE("state is 0, go up");
       --stack_;
       stack_.GetStates()++;
-      current_state_ = stack_.GetStates().GetNextState();
+      current_state_ = FilterByMinWeight(stack_.GetStates().GetNextState());
       TRACE("next state %ld depth %ld", current_state_, stack_.GetDepth());
     }
 
@@ -155,6 +159,15 @@ class StateTraverser final {
 
   operator bool() const { return !at_end_; }
 
+  /**
+   * Set the minimum weight states must be greater or equal to.
+   *
+   * Only available for WeightedTransition specialization.
+   *
+   * @param weight minimum transition weight
+   */
+  inline void SetMinWeight(uint32_t weight) = delete;
+
   bool AtEnd() const { return at_end_; }
 
  private:
@@ -164,6 +177,12 @@ class StateTraverser final {
   label_t current_label_;
   bool at_end_;
   traversal::TraversalStack<TransitionT> stack_;
+  // this field only used for weighted traversal, ignored otherwise
+  uint32_t min_weight_ = 0;
+
+  inline void PreIncrement() {}
+
+  inline uint64_t FilterByMinWeight(uint64_t state) { return state; }
 
   template <class innerTraverserType>
   friend class ComparableStateTraverser;
@@ -175,6 +194,28 @@ class StateTraverser final {
 
   const traversal::TraversalPayload<TransitionT> &GetTraversalPayload() const { return stack_.traversal_stack_payload; }
 };
+
+template <>
+inline void StateTraverser<traversal::WeightedTransition>::PreIncrement() {
+  TRACE("preincrement weighted transition specialization");
+  stack_.traversal_stack_payload.min_weight = min_weight_;
+}
+
+template <>
+inline uint64_t StateTraverser<traversal::WeightedTransition>::FilterByMinWeight(uint64_t state) {
+  TRACE("filter min weight for weighted transition specialization");
+  return state > 0 && stack_.GetStates().GetNextInnerWeight() >= min_weight_ ? state : 0;
+}
+
+/**
+ * Set the minimum weight states must be greater or equal to.
+ *
+ * @param weight minimum transition weight
+ */
+template <>
+inline void StateTraverser<traversal::WeightedTransition>::SetMinWeight(uint32_t weight) {
+  min_weight_ = weight;
+}
 
 } /* namespace fsa */
 } /* namespace dictionary */

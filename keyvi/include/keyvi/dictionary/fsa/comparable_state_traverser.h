@@ -168,6 +168,15 @@ class ComparableStateTraverser final {
 
   size_t GetOrder() const { return order_; }
 
+  /**
+   * Set the minimum weight states must be greater or equal to.
+   *
+   * Only available for WeightedTransition specialization.
+   *
+   * @param weight minimum transition weight
+   */
+  inline void SetMinWeight(uint32_t weight) = delete;
+
  private:
   innerTraverserType state_traverser_;
   std::vector<label_t> label_stack_;
@@ -265,6 +274,16 @@ inline bool ComparableStateTraverser<NearStateTraverser>::operator<(const Compar
   }
 
   return order_ > rhs.order_;
+}
+
+/**
+ * Set the minimum weight states must be greater or equal to.
+ *
+ * @param weight minimum transition weight
+ */
+template <>
+inline void ComparableStateTraverser<WeightedStateTraverser>::SetMinWeight(uint32_t weight) {
+  state_traverser_.SetMinWeight(weight);
 }
 
 } /* namespace fsa */
