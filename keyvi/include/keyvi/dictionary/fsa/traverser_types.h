@@ -26,7 +26,6 @@
 #define KEYVI_DICTIONARY_FSA_TRAVERSER_TYPES_H_
 
 #include "keyvi/dictionary/fsa/state_traverser.h"
-#include "keyvi/dictionary/fsa/traversal/bounded_weighted_traversal.h"
 #include "keyvi/dictionary/fsa/traversal/near_traversal.h"
 #include "keyvi/dictionary/fsa/traversal/weighted_traversal.h"
 
@@ -34,7 +33,6 @@ namespace keyvi {
 namespace dictionary {
 namespace fsa {
 
-using BoundedWeightedStateTraverser2 = StateTraverser<traversal::BoundedWeightedTransition>;
 using NearStateTraverser = StateTraverser<traversal::NearTransition>;
 using WeightedStateTraverser = StateTraverser<traversal::WeightedTransition>;
 
