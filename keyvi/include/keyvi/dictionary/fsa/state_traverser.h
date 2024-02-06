@@ -121,8 +121,6 @@ class StateTraverser final {
   void operator++(int) {
     TRACE("statetraverser++");
 
-    PreIncrement();
-
     // ignore cases where we are already at the end
     if (current_state_ == 0) {
       TRACE("at the end");
@@ -166,9 +164,9 @@ class StateTraverser final {
    *
    * Only available for WeightedTransition specialization.
    *
-   * @param weight minimum transition weight
+   * @param min_weight minimum transition weight
    */
-  inline void SetMinWeight(uint32_t weight) = delete;
+  inline void SetMinWeight(uint32_t min_weight) = delete;
 
   bool AtEnd() const { return at_end_; }
 
@@ -179,10 +177,6 @@ class StateTraverser final {
   label_t current_label_;
   bool at_end_;
   traversal::TraversalStack<TransitionT> stack_;
-  // this field only used for weighted traversal, ignored otherwise
-  uint32_t min_weight_ = 0;
-
-  inline void PreIncrement() {}
 
   inline uint64_t FilterByMinWeight(uint64_t state) { return state; }
 
@@ -195,16 +189,19 @@ class StateTraverser final {
   const traversal::TraversalPayload<TransitionT> &GetTraversalPayload() const { return stack_.traversal_stack_payload; }
 };
 
-template <>
-inline void StateTraverser<traversal::WeightedTransition>::PreIncrement() {
-  TRACE("preincrement weighted transition specialization");
-  stack_.traversal_stack_payload.min_weight = min_weight_;
-}
-
+/**
+ * Filter state that doesn't meet the min weight requirement.
+ *
+ * This happens when SetMinWeight has been calles after the transitions got already read.
+ *
+ * @param state the state we currently look at.
+ *
+ * @return the current state if it has a weight higher than the minimum weight, 0 otherwise.
+ */
 template <>
 inline uint64_t StateTraverser<traversal::WeightedTransition>::FilterByMinWeight(uint64_t state) {
   TRACE("filter min weight for weighted transition specialization");
-  return state > 0 && stack_.GetStates().GetNextInnerWeight() >= min_weight_ ? state : 0;
+  return state > 0 && stack_.GetStates().GetNextInnerWeight() >= stack_.traversal_stack_payload.min_weight ? state : 0;
 }
 
 /**
@@ -213,8 +210,8 @@ inline uint64_t StateTraverser<traversal::WeightedTransition>::FilterByMinWeight
  * @param weight minimum transition weight
  */
 template <>
-inline void StateTraverser<traversal::WeightedTransition>::SetMinWeight(uint32_t weight) {
-  min_weight_ = weight;
+inline void StateTraverser<traversal::WeightedTransition>::SetMinWeight(uint32_t min_weight) {
+  stack_.traversal_stack_payload.min_weight = min_weight;
 }
 
 } /* namespace fsa */
