@@ -33,6 +33,7 @@
 #include "keyvi/dictionary/fsa/traverser_types.h"
 #include "keyvi/dictionary/fsa/zip_state_traverser.h"
 #include "keyvi/dictionary/match.h"
+#include "keyvi/dictionary/matching/filter.h"
 #include "keyvi/dictionary/util/utf8_utils.h"
 #include "keyvi/stringdistance/levenshtein.h"
 #include "utf8.h"
@@ -61,8 +62,9 @@ class PrefixCompletionMatching final {
    * @param fsa the fsa
    * @param query the query
    */
-  static PrefixCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query) {
-    return FromSingleFsa(fsa, fsa->GetStartState(), query);
+  static PrefixCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query,
+                                                const filter_t filter = accept_all) {
+    return FromSingleFsa(fsa, fsa->GetStartState(), query, filter);
   }
 
   /**
@@ -73,7 +75,7 @@ class PrefixCompletionMatching final {
    * @param query the query
    */
   static PrefixCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state,
-                                                const std::string& query) {
+                                                const std::string& query, const filter_t filter = accept_all) {
     if (start_state == 0) {
       return PrefixCompletionMatching();
     }
@@ -103,13 +105,18 @@ class PrefixCompletionMatching final {
 
     TRACE("matched prefix, length %d", depth);
 
-    if (fsa->IsFinalState(state)) {
-      first_match = Match(0, query_length, query, 0, fsa, fsa->GetStateValue(state));
-    }
-
     std::shared_ptr<std::string> prefix = std::make_shared<std::string>(query);
     std::unique_ptr<innerTraverserType> traverser;
     traverser.reset(new innerTraverserType(fsa, state));
+
+    if (fsa->IsFinalState(state)) {
+      first_match = Match(0, query_length, query, 0, fsa, fsa->GetStateValue(state));
+      FilterResult fr = filter(first_match);
+      if (!fr.accept) {
+          first_match = Match();
+      }
+      // traverser->SetMinWeight(fr.min_weight);
+    }
 
     TRACE("create matcher");
     return PrefixCompletionMatching(std::move(traverser), std::move(first_match), std::move(traversal_stack),
