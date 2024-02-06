@@ -176,6 +176,11 @@ class StateTraverser final {
   bool at_end_;
   traversal::TraversalStack<TransitionT> stack_;
 
+  /**
+   * Filter hook for weighted traversal to filter weights lower than the minimum weight (see spezialisation).
+   *
+   * Default: no filter
+   */
   inline uint64_t FilterByMinWeight(uint64_t state) { return state; }
 
   template <class innerTraverserType>
