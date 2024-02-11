@@ -175,7 +175,7 @@ class ComparableStateTraverser final {
    *
    * @param weight minimum transition weight
    */
-  inline void SetMinWeight(uint32_t weight) = delete;
+  inline void SetMinWeight(uint32_t weight) {}
 
  private:
   innerTraverserType state_traverser_;

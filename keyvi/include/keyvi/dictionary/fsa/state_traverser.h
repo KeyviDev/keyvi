@@ -164,7 +164,7 @@ class StateTraverser final {
    *
    * @param min_weight minimum transition weight
    */
-  inline void SetMinWeight(uint32_t min_weight) = delete;
+  inline void SetMinWeight(uint32_t min_weight) {}
 
   bool AtEnd() const { return at_end_; }
 

@@ -36,6 +36,7 @@
 #include "keyvi/dictionary/fsa/traverser_types.h"
 #include "keyvi/dictionary/match.h"
 #include "keyvi/dictionary/match_iterator.h"
+#include "keyvi/dictionary/matching/filter.h"
 #include "keyvi/dictionary/matching/fuzzy_matching.h"
 #include "keyvi/dictionary/matching/near_matching.h"
 #include "keyvi/dictionary/matching/prefix_completion_matching.h"
@@ -325,11 +326,23 @@ class Dictionary final {
     return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
   }
 
-  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query) const {
+  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query,
+                                                       const matching::filter_t filter = matching::accept_all) const {
     auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
-        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query));
+        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query, filter));
 
     auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+  }
+
+  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query, size_t top_n) const {
+    auto top_results = std::make_shared<matching::filter::TopN>(top_n);
+
+    auto data =
+        std::make_shared<matching::PrefixCompletionMatching<>>(matching::PrefixCompletionMatching<>::FromSingleFsa(
+            fsa_, query, std::bind(&matching::filter::TopN::filter, &(*top_results), std::placeholders::_1)));
+
+    auto func = [data, top_results]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
   }
 

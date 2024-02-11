@@ -110,17 +110,12 @@ class PrefixCompletionMatching final {
     traverser.reset(new innerTraverserType(fsa, state));
 
     if (fsa->IsFinalState(state)) {
-      first_match = Match(0, query_length, query, 0, fsa, fsa->GetStateValue(state));
-      FilterResult fr = filter(first_match);
-      if (!fr.accept) {
-          first_match = Match();
-      }
-      // traverser->SetMinWeight(fr.min_weight);
+      first_match = Match(0, query_length, query, 0, fsa, fsa->GetStateValue(state), fsa->GetWeightValue(state));
     }
 
     TRACE("create matcher");
     return PrefixCompletionMatching(std::move(traverser), std::move(first_match), std::move(traversal_stack),
-                                    query_length);
+                                    query_length, filter);
   }
 
   /**
@@ -129,7 +124,8 @@ class PrefixCompletionMatching final {
    * @param fsas a vector of fsas
    * @param query the query
    */
-  static PrefixCompletionMatching FromMulipleFsas(const std::vector<fsa::automata_t>& fsas, const std::string& query) {
+  static PrefixCompletionMatching FromMulipleFsas(const std::vector<fsa::automata_t>& fsas, const std::string& query,
+                                                  const filter_t filter = accept_all) {
     const size_t query_length = query.size();
     std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs;
 
@@ -164,7 +160,8 @@ class PrefixCompletionMatching final {
     for (const auto& fsa_state : fsa_start_state_pairs) {
       if (fsa_state.first->IsFinalState(fsa_state.second)) {
         first_match =
-            Match(0, query_length, query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
+            Match(0, query_length, query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second),
+                  fsa_state.first->GetWeightValue(fsa_state.second));
         break;
       }
     }
@@ -173,10 +170,18 @@ class PrefixCompletionMatching final {
     traverser.reset(new innerTraverserType(fsa_start_state_pairs));
 
     return PrefixCompletionMatching(std::move(traverser), std::move(first_match), std::move(traversal_stack),
-                                    query_length);
+                                    query_length, filter);
   }
 
-  Match FirstMatch() const { return first_match_; }
+  Match FirstMatch() const {
+    if (first_match_.IsEmpty()) {
+      return first_match_;
+    }
+
+    FilterResult fr = filter_(first_match_);
+    traverser_ptr_->SetMinWeight(fr.min_weight);
+    return fr.accept ? first_match_ : Match();
+  }
 
   Match NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
@@ -189,7 +194,13 @@ class PrefixCompletionMatching final {
 
         TRACE("found final state at depth %d %s", prefix_length_ + traverser_ptr_->GetDepth(), match_str.c_str());
         Match m(0, prefix_length_ + traverser_ptr_->GetDepth(), match_str, 0, traverser_ptr_->GetFsa(),
-                traverser_ptr_->GetStateValue());
+                traverser_ptr_->GetStateValue(), traverser_ptr_->GetInnerWeight());
+
+        FilterResult fr = filter_(m);
+        traverser_ptr_->SetMinWeight(fr.min_weight);
+        if (!fr.accept) {
+          continue;
+        }
 
         (*traverser_ptr_)++;
         return m;
@@ -201,11 +212,13 @@ class PrefixCompletionMatching final {
 
  private:
   PrefixCompletionMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match,
-                           std::unique_ptr<std::vector<unsigned char>>&& traversal_stack, const size_t prefix_length)
+                           std::unique_ptr<std::vector<unsigned char>>&& traversal_stack, const size_t prefix_length,
+                           const filter_t filter)
       : traverser_ptr_(std::move(traverser)),
         first_match_(std::move(first_match)),
         traversal_stack_(std::move(traversal_stack)),
-        prefix_length_(prefix_length) {}
+        prefix_length_(prefix_length),
+        filter_(filter) {}
 
   PrefixCompletionMatching() {}
 
@@ -214,6 +227,7 @@ class PrefixCompletionMatching final {
   const Match first_match_;
   std::unique_ptr<std::vector<unsigned char>> traversal_stack_;
   const size_t prefix_length_ = 0;
+  const filter_t filter_;
 
   // reset method for the index in the special case the match is deleted
   template <class MatcherT, class DeletedT>

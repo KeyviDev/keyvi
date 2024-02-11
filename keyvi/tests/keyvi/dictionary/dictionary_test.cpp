@@ -223,6 +223,46 @@ BOOST_AUTO_TEST_CASE(DictGetZerobyte) {
   BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
 }
 
+BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"eric a", 331}, {"eric b", 1331}, {"eric c", 1431}, {"eric d", 231}, {"eric e", 431},
+      {"eric f", 531}, {"eric g", 631},  {"eric h", 731},  {"eric i", 831}, {"eric j", 131},
+  };
+
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  std::vector<std::string> expected_matches = {"eric c", "eric b", "eric i"};
+
+  size_t i = 0;
+
+  for (auto m : d->GetPrefixCompletion("eric", 3)) {
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
+    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+  }
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
+
+  expected_matches = {"eric c", "eric b", "eric i", "eric h", "eric g"};
+
+  i = 0;
+
+  for (auto m : d->GetPrefixCompletion("eric", 5)) {
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
+    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+  }
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
+
+  for (auto m : d->GetPrefixCompletion("steve", 3)) {
+    BOOST_FAIL("expected no match");
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */

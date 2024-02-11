@@ -74,13 +74,21 @@ struct Match {
   typedef std::shared_ptr<boost::container::flat_map<std::string, boost::variant<std::string, int, double, bool>>>
       attributes_t;
 
-  Match(size_t a, size_t b, const std::string& matched_item, uint32_t score = 0)
-      : start_(a), end_(b), matched_item_(matched_item), raw_value_(), score_(score) {
+  Match(size_t a, size_t b, const std::string& matched_item, uint32_t score = 0, uint32_t weight = 0)
+      : start_(a), end_(b), matched_item_(matched_item), raw_value_(), score_(score), weight_(weight) {
     TRACE("initialized Match %d->%d %s", a, b, matched_item.c_str());
   }
 
-  Match(size_t a, size_t b, const std::string& matched_item, uint32_t score, const fsa::automata_t& fsa, uint64_t state)
-      : start_(a), end_(b), matched_item_(matched_item), raw_value_(), score_(score), fsa_(fsa), state_(state) {
+  Match(size_t a, size_t b, const std::string& matched_item, uint32_t score, const fsa::automata_t& fsa, uint64_t state,
+        uint32_t weight = 0)
+      : start_(a),
+        end_(b),
+        matched_item_(matched_item),
+        raw_value_(),
+        score_(score),
+        fsa_(fsa),
+        state_(state),
+        weight_(weight) {
     TRACE("initialized Match %d->%d %s", a, b, matched_item.c_str());
   }
 
@@ -105,6 +113,8 @@ struct Match {
   size_t GetStart() const { return start_; }
 
   void SetStart(size_t start = 0) { start_ = start; }
+
+  uint32_t GetWeight() const { return weight_; }
 
   bool IsEmpty() const { return start_ == 0 && end_ == 0; }
 
@@ -175,7 +185,9 @@ struct Match {
    *
    * @param value
    */
-  void SetRawValue(const std::string& value) { raw_value_ = value; }
+  void SetRawValue(const std::string& value) {
+    raw_value_ = value;
+  }
 
  private:
   size_t start_ = 0;
@@ -186,6 +198,7 @@ struct Match {
   fsa::automata_t fsa_ = 0;
   uint64_t state_ = 0;
   attributes_t attributes_ = 0;
+  uint32_t weight_ = 0;
 
   // friend for accessing the fsa
   template <class MatcherT, class DeletedT>
@@ -193,7 +206,9 @@ struct Match {
   template <class MatcherT, class DeletedT>
   friend Match index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
 
-  fsa::automata_t& GetFsa() { return fsa_; }
+  fsa::automata_t& GetFsa() {
+    return fsa_;
+  }
 };
 
 } /* namespace dictionary */
