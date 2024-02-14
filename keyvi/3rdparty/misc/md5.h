@@ -317,35 +317,10 @@ public:
     memset((POINTER)&context, 0, sizeof (context));
   }
 
-  /// Buffer must be 32+1 (nul) = 33 chars long at least
-  void writeToString()
-  {
-    int pos ;
-
-    for( pos = 0 ; pos < 16 ; pos++ )
-      sprintf( digestChars+(pos*2), "%02x", digestRaw[pos] ) ;
-  }
-
 
 public:
   // an MD5 digest is a 16-byte number (32 hex digits)
   BYTE digestRaw[ 16 ] ;
-
-  // This version of the digest is actually
-  // a "printf'd" version of the digest.
-  char digestChars[ 33 ] ;
-
-  // Digests a string and prints the result.
-  char* digestString( const char *string )
-  {
-    Init() ;
-    Update( (unsigned char*)string, strlen(string) ) ;
-    Final() ;
-
-    writeToString() ;
-
-    return digestChars ;
-  }
 
   uint64_t Hash( const char * string )
   {
