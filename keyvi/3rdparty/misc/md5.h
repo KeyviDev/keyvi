@@ -34,6 +34,7 @@
 // The original md5 implementation avoids external libraries.
 // This version has dependency on stdio.h for file input and
 // string.h for memcpy.
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
