@@ -346,6 +346,22 @@ class Dictionary final {
     return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
   }
 
+  /**
+   * Complete a prefix.
+   */
+  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query, matching::filter_wrapper_t filter,
+                                                       void* user_data) const {
+    auto filter_wrapper = std::make_shared<matching::filter::FilterWrapper>(filter, user_data);
+
+    auto data =
+        std::make_shared<matching::PrefixCompletionMatching<>>(matching::PrefixCompletionMatching<>::FromSingleFsa(
+            fsa_, query,
+            std::bind(&matching::filter::FilterWrapper::filter, &(*filter_wrapper), std::placeholders::_1)));
+
+    auto func = [data, filter_wrapper]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+  }
+
   std::string GetManifest() const { return fsa_->GetManifest(); }
 
  private:

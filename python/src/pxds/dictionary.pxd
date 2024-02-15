@@ -3,10 +3,14 @@ from libcpp.string cimport string as libcpp_string
 from libcpp.string cimport string as libcpp_utf8_string
 from libcpp.string cimport string as libcpp_utf8_output_string
 from libc.stdint cimport int32_t
+from libc.stdint cimport uint32_t
 from libc.stdint cimport uint64_t
 from libcpp cimport bool
-from match cimport Match
+from libcpp.pair cimport pair as libcpp_pair
+from match cimport Match as _Match
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
+
+ctypedef libcpp_pair[bool, uint32_t] (*filter_t)(_Match m, void* user_data)
 
 cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
     ctypedef enum loading_strategy_types:
@@ -23,12 +27,13 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         Dictionary (libcpp_utf8_string filename) except +
         Dictionary (libcpp_utf8_string filename, loading_strategy_types) except +
         bool Contains (libcpp_utf8_string) # wrap-ignore
-        Match operator[](libcpp_utf8_string) # wrap-ignore
+        _Match operator[](libcpp_utf8_string) # wrap-ignore
         _MatchIteratorPair Get (libcpp_utf8_string) # wrap-as:match
         _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except + # wrap-as:match_near
         _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except + # wrap-as:match_near
         _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance) except + # wrap-as:match_fuzzy
         _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:match_fuzzy
+        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string, filter_t, void*) # wrap-ignore
         _MatchIteratorPair GetAllItems () # wrap-ignore
         _MatchIteratorPair Lookup(libcpp_utf8_string) # wrap-as:search
         _MatchIteratorPair LookupText(libcpp_utf8_string) # wrap-as:search_tokenized

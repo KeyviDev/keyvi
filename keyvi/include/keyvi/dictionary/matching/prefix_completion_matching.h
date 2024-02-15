@@ -178,9 +178,9 @@ class PrefixCompletionMatching final {
       return first_match_;
     }
 
-    FilterResult fr = filter_(first_match_);
-    traverser_ptr_->SetMinWeight(fr.min_weight);
-    return fr.accept ? first_match_ : Match();
+    filter_result_t fr = filter_(first_match_);
+    traverser_ptr_->SetMinWeight(fr.second);
+    return fr.first ? first_match_ : Match();
   }
 
   Match NextMatch() {
@@ -196,9 +196,12 @@ class PrefixCompletionMatching final {
         Match m(0, prefix_length_ + traverser_ptr_->GetDepth(), match_str, 0, traverser_ptr_->GetFsa(),
                 traverser_ptr_->GetStateValue(), traverser_ptr_->GetInnerWeight());
 
-        FilterResult fr = filter_(m);
-        traverser_ptr_->SetMinWeight(fr.min_weight);
-        if (!fr.accept) {
+        filter_result_t fr = filter_(m);
+
+        TRACE("filter result: %s, min weight: %d", fr.first ? "true" : "false", fr.second);
+
+        traverser_ptr_->SetMinWeight(fr.second);
+        if (!fr.first) {
           continue;
         }
 

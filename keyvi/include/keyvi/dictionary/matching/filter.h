@@ -22,6 +22,8 @@
 #ifndef KEYVI_DICTIONARY_MATCHING_FILTER_H_
 #define KEYVI_DICTIONARY_MATCHING_FILTER_H_
 
+#include <utility>
+
 #include "keyvi/dictionary/match.h"
 #include "keyvi/dictionary/util/bounded_priority_queue.h"
 
@@ -32,35 +34,44 @@ namespace keyvi {
 namespace dictionary {
 namespace matching {
 
-struct FilterResult {
-  FilterResult() {}
-  FilterResult(bool a, uint32_t m) : accept(a), min_weight(m) {}
+using filter_result_t = std::pair<bool, uint32_t>;
+using filter_t = std::function<filter_result_t(const Match&)>;
+using filter_wrapper_t = std::function<filter_result_t(const Match&, void*)>;
 
-  bool accept = true;
-  uint32_t min_weight = 0;
-};
-
-using filter_t = std::function<FilterResult(const Match&)>;
-
-inline FilterResult accept_all(const Match& m) {
-  return FilterResult();
+inline filter_result_t accept_all(const Match& m) {
+  return filter_result_t(true, 0);
 }
 namespace filter {
 class TopN final {
  public:
   TopN(size_t n) : priority_queue_(n) {}
 
-  FilterResult filter(const Match& m) {
+  filter_result_t filter(const Match& m) {
     if (m.GetWeight() < priority_queue_.Back()) {
-      return FilterResult(false, priority_queue_.Back());
+      return filter_result_t(false, priority_queue_.Back());
     }
 
     priority_queue_.Put(m.GetWeight());
-    return FilterResult(true, priority_queue_.Back());
+    return filter_result_t(true, priority_queue_.Back());
   }
 
  private:
   util::BoundedPriorityQueue<uint32_t> priority_queue_;
+};
+
+/**
+ * A wrapper around a filter that can hold an object internally.
+ * Used for interfacing with bindings, e.g. to implement filter code in python.
+ */
+class FilterWrapper final {
+ public:
+  FilterWrapper(filter_wrapper_t filter, void* user_data) : inner_filter_(filter), user_data_(user_data) {}
+
+  filter_result_t filter(const Match& m) { return (inner_filter_(m, user_data_)); }
+
+ private:
+  filter_wrapper_t inner_filter_;
+  void* user_data_;
 };
 
 } /* namespace filter */

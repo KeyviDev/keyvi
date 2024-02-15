@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
   size_t i = 0;
 
   for (auto m : d->GetPrefixCompletion(
-           "mr. ", [](const Match m) { return matching::FilterResult(m.GetMatchedString().back() == 'b', 500); })) {
+           "mr. ", [](const Match m) { return matching::filter_result_t(m.GetMatchedString().back() == 'b', 500); })) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
