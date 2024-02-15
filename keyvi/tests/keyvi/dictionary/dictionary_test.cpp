@@ -263,6 +263,31 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
   }
 }
 
+BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"mr. eric a", 331},  {"mr. eric b", 1331}, {"mr. max b", 1431},   {"mr. stefan b", 231}, {"mr. stefan e", 431},
+      {"mr. heinz f", 531}, {"mr. karl b", 631},  {"mr. gustav b", 731}, {"mr. gustav h", 831}, {"mr. jeremy j", 131},
+  };
+
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  // all names ending with 'b' and weight > 500
+  std::vector<std::string> expected_matches = {"mr. max b", "mr. eric b", "mr. gustav b", "mr. karl b"};
+
+  size_t i = 0;
+
+  for (auto m : d->GetPrefixCompletion(
+           "mr. ", [](const Match m) { return matching::FilterResult(m.GetMatchedString().back() == 'b', 500); })) {
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
+    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+  }
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */
