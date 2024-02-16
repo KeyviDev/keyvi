@@ -136,8 +136,9 @@ jobs:
         with:
           package-dir: python
         
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: artifact-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.flavor }}-${{ matrix.target }}
           path: ./wheelhouse/*.whl
 
   build_sdist:
@@ -165,8 +166,9 @@ jobs:
         python -m pytest tests && \
         python -m pip uninstall -y keyvi
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
+        name: artifact-sdist
         path: python/wheelhouse/*.tar.gz
 
   upload_all:
@@ -176,7 +178,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: artifact
+          pattern: artifact-*
+          merge-multiple: true
           path: dist
   
       - uses: pypa/gh-action-pypi-publish@release/v1
