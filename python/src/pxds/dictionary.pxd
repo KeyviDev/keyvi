@@ -10,7 +10,7 @@ from libcpp.pair cimport pair as libcpp_pair
 from match cimport Match as _Match
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
 
-ctypedef libcpp_pair[bool, uint32_t] (*filter_t)(_Match m, void* user_data)
+ctypedef libcpp_pair[bool, uint32_t] (*match_filter)(_Match m, void* user_data)
 
 cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
     ctypedef enum loading_strategy_types:
@@ -24,19 +24,29 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         populate_key_part_no_readahead_value_part # populate the key part, but disable read ahead value part
         
     cdef cppclass Dictionary:
+        # wrap-doc:
+        #  Keyvi dictionary, basically a set of key values. Keyvi dictionaries are immutable containers,
+        #  created by a previours compile run. Immutability has performance benefits. If you are looking for
+        #  an updateable container, have a look at keyvi index.
+        #  
+        #  Keyvi dictionaries allow multiple types of approximate and completion matches due to its internal
+        #  FST based data structure.
         Dictionary (libcpp_utf8_string filename) except +
         Dictionary (libcpp_utf8_string filename, loading_strategy_types) except +
-        bool Contains (libcpp_utf8_string) # wrap-ignore
-        _Match operator[](libcpp_utf8_string) # wrap-ignore
-        _MatchIteratorPair Get (libcpp_utf8_string) # wrap-as:match
-        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except + # wrap-as:match_near
-        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except + # wrap-as:match_near
-        _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance) except + # wrap-as:match_fuzzy
-        _MatchIteratorPair GetFuzzy (libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:match_fuzzy
-        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string, filter_t, void*) # wrap-ignore
+        bool Contains (libcpp_utf8_string key) # wrap-ignore
+        _Match operator[](libcpp_utf8_string key) # wrap-ignore
+        _MatchIteratorPair Get (libcpp_utf8_string key) # wrap-as:match
+        _MatchIteratorPair GetNear (libcpp_utf8_string key, size_t minimum_prefix_length) except + # wrap-as:match_near
+        _MatchIteratorPair GetNear (libcpp_utf8_string key, size_t minimum_prefix_length, bool greedy) except + # wrap-as:match_near
+        _MatchIteratorPair GetFuzzy (libcpp_utf8_string key, int32_t max_edit_distance) except + # wrap-as:match_fuzzy
+        _MatchIteratorPair GetFuzzy (libcpp_utf8_string key, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:match_fuzzy
+        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string key) except + # wrap-as:complete_prefix
+        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string key, size_t top_n) except + # wrap-as:complete_prefix
+        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string key, match_filter filter, void* filter_data) # wrap-ignore
+        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string key, match_filter filter) # wrap-as:complete_prefix
         _MatchIteratorPair GetAllItems () # wrap-ignore
-        _MatchIteratorPair Lookup(libcpp_utf8_string) # wrap-as:search
-        _MatchIteratorPair LookupText(libcpp_utf8_string) # wrap-as:search_tokenized
+        _MatchIteratorPair Lookup(libcpp_utf8_string  key) # wrap-as:search
+        _MatchIteratorPair LookupText(libcpp_utf8_string text) # wrap-as:search_tokenized
         libcpp_utf8_output_string GetManifest() except + # wrap-as:manifest
         libcpp_string GetStatistics() # wrap-ignore
         uint64_t GetSize() # wrap-ignore

@@ -108,16 +108,3 @@
     def GetManifest(self, *args):
         return call_deprecated_method("GetManifest", "manifest", self.manifest, *args)
 
-    def complete_prefix(self, key, filter):
-        assert isinstance(key, (bytes, str)), 'arg in_0 wrong type'
-
-        if isinstance(key, unicode):
-            key = key.encode('utf-8')
-
-        cdef void* c_filter = <void*> filter
-
-        cdef _MatchIteratorPair _r = self.inst.get().GetPrefixCompletion((<libcpp_string>key), filter_callback, c_filter)
-        cdef MatchIterator py_result = MatchIterator.__new__(MatchIterator)
-        py_result.it = _r.begin()
-        py_result.end = _r.end()
-        return py_result
