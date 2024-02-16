@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -24,8 +24,8 @@ jobs:
       - name: install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format-6.0
-          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-6.0 1000
+          sudo apt-get install -y clang-format-14
+          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-14 1000
       - uses: BSFishy/pip-action@v1
         with:
           packages: cpplint
