@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         type: ['Release', 'Debug']
-        os: ['macos-latest', 'ubuntu-20.04']
+        os: ['macos-latest', 'ubuntu-22.04']
     steps:
       - name: install Linux deps
         if: runner.os == 'Linux'
