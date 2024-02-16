@@ -153,8 +153,6 @@ class StateTraverser final {
 
   label_t GetStateLabel() const { return current_label_; }
 
-  traversal::TraversalPayload<TransitionT> &GetTraversalPayload() { return stack_.traversal_stack_payload; }
-
   operator bool() const { return !at_end_; }
 
   bool AtEnd() const { return at_end_; }
@@ -172,6 +170,8 @@ class StateTraverser final {
   const traversal::TraversalStack<TransitionT> &GetStack() const { return stack_; }
 
   traversal::TraversalState<transition_t> &GetStates() { return stack_.GetStates(); }
+
+  traversal::TraversalPayload<TransitionT> &GetTraversalPayload() { return stack_.traversal_stack_payload; }
 
   const traversal::TraversalPayload<TransitionT> &GetTraversalPayload() const { return stack_.traversal_stack_payload; }
 };
