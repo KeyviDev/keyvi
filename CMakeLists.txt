@@ -11,8 +11,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake_mo
 
 #### Compiler Flags ####
 
-# configure C++11
-set(CMAKE_CXX_STANDARD 11)
+# configure C++17
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # keyvi specific compile options, definitions and flags
@@ -207,7 +207,7 @@ add_custom_target(bindings
 string(REPLACE ";" " " _KEYVI_INCLUDES "${KEYVI_INCLUDES}")
 
 # compile flags
-set(_KEYVI_CXX_FLAGS_ALL "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}} ${_KEYVI_CXX_FLAGS} ${_KEVYI_COMPILE_OPTIONS} -std=c++11")
+set(_KEYVI_CXX_FLAGS_ALL "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE_UPPER}} ${_KEYVI_CXX_FLAGS} ${_KEVYI_COMPILE_OPTIONS} -std=c++17")
 
 configure_file(keyvi/flags.cmake keyvi/flags)
 
