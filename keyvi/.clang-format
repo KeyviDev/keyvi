@@ -2,10 +2,11 @@
 BasedOnStyle: Google
 ColumnLimit: '120'
 Language: Cpp
-Standard: Cpp11
+Standard: c++17
 TabWidth: '2'
 UseTab: Never
 ConstructorInitializerIndentWidth: 4
 AllowShortFunctionsOnASingleLine: Inline
+IncludeBlocks: Preserve
 
 ...
