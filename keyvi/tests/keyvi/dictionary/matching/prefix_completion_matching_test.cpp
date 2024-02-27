@@ -113,65 +113,6 @@ void test_prefix_completion_matching(std::vector<std::pair<std::string, uint32_t
   BOOST_CHECK(expected_it == expected_sorted.end());
 }
 
-/*
-void test_prefix_completion_matching_with_filter(std::vector<std::pair<std::string, uint32_t>>* test_data,
-                                                 const std::string& query, const std::vector<std::string> expected,
-                                                 const filter_t filter) {
-  testing::TempDictionary dictionary(test_data);
-
-  auto matcher_weights = std::make_shared<matching::PrefixCompletionMatching<>>(
-      matching::PrefixCompletionMatching<>::FromSingleFsa(dictionary.GetFsa(), query, filter));
-
-  MatchIterator::MatchIteratorPair it = MatchIterator::MakeIteratorPair(
-      [matcher_weights]() { return matcher_weights->NextMatch(); }, matcher_weights->FirstMatch());
-
-  auto expected_it = expected.begin();
-  for (auto m : it) {
-    BOOST_CHECK(expected_it != expected.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-  }
-}
-
-void test_prefix_completion_matching_with_filter_multi_fsa(std::vector<std::pair<std::string, uint32_t>>* test_data,
-                                                           const std::string& query,
-                                                           const std::vector<std::string> expected,
-                                                           const filter_t filter) {
-  // test with multiple dictionaries
-  // split test data into 3 groups with some duplication
-  std::vector<std::pair<std::string, uint32_t>> test_data_1;
-  std::vector<std::pair<std::string, uint32_t>> test_data_2;
-  std::vector<std::pair<std::string, uint32_t>> test_data_3;
-
-  for (size_t i = 0; i < test_data->size(); ++i) {
-    if (i % 1 == 0 || i % 5 == 0) {
-      test_data_1.push_back((*test_data)[i]);
-    }
-    if (i % 2 == 0 || i == 3) {
-      test_data_2.push_back((*test_data)[i]);
-    }
-    if (i % 3 == 0) {
-      test_data_3.push_back((*test_data)[i]);
-    }
-  }
-  testing::TempDictionary d1(&test_data_1);
-  testing::TempDictionary d2(&test_data_2);
-  testing::TempDictionary d3(&test_data_3);
-  std::vector<fsa::automata_t> fsas = {d1.GetFsa(), d2.GetFsa(), d3.GetFsa()};
-
-  auto matcher_zipped =
-      std::make_shared<matching::PrefixCompletionMatching<fsa::ZipStateTraverser<fsa::WeightedStateTraverser>>>(
-          matching::PrefixCompletionMatching<fsa::ZipStateTraverser<fsa::WeightedStateTraverser>>::FromMulipleFsas(
-              fsas, query, filter));
-  MatchIterator::MatchIteratorPair matcher_zipped_it = MatchIterator::MakeIteratorPair(
-      [matcher_zipped]() { return matcher_zipped->NextMatch(); }, matcher_zipped->FirstMatch());
-  auto expected_it = expected.begin();
-  for (auto m : matcher_zipped_it) {
-    BOOST_CHECK(expected_it != expected.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
-  }
-  BOOST_CHECK(expected_it == expected.end());
-}*/
-
 BOOST_AUTO_TEST_CASE(prefix_0) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"aaaa", 1000}, {"aabb", 1001}, {"aabc", 1002}, {"aacd", 1030}, {"bbcd", 1040}};
