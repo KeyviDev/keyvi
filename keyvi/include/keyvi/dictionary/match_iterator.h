@@ -73,7 +73,12 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, 
 
   MatchIterator() : match_functor_(0), set_min_weight_({}) {}
 
-  void SetMinWeight(uint32_t min_weight) { set_min_weight_(min_weight); }
+  void SetMinWeight(uint32_t min_weight) {
+    // ignore if a min weight setter was not provided
+    if (set_min_weight_) {
+      set_min_weight_(min_weight);
+    }
+  }
 
   // What we implement is determined by the boost::forward_traversal_tag
   // template parameter

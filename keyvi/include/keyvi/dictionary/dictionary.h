@@ -340,10 +340,9 @@ class Dictionary final {
     auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
         matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query));
 
-    // TODO(hendrik): C++14, use a unique pointer and move this into func
     auto best_weights = std::make_shared<util::BoundedPriorityQueue<uint32_t>>(top_n);
 
-    auto func = [data, best_weights]() {
+    auto func = [data, best_weights = std::move(best_weights)]() {
       auto m = data->NextMatch();
       while (!m.IsEmpty()) {
         if (m.GetWeight() >= best_weights->Back()) {

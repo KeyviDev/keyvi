@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
+import heapq
 import sys
 import os
 
@@ -33,31 +34,45 @@ def test_prefix_simple():
             "eric boox",
             "eric bxxxx",
         ]
+
+        # note: we are getting one more("eric"), because of dfs traversal
         assert [m.matched_string for m in d.complete_prefix("eric", 2)] == [
             "eric",
             "eric ble",
             "eric bla",
         ]
 
-        def my_filter(m):
-            return m.matched_string.endswith("x"), 40
-
-       # assert [m.matched_string for m in d.complete_prefix("eric", my_filter)] == [
-       ##     "eric blx",
-        #    "eric bllllx",
-        #    "eric boox",
-        #]
-        # same with lambda, not working yet: assert [m.matched_string for m in d.complete_prefix("eric", lambda m: (m.matched_string.endswith('x'), 40))] ==  ['eric blx', 'eric bllllx', 'eric boox']
-
-        def filter(completer):
+        def filter_x(completer):
             for m in completer:
-                print(m.matched_string)
                 if m.matched_string.endswith("x"):
                     completer.set_min_weight(40)
                     yield m
-        
-        assert [m.matched_string for m in filter(d.complete_prefix("eric"))] == [
+
+        assert [m.matched_string for m in filter_x(d.complete_prefix("eric"))] == [
             "eric blx",
             "eric bllllx",
             "eric boox",
+        ]
+
+        heap = []
+
+        def filter_top_5(completer):
+            for m in completer:
+                if len(heap) < 6:
+                    heapq.heappush(heap, m.score)
+                    yield m
+                elif m.score > heap[0]:
+                    heapq.heappop(heap)
+                    heapq.heappush(heap, m.score)
+                    completer.set_min_weight(m.score)
+                    yield m
+
+        # note: we are getting one more("eric"), because of dfs traversal
+        assert [m.matched_string for m in filter_top_5(d.complete_prefix("eric"))] == [
+            "eric",
+            "eric ble",
+            "eric bla",
+            "eric blx",
+            "eric bllllx",
+            "eric blu",
         ]

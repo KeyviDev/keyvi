@@ -263,7 +263,6 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
   }
 }
 
-/*
 BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"mr. eric a", 331},  {"mr. eric b", 1331}, {"mr. max b", 1431},   {"mr. stefan b", 231}, {"mr. stefan e", 431},
@@ -278,16 +277,25 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
 
   size_t i = 0;
 
-  for (auto m : d->GetPrefixCompletion(
-           "mr. ", [](const Match m) { return matching::filter_result_t(m.GetMatchedString().back() == 'b', 500); })) {
-    if (i >= expected_matches.size()) {
-      BOOST_FAIL("got more results than expected.");
+  auto completer = d->GetPrefixCompletion("mr. ");
+  auto completer_it = completer.begin();
+
+  while (completer_it != completer.end()) {
+    if (completer_it->GetMatchedString().back() == 'b') {
+      if (i >= expected_matches.size()) {
+        BOOST_FAIL("got more results than expected.");
+      }
+      BOOST_CHECK_EQUAL(expected_matches[i++], completer_it->GetMatchedString());
     }
-    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+    completer_it.SetMinWeight(500);
+    completer_it++;
   }
 
+  // test that bogus call does not cause bad_function
+  completer.end().SetMinWeight(5);
+
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
-}*/
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

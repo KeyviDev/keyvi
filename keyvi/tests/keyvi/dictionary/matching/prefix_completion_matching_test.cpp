@@ -205,34 +205,6 @@ BOOST_AUTO_TEST_CASE(prefix_completion_cjk) {
                                   std::vector<std::string>{"あsだ", "あsだs", "あsだsっd", "あsaだsっdさ"});
 }
 
-/*
-
-BOOST_AUTO_TEST_CASE(prefix_top_3) {
-  std::vector<std::pair<std::string, uint32_t>> test_data = {
-      {"eric a", 331}, {"eric b", 1331}, {"eric c", 1431}, {"eric d", 231}, {"eric e", 431},
-      {"eric f", 531}, {"eric g", 631},  {"eric h", 731},  {"eric i", 831}, {"eric j", 131},
-  };
-
-  filter::TopN top3(3);
-
-
-
-  test_prefix_completion_matching_with_filter(&test_data, "eric",
-                                              std::vector<std::string>{"eric c", "eric b", "eric i"},
-                                              std::bind(&filter::TopN::filter, &top3, std::placeholders::_1));
-
-  // create a new filter instance
-  filter::TopN top3_2(3);
-  test_prefix_completion_matching_with_filter_multi_fsa(
-      &test_data, "eric", std::vector<std::string>{"eric c", "eric b", "eric i"},
-      std::bind(&filter::TopN::filter, &top3_2, std::placeholders::_1));
-
-  // test no match
-  filter::TopN top3_3(3);
-  test_prefix_completion_matching_with_filter(&test_data, "steven", std::vector<std::string>{},
-                                              std::bind(&filter::TopN::filter, &top3_3, std::placeholders::_1));
-}
-*/
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace matching */
