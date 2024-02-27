@@ -103,10 +103,9 @@ class NearMatching final {
 
     auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
 
-    // todo: switch to make_unique, requires C++14
-    std::unique_ptr<fsa::ComparableStateTraverser<fsa::NearStateTraverser>> traverser;
-    traverser.reset(
-        new fsa::ComparableStateTraverser<fsa::NearStateTraverser>(fsa, start_state, std::move(payload), true, 0));
+    std::unique_ptr<fsa::ComparableStateTraverser<fsa::NearStateTraverser>> traverser =
+        std::make_unique<fsa::ComparableStateTraverser<fsa::NearStateTraverser>>(fsa, start_state, std::move(payload),
+                                                                                 true, 0);
 
     return NearMatching(std::move(traverser), std::move(first_match), query.substr(0, exact_prefix), greedy);
   }
@@ -155,9 +154,8 @@ class NearMatching final {
       }
     }
 
-    // todo: switch to make_unique, requires C++14
-    std::unique_ptr<fsa::ZipStateTraverser<fsa::NearStateTraverser>> traverser;
-    traverser.reset(new fsa::ZipStateTraverser<fsa::NearStateTraverser>(std::move(fsa_start_state_payloads)));
+    std::unique_ptr<fsa::ZipStateTraverser<fsa::NearStateTraverser>> traverser =
+        std::make_unique<fsa::ZipStateTraverser<fsa::NearStateTraverser>>(std::move(fsa_start_state_payloads));
 
     return NearMatching<fsa::ZipStateTraverser<fsa::NearStateTraverser>>(std::move(traverser), std::move(first_match),
                                                                          query.substr(0, exact_prefix), greedy);
