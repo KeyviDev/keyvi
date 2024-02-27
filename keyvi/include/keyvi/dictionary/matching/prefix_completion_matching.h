@@ -61,8 +61,7 @@ class PrefixCompletionMatching final {
    * @param fsa the fsa
    * @param query the query
    */
-  static PrefixCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query
-                                                ) {
+  static PrefixCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query) {
     return FromSingleFsa(fsa, fsa->GetStartState(), query);
   }
 
@@ -123,8 +122,7 @@ class PrefixCompletionMatching final {
    * @param fsas a vector of fsas
    * @param query the query
    */
-  static PrefixCompletionMatching FromMulipleFsas(const std::vector<fsa::automata_t>& fsas, const std::string& query
-                                                  ) {
+  static PrefixCompletionMatching FromMulipleFsas(const std::vector<fsa::automata_t>& fsas, const std::string& query) {
     const size_t query_length = query.size();
     std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs;
 
@@ -172,9 +170,7 @@ class PrefixCompletionMatching final {
                                     query_length);
   }
 
-  Match FirstMatch() const {
-    return first_match_;
-  }
+  Match FirstMatch() const { return first_match_; }
 
   Match NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
@@ -197,14 +193,11 @@ class PrefixCompletionMatching final {
     return Match();
   }
 
-  void SetMinWeight(uint32_t min_weight) {
-    traverser_ptr_->SetMinWeight(min_weight);
-  }
+  void SetMinWeight(uint32_t min_weight) { traverser_ptr_->SetMinWeight(min_weight); }
 
  private:
   PrefixCompletionMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match,
-                           std::unique_ptr<std::vector<unsigned char>>&& traversal_stack, const size_t prefix_length
-                           )
+                           std::unique_ptr<std::vector<unsigned char>>&& traversal_stack, const size_t prefix_length)
       : traverser_ptr_(std::move(traverser)),
         first_match_(std::move(first_match)),
         traversal_stack_(std::move(traversal_stack)),
