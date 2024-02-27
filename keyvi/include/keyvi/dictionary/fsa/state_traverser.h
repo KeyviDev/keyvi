@@ -216,6 +216,7 @@ inline uint64_t StateTraverser<traversal::WeightedTransition>::FilterByMinWeight
  */
 template <>
 inline void StateTraverser<traversal::WeightedTransition>::SetMinWeight(uint32_t min_weight) {
+  TRACE("set min weight for weighted transition specialization %d", min_weight);
   stack_.traversal_stack_payload.min_weight = min_weight;
 }
 

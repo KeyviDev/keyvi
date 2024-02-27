@@ -22,16 +22,6 @@ import warnings
 cdef void progress_compiler_callback(size_t a, size_t b, void* py_callback) noexcept with gil:
     (<object>py_callback)(a, b)
 
-cdef libcpp_pair[bool, uint32_t] filter_callback(_Match m, void* py_callback) noexcept with gil:
-    cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(m))
-
-    cdef Match py_match = Match.__new__(Match)
-    py_match.inst = _r
-
-    accept, min_weight = (<object>py_callback)(py_match)
-    cdef libcpp_pair[bool, uint32_t] c_result = libcpp_pair[bool, uint32_t](accept, min_weight)
-    return c_result
-
 def get_package_root():
     module_location = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(keyvi._pycore.__file__)), ".."))
 

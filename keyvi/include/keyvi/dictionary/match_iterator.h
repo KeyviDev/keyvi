@@ -55,21 +55,26 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, 
  public:
   typedef util::iterator_pair<MatchIterator> MatchIteratorPair;
 
-  explicit MatchIterator(std::function<Match()> match_functor, const Match& first_match = Match())
-      : match_functor_(match_functor) {
+  explicit MatchIterator(std::function<Match()> match_functor, const Match& first_match = Match(),
+                         std::function<void(uint32_t)> set_min_weight = {})
+      : match_functor_(match_functor), set_min_weight_(set_min_weight) {
     current_match_ = first_match;
     if (first_match.IsEmpty()) {
       increment();
     }
   }
 
-  static MatchIteratorPair MakeIteratorPair(std::function<Match()> f, const Match& first_match = Match()) {
-    return MatchIteratorPair(MatchIterator(f, first_match), MatchIterator());
+  static MatchIteratorPair MakeIteratorPair(std::function<Match()> f, const Match& first_match = Match(),
+                                            std::function<void(uint32_t)> set_min_weight = {}) {
+    return MatchIteratorPair(MatchIterator(f, first_match, set_min_weight), MatchIterator());
   }
 
   static MatchIteratorPair EmptyIteratorPair() { return MatchIteratorPair(MatchIterator(), MatchIterator()); }
 
-  MatchIterator() : match_functor_(0) {}
+  MatchIterator() : match_functor_(0), set_min_weight_({}) {}
+
+  void SetMinWeight(uint32_t min_weight) { set_min_weight_(min_weight); }
+
   // What we implement is determined by the boost::forward_traversal_tag
   // template parameter
  private:
@@ -105,6 +110,7 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, 
  private:
   std::function<Match()> match_functor_;
   Match current_match_;
+  std::function<void(uint32_t)> set_min_weight_;
 };
 
 } /* namespace dictionary */

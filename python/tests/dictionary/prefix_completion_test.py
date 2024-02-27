@@ -36,14 +36,28 @@ def test_prefix_simple():
         assert [m.matched_string for m in d.complete_prefix("eric", 2)] == [
             "eric",
             "eric ble",
+            "eric bla",
         ]
 
         def my_filter(m):
             return m.matched_string.endswith("x"), 40
 
-        assert [m.matched_string for m in d.complete_prefix("eric", my_filter)] == [
+       # assert [m.matched_string for m in d.complete_prefix("eric", my_filter)] == [
+       ##     "eric blx",
+        #    "eric bllllx",
+        #    "eric boox",
+        #]
+        # same with lambda, not working yet: assert [m.matched_string for m in d.complete_prefix("eric", lambda m: (m.matched_string.endswith('x'), 40))] ==  ['eric blx', 'eric bllllx', 'eric boox']
+
+        def filter(completer):
+            for m in completer:
+                print(m.matched_string)
+                if m.matched_string.endswith("x"):
+                    completer.set_min_weight(40)
+                    yield m
+        
+        assert [m.matched_string for m in filter(d.complete_prefix("eric"))] == [
             "eric blx",
             "eric bllllx",
             "eric boox",
         ]
-        # same with lambda, not working yet: assert [m.matched_string for m in d.complete_prefix("eric", lambda m: (m.matched_string.endswith('x'), 40))] ==  ['eric blx', 'eric bllllx', 'eric boox']

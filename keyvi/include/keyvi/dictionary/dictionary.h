@@ -36,10 +36,10 @@
 #include "keyvi/dictionary/fsa/traverser_types.h"
 #include "keyvi/dictionary/match.h"
 #include "keyvi/dictionary/match_iterator.h"
-#include "keyvi/dictionary/matching/filter.h"
 #include "keyvi/dictionary/matching/fuzzy_matching.h"
 #include "keyvi/dictionary/matching/near_matching.h"
 #include "keyvi/dictionary/matching/prefix_completion_matching.h"
+#include "keyvi/dictionary/util/bounded_priority_queue.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -326,40 +326,39 @@ class Dictionary final {
     return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
   }
 
-  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query,
-                                                       const matching::filter_t filter = matching::accept_all) const {
+  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query) const {
     auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
-        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query, filter));
+        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query));
 
     auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    return MatchIterator::MakeIteratorPair(
+        func, data->FirstMatch(),
+        std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query, size_t top_n) const {
-    auto top_results = std::make_shared<matching::filter::TopN>(top_n);
+    auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
+        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query));
 
-    auto data =
-        std::make_shared<matching::PrefixCompletionMatching<>>(matching::PrefixCompletionMatching<>::FromSingleFsa(
-            fsa_, query, std::bind(&matching::filter::TopN::filter, &(*top_results), std::placeholders::_1)));
+    // TODO(hendrik): C++14, use a unique pointer and move this into func
+    auto best_weights = std::make_shared<util::BoundedPriorityQueue<uint32_t>>(top_n);
 
-    auto func = [data, top_results]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
-  }
+    auto func = [data, best_weights]() {
+      auto m = data->NextMatch();
+      while (!m.IsEmpty()) {
+        if (m.GetWeight() >= best_weights->Back()) {
+          best_weights->Put(m.GetWeight());
+          return m;
+        }
 
-  /**
-   * Complete a prefix.
-   */
-  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query, matching::filter_wrapper_t filter,
-                                                       void* user_data) const {
-    auto filter_wrapper = std::make_shared<matching::filter::FilterWrapper>(filter, user_data);
+        m = data->NextMatch();
+      }
+      return Match();
+    };
 
-    auto data =
-        std::make_shared<matching::PrefixCompletionMatching<>>(matching::PrefixCompletionMatching<>::FromSingleFsa(
-            fsa_, query,
-            std::bind(&matching::filter::FilterWrapper::filter, &(*filter_wrapper), std::placeholders::_1)));
-
-    auto func = [data, filter_wrapper]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    return MatchIterator::MakeIteratorPair(
+        func, data->FirstMatch(),
+        std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
   std::string GetManifest() const { return fsa_->GetManifest(); }
