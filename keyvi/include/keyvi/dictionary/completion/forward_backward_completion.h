@@ -53,7 +53,7 @@ class ForwardBackwardCompletion final {
   ForwardBackwardCompletion(dictionary_t forward_dictionary, dictionary_t backward_dictionary)
       : forward_completions_(forward_dictionary), backward_completions_(backward_dictionary) {}
 
-  struct result_compare : public std::binary_function<Match, Match, bool> {
+  struct result_compare {
     bool operator()(const Match& m1, const Match& m2) const { return m1.GetScore() < m2.GetScore(); }
   };
 
