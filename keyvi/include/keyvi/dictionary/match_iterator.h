@@ -95,6 +95,7 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, 
       if (current_match_.IsEmpty()) {
         TRACE("Match Iterator: no more match found reset functor");
         match_functor_ = 0;
+        set_min_weight_ = {};
       }
     }
   }
