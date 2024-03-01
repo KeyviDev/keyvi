@@ -76,3 +76,16 @@ def test_prefix_simple():
             "eric bllllx",
             "eric blu",
         ]
+
+
+def test_mismatches():
+    c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
+    c.Add("a", 33)
+    c.Add("ab", 33)
+    c.Add("abcd", 233)
+    with tmp_dictionary(c, "completion.kv") as d:
+        assert [m.matched_string for m in d.complete_prefix("v")] == []
+        assert [m.matched_string for m in d.complete_prefix("vwxyz")] == []
+        assert [m.matched_string for m in d.complete_prefix("av")] == []
+        assert [m.matched_string for m in d.complete_prefix("abcde")] == []
+        assert [m.matched_string for m in d.complete_prefix(" ")] == []

@@ -96,7 +96,7 @@ class PrefixCompletionMatching final {
 
     TRACE("state %d", state);
 
-    if (depth != query_length) {
+    if (state == 0) {
       return PrefixCompletionMatching();
     }
 
