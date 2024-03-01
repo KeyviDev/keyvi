@@ -78,8 +78,7 @@ class PrefixCompletionMatching final {
       return PrefixCompletionMatching();
     }
 
-    std::unique_ptr<std::vector<unsigned char>> traversal_stack;
-    traversal_stack.reset(new std::vector<unsigned char>());
+    std::unique_ptr<std::vector<unsigned char>> traversal_stack = std::make_unique<std::vector<unsigned char>>();
     traversal_stack->reserve(1024);
 
     const size_t query_length = query.size();
@@ -103,9 +102,7 @@ class PrefixCompletionMatching final {
 
     TRACE("matched prefix, length %d", depth);
 
-    std::shared_ptr<std::string> prefix = std::make_shared<std::string>(query);
-    std::unique_ptr<innerTraverserType> traverser;
-    traverser.reset(new innerTraverserType(fsa, state));
+    std::unique_ptr<innerTraverserType> traverser = std::make_unique<innerTraverserType>(fsa, state);
 
     if (fsa->IsFinalState(state)) {
       first_match = Match(0, query_length, query, 0, fsa, fsa->GetStateValue(state), fsa->GetWeightValue(state));
@@ -144,8 +141,7 @@ class PrefixCompletionMatching final {
     }
 
     // create the traversal stack
-    std::unique_ptr<std::vector<unsigned char>> traversal_stack;
-    traversal_stack.reset(new std::vector<unsigned char>());
+    std::unique_ptr<std::vector<unsigned char>> traversal_stack = std::make_unique<std::vector<unsigned char>>();
     traversal_stack->reserve(1024);
 
     for (const char& c : query) {
@@ -163,8 +159,7 @@ class PrefixCompletionMatching final {
       }
     }
 
-    std::unique_ptr<innerTraverserType> traverser;
-    traverser.reset(new innerTraverserType(fsa_start_state_pairs));
+    std::unique_ptr<innerTraverserType> traverser = std::make_unique<innerTraverserType>(fsa_start_state_pairs);
 
     return PrefixCompletionMatching(std::move(traverser), std::move(first_match), std::move(traversal_stack),
                                     query_length);
