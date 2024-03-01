@@ -131,7 +131,7 @@ class PrefixCompletionMatching final {
         state = fsa->TryWalkTransition(state, query[depth++]);
       }
 
-      if (depth == query_length) {
+      if (state != 0) {
         fsa_start_state_pairs.emplace_back(fsa, state);
       }
     }

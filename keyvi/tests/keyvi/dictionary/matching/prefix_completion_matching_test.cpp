@@ -127,11 +127,14 @@ BOOST_AUTO_TEST_CASE(prefix_1) {
   test_prefix_completion_matching(&test_data, "aa", std::vector<std::string>{"aa", "aacd", "aabc", "aabb", "aaaa"});
 }
 
-BOOST_AUTO_TEST_CASE(prefix_completion_empty_input) {
+BOOST_AUTO_TEST_CASE(prefix_completion_edge_cases) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {
       {"aaaa", 1000}, {"aabb", 1001}, {"aabc", 1002}, {"aacd", 1030}, {"bbcd", 1040}};
 
   test_prefix_completion_matching(&test_data, "", std::vector<std::string>{"bbcd", "aacd", "aabc", "aabb", "aaaa"});
+  test_prefix_completion_matching(&test_data, "c", {});
+  test_prefix_completion_matching(&test_data, "cc", {});
+  test_prefix_completion_matching(&test_data, " ", {});
 }
 
 BOOST_AUTO_TEST_CASE(prefix_completion_cjk) {
