@@ -239,7 +239,7 @@ class Automata final {
                                      traversal::TraversalPayload<TransitionT>* payload) const {
     // reset the state
     traversal_state->Clear();
-    uint32_t parent_weight = GetWeightValue(starting_state);
+    uint32_t parent_weight = GetInnerWeight(starting_state);
 
 #if defined(KEYVI_SSE42)
     // Optimized version using SSE4.2, see http://www.strchr.com/strcmp_and_strlen_using_sse_4.2
@@ -262,7 +262,7 @@ class Automata final {
           if ((mask_int & 1) == 1) {
             TRACE("push symbol+%d", symbol + i);
             uint64_t child_state = ResolvePointer(starting_state, symbol + i);
-            uint32_t weight = GetWeightValue(child_state);
+            uint32_t weight = GetInnerWeight(child_state);
             weight = weight != 0 ? weight : parent_weight;
             traversal_state->Add(child_state, weight, symbol + i, payload);
           }
@@ -285,49 +285,49 @@ class Automata final {
 
       if (((xor_labels_with_mask & 0x00000000000000ffULL) == 0)) {
         uint64_t child_state = ResolvePointer(starting_state, symbol);
-        uint32_t weight = GetWeightValue(child_state);
+        uint32_t weight = GetInnerWeight(child_state);
         weight = weight != 0 ? weight : parent_weight;
         traversal_state->Add(child_state, weight, symbol, payload);
       }
       if ((xor_labels_with_mask & 0x000000000000ff00ULL) == 0) {
         uint64_t child_state = ResolvePointer(starting_state, symbol + 1);
-        uint32_t weight = GetWeightValue(child_state);
+        uint32_t weight = GetInnerWeight(child_state);
         weight = weight != 0 ? weight : parent_weight;
         traversal_state->Add(child_state, weight, symbol + 1, payload);
       }
       if ((xor_labels_with_mask & 0x0000000000ff0000ULL) == 0) {
         uint64_t child_state = ResolvePointer(starting_state, symbol + 2);
-        uint32_t weight = GetWeightValue(child_state);
+        uint32_t weight = GetInnerWeight(child_state);
         weight = weight != 0 ? weight : parent_weight;
         traversal_state->Add(child_state, weight, symbol + 2, payload);
       }
       if ((xor_labels_with_mask & 0x00000000ff000000ULL) == 0) {
         uint64_t child_state = ResolvePointer(starting_state, symbol + 3);
-        uint32_t weight = GetWeightValue(child_state);
+        uint32_t weight = GetInnerWeight(child_state);
         weight = weight != 0 ? weight : parent_weight;
         traversal_state->Add(child_state, weight, symbol + 3, payload);
       }
       if ((xor_labels_with_mask & 0x000000ff00000000ULL) == 0) {
         uint64_t child_state = ResolvePointer(starting_state, symbol + 4);
-        uint32_t weight = GetWeightValue(child_state);
+        uint32_t weight = GetInnerWeight(child_state);
         weight = weight != 0 ? weight : parent_weight;
         traversal_state->Add(child_state, weight, symbol + 4, payload);
       }
       if ((xor_labels_with_mask & 0x0000ff0000000000ULL) == 0) {
         uint64_t child_state = ResolvePointer(starting_state, symbol + 5);
-        uint32_t weight = GetWeightValue(child_state);
+        uint32_t weight = GetInnerWeight(child_state);
         weight = weight != 0 ? weight : parent_weight;
         traversal_state->Add(child_state, weight, symbol + 5, payload);
       }
       if ((xor_labels_with_mask & 0x00ff000000000000ULL) == 0) {
         uint64_t child_state = ResolvePointer(starting_state, symbol + 6);
-        uint32_t weight = GetWeightValue(child_state);
+        uint32_t weight = GetInnerWeight(child_state);
         weight = weight != 0 ? weight : parent_weight;
         traversal_state->Add(child_state, weight, symbol + 6, payload);
       }
       if ((xor_labels_with_mask & 0xff00000000000000ULL) == 0) {
         uint64_t child_state = ResolvePointer(starting_state, symbol + 7);
-        uint32_t weight = GetWeightValue(child_state);
+        uint32_t weight = GetInnerWeight(child_state);
         weight = weight != 0 ? weight : parent_weight;
         traversal_state->Add(child_state, weight, symbol + 7, payload);
       }
@@ -356,12 +356,17 @@ class Automata final {
     return keyvi::util::decodeVarShort(transitions_compact_ + state + FINAL_OFFSET_TRANSITION);
   }
 
-  uint32_t GetWeightValue(uint64_t state) const {
+  uint32_t GetInnerWeight(uint64_t state) const {
     if (labels_[state + INNER_WEIGHT_TRANSITION_COMPACT] != 0) {
       return 0;
     }
 
     return (transitions_compact_[state + INNER_WEIGHT_TRANSITION_COMPACT]);
+  }
+
+  uint32_t GetWeight(uint64_t state) const {
+     assert(value_store_reader_);
+    return value_store_reader_->GetWeight(state);
   }
 
   internal::IValueStoreReader::attributes_t GetValueAsAttributeVector(uint64_t state_value) const {
