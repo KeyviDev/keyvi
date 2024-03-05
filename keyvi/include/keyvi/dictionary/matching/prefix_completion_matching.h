@@ -105,7 +105,7 @@ class PrefixCompletionMatching final {
     std::unique_ptr<innerTraverserType> traverser = std::make_unique<innerTraverserType>(fsa, state);
 
     if (fsa->IsFinalState(state)) {
-      first_match = Match(0, query_length, query, 0, fsa, fsa->GetStateValue(state), fsa->GetWeightValue(state));
+      first_match = Match(0, query_length, query, 0, fsa, fsa->GetStateValue(state));
     }
 
     TRACE("create matcher");
@@ -153,8 +153,7 @@ class PrefixCompletionMatching final {
     for (const auto& fsa_state : fsa_start_state_pairs) {
       if (fsa_state.first->IsFinalState(fsa_state.second)) {
         first_match =
-            Match(0, query_length, query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second),
-                  fsa_state.first->GetWeightValue(fsa_state.second));
+            Match(0, query_length, query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
         break;
       }
     }
@@ -178,7 +177,7 @@ class PrefixCompletionMatching final {
 
         TRACE("found final state at depth %d %s", prefix_length_ + traverser_ptr_->GetDepth(), match_str.c_str());
         Match m(0, prefix_length_ + traverser_ptr_->GetDepth(), match_str, 0, traverser_ptr_->GetFsa(),
-                traverser_ptr_->GetStateValue(), traverser_ptr_->GetInnerWeight());
+                traverser_ptr_->GetStateValue());
 
         (*traverser_ptr_)++;
         return m;
