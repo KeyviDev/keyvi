@@ -177,3 +177,7 @@
     def IsEmpty(self, *args):
         """deprecated, use bool operator"""
         return not call_deprecated_method("IsEmpty", "__bool__", self.__bool__, *args)
+
+    @property
+    def weight(self):
+        return self.inst.get().GetWeight()

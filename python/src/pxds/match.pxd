@@ -15,6 +15,7 @@ cdef extern from "keyvi/dictionary/match.h" namespace "keyvi::dictionary":
         void SetEnd(size_t end) # wrap-ignore
         float GetScore() # wrap-ignore
         void SetScore(float score) # wrap-ignore
+        uint32_t GetWeight() # wrap-ignore
         libcpp_utf8_output_string GetMatchedString() # wrap-ignore
         void SetMatchedString (libcpp_utf8_string matched_string) # wrap-ignore
         PyObject* GetAttributePy(libcpp_utf8_string) except + nogil # wrap-ignore
