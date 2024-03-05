@@ -64,11 +64,11 @@ def test_prefix_simple():
                 for m in completer:
                     self.visits += 1
                     if len(self.heap) < self.n:
-                        heapq.heappush(self.heap, m.value)
+                        heapq.heappush(self.heap, m.weight)
                         yield m
-                    elif m.value > self.heap[0]:
+                    elif m.weight > self.heap[0]:
                         heapq.heappop(self.heap)
-                        heapq.heappush(self.heap, m.value)
+                        heapq.heappush(self.heap, m.weight)
                         completer.set_min_weight(self.heap[0])
                         yield m
 
