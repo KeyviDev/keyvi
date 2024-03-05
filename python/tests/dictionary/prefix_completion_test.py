@@ -54,28 +54,50 @@ def test_prefix_simple():
             "eric boox",
         ]
 
-        heap = []
+        class TopNFilter:
+            def __init__(self, n) -> None:
+                self.n = n
+                self.heap = []
+                self.visits = 0
 
-        def filter_top_5(completer):
-            for m in completer:
-                if len(heap) < 6:
-                    heapq.heappush(heap, m.score)
-                    yield m
-                elif m.score > heap[0]:
-                    heapq.heappop(heap)
-                    heapq.heappush(heap, m.score)
-                    completer.set_min_weight(m.score)
-                    yield m
+            def filter(self, completer):
+                for m in completer:
+                    self.visits += 1
+                    if len(self.heap) < self.n:
+                        heapq.heappush(self.heap, m.value)
+                        yield m
+                    elif m.value > self.heap[0]:
+                        heapq.heappop(self.heap)
+                        heapq.heappush(self.heap, m.value)
+                        completer.set_min_weight(self.heap[0])
+                        yield m
 
-        # note: we are getting one more("eric"), because of dfs traversal
-        assert [m.matched_string for m in filter_top_5(d.complete_prefix("eric"))] == [
+        top5 = TopNFilter(5)
+        # note: we are getting more erics, because of dfs traversal
+        assert [m.matched_string for m in top5.filter(d.complete_prefix("eric"))] == [
             "eric",
             "eric ble",
             "eric bla",
             "eric blx",
             "eric bllllx",
             "eric blu",
+            "eric boox",
         ]
+
+        # by traversing using min weight, we should _not_ visit all entries
+        assert top5.visits < len(d)
+
+        top3 = TopNFilter(3)
+        # note: getting more erics, because of dfs traversal
+        assert [m.matched_string for m in top3.filter(d.complete_prefix("eric"))] == [
+            "eric",
+            "eric ble",
+            "eric bla",
+            "eric blx",
+        ]
+
+        # top-3 should have less visits than top-5
+        assert top3.visits < top5.visits
 
 
 def test_mismatches():
