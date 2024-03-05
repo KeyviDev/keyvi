@@ -365,7 +365,7 @@ class Automata final {
   }
 
   uint32_t GetWeight(uint64_t state) const {
-     assert(value_store_reader_);
+    assert(value_store_reader_);
     return value_store_reader_->GetWeight(state);
   }
 
@@ -384,9 +384,13 @@ class Automata final {
     return value_store_reader_->GetRawValueAsString(state_value);
   }
 
-  std::string GetStatistics() const { return dictionary_properties_->GetStatistics(); }
+  std::string GetStatistics() const {
+    return dictionary_properties_->GetStatistics();
+  }
 
-  std::string GetManifest() const { return dictionary_properties_->GetManifest(); }
+  std::string GetManifest() const {
+    return dictionary_properties_->GetManifest();
+  }
 
  private:
   dictionary_properties_t dictionary_properties_;
