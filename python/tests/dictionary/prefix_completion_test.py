@@ -62,6 +62,7 @@ def test_prefix_simple():
 
             def filter(self, completer):
                 for m in completer:
+                    assert m.weight == m.value
                     self.visits += 1
                     if len(self.heap) < self.n:
                         heapq.heappush(self.heap, m.weight)
