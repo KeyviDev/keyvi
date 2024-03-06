@@ -88,7 +88,7 @@ class BoundedWeightedStateTraverser final {
 
   uint64_t GetStateValue() { return fsa_->GetStateValue(current_state_); }
 
-  uint32_t GetInnerWeight() { return fsa_->GetWeightValue(current_state_); }
+  uint32_t GetInnerWeight() { return fsa_->GetInnerWeight(current_state_); }
 
   uint64_t GetStateId() { return current_state_; }
 
@@ -220,7 +220,7 @@ class BoundedWeightedStateTraverser final {
       child_node = fsa_->TryWalkTransition(current_state_, i);
       if (child_node) {
         // todo: stop reading the weight dependent on the depth of traversal
-        uint32_t weight = fsa_->GetWeightValue(child_node);
+        uint32_t weight = fsa_->GetInnerWeight(child_node);
 
         // if weight is not set take the weight of the parent
         if (weight == 0) {

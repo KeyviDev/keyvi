@@ -104,6 +104,8 @@ class IntInnerWeightsValueStoreReader final : public IValueStoreReader {
   }
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return std::to_string(fsa_value); }
+
+  uint32_t GetWeight(uint64_t fsa_value) const override { return static_cast<uint32_t>(fsa_value); }
 };
 
 template <>

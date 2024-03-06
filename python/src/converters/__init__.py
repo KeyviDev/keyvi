@@ -1,4 +1,4 @@
-from .pykeyvi_autowrap_conversion_providers import *
+from .match_iterator_converter import *
 from autowrap.ConversionProvider import special_converters
 
 

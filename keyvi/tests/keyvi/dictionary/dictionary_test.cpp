@@ -223,6 +223,80 @@ BOOST_AUTO_TEST_CASE(DictGetZerobyte) {
   BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
 }
 
+BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"eric a", 331}, {"eric b", 1331}, {"eric c", 1431}, {"eric d", 231}, {"eric e", 431},
+      {"eric f", 531}, {"eric g", 631},  {"eric h", 731},  {"eric i", 831}, {"eric j", 131},
+  };
+
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  std::vector<std::string> expected_matches = {"eric c", "eric b", "eric i"};
+
+  size_t i = 0;
+
+  for (auto m : d->GetPrefixCompletion("eric", 3)) {
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
+    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+  }
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
+
+  expected_matches = {"eric c", "eric b", "eric i", "eric h", "eric g"};
+
+  i = 0;
+
+  for (auto m : d->GetPrefixCompletion("eric", 5)) {
+    if (i >= expected_matches.size()) {
+      BOOST_FAIL("got more results than expected.");
+    }
+    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+  }
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
+
+  for (auto m : d->GetPrefixCompletion("steve", 3)) {
+    BOOST_FAIL("expected no match");
+  }
+}
+
+BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {
+      {"mr. eric a", 331},  {"mr. eric b", 1331}, {"mr. max b", 1431},   {"mr. stefan b", 231}, {"mr. stefan e", 431},
+      {"mr. heinz f", 531}, {"mr. karl b", 631},  {"mr. gustav b", 731}, {"mr. gustav h", 831}, {"mr. jeremy j", 131},
+  };
+
+  testing::TempDictionary dictionary(&test_data);
+  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  // all names ending with 'b' and weight > 500
+  std::vector<std::string> expected_matches = {"mr. max b", "mr. eric b", "mr. gustav b", "mr. karl b"};
+
+  size_t i = 0;
+
+  auto completer = d->GetPrefixCompletion("mr. ");
+  auto completer_it = completer.begin();
+
+  while (completer_it != completer.end()) {
+    if (completer_it->GetMatchedString().back() == 'b') {
+      if (i >= expected_matches.size()) {
+        BOOST_FAIL("got more results than expected.");
+      }
+      BOOST_CHECK_EQUAL(expected_matches[i++], completer_it->GetMatchedString());
+    }
+    completer_it.SetMinWeight(500);
+    completer_it++;
+  }
+
+  // test that bogus call does not cause bad_function
+  completer.end().SetMinWeight(5);
+
+  BOOST_CHECK_EQUAL(expected_matches.size(), i);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */

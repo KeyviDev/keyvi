@@ -38,6 +38,8 @@
 #include "keyvi/dictionary/match_iterator.h"
 #include "keyvi/dictionary/matching/fuzzy_matching.h"
 #include "keyvi/dictionary/matching/near_matching.h"
+#include "keyvi/dictionary/matching/prefix_completion_matching.h"
+#include "keyvi/dictionary/util/bounded_priority_queue.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -322,6 +324,40 @@ class Dictionary final {
 
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+  }
+
+  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query) const {
+    auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
+        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query));
+
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(
+        func, data->FirstMatch(),
+        std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
+  }
+
+  MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query, size_t top_n) const {
+    auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
+        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query));
+
+    auto best_weights = std::make_shared<util::BoundedPriorityQueue<uint32_t>>(top_n);
+
+    auto func = [data, best_weights = std::move(best_weights)]() {
+      auto m = data->NextMatch();
+      while (!m.IsEmpty()) {
+        if (m.GetWeight() >= best_weights->Back()) {
+          best_weights->Put(m.GetWeight());
+          return m;
+        }
+
+        m = data->NextMatch();
+      }
+      return Match();
+    };
+
+    return MatchIterator::MakeIteratorPair(
+        func, data->FirstMatch(),
+        std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
   std::string GetManifest() const { return fsa_->GetManifest(); }

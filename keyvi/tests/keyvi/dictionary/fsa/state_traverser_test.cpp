@@ -23,11 +23,12 @@
  *      Author: hendrik
  */
 
+#include "keyvi/dictionary/fsa/state_traverser.h"
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/generator.h"
-#include "keyvi/dictionary/fsa/state_traverser.h"
 #include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
@@ -313,6 +314,91 @@ BOOST_AUTO_TEST_CASE(zeroByte) {
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
   BOOST_CHECK_EQUAL(0, s.GetDepth());
   BOOST_CHECK(s.AtEnd());
+}
+
+BOOST_AUTO_TEST_CASE(traversal_min_weight) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {{"aaaa", 5},  {"aabb", 15}, {"aabc", 10}, {"aacd", 20},
+                                                             {"bbcd", 40}, {"cbcd", 18}, {"cefgh", 12}};
+
+  testing::TempDictionary dictionary(&test_data);
+  automata_t f = dictionary.GetFsa();
+
+  StateTraverser<traversal::WeightedTransition> s(f);
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK_EQUAL(40, s.GetInnerWeight());
+  BOOST_CHECK(!s.AtEnd());
+
+  s++;
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+
+  s++;
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  BOOST_CHECK_EQUAL(40, s.GetInnerWeight());
+  BOOST_CHECK(!s.AtEnd());
+
+  s.SetMinWeight(12);
+  s++;
+  BOOST_CHECK(!s.AtEnd());
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK_EQUAL(20, s.GetInnerWeight());
+  s++;
+
+  BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(1, s.GetDepth());
+  BOOST_CHECK_EQUAL(18, s.GetInnerWeight());
+  s++;
+
+  BOOST_CHECK_EQUAL('b', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('c', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(3, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('d', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(4, s.GetDepth());
+  s++;
+
+  BOOST_CHECK_EQUAL('e', s.GetStateLabel());
+  BOOST_CHECK_EQUAL(2, s.GetDepth());
+  BOOST_CHECK_EQUAL(12, s.GetInnerWeight());
+  s++;
+
+  s.SetMinWeight(20);
+  s++;
+  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK_EQUAL(0, s.GetStateLabel());
+  BOOST_CHECK_EQUAL(0, s.GetDepth());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

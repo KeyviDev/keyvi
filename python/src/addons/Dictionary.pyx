@@ -107,3 +107,4 @@
 
     def GetManifest(self, *args):
         return call_deprecated_method("GetManifest", "manifest", self.manifest, *args)
+

@@ -127,6 +127,16 @@ class IValueStoreReader {
   virtual std::string GetValueAsString(uint64_t fsa_value) const = 0;
 
   /**
+   * Get Weight
+   *
+   * This is only supported by value stores that support weights.
+   *
+   * @param fsa_value
+   * @return the weight
+   */
+  virtual uint32_t GetWeight(uint64_t fsa_value) const { return 0; }
+
+  /**
    * Test whether this value store is compatible to the given value store.
    * Throws if they are not compatible.
    *
