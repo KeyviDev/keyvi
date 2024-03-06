@@ -1,4 +1,3 @@
-from libc.string cimport const_uchar
 from libcpp.string cimport string as libcpp_string
 from libcpp.string cimport string as libcpp_utf8_string
 from libcpp.string cimport string as libcpp_utf8_output_string
