@@ -29,14 +29,10 @@
 #include <vector>
 
 #include "keyvi/dictionary/fsa/automata.h"
-#include "keyvi/dictionary/fsa/codepoint_state_traverser.h"
 #include "keyvi/dictionary/fsa/traverser_types.h"
 #include "keyvi/dictionary/fsa/zip_state_traverser.h"
 #include "keyvi/dictionary/match.h"
 #include "keyvi/dictionary/util/transform.h"
-#include "keyvi/dictionary/util/utf8_utils.h"
-#include "keyvi/stringdistance/levenshtein.h"
-#include "utf8.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -61,6 +57,7 @@ class MultiwordCompletionMatching final {
    *
    * @param fsa the fsa
    * @param query the query
+   * @param multiword_separator separator used during compile for separating lookup key and matched string
    */
   static MultiwordCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query,
                                                    const unsigned char multiword_separator = 0x1b) {
@@ -72,6 +69,7 @@ class MultiwordCompletionMatching final {
    *
    * @param fsa the fsa
    * @param start_state the state to start from
+   * @param multiword_separator separator used during compile for separating lookup key and matched string
    * @param query the query
    */
   static MultiwordCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state,
@@ -123,6 +121,7 @@ class MultiwordCompletionMatching final {
    *
    * @param fsas a vector of fsas
    * @param query the query
+   * @param multiword_separator separator used during compile for separating lookup key and matched string
    */
   static MultiwordCompletionMatching FromMulipleFsas(const std::vector<fsa::automata_t>& fsas, const std::string& query,
                                                      const unsigned char multiword_separator = 0x1b) {
