@@ -189,7 +189,6 @@ class MultiwordCompletionMatching final {
       if (label == 0x20 && multiword_boundary_ == 0) {
         TRACE("found space before MW boundary at %d", multiword_boundary_);
         traverser_ptr_->Prune();
-        (*traverser_ptr_)++;
         continue;
       }
 
