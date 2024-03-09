@@ -108,8 +108,7 @@ class FuzzyMultiwordCompletionMatching final {
           break;
         }
       }
-      auto s = metric->Put(codepoints[depth], depth);
-      TRACE("s %d", s);
+      metric->Put(codepoints[depth], depth);
       ++depth;
     }
 
