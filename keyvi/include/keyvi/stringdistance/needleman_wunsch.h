@@ -36,7 +36,7 @@
 #include "keyvi/stringdistance/distance_matrix.h"
 #include "utf8.h"
 
-#define ENABLE_TRACING
+// #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
@@ -115,8 +115,7 @@ class NeedlemanWunsch final {
     if (left_cutoff >= columns) {
       // last character == exact match?
       if (row > completion_row_ || input_sequence_.empty() ||
-           compare_sequence_[columns - 2] == input_sequence_.back()) {
-      //if (row > completion_row_ || input_sequence_.empty()) {
+          compare_sequence_[columns - 2] == input_sequence_.back()) {
         intermediate_scores_[row] = intermediate_scores_[row - 1] + cost_function_.GetCompletionCost();
       } else {
         intermediate_scores_[row] = intermediate_scores_[row - 1] + cost_function_.GetInsertionCost(codepoint);
