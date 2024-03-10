@@ -36,7 +36,7 @@
 #include "keyvi/stringdistance/distance_matrix.h"
 #include "utf8.h"
 
-// #define ENABLE_TRACING
+#define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
 
 namespace keyvi {
@@ -115,7 +115,8 @@ class NeedlemanWunsch final {
     if (left_cutoff >= columns) {
       // last character == exact match?
       if (row > completion_row_ || input_sequence_.empty() ||
-          compare_sequence_[columns - 2] == input_sequence_.back()) {
+           compare_sequence_[columns - 2] == input_sequence_.back()) {
+      //if (row > completion_row_ || input_sequence_.empty()) {
         intermediate_scores_[row] = intermediate_scores_[row - 1] + cost_function_.GetCompletionCost();
       } else {
         intermediate_scores_[row] = intermediate_scores_[row - 1] + cost_function_.GetInsertionCost(codepoint);
@@ -145,10 +146,11 @@ class NeedlemanWunsch final {
         int32_t completion_result = std::numeric_limits<int32_t>::max();
 
         if (row > completion_row_) {
-          completion_result = distance_matrix_.Get(completion_row_, column) + cost_function_.GetCompletionCost();
+          completion_result = distance_matrix_.Get(row - 1, column) + cost_function_.GetCompletionCost();
         } else if (column + 1 == columns && columns > 1 &&
                    compare_sequence_[last_put_position_ - 1] == input_sequence_.back()) {
           completion_row_ = row;
+          TRACE("set completion row %d columns: %d", row, columns);
           completion_result = distance_matrix_.Get(row - 1, column) + cost_function_.GetCompletionCost();
         }
 
