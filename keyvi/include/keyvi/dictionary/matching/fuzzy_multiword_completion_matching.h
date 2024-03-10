@@ -90,8 +90,11 @@ class FuzzyMultiwordCompletionMatching final {
 
     std::vector<uint32_t> codepoints;
     utf8::unchecked::utf8to32(query_bow.begin(), query_bow.end(), back_inserter(codepoints));
-    const size_t query_length = codepoints.size();
-    size_t exact_prefix = std::min(query_length, minimum_exact_prefix);
+    const size_t utf8_query_length = codepoints.size();
+
+    if (utf8_query_length < minimum_exact_prefix) {
+      return FuzzyMultiwordCompletionMatching();
+    }
 
     std::unique_ptr<stringdistance::LevenshteinCompletion> metric =
         std::make_unique<stringdistance::LevenshteinCompletion>(codepoints, 20, max_edit_distance);
@@ -100,7 +103,7 @@ class FuzzyMultiwordCompletionMatching final {
     uint64_t state = start_state;
     size_t utf8_depth = 0;
     // match exact
-    while (state != 0 && depth != exact_prefix) {
+    while (state != 0 && depth < minimum_exact_prefix) {
       const size_t code_point_length = util::Utf8Utils::GetCharLength(query[utf8_depth]);
       for (size_t i = 0; i < code_point_length; ++i, ++utf8_depth) {
         state = fsa->TryWalkTransition(state, query[utf8_depth]);
@@ -112,7 +115,7 @@ class FuzzyMultiwordCompletionMatching final {
       ++depth;
     }
 
-    if (state == 0) {
+    if (state == 0 || depth != minimum_exact_prefix) {
       return FuzzyMultiwordCompletionMatching();
     }
 
@@ -121,9 +124,9 @@ class FuzzyMultiwordCompletionMatching final {
     std::unique_ptr<innerTraverserType> traverser = std::make_unique<innerTraverserType>(fsa, state);
 
     Match first_match;
-    if (depth == query_length && fsa->IsFinalState(state)) {
-      TRACE("first_match %d %s", query_length, query);
-      first_match = Match(0, query_length, query, 0, fsa, fsa->GetStateValue(state));
+    if (depth == utf8_query_length && fsa->IsFinalState(state)) {
+      TRACE("first_match %d %s", utf8_query_length, query);
+      first_match = Match(0, utf8_query_length, query, 0, fsa, fsa->GetStateValue(state));
     }
 
     return FuzzyMultiwordCompletionMatching(std::move(traverser), std::move(first_match), std::move(metric),
@@ -147,7 +150,6 @@ class FuzzyMultiwordCompletionMatching final {
     std::vector<uint32_t> codepoints;
     utf8::unchecked::utf8to32(query_bow.begin(), query_bow.end(), back_inserter(codepoints));
     const size_t query_length = codepoints.size();
-    size_t exact_prefix = std::min(query_length, minimum_exact_prefix);
 
     std::unique_ptr<stringdistance::LevenshteinCompletion> metric =
         std::make_unique<stringdistance::LevenshteinCompletion>(codepoints, 20, max_edit_distance);
@@ -159,7 +161,7 @@ class FuzzyMultiwordCompletionMatching final {
       uint64_t state = fsa->GetStartState();
       size_t depth, utf8_depth = 0;
 
-      while (state != 0 && depth != exact_prefix) {
+      while (state != 0 && depth < minimum_exact_prefix) {
         const size_t code_point_length = util::Utf8Utils::GetCharLength(query[utf8_depth]);
         for (size_t i = 0; i < code_point_length; ++i, ++utf8_depth) {
           state = fsa->TryWalkTransition(state, query[utf8_depth]);
@@ -170,7 +172,7 @@ class FuzzyMultiwordCompletionMatching final {
         ++depth;
       }
 
-      if (state != 0) {
+      if (state != 0 && depth == minimum_exact_prefix) {
         fsa_start_state_pairs.emplace_back(fsa, state);
       }
     }
@@ -181,7 +183,7 @@ class FuzzyMultiwordCompletionMatching final {
 
     size_t depth = 0;
     // fill the metric
-    for (size_t utf8_depth = 0; utf8_depth < exact_prefix; ++utf8_depth) {
+    for (size_t utf8_depth = 0; utf8_depth < minimum_exact_prefix; ++utf8_depth) {
       metric->Put(codepoints[utf8_depth], utf8_depth);
     }
 
@@ -232,6 +234,7 @@ class FuzzyMultiwordCompletionMatching final {
 
       // only match up to the number of tokens in input
       if (label == 0x20 && multiword_boundary_ == 0) {
+        // todo: should every token be matched with the exact prefix, except for the last token?
         TRACE("push space(%d)", token_start_positions_.size());
         token_start_positions_.push_back(traverser_ptr_->GetDepth());
       }

@@ -129,48 +129,33 @@ def test_multiword_simple():
             c.Add(e, weight)
 
     with tmp_dictionary(c, "completion.kv") as d:
-        assert [m.matched_string for m in d.complete_multiword("zombies 8")] == [
-            "80s movie with zombies"
-        ]
-        assert [m.matched_string for m in d.complete_multiword("80s mo")] == [
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("zonbies 8", 1)
+        ] == ["80s movie with zombies"]
+        assert [m.matched_string for m in d.complete_fuzzy_multiword("80th mo", 2)] == [
             "80s movie with zombies",
             "80s monsters tribute art",
         ]
-        assert [m.matched_string for m in d.complete_multiword("with 80")] == [
-            "80s movie with zombies",
-            "80s cartoon with cars",
-        ]
-        assert [m.matched_string for m in d.complete_multiword("techno fa")] == [
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("witsah 80s", 3)
+        ] == ["80s movie with zombies", "80s cartoon with cars"]
+
+        # todo: this should work with edit distance 1
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("tehno fa", 2)
+        ] == [
             "80s techno fashion",
         ]
-        assert [m.matched_string for m in d.complete_multiword("90s")] == []
-
         assert [
-            m.matched_string
-            for m in sorted(
-                [m for m in d.complete_multiword("80")],
-                key=lambda m: m.weight,
-                reverse=True,
-            )
+            m.matched_string for m in d.complete_fuzzy_multiword("teschno fa", 1)
         ] == [
-            k
-            for k, v in sorted(
-                multiword_data.items(), key=lambda item: item[1]["w"], reverse=True
-            )
-            if len(k.split(" ")) < 5
+            "80s techno fashion",
         ]
 
-        assert set(
-            m.matched_string
-            for m in sorted(
-                [m for m in d.complete_multiword("")],
-                key=lambda m: m.weight,
-                reverse=True,
-            )
-        ) == set(
-            k
-            for k, v in sorted(
-                multiword_data.items(), key=lambda item: item[1]["w"], reverse=True
-            )
-            if len(k.split(" ")) < 5
-        )
+        assert [m.matched_string for m in d.complete_fuzzy_multiword("90s", 10)] == []
+
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("80s xxxf", 3)
+        ] == ["80s techno fashion"]
+
+        assert [m.matched_string for m in d.complete_fuzzy_multiword("", 10)] == []
