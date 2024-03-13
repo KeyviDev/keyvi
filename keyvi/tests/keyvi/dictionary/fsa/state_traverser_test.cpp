@@ -401,6 +401,26 @@ BOOST_AUTO_TEST_CASE(traversal_min_weight) {
   BOOST_CHECK_EQUAL(0, s.GetDepth());
 }
 
+BOOST_AUTO_TEST_CASE(traversal_inner_weight_long_entry) {
+  std::vector<std::pair<std::string, uint32_t>> test_data = {{std::string(500, 'a'), 300}};
+
+  testing::TempDictionary dictionary(&test_data);
+  automata_t f = dictionary.GetFsa();
+
+  StateTraverser<traversal::WeightedTransition> s(f);
+
+  int steps = 0;
+  while (s) {
+    ++steps;
+    BOOST_CHECK_EQUAL('a', s.GetStateLabel());
+    BOOST_CHECK_EQUAL(steps, s.GetDepth());
+    BOOST_CHECK_EQUAL(300, s.GetInnerWeight());
+    s++;
+  }
+
+  BOOST_CHECK_EQUAL(500, steps);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace fsa */

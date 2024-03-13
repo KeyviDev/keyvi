@@ -50,7 +50,7 @@ class StateTraverser final {
   explicit StateTraverser(automata_t f)
       : fsa_(f), current_state_(f->GetStartState()), current_weight_(0), current_label_(0), at_end_(false), stack_() {
     TRACE("StateTraverser starting with Start state %d", current_state_);
-    f->GetOutGoingTransitions(current_state_, &stack_.GetStates(), &stack_.traversal_stack_payload);
+    f->GetOutGoingTransitions(current_state_, &stack_.GetStates(), &stack_.traversal_stack_payload, 0);
 
     this->operator++(0);
   }
@@ -61,7 +61,8 @@ class StateTraverser final {
     current_state_ = start_state;
 
     TRACE("StateTraverser starting with Start state %d", current_state_);
-    f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload);
+    f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload,
+                              f->GetInnerWeight(start_state));
 
     if (advance) {
       this->operator++(0);
@@ -71,7 +72,8 @@ class StateTraverser final {
   StateTraverser(automata_t f, const uint64_t start_state, const bool advance = true)
       : fsa_(f), current_state_(start_state), current_weight_(0), current_label_(0), at_end_(false), stack_() {
     TRACE("StateTraverser starting with Start state %d", current_state_);
-    f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload);
+    f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload,
+                              f->GetInnerWeight(start_state));
 
     if (advance) {
       this->operator++(0);
@@ -149,7 +151,7 @@ class StateTraverser final {
     current_weight_ = stack_.GetStates().GetNextInnerWeight();
     TRACE("Label: %c", current_label_);
     stack_++;
-    fsa_->GetOutGoingTransitions(current_state_, &stack_.GetStates(), &stack_.traversal_stack_payload);
+    fsa_->GetOutGoingTransitions(current_state_, &stack_.GetStates(), &stack_.traversal_stack_payload, current_weight_);
     TRACE("found %ld outgoing states", stack_.GetStates().size());
   }
 
