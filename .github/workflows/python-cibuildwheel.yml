@@ -76,13 +76,13 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: |
           brew update && \
-          brew install ccache
+          brew install --overwrite ccache
 
       - name: install mac dependencies X86_64
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'x86_64') }}
         run: |
           brew update && \
-          brew install zlib snappy boost
+          brew install --overwrite zlib snappy boost
 
       - name: install mac dependencies arm64
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'arm64') }}

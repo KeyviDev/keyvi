@@ -31,7 +31,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
-          brew install zlib snappy boost
+          brew install --overwrite zlib snappy boost
       - name: checkout from git
         uses: actions/checkout@v4
 
