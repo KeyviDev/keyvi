@@ -77,7 +77,7 @@ jobs:
         run: |
           brew update && \
           brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done && \
-          brew install overwrite ccache
+          brew install ccache
 
       - name: install mac dependencies X86_64
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'x86_64') }}
