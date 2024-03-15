@@ -251,7 +251,7 @@ class FuzzyMultiwordCompletionMatching final {
 
       if (traverser_ptr_->IsFinalState()) {
         std::string match_str = multiword_boundary_ > 0
-                                    ? distance_metric_->GetCandidate().substr(prefix_length_ + multiword_boundary_)
+                                    ? distance_metric_->GetCandidate(prefix_length_ + multiword_boundary_)
                                     : distance_metric_->GetCandidate();
 
         TRACE("found final state at depth %d %s", prefix_length_ + traverser_ptr_->GetDepth(), match_str.c_str());

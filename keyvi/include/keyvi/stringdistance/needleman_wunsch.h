@@ -198,9 +198,9 @@ class NeedlemanWunsch final {
 
   int32_t GetScore() const { return distance_matrix_.Get(latest_calculated_row_, distance_matrix_.Columns() - 1); }
 
-  std::string GetCandidate() {
+  std::string GetCandidate(size_t pos = 0) {
     std::vector<unsigned char> utf8result;
-    utf8::utf32to8(compare_sequence_.begin(), compare_sequence_.begin() + last_put_position_ + 1,
+    utf8::utf32to8(compare_sequence_.begin() + pos, compare_sequence_.begin() + last_put_position_ + 1,
                    back_inserter(utf8result));
 
     return std::string(utf8result.begin(), utf8result.end());
