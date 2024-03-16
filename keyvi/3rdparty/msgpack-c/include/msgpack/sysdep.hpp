@@ -26,6 +26,13 @@
     typedef unsigned __int32 uint32_t;
     typedef signed __int64 int64_t;
     typedef unsigned __int64 uint64_t;
+#   if defined(_WIN64)
+        typedef signed __int64 intptr_t;
+        typedef unsigned __int64 uintptr_t;
+#   else
+        typedef signed __int32 intptr_t;
+        typedef unsigned __int32 uintptr_t;
+#   endif
 #elif defined(_MSC_VER)  // && _MSC_VER >= 1600
 #   include <stdint.h>
 #else
@@ -81,16 +88,24 @@
 #elif defined(unix) || defined(__unix) || defined(__APPLE__) || defined(__OpenBSD__)
 
 #include <arpa/inet.h>  /* __BYTE_ORDER */
-#   if defined(linux)
+#   if defined(linux) || defined(__linux__)
 #       include <byteswap.h>
 #   endif
 
 #endif
 
 #if !defined(MSGPACK_ENDIAN_LITTLE_BYTE) && !defined(MSGPACK_ENDIAN_BIG_BYTE)
+
+#if defined(MSGPACK_NO_BOOST)
+#include <msgpack/predef/other/endian.h>
+#else  // defined(MSGPACK_NO_BOOST)
 #include <boost/predef/other/endian.h>
+
 #define MSGPACK_ENDIAN_LITTLE_BYTE BOOST_ENDIAN_LITTLE_BYTE
 #define MSGPACK_ENDIAN_BIG_BYTE BOOST_ENDIAN_BIG_BYTE
+
+#endif // defined(MSGPACK_NO_BOOST)
+
 #endif // !defined(MSGPACK_ENDIAN_LITTLE_BYTE) && !defined(MSGPACK_ENDIAN_BIG_BYTE)
 
 #if MSGPACK_ENDIAN_LITTLE_BYTE

@@ -74,12 +74,13 @@ struct Match {
   typedef std::shared_ptr<boost::container::flat_map<std::string, boost::variant<std::string, int, double, bool>>>
       attributes_t;
 
-  Match(size_t a, size_t b, const std::string& matched_item, uint32_t score = 0)
+  Match(size_t a, size_t b, const std::string& matched_item, uint32_t score = 0, uint32_t weight = 0)
       : start_(a), end_(b), matched_item_(matched_item), raw_value_(), score_(score) {
     TRACE("initialized Match %d->%d %s", a, b, matched_item.c_str());
   }
 
-  Match(size_t a, size_t b, const std::string& matched_item, uint32_t score, const fsa::automata_t& fsa, uint64_t state)
+  Match(size_t a, size_t b, const std::string& matched_item, uint32_t score, const fsa::automata_t& fsa, uint64_t state,
+        uint32_t weight = 0)
       : start_(a), end_(b), matched_item_(matched_item), raw_value_(), score_(score), fsa_(fsa), state_(state) {
     TRACE("initialized Match %d->%d %s", a, b, matched_item.c_str());
   }
@@ -141,6 +142,14 @@ struct Match {
     (*attributes_)[key] = value;
   }
 
+  uint32_t GetWeight() const {
+    if (!fsa_) {
+      return 0;
+    }
+
+    return fsa_->GetWeight(state_);
+  }
+
   std::string GetValueAsString() const {
     if (!fsa_) {
       if (raw_value_.size() != 0) {
@@ -175,7 +184,9 @@ struct Match {
    *
    * @param value
    */
-  void SetRawValue(const std::string& value) { raw_value_ = value; }
+  void SetRawValue(const std::string& value) {
+    raw_value_ = value;
+  }
 
  private:
   size_t start_ = 0;
@@ -193,7 +204,9 @@ struct Match {
   template <class MatcherT, class DeletedT>
   friend Match index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
 
-  fsa::automata_t& GetFsa() { return fsa_; }
+  fsa::automata_t& GetFsa() {
+    return fsa_;
+  }
 };
 
 } /* namespace dictionary */

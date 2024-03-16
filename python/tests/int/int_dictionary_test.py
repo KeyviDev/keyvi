@@ -21,6 +21,6 @@ def test_manifest():
     c["Kif"] = 2
     c.SetManifest('{"drink": "slurm"}')
     with tmp_dictionary(c, 'slurm.kv') as d:
-        m = json.loads(d.GetManifest())
-        assert 9223372036854775 == d.get('Leela').GetValue()
+        m = json.loads(d.manifest())
+        assert 9223372036854775 == d.get('Leela').value
         assert m['drink'] == "slurm"

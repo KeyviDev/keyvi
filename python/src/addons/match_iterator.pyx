@@ -41,3 +41,6 @@ cdef class MatchIterator:
         py_result.inst = shared_ptr[_Match](_r)
 
         return py_result
+
+    def set_min_weight(self, w):
+        self.it.SetMinWeight(w)

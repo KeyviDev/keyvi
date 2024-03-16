@@ -1,6 +1,6 @@
 ##
 [![BuildBadge](https://github.com/KeyviDev/keyvi/workflows/Build%20keyvi/badge.svg)](https://github.com/KeyviDev/keyvi/actions)
-[![C++](https://img.shields.io/badge/C%2B%2B-11-blue.svg)](/keyvi/README.md)
+[![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](/keyvi/README.md)
 [![PythonVersions](https://img.shields.io/pypi/pyversions/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PythonImpl](https://img.shields.io/pypi/implementation/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PythonFormat](https://img.shields.io/pypi/format/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
@@ -74,7 +74,6 @@ keyvi is licensed under Apache License 2.0("ALv2"), see [license](LICENSE) for d
 | msgpack-c                   | Boost Software License  |
 | RapidJSON                   | MIT License             |
 | Snappy                      | BSD                     |
-| tiny-process-library        | MIT License             |
 | Zlib                        | Zlib License            |
 
 

@@ -1,3 +1,7 @@
+FIND_PACKAGE (Threads REQUIRED)
+
+FIND_PACKAGE (Boost COMPONENTS timer)
+
 LIST (APPEND exec_PROGRAMS
     class_intrusive.cpp
     class_intrusive_map.cpp
@@ -22,12 +26,15 @@ IF (NOT MSVC)
     )
 ENDIF ()
 
-if (Boost_TIMER_LIBRARY)
-    LIST (APPEND with_boost_lib_PROGRAMS
-        speed_test.cpp
-        speed_test_nested_array.cpp
-    )
-endif()
+
+IF (MSGPACK_USE_BOOST)
+    IF (Boost_TIMER_LIBRARY)
+        LIST (APPEND with_boost_lib_PROGRAMS
+            speed_test.cpp
+            speed_test_nested_array.cpp
+        )
+    ENDIF ()
+ENDIF ()
 
 FOREACH (source_file ${exec_PROGRAMS})
     GET_FILENAME_COMPONENT (source_file_we ${source_file} NAME_WE)
@@ -35,9 +42,8 @@ FOREACH (source_file ${exec_PROGRAMS})
         ${source_file_we}
         ${source_file}
     )
-    TARGET_INCLUDE_DIRECTORIES (${source_file_we}
-        PRIVATE
-            $<TARGET_PROPERTY:msgpackcxx,INTERFACE_INCLUDE_DIRECTORIES>
+    TARGET_LINK_LIBRARIES (${source_file_we} PRIVATE
+        msgpack-cxx
     )
     IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wall -Wextra")
@@ -57,12 +63,9 @@ FOREACH (source_file ${with_pthread_PROGRAMS})
         ${source_file_we}
         ${source_file}
     )
-    TARGET_INCLUDE_DIRECTORIES (${source_file_we}
-        PRIVATE
-            $<TARGET_PROPERTY:msgpackcxx,INTERFACE_INCLUDE_DIRECTORIES>
-    )
-    TARGET_LINK_LIBRARIES (${source_file_we}
-        ${CMAKE_THREAD_LIBS_INIT}
+    TARGET_LINK_LIBRARIES (${source_file_we} PRIVATE
+        msgpack-cxx
+        Threads::Threads
     )
     IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         SET_PROPERTY (TARGET ${source_file_we} APPEND_STRING PROPERTY COMPILE_FLAGS " -Wall -Wextra")
@@ -77,27 +80,17 @@ FOREACH (source_file ${with_pthread_PROGRAMS})
 ENDFOREACH ()
 
 FOREACH (source_file ${with_boost_lib_PROGRAMS})
-    INCLUDE_DIRECTORIES (
-        ../include
-        ${Boost_INCLUDE_DIRS}
-    )
     GET_FILENAME_COMPONENT (source_file_we ${source_file} NAME_WE)
     ADD_EXECUTABLE (
         ${source_file_we}
         ${source_file}
     )
-    TARGET_INCLUDE_DIRECTORIES (${source_file_we}
-        PRIVATE
-            $<TARGET_PROPERTY:msgpackcxx,INTERFACE_INCLUDE_DIRECTORIES>
-    )
-    LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-    TARGET_LINK_LIBRARIES (${source_file_we}
-        ${Boost_TIMER_LIBRARY}
-        ${Boost_CHRONO_LIBRARY}
-        ${Boost_SYSTEM_LIBRARY}
+    TARGET_LINK_LIBRARIES (${source_file_we} PRIVATE
+        msgpack-cxx
+        Boost::timer
     )
     IF (NOT MSVC AND NOT APPLE)
-        TARGET_LINK_LIBRARIES (${source_file_we}
+        TARGET_LINK_LIBRARIES (${source_file_we} PRIVATE
             rt
         )
     ENDIF ()

@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(wrong_value_store) {
   TempVectorGenerator<JsonVectorGenerator> temp_vector;
   temp_vector.WriteToFile();
 
-  BOOST_CHECK_THROW(std::move(StringVector(temp_vector.filename)), std::invalid_argument);
+  BOOST_CHECK_THROW(StringVector v(temp_vector.filename), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(truncation) {
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(truncation) {
   truncated_file.write(file_content.data(), file_size - 1);
   truncated_file.close();
 
-  BOOST_CHECK_THROW(std::move(JsonVector(truncated_filename)), std::invalid_argument);
+  BOOST_CHECK_THROW(JsonVector v(truncated_filename), std::invalid_argument);
 
   boost::filesystem::remove(truncated_filename);
 }

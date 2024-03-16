@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(GetOutGoingTransitionsWeightTest) {
 
   traversal::TraversalStack<traversal::WeightedTransition> stack;
 
-  f->GetOutGoingTransitions(f->GetStartState(), &stack.GetStates(), &stack.traversal_stack_payload);
+  f->GetOutGoingTransitions(f->GetStartState(), &stack.GetStates(), &stack.traversal_stack_payload, 42);
 
   BOOST_CHECK_EQUAL(1, stack.GetStates().traversal_state_payload.transitions.size());
   BOOST_CHECK_EQUAL(444, stack.GetStates().traversal_state_payload.transitions[0].weight);

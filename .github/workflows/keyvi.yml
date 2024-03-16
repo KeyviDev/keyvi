@@ -20,7 +20,7 @@ jobs:
       fail-fast: false
       matrix:
         type: ['Release', 'Debug']
-        os: ['macos-latest', 'ubuntu-20.04']
+        os: ['macos-latest', 'ubuntu-22.04']
     steps:
       - name: install Linux deps
         if: runner.os == 'Linux'
@@ -31,12 +31,14 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew update
+          # workaround for https://github.com/actions/setup-python/issues/577
+          brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done
           brew install zlib snappy boost
       - name: checkout from git
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.1
+        uses: hendrikmuhs/ccache-action@v1.2.11
         with:
           key: ${{ matrix.os }}-${{ matrix.type }}
 

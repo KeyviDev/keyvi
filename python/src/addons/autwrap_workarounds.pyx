@@ -15,7 +15,12 @@ import msgpack
 import keyvi._pycore
 import os.path
 import sys
+import warnings
 
+
+# definition of progress callback for all compilers
+cdef void progress_compiler_callback(size_t a, size_t b, void* py_callback) noexcept with gil:
+    (<object>py_callback)(a, b)
 
 def get_package_root():
     module_location = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(keyvi._pycore.__file__)), ".."))
@@ -34,7 +39,17 @@ def get_interpreter_executable():
 
     return executable
 
+def call_deprecated_method(deprecated_method_name, new_method_name, new_method, *args):
+    msg = f"{deprecated_method_name} is deprecated and will be removed in a future version. Use {new_method_name} instead."
+    warnings.warn(msg, DeprecationWarning)
+    return new_method(*args)
 
-# definition for all compilers
-cdef void progress_compiler_callback(size_t a, size_t b, void* py_callback) noexcept with gil:
-    (<object>py_callback)(a, b)
+def call_deprecated_method_setter(deprecated_method_name, new_method_name, setter, value):
+    msg = f"{deprecated_method_name} is deprecated and will be removed in a future version. Use {new_method_name} instead."
+    warnings.warn(msg, DeprecationWarning)
+    setter(value)
+
+def call_deprecated_method_getter(deprecated_method_name, new_method_name, getter):
+    msg = f"{deprecated_method_name} is deprecated and will be removed in a future version. Use {new_method_name} instead."
+    warnings.warn(msg, DeprecationWarning)
+    return getter
