@@ -44,13 +44,13 @@ def test_fuzzy_completion():
         assert len(matches) == 9
 
         matches = [m.matched_string for m in completer.GetFuzzyCompletions('tue', 1)]
-        assert len(matches) == 1
+        assert len(matches) == 21
 
         matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuv h', 1)]
-        assert len(matches) == 2
+        assert len(matches) == 8
 
         matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuv h', 2)]
-        assert len(matches) == 7
+        assert len(matches) == 12
 
         matches = [m.matched_string for m in completer.GetFuzzyCompletions('tuk töffnungszeiten', 2)]
         assert len(matches) == 1

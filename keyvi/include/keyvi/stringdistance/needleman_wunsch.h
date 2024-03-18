@@ -61,7 +61,6 @@ class NeedlemanWunsch final {
       : max_distance_(other.max_distance_),
         compare_sequence_(std::move(other.compare_sequence_)),
         intermediate_scores_(std::move(other.intermediate_scores_)),
-        completion_row_(other.completion_row_),
         last_put_position_(other.last_put_position_),
         latest_calculated_row_(other.latest_calculated_row_),
         input_sequence_(std::move(other.input_sequence_)),
@@ -70,7 +69,6 @@ class NeedlemanWunsch final {
     other.max_distance_ = 0;
     other.last_put_position_ = 0;
     other.latest_calculated_row_ = 0;
-    other.completion_row_ = std::numeric_limits<int32_t>::max();
   }
 
   ~NeedlemanWunsch() {}
@@ -82,12 +80,6 @@ class NeedlemanWunsch final {
     // ensure that we have enough rows in the matrix
     EnsureCapacity(row + 1);
     compare_sequence_[position] = codepoint;
-
-    // reset completion row if we walked backwards
-    if (row <= completion_row_) {
-      TRACE("reset completion row");
-      completion_row_ = std::numeric_limits<int32_t>::max();
-    }
 
     last_put_position_ = position;
     size_t columns = distance_matrix_.Columns();
@@ -113,13 +105,8 @@ class NeedlemanWunsch final {
     // if left_cutoff >= columns, the candidate string is longer than the input + max edit distance, we can make a
     // shortcut
     if (left_cutoff >= columns) {
-      // last character == exact match?
-      if (row > completion_row_ || input_sequence_.empty() ||
-          compare_sequence_[columns - 2] == input_sequence_.back()) {
-        intermediate_scores_[row] = intermediate_scores_[row - 1] + cost_function_.GetCompletionCost();
-      } else {
-        intermediate_scores_[row] = intermediate_scores_[row - 1] + cost_function_.GetInsertionCost(codepoint);
-      }
+      intermediate_scores_[row] = intermediate_scores_[row - 1] + std::min(cost_function_.GetCompletionCost(),
+                                                                           cost_function_.GetInsertionCost(codepoint));
       return intermediate_scores_[row];
     }
 
@@ -129,32 +116,24 @@ class NeedlemanWunsch final {
     int32_t field_result;
 
     for (size_t column = left_cutoff; column < right_cutoff; ++column) {
+      TRACE("calculating column %d", column);
       // 1. check for exact match according to the substitution cost
       // function
       int32_t substitution_cost = cost_function_.GetSubstitutionCost(input_sequence_[column - 1], codepoint);
       int32_t substitution_result = substitution_cost + distance_matrix_.Get(row - 1, column - 1);
 
       if (substitution_cost == 0) {
-        // codePoints match
+        // short cut: codePoints match
         field_result = substitution_result;
       } else {
-        // 2. calculate costs for deletion, insertion and transposition
+        // 2. calculate costs for deletion
         int32_t deletion_result =
             distance_matrix_.Get(row, column - 1) + cost_function_.GetDeletionCost(input_sequence_[column - 1]);
 
-        int32_t completion_result = std::numeric_limits<int32_t>::max();
-
-        if (row > completion_row_) {
-          completion_result = distance_matrix_.Get(row - 1, column) + cost_function_.GetCompletionCost();
-        } else if (column + 1 == columns && columns > 1 &&
-                   compare_sequence_[last_put_position_ - 1] == input_sequence_.back()) {
-          completion_row_ = row;
-          TRACE("set completion row %d columns: %d", row, columns);
-          completion_result = distance_matrix_.Get(row - 1, column) + cost_function_.GetCompletionCost();
-        }
-
+        // 3. calculate costs for insertion, transposition
         int32_t insertion_result = distance_matrix_.Get(row - 1, column) + cost_function_.GetInsertionCost(codepoint);
 
+        // 4. calculate costs for transposition (swap of 2 characters: house <--> huose)
         int32_t transposition_result = std::numeric_limits<int32_t>::max();
 
         if (row > 1 && column > 1 && input_sequence_[column - 1] == compare_sequence_[position - 1] &&
@@ -164,15 +143,23 @@ class NeedlemanWunsch final {
               cost_function_.GetTranspositionCost(input_sequence_[column - 1], input_sequence_[column - 2]);
         }
 
-        // 4. take the minimum cost
-        field_result =
-            std::min({deletion_result, insertion_result, transposition_result, substitution_result, completion_result});
+        TRACE("deletion: %d vs. insertion %d vs. transposition %d vs. substitution %d", deletion_result,
+              insertion_result, transposition_result, substitution_result);
+
+        // 5. take the minimum cost
+        field_result = std::min({deletion_result, insertion_result, transposition_result, substitution_result});
       }
 
-      // put cost into matrix
+      // 6. check if we have a completion case, only calculated on the last column
+      if (column + 1 == columns) {
+        field_result =
+            std::min(distance_matrix_.Get(row - 1, column) + cost_function_.GetCompletionCost(), field_result);
+      }
+
+      // 7. put cost into matrix
       distance_matrix_.Set(row, column, field_result);
 
-      // take the best intermediate result from the possible cells in the matrix
+      // 8. keep track of the best intermediate result from the possible cells in the matrix
       if ((column + 1 == columns || column + max_distance_ >= row) && field_result <= intermediate_score) {
         intermediate_score = field_result;
       }
@@ -213,7 +200,6 @@ class NeedlemanWunsch final {
   std::vector<uint32_t> compare_sequence_;
   std::vector<int32_t> intermediate_scores_;
 
-  size_t completion_row_ = 0;
   size_t last_put_position_ = 0;
   size_t latest_calculated_row_ = 0;
 
@@ -228,7 +214,6 @@ class NeedlemanWunsch final {
     }
 
     latest_calculated_row_ = 1;
-    completion_row_ = std::numeric_limits<int32_t>::max();
 
     // initialize compare Sequence and immediateScore
     compare_sequence_.reserve(rows);
@@ -242,9 +227,7 @@ class NeedlemanWunsch final {
 
     if (compare_sequence_.size() < capacity) {
       compare_sequence_.resize(capacity);
-      compare_sequence_.resize(compare_sequence_.capacity());
       intermediate_scores_.resize(capacity);
-      intermediate_scores_.resize(intermediate_scores_.capacity());
     }
   }
 

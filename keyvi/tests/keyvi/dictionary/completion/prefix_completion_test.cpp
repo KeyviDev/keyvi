@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(approx1) {
 
   std::vector<std::string> expected_output;
   expected_output.push_back("aabc");
-  // not matching aabcül because of last character mismatch
+  expected_output.push_back("aabcül");
   expected_output.push_back("aabcdefghijklmnop");  // this matches because aab_c_d, "c" is an insert
 
   auto expected_it = expected_output.begin();

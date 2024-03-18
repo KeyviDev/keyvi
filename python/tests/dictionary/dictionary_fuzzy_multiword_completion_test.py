@@ -34,6 +34,12 @@ multiword_data = {
     "80s video megamix": {"w": 96, "id": "b4"},
 }
 
+multiword_data_non_ascii = {
+    "bäder öfen übelkeit": {"w": 43, "id": "a1"},
+    "übelkeit kräuterschnapps alles gut": {"w": 72, "id": "a2"},
+    "öfen übelkeit rauchvergiftung ": {"w": 372, "id": "a3"},
+}
+
 PERMUTATION_LOOKUP_TABLE = {
     2: [
         [0],
@@ -117,37 +123,40 @@ class MultiWordPermutation:
             )
 
 
-def test_multiword_simple():
+def create_dict(data):
     pipeline = []
     pipeline.append(MultiWordPermutation())
     c = CompletionDictionaryCompiler()
 
-    for key, value in multiword_data.items():
+    for key, value in data.items():
         weight = value["w"]
 
         for e in reduce(lambda x, y: y(x), pipeline, (key, key)):
             c.Add(e, weight)
 
-    with tmp_dictionary(c, "completion.kv") as d:
+    return c
+
+
+def test_multiword_simple():
+    with tmp_dictionary(create_dict(multiword_data), "completion.kv") as d:
         assert [
             m.matched_string for m in d.complete_fuzzy_multiword("zonbies 8", 1)
         ] == ["80s movie with zombies"]
-        #assert [m.matched_string for m in d.complete_fuzzy_multiword("80th mo", 2)] == [
-        #    "80s movie with zombies",
-        #    "80s monsters tribute art",
-        #]
-        #assert [
-        #    m.matched_string for m in d.complete_fuzzy_multiword("witsah 80s", 3)
-        #] == ["80s movie with zombies", "80s cartoon with cars"]
+        assert [m.matched_string for m in d.complete_fuzzy_multiword("80th mo", 2)] == [
+            "80s movie with zombies",
+            "80s monsters tribute art",
+        ]
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("witsah 80s", 3)
+        ] == ["80s movie with zombies", "80s cartoon with cars"]
 
         assert [m.matched_string for m in d.complete_fuzzy_multiword("80ts mo", 1)] == [
             "80s movie with zombies",
             "80s monsters tribute art",
         ]
 
-        # todo: this should work with edit distance 1
         assert [
-            m.matched_string for m in d.complete_fuzzy_multiword("tehno fa", 2)
+            m.matched_string for m in d.complete_fuzzy_multiword("tehno fa", 1)
         ] == [
             "80s techno fashion",
         ]
@@ -164,3 +173,27 @@ def test_multiword_simple():
         ] == ["80s techno fashion"]
 
         assert [m.matched_string for m in d.complete_fuzzy_multiword("", 10)] == []
+
+
+def test_multiword_nonascii():
+    with tmp_dictionary(create_dict(multiword_data_non_ascii), "completion.kv") as d:
+        assert [m.matched_string for m in d.complete_fuzzy_multiword("öfen", 0)] == [
+            "öfen übelkeit rauchvergiftung ",
+            "bäder öfen übelkeit",
+        ]
+        assert [m.matched_string for m in d.complete_fuzzy_multiword("ofen", 1, 0)] == [
+            "öfen übelkeit rauchvergiftung ",
+            "bäder öfen übelkeit",
+        ]
+
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("krauterlc", 2)
+        ] == [
+            "übelkeit kräuterschnapps alles gut",
+        ]
+
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("krauterl", 2)
+        ] == [
+            "übelkeit kräuterschnapps alles gut",
+        ]
