@@ -400,7 +400,7 @@ class Dictionary final {
 
   MatchIterator::MatchIteratorPair GetFuzzyMultiwordCompletion(const std::string& query,
                                                                const int32_t max_edit_distance,
-                                                               const size_t minimum_exact_prefix = 2,
+                                                               const size_t minimum_exact_prefix = 0,
                                                                const unsigned char multiword_separator = 0x1b) const {
     auto data = std::make_shared<matching::FuzzyMultiwordCompletionMatching<>>(
         matching::FuzzyMultiwordCompletionMatching<>::FromSingleFsa(fsa_, query, max_edit_distance,

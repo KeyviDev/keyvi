@@ -142,9 +142,19 @@ def test_multiword_simple():
         assert [
             m.matched_string for m in d.complete_fuzzy_multiword("zonbies 8", 1)
         ] == ["80s movie with zombies"]
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("80th mo", 2, 2)
+        ] == [
+            "80s movie with zombies",
+            "80s monsters tribute art",
+        ]
+
+        # matches 80s movie with zombies twice: 80th -> 80s, 80th -> with
+        # note: order comes from depth first traversal
         assert [m.matched_string for m in d.complete_fuzzy_multiword("80th mo", 2)] == [
             "80s movie with zombies",
             "80s monsters tribute art",
+            "80s movie with zombies",
         ]
         assert [
             m.matched_string for m in d.complete_fuzzy_multiword("witsah 80s", 3)
@@ -166,13 +176,25 @@ def test_multiword_simple():
             "80s techno fashion",
         ]
 
-        assert [m.matched_string for m in d.complete_fuzzy_multiword("90s", 10)] == []
+        assert [
+            m.matched_string for m in d.complete_fuzzy_multiword("90s", 10, 2)
+        ] == []
+
+        # no exact prefix: match all
+        assert len(
+            [m.matched_string for m in d.complete_fuzzy_multiword("90s", 10)]
+        ) == 44
 
         assert [
             m.matched_string for m in d.complete_fuzzy_multiword("80s xxxf", 3)
         ] == ["80s techno fashion"]
 
-        assert [m.matched_string for m in d.complete_fuzzy_multiword("", 10)] == []
+        assert [m.matched_string for m in d.complete_fuzzy_multiword("", 10, 2)] == []
+
+        # no exact prefix: match all
+        assert len(
+            [m.matched_string for m in d.complete_fuzzy_multiword("", 10)]
+        ) == 44
 
 
 def test_multiword_nonascii():

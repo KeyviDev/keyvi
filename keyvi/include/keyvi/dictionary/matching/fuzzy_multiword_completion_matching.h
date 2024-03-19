@@ -80,7 +80,7 @@ class FuzzyMultiwordCompletionMatching final {
    */
   static FuzzyMultiwordCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state,
                                                         const std::string& query, const int32_t max_edit_distance,
-                                                        const size_t minimum_exact_prefix = 2,
+                                                        const size_t minimum_exact_prefix = 0,
                                                         const unsigned char multiword_separator = 0x1b) {
     if (start_state == 0) {
       return FuzzyMultiwordCompletionMatching();
@@ -142,7 +142,7 @@ class FuzzyMultiwordCompletionMatching final {
    */
   static FuzzyMultiwordCompletionMatching FromMulipleFsas(const std::vector<fsa::automata_t>& fsas,
                                                           const std::string& query, const int32_t max_edit_distance,
-                                                          const size_t minimum_exact_prefix = 2,
+                                                          const size_t minimum_exact_prefix = 0,
                                                           const unsigned char multiword_separator = 0x1b) {
     size_t number_of_tokens;
     std::string query_bow = util::Transform::BagOfWordsPartial(query, number_of_tokens);
