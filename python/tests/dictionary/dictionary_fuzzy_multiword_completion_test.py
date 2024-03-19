@@ -37,7 +37,12 @@ multiword_data = {
 multiword_data_non_ascii = {
     "bäder öfen übelkeit": {"w": 43, "id": "a1"},
     "übelkeit kräuterschnapps alles gut": {"w": 72, "id": "a2"},
-    "öfen übelkeit rauchvergiftung ": {"w": 372, "id": "a3"},
+    "öfen übelkeit rauchvergiftung": {"w": 372, "id": "a3"},
+}
+
+multiword_data_stack_corner_case = {
+    "a b c d e f": {"w": 43, "id": "a1"},
+    "a": {"w": 12, "id": "a2"},
 }
 
 PERMUTATION_LOOKUP_TABLE = {
@@ -181,9 +186,9 @@ def test_multiword_simple():
         ] == []
 
         # no exact prefix: match all
-        assert len(
-            [m.matched_string for m in d.complete_fuzzy_multiword("90s", 10)]
-        ) == 44
+        assert (
+            len([m.matched_string for m in d.complete_fuzzy_multiword("90s", 10)]) == 44
+        )
 
         assert [
             m.matched_string for m in d.complete_fuzzy_multiword("80s xxxf", 3)
@@ -192,19 +197,17 @@ def test_multiword_simple():
         assert [m.matched_string for m in d.complete_fuzzy_multiword("", 10, 2)] == []
 
         # no exact prefix: match all
-        assert len(
-            [m.matched_string for m in d.complete_fuzzy_multiword("", 10)]
-        ) == 44
+        assert len([m.matched_string for m in d.complete_fuzzy_multiword("", 10)]) == 44
 
 
 def test_multiword_nonascii():
     with tmp_dictionary(create_dict(multiword_data_non_ascii), "completion.kv") as d:
         assert [m.matched_string for m in d.complete_fuzzy_multiword("öfen", 0)] == [
-            "öfen übelkeit rauchvergiftung ",
+            "öfen übelkeit rauchvergiftung",
             "bäder öfen übelkeit",
         ]
         assert [m.matched_string for m in d.complete_fuzzy_multiword("ofen", 1, 0)] == [
-            "öfen übelkeit rauchvergiftung ",
+            "öfen übelkeit rauchvergiftung",
             "bäder öfen übelkeit",
         ]
 
@@ -218,4 +221,13 @@ def test_multiword_nonascii():
             m.matched_string for m in d.complete_fuzzy_multiword("krauterl", 2)
         ] == [
             "übelkeit kräuterschnapps alles gut",
+        ]
+
+
+def test_multiword_stack_corner_case():
+    with tmp_dictionary(
+        create_dict(multiword_data_stack_corner_case), "completion.kv"
+    ) as d:
+        assert [m.matched_string for m in d.complete_fuzzy_multiword("a", 0)] == [
+            "a",
         ]

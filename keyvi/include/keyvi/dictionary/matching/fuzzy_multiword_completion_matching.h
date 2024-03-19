@@ -209,6 +209,11 @@ class FuzzyMultiwordCompletionMatching final {
       uint64_t label = traverser_ptr_->GetStateLabel();
       TRACE("label [%c] prefix length %ld traverser depth: %ld", label, prefix_length_, traverser_ptr_->GetDepth());
 
+      while (token_start_positions_.size() > 0 && traverser_ptr_->GetDepth() <= token_start_positions_.back()) {
+        TRACE("pop token stack");
+        token_start_positions_.pop_back();
+      }
+
       if (label == multiword_separator_) {
         TRACE("found MW boundary at %d", traverser_ptr_->GetDepth());
         if (token_start_positions_.size() != number_of_tokens_ - 1) {
@@ -224,11 +229,6 @@ class FuzzyMultiwordCompletionMatching final {
         // reset the multiword boundary if we went up
         multiword_boundary_ = 0;
         TRACE("reset MW boundary at %d %d", traverser_ptr_->GetDepth(), multiword_boundary_);
-      }
-
-      if (token_start_positions_.size() > 0 && traverser_ptr_->GetDepth() <= token_start_positions_.back()) {
-        TRACE("pop token stack");
-        token_start_positions_.pop_back();
       }
 
       // only match up to the number of tokens in input
