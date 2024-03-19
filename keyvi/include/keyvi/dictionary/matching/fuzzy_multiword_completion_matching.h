@@ -65,7 +65,7 @@ class FuzzyMultiwordCompletionMatching final {
    */
   static FuzzyMultiwordCompletionMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query,
                                                         const int32_t max_edit_distance,
-                                                        const size_t minimum_exact_prefix = 2,
+                                                        const size_t minimum_exact_prefix = 0,
                                                         const unsigned char multiword_separator = 0x1b) {
     return FromSingleFsa(fsa, fsa->GetStartState(), query, max_edit_distance, minimum_exact_prefix,
                          multiword_separator);
@@ -181,7 +181,6 @@ class FuzzyMultiwordCompletionMatching final {
       return FuzzyMultiwordCompletionMatching();
     }
 
-    size_t depth = 0;
     // fill the metric
     for (size_t utf8_depth = 0; utf8_depth < minimum_exact_prefix; ++utf8_depth) {
       metric->Put(codepoints[utf8_depth], utf8_depth);
