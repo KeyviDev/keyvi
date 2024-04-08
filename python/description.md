@@ -18,11 +18,11 @@ index.Set('key', '{"answer": 42, "condition": "always"}')
 index.Flush()
 # get the entry for key
 m = index.Get('key')
-print(m.GetValue())
+print(m.value)
 
 # match fuzzy(levenshtein distance) with max edit distance 1, exact prefix 2
-m = index.GetFuzzy("kei", 1, 2)
-print(m.GetMatchedString())
+matches = index.GetFuzzy("kei", 1, 2)
+print([m.matched_string for m in matches])
 ```
 
-For more information visit http://keyvi.org
+For more information visit the [docs](https://keyvidev.github.io/keyvi/index.html) and [project](http://keyvi.org) pages.
