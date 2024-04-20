@@ -4,7 +4,7 @@ from libcpp cimport bool
 from libc.stdint cimport int32_t
 from match cimport Match
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
-from std_smart_ptr cimport shared_ptr
+from libcpp.memory cimport shared_ptr
 
 cdef extern from "keyvi/index/read_only_index.h" namespace "keyvi::index":
     cdef cppclass ReadOnlyIndex:

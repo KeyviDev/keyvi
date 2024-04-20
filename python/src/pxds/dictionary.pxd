@@ -8,7 +8,7 @@ from libcpp cimport bool
 from libcpp.pair cimport pair as libcpp_pair
 from match cimport Match as _Match
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
-from std_smart_ptr cimport shared_ptr
+from libcpp.memory cimport shared_ptr
 
 cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
     ctypedef enum loading_strategy_types:
