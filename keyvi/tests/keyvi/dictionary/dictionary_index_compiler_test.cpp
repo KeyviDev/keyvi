@@ -151,9 +151,9 @@ void bigger_compile_test(const keyvi::util::parameters_t& params = keyvi::util::
   Dictionary d(file_name.c_str());
 
   for (size_t i = 0; i < 50; ++i) {
-    keyvi::dictionary::Match m = d["loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i)];
-    BOOST_CHECK_EQUAL("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), m.GetMatchedString());
-    BOOST_CHECK_EQUAL("{\"id\":" + std::to_string(keys - 50 + i) + "}", m.GetValueAsString());
+    keyvi::dictionary::match_t m = d["loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i)];
+    BOOST_CHECK_EQUAL("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), m->GetMatchedString());
+    BOOST_CHECK_EQUAL("{\"id\":" + std::to_string(keys - 50 + i) + "}", m->GetValueAsString());
   }
 }
 

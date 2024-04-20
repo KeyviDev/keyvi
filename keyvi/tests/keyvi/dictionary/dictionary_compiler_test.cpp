@@ -255,9 +255,9 @@ void bigger_compile_test(const keyvi::util::parameters_t& params = keyvi::util::
   Dictionary d(file_name.c_str());
 
   for (size_t i = 0; i < keys; ++i) {
-    keyvi::dictionary::Match m = d["loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i)];
-    BOOST_CHECK_EQUAL("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), m.GetMatchedString());
-    BOOST_CHECK_EQUAL("{\"id\":" + std::to_string(i) + "}", m.GetValueAsString());
+    keyvi::dictionary::match_t m = d["loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i)];
+    BOOST_CHECK_EQUAL("loooooooooooooooonnnnnnnngggggggg_key-" + std::to_string(i), m->GetMatchedString());
+    BOOST_CHECK_EQUAL("{\"id\":" + std::to_string(i) + "}", m->GetValueAsString());
   }
 }
 
@@ -291,8 +291,8 @@ BOOST_AUTO_TEST_CASE(float_dictionary) {
 
   bool matched = false;
   for (auto m : d.Get("abbe")) {
-    BOOST_CHECK_EQUAL("3.1, 0.2, 1.3, 0.4, 0.5", m.GetValueAsString());
-    std::vector<float> float_vector = keyvi::util::DecodeFloatVector(m.GetRawValueAsString());
+    BOOST_CHECK_EQUAL("3.1, 0.2, 1.3, 0.4, 0.5", m->GetValueAsString());
+    std::vector<float> float_vector = keyvi::util::DecodeFloatVector(m->GetRawValueAsString());
     BOOST_CHECK_EQUAL(5, float_vector.size());
     BOOST_CHECK_EQUAL(3.1f, float_vector[0]);
     BOOST_CHECK_EQUAL(1.3f, float_vector[2]);

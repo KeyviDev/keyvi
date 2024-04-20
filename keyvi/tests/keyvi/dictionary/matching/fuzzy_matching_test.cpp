@@ -50,7 +50,7 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
   auto expected_it = expected.begin();
   for (auto m : it) {
     BOOST_CHECK(expected_it != expected.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
 
   // test without weights
@@ -66,7 +66,7 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
   expected_it = expected_sorted.begin();
   for (auto m : matcher_no_weights_it) {
     BOOST_CHECK(expected_it != expected_sorted.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected_sorted.end());
 
@@ -100,7 +100,7 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
   expected_it = expected.begin();
   for (auto m : matcher_zipped_it) {
     BOOST_CHECK(expected_it != expected.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected.end());
 
@@ -114,7 +114,7 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
   expected_it = expected_sorted.begin();
   for (auto m : matcher_zipped_no_weights_it) {
     BOOST_CHECK(expected_it != expected_sorted.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected_sorted.end());
 }

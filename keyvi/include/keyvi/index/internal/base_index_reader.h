@@ -64,15 +64,15 @@ class BaseIndexReader {
    *
    * @param key the key
    */
-  dictionary::Match operator[](const std::string& key) {
-    dictionary::Match match;
+  dictionary::match_t operator[](const std::string& key) {
+    dictionary::match_t match;
     const_segments_t segments = payload_.Segments();
 
     for (auto it = segments->crbegin(); it != segments->crend(); ++it) {
       match = (*it)->GetDictionary()->operator[](key);
-      if (!match.IsEmpty()) {
+      if (match) {
         if ((*it)->IsDeleted(key)) {
-          return dictionary::Match();
+          return dictionary::match_t();
         }
         return match;
       }

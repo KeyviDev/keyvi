@@ -150,10 +150,10 @@ void basic_writer_bulk_test(const keyvi::util::parameters_t& params = keyvi::uti
     BOOST_CHECK(writer.Contains("c5"));
 
     // check that last one wins
-    dictionary::Match m = writer["b"];
-    BOOST_CHECK_EQUAL("{\"id\":9}", m.GetValueAsString());
+    dictionary::match_t m = writer["b"];
+    BOOST_CHECK_EQUAL("{\"id\":9}", m->GetValueAsString());
     m = writer["c5"];
-    BOOST_CHECK_EQUAL("{\"id\":5}", m.GetValueAsString());
+    BOOST_CHECK_EQUAL("{\"id\":5}", m->GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
 }
@@ -188,9 +188,9 @@ void bigger_feed_test(const keyvi::util::parameters_t& params = keyvi::util::par
     }
     writer.Flush();
     BOOST_CHECK(writer.Contains("a"));
-    dictionary::Match m = writer["a"];
+    dictionary::match_t m = writer["a"];
 
-    BOOST_CHECK_EQUAL("{\"id\":9999}", m.GetValueAsString());
+    BOOST_CHECK_EQUAL("{\"id\":9999}", m->GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
 }

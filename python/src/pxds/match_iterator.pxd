@@ -1,11 +1,13 @@
 # same import style as autowrap
 from match cimport Match as _Match
 from libc.stdint cimport uint32_t
+from std_smart_ptr cimport shared_ptr
+
 
 cdef extern from "keyvi/dictionary/match_iterator.h" namespace "keyvi::dictionary":
     cdef cppclass MatchIterator:
         # wrap-ignore
-        _Match operator*()
+        shared_ptr[_Match] operator*()
         # wrap-ignore
         MatchIterator& operator++()
         bint operator==(MatchIterator)

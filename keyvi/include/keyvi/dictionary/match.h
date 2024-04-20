@@ -44,9 +44,9 @@ struct Match;
 namespace index {
 namespace internal {
 template <class MatcherT, class DeletedT>
-keyvi::dictionary::Match NextFilteredMatch(const MatcherT&, const DeletedT&);
+std::shared_ptr<keyvi::dictionary::Match> NextFilteredMatch(const MatcherT&, const DeletedT&);
 template <class MatcherT, class DeletedT>
-keyvi::dictionary::Match FirstFilteredMatch(const MatcherT&, const DeletedT&);
+std::shared_ptr<keyvi::dictionary::Match> FirstFilteredMatch(const MatcherT&, const DeletedT&);
 }  // namespace internal
 }  // namespace index
 namespace dictionary {
@@ -200,14 +200,16 @@ struct Match {
 
   // friend for accessing the fsa
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+  friend std::shared_ptr<Match> index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
+  friend std::shared_ptr<Match> index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
 
   fsa::automata_t& GetFsa() {
     return fsa_;
   }
 };
+
+using match_t = std::shared_ptr<Match>;
 
 } /* namespace dictionary */
 } /* namespace keyvi */

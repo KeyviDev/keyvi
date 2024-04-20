@@ -51,20 +51,21 @@ namespace dictionary {
  *  http://www.codeproject.com/Articles/11015/The-Impossibly-Fast-C-Delegates
  *  http://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11
  */
-class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, boost::single_pass_traversal_tag> {
+class MatchIterator : public boost::iterator_facade<MatchIterator, match_t const, boost::single_pass_traversal_tag> {
  public:
   typedef util::iterator_pair<MatchIterator> MatchIteratorPair;
 
-  explicit MatchIterator(std::function<Match()> match_functor, const Match& first_match = Match(),
+  explicit MatchIterator(std::function<match_t()> match_functor, const match_t& first_match = match_t(),
                          std::function<void(uint32_t)> set_min_weight = {})
       : match_functor_(match_functor), set_min_weight_(set_min_weight) {
     current_match_ = first_match;
-    if (first_match.IsEmpty()) {
+    if (!first_match) {
+      TRACE("first match empty");
       increment();
     }
   }
 
-  static MatchIteratorPair MakeIteratorPair(std::function<Match()> f, const Match& first_match = Match(),
+  static MatchIteratorPair MakeIteratorPair(std::function<match_t()> f, const match_t& first_match = match_t(),
                                             std::function<void(uint32_t)> set_min_weight = {}) {
     return MatchIteratorPair(MatchIterator(f, first_match, set_min_weight), MatchIterator());
   }
@@ -92,7 +93,7 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, 
       current_match_ = match_functor_();
 
       // if we get an empty match, release the functor
-      if (current_match_.IsEmpty()) {
+      if (!current_match_) {
         TRACE("Match Iterator: no more match found reset functor");
         match_functor_ = 0;
         set_min_weight_ = {};
@@ -102,7 +103,7 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, 
 
   bool equal(MatchIterator const& other) const {
     // usual case for comparing with end()
-    if (this->current_match_.IsEmpty() && other.current_match_.IsEmpty()) {
+    if (!this->current_match_ && !other.current_match_) {
       TRACE("Match Iterator: equal true");
       return true;
     }
@@ -111,11 +112,11 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, Match const, 
     return false;  // return this->current_match_ == other.current_match_;
   }
 
-  Match const& dereference() const { return current_match_; }
+  match_t const& dereference() const { return current_match_; }
 
  private:
-  std::function<Match()> match_functor_;
-  Match current_match_;
+  std::function<match_t()> match_functor_;
+  match_t current_match_;
   std::function<void(uint32_t)> set_min_weight_;
 };
 

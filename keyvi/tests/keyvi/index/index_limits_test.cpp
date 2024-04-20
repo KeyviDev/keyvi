@@ -78,9 +78,9 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
     }
     writer.Flush();
     BOOST_CHECK(writer.Contains("a"));
-    dictionary::Match m = writer["a"];
+    dictionary::match_t m = writer["a"];
 
-    BOOST_CHECK_EQUAL("{\"id\":4999}", m.GetValueAsString());
+    BOOST_CHECK_EQUAL("{\"id\":4999}", m->GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
 

@@ -41,9 +41,9 @@ namespace keyvi {
 namespace index {
 namespace internal {
 template <class MatcherT, class DeletedT>
-keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+keyvi::dictionary::match_t NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
 template <class MatcherT, class DeletedT>
-keyvi::dictionary::Match NextFilteredMatch(const MatcherT&, const DeletedT&);
+keyvi::dictionary::match_t NextFilteredMatch(const MatcherT&, const DeletedT&);
 }  // namespace internal
 }  // namespace index
 namespace dictionary {
@@ -94,9 +94,9 @@ class NearMatching final {
    */
   static NearMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state, const std::string& query,
                                     const size_t exact_prefix, const bool greedy = false) {
-    Match first_match;
+    match_t first_match;
     if (fsa->IsFinalState(start_state)) {
-      first_match = Match(0, query.size(), query, exact_prefix, fsa, fsa->GetStateValue(start_state));
+      first_match = std::make_shared<Match>(0, query.size(), query, exact_prefix, fsa, fsa->GetStateValue(start_state));
     }
 
     std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(exact_prefix));
@@ -143,12 +143,12 @@ class NearMatching final {
     std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(exact_prefix));
     std::vector<std::tuple<fsa::automata_t, uint64_t, fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>>>
         fsas_with_payload;
-    Match first_match;
+    match_t first_match;
 
     // check if the prefix is already an exact match
     for (const auto& fsa_state : boost::adaptors::reverse(fsa_start_state_payloads)) {
       if (std::get<0>(fsa_state)->IsFinalState(std::get<1>(fsa_state))) {
-        first_match = Match(0, query.size(), query, exact_prefix, std::get<0>(fsa_state),
+        first_match = std::make_shared<Match>(0, query.size(), query, exact_prefix, std::get<0>(fsa_state),
                             std::get<0>(fsa_state)->GetStateValue(std::get<1>(fsa_state)));
         break;
       }
@@ -182,9 +182,9 @@ class NearMatching final {
     return fsa_start_state_payloads;
   }
 
-  Match FirstMatch() const { return first_match_; }
+  match_t FirstMatch() const { return first_match_; }
 
-  Match NextMatch() {
+  match_t NextMatch() {
     TRACE("call next match %lu", matched_depth_);
     for (; traverser_ptr_ && traverser_ptr_->GetDepth() > matched_depth_;) {
       if (traverser_ptr_->IsFinalState()) {
@@ -194,7 +194,7 @@ class NearMatching final {
                                         traverser_ptr_->GetDepth());
 
         // length should be query.size???
-        Match m(0, traverser_ptr_->GetDepth() + exact_prefix_.size(), match_str,
+        match_t m = std::make_shared<Match>(0, traverser_ptr_->GetDepth() + exact_prefix_.size(), match_str,
                 exact_prefix_.size() + traverser_ptr_->GetTraversalPayload().exact_depth, traverser_ptr_->GetFsa(),
                 traverser_ptr_->GetStateValue());
 
@@ -211,17 +211,17 @@ class NearMatching final {
       (*traverser_ptr_)++;
     }
 
-    return Match();
+    return match_t();
   }
 
  private:
   std::unique_ptr<innerTraverserType> traverser_ptr_;
   const std::string exact_prefix_;
-  const Match first_match_;
+  const match_t first_match_;
   const bool greedy_ = false;
   size_t matched_depth_ = 0;
 
-  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match, std::string&& minimum_exact_prefix,
+  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, match_t&& first_match, std::string&& minimum_exact_prefix,
                const bool greedy)
       : traverser_ptr_(std::move(traverser)),
         exact_prefix_(std::move(minimum_exact_prefix)),
@@ -232,9 +232,9 @@ class NearMatching final {
 
   // reset method for the index in the special case the match is deleted
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+  friend match_t index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+  friend match_t index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
 
   void ResetLastMatch() { matched_depth_ = 0; }
 };

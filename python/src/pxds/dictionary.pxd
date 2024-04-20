@@ -8,6 +8,7 @@ from libcpp cimport bool
 from libcpp.pair cimport pair as libcpp_pair
 from match cimport Match as _Match
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
+from std_smart_ptr cimport shared_ptr
 
 cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
     ctypedef enum loading_strategy_types:
@@ -31,7 +32,7 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         Dictionary (libcpp_utf8_string filename) except +
         Dictionary (libcpp_utf8_string filename, loading_strategy_types) except +
         bool Contains (libcpp_utf8_string key) # wrap-ignore
-        _Match operator[](libcpp_utf8_string key) # wrap-ignore
+        shared_ptr[_Match] operator[](libcpp_utf8_string key) # wrap-ignore
         _MatchIteratorPair Get (libcpp_utf8_string key) # wrap-as:match
         _MatchIteratorPair GetNear (libcpp_utf8_string key, size_t minimum_prefix_length) except + # wrap-as:match_near
         _MatchIteratorPair GetNear (libcpp_utf8_string key, size_t minimum_prefix_length, bool greedy) except + # wrap-as:match_near

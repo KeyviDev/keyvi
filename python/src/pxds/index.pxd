@@ -21,4 +21,4 @@ cdef extern from "keyvi/index/index.h" namespace "keyvi::index":
         void Flush() except+
         void Flush(bool) except+
         bool Contains(libcpp_utf8_string) # wrap-ignore
-        Match operator[](libcpp_utf8_string) # wrap-ignore
+        s_shared_ptr[Match] operator[](libcpp_utf8_string) # wrap-ignore

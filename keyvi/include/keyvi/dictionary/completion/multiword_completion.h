@@ -75,7 +75,7 @@ class MultiWordCompletion final {
     traversal_stack.reserve(100);
 
     if (depth == query_length) {
-      Match first_match;
+      match_t first_match;
       TRACE("matched prefix");
 
       // data which is required for the callback as well
@@ -95,7 +95,7 @@ class MultiWordCompletion final {
         TRACE("prefix matched depth %d %s", query_length + data->traverser.GetDepth(),
               std::string(reinterpret_cast<char*>(&data->traversal_stack[0]), query_length + data->traverser.GetDepth())
                   .c_str());
-        first_match = Match(0, query_length, query, 0, fsa_, fsa_->GetStateValue(state));
+        first_match = std::make_shared<Match>(0, query_length, query, 0, fsa_, fsa_->GetStateValue(state));
       }
 
       auto tfunc = [data, query_length]() {
@@ -140,7 +140,7 @@ class MultiWordCompletion final {
                                             query_length + data->traverser.GetDepth());
               }
 
-              Match m(0, data->traverser.GetDepth() + query_length, matched_entry, 0, data->traverser.GetFsa(),
+              match_t m = std::make_shared<Match>(0, data->traverser.GetDepth() + query_length, matched_entry, 0, data->traverser.GetFsa(),
                       data->traverser.GetStateValue());
 
               data->traverser++;
@@ -150,7 +150,7 @@ class MultiWordCompletion final {
             data->traverser++;
           } else {
             TRACE("StateTraverser exhausted.");
-            return Match();
+            return match_t();
           }
         }
       };

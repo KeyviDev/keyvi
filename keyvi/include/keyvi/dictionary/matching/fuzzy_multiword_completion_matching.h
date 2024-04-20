@@ -46,9 +46,9 @@ namespace keyvi {
 namespace index {
 namespace internal {
 template <class MatcherT, class DeletedT>
-keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+keyvi::dictionary::match_t NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
 template <class MatcherT, class DeletedT>
-keyvi::dictionary::Match NextFilteredMatch(const MatcherT&, const DeletedT&);
+keyvi::dictionary::match_t NextFilteredMatch(const MatcherT&, const DeletedT&);
 }  // namespace internal
 }  // namespace index
 namespace dictionary {
@@ -123,10 +123,10 @@ class FuzzyMultiwordCompletionMatching final {
 
     std::unique_ptr<innerTraverserType> traverser = std::make_unique<innerTraverserType>(fsa, state);
 
-    Match first_match;
+    match_t first_match;
     if (depth == utf8_query_length && fsa->IsFinalState(state)) {
       TRACE("first_match %d %s", utf8_query_length, query);
-      first_match = Match(0, utf8_query_length, query, 0, fsa, fsa->GetStateValue(state));
+      first_match = std::make_shared<Match>(0, utf8_query_length, query, 0, fsa, fsa->GetStateValue(state));
     }
 
     return FuzzyMultiwordCompletionMatching(std::move(traverser), std::move(first_match), std::move(metric),
@@ -186,12 +186,12 @@ class FuzzyMultiwordCompletionMatching final {
       metric->Put(codepoints[utf8_depth], utf8_depth);
     }
 
-    Match first_match;
+    match_t first_match;
     // check for a match given the exact prefix
     for (const auto& fsa_state : fsa_start_state_pairs) {
       if (fsa_state.first->IsFinalState(fsa_state.second)) {
         first_match =
-            Match(0, query_length, query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
+            std::make_shared<Match>(0, query_length, query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
         break;
       }
     }
@@ -202,9 +202,9 @@ class FuzzyMultiwordCompletionMatching final {
                                             minimum_exact_prefix, number_of_tokens, multiword_separator);
   }
 
-  Match FirstMatch() const { return first_match_; }
+  match_t FirstMatch() const { return first_match_; }
 
-  Match NextMatch() {
+  match_t NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
       uint64_t label = traverser_ptr_->GetStateLabel();
       TRACE("label [%c] prefix length %ld traverser depth: %ld", label, prefix_length_, traverser_ptr_->GetDepth());
@@ -254,7 +254,7 @@ class FuzzyMultiwordCompletionMatching final {
                                     : distance_metric_->GetCandidate();
 
         TRACE("found final state at depth %d %s", prefix_length_ + traverser_ptr_->GetDepth(), match_str.c_str());
-        Match m(0, prefix_length_ + traverser_ptr_->GetDepth(), match_str, distance_metric_->GetScore(),
+        match_t m=std::make_shared<Match>(0, prefix_length_ + traverser_ptr_->GetDepth(), match_str, distance_metric_->GetScore(),
                 traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
 
         (*traverser_ptr_)++;
@@ -262,13 +262,13 @@ class FuzzyMultiwordCompletionMatching final {
       }
     }
 
-    return Match();
+    return match_t();
   }
 
   void SetMinWeight(uint32_t min_weight) { traverser_ptr_->SetMinWeight(min_weight); }
 
  private:
-  FuzzyMultiwordCompletionMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match,
+  FuzzyMultiwordCompletionMatching(std::unique_ptr<innerTraverserType>&& traverser, match_t&& first_match,
                                    std::unique_ptr<stringdistance::LevenshteinCompletion>&& distance_metric,
                                    const int32_t max_edit_distance, const size_t prefix_length, size_t number_of_tokens,
                                    const unsigned char multiword_separator)
@@ -284,7 +284,7 @@ class FuzzyMultiwordCompletionMatching final {
 
  private:
   std::unique_ptr<innerTraverserType> traverser_ptr_;
-  const Match first_match_;
+  const match_t first_match_;
   std::unique_ptr<stringdistance::LevenshteinCompletion> distance_metric_;
   const int32_t max_edit_distance_ = 0;
   const size_t prefix_length_ = 0;
@@ -295,9 +295,9 @@ class FuzzyMultiwordCompletionMatching final {
 
   // reset method for the index in the special case the match is deleted
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+  friend match_t index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+  friend match_t index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
 
   void ResetLastMatch() {}
 };

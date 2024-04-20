@@ -57,13 +57,13 @@ BOOST_AUTO_TEST_CASE(basicindex) {
   BOOST_CHECK(!reader.Contains("ab"));
   BOOST_CHECK(!reader.Contains("bbc"));
   BOOST_CHECK(!reader.Contains(""));
-  BOOST_CHECK_EQUAL(reader["abc"].GetValueAsString(), "\"{a:1}\"");
+  BOOST_CHECK_EQUAL(reader["abc"]->GetValueAsString(), "\"{a:1}\"");
 
-  BOOST_CHECK(reader[""].IsEmpty());
-  BOOST_CHECK(reader["ab"].IsEmpty());
+  BOOST_CHECK(!reader[""]);
+  BOOST_CHECK(!reader["ab"]);
 
   // test priority, last one should be returned
-  BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:6}\"");
+  BOOST_CHECK_EQUAL(reader["abbcd"]->GetValueAsString(), "\"{c:6}\"");
 
   std::vector<std::pair<std::string, std::string>> test_data_3 = {
       {"abbcd", "{c:8}"}, {"cabc", "{a:1}"}, {"cabbc", "{b:2}"}, {"cabcde", "{a:1}"}, {"cabdd", "{b:2}"},
@@ -75,26 +75,26 @@ BOOST_AUTO_TEST_CASE(basicindex) {
   index.AddSegment(&test_data_3);
   BOOST_CHECK(reader.Contains("abc"));
 
-  BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:6}\"");
+  BOOST_CHECK_EQUAL(reader["abbcd"]->GetValueAsString(), "\"{c:6}\"");
 
   // force reload
   reader.Reload();
   BOOST_CHECK(reader.Contains("abc"));
 
-  BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:8}\"");
+  BOOST_CHECK_EQUAL(reader["abbcd"]->GetValueAsString(), "\"{c:8}\"");
   std::this_thread::sleep_for(std::chrono::seconds(1));
   std::vector<std::pair<std::string, std::string>> test_data_4 = {{"abbcd", "{c:10}"}};
   index.AddSegment(&test_data_4);
   std::this_thread::sleep_for(std::chrono::seconds(1));
 
-  BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:10}\"");
+  BOOST_CHECK_EQUAL(reader["abbcd"]->GetValueAsString(), "\"{c:10}\"");
 
   std::vector<std::pair<std::string, std::string>> test_data_5 = {{"abbcd", "{c:12}"}};
   index.AddSegment(&test_data_5);
   std::this_thread::sleep_for(std::chrono::seconds(1));
   BOOST_CHECK(reader.Contains("abc"));
 
-  BOOST_CHECK_EQUAL(reader["abbcd"].GetValueAsString(), "\"{c:12}\"");
+  BOOST_CHECK_EQUAL(reader["abbcd"]->GetValueAsString(), "\"{c:12}\"");
 }
 
 BOOST_AUTO_TEST_CASE(indexwithdeletedkeys) {
@@ -122,13 +122,13 @@ BOOST_AUTO_TEST_CASE(indexwithdeletedkeys) {
   BOOST_CHECK(!reader.Contains(""));
   BOOST_CHECK(!reader.Contains("תֵ"));
 
-  BOOST_CHECK_EQUAL(reader["מַפְתֵחַ"].GetValueAsString(), "\"{b:2}\"");
+  BOOST_CHECK_EQUAL(reader["מַפְתֵחַ"]->GetValueAsString(), "\"{b:2}\"");
 
-  BOOST_CHECK(reader[""].IsEmpty());
-  BOOST_CHECK(reader["ab"].IsEmpty());
+  BOOST_CHECK(!reader[""]);
+  BOOST_CHECK(!reader["ab"]);
 
   // test priority, last one should be returned
-  BOOST_CHECK_EQUAL(reader["商店"].GetValueAsString(), "\"{b:2}\"");
+  BOOST_CHECK_EQUAL(reader["商店"]->GetValueAsString(), "\"{b:2}\"");
   index.AddDeletedKeys({"מַפְתֵחַ", "商店"}, 1);
   reader.Reload();
 
@@ -158,8 +158,8 @@ void testFuzzyMatching(ReadOnlyIndex* reader, const std::string& query, const si
   auto matcher = reader->GetFuzzy(query, max_edit_distance, minimum_exact_prefix);
   for (auto m : matcher) {
     BOOST_REQUIRE(expected_matches_it != expected_matches.end());
-    BOOST_CHECK_EQUAL(*expected_matches_it++, m.GetMatchedString());
-    BOOST_CHECK_EQUAL(*expected_values_it++, m.GetValueAsString());
+    BOOST_CHECK_EQUAL(*expected_matches_it++, m->GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_values_it++, m->GetValueAsString());
   }
   BOOST_CHECK(expected_matches_it == expected_matches.end());
 }
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(fuzzyMatching) {
   testFuzzyMatching(&reader_1, "babdd", 0, 5, {"babdd"}, {"\"{g:2}\""});
   testFuzzyMatching(&reader_1, "babdd", 0, 4, {"babdd"}, {"\"{g:2}\""});
 
-  BOOST_CHECK_EQUAL(reader_1["abbc"].GetValueAsString(), "\"{b:2}\"");
+  BOOST_CHECK_EQUAL(reader_1["abbc"]->GetValueAsString(), "\"{b:2}\"");
   testFuzzyMatching(&reader_1, "abbc", 0, 2, {"abbc"}, {"\"{b:2}\""});
   testFuzzyMatching(&reader_1, "abc", 0, 2, {"abc"}, {"\"{a:1}\""});
 
@@ -239,8 +239,8 @@ void testNearMatching(ReadOnlyIndex* reader, const std::string& query, const siz
   auto matcher = reader->GetNear(query, minimum_exact_prefix, greedy);
   for (auto m : matcher) {
     BOOST_REQUIRE(expected_matches_it != expected_matches.end());
-    BOOST_CHECK_EQUAL(*expected_matches_it++, m.GetMatchedString());
-    BOOST_CHECK_EQUAL(*expected_values_it++, m.GetValueAsString());
+    BOOST_CHECK_EQUAL(*expected_matches_it++, m->GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_values_it++, m->GetValueAsString());
   }
   BOOST_CHECK(expected_matches_it == expected_matches.end());
 }
