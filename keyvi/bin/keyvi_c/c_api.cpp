@@ -147,15 +147,26 @@ bool keyvi_match_is_empty(const keyvi_match* match) {
 }
 
 double keyvi_match_get_score(const keyvi_match* match) {
+  if (match->obj_ == nullptr) {
+    return 0;
+  }
   return match->obj_->GetScore();
 }
 
 char* keyvi_match_get_value_as_string(const keyvi_match* match) {
+  if (match->obj_ == nullptr) {
+    return std_2_c_string("");
+  }
   return std_2_c_string(match->obj_->GetValueAsString());
 }
 
 keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
   const keyvi_bytes empty_keyvi_bytes{0, nullptr};
+
+  if (match->obj_ == nullptr) {
+    return empty_keyvi_bytes;
+  }
+
   const std::string msgpacked_value = match->obj_->GetMsgPackedValueAsString();
 
   const size_t data_size = msgpacked_value.size();
@@ -172,6 +183,9 @@ keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
 }
 
 char* keyvi_match_get_matched_string(const keyvi_match* match) {
+  if (match->obj_ == nullptr) {
+    return std_2_c_string("");
+  }
   return std_2_c_string(match->obj_->GetMatchedString());
 }
 
