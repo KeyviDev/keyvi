@@ -106,8 +106,8 @@ class PrefixCompletion final {
               std::string match_str = std::string(reinterpret_cast<char*>(&data->traversal_stack[0]),
                                                   query_length + data->traverser.GetDepth());
               TRACE("found final state at depth %d %s", query_length + data->traverser.GetDepth(), match_str.c_str());
-              match_t m = std::make_shared<Match>(0, data->traverser.GetDepth() + query_length, match_str, 0, data->traverser.GetFsa(),
-                      data->traverser.GetStateValue());
+              match_t m = std::make_shared<Match>(0, data->traverser.GetDepth() + query_length, match_str, 0,
+                                                  data->traverser.GetFsa(), data->traverser.GetStateValue());
 
               data->traverser++;
               // data->traverser.TryReduceResultQueue();
@@ -204,8 +204,8 @@ class PrefixCompletion final {
           if (data->traverser.IsFinalState()) {
             if (query_length < depth || data->metric.GetScore() <= max_edit_distance) {
               TRACE("found final state at depth %d %s", depth, data->metric.GetCandidate().c_str());
-              match_t m=std::make_shared<Match>(0, depth, data->metric.GetCandidate(), data->metric.GetScore(), data->traverser.GetFsa(),
-                      data->traverser.GetStateValue());
+              match_t m = std::make_shared<Match>(0, depth, data->metric.GetCandidate(), data->metric.GetScore(),
+                                                  data->traverser.GetFsa(), data->traverser.GetStateValue());
 
               data->traverser++;
               return m;

@@ -146,7 +146,7 @@ class Dictionary final {
     // right now this is returning just 1 match, but it could be more if it is a multi-value dictionary
     m = std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
 
-    return MatchIterator::MakeIteratorPair([](){return match_t();}, m);
+    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, m);
   }
 
   /**
@@ -186,7 +186,7 @@ class Dictionary final {
                 std::string(reinterpret_cast<char*>(&data->traversal_stack[0]), data->traverser.GetDepth());
             TRACE("found final state at depth %d %s", data->traverser.GetDepth(), match_str.c_str());
             match_t m = std::make_shared<Match>(0, data->traverser.GetDepth(), match_str, 0, data->traverser.GetFsa(),
-                    data->traverser.GetStateValue());
+                                                data->traverser.GetStateValue());
 
             data->traverser++;
             return m;
@@ -233,8 +233,9 @@ class Dictionary final {
 
     if (last_final_state) {
       // right now this is returning just 1 match, but it could do more
-      m = std::make_shared<Match>(offset, last_final_state_position, text.substr(offset, last_final_state_position - offset), 0, fsa_,
-                fsa_->GetStateValue(last_final_state));
+      m = std::make_shared<Match>(offset, last_final_state_position,
+                                  text.substr(offset, last_final_state_position - offset), 0, fsa_,
+                                  fsa_->GetStateValue(last_final_state));
     }
 
     auto func = [m, has_run]() mutable {

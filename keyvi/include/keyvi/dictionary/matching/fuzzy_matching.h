@@ -130,8 +130,8 @@ class FuzzyMatching final {
 
     if (fsa->IsFinalState(start_state) && metric->GetScore() <= max_edit_distance) {
       TRACE("exact prefix matched");
-      first_match =
-          std::make_shared<Match>(0, exact_prefix, metric->GetCandidate(), metric->GetScore(), fsa, fsa->GetStateValue(start_state));
+      first_match = std::make_shared<Match>(0, exact_prefix, metric->GetCandidate(), metric->GetScore(), fsa,
+                                            fsa->GetStateValue(start_state));
     }
 
     TRACE("create iterator");
@@ -191,8 +191,8 @@ class FuzzyMatching final {
     // check for a match given the exact prefix
     for (const auto& fsa_state : fsa_start_state_pairs) {
       if (fsa_state.first->IsFinalState(fsa_state.second) && metric->GetScore() <= max_edit_distance) {
-        first_match = std::make_shared<Match>(0, exact_prefix, metric->GetCandidate(), metric->GetScore(), fsa_state.first,
-                            fsa_state.first->GetStateValue(fsa_state.second));
+        first_match = std::make_shared<Match>(0, exact_prefix, metric->GetCandidate(), metric->GetScore(),
+                                              fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
         break;
       }
     }
@@ -253,7 +253,7 @@ class FuzzyMatching final {
       if (traverser_ptr_->IsFinalState() && metric_ptr_->GetScore() <= max_edit_distance_) {
         TRACE("found match %s %lu", metric_ptr_->GetCandidate().c_str(), traverser_ptr_->GetStateValue());
         match_t m = std::make_shared<Match>(0, candidate_length(), metric_ptr_->GetCandidate(), metric_ptr_->GetScore(),
-                        traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
+                                            traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
         (*traverser_ptr_)++;
         return m;
       }

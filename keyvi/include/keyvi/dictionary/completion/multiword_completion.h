@@ -140,8 +140,8 @@ class MultiWordCompletion final {
                                             query_length + data->traverser.GetDepth());
               }
 
-              match_t m = std::make_shared<Match>(0, data->traverser.GetDepth() + query_length, matched_entry, 0, data->traverser.GetFsa(),
-                      data->traverser.GetStateValue());
+              match_t m = std::make_shared<Match>(0, data->traverser.GetDepth() + query_length, matched_entry, 0,
+                                                  data->traverser.GetFsa(), data->traverser.GetStateValue());
 
               data->traverser++;
               data->traverser.TryReduceResultQueue();

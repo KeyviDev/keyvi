@@ -159,8 +159,8 @@ class MultiwordCompletionMatching final {
     // check for a match given the exact prefix
     for (const auto& fsa_state : fsa_start_state_pairs) {
       if (fsa_state.first->IsFinalState(fsa_state.second)) {
-        first_match =
-            std::make_shared<Match>(0, query_length, query, 0, fsa_state.first, fsa_state.first->GetStateValue(fsa_state.second));
+        first_match = std::make_shared<Match>(0, query_length, query, 0, fsa_state.first,
+                                              fsa_state.first->GetStateValue(fsa_state.second));
         break;
       }
     }
@@ -203,8 +203,8 @@ class MultiwordCompletionMatching final {
                 : std::string(traversal_stack_->begin(), traversal_stack_->end());
 
         TRACE("found final state at depth %d %s", prefix_length_ + traverser_ptr_->GetDepth(), match_str.c_str());
-        match_t m = std::make_shared<Match>(0, prefix_length_ + traverser_ptr_->GetDepth(), match_str, 0, traverser_ptr_->GetFsa(),
-                traverser_ptr_->GetStateValue());
+        match_t m = std::make_shared<Match>(0, prefix_length_ + traverser_ptr_->GetDepth(), match_str, 0,
+                                            traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
 
         (*traverser_ptr_)++;
         return m;

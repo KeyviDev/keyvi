@@ -149,7 +149,7 @@ class NearMatching final {
     for (const auto& fsa_state : boost::adaptors::reverse(fsa_start_state_payloads)) {
       if (std::get<0>(fsa_state)->IsFinalState(std::get<1>(fsa_state))) {
         first_match = std::make_shared<Match>(0, query.size(), query, exact_prefix, std::get<0>(fsa_state),
-                            std::get<0>(fsa_state)->GetStateValue(std::get<1>(fsa_state)));
+                                              std::get<0>(fsa_state)->GetStateValue(std::get<1>(fsa_state)));
         break;
       }
     }
@@ -195,8 +195,8 @@ class NearMatching final {
 
         // length should be query.size???
         match_t m = std::make_shared<Match>(0, traverser_ptr_->GetDepth() + exact_prefix_.size(), match_str,
-                exact_prefix_.size() + traverser_ptr_->GetTraversalPayload().exact_depth, traverser_ptr_->GetFsa(),
-                traverser_ptr_->GetStateValue());
+                                            exact_prefix_.size() + traverser_ptr_->GetTraversalPayload().exact_depth,
+                                            traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
 
         if (!greedy_) {
           // remember the depth
@@ -221,8 +221,8 @@ class NearMatching final {
   const bool greedy_ = false;
   size_t matched_depth_ = 0;
 
-  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, match_t&& first_match, std::string&& minimum_exact_prefix,
-               const bool greedy)
+  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, match_t&& first_match,
+               std::string&& minimum_exact_prefix, const bool greedy)
       : traverser_ptr_(std::move(traverser)),
         exact_prefix_(std::move(minimum_exact_prefix)),
         first_match_(std::move(first_match)),
