@@ -164,7 +164,7 @@ class PrefixCompletionMatching final {
                                     query_length);
   }
 
-  match_t FirstMatch() const { return first_match_; }
+  match_t& FirstMatch() { return first_match_; }
 
   match_t NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
@@ -201,7 +201,7 @@ class PrefixCompletionMatching final {
 
  private:
   std::unique_ptr<innerTraverserType> traverser_ptr_;
-  const match_t first_match_;
+  match_t first_match_;
   std::unique_ptr<std::vector<unsigned char>> traversal_stack_;
   const size_t prefix_length_ = 0;
 

@@ -182,7 +182,7 @@ class NearMatching final {
     return fsa_start_state_payloads;
   }
 
-  match_t FirstMatch() const { return first_match_; }
+  match_t& FirstMatch() { return first_match_; }
 
   match_t NextMatch() {
     TRACE("call next match %lu", matched_depth_);
@@ -217,7 +217,7 @@ class NearMatching final {
  private:
   std::unique_ptr<innerTraverserType> traverser_ptr_;
   const std::string exact_prefix_;
-  const match_t first_match_;
+  match_t first_match_;
   const bool greedy_ = false;
   size_t matched_depth_ = 0;
 

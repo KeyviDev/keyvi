@@ -233,7 +233,7 @@ class FuzzyMatching final {
     return fsa_start_state_pairs;
   }
 
-  match_t FirstMatch() const { return first_match_; }
+  match_t& FirstMatch() { return first_match_; }
 
   match_t NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
@@ -283,7 +283,7 @@ class FuzzyMatching final {
   std::unique_ptr<fsa::CodePointStateTraverser<codepointInnerTraverserType>> traverser_ptr_;
   const int32_t max_edit_distance_;
   const size_t exact_prefix_;
-  const match_t first_match_;
+  match_t first_match_;
 
   // reset method for the index in the special case the match is deleted
   template <class MatcherT, class DeletedT>

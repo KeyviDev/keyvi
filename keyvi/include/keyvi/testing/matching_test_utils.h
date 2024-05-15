@@ -45,7 +45,7 @@ void test_matching(std::vector<std::pair<std::string, uint32_t>>* test_data, con
       matchingType<dictionary::fsa::WeightedStateTraverser>::FromSingleFsa(dictionary.GetFsa(), query));
 
   dictionary::MatchIterator::MatchIteratorPair it = dictionary::MatchIterator::MakeIteratorPair(
-      [matcher_weights]() { return matcher_weights->NextMatch(); }, matcher_weights->FirstMatch());
+      [matcher_weights]() { return matcher_weights->NextMatch(); }, std::move(matcher_weights->FirstMatch()));
 
   auto expected_it = expected.begin();
   for (auto m : it) {
@@ -60,7 +60,7 @@ void test_matching(std::vector<std::pair<std::string, uint32_t>>* test_data, con
   auto matcher_no_weights = std::make_shared<matchingType<dictionary::fsa::StateTraverser<>>>(
       matchingType<dictionary::fsa::StateTraverser<>>::FromSingleFsa(dictionary.GetFsa(), query));
   dictionary::MatchIterator::MatchIteratorPair matcher_no_weights_it = dictionary::MatchIterator::MakeIteratorPair(
-      [matcher_no_weights]() { return matcher_no_weights->NextMatch(); }, matcher_no_weights->FirstMatch());
+      [matcher_no_weights]() { return matcher_no_weights->NextMatch(); }, std::move(matcher_no_weights->FirstMatch()));
 
   expected_it = expected_sorted.begin();
   for (auto m : matcher_no_weights_it) {
@@ -96,7 +96,7 @@ void test_matching(std::vector<std::pair<std::string, uint32_t>>* test_data, con
           matchingType<dictionary::fsa::ZipStateTraverser<dictionary::fsa::WeightedStateTraverser>>::FromMulipleFsas(
               fsas, query));
   dictionary::MatchIterator::MatchIteratorPair matcher_zipped_it = dictionary::MatchIterator::MakeIteratorPair(
-      [matcher_zipped]() { return matcher_zipped->NextMatch(); }, matcher_zipped->FirstMatch());
+      [matcher_zipped]() { return matcher_zipped->NextMatch(); }, std::move(matcher_zipped->FirstMatch()));
   expected_it = expected.begin();
   for (auto m : matcher_zipped_it) {
     BOOST_CHECK(expected_it != expected.end());
@@ -112,7 +112,7 @@ void test_matching(std::vector<std::pair<std::string, uint32_t>>* test_data, con
   dictionary::MatchIterator::MatchIteratorPair matcher_zipped_no_weights_it =
       dictionary::MatchIterator::MakeIteratorPair(
           [matcher_zipped_no_weights]() { return matcher_zipped_no_weights->NextMatch(); },
-          matcher_zipped_no_weights->FirstMatch());
+          std::move(matcher_zipped_no_weights->FirstMatch()));
   expected_it = expected_sorted.begin();
   for (auto m : matcher_zipped_no_weights_it) {
     BOOST_CHECK(expected_it != expected_sorted.end());

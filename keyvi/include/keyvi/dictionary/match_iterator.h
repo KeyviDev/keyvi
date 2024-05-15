@@ -25,6 +25,8 @@
 #ifndef KEYVI_DICTIONARY_MATCH_ITERATOR_H_
 #define KEYVI_DICTIONARY_MATCH_ITERATOR_H_
 
+#include <utility>
+
 #include <boost/iterator/iterator_facade.hpp>
 
 #include "keyvi/dictionary/match.h"
@@ -53,26 +55,25 @@ namespace dictionary {
  */
 class MatchIterator : public boost::iterator_facade<MatchIterator, match_t const, boost::single_pass_traversal_tag> {
  public:
-  typedef util::iterator_pair<MatchIterator> MatchIteratorPair;
+  using MatchIteratorPair = util::iterator_pair<MatchIterator>;
 
-  explicit MatchIterator(std::function<match_t()> match_functor, const match_t& first_match = match_t(),
+  explicit MatchIterator(std::function<match_t()> match_functor, match_t&& first_match = match_t(),
                          std::function<void(uint32_t)> set_min_weight = {})
-      : match_functor_(match_functor), set_min_weight_(set_min_weight) {
-    current_match_ = first_match;
-    if (!first_match) {
+      : match_functor_(match_functor), current_match_(std::move(first_match)), set_min_weight_(set_min_weight) {
+    if (!current_match_) {
       TRACE("first match empty");
       increment();
     }
   }
 
-  static MatchIteratorPair MakeIteratorPair(std::function<match_t()> f, const match_t& first_match = match_t(),
+  MatchIterator() : match_functor_(0), set_min_weight_({}) {}
+
+  static MatchIteratorPair MakeIteratorPair(std::function<match_t()> f, match_t&& first_match = match_t(),
                                             std::function<void(uint32_t)> set_min_weight = {}) {
-    return MatchIteratorPair(MatchIterator(f, first_match, set_min_weight), MatchIterator());
+    return MatchIteratorPair(MatchIterator(f, std::move(first_match), set_min_weight), MatchIterator());
   }
 
   static MatchIteratorPair EmptyIteratorPair() { return MatchIteratorPair(MatchIterator(), MatchIterator()); }
-
-  MatchIterator() : match_functor_(0), set_min_weight_({}) {}
 
   void SetMinWeight(uint32_t min_weight) {
     // ignore if a min weight setter was not provided
@@ -90,7 +91,7 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, match_t const
     if (match_functor_) {
       TRACE("Match Iterator: call increment()");
 
-      current_match_ = match_functor_();
+      current_match_ = std::move(match_functor_());
 
       // if we get an empty match, release the functor
       if (!current_match_) {

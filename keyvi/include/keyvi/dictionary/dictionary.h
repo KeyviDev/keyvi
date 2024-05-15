@@ -146,7 +146,7 @@ class Dictionary final {
     // right now this is returning just 1 match, but it could be more if it is a multi-value dictionary
     m = std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
 
-    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, m);
+    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, std::move(m));
   }
 
   /**
@@ -198,7 +198,7 @@ class Dictionary final {
         }
       }
     };
-    return MatchIterator::MakeIteratorPair(tfunc, first_match);
+    return MatchIterator::MakeIteratorPair(tfunc, std::move(first_match));
   }
 
   /**
@@ -229,7 +229,6 @@ class Dictionary final {
     }
 
     match_t m;
-    bool has_run = false;
 
     if (last_final_state) {
       // right now this is returning just 1 match, but it could do more
@@ -238,16 +237,7 @@ class Dictionary final {
                                   fsa_->GetStateValue(last_final_state));
     }
 
-    auto func = [m, has_run]() mutable {
-      if (!has_run) {
-        has_run = true;
-        return m;
-      }
-
-      return match_t();
-    };
-
-    return MatchIterator::MakeIteratorPair(func);
+    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, std::move(m));
   }
 
   /**
@@ -276,16 +266,14 @@ class Dictionary final {
       iterators.push(Lookup(text, position).begin());
     }
 
-    MatchIterator current_it = iterators.front();
     iterators.pop();
 
-    auto func = [iterators, current_it]() mutable {
-      while (iterators.size() && !(*current_it)) {
-        current_it = iterators.front();
+    auto func = [iterators = std::move(iterators)]() mutable {
+      while (iterators.size() && !(*iterators.front())) {
         iterators.pop();
       }
 
-      return *current_it++;
+      return *iterators.front()++;
     };
 
     return MatchIterator::MakeIteratorPair(func);
@@ -307,7 +295,7 @@ class Dictionary final {
         matching::NearMatching<>::FromSingleFsa(fsa_, key, minimum_prefix_length, greedy));
 
     auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    return MatchIterator::MakeIteratorPair(func, std::move(data->FirstMatch()));
   }
 
   MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const int32_t max_edit_distance,
@@ -316,7 +304,7 @@ class Dictionary final {
         matching::FuzzyMatching<>::FromSingleFsa(fsa_, query, max_edit_distance, minimum_exact_prefix));
 
     auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    return MatchIterator::MakeIteratorPair(func, std::move(data->FirstMatch()));
   }
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query) const {
@@ -325,7 +313,7 @@ class Dictionary final {
 
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
@@ -349,7 +337,7 @@ class Dictionary final {
     };
 
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
@@ -360,7 +348,7 @@ class Dictionary final {
 
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
@@ -385,7 +373,7 @@ class Dictionary final {
     };
 
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
@@ -399,7 +387,7 @@ class Dictionary final {
 
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::FuzzyMultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 

@@ -202,7 +202,7 @@ class FuzzyMultiwordCompletionMatching final {
                                             minimum_exact_prefix, number_of_tokens, multiword_separator);
   }
 
-  match_t FirstMatch() const { return first_match_; }
+  match_t& FirstMatch() { return first_match_; }
 
   match_t NextMatch() {
     for (; traverser_ptr_ && *traverser_ptr_; (*traverser_ptr_)++) {
@@ -285,7 +285,7 @@ class FuzzyMultiwordCompletionMatching final {
 
  private:
   std::unique_ptr<innerTraverserType> traverser_ptr_;
-  const match_t first_match_;
+  match_t first_match_;
   std::unique_ptr<stringdistance::LevenshteinCompletion> distance_metric_;
   const int32_t max_edit_distance_ = 0;
   const size_t prefix_length_ = 0;

@@ -27,6 +27,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #include <boost/container/flat_map.hpp>
 #include <boost/variant.hpp>
@@ -87,9 +88,37 @@ struct Match {
 
   Match() : matched_item_(), raw_value_() {}
 
-  // todo: consider disallowing copy and assignment
-  // Match& operator=(Match const&) = delete;
-  // Match(const Match& that) = delete;
+  Match(Match&& other)
+      : start_(other.start_),
+        end_(other.end_),
+        matched_item_(std::move(other.matched_item_)),
+        raw_value_(std::move(other.raw_value_)),
+        score_(other.score_),
+        fsa_(other.fsa_),
+        state_(other.state_),
+        attributes_(std::move(other.attributes_)) {
+    other.start_ = 0;
+    other.end_ = 0;
+    other.score_ = 0;
+    other.state_ = 0;
+  }
+
+  Match& operator=(Match&& other) {
+    start_ = other.start_;
+    end_ = other.end_;
+    matched_item_ = std::move(other.matched_item_);
+    raw_value_ = std::move(other.raw_value_);
+    score_ = other.score_;
+    fsa_ = std::move(other.fsa_);
+    state_ = other.state_;
+    attributes_ = std::move(other.attributes_);
+
+    other.start_ = 0;
+    other.end_ = 0;
+    other.score_ = 0;
+    other.state_ = 0;
+    return *this;
+  }
 
   size_t GetEnd() const { return end_; }
 

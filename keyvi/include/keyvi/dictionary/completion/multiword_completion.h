@@ -155,7 +155,7 @@ class MultiWordCompletion final {
         }
       };
 
-      return MatchIterator::MakeIteratorPair(tfunc, first_match);
+      return MatchIterator::MakeIteratorPair(tfunc, std::move(first_match));
     }
 
     return MatchIterator::EmptyIteratorPair();

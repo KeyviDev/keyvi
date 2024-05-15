@@ -29,28 +29,15 @@ namespace keyvi {
 namespace dictionary {
 namespace util {
 
-template<typename Iterator>
-class iterator_pair {
- public:
-  iterator_pair(){}
+template <typename Iterator>
+struct iterator_pair : std::pair<Iterator, Iterator> {
+  using std::pair<Iterator, Iterator>::pair;
 
-  iterator_pair(Iterator first, Iterator last)
-      : f_(first),
-        l_(last) {
-  }
-  Iterator begin() const {
-    return f_;
-  }
-  Iterator end() const {
-    return l_;
-  }
-
- private:
-  Iterator f_;
-  Iterator l_;
+  Iterator begin() const { return this->first; }
+  Iterator end() const { return this->second; }
 };
 
-template<typename Iterator>
+template <typename Iterator>
 iterator_pair<Iterator> make_iterator_pair(Iterator f, Iterator l) {
   return iterator_pair<Iterator>(f, l);
 }

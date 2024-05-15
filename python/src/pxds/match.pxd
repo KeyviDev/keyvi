@@ -8,7 +8,6 @@ from cpython.ref cimport PyObject
 cdef extern from "keyvi/dictionary/match.h" namespace "keyvi::dictionary":
     cdef cppclass Match:
         Match()
-        Match(Match& m)
         size_t GetStart() # wrap-ignore
         void SetStart(size_t start) # wrap-ignore
         size_t GetEnd() # wrap-ignore
