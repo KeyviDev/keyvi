@@ -63,7 +63,7 @@ struct keyvi_match_iterator {
   explicit keyvi_match_iterator(const MatchIterator::MatchIteratorPair&& obj)
       : current_(obj.begin()), end_(obj.end()) {}
   MatchIterator current_;
-  MatchIterator end_;
+  const MatchIterator end_;
 };
 
 //////////////////////
@@ -201,7 +201,7 @@ bool keyvi_match_iterator_empty(const keyvi_match_iterator* iterator) {
   return iterator->current_ == iterator->end_;
 }
 
-keyvi_match* keyvi_match_iterator_dereference(keyvi_match_iterator* iterator) {
+keyvi_match* keyvi_match_iterator_dereference(const keyvi_match_iterator* iterator) {
   return new keyvi_match(*iterator->current_);
 }
 
