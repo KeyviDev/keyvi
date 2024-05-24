@@ -91,7 +91,7 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, match_t const
     if (match_functor_) {
       TRACE("Match Iterator: call increment()");
 
-      current_match_ = std::move(match_functor_());
+      current_match_ = match_functor_();
 
       // if we get an empty match, release the functor
       if (!current_match_) {

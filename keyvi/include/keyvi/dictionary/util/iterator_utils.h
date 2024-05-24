@@ -22,8 +22,10 @@
  *      Author: hendrik
  */
 
-#ifndef ITERATOR_UTILS_H_
-#define ITERATOR_UTILS_H_
+#ifndef KEYVI_DICTIONARY_UTIL_ITERATOR_UTILS_H_
+#define KEYVI_DICTIONARY_UTIL_ITERATOR_UTILS_H_
+
+#include <utility>
 
 namespace keyvi {
 namespace dictionary {
@@ -46,4 +48,4 @@ iterator_pair<Iterator> make_iterator_pair(Iterator f, Iterator l) {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* ITERATOR_UTILS_H_ */
+#endif /* KEYVI_DICTIONARY_UTIL_ITERATOR_UTILS_H_ */
