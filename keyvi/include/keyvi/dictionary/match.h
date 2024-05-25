@@ -61,13 +61,7 @@ class attributes_visitor : public boost::static_visitor<PyObject*> {
 
   PyObject* operator()(bool i) const { return i ? Py_True : Py_False; }
 
-  PyObject* operator()(const std::string& str) const {
-#if PY_MAJOR_VERSION >= 3
-    return PyUnicode_FromString(str.c_str());
-#else
-    return PyString_FromString(str.c_str());
-#endif
-  }
+  PyObject* operator()(const std::string& str) const { return PyUnicode_FromString(str.c_str()); }
 };
 #endif
 
@@ -135,8 +129,6 @@ struct Match {
   size_t GetStart() const { return start_; }
 
   void SetStart(size_t start = 0) { start_ = start; }
-
-  bool IsEmpty() const { return start_ == 0 && end_ == 0; }
 
 #ifdef Py_PYTHON_H
   PyObject* GetAttributePy(const std::string& key) {
