@@ -48,6 +48,7 @@
 
 namespace keyvi {
 namespace dictionary {
+class SecondaryKeyDictionary;
 
 class Dictionary final {
  public:
@@ -102,21 +103,7 @@ class Dictionary final {
 
   match_t operator[](const std::string& key) const {
     uint64_t state = fsa_->GetStartState();
-    const size_t text_length = key.size();
-
-    for (size_t i = 0; i < text_length; ++i) {
-      state = fsa_->TryWalkTransition(state, key[i]);
-
-      if (!state) {
-        break;
-      }
-    }
-
-    if (!fsa_->IsFinalState(state)) {
-      return match_t();
-    }
-
-    return std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
+    return GetSubscript(key, state);
   }
 
   /**
@@ -345,13 +332,9 @@ class Dictionary final {
 
   MatchIterator::MatchIteratorPair GetMultiwordCompletion(const std::string& query,
                                                           const unsigned char multiword_separator = 0x1b) const {
-    auto data = std::make_shared<matching::MultiwordCompletionMatching<>>(
-        matching::MultiwordCompletionMatching<>::FromSingleFsa(fsa_, query, multiword_separator));
+    uint64_t state = fsa_->GetStartState();
 
-    auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(
-        func, std::move(data->FirstMatch()),
-        std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
+    return GetMultiWordCompletion(state, query, multiword_separator);
   }
 
   MatchIterator::MatchIteratorPair GetMultiwordCompletion(const std::string& query, size_t top_n,
@@ -397,6 +380,38 @@ class Dictionary final {
 
  private:
   fsa::automata_t fsa_;
+
+  friend class SecondaryKeyDictionary;
+
+  Match GetSubscript(const std::string& key, const uint64_t start_state) const {
+    uint64_t state = start_state;
+    const size_t text_length = key.size();
+
+    for (size_t i = 0; i < text_length; ++i) {
+      state = fsa_->TryWalkTransition(state, key[i]);
+
+      if (!state) {
+        break;
+      }
+    }
+
+    if (!fsa_->IsFinalState(state)) {
+      return Match();
+    }
+
+    return Match(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
+  }
+
+  MatchIterator::MatchIteratorPair GetMultiWordCompletion(
+      uint64_t state, const std::string& query, const unsigned char multiword_separator) const {
+    auto data = std::make_shared<matching::MultiwordCompletionMatching<>>(
+        matching::MultiwordCompletionMatching<>::FromSingleFsa(fsa_, state, query, multiword_separator));
+
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(
+        func, data->FirstMatch(),
+        std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
+  }
 };
 
 // shared pointer
