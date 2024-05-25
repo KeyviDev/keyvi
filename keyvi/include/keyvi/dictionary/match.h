@@ -130,6 +130,8 @@ struct Match {
 
   void SetStart(size_t start = 0) { start_ = start; }
 
+  bool IsEmpty() const { return start_ == 0 && end_ == 0; }
+
 #ifdef Py_PYTHON_H
   PyObject* GetAttributePy(const std::string& key) {
     auto result = GetAttribute(key);
