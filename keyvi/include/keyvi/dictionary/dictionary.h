@@ -266,14 +266,16 @@ class Dictionary final {
       iterators.push(Lookup(text, position).begin());
     }
 
+    MatchIterator current_it = iterators.front();
     iterators.pop();
 
-    auto func = [iterators = std::move(iterators)]() mutable {
-      while (iterators.size() && !(*iterators.front())) {
+    auto func = [iterators = std::move(iterators), current_it]() mutable {
+      while (iterators.size() && *current_it == nullptr) {
+        current_it = iterators.front();
         iterators.pop();
       }
 
-      return *iterators.front()++;
+      return *current_it++;
     };
 
     return MatchIterator::MakeIteratorPair(func);
