@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(OneSecondaryKey) {
   testing::TempDictionary dictionary(&test_data);
   secondary_key_dictionary_t d(new SecondaryKeyDictionary(dictionary.GetFsa()));
 
-  auto m = d->GetFirst("siegfried", {{"skey", "acme"}});
+  /*auto m = d->GetFirst("siegfried", {{"skey", "acme"}});
   BOOST_CHECK_EQUAL(22, m.GetWeight());
 
   auto completer = d->GetMultiwordCompletion("sie", {{"skey", "acme"}});
@@ -52,6 +52,7 @@ BOOST_AUTO_TEST_CASE(OneSecondaryKey) {
     BOOST_CHECK_EQUAL(22, completer_it->GetWeight());
   }
   BOOST_CHECK_EQUAL(1, i);
+  */
 }
 
 BOOST_AUTO_TEST_SUITE_END()

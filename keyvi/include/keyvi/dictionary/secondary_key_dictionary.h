@@ -25,7 +25,14 @@
 #ifndef KEYVI_DICTIONARY_SECONDARY_KEY_DICTIONARY_H_
 #define KEYVI_DICTIONARY_SECONDARY_KEY_DICTIONARY_H_
 
+#include <map>
+#include <string>
+#include <vector>
+
+#include "rapidjson/document.h"
+
 #include "keyvi/dictionary/dictionary.h"
+#include "keyvi/util/vint.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -47,7 +54,40 @@ class SecondaryKeyDictionary final {
 
   //
   explicit SecondaryKeyDictionary(fsa::automata_t f) : dictionary_(std::make_shared<Dictionary>(f)) {
-    // TODO: load map of secondary keys from dictionary properties and initialize lookup table
+    // TODO: use a custom property instead
+    std::string manifest = dictionary_->GetManifest();
+    rapidjson::Document parsed_manifest;
+    parsed_manifest.Parse(manifest);
+    if (!parsed_manifest.IsObject()) {
+      throw std::invalid_argument("not a secondary key dict");
+    }
+
+    /*if (!parsed_manifest.HasMember("SecondaryKeys") || !parsed_manifest.HasMember("SecondaryKeyValues")) {
+        throw std::invalid_argument("keys not found");
+    }
+
+    if (!parsed_manifest["SecondaryKeys"].IsArray() || !parsed_manifest["SecondaryKeyValues"].IsArray()) {
+        throw std::invalid_argument("value in wrong format");
+    }
+
+    for (auto const& value: parsed_manifest["SecondaryKeys"].GetArray()) {
+        secondary_keys_.push_back(value.GetString());
+    }
+
+    uint64_t i = 1;
+    std::vector<char> string_buffer;
+    size_t length;
+
+    // reserve a slot for empty replacement
+    keyvi::util::encodeVarInt(i++, &string_buffer, &length);
+    secondary_key_replacements_.emplace("", std::string(string_buffer.begin(), string_buffer.end()));
+
+    // create lookup table for values
+    for (auto const& value: parsed_manifest["SecondaryKeyValues"].GetArray()) {
+        string_buffer.clear();
+        keyvi::util::encodeVarInt(i++, &string_buffer, &length);
+        secondary_key_replacements_.emplace(value.GetString(), std::string(string_buffer.begin(), string_buffer.end()));
+    }*/
   }
 
   /**
@@ -56,12 +96,12 @@ class SecondaryKeyDictionary final {
    * @param key The key
    * @return True if key is in the dictionary, False otherwise.
    */
-  bool Contains(const std::string& key, const std::map<std::string, std::string>& meta) const { return false; }
+  bool Contains(const std::string& key, const std::map<std::string, std::string>& meta) const {
+    return dictionary_->Contains(GetStartState(meta), key);
+  }
 
   Match GetFirst(const std::string& key, const std::map<std::string, std::string>& meta) const {
-    // TODO: construct the secondary key from the given meta data and move the start state accordingly
-    uint64_t start_state = dictionary_->GetFsa()->GetStartState();
-    return dictionary_->GetSubscript(key, start_state);
+    return dictionary_->GetSubscript(GetStartState(meta), key);
   }
 
   /**
@@ -120,7 +160,7 @@ class SecondaryKeyDictionary final {
                                                           const unsigned char multiword_separator = 0x1b) const {
     // TODO: construct the secondary key from the given meta data and move the start state accordingly
     uint64_t start_state = dictionary_->GetFsa()->GetStartState();
-    return dictionary_->GetMultiWordCompletion(start_state, query, multiword_separator);
+    return dictionary_->GetMultiwordCompletion(query, start_state, multiword_separator);
   }
 
   MatchIterator::MatchIteratorPair GetMultiwordCompletion(const std::string& query,
@@ -141,6 +181,29 @@ class SecondaryKeyDictionary final {
 
  private:
   dictionary_t dictionary_;
+  std::vector<std::string> secondary_keys_;
+  std::map<std::string, std::string> secondary_key_replacements_;
+
+  uint64_t GetStartState(const std::map<std::string, std::string>& meta) const {
+    uint64_t state = dictionary_->GetFsa()->GetStartState();
+
+    for (auto const& key : secondary_keys_) {
+      const std::string& value = meta.at(key);
+      auto pos = secondary_key_replacements_.find(value);
+      if (pos == secondary_key_replacements_.end()) {
+        return 0;
+      }
+      for (auto c : pos->second) {
+        state = dictionary_->GetFsa()->TryWalkTransition(state, c);
+
+        if (!state) {
+          return 0;
+        }
+      }
+    }
+
+    return state;
+  }
 };
 
 // shared pointer
