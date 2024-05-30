@@ -143,21 +143,21 @@ void keyvi_match_destroy(const keyvi_match* match) {
 }
 
 bool keyvi_match_is_empty(const keyvi_match* match) {
-  return match->obj_ == nullptr;
+  return static_cast<bool>(match->obj_);
 }
 
 double keyvi_match_get_score(const keyvi_match* match) {
-  return match->obj_ == nullptr ? 0 : match->obj_->GetScore();
+  return match->obj_ ? 0 : match->obj_->GetScore();
 }
 
 char* keyvi_match_get_value_as_string(const keyvi_match* match) {
-  return match->obj_ == nullptr ? std_2_c_string("") : std_2_c_string(match->obj_->GetValueAsString());
+  return match->obj_ ? std_2_c_string("") : std_2_c_string(match->obj_->GetValueAsString());
 }
 
 keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
   const keyvi_bytes empty_keyvi_bytes{0, nullptr};
 
-  if (match->obj_ == nullptr) {
+  if (match->obj_) {
     return empty_keyvi_bytes;
   }
 
@@ -177,7 +177,7 @@ keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
 }
 
 char* keyvi_match_get_matched_string(const keyvi_match* match) {
-  return match->obj_ == nullptr ? std_2_c_string("") : std_2_c_string(match->obj_->GetMatchedString());
+  return match->obj_ ? std_2_c_string("") : std_2_c_string(match->obj_->GetMatchedString());
 }
 
 //////////////////////
