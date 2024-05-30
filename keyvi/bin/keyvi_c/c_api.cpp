@@ -147,11 +147,11 @@ bool keyvi_match_is_empty(const keyvi_match* match) {
 }
 
 double keyvi_match_get_score(const keyvi_match* match) {
-  return match->obj_ ? 0 : match->obj_->GetScore();
+  return match->obj_ ? match->obj_->GetScore() : 0;
 }
 
 char* keyvi_match_get_value_as_string(const keyvi_match* match) {
-  return match->obj_ ? std_2_c_string("") : std_2_c_string(match->obj_->GetValueAsString());
+  return std_2_c_string(match->obj_ ? match->obj_->GetValueAsString() : "");
 }
 
 keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
@@ -177,7 +177,7 @@ keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
 }
 
 char* keyvi_match_get_matched_string(const keyvi_match* match) {
-  return match->obj_ ? std_2_c_string("") : std_2_c_string(match->obj_->GetMatchedString());
+  return std_2_c_string(match->obj_ ? match->obj_->GetMatchedString() : "");
 }
 
 //////////////////////
