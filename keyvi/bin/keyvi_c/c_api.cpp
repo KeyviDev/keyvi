@@ -157,7 +157,7 @@ char* keyvi_match_get_value_as_string(const keyvi_match* match) {
 keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
   const keyvi_bytes empty_keyvi_bytes{0, nullptr};
 
-  if (match->obj_) {
+  if (!match->obj_) {
     return empty_keyvi_bytes;
   }
 
