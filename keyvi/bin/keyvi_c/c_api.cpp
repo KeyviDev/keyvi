@@ -143,7 +143,7 @@ void keyvi_match_destroy(const keyvi_match* match) {
 }
 
 bool keyvi_match_is_empty(const keyvi_match* match) {
-  return static_cast<bool>(match->obj_);
+  return !match->obj_;
 }
 
 double keyvi_match_get_score(const keyvi_match* match) {
