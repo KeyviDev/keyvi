@@ -270,7 +270,7 @@ class Dictionary final {
     iterators.pop();
 
     auto func = [iterators = std::move(iterators), current_it]() mutable {
-      while (iterators.size() && *current_it) {
+      while (iterators.size() && !*current_it) {
         current_it = iterators.front();
         iterators.pop();
       }
