@@ -59,7 +59,9 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, match_t const
 
   explicit MatchIterator(std::function<match_t()> match_functor, match_t&& first_match = match_t(),
                          std::function<void(uint32_t)> set_min_weight = {})
-      : match_functor_(match_functor), current_match_(std::move(first_match)), set_min_weight_(set_min_weight) {
+      : match_functor_(std::move(match_functor)),
+        current_match_(std::move(first_match)),
+        set_min_weight_(std::move(set_min_weight)) {
     if (!current_match_) {
       TRACE("first match empty");
       increment();
@@ -70,7 +72,8 @@ class MatchIterator : public boost::iterator_facade<MatchIterator, match_t const
 
   static MatchIteratorPair MakeIteratorPair(std::function<match_t()> f, match_t&& first_match = match_t(),
                                             std::function<void(uint32_t)> set_min_weight = {}) {
-    return MatchIteratorPair(MatchIterator(f, std::move(first_match), set_min_weight), MatchIterator());
+    return MatchIteratorPair(MatchIterator(std::move(f), std::move(first_match), std::move(set_min_weight)),
+                             MatchIterator());
   }
 
   static MatchIteratorPair EmptyIteratorPair() { return MatchIteratorPair(MatchIterator(), MatchIterator()); }
