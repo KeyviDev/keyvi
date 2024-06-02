@@ -25,7 +25,9 @@
 #ifndef KEYVI_DICTIONARY_SECONDARY_KEY_DICTIONARY_COMPILER_H_
 #define KEYVI_DICTIONARY_SECONDARY_KEY_DICTIONARY_COMPILER_H_
 
+#include <map>
 #include <string>
+#include <vector>
 
 #include "keyvi/dictionary/dictionary_compiler.h"
 
@@ -48,16 +50,14 @@ class SecondaryKeyDictionaryCompiler final {
 
  public:
   /**
-   * Instantiate a dictionary compiler.
+   * Instantiate a secondary key dictionary compiler.
    *
-   * Note the memory limit only limits the memory used for internal buffers,
-   * memory usage for small short-lived objects and the library itself is not
-   * part of the limit.
-   *
+   * @param secondary_keys a list of secondary keys
    * @param params compiler parameters
    */
-  explicit SecondaryKeyDictionaryCompiler(const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
-      : dictionary_compiler_(params) {}
+  explicit SecondaryKeyDictionaryCompiler(const std::vector<std::string> secondary_keys,
+                                          const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
+      : dictionary_compiler_(params), secondary_keys_(secondary_keys) {}
 
   SecondaryKeyDictionaryCompiler& operator=(SecondaryKeyDictionaryCompiler const&) = delete;
   SecondaryKeyDictionaryCompiler(const SecondaryKeyDictionaryCompiler& that) = delete;
@@ -70,7 +70,7 @@ class SecondaryKeyDictionaryCompiler final {
   /**
    * Do the final compilation
    */
-  void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
+  void Compile(DictionaryCompiler<>::callback_t progress_callback = nullptr, void* user_data = nullptr) {
     dictionary_compiler_.Compile(progress_callback, user_data);
   }
 
@@ -87,6 +87,8 @@ class SecondaryKeyDictionaryCompiler final {
 
  private:
   DictionaryCompiler<ValueStoreType> dictionary_compiler_;
+  std::vector<std::string> secondary_keys_;
+  std::map<std::string, std::string> secondary_key_replacements_;
 };
 
 } /* namespace dictionary */

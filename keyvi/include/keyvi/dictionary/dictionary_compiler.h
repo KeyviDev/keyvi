@@ -65,9 +65,8 @@ template <keyvi::dictionary::fsa::internal::value_store_t ValueStoreType = fsa::
 class DictionaryCompiler final {
  public:
   using ValueStoreT = typename fsa::internal::ValueStoreComponents<ValueStoreType>::value_store_writer_t;
-
- private:
   using callback_t = std::function<void(size_t, size_t, void*)>;
+ private:
   using GeneratorAdapter = fsa::GeneratorAdapterInterface<typename ValueStoreT::value_t>;
 
  public:

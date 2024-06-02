@@ -22,9 +22,14 @@
  *      Author: hendrik
  */
 
+#include <map>
+#include <tuple>
+#include <vector>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/secondary_key_dictionary.h"
+#include "keyvi/dictionary/secondary_key_dictionary_compiler.h"
 #include "keyvi/testing/temp_dictionary.h"
 
 namespace keyvi {
@@ -32,12 +37,29 @@ namespace dictionary {
 BOOST_AUTO_TEST_SUITE(SecondaryKeyDictionaryTests)
 
 BOOST_AUTO_TEST_CASE(OneSecondaryKey) {
-  std::vector<std::pair<std::string, uint32_t>> test_data = {
-      {"acme:siegfried", 22},
-      {"acma:walpurga", 10},
+  std::vector<std::tuple<std::string, std::map<std::string, std::string>, uint32_t>> test_data = {
+      {"siegfried", {{"company", "acme"}}, 22},
+      {"walpurga", {{"company", "acma"}}, 10},
   };
 
-  testing::TempDictionary dictionary(&test_data);
+  SecondaryKeyDictionaryCompiler<fsa::internal::value_store_t::INT_WITH_WEIGHTS> compiler(
+      {"company"}, keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+
+  for (auto p : test_data) {
+    compiler.Add(std::get<0>(p), std::get<1>(p), std::get<2>(p));
+  }
+  compiler.Compile();
+
+  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+
+  temp_path /=
+      boost::filesystem::unique_path("secondary-key-dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
+  std::string file_name = temp_path.string();
+
+  compiler.WriteToFile(file_name);
+
+  Dictionary d(file_name.c_str());
+
   // secondary_key_dictionary_t d(new SecondaryKeyDictionary(dictionary.GetFsa()));
 
   /*auto m = d->GetFirst("siegfried", {{"skey", "acme"}});
