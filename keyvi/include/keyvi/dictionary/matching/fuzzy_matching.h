@@ -124,7 +124,8 @@ class FuzzyMatching final {
     std::vector<std::pair<fsa::automata_t, uint64_t>> fsa_start_state_pairs =
         FilterWithExactPrefix(fsas, query, minimum_exact_prefix);
 
-    return FromMulipleFsasWithMatchedExactPrefix<innerTraverserType>(fsa_start_state_pairs, query, max_edit_distance, minimum_exact_prefix);
+    return FromMulipleFsasWithMatchedExactPrefix<innerTraverserType>(fsa_start_state_pairs, query, max_edit_distance,
+                                                                     minimum_exact_prefix);
   }
 
   static inline std::vector<std::pair<fsa::automata_t, uint64_t>> FilterWithExactPrefix(
