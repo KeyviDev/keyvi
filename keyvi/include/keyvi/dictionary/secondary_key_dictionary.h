@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_SECONDARY_KEY_DICTIONARY_H_
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -54,7 +55,7 @@ class SecondaryKeyDictionary final {
 
   //
   explicit SecondaryKeyDictionary(fsa::automata_t f) : dictionary_(std::make_shared<Dictionary>(f)) {
-    // TODO: use a custom property instead
+    // TODO(hendrik): use a custom property instead
     std::string manifest = dictionary_->GetManifest();
     rapidjson::Document parsed_manifest;
     parsed_manifest.Parse(manifest);
@@ -111,7 +112,7 @@ class SecondaryKeyDictionary final {
    * @return a match iterator
    */
   MatchIterator::MatchIteratorPair Get(const std::string& key, const std::map<std::string, std::string>& meta) const {
-    return MatchIterator::EmptyIteratorPair();
+    return dictionary_->Get(GetStartState(meta), key);
   }
 
   /**
@@ -120,7 +121,7 @@ class SecondaryKeyDictionary final {
    * @return a match iterator of all the items
    */
   MatchIterator::MatchIteratorPair GetAllItems(const std::map<std::string, std::string>& meta) const {
-    return MatchIterator::EmptyIteratorPair();
+    return dictionary_->GetAllItems(GetStartState(meta));
   }
 
   /**
@@ -135,38 +136,36 @@ class SecondaryKeyDictionary final {
    */
   MatchIterator::MatchIteratorPair GetNear(const std::string& key, const std::map<std::string, std::string>& meta,
                                            const size_t minimum_prefix_length, const bool greedy = false) const {
-    return MatchIterator::EmptyIteratorPair();
+    return dictionary_->GetNear(GetStartState(meta), key, minimum_prefix_length, greedy);
   }
 
   MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const std::map<std::string, std::string>& meta,
                                             const int32_t max_edit_distance,
                                             const size_t minimum_exact_prefix = 2) const {
-    return MatchIterator::EmptyIteratorPair();
+    return dictionary_->GetFuzzy(GetStartState(meta), query, max_edit_distance, minimum_exact_prefix);
   }
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query,
                                                        const std::map<std::string, std::string>& meta) const {
-    return MatchIterator::EmptyIteratorPair();
+    return dictionary_->GetPrefixCompletion(GetStartState(meta), query);
   }
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query,
                                                        const std::map<std::string, std::string>& meta,
                                                        size_t top_n) const {
-    return MatchIterator::EmptyIteratorPair();
+    return dictionary_->GetPrefixCompletion(GetStartState(meta), query, top_n);
   }
 
   MatchIterator::MatchIteratorPair GetMultiwordCompletion(const std::string& query,
                                                           const std::map<std::string, std::string>& meta,
                                                           const unsigned char multiword_separator = 0x1b) const {
-    // TODO: construct the secondary key from the given meta data and move the start state accordingly
-    uint64_t start_state = dictionary_->GetFsa()->GetStartState();
-    return dictionary_->GetMultiwordCompletion(query, start_state, multiword_separator);
+    return dictionary_->GetMultiwordCompletion(GetStartState(meta), query, multiword_separator);
   }
 
   MatchIterator::MatchIteratorPair GetMultiwordCompletion(const std::string& query,
                                                           const std::map<std::string, std::string>& meta, size_t top_n,
                                                           const unsigned char multiword_separator = 0x1b) const {
-    return MatchIterator::EmptyIteratorPair();
+    return dictionary_->GetMultiwordCompletion(GetStartState(meta), query, top_n, multiword_separator);
   }
 
   MatchIterator::MatchIteratorPair GetFuzzyMultiwordCompletion(const std::string& query,
@@ -174,7 +173,8 @@ class SecondaryKeyDictionary final {
                                                                const int32_t max_edit_distance,
                                                                const size_t minimum_exact_prefix = 0,
                                                                const unsigned char multiword_separator = 0x1b) const {
-    return MatchIterator::EmptyIteratorPair();
+    return dictionary_->GetFuzzyMultiwordCompletion(GetStartState(meta), query, max_edit_distance, minimum_exact_prefix,
+                                                    multiword_separator);
   }
 
   std::string GetManifest() const { return dictionary_->GetManifest(); }

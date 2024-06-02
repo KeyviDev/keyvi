@@ -189,7 +189,7 @@ class Dictionary final {
    */
   MatchIterator::MatchIteratorPair GetNear(const std::string& key, const size_t minimum_prefix_length,
                                            const bool greedy = false) const {
-    return GetNear(fsa_->GetStartState(),key, minimum_prefix_length, greedy);
+    return GetNear(fsa_->GetStartState(), key, minimum_prefix_length, greedy);
   }
 
   MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const int32_t max_edit_distance,
@@ -422,7 +422,7 @@ class Dictionary final {
         std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
-  MatchIterator::MatchIteratorPair GetMultiwordCompletion(const uint64_t state, const std::string& query, 
+  MatchIterator::MatchIteratorPair GetMultiwordCompletion(const uint64_t state, const std::string& query,
                                                           const size_t top_n,
                                                           const unsigned char multiword_separator) const {
     auto data = std::make_shared<matching::MultiwordCompletionMatching<>>(

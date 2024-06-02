@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(OneSecondaryKey) {
   };
 
   testing::TempDictionary dictionary(&test_data);
-  secondary_key_dictionary_t d(new SecondaryKeyDictionary(dictionary.GetFsa()));
+  // secondary_key_dictionary_t d(new SecondaryKeyDictionary(dictionary.GetFsa()));
 
   /*auto m = d->GetFirst("siegfried", {{"skey", "acme"}});
   BOOST_CHECK_EQUAL(22, m.GetWeight());

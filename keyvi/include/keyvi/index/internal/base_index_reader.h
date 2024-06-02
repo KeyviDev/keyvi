@@ -131,7 +131,7 @@ class BaseIndexReader {
 
     if (fsa_start_state_payloads.size() == 1) {
       auto near_matcher =
-          std::make_shared<dictionary::matching::NearMatching<>>(dictionary::matching::NearMatching<>::FromSingleFsa(
+          std::make_shared<dictionary::matching::NearMatching<>>(dictionary::matching::NearMatching<>::FromSingleFsaWithMatchedExactPrefix(
               std::get<0>(fsa_start_state_payloads[0]), std::get<1>(fsa_start_state_payloads[0]), query,
               minimum_exact_prefix, greedy));
 
@@ -157,7 +157,7 @@ class BaseIndexReader {
     auto near_matcher = std::make_shared<
         dictionary::matching::NearMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::NearStateTraverser>>>(
         dictionary::matching::NearMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::NearStateTraverser>>::
-            FromMulipleFsas(std::move(fsa_start_state_payloads), query, minimum_exact_prefix, greedy));
+            FromMulipleFsasWithMatchedExactPrefix(std::move(fsa_start_state_payloads), query, minimum_exact_prefix, greedy));
 
     if (deleted_keys_map.size() == 0) {
       auto func = [near_matcher]() { return near_matcher->NextMatch(); };
