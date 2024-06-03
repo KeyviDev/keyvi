@@ -100,7 +100,7 @@ class Dictionary final {
     return false;
   }
 
-  Match operator[](const std::string& key) const {
+  match_t operator[](const std::string& key) const {
     uint64_t state = fsa_->GetStartState();
     const size_t text_length = key.size();
 
@@ -113,10 +113,10 @@ class Dictionary final {
     }
 
     if (!fsa_->IsFinalState(state)) {
-      return Match();
+      return match_t();
     }
 
-    return Match(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
+    return std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
   }
 
   /**
@@ -141,22 +141,12 @@ class Dictionary final {
       return MatchIterator::EmptyIteratorPair();
     }
 
-    Match m;
-    bool has_run = false;
+    match_t m;
 
     // right now this is returning just 1 match, but it could be more if it is a multi-value dictionary
-    m = Match(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
+    m = std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
 
-    auto func = [m, has_run]() mutable {
-      if (!has_run) {
-        has_run = true;
-        return m;
-      }
-
-      return Match();
-    };
-
-    return MatchIterator::MakeIteratorPair(func);
+    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, std::move(m));
   }
 
   /**
@@ -169,7 +159,7 @@ class Dictionary final {
     std::vector<unsigned char> traversal_stack;
     traversal_stack.reserve(1024);
 
-    Match first_match;
+    match_t first_match;
 
     // data which is required for the callback as well
     struct delegate_payload {
@@ -182,7 +172,7 @@ class Dictionary final {
 
     std::shared_ptr<delegate_payload> data(new delegate_payload(fsa::StateTraverser<>(fsa_, state), traversal_stack));
 
-    std::function<Match()> tfunc = [data]() {
+    std::function<match_t()> tfunc = [data]() {
       TRACE("GetAllKeys callback called");
 
       for (;;) {
@@ -195,8 +185,8 @@ class Dictionary final {
             std::string match_str =
                 std::string(reinterpret_cast<char*>(&data->traversal_stack[0]), data->traverser.GetDepth());
             TRACE("found final state at depth %d %s", data->traverser.GetDepth(), match_str.c_str());
-            Match m(0, data->traverser.GetDepth(), match_str, 0, data->traverser.GetFsa(),
-                    data->traverser.GetStateValue());
+            match_t m = std::make_shared<Match>(0, data->traverser.GetDepth(), match_str, 0, data->traverser.GetFsa(),
+                                                data->traverser.GetStateValue());
 
             data->traverser++;
             return m;
@@ -204,11 +194,11 @@ class Dictionary final {
           data->traverser++;
         } else {
           TRACE("StateTraverser exhausted.");
-          return Match();
+          return match_t();
         }
       }
     };
-    return MatchIterator::MakeIteratorPair(tfunc, first_match);
+    return MatchIterator::MakeIteratorPair(tfunc, std::move(first_match));
   }
 
   /**
@@ -238,25 +228,16 @@ class Dictionary final {
       }
     }
 
-    Match m;
-    bool has_run = false;
+    match_t m;
 
     if (last_final_state) {
       // right now this is returning just 1 match, but it could do more
-      m = Match(offset, last_final_state_position, text.substr(offset, last_final_state_position - offset), 0, fsa_,
-                fsa_->GetStateValue(last_final_state));
+      m = std::make_shared<Match>(offset, last_final_state_position,
+                                  text.substr(offset, last_final_state_position - offset), 0, fsa_,
+                                  fsa_->GetStateValue(last_final_state));
     }
 
-    auto func = [m, has_run]() mutable {
-      if (!has_run) {
-        has_run = true;
-        return m;
-      }
-
-      return Match();
-    };
-
-    return MatchIterator::MakeIteratorPair(func);
+    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, std::move(m));
   }
 
   /**
@@ -288,8 +269,8 @@ class Dictionary final {
     MatchIterator current_it = iterators.front();
     iterators.pop();
 
-    auto func = [iterators, current_it]() mutable {
-      while (iterators.size() && (*current_it).IsEmpty()) {
+    auto func = [iterators = std::move(iterators), current_it]() mutable {
+      while (iterators.size() && !*current_it) {
         current_it = iterators.front();
         iterators.pop();
       }
@@ -316,7 +297,7 @@ class Dictionary final {
         matching::NearMatching<>::FromSingleFsa(fsa_, key, minimum_prefix_length, greedy));
 
     auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    return MatchIterator::MakeIteratorPair(func, std::move(data->FirstMatch()));
   }
 
   MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const int32_t max_edit_distance,
@@ -325,7 +306,7 @@ class Dictionary final {
         matching::FuzzyMatching<>::FromSingleFsa(fsa_, query, max_edit_distance, minimum_exact_prefix));
 
     auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    return MatchIterator::MakeIteratorPair(func, std::move(data->FirstMatch()));
   }
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query) const {
@@ -334,7 +315,7 @@ class Dictionary final {
 
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
@@ -346,19 +327,19 @@ class Dictionary final {
 
     auto func = [data, best_weights = std::move(best_weights)]() {
       auto m = data->NextMatch();
-      while (!m.IsEmpty()) {
-        if (m.GetWeight() >= best_weights->Back()) {
-          best_weights->Put(m.GetWeight());
+      while (m) {
+        if (m->GetWeight() >= best_weights->Back()) {
+          best_weights->Put(m->GetWeight());
           return m;
         }
 
         m = data->NextMatch();
       }
-      return Match();
+      return match_t();
     };
 
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
@@ -369,7 +350,7 @@ class Dictionary final {
 
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
@@ -382,19 +363,19 @@ class Dictionary final {
 
     auto func = [data, best_weights = std::move(best_weights)]() {
       auto m = data->NextMatch();
-      while (!m.IsEmpty()) {
-        if (m.GetWeight() >= best_weights->Back()) {
-          best_weights->Put(m.GetWeight());
+      while (m) {
+        if (m->GetWeight() >= best_weights->Back()) {
+          best_weights->Put(m->GetWeight());
           return m;
         }
 
         m = data->NextMatch();
       }
-      return Match();
+      return match_t();
     };
 
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
@@ -408,7 +389,7 @@ class Dictionary final {
 
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::FuzzyMultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 

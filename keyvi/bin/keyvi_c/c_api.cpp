@@ -33,7 +33,7 @@
 
 using keyvi::dictionary::Dictionary;
 using keyvi::dictionary::dictionary_t;
-using keyvi::dictionary::Match;
+using keyvi::dictionary::match_t;
 using keyvi::dictionary::MatchIterator;
 using keyvi::dictionary::completion::MultiWordCompletion;
 using keyvi::dictionary::completion::PrefixCompletion;
@@ -54,14 +54,13 @@ struct keyvi_dictionary {
 };
 
 struct keyvi_match {
-  explicit keyvi_match(const Match& obj) : obj_(obj) {}
+  explicit keyvi_match(const match_t& obj) : obj_(obj) {}
 
-  Match obj_;
+  match_t obj_;
 };
 
 struct keyvi_match_iterator {
   explicit keyvi_match_iterator(const MatchIterator::MatchIteratorPair& obj) : current_(obj.begin()), end_(obj.end()) {}
-
   MatchIterator current_;
   const MatchIterator end_;
 };
@@ -143,20 +142,25 @@ void keyvi_match_destroy(const keyvi_match* match) {
 }
 
 bool keyvi_match_is_empty(const keyvi_match* match) {
-  return match->obj_.IsEmpty();
+  return !match->obj_;
 }
 
 double keyvi_match_get_score(const keyvi_match* match) {
-  return match->obj_.GetScore();
+  return match->obj_ ? match->obj_->GetScore() : 0;
 }
 
 char* keyvi_match_get_value_as_string(const keyvi_match* match) {
-  return std_2_c_string(match->obj_.GetValueAsString());
+  return std_2_c_string(match->obj_ ? match->obj_->GetValueAsString() : "");
 }
 
 keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
   const keyvi_bytes empty_keyvi_bytes{0, nullptr};
-  const std::string msgpacked_value = match->obj_.GetMsgPackedValueAsString();
+
+  if (!match->obj_) {
+    return empty_keyvi_bytes;
+  }
+
+  const std::string msgpacked_value = match->obj_->GetMsgPackedValueAsString();
 
   const size_t data_size = msgpacked_value.size();
   if (0 == data_size) {
@@ -172,7 +176,7 @@ keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
 }
 
 char* keyvi_match_get_matched_string(const keyvi_match* match) {
-  return std_2_c_string(match->obj_.GetMatchedString());
+  return std_2_c_string(match->obj_ ? match->obj_->GetMatchedString() : "");
 }
 
 //////////////////////

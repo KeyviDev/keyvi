@@ -13,16 +13,15 @@ cdef class MatchIterator:
         return self
 
     def __next__(self):
-        #if  co.dereference( self.it ) == co.dereference( self.end ) :
         if  self.it == self.end:
-
             raise StopIteration()
-        cdef _Match * _r = new _Match(co.dereference( self.it ))
+
+        cdef shared_ptr[_Match] _r = co.dereference( self.it )
         with nogil:
             co.preincrement( self.it )
         
         cdef Match py_result = Match.__new__(Match)
-        py_result.inst = shared_ptr[_Match](_r)
+        py_result.inst = _r
 
         return py_result
 

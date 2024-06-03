@@ -64,15 +64,15 @@ class BaseIndexReader {
    *
    * @param key the key
    */
-  dictionary::Match operator[](const std::string& key) {
-    dictionary::Match match;
+  dictionary::match_t operator[](const std::string& key) {
+    dictionary::match_t match;
     const_segments_t segments = payload_.Segments();
 
     for (auto it = segments->crbegin(); it != segments->crend(); ++it) {
       match = (*it)->GetDictionary()->operator[](key);
-      if (!match.IsEmpty()) {
+      if (match) {
         if ((*it)->IsDeleted(key)) {
-          return dictionary::Match();
+          return dictionary::match_t();
         }
         return match;
       }
@@ -150,7 +150,7 @@ class BaseIndexReader {
       }
 
       auto func = [near_matcher]() { return near_matcher->NextMatch(); };
-      return dictionary::MatchIterator::MakeIteratorPair(func, near_matcher->FirstMatch());
+      return dictionary::MatchIterator::MakeIteratorPair(func, std::move(near_matcher->FirstMatch()));
     }
 
     auto deleted_keys_map = CreatedDeletedKeysMap(segments, fsa_start_state_payloads);
@@ -161,7 +161,7 @@ class BaseIndexReader {
 
     if (deleted_keys_map.size() == 0) {
       auto func = [near_matcher]() { return near_matcher->NextMatch(); };
-      return dictionary::MatchIterator::MakeIteratorPair(func, near_matcher->FirstMatch());
+      return dictionary::MatchIterator::MakeIteratorPair(func, std::move(near_matcher->FirstMatch()));
     }
 
     auto func = [near_matcher, deleted_keys_map]() { return NextFilteredMatch(near_matcher, deleted_keys_map); };
@@ -221,7 +221,7 @@ class BaseIndexReader {
       }
 
       auto func = [fuzzy_matcher]() { return fuzzy_matcher->NextMatch(); };
-      return dictionary::MatchIterator::MakeIteratorPair(func, fuzzy_matcher->FirstMatch());
+      return dictionary::MatchIterator::MakeIteratorPair(func, std::move(fuzzy_matcher->FirstMatch()));
     }
 
     TRACE("collect deleted keys");
@@ -238,7 +238,7 @@ class BaseIndexReader {
 
     if (deleted_keys_map.size() == 0) {
       auto func = [fuzzy_matcher]() { return fuzzy_matcher->NextMatch(); };
-      return dictionary::MatchIterator::MakeIteratorPair(func, fuzzy_matcher->FirstMatch());
+      return dictionary::MatchIterator::MakeIteratorPair(func, std::move(fuzzy_matcher->FirstMatch()));
     }
 
     auto func = [fuzzy_matcher, deleted_keys_map]() { return NextFilteredMatch(fuzzy_matcher, deleted_keys_map); };
