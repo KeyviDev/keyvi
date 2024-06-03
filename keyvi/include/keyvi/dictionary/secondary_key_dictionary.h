@@ -101,7 +101,7 @@ class SecondaryKeyDictionary final {
     return dictionary_->Contains(GetStartState(meta), key);
   }
 
-  Match GetFirst(const std::string& key, const std::map<std::string, std::string>& meta) const {
+  match_t GetFirst(const std::string& key, const std::map<std::string, std::string>& meta) const {
     return dictionary_->GetSubscript(GetStartState(meta), key);
   }
 

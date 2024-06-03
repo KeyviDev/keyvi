@@ -80,7 +80,7 @@ class Dictionary final {
    */
   bool Contains(const std::string& key) const { return Contains(fsa_->GetStartState(), key); }
 
-  Match operator[](const std::string& key) const { return GetSubscript(fsa_->GetStartState(), key); }
+  match_t operator[](const std::string& key) const { return GetSubscript(fsa_->GetStartState(), key); }
 
   /**
    * Exact Match function.
@@ -230,11 +230,11 @@ class Dictionary final {
 
   friend class SecondaryKeyDictionary;
 
-  Match GetSubscript(const uint64_t start_state, const std::string& key) const {
+  match_t GetSubscript(const uint64_t start_state, const std::string& key) const {
     uint64_t state = start_state;
 
     if (!state) {
-      return Match();
+      return match_t();
     }
 
     const size_t text_length = key.size();
@@ -247,11 +247,11 @@ class Dictionary final {
       }
     }
 
-    if (!state || !fsa_->IsFinalState(state)) {
-      return Match();
+    if (!fsa_->IsFinalState(state)) {
+      return match_t();
     }
 
-    return Match(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
+    return std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
   }
 
   bool Contains(const uint64_t start_state, const std::string& key) const {
@@ -289,33 +289,23 @@ class Dictionary final {
       }
     }
 
-    if (!state || !fsa_->IsFinalState(state)) {
+    if (!fsa_->IsFinalState(state)) {
       return MatchIterator::EmptyIteratorPair();
     }
 
-    Match m;
-    bool has_run = false;
+    match_t m;
 
     // right now this is returning just 1 match, but it could be more if it is a multi-value dictionary
-    m = Match(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
+    m = std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
 
-    auto func = [m, has_run]() mutable {
-      if (!has_run) {
-        has_run = true;
-        return m;
-      }
-
-      return Match();
-    };
-
-    return MatchIterator::MakeIteratorPair(func);
+    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, std::move(m));
   }
 
   MatchIterator::MatchIteratorPair GetAllItems(const uint64_t state) const {
     std::vector<unsigned char> traversal_stack;
     traversal_stack.reserve(1024);
 
-    Match first_match;
+    match_t first_match;
 
     // data which is required for the callback as well
     struct delegate_payload {
@@ -328,7 +318,7 @@ class Dictionary final {
 
     std::shared_ptr<delegate_payload> data(new delegate_payload(fsa::StateTraverser<>(fsa_, state), traversal_stack));
 
-    std::function<Match()> tfunc = [data]() {
+    std::function<match_t()> tfunc = [data]() {
       TRACE("GetAllKeys callback called");
 
       for (;;) {
@@ -341,8 +331,8 @@ class Dictionary final {
             std::string match_str =
                 std::string(reinterpret_cast<char*>(&data->traversal_stack[0]), data->traverser.GetDepth());
             TRACE("found final state at depth %d %s", data->traverser.GetDepth(), match_str.c_str());
-            Match m(0, data->traverser.GetDepth(), match_str, 0, data->traverser.GetFsa(),
-                    data->traverser.GetStateValue());
+            match_t m = std::make_shared<Match>(0, data->traverser.GetDepth(), match_str, 0, data->traverser.GetFsa(),
+                                                data->traverser.GetStateValue());
 
             data->traverser++;
             return m;
@@ -350,15 +340,15 @@ class Dictionary final {
           data->traverser++;
         } else {
           TRACE("StateTraverser exhausted.");
-          return Match();
+          return match_t();
         }
       }
     };
-    return MatchIterator::MakeIteratorPair(tfunc, first_match);
+    return MatchIterator::MakeIteratorPair(tfunc, std::move(first_match));
   }
 
-  MatchIterator::MatchIteratorPair GetNear(const uint64_t state, const std::string& key,
-                                           const size_t minimum_prefix_length, const bool greedy = false) const {
+  MatchIterator::MatchIteratorPair GetNear(const uint64_t state, const std::string& key, const size_t minimum_prefix_length,
+                                           const bool greedy = false) const {
     auto data = std::make_shared<matching::NearMatching<>>(
         matching::NearMatching<>::FromSingleFsa(fsa_, state, key, minimum_prefix_length, greedy));
 
@@ -418,7 +408,7 @@ class Dictionary final {
 
     auto func = [data]() { return data->NextMatch(); };
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 

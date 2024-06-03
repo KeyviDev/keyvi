@@ -115,9 +115,9 @@ class NearMatching final {
     return FromMulipleFsas(std::move(fsa_start_state_payloads), query, minimum_exact_prefix, greedy);
   }
 
-  Match FirstMatch() const { return first_match_; }
+  match_t& FirstMatch() { return first_match_; }
 
-  Match NextMatch() {
+  match_t NextMatch() {
     TRACE("call next match %lu", matched_depth_);
     for (; traverser_ptr_ && traverser_ptr_->GetDepth() > matched_depth_;) {
       if (traverser_ptr_->IsFinalState()) {
@@ -127,9 +127,9 @@ class NearMatching final {
                                         traverser_ptr_->GetDepth());
 
         // length should be query.size???
-        Match m(0, traverser_ptr_->GetDepth() + exact_prefix_.size(), match_str,
-                exact_prefix_.size() + traverser_ptr_->GetTraversalPayload().exact_depth, traverser_ptr_->GetFsa(),
-                traverser_ptr_->GetStateValue());
+        match_t m = std::make_shared<Match>(0, traverser_ptr_->GetDepth() + exact_prefix_.size(), match_str,
+                                            exact_prefix_.size() + traverser_ptr_->GetTraversalPayload().exact_depth,
+                                            traverser_ptr_->GetFsa(), traverser_ptr_->GetStateValue());
 
         if (!greedy_) {
           // remember the depth
@@ -144,18 +144,17 @@ class NearMatching final {
       (*traverser_ptr_)++;
     }
 
-    return Match();
+    return match_t();
   }
-
  private:
   std::unique_ptr<innerTraverserType> traverser_ptr_;
   const std::string exact_prefix_;
-  const Match first_match_;
+  match_t first_match_;
   const bool greedy_ = false;
   size_t matched_depth_ = 0;
 
-  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, Match&& first_match, std::string&& minimum_exact_prefix,
-               const bool greedy)
+  NearMatching(std::unique_ptr<innerTraverserType>&& traverser, match_t&& first_match,
+               std::string&& minimum_exact_prefix, const bool greedy)
       : traverser_ptr_(std::move(traverser)),
         exact_prefix_(std::move(minimum_exact_prefix)),
         first_match_(std::move(first_match)),
@@ -168,9 +167,9 @@ class NearMatching final {
 
   // reset method for the index in the special case the match is deleted
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
+  friend match_t index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+  friend match_t index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
 
   /**
    * Create a near matcher from a single Fsa
@@ -183,6 +182,7 @@ class NearMatching final {
   static NearMatching FromSingleFsaWithMatchedExactPrefix(const fsa::automata_t& fsa, const uint64_t start_state,
                                                           const std::string& query, const size_t exact_prefix,
                                                           const bool greedy = false) {
+    match_t first_match;
     if (fsa->IsFinalState(start_state)) {
       first_match = std::make_shared<Match>(0, query.size(), query, exact_prefix, fsa, fsa->GetStateValue(start_state));
     }
