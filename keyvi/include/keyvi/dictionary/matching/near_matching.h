@@ -146,6 +146,7 @@ class NearMatching final {
 
     return match_t();
   }
+
  private:
   std::unique_ptr<innerTraverserType> traverser_ptr_;
   const std::string exact_prefix_;

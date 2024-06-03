@@ -347,8 +347,8 @@ class Dictionary final {
     return MatchIterator::MakeIteratorPair(tfunc, std::move(first_match));
   }
 
-  MatchIterator::MatchIteratorPair GetNear(const uint64_t state, const std::string& key, const size_t minimum_prefix_length,
-                                           const bool greedy = false) const {
+  MatchIterator::MatchIteratorPair GetNear(const uint64_t state, const std::string& key,
+                                           const size_t minimum_prefix_length, const bool greedy = false) const {
     auto data = std::make_shared<matching::NearMatching<>>(
         matching::NearMatching<>::FromSingleFsa(fsa_, state, key, minimum_prefix_length, greedy));
 
