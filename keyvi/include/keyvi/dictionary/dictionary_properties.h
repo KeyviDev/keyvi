@@ -306,7 +306,8 @@ class DictionaryProperties {
     size_t transitions_offset = persistence_offset + sparse_array_size;
 
     // check for file truncation
-    file_stream.seekg((size_t)file_stream.tellg() + sparse_array_size + bucket_size * sparse_array_size - 1);
+    file_stream.seekg(static_cast<size_t>(file_stream.tellg()) + sparse_array_size + bucket_size * sparse_array_size -
+                      1);
     if (file_stream.peek() == EOF) {
       throw std::invalid_argument("file is corrupt(truncated)");
     }
