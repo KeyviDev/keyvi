@@ -52,6 +52,7 @@ namespace dictionary {
 static const char START_STATE_PROPERTY[] = "start_state";
 static const char VERSION_PROPERTY[] = "version";
 static const char MANIFEST_PROPERTY[] = "manifest";
+static const char SPECIALIZED_DICTIONARY_PROPERTY[] = "specialized_dict_properties";
 static const char NUMBER_OF_KEYS_PROPERTY[] = "number_of_keys";
 static const char VALUE_STORE_TYPE_PROPERTY[] = "value_store_type";
 static const char NUMBER_OF_STATES_PROPERTY[] = "number_of_states";
@@ -66,7 +67,8 @@ class DictionaryProperties {
                        const uint64_t number_of_keys, const uint64_t number_of_states,
                        const fsa::internal::value_store_t value_store_type, uint64_t sparse_array_version,
                        const size_t sparse_array_size, const size_t persistence_offset, const size_t transitions_offset,
-                       const fsa::internal::ValueStoreProperties& value_store_properties, const std::string& manifest) {
+                       const fsa::internal::ValueStoreProperties& value_store_properties, const std::string& manifest,
+                       const std::string& specialized_dictionary_properties) {
     file_name_ = file_name;
     version_ = version;
     start_state_ = start_state;
@@ -79,6 +81,7 @@ class DictionaryProperties {
     transitions_offset_ = transitions_offset;
     value_store_properties_ = value_store_properties;
     manifest_ = manifest;
+    specialized_dictionary_properties_ = specialized_dictionary_properties;
   }
 
   /**
@@ -86,7 +89,8 @@ class DictionaryProperties {
    */
   DictionaryProperties(const uint64_t version, const uint64_t start_state, const uint64_t number_of_keys,
                        const uint64_t number_of_states, const fsa::internal::value_store_t value_store_type,
-                       uint64_t sparse_array_version, const size_t sparse_array_size, std::string manifest) {
+                       uint64_t sparse_array_version, const size_t sparse_array_size, const std::string& manifest,
+                       const std::string& specialized_dictionary_properties) {
     version_ = version;
     start_state_ = start_state;
     number_of_keys_ = number_of_keys;
@@ -95,6 +99,7 @@ class DictionaryProperties {
     sparse_array_version_ = sparse_array_version;
     sparse_array_size_ = sparse_array_size;
     manifest_ = manifest;
+    specialized_dictionary_properties_ = specialized_dictionary_properties;
   }
 
   static DictionaryProperties FromFile(const std::string& file_name) {
@@ -132,7 +137,9 @@ class DictionaryProperties {
 
   const fsa::internal::ValueStoreProperties& GetValueStoreProperties() const { return value_store_properties_; }
 
-  const std::string GetManifest() const { return manifest_; }
+  const std::string& GetManifest() const { return manifest_; }
+
+  const std::string& GetSpecializedDictionaryProperties() const { return specialized_dictionary_properties_; }
 
   std::string GetStatistics() const {
     rapidjson::StringBuffer string_buffer;
@@ -191,8 +198,15 @@ class DictionaryProperties {
       writer.Key(NUMBER_OF_STATES_PROPERTY);
       writer.String(std::to_string(number_of_states_));
       // manifest
-      writer.Key(MANIFEST_PROPERTY);
-      writer.String(manifest_);
+      if (!manifest_.empty()) {
+        writer.Key(MANIFEST_PROPERTY);
+        writer.String(manifest_);
+      }
+      // special properties
+      if (!specialized_dictionary_properties_.empty()) {
+        writer.Key(SPECIALIZED_DICTIONARY_PROPERTY);
+        writer.String(specialized_dictionary_properties_);
+      }
       writer.EndObject();
     }
 
@@ -232,6 +246,7 @@ class DictionaryProperties {
   size_t transitions_offset_ = 0;
   fsa::internal::ValueStoreProperties value_store_properties_;
   std::string manifest_;
+  std::string specialized_dictionary_properties_;
 
   static DictionaryProperties ReadJsonFormat(const std::string& file_name, std::ifstream& file_stream) {
     rapidjson::Document automata_properties;
@@ -262,6 +277,14 @@ class DictionaryProperties {
       if (automata_properties[MANIFEST_PROPERTY].IsString()) {
         // manifest should be a string, if not ignore it
         manifest = automata_properties[MANIFEST_PROPERTY].GetString();
+      }
+    }
+
+    std::string specialized_dictionary_properties;
+    if (automata_properties.HasMember(SPECIALIZED_DICTIONARY_PROPERTY)) {
+      if (automata_properties[SPECIALIZED_DICTIONARY_PROPERTY].IsString()) {
+        // manifest should be a string, if not ignore it
+        specialized_dictionary_properties = automata_properties[SPECIALIZED_DICTIONARY_PROPERTY].GetString();
       }
     }
 
@@ -298,7 +321,7 @@ class DictionaryProperties {
 
     return DictionaryProperties(file_name, version, start_state, number_of_keys, number_of_states, value_store_type,
                                 sparse_array_version, sparse_array_size, persistence_offset, transitions_offset,
-                                value_store_properties, manifest);
+                                value_store_properties, manifest, specialized_dictionary_properties);
   }
 };
 

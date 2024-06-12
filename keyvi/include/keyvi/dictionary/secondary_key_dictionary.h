@@ -77,16 +77,15 @@ class SecondaryKeyDictionary final {
 
     uint64_t i = 1;
     std::vector<char> string_buffer;
-    size_t length;
 
     // reserve a slot for empty replacement
-    keyvi::util::encodeVarInt(i++, &string_buffer, &length);
+    keyvi::util::encodeVarInt(i++, &string_buffer);
     secondary_key_replacements_.emplace("", std::string(string_buffer.begin(), string_buffer.end()));
 
     // create lookup table for values
     for (auto const& value: parsed_manifest["SecondaryKeyValues"].GetArray()) {
         string_buffer.clear();
-        keyvi::util::encodeVarInt(i++, &string_buffer, &length);
+        keyvi::util::encodeVarInt(i++, &string_buffer);
         secondary_key_replacements_.emplace(value.GetString(), std::string(string_buffer.begin(), string_buffer.end()));
     }*/
   }

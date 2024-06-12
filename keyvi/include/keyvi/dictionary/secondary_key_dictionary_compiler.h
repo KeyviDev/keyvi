@@ -57,14 +57,35 @@ class SecondaryKeyDictionaryCompiler final {
    */
   explicit SecondaryKeyDictionaryCompiler(const std::vector<std::string> secondary_keys,
                                           const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
-      : dictionary_compiler_(params), secondary_keys_(secondary_keys) {}
+      : dictionary_compiler_(params), secondary_keys_(secondary_keys) {
+    // reserve a slot for empty replacement
+    keyvi::util::encodeVarInt(current_index_++, &replacements_buffer_);
+    secondary_key_replacements_.emplace("", std::string(replacements_buffer_.begin(), replacements_buffer_.end()));
+  }
 
   SecondaryKeyDictionaryCompiler& operator=(SecondaryKeyDictionaryCompiler const&) = delete;
   SecondaryKeyDictionaryCompiler(const SecondaryKeyDictionaryCompiler& that) = delete;
 
   void Add(const std::string& input_key, const std::map<std::string, std::string>& meta,
            typename ValueStoreT::value_t value = ValueStoreT::no_value) {
-    dictionary_compiler_.Add(input_key, value);
+    key_buffer_.clear();
+
+    for (auto const& key : secondary_keys_) {
+      const std::string& value = meta.at(key);
+      auto pos = secondary_key_replacements_.find(value);
+      if (pos == secondary_key_replacements_.end()) {
+        // create a new entry
+        replacements_buffer_.clear();
+        keyvi::util::encodeVarInt(current_index_++, &replacements_buffer_);
+        secondary_key_replacements_.emplace(value,
+                                            std::string(replacements_buffer_.begin(), replacements_buffer_.end()));
+        key_buffer_ << replacements_buffer_.data();
+      } else {
+        key_buffer_ << pos->second;
+      }
+    }
+    key_buffer_ << input_key;
+    dictionary_compiler_.Add(key_buffer_.str(), value);
   }
 
   /**
@@ -81,14 +102,27 @@ class SecondaryKeyDictionaryCompiler final {
    */
   void SetManifest(const std::string& manifest) { dictionary_compiler_.SetManifest; }
 
-  void Write(std::ostream& stream) { dictionary_compiler_.Write(stream); }
+  void Write(std::ostream& stream) {
+    dictionary_compiler_.Write(stream);
 
-  void WriteToFile(const std::string& filename) { dictionary_compiler_.WriteToFile(filename); }
+    for (auto const& [value, replacement] : secondary_key_replacements_) {
+    }
+  }
+
+  void WriteToFile(const std::string& filename) {
+    std::ofstream out_stream = keyvi::util::OsUtils::OpenOutFileStream(filename);
+
+    Write(out_stream);
+    out_stream.close();
+  }
 
  private:
   DictionaryCompiler<ValueStoreType> dictionary_compiler_;
   std::vector<std::string> secondary_keys_;
   std::map<std::string, std::string> secondary_key_replacements_;
+  uint64_t current_index_ = 1;
+  std::vector<char> replacements_buffer_;
+  std::stringstream key_buffer_;
 };
 
 } /* namespace dictionary */
