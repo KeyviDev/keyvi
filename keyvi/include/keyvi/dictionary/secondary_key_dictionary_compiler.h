@@ -27,9 +27,12 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -57,35 +60,43 @@ class SecondaryKeyDictionaryCompiler final {
    */
   explicit SecondaryKeyDictionaryCompiler(const std::vector<std::string> secondary_keys,
                                           const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
-      : dictionary_compiler_(params), secondary_keys_(secondary_keys) {
-    // reserve a slot for empty replacement
-    keyvi::util::encodeVarInt(current_index_++, &replacements_buffer_);
-    secondary_key_replacements_.emplace("", std::string(replacements_buffer_.begin(), replacements_buffer_.end()));
-  }
+      : params_(params), dictionary_compiler_(params), secondary_keys_(secondary_keys) {}
 
   SecondaryKeyDictionaryCompiler& operator=(SecondaryKeyDictionaryCompiler const&) = delete;
   SecondaryKeyDictionaryCompiler(const SecondaryKeyDictionaryCompiler& that) = delete;
 
   void Add(const std::string& input_key, const std::map<std::string, std::string>& meta,
            typename ValueStoreT::value_t value = ValueStoreT::no_value) {
-    key_buffer_.clear();
+    std::ostringstream key_buffer;
+
+    TRACE("add %s", input_key.c_str());
 
     for (auto const& key : secondary_keys_) {
       const std::string& value = meta.at(key);
+
+      if (value.size() == 0) {
+        key_buffer << static_cast<char>(1);
+        continue;
+      }
+
       auto pos = secondary_key_replacements_.find(value);
       if (pos == secondary_key_replacements_.end()) {
         // create a new entry
         replacements_buffer_.clear();
         keyvi::util::encodeVarInt(current_index_++, &replacements_buffer_);
-        secondary_key_replacements_.emplace(value,
-                                            std::string(replacements_buffer_.begin(), replacements_buffer_.end()));
-        key_buffer_ << replacements_buffer_.data();
+
+        std::string replacement = std::string(replacements_buffer_.begin(), replacements_buffer_.end());
+        TRACE("replace %s with: %s", value.c_str(), replacement.c_str());
+        key_buffer << replacement;
+        secondary_key_replacements_.emplace(value, std::move(replacement));
       } else {
-        key_buffer_ << pos->second;
+        key_buffer << pos->second;
       }
     }
-    key_buffer_ << input_key;
-    dictionary_compiler_.Add(key_buffer_.str(), value);
+    key_buffer << input_key;
+
+    TRACE("add %s", key_buffer.str().c_str());
+    dictionary_compiler_.Add(key_buffer.str(), value);
   }
 
   /**
@@ -103,10 +114,30 @@ class SecondaryKeyDictionaryCompiler final {
   void SetManifest(const std::string& manifest) { dictionary_compiler_.SetManifest; }
 
   void Write(std::ostream& stream) {
+    rapidjson::StringBuffer string_buffer;
+
+    {
+      rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);
+
+      writer.StartObject();
+      writer.Key(SECONDARY_KEY_DICT_KEYS_PROPERTY);
+      writer.StartArray();
+      for (const std::string& key : secondary_keys_) {
+        writer.String(key);
+      }
+      writer.EndArray();
+      writer.EndObject();
+    }
+    dictionary_compiler_.SetSpecializedDictionaryProperties(string_buffer.GetString());
     dictionary_compiler_.Write(stream);
 
+    StringDictionaryCompiler secondary_key_compiler(params_);
+
     for (auto const& [value, replacement] : secondary_key_replacements_) {
+      secondary_key_compiler.Add(value, replacement);
     }
+    secondary_key_compiler.Compile();
+    secondary_key_compiler.Write(stream);
   }
 
   void WriteToFile(const std::string& filename) {
@@ -117,12 +148,12 @@ class SecondaryKeyDictionaryCompiler final {
   }
 
  private:
+  keyvi::util::parameters_t params_;
   DictionaryCompiler<ValueStoreType> dictionary_compiler_;
   std::vector<std::string> secondary_keys_;
   std::map<std::string, std::string> secondary_key_replacements_;
-  uint64_t current_index_ = 1;
+  uint64_t current_index_ = 2;  //  starting from 2, 1 is reserved for empty string
   std::vector<char> replacements_buffer_;
-  std::stringstream key_buffer_;
 };
 
 } /* namespace dictionary */

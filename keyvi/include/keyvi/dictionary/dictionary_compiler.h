@@ -138,10 +138,11 @@ class DictionaryCompiler final {
     }
 
     generator_->SetManifest(manifest_);
+    generator_->SetSpecializedDictionaryProperties(specialized_dictionary_properties_);
   }
 
   /**
-   * Set a custom manifest to be embedded into the index file.
+   * Set a custom manifest to be embedded into the keyvi file.
    *
    * @param manifest as string
    */
@@ -152,6 +153,21 @@ class DictionaryCompiler final {
     // is created
     if (generator_) {
       generator_->SetManifest(manifest);
+    }
+  }
+
+  /**
+   * Set a specialized dictionary properties.
+   *
+   * @param specialized_dictionary_properties properties as string
+   */
+  void SetSpecializedDictionaryProperties(const std::string& specialized_dictionary_properties) {
+    specialized_dictionary_properties_ = specialized_dictionary_properties;
+
+    // if generator object is already there, set it otherwise cache it until it
+    // is created
+    if (generator_) {
+      generator_->SetSpecializedDictionaryProperties(specialized_dictionary_properties_);
     }
   }
 
@@ -180,6 +196,7 @@ class DictionaryCompiler final {
   ValueStoreT* value_store_;
   typename GeneratorAdapter::AdapterPtr generator_;
   std::string manifest_;
+  std::string specialized_dictionary_properties_;
   size_t memory_limit_;
   size_t memory_estimate_ = 0;
   size_t chunk_ = 0;

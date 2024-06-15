@@ -46,6 +46,10 @@
 
 namespace keyvi {
 namespace dictionary {
+
+// for friending
+class SecondaryKeyDictionary;
+
 namespace fsa {
 
 /**
@@ -76,6 +80,11 @@ class Automata final {
                     loading_strategy_types loading_strategy = loading_strategy_types::lazy)
       : Automata(std::make_shared<DictionaryProperties>(DictionaryProperties::FromFile(file_name)), loading_strategy,
                  true) {}
+
+  explicit Automata(const std::string& file_name, const size_t offset,
+                    loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+      : Automata(std::make_shared<DictionaryProperties>(DictionaryProperties::FromFile(file_name, offset)),
+                 loading_strategy, true) {}
 
  private:
   explicit Automata(const dictionary_properties_t& dictionary_properties, loading_strategy_types loading_strategy,
@@ -385,13 +394,9 @@ class Automata final {
     return value_store_reader_->GetRawValueAsString(state_value);
   }
 
-  std::string GetStatistics() const {
-    return dictionary_properties_->GetStatistics();
-  }
+  std::string GetStatistics() const { return dictionary_properties_->GetStatistics(); }
 
-  std::string GetManifest() const {
-    return dictionary_properties_->GetManifest();
-  }
+  const std::string& GetManifest() const { return dictionary_properties_->GetManifest(); }
 
  private:
   dictionary_properties_t dictionary_properties_;
@@ -450,6 +455,10 @@ class Automata final {
     TRACE("Compact Transition after resolve %d", resolved_ptr);
     return resolved_ptr;
   }
+
+  friend class keyvi::dictionary::SecondaryKeyDictionary;
+
+  const dictionary_properties_t& GetDictionaryProperties() const { return dictionary_properties_; }
 };
 
 // shared pointer

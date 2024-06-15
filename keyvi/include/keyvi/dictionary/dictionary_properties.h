@@ -102,9 +102,10 @@ class DictionaryProperties {
     specialized_dictionary_properties_ = specialized_dictionary_properties;
   }
 
-  static DictionaryProperties FromFile(const std::string& file_name) {
+  static DictionaryProperties FromFile(const std::string& file_name, const size_t offset = 0) {
     std::ifstream file_stream(file_name, std::ios::binary);
 
+    file_stream.seekg(offset);
     if (!file_stream.good()) {
       throw std::invalid_argument("dictionary file not found");
     }
@@ -134,6 +135,8 @@ class DictionaryProperties {
   size_t GetTransitionsOffset() const { return transitions_offset_; }
 
   size_t GetTransitionsSize() const { return sparse_array_size_ * 2; }
+
+  size_t GetEndOffset() const { return GetTransitionsOffset() + GetTransitionsSize(); }
 
   const fsa::internal::ValueStoreProperties& GetValueStoreProperties() const { return value_store_properties_; }
 
@@ -315,8 +318,9 @@ class DictionaryProperties {
     file_stream.get();
 
     fsa::internal::ValueStoreProperties value_store_properties;
-    // not all value stores have properties
-    if (file_stream.peek() != EOF) {
+
+    // not all value stores have persisted properties
+    if (fsa::internal::ValueStoreHasPersistedProperties(value_store_type)) {
       value_store_properties = fsa::internal::ValueStoreProperties::FromJson(file_stream);
     }
 

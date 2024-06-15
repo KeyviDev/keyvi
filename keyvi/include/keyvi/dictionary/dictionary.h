@@ -223,7 +223,7 @@ class Dictionary final {
                                        multiword_separator);
   }
 
-  std::string GetManifest() const { return fsa_->GetManifest(); }
+  const std::string& GetManifest() const { return fsa_->GetManifest(); }
 
  private:
   fsa::automata_t fsa_;

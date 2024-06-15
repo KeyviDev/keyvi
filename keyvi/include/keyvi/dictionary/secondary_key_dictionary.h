@@ -33,6 +33,8 @@
 #include "rapidjson/document.h"
 
 #include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
+#include "keyvi/transform/fsa_transform.h"
 #include "keyvi/util/vint.h"
 
 // #define ENABLE_TRACING
@@ -51,43 +53,29 @@ class SecondaryKeyDictionary final {
    */
   explicit SecondaryKeyDictionary(const std::string& filename,
                                   loading_strategy_types loading_strategy = loading_strategy_types::lazy)
-      : SecondaryKeyDictionary(std::make_shared<fsa::Automata>(filename, loading_strategy)) {}
+      : SecondaryKeyDictionary(std::make_shared<fsa::Automata>(filename, loading_strategy), loading_strategy) {}
 
-  //
-  explicit SecondaryKeyDictionary(fsa::automata_t f) : dictionary_(std::make_shared<Dictionary>(f)) {
-    // TODO(hendrik): use a custom property instead
-    std::string manifest = dictionary_->GetManifest();
-    rapidjson::Document parsed_manifest;
-    parsed_manifest.Parse(manifest);
-    if (!parsed_manifest.IsObject()) {
+  explicit SecondaryKeyDictionary(fsa::automata_t f,
+                                  loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+      : dictionary_(std::make_shared<Dictionary>(f)) {
+    std::string properties = dictionary_->GetFsa()->GetDictionaryProperties()->GetSpecializedDictionaryProperties();
+
+    TRACE("Specialized properties: %s", properties.c_str());
+
+    rapidjson::Document parsed_properties;
+    parsed_properties.Parse(properties);
+    if (!parsed_properties.IsObject() || !parsed_properties.HasMember(SECONDARY_KEY_DICT_KEYS_PROPERTY) ||
+        !parsed_properties[SECONDARY_KEY_DICT_KEYS_PROPERTY].IsArray()) {
       throw std::invalid_argument("not a secondary key dict");
     }
 
-    /*if (!parsed_manifest.HasMember("SecondaryKeys") || !parsed_manifest.HasMember("SecondaryKeyValues")) {
-        throw std::invalid_argument("keys not found");
+    secondary_key_replacement_dict_ = std::make_shared<Dictionary>(std::make_shared<fsa::Automata>(
+        dictionary_->GetFsa()->GetDictionaryProperties()->GetFileName(),
+        dictionary_->GetFsa()->GetDictionaryProperties()->GetEndOffset(), loading_strategy));
+
+    for (auto const& value : parsed_properties[SECONDARY_KEY_DICT_KEYS_PROPERTY].GetArray()) {
+      secondary_keys_.push_back(value.GetString());
     }
-
-    if (!parsed_manifest["SecondaryKeys"].IsArray() || !parsed_manifest["SecondaryKeyValues"].IsArray()) {
-        throw std::invalid_argument("value in wrong format");
-    }
-
-    for (auto const& value: parsed_manifest["SecondaryKeys"].GetArray()) {
-        secondary_keys_.push_back(value.GetString());
-    }
-
-    uint64_t i = 1;
-    std::vector<char> string_buffer;
-
-    // reserve a slot for empty replacement
-    keyvi::util::encodeVarInt(i++, &string_buffer);
-    secondary_key_replacements_.emplace("", std::string(string_buffer.begin(), string_buffer.end()));
-
-    // create lookup table for values
-    for (auto const& value: parsed_manifest["SecondaryKeyValues"].GetArray()) {
-        string_buffer.clear();
-        keyvi::util::encodeVarInt(i++, &string_buffer);
-        secondary_key_replacements_.emplace(value.GetString(), std::string(string_buffer.begin(), string_buffer.end()));
-    }*/
   }
 
   /**
@@ -180,26 +168,42 @@ class SecondaryKeyDictionary final {
 
  private:
   dictionary_t dictionary_;
+  dictionary_t secondary_key_replacement_dict_;
   std::vector<std::string> secondary_keys_;
-  std::map<std::string, std::string> secondary_key_replacements_;
 
   uint64_t GetStartState(const std::map<std::string, std::string>& meta) const {
     uint64_t state = dictionary_->GetFsa()->GetStartState();
 
     for (auto const& key : secondary_keys_) {
-      const std::string& value = meta.at(key);
-      auto pos = secondary_key_replacements_.find(value);
-      if (pos == secondary_key_replacements_.end()) {
+      TRACE("match secondary key: %s", key.c_str());
+      auto pos = meta.find(key);
+      if (pos == meta.end()) {
         return 0;
       }
-      for (auto c : pos->second) {
-        state = dictionary_->GetFsa()->TryWalkTransition(state, c);
 
+      // edge case: empty value
+      if (pos->second.size() == 0) {
+        TRACE("match empty string");
+        state = dictionary_->GetFsa()->TryWalkTransition(state, static_cast<char>(1));
+        continue;
+      }
+
+      match_t m = secondary_key_replacement_dict_->operator[](pos->second);
+      if (!m) {
+        return 0;
+      }
+
+      TRACE("found secondary replacement");
+
+      for (auto c : m->GetValueAsString()) {
+        state = dictionary_->GetFsa()->TryWalkTransition(state, c);
         if (!state) {
           return 0;
         }
       }
     }
+
+    TRACE("state after secondary key matches: %d", state);
 
     return state;
   }
