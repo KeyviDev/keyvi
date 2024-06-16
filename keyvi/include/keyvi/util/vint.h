@@ -145,13 +145,11 @@ void encodeVarInt(int_t value, buffer_t* output, size_t* written_bytes) {
  */
 template <typename int_t = uint64_t, typename buffer_t>
 void encodeVarInt(int_t value, buffer_t* output) {
-  size_t length = 0;
   while (value > 127) {
     // |128: Set the next byte flag
     output->push_back(((uint8_t)(value & 127)) | 128);
     // Remove the seven bits we just wrote
     value >>= 7;
-    ++length;
   }
   output->push_back(((uint8_t)value) & 127);
 }
