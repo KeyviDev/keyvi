@@ -8,7 +8,7 @@
         self.Compile()
 
 
-    def Compile(self, *args):
+    def compile(self, *args):
         if not args:
             with nogil:
                 self.inst.get().Compile()
