@@ -78,3 +78,56 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
         void SetManifest(libcpp_utf8_string) except +
         void WriteToFile(libcpp_utf8_string) except +
 
+    cdef cppclass SecondaryKeyCompletionDictionaryCompiler:
+        SecondaryKeyCompletionDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys) except +
+        SecondaryKeyCompletionDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
+        void Add(libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int value) except + # wrap-as:add
+        void Compile() nogil # wrap-ignore
+        void Compile(callback_t, void*) nogil # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file
+
+    cdef cppclass SecondaryKeyFloatVectorDictionaryCompiler:
+        SecondaryKeyFloatVectorDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys) except +
+        SecondaryKeyFloatVectorDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
+        void Add(libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, libcpp_vector[float] value) except + # wrap-as:add
+        void Compile() nogil # wrap-ignore
+        void Compile(callback_t, void*) nogil # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file
+
+    cdef cppclass SecondaryKeyIntDictionaryCompiler:
+        SecondaryKeyIntDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys) except +
+        SecondaryKeyIntDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
+        void Add(libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, long value) except + # wrap-as:add
+        void Compile() nogil # wrap-ignore
+        void Compile(callback_t, void*) nogil # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file
+
+    cdef cppclass SecondaryKeyKeyOnlyDictionaryCompiler:
+        SecondaryKeyKeyOnlyDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys) except +
+        SecondaryKeyKeyOnlyDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
+        void Add(libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) except + # wrap-as:add
+        void Compile() nogil # wrap-ignore
+        void Compile(callback_t, void*) nogil # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file
+
+    cdef cppclass SecondaryKeyJsonDictionaryCompiler:
+        SecondaryKeyJsonDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys) except +
+        SecondaryKeyJsonDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
+        void Add(libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, libcpp_utf8_string value) except + # wrap-as:add
+        void Compile() nogil # wrap-ignore
+        void Compile(callback_t, void*) nogil # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file
+
+    cdef cppclass SecondaryKeyStringDictionaryCompiler:
+        SecondaryKeyStringDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys) except +
+        SecondaryKeyStringDictionaryCompiler(libcpp_vector[libcpp_utf8_string] secondary_keys, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
+        void Add(libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, libcpp_utf8_string value) except + # wrap-as:add
+        void Compile() nogil # wrap-ignore
+        void Compile(callback_t, void*) nogil # wrap-ignore
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file

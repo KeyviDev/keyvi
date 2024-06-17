@@ -110,7 +110,7 @@ class SecondaryKeyDictionaryCompiler final {
    *
    * @param manifest as string
    */
-  void SetManifest(const std::string& manifest) { dictionary_compiler_.SetManifest; }
+  void SetManifest(const std::string& manifest) { dictionary_compiler_.SetManifest(manifest); }
 
   void Write(std::ostream& stream) {
     rapidjson::StringBuffer string_buffer;
