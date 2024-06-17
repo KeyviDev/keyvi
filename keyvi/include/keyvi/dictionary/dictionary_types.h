@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_DICTIONARY_TYPES_H_
 
 #include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/secondary_key_dictionary_compiler.h"
 #include "keyvi/dictionary/dictionary_index_compiler.h"
 #include "keyvi/dictionary/dictionary_merger.h"
 #include "keyvi/dictionary/fsa/generator.h"
@@ -68,6 +69,19 @@ using StringDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_ty
 using KeyOnlyDictionaryMerger = keyvi::dictionary::DictionaryMerger<dictionary_type_t::KEY_ONLY>;
 
 using JsonDictionaryIndexCompiler = keyvi::dictionary::DictionaryIndexCompiler<dictionary_type_t::JSON>;
+
+// secondary key types
+using SecondaryKeyCompletionDictionaryCompiler = keyvi::dictionary::SecondaryKeyDictionaryCompiler<dictionary_type_t::INT_WITH_WEIGHTS>;
+
+using SecondaryKeyFloatVectorDictionaryCompiler = keyvi::dictionary::SecondaryKeyDictionaryCompiler<dictionary_type_t::FLOAT_VECTOR>;
+
+using SecondaryKeyIntDictionaryCompiler = keyvi::dictionary::SecondaryKeyDictionaryCompiler<dictionary_type_t::INT>;
+
+using SecondaryKeyKeyOnlyDictionaryCompiler = keyvi::dictionary::SecondaryKeyDictionaryCompiler<dictionary_type_t::KEY_ONLY>;
+
+using SecondaryKeyJsonDictionaryCompiler = keyvi::dictionary::SecondaryKeyDictionaryCompiler<dictionary_type_t::JSON>;
+
+using SecondaryKeyStringDictionaryCompiler = keyvi::dictionary::SecondaryKeyDictionaryCompiler<dictionary_type_t::STRING>;
 
 #ifndef KEYVI_REMOVE_DEPRECATED
 using IntDictionaryCompilerSmallData = IntDictionaryCompiler;

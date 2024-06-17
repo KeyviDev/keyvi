@@ -31,7 +31,6 @@
 #include <vector>
 
 #include "keyvi/dictionary/dictionary_compiler.h"
-#include "keyvi/dictionary/dictionary_types.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 
 // #define ENABLE_TRACING
@@ -131,7 +130,7 @@ class SecondaryKeyDictionaryCompiler final {
     dictionary_compiler_.SetSpecializedDictionaryProperties(string_buffer.GetString());
     dictionary_compiler_.Write(stream);
 
-    StringDictionaryCompiler secondary_key_compiler(params_);
+    keyvi::dictionary::DictionaryCompiler<fsa::internal::value_store_t::STRING> secondary_key_compiler(params_);
 
     for (auto const& [value, replacement] : secondary_key_replacements_) {
       secondary_key_compiler.Add(value, replacement);

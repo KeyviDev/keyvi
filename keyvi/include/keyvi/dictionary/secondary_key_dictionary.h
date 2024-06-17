@@ -78,6 +78,10 @@ class SecondaryKeyDictionary final {
     }
   }
 
+  std::string GetStatistics() const { return dictionary_->GetStatistics(); }
+
+  uint64_t GetSize() const { return dictionary_->GetSize(); }
+
   /**
    * A simple Contains method to check whether a key is in the dictionary.
    *
