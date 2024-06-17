@@ -2,9 +2,9 @@ name: Python cibuildwheel
 
 on:
   push:
-    branches: [ master, release-* ]
+    branches: [ master, dev, release-* ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
   workflow_dispatch:
 
 jobs:
