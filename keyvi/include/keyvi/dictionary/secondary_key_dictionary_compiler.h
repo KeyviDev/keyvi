@@ -57,7 +57,7 @@ class SecondaryKeyDictionaryCompiler final {
    * @param secondary_keys a list of secondary keys
    * @param params compiler parameters
    */
-  explicit SecondaryKeyDictionaryCompiler(const std::vector<std::string> secondary_keys,
+  explicit SecondaryKeyDictionaryCompiler(const std::vector<std::string>& secondary_keys,
                                           const keyvi::util::parameters_t& params = keyvi::util::parameters_t())
       : params_(params), dictionary_compiler_(params), secondary_keys_(secondary_keys) {}
 
@@ -147,9 +147,9 @@ class SecondaryKeyDictionaryCompiler final {
   }
 
  private:
-  keyvi::util::parameters_t params_;
+  const keyvi::util::parameters_t params_;
   DictionaryCompiler<ValueStoreType> dictionary_compiler_;
-  std::vector<std::string> secondary_keys_;
+  const std::vector<std::string> secondary_keys_;
   std::map<std::string, std::string> secondary_key_replacements_;
   uint64_t current_index_ = 2;  //  starting from 2, 1 is reserved for empty string
   std::vector<char> replacements_buffer_;

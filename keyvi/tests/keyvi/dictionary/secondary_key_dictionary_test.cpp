@@ -22,6 +22,7 @@
  *      Author: hendrik
  */
 
+#include <filesystem>
 #include <map>
 #include <tuple>
 #include <vector>
@@ -35,7 +36,7 @@ namespace keyvi {
 namespace dictionary {
 BOOST_AUTO_TEST_SUITE(SecondaryKeyDictionaryTests)
 
-BOOST_AUTO_TEST_CASE(OneSecondaryKey) {
+BOOST_AUTO_TEST_CASE(completions) {
   std::vector<std::tuple<std::string, std::map<std::string, std::string>, uint32_t>> test_data = {
       {"siegfried", {{"company", "acme"}}, 22},
       {"walburga", {{"company", "acma"}}, 10},
@@ -51,10 +52,11 @@ BOOST_AUTO_TEST_CASE(OneSecondaryKey) {
   }
   compiler.Compile();
 
-  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+  std::filesystem::path temp_path = std::filesystem::temp_directory_path();
 
   temp_path /=
-      boost::filesystem::unique_path("secondary-key-dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%");
+      boost::filesystem::unique_path("secondary-key-dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%")
+          .string();
   std::string file_name = temp_path.string();
 
   compiler.WriteToFile(file_name);
@@ -113,6 +115,47 @@ BOOST_AUTO_TEST_CASE(OneSecondaryKey) {
     completer_it++;
   }
   BOOST_CHECK_EQUAL(1, i);
+
+  std::filesystem::remove_all(temp_path);
+}
+
+BOOST_AUTO_TEST_CASE(json) {
+  std::vector<std::tuple<std::string, std::map<std::string, std::string>, std::string>> test_data = {
+      {"key", {{"user_id", "a1"}}, "{a:1}"},
+      {"key", {{"user_id", "a2"}}, "{a:2}"},
+      {"key", {{"user_id", ""}}, "{c:1}"},
+  };
+
+  SecondaryKeyDictionaryCompiler<fsa::internal::value_store_t::JSON> compiler(
+      {"user_id"}, keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+
+  for (auto p : test_data) {
+    compiler.Add(std::get<0>(p), std::get<1>(p), std::get<2>(p));
+  }
+  compiler.Compile();
+
+  std::filesystem::path temp_path = std::filesystem::temp_directory_path();
+
+  temp_path /=
+      boost::filesystem::unique_path("secondary-key-dictionary-unit-test-dictionarycompiler-%%%%-%%%%-%%%%-%%%%")
+          .string();
+  std::string file_name = temp_path.string();
+
+  compiler.WriteToFile(file_name);
+
+  SecondaryKeyDictionary d(file_name.c_str());
+
+  match_t m = d.GetFirst("key", {{"user_id", "a1"}});
+  BOOST_CHECK(m);
+  BOOST_CHECK_EQUAL("\"{a:1}\"", m->GetValueAsString());
+  m = d.GetFirst("key", {{"user_id", "a2"}});
+  BOOST_CHECK(m);
+  BOOST_CHECK_EQUAL("\"{a:2}\"", m->GetValueAsString());
+  m = d.GetFirst("key", {{"user_id", ""}});
+  BOOST_CHECK(m);
+  BOOST_CHECK_EQUAL("\"{c:1}\"", m->GetValueAsString());
+
+  std::filesystem::remove_all(temp_path);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

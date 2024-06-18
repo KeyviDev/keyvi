@@ -52,11 +52,11 @@ class SecondaryKeyDictionary final {
    * @param loading_strategy optional: Loading strategy to use.
    */
   explicit SecondaryKeyDictionary(const std::string& filename,
-                                  loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+                                  const loading_strategy_types loading_strategy = loading_strategy_types::lazy)
       : SecondaryKeyDictionary(std::make_shared<fsa::Automata>(filename, loading_strategy), loading_strategy) {}
 
-  explicit SecondaryKeyDictionary(fsa::automata_t f,
-                                  loading_strategy_types loading_strategy = loading_strategy_types::lazy)
+  explicit SecondaryKeyDictionary(const fsa::automata_t& f,
+                                  const loading_strategy_types loading_strategy = loading_strategy_types::lazy)
       : dictionary_(std::make_shared<Dictionary>(f)) {
     std::string properties = dictionary_->GetFsa()->GetDictionaryProperties()->GetSpecializedDictionaryProperties();
 
