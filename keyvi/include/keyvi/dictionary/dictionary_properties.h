@@ -136,7 +136,10 @@ class DictionaryProperties {
 
   size_t GetTransitionsSize() const { return sparse_array_size_ * 2; }
 
-  size_t GetEndOffset() const { return GetTransitionsOffset() + GetTransitionsSize(); }
+  size_t GetEndOffset() const {
+    return value_store_properties_.GetOffset() ? value_store_properties_.GetOffset() + value_store_properties_.GetSize()
+                                               : GetTransitionsOffset() + GetTransitionsSize();
+  }
 
   const fsa::internal::ValueStoreProperties& GetValueStoreProperties() const { return value_store_properties_; }
 
