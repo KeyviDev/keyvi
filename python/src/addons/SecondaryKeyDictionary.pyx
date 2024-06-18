@@ -1,20 +1,20 @@
 
 
-    def get (self, key, meta, default = None):
-        if isinstance(key, unicode):
-            key = key.encode('utf-8')
-        assert isinstance(key, bytes), 'arg in_0 wrong type'
+    def get (self, the_key, meta, default = None):
+        if isinstance(the_key, unicode):
+            the_key = the_key.encode('utf-8')
+        assert isinstance(the_key, bytes), 'arg in_0 wrong type'
         assert isinstance(meta, dict), 'arg in_1 wrong type'
 
         cdef libcpp_map[libcpp_utf8_string, libcpp_utf8_string] * v1 = new libcpp_map[libcpp_utf8_string, libcpp_utf8_string]()
-        for key, value in meta.items():
-            if isinstance(key, unicode):
-                key = key.encode('utf-8')
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
-            deref(v1)[ (<libcpp_string>key) ] = (<libcpp_string>value)
+        for _key, _value in meta.items():
+            if isinstance(_key, unicode):
+                _key = _key.encode('utf-8')
+            if isinstance(_value, unicode):
+                _value = _value.encode('utf-8')
+            deref(v1)[ (<libcpp_string>_key) ] = (<libcpp_string>_value)
 
-        cdef shared_ptr[_Match] _r = self.inst.get().GetFirst(<libcpp_string>key, deref(v1))
+        cdef shared_ptr[_Match] _r = self.inst.get().GetFirst(<libcpp_string>the_key, deref(v1))
         del(v1)
 
         if _r.get() == nullptr:
@@ -23,14 +23,14 @@
         py_result.inst = _r
         return py_result
 
-    def contains(self, key, meta):
-        if isinstance(key, unicode):
-            key = key.encode('utf-8')
+    def contains(self, the_key, meta):
+        if isinstance(the_key, unicode):
+            the_key = the_key.encode('utf-8')
 
-        assert isinstance(key, bytes), 'arg in_0 wrong type'
+        assert isinstance(the_key, bytes), 'arg in_0 wrong type'
         assert isinstance(meta, dict), 'arg in_1 wrong type'
 
-        return self.inst.get().Contains(key, meta)
+        return self.inst.get().Contains(the_key, meta)
 
     def __len__(self):
         return self.inst.get().GetSize()

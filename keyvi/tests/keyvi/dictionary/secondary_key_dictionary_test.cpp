@@ -121,14 +121,13 @@ BOOST_AUTO_TEST_CASE(completions) {
 
 BOOST_AUTO_TEST_CASE(json) {
   std::vector<std::tuple<std::string, std::map<std::string, std::string>, std::string>> test_data = {
-      {"siegfried", {{"company", "acme"}}, "{a:1}"},
-      {"walburga", {{"company", "acma"}}, "{a:2}"},
-      {"walburga", {{"company", "abcde"}}, "{b:1}"},
-      {"walburga", {{"company", ""}}, "{c:1}"},
+      {"key", {{"user_id", "a1"}}, "{a:1}"},
+      {"key", {{"user_id", "a2"}}, "{a:2}"},
+      {"key", {{"user_id", ""}}, "{c:1}"},
   };
 
   SecondaryKeyDictionaryCompiler<fsa::internal::value_store_t::JSON> compiler(
-      {"company"}, keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+      {"user_id"}, keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
 
   for (auto p : test_data) {
     compiler.Add(std::get<0>(p), std::get<1>(p), std::get<2>(p));
@@ -145,6 +144,18 @@ BOOST_AUTO_TEST_CASE(json) {
   compiler.WriteToFile(file_name);
 
   SecondaryKeyDictionary d(file_name.c_str());
+
+  match_t m = d.GetFirst("key", {{"user_id", "a1"}});
+  BOOST_CHECK(m);
+  BOOST_CHECK_EQUAL("\"{a:1}\"", m->GetValueAsString());
+  m = d.GetFirst("key", {{"user_id", "a2"}});
+  BOOST_CHECK(m);
+  BOOST_CHECK_EQUAL("\"{a:2}\"", m->GetValueAsString());
+  m = d.GetFirst("key", {{"user_id", ""}});
+  BOOST_CHECK(m);
+  BOOST_CHECK_EQUAL("\"{c:1}\"", m->GetValueAsString());
+
+  std::filesystem::remove_all(temp_path);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

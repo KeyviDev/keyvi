@@ -19,21 +19,21 @@ cdef extern from "keyvi/dictionary/secondary_key_dictionary.h" namespace "keyvi:
 
         SecondaryKeyDictionary (libcpp_utf8_string filename) except +
         #SecondaryKeyDictionary (libcpp_utf8_string filename, loading_strategy_types) except +
-        shared_ptr[_Match] GetFirst (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) # wrap-ignore
-        bool Contains (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) # wrap-ignore
-        _MatchIteratorPair Get (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) # wrap-as:match
-        _MatchIteratorPair GetNear (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, size_t minimum_prefix_length) except + # wrap-as:match_near
-        _MatchIteratorPair GetNear (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, size_t minimum_prefix_length, bool greedy) except + # wrap-as:match_near
-        _MatchIteratorPair GetFuzzy (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int32_t max_edit_distance) except + # wrap-as:match_fuzzy
-        _MatchIteratorPair GetFuzzy (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:match_fuzzy
-        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) except + # wrap-as:complete_prefix
+        shared_ptr[_Match] GetFirst (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) # wrap-ignore
+        bool Contains (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) # wrap-ignore
+        _MatchIteratorPair Get (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) # wrap-as:match
+        _MatchIteratorPair GetNear (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, size_t minimum_prefix_length) except + # wrap-as:match_near
+        _MatchIteratorPair GetNear (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, size_t minimum_prefix_length, bool greedy) except + # wrap-as:match_near
+        _MatchIteratorPair GetFuzzy (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int32_t max_edit_distance) except + # wrap-as:match_fuzzy
+        _MatchIteratorPair GetFuzzy (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:match_fuzzy
+        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) except + # wrap-as:complete_prefix
         # wrap-doc:
         #  Complete the given key to full matches(prefix matching)
         #  In case the used dictionary supports inner weights, the
         #  completer traverses the dictionary according to weights,
         #  otherwise byte-order.
 
-        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, size_t top_n) except + # wrap-as:complete_prefix
+        _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, size_t top_n) except + # wrap-as:complete_prefix
         # wrap-doc:
         #  Complete the given key to full matches(prefix matching)
         #  and return the top n completions.
@@ -47,14 +47,14 @@ cdef extern from "keyvi/dictionary/secondary_key_dictionary.h" namespace "keyvi:
         #  and truncate the lists of results.
         #  Only the number of top completions is guaranteed.
 
-        _MatchIteratorPair GetMultiwordCompletion (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) except + # wrap-as:complete_multiword
+        _MatchIteratorPair GetMultiwordCompletion (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta) except + # wrap-as:complete_multiword
         # wrap-doc:
         #  Complete the given key to full matches after whitespace tokenizing.
         #  In case the used dictionary supports inner weights, the
         #  completer traverses the dictionary according to weights,
         #  otherwise byte-order.
 
-        _MatchIteratorPair GetMultiwordCompletion (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, size_t top_n) except + # wrap-as:complete_multiword
+        _MatchIteratorPair GetMultiwordCompletion (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, size_t top_n) except + # wrap-as:complete_multiword
         # wrap-doc:
         #  Complete the given key to full matches after whitespace tokenizing
         #  and return the top n completions.
@@ -68,7 +68,7 @@ cdef extern from "keyvi/dictionary/secondary_key_dictionary.h" namespace "keyvi:
         #  and truncate the lists of results.
         #  Only the number of top completions is guaranteed.
 
-        _MatchIteratorPair GetFuzzyMultiwordCompletion (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int32_t max_edit_distance) except + # wrap-as:complete_fuzzy_multiword
+        _MatchIteratorPair GetFuzzyMultiwordCompletion (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int32_t max_edit_distance) except + # wrap-as:complete_fuzzy_multiword
         # wrap-doc:
         #  Complete the given key to full matches after whitespace tokenizing,
         #  allowing up to max_edit_distance distance(Levenshtein).
@@ -76,7 +76,7 @@ cdef extern from "keyvi/dictionary/secondary_key_dictionary.h" namespace "keyvi:
         #  completer traverses the dictionary according to weights,
         #  otherwise byte-order.
 
-        _MatchIteratorPair GetFuzzyMultiwordCompletion (libcpp_utf8_string key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:complete_fuzzy_multiword
+        _MatchIteratorPair GetFuzzyMultiwordCompletion (libcpp_utf8_string the_key, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] meta, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:complete_fuzzy_multiword
         # wrap-doc:
         #  Complete the given key to full matches after whitespace tokenizing,
         #  allowing up to max_edit_distance distance(Levenshtein) except for
