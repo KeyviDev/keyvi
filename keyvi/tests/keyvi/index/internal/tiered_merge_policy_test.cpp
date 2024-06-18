@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_SUITE(MergePolicySelectorTests)
 static dictionary::dictionary_properties_t createDictionaryProperties(const uint64_t number_of_keys,
                                                                       const uint64_t start_state = 0) {
   return std::make_shared<dictionary::DictionaryProperties>(0, start_state, number_of_keys, 0,
-                                                            dictionary::dictionary_type_t::KEY_ONLY, 0, 0, "");
+                                                            dictionary::dictionary_type_t::KEY_ONLY, 0, 0, "", "");
 }
 
 BOOST_AUTO_TEST_CASE(one_segment) {

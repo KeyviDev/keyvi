@@ -23,3 +23,5 @@ from keyvi._core import IntDictionaryCompilerSmallData
 from keyvi._core import KeyOnlyDictionaryCompiler, KeyOnlyDictionaryGenerator, KeyOnlyDictionaryMerger
 from keyvi._core import StringDictionaryCompiler, StringDictionaryMerger
 from keyvi._core import FloatVectorDictionaryCompiler
+from keyvi._core import SecondaryKeyCompletionDictionaryCompiler, SecondaryKeyFloatVectorDictionaryCompiler, SecondaryKeyIntDictionaryCompiler
+from keyvi._core import SecondaryKeyKeyOnlyDictionaryCompiler, SecondaryKeyStringDictionaryCompiler, SecondaryKeyJsonDictionaryCompiler

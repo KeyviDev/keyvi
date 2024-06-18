@@ -130,8 +130,8 @@ class BaseIndexReader {
     }
 
     if (fsa_start_state_payloads.size() == 1) {
-      auto near_matcher =
-          std::make_shared<dictionary::matching::NearMatching<>>(dictionary::matching::NearMatching<>::FromSingleFsa(
+      auto near_matcher = std::make_shared<dictionary::matching::NearMatching<>>(
+          dictionary::matching::NearMatching<>::FromSingleFsaWithMatchedExactPrefix(
               std::get<0>(fsa_start_state_payloads[0]), std::get<1>(fsa_start_state_payloads[0]), query,
               minimum_exact_prefix, greedy));
 
@@ -157,7 +157,8 @@ class BaseIndexReader {
     auto near_matcher = std::make_shared<
         dictionary::matching::NearMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::NearStateTraverser>>>(
         dictionary::matching::NearMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::NearStateTraverser>>::
-            FromMulipleFsas(std::move(fsa_start_state_payloads), query, minimum_exact_prefix, greedy));
+            FromMulipleFsasWithMatchedExactPrefix(std::move(fsa_start_state_payloads), query, minimum_exact_prefix,
+                                                  greedy));
 
     if (deleted_keys_map.size() == 0) {
       auto func = [near_matcher]() { return near_matcher->NextMatch(); };
@@ -200,9 +201,9 @@ class BaseIndexReader {
 
     if (fsa_start_state_pairs.size() == 1) {
       auto fuzzy_matcher = std::make_shared<dictionary::matching::FuzzyMatching<>>(
-          dictionary::matching::FuzzyMatching<>::FromSingleFsa<>(fsa_start_state_pairs[0].first,
-                                                                 fsa_start_state_pairs[0].second, query,
-                                                                 max_edit_distance, minimum_exact_prefix));
+          dictionary::matching::FuzzyMatching<>::FromSingleFsaWithMatchedExactPrefix<>(
+              fsa_start_state_pairs[0].first, fsa_start_state_pairs[0].second, query, max_edit_distance,
+              minimum_exact_prefix));
 
       for (auto it = segments->crbegin(); it != segments->crend(); it++) {
         if ((*it)->GetDictionary()->GetFsa() == fsa_start_state_pairs[0].first) {
@@ -233,8 +234,8 @@ class BaseIndexReader {
     auto fuzzy_matcher = std::make_shared<
         dictionary::matching::FuzzyMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::StateTraverser<>>>>(
         dictionary::matching::FuzzyMatching<dictionary::fsa::ZipStateTraverser<dictionary::fsa::StateTraverser<>>>::
-            FromMulipleFsas<dictionary::fsa::StateTraverser<>>(fsa_start_state_pairs, query, max_edit_distance,
-                                                               minimum_exact_prefix));
+            FromMulipleFsasWithMatchedExactPrefix<dictionary::fsa::StateTraverser<>>(
+                fsa_start_state_pairs, query, max_edit_distance, minimum_exact_prefix));
 
     if (deleted_keys_map.size() == 0) {
       auto func = [fuzzy_matcher]() { return fuzzy_matcher->NextMatch(); };

@@ -297,7 +297,8 @@ class Generator final {
 
     keyvi::dictionary::DictionaryProperties p(KEYVI_FILE_VERSION_CURRENT, start_state_, number_of_keys_added_,
                                               number_of_states_, value_store_->GetValueStoreType(),
-                                              persistence_->GetVersion(), persistence_->GetSize(), manifest_);
+                                              persistence_->GetVersion(), persistence_->GetSize(), manifest_,
+                                              specialized_dictionary_properties_);
     p.WriteAsJsonV2(stream);
 
     // write data from persistence
@@ -323,6 +324,10 @@ class Generator final {
    */
   inline void SetManifest(const std::string& manifest) { manifest_ = manifest; }
 
+  inline void SetSpecializedDictionaryProperties(const std::string& specialized_dictionary_properties) {
+    specialized_dictionary_properties_ = specialized_dictionary_properties;
+  }
+
  private:
   size_t memory_limit_;
   keyvi::util::parameters_t params_;
@@ -337,6 +342,7 @@ class Generator final {
   OffsetTypeT start_state_ = 0;
   uint64_t number_of_states_ = 0;
   std::string manifest_;
+  std::string specialized_dictionary_properties_;
   bool minimize_ = true;
 
   inline void FeedStack(const size_t start, const std::string& key) {

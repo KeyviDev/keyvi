@@ -120,6 +120,7 @@ size_t getVarShortLength(int_t value) {
  * Encode variable length integer and write it to the given buffer
  * @param value the integer
  * @param output the buffer to write to
+ * @param written_bytes number of bytes written
  */
 template <typename int_t = uint64_t, typename buffer_t>
 void encodeVarInt(int_t value, buffer_t* output, size_t* written_bytes) {
@@ -135,6 +136,22 @@ void encodeVarInt(int_t value, buffer_t* output, size_t* written_bytes) {
   }
   output->push_back(((uint8_t)value) & 127);
   *written_bytes = ++length;
+}
+
+/**
+ * Encode variable length integer and write it to the given buffer
+ * @param value the integer
+ * @param output the buffer to write to
+ */
+template <typename int_t = uint64_t, typename buffer_t>
+void encodeVarInt(int_t value, buffer_t* output) {
+  while (value > 127) {
+    // |128: Set the next byte flag
+    output->push_back(((uint8_t)(value & 127)) | 128);
+    // Remove the seven bits we just wrote
+    value >>= 7;
+  }
+  output->push_back(((uint8_t)value) & 127);
 }
 
 /**

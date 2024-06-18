@@ -85,4 +85,7 @@ static const char VECTOR_SIZE_KEY[] = "vector_size";
 static const char MERGE_MODE[] = "merge_mode";
 static const char MERGE_APPEND[] = "append";
 
+// constants for specialized dictionaries
+static const char SECONDARY_KEY_DICT_KEYS_PROPERTY[] = "secondary_keys";
+
 #endif  // KEYVI_DICTIONARY_FSA_INTERNAL_CONSTANTS_H_
