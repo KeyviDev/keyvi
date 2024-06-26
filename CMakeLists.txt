@@ -12,7 +12,7 @@ if(CLANGTIDY)
   message ("-- Found clang-tidy")
   set(CMAKE_CXX_CLANG_TIDY clang-tidy; --extra-arg-before=-std=c++17)
 else()
-  message(SEND_ERROR "-- clang-tidy not found")
+  message ("-- clang-tidy not found")
 endif()
 
 #### Cmake modules
