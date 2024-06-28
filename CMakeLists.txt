@@ -6,6 +6,15 @@ if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
 endif()
 
+#### Linting
+find_program(CLANGTIDY clang-tidy)
+if(CLANGTIDY)
+  message ("-- Found clang-tidy")
+  set(CMAKE_CXX_CLANG_TIDY clang-tidy; --extra-arg-before=-std=c++17)
+else()
+  message ("-- clang-tidy not found")
+endif()
+
 #### Cmake modules
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 
