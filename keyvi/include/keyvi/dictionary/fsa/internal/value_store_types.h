@@ -45,6 +45,26 @@ enum class value_store_t {
   FLOAT_VECTOR = 7,      //!< FloatVectorValueStore
 };
 
+/**
+ * Wheter the given value store has persisted value store properties.
+ */
+inline bool ValueStoreHasPersistedProperties(const value_store_t type) {
+  switch (type) {
+    case value_store_t::KEY_ONLY:
+    case value_store_t::INT:
+    case value_store_t::INT_WITH_WEIGHTS:
+      return false;
+    case value_store_t::STRING:
+    case value_store_t::JSON:
+    case value_store_t::FLOAT_VECTOR:
+      return true;
+    case value_store_t::JSON_DEPRECATED:
+      throw std::invalid_argument("Deprecated Value Storage type");
+    default:
+      throw std::invalid_argument("Unknown Value Storage type");
+  }
+}
+
 } /* namespace internal */
 } /* namespace fsa */
 } /* namespace dictionary */

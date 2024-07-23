@@ -40,6 +40,8 @@
 namespace keyvi {
 namespace index {
 namespace internal {
+template <class PayloadT, class SegmentT>
+class BaseIndexReader;
 template <class MatcherT, class DeletedT>
 keyvi::dictionary::match_t NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
 template <class MatcherT, class DeletedT>
@@ -66,11 +68,25 @@ class NearMatching final {
    */
   static NearMatching FromSingleFsa(const fsa::automata_t& fsa, const std::string& query,
                                     const size_t minimum_exact_prefix, const bool greedy = false) {
-    uint64_t state = fsa->GetStartState();
+    return FromSingleFsa(fsa, fsa->GetStartState(), query, minimum_exact_prefix, greedy);
+  }
 
+  /**
+   * Create a near matcher from a single Fsa
+   *
+   * @param fsa the fsa
+   * @param start_state the state to start from
+   * @param query the query
+   * @param minimum_exact_prefix the minimum exact prefix to match before matching approximate
+   * @param greedy if true matches everything below minimum prefix
+   */
+  static NearMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state, const std::string& query,
+                                    const size_t minimum_exact_prefix, const bool greedy = false) {
     if (query.size() < minimum_exact_prefix) {
       return NearMatching();
     }
+
+    uint64_t state = start_state;
 
     TRACE("GetNear %s, matching prefix first", query.substr(0, minimum_exact_prefix).c_str());
     for (size_t i = 0; i < minimum_exact_prefix; ++i) {
@@ -81,33 +97,7 @@ class NearMatching final {
       }
     }
 
-    return FromSingleFsa(fsa, state, query, minimum_exact_prefix, greedy);
-  }
-
-  /**
-   * Create a near matcher from a single Fsa
-   *
-   * @param fsa the fsa
-   * @param query the query
-   * @param exact_prefix the exact prefix that already matched
-   * @param greedy if true matches everything below minimum prefix
-   */
-  static NearMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state, const std::string& query,
-                                    const size_t exact_prefix, const bool greedy = false) {
-    match_t first_match;
-    if (fsa->IsFinalState(start_state)) {
-      first_match = std::make_shared<Match>(0, query.size(), query, exact_prefix, fsa, fsa->GetStateValue(start_state));
-    }
-
-    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(exact_prefix));
-
-    auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
-
-    std::unique_ptr<fsa::ComparableStateTraverser<fsa::NearStateTraverser>> traverser =
-        std::make_unique<fsa::ComparableStateTraverser<fsa::NearStateTraverser>>(fsa, start_state, std::move(payload),
-                                                                                 true, 0);
-
-    return NearMatching(std::move(traverser), std::move(first_match), query.substr(0, exact_prefix), greedy);
+    return FromSingleFsaWithMatchedExactPrefix(fsa, state, query, minimum_exact_prefix, greedy);
   }
 
   /**
@@ -123,63 +113,6 @@ class NearMatching final {
     fsa_start_state_payloads_t fsa_start_state_payloads = FilterWithExactPrefix(fsas, query, minimum_exact_prefix);
 
     return FromMulipleFsas(std::move(fsa_start_state_payloads), query, minimum_exact_prefix, greedy);
-  }
-
-  /**
-   * Create a near matcher with already matched exact prefix.
-   *
-   * @param fsa_start_state_pairs pairs of fsa and current state
-   * @param query the query
-   * @param exact_prefix the exact prefix that already matched
-   * @param greedy if true matches everything below minimum prefix, if false everything at the longest matched prefix
-   */
-
-  static NearMatching FromMulipleFsas(fsa_start_state_payloads_t&& fsa_start_state_payloads, const std::string& query,
-                                      const size_t exact_prefix, const bool greedy = false) {
-    if (fsa_start_state_payloads.size() == 0) {
-      return NearMatching();
-    }
-
-    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(exact_prefix));
-    std::vector<std::tuple<fsa::automata_t, uint64_t, fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>>>
-        fsas_with_payload;
-    match_t first_match;
-
-    // check if the prefix is already an exact match
-    for (const auto& fsa_state : boost::adaptors::reverse(fsa_start_state_payloads)) {
-      if (std::get<0>(fsa_state)->IsFinalState(std::get<1>(fsa_state))) {
-        first_match = std::make_shared<Match>(0, query.size(), query, exact_prefix, std::get<0>(fsa_state),
-                                              std::get<0>(fsa_state)->GetStateValue(std::get<1>(fsa_state)));
-        break;
-      }
-    }
-
-    std::unique_ptr<fsa::ZipStateTraverser<fsa::NearStateTraverser>> traverser =
-        std::make_unique<fsa::ZipStateTraverser<fsa::NearStateTraverser>>(std::move(fsa_start_state_payloads));
-
-    return NearMatching<fsa::ZipStateTraverser<fsa::NearStateTraverser>>(std::move(traverser), std::move(first_match),
-                                                                         query.substr(0, exact_prefix), greedy);
-  }
-
-  static inline fsa_start_state_payloads_t FilterWithExactPrefix(const std::vector<fsa::automata_t>& fsas,
-                                                                 const std::string& query,
-                                                                 const size_t minimum_exact_prefix = 2) {
-    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(minimum_exact_prefix));
-    fsa_start_state_payloads_t fsa_start_state_payloads;
-
-    for (const fsa::automata_t& fsa : fsas) {
-      uint64_t state = fsa->GetStartState();
-      size_t depth = 0;
-      while (state != 0 && depth < minimum_exact_prefix) {
-        state = fsa->TryWalkTransition(state, query[depth++]);
-      }
-
-      if (state && depth == minimum_exact_prefix) {
-        auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
-        fsa_start_state_payloads.emplace_back(fsa, state, std::move(payload));
-      }
-    }
-    return fsa_start_state_payloads;
   }
 
   match_t& FirstMatch() { return first_match_; }
@@ -230,11 +163,99 @@ class NearMatching final {
 
   NearMatching() {}
 
+  template <class PayloadT, class SegmentT>
+  friend class index::internal::BaseIndexReader;
+
   // reset method for the index in the special case the match is deleted
   template <class MatcherT, class DeletedT>
   friend match_t index::internal::NextFilteredMatchSingle(const MatcherT&, const DeletedT&);
   template <class MatcherT, class DeletedT>
   friend match_t index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+
+  /**
+   * Create a near matcher from a single Fsa
+   *
+   * @param fsa the fsa
+   * @param query the query
+   * @param exact_prefix the exact prefix that already matched
+   * @param greedy if true matches everything below minimum prefix
+   */
+  static NearMatching FromSingleFsaWithMatchedExactPrefix(const fsa::automata_t& fsa, const uint64_t start_state,
+                                                          const std::string& query, const size_t exact_prefix,
+                                                          const bool greedy = false) {
+    match_t first_match;
+    if (fsa->IsFinalState(start_state)) {
+      first_match = std::make_shared<Match>(0, query.size(), query, exact_prefix, fsa, fsa->GetStateValue(start_state));
+    }
+
+    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(exact_prefix));
+
+    auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
+
+    std::unique_ptr<fsa::ComparableStateTraverser<fsa::NearStateTraverser>> traverser =
+        std::make_unique<fsa::ComparableStateTraverser<fsa::NearStateTraverser>>(fsa, start_state, std::move(payload),
+                                                                                 true, 0);
+
+    return NearMatching(std::move(traverser), std::move(first_match), query.substr(0, exact_prefix), greedy);
+  }
+
+  /**
+   * Create a near matcher with already matched exact prefix.
+   *
+   * @param fsa_start_state_pairs pairs of fsa and current state
+   * @param query the query
+   * @param exact_prefix the exact prefix that already matched
+   * @param greedy if true matches everything below minimum prefix, if false everything at the longest matched prefix
+   */
+
+  static NearMatching FromMulipleFsasWithMatchedExactPrefix(fsa_start_state_payloads_t&& fsa_start_state_payloads,
+                                                            const std::string& query, const size_t exact_prefix,
+                                                            const bool greedy = false) {
+    if (fsa_start_state_payloads.size() == 0) {
+      return NearMatching();
+    }
+
+    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(exact_prefix));
+    std::vector<std::tuple<fsa::automata_t, uint64_t, fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>>>
+        fsas_with_payload;
+    match_t first_match;
+
+    // check if the prefix is already an exact match
+    for (const auto& fsa_state : boost::adaptors::reverse(fsa_start_state_payloads)) {
+      if (std::get<0>(fsa_state)->IsFinalState(std::get<1>(fsa_state))) {
+        first_match = std::make_shared<Match>(0, query.size(), query, exact_prefix, std::get<0>(fsa_state),
+                                              std::get<0>(fsa_state)->GetStateValue(std::get<1>(fsa_state)));
+        break;
+      }
+    }
+
+    std::unique_ptr<fsa::ZipStateTraverser<fsa::NearStateTraverser>> traverser =
+        std::make_unique<fsa::ZipStateTraverser<fsa::NearStateTraverser>>(std::move(fsa_start_state_payloads));
+
+    return NearMatching<fsa::ZipStateTraverser<fsa::NearStateTraverser>>(std::move(traverser), std::move(first_match),
+                                                                         query.substr(0, exact_prefix), greedy);
+  }
+
+  static inline fsa_start_state_payloads_t FilterWithExactPrefix(const std::vector<fsa::automata_t>& fsas,
+                                                                 const std::string& query,
+                                                                 const size_t minimum_exact_prefix = 2) {
+    std::shared_ptr<std::string> near_key = std::make_shared<std::string>(query.substr(minimum_exact_prefix));
+    fsa_start_state_payloads_t fsa_start_state_payloads;
+
+    for (const fsa::automata_t& fsa : fsas) {
+      uint64_t state = fsa->GetStartState();
+      size_t depth = 0;
+      while (state != 0 && depth < minimum_exact_prefix) {
+        state = fsa->TryWalkTransition(state, query[depth++]);
+      }
+
+      if (state && depth == minimum_exact_prefix) {
+        auto payload = fsa::traversal::TraversalPayload<fsa::traversal::NearTransition>(near_key);
+        fsa_start_state_payloads.emplace_back(fsa, state, std::move(payload));
+      }
+    }
+    return fsa_start_state_payloads;
+  }
 
   void ResetLastMatch() { matched_depth_ = 0; }
 };
