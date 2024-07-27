@@ -37,6 +37,8 @@
 #include "keyvi/dictionary/match.h"
 #include "keyvi/dictionary/match_iterator.h"
 #include "keyvi/dictionary/matching/fuzzy_matching.h"
+#include "keyvi/dictionary/matching/fuzzy_multiword_completion_matching.h"
+#include "keyvi/dictionary/matching/multiword_completion_matching.h"
 #include "keyvi/dictionary/matching/near_matching.h"
 #include "keyvi/dictionary/matching/prefix_completion_matching.h"
 #include "keyvi/dictionary/util/bounded_priority_queue.h"
@@ -46,6 +48,7 @@
 
 namespace keyvi {
 namespace dictionary {
+class SecondaryKeyDictionary;
 
 class Dictionary final {
  public:
@@ -75,47 +78,9 @@ class Dictionary final {
    * @param key The key
    * @return True if key is in the dictionary, False otherwise.
    */
-  bool Contains(const std::string& key) const {
-    uint64_t state = fsa_->GetStartState();
-    const size_t key_length = key.size();
+  bool Contains(const std::string& key) const { return Contains(fsa_->GetStartState(), key); }
 
-    TRACE("Contains for %s", key.c_str());
-    for (size_t i = 0; i < key_length; ++i) {
-      state = fsa_->TryWalkTransition(state, key[i]);
-
-      if (!state) {
-        return false;
-      }
-      TRACE("Contains matched %d/%d", i + 1, key_length);
-    }
-
-    TRACE("Contains matched key, looking for Final State (%d)", state);
-    if (state && fsa_->IsFinalState(state)) {
-      TRACE("Contains matched final state.");
-      return true;
-    }
-
-    return false;
-  }
-
-  Match operator[](const std::string& key) const {
-    uint64_t state = fsa_->GetStartState();
-    const size_t text_length = key.size();
-
-    for (size_t i = 0; i < text_length; ++i) {
-      state = fsa_->TryWalkTransition(state, key[i]);
-
-      if (!state) {
-        break;
-      }
-    }
-
-    if (!fsa_->IsFinalState(state)) {
-      return Match();
-    }
-
-    return Match(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
-  }
+  match_t operator[](const std::string& key) const { return GetSubscript(fsa_->GetStartState(), key); }
 
   /**
    * Exact Match function.
@@ -123,91 +88,14 @@ class Dictionary final {
    * @param key the key to lookup.
    * @return a match iterator
    */
-  MatchIterator::MatchIteratorPair Get(const std::string& key) const {
-    uint64_t state = fsa_->GetStartState();
-    const size_t text_length = key.size();
-
-    for (size_t i = 0; i < text_length; ++i) {
-      state = fsa_->TryWalkTransition(state, key[i]);
-
-      if (!state) {
-        break;
-      }
-    }
-
-    if (!fsa_->IsFinalState(state)) {
-      return MatchIterator::EmptyIteratorPair();
-    }
-
-    Match m;
-    bool has_run = false;
-
-    // right now this is returning just 1 match, but it could be more if it is a multi-value dictionary
-    m = Match(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
-
-    auto func = [m, has_run]() mutable {
-      if (!has_run) {
-        has_run = true;
-        return m;
-      }
-
-      return Match();
-    };
-
-    return MatchIterator::MakeIteratorPair(func);
-  }
+  MatchIterator::MatchIteratorPair Get(const std::string& key) const { return Get(fsa_->GetStartState(), key); }
 
   /**
    * All the items in the dictionary.
    *
    * @return a match iterator of all the items
    */
-  MatchIterator::MatchIteratorPair GetAllItems() const {
-    uint64_t state = fsa_->GetStartState();
-    std::vector<unsigned char> traversal_stack;
-    traversal_stack.reserve(1024);
-
-    Match first_match;
-
-    // data which is required for the callback as well
-    struct delegate_payload {
-      delegate_payload(fsa::StateTraverser<>&& t, const std::vector<unsigned char>& stack)
-          : traverser(std::move(t)), traversal_stack(std::move(stack)) {}
-
-      fsa::StateTraverser<> traverser;
-      std::vector<unsigned char> traversal_stack;
-    };
-
-    std::shared_ptr<delegate_payload> data(new delegate_payload(fsa::StateTraverser<>(fsa_, state), traversal_stack));
-
-    std::function<Match()> tfunc = [data]() {
-      TRACE("GetAllKeys callback called");
-
-      for (;;) {
-        if (!data->traverser.AtEnd()) {
-          data->traversal_stack.resize(data->traverser.GetDepth() - 1);
-          data->traversal_stack.push_back(data->traverser.GetStateLabel());
-          TRACE("Current depth %d (%d)", data->traverser.GetDepth() - 1, data->traversal_stack.size());
-
-          if (data->traverser.IsFinalState()) {
-            std::string match_str =
-                std::string(reinterpret_cast<char*>(&data->traversal_stack[0]), data->traverser.GetDepth());
-            TRACE("found final state at depth %d %s", data->traverser.GetDepth(), match_str.c_str());
-            Match m(0, data->traverser.GetDepth(), match_str, 0, data->traverser.GetFsa(),
-                    data->traverser.GetStateValue());
-
-            data->traverser++;
-            return m;
-          }
-          data->traverser++;
-        } else {
-          TRACE("StateTraverser exhausted.");
-          return Match();
-        }
-      }
-    };
-    return MatchIterator::MakeIteratorPair(tfunc, first_match);
-  }
+  MatchIterator::MatchIteratorPair GetAllItems() const { return GetAllItems(fsa_->GetStartState()); }
 
   /**
    * A simple leftmostlongest lookup function.
@@ -236,25 +124,16 @@ class Dictionary final {
       }
     }
 
-    Match m;
-    bool has_run = false;
+    match_t m;
 
     if (last_final_state) {
       // right now this is returning just 1 match, but it could do more
-      m = Match(offset, last_final_state_position, text.substr(offset, last_final_state_position - offset), 0, fsa_,
-                fsa_->GetStateValue(last_final_state));
+      m = std::make_shared<Match>(offset, last_final_state_position,
+                                  text.substr(offset, last_final_state_position - offset), 0, fsa_,
+                                  fsa_->GetStateValue(last_final_state));
     }
 
-    auto func = [m, has_run]() mutable {
-      if (!has_run) {
-        has_run = true;
-        return m;
-      }
-
-      return Match();
-    };
-
-    return MatchIterator::MakeIteratorPair(func);
+    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, std::move(m));
   }
 
   /**
@@ -286,8 +165,8 @@ class Dictionary final {
     MatchIterator current_it = iterators.front();
     iterators.pop();
 
-    auto func = [iterators, current_it]() mutable {
-      while (iterators.size() && (*current_it).IsEmpty()) {
+    auto func = [iterators = std::move(iterators), current_it]() mutable {
+      while (iterators.size() && !*current_it) {
         current_it = iterators.front();
         iterators.pop();
       }
@@ -310,60 +189,268 @@ class Dictionary final {
    */
   MatchIterator::MatchIteratorPair GetNear(const std::string& key, const size_t minimum_prefix_length,
                                            const bool greedy = false) const {
-    auto data = std::make_shared<matching::NearMatching<>>(
-        matching::NearMatching<>::FromSingleFsa(fsa_, key, minimum_prefix_length, greedy));
-
-    auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    return GetNear(fsa_->GetStartState(), key, minimum_prefix_length, greedy);
   }
 
   MatchIterator::MatchIteratorPair GetFuzzy(const std::string& query, const int32_t max_edit_distance,
                                             const size_t minimum_exact_prefix = 2) const {
-    auto data = std::make_shared<matching::FuzzyMatching<>>(
-        matching::FuzzyMatching<>::FromSingleFsa(fsa_, query, max_edit_distance, minimum_exact_prefix));
-
-    auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(func, data->FirstMatch());
+    return GetFuzzy(fsa_->GetStartState(), query, max_edit_distance, minimum_exact_prefix);
   }
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query) const {
-    auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
-        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query));
-
-    auto func = [data]() { return data->NextMatch(); };
-    return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
-        std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
+    return GetPrefixCompletion(fsa_->GetStartState(), query);
   }
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const std::string& query, size_t top_n) const {
+    return GetPrefixCompletion(fsa_->GetStartState(), query, top_n);
+  }
+
+  MatchIterator::MatchIteratorPair GetMultiwordCompletion(const std::string& query,
+                                                          const unsigned char multiword_separator = 0x1b) const {
+    return GetMultiwordCompletion(fsa_->GetStartState(), query, multiword_separator);
+  }
+
+  MatchIterator::MatchIteratorPair GetMultiwordCompletion(const std::string& query, const size_t top_n,
+                                                          const unsigned char multiword_separator = 0x1b) const {
+    return GetMultiwordCompletion(fsa_->GetStartState(), query, top_n, multiword_separator);
+  }
+
+  MatchIterator::MatchIteratorPair GetFuzzyMultiwordCompletion(const std::string& query,
+                                                               const int32_t max_edit_distance,
+                                                               const size_t minimum_exact_prefix = 0,
+                                                               const unsigned char multiword_separator = 0x1b) const {
+    return GetFuzzyMultiwordCompletion(fsa_->GetStartState(), query, max_edit_distance, minimum_exact_prefix,
+                                       multiword_separator);
+  }
+
+  const std::string& GetManifest() const { return fsa_->GetManifest(); }
+
+ private:
+  fsa::automata_t fsa_;
+
+  friend class SecondaryKeyDictionary;
+
+  match_t GetSubscript(const uint64_t start_state, const std::string& key) const {
+    uint64_t state = start_state;
+
+    if (!state) {
+      return match_t();
+    }
+
+    const size_t text_length = key.size();
+
+    for (size_t i = 0; i < text_length; ++i) {
+      state = fsa_->TryWalkTransition(state, key[i]);
+
+      if (!state) {
+        break;
+      }
+    }
+
+    if (!fsa_->IsFinalState(state)) {
+      return match_t();
+    }
+
+    return std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
+  }
+
+  bool Contains(const uint64_t start_state, const std::string& key) const {
+    uint64_t state = start_state;
+    const size_t key_length = key.size();
+
+    TRACE("Contains for %s", key.c_str());
+    for (size_t i = 0; i < key_length; ++i) {
+      state = fsa_->TryWalkTransition(state, key[i]);
+
+      if (!state) {
+        return false;
+      }
+      TRACE("Contains matched %d/%d", i + 1, key_length);
+    }
+
+    TRACE("Contains matched key, looking for Final State (%d)", state);
+    if (state && fsa_->IsFinalState(state)) {
+      TRACE("Contains matched final state.");
+      return true;
+    }
+
+    return false;
+  }
+
+  MatchIterator::MatchIteratorPair Get(const uint64_t start_state, const std::string& key) const {
+    uint64_t state = start_state;
+    const size_t text_length = key.size();
+
+    for (size_t i = 0; i < text_length; ++i) {
+      state = fsa_->TryWalkTransition(state, key[i]);
+
+      if (!state) {
+        break;
+      }
+    }
+
+    if (!fsa_->IsFinalState(state)) {
+      return MatchIterator::EmptyIteratorPair();
+    }
+
+    match_t m;
+
+    // right now this is returning just 1 match, but it could be more if it is a multi-value dictionary
+    m = std::make_shared<Match>(0, text_length, key, 0, fsa_, fsa_->GetStateValue(state));
+
+    return MatchIterator::MakeIteratorPair([]() { return match_t(); }, std::move(m));
+  }
+
+  MatchIterator::MatchIteratorPair GetAllItems(const uint64_t state) const {
+    std::vector<unsigned char> traversal_stack;
+    traversal_stack.reserve(1024);
+
+    match_t first_match;
+
+    // data which is required for the callback as well
+    struct delegate_payload {
+      delegate_payload(fsa::StateTraverser<>&& t, const std::vector<unsigned char>& stack)
+          : traverser(std::move(t)), traversal_stack(std::move(stack)) {}
+
+      fsa::StateTraverser<> traverser;
+      std::vector<unsigned char> traversal_stack;
+    };
+
+    std::shared_ptr<delegate_payload> data(new delegate_payload(fsa::StateTraverser<>(fsa_, state), traversal_stack));
+
+    std::function<match_t()> tfunc = [data]() {
+      TRACE("GetAllKeys callback called");
+
+      for (;;) {
+        if (!data->traverser.AtEnd()) {
+          data->traversal_stack.resize(data->traverser.GetDepth() - 1);
+          data->traversal_stack.push_back(data->traverser.GetStateLabel());
+          TRACE("Current depth %d (%d)", data->traverser.GetDepth() - 1, data->traversal_stack.size());
+
+          if (data->traverser.IsFinalState()) {
+            std::string match_str =
+                std::string(reinterpret_cast<char*>(&data->traversal_stack[0]), data->traverser.GetDepth());
+            TRACE("found final state at depth %d %s", data->traverser.GetDepth(), match_str.c_str());
+            match_t m = std::make_shared<Match>(0, data->traverser.GetDepth(), match_str, 0, data->traverser.GetFsa(),
+                                                data->traverser.GetStateValue());
+
+            data->traverser++;
+            return m;
+          }
+          data->traverser++;
+        } else {
+          TRACE("StateTraverser exhausted.");
+          return match_t();
+        }
+      }
+    };
+    return MatchIterator::MakeIteratorPair(tfunc, std::move(first_match));
+  }
+
+  MatchIterator::MatchIteratorPair GetNear(const uint64_t state, const std::string& key,
+                                           const size_t minimum_prefix_length, const bool greedy = false) const {
+    auto data = std::make_shared<matching::NearMatching<>>(
+        matching::NearMatching<>::FromSingleFsa(fsa_, state, key, minimum_prefix_length, greedy));
+
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(func, std::move(data->FirstMatch()));
+  }
+
+  MatchIterator::MatchIteratorPair GetFuzzy(const uint64_t state, const std::string& query,
+                                            const int32_t max_edit_distance,
+                                            const size_t minimum_exact_prefix = 2) const {
+    auto data = std::make_shared<matching::FuzzyMatching<>>(
+        matching::FuzzyMatching<>::FromSingleFsa(fsa_, state, query, max_edit_distance, minimum_exact_prefix));
+
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(func, std::move(data->FirstMatch()));
+  }
+
+  MatchIterator::MatchIteratorPair GetPrefixCompletion(const uint64_t state, const std::string& query) const {
     auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
-        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, query));
+        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, state, query));
+
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(
+        func, std::move(data->FirstMatch()),
+        std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
+  }
+
+  MatchIterator::MatchIteratorPair GetPrefixCompletion(const uint64_t state, const std::string& query,
+                                                       size_t top_n) const {
+    auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
+        matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, state, query));
 
     auto best_weights = std::make_shared<util::BoundedPriorityQueue<uint32_t>>(top_n);
 
     auto func = [data, best_weights = std::move(best_weights)]() {
       auto m = data->NextMatch();
-      while (!m.IsEmpty()) {
-        if (m.GetWeight() >= best_weights->Back()) {
-          best_weights->Put(m.GetWeight());
+      while (m) {
+        if (m->GetWeight() >= best_weights->Back()) {
+          best_weights->Put(m->GetWeight());
           return m;
         }
 
         m = data->NextMatch();
       }
-      return Match();
+      return match_t();
     };
 
     return MatchIterator::MakeIteratorPair(
-        func, data->FirstMatch(),
+        func, std::move(data->FirstMatch()),
         std::bind(&matching::PrefixCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
   }
 
-  std::string GetManifest() const { return fsa_->GetManifest(); }
+  MatchIterator::MatchIteratorPair GetMultiwordCompletion(const uint64_t state, const std::string& query,
+                                                          const unsigned char multiword_separator) const {
+    auto data = std::make_shared<matching::MultiwordCompletionMatching<>>(
+        matching::MultiwordCompletionMatching<>::FromSingleFsa(fsa_, state, query, multiword_separator));
 
- private:
-  fsa::automata_t fsa_;
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(
+        func, std::move(data->FirstMatch()),
+        std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
+  }
+
+  MatchIterator::MatchIteratorPair GetMultiwordCompletion(const uint64_t state, const std::string& query,
+                                                          const size_t top_n,
+                                                          const unsigned char multiword_separator) const {
+    auto data = std::make_shared<matching::MultiwordCompletionMatching<>>(
+        matching::MultiwordCompletionMatching<>::FromSingleFsa(fsa_, state, query, multiword_separator));
+
+    auto best_weights = std::make_shared<util::BoundedPriorityQueue<uint32_t>>(top_n);
+
+    auto func = [data, best_weights = std::move(best_weights)]() {
+      auto m = data->NextMatch();
+      while (m) {
+        if (m->GetWeight() >= best_weights->Back()) {
+          best_weights->Put(m->GetWeight());
+          return m;
+        }
+
+        m = data->NextMatch();
+      }
+      return match_t();
+    };
+
+    return MatchIterator::MakeIteratorPair(
+        func, std::move(data->FirstMatch()),
+        std::bind(&matching::MultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
+  }
+
+  MatchIterator::MatchIteratorPair GetFuzzyMultiwordCompletion(const uint64_t state, const std::string& query,
+                                                               const int32_t max_edit_distance,
+                                                               const size_t minimum_exact_prefix,
+                                                               const unsigned char multiword_separator) const {
+    auto data = std::make_shared<matching::FuzzyMultiwordCompletionMatching<>>(
+        matching::FuzzyMultiwordCompletionMatching<>::FromSingleFsa(fsa_, state, query, max_edit_distance,
+                                                                    minimum_exact_prefix, multiword_separator));
+
+    auto func = [data]() { return data->NextMatch(); };
+    return MatchIterator::MakeIteratorPair(
+        func, std::move(data->FirstMatch()),
+        std::bind(&matching::FuzzyMultiwordCompletionMatching<>::SetMinWeight, &(*data), std::placeholders::_1));
+  }
 };
 
 // shared pointer

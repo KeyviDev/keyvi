@@ -260,11 +260,13 @@ class ReadOnlySegment {
     deleted_t deleted_keys;
     std::ifstream deleted_keys_stream(filename, std::ios::binary);
     if (deleted_keys_stream.good()) {
-      std::stringstream buffer;
-      buffer << deleted_keys_stream.rdbuf();
-
+      std::string buffer;
+      deleted_keys_stream.seekg(0, std::ios::end);
+      buffer.resize(deleted_keys_stream.tellg());
+      deleted_keys_stream.seekg(0, std::ios::beg);
+      deleted_keys_stream.read(&buffer[0], buffer.size());
       msgpack::unpacked unpacked_object;
-      msgpack::unpack(unpacked_object, buffer.str().data(), buffer.str().size());
+      msgpack::unpack(unpacked_object, buffer.data(), buffer.size());
       unpacked_object.get().convert(deleted_keys);
     }
     return deleted_keys;

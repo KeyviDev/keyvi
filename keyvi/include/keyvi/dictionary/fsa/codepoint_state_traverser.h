@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/traverser_types.h"
 #include "keyvi/dictionary/util/utf8_utils.h"
 
 // #define ENABLE_TRACING
@@ -130,6 +131,15 @@ class CodePointStateTraverser final {
 
   operator bool() const { return wrapped_state_traverser_; }
 
+  /**
+   * Set the minimum weight states must be greater or equal to.
+   *
+   * Only available for WeightedTransition specialization.
+   *
+   * @param weight minimum transition weight
+   */
+  inline void SetMinWeight(uint32_t weight) {}
+
  private:
   innerTraverserType wrapped_state_traverser_;
   std::vector<int> transitions_stack_;
@@ -177,6 +187,16 @@ class CodePointStateTraverser final {
     }
   }
 };
+
+/**
+ * Set the minimum weight states must be greater or equal to.
+ *
+ * @param weight minimum transition weight
+ */
+template <>
+inline void CodePointStateTraverser<WeightedStateTraverser>::SetMinWeight(uint32_t weight) {
+  wrapped_state_traverser_.SetMinWeight(weight);
+}
 
 } /* namespace fsa */
 } /* namespace dictionary */

@@ -27,6 +27,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #include <boost/container/flat_map.hpp>
 #include <boost/variant.hpp>
@@ -40,13 +41,16 @@
 namespace keyvi {
 namespace dictionary {
 struct Match;
-}
+
+using match_t = std::shared_ptr<Match>;
+}  // namespace dictionary
+
 namespace index {
 namespace internal {
 template <class MatcherT, class DeletedT>
-keyvi::dictionary::Match NextFilteredMatch(const MatcherT&, const DeletedT&);
+keyvi::dictionary::match_t NextFilteredMatch(const MatcherT&, const DeletedT&);
 template <class MatcherT, class DeletedT>
-keyvi::dictionary::Match FirstFilteredMatch(const MatcherT&, const DeletedT&);
+keyvi::dictionary::match_t FirstFilteredMatch(const MatcherT&, const DeletedT&);
 }  // namespace internal
 }  // namespace index
 namespace dictionary {
@@ -60,13 +64,7 @@ class attributes_visitor : public boost::static_visitor<PyObject*> {
 
   PyObject* operator()(bool i) const { return i ? Py_True : Py_False; }
 
-  PyObject* operator()(const std::string& str) const {
-#if PY_MAJOR_VERSION >= 3
-    return PyUnicode_FromString(str.c_str());
-#else
-    return PyString_FromString(str.c_str());
-#endif
-  }
+  PyObject* operator()(const std::string& str) const { return PyUnicode_FromString(str.c_str()); }
 };
 #endif
 
@@ -87,9 +85,37 @@ struct Match {
 
   Match() : matched_item_(), raw_value_() {}
 
-  // todo: consider disallowing copy and assignment
-  // Match& operator=(Match const&) = delete;
-  // Match(const Match& that) = delete;
+  Match(Match&& other)
+      : start_(other.start_),
+        end_(other.end_),
+        matched_item_(std::move(other.matched_item_)),
+        raw_value_(std::move(other.raw_value_)),
+        score_(other.score_),
+        fsa_(other.fsa_),
+        state_(other.state_),
+        attributes_(std::move(other.attributes_)) {
+    other.start_ = 0;
+    other.end_ = 0;
+    other.score_ = 0;
+    other.state_ = 0;
+  }
+
+  Match& operator=(Match&& other) {
+    start_ = other.start_;
+    end_ = other.end_;
+    matched_item_ = std::move(other.matched_item_);
+    raw_value_ = std::move(other.raw_value_);
+    score_ = other.score_;
+    fsa_ = std::move(other.fsa_);
+    state_ = other.state_;
+    attributes_ = std::move(other.attributes_);
+
+    other.start_ = 0;
+    other.end_ = 0;
+    other.score_ = 0;
+    other.state_ = 0;
+    return *this;
+  }
 
   size_t GetEnd() const { return end_; }
 
@@ -200,9 +226,9 @@ struct Match {
 
   // friend for accessing the fsa
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
+  friend match_t index::internal::NextFilteredMatch(const MatcherT&, const DeletedT&);
   template <class MatcherT, class DeletedT>
-  friend Match index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
+  friend match_t index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
 
   fsa::automata_t& GetFsa() {
     return fsa_;

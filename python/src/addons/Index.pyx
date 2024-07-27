@@ -42,9 +42,9 @@
             key = key.encode('utf-8')
         assert isinstance(key, bytes), 'arg in_0 wrong type'
 
-        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<libcpp_string>key)]))
+        cdef shared_ptr[_Match] _r = deref(self.inst.get())[(<libcpp_string>key)]
 
-        if _r.get().IsEmpty():
+        if _r.get() == nullptr:
             return default
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r
@@ -64,9 +64,9 @@
 
         assert isinstance(key, bytes), 'arg in_0 wrong type'
 
-        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<libcpp_string>key)]))
+        cdef shared_ptr[_Match] _r = deref(self.inst.get())[(<libcpp_string>key)]
 
-        if _r.get().IsEmpty():
+        if _r.get() == nullptr:
             raise KeyError(key)
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r
@@ -74,7 +74,7 @@
 
     def MSet(self, list key_values ):
         assert isinstance(key_values, list), 'arg in_0 wrong type'
-        cdef s_shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]] cpp_key_values = s_shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]](new libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]())
+        cdef shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]] cpp_key_values = shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]](new libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]())
         cdef libcpp_pair[libcpp_utf8_string, libcpp_utf8_string] cpp_kv
 
         for kv in key_values:

@@ -1,4 +1,3 @@
-from libc.string cimport const_char
 from libcpp.string cimport string as libcpp_string
 from libcpp.string cimport string as libcpp_utf8_string
 from libcpp.string cimport string as libcpp_utf8_output_string
@@ -9,6 +8,7 @@ from libcpp cimport bool
 from libcpp.pair cimport pair as libcpp_pair
 from match cimport Match as _Match
 from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
+from libcpp.memory cimport shared_ptr
 
 cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
     ctypedef enum loading_strategy_types:
@@ -23,17 +23,16 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         
     cdef cppclass Dictionary:
         # wrap-doc:
-        #  Keyvi dictionary, basically a set of key values. Keyvi dictionaries
-        #  are immutable containers, created by a previours compile run.
-        #  Immutability has performance benefits. If you are looking for an
-        #  updateable container, have a look at keyvi index.
+        #  Keyvi dictionary, an immutable containers storing key value pairs, optimized
+        #  for size, lookup performance and special lookp use cases.
+        #  A keyvi dictionary has to be created by a previous compile run.
         #  
         #  Keyvi dictionaries allow multiple types of approximate and completion
         #  matches due to its internal FST based data structure.
         Dictionary (libcpp_utf8_string filename) except +
         Dictionary (libcpp_utf8_string filename, loading_strategy_types) except +
         bool Contains (libcpp_utf8_string key) # wrap-ignore
-        _Match operator[](libcpp_utf8_string key) # wrap-ignore
+        shared_ptr[_Match] operator[](libcpp_utf8_string key) # wrap-ignore
         _MatchIteratorPair Get (libcpp_utf8_string key) # wrap-as:match
         _MatchIteratorPair GetNear (libcpp_utf8_string key, size_t minimum_prefix_length) except + # wrap-as:match_near
         _MatchIteratorPair GetNear (libcpp_utf8_string key, size_t minimum_prefix_length, bool greedy) except + # wrap-as:match_near
@@ -41,19 +40,63 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         _MatchIteratorPair GetFuzzy (libcpp_utf8_string key, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:match_fuzzy
         _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string key) except + # wrap-as:complete_prefix
         # wrap-doc:
-        #  complete the given key to full matches by matching the given key as
-        #  prefix. In case the used dictionary supports inner weights, the
-        #  completer traverses the dictionary according to weights. If weights
-        #  are not available the dictionary gets traversed in byte-order.
+        #  Complete the given key to full matches(prefix matching)
+        #  In case the used dictionary supports inner weights, the
+        #  completer traverses the dictionary according to weights,
+        #  otherwise byte-order.
+
         _MatchIteratorPair GetPrefixCompletion (libcpp_utf8_string key, size_t top_n) except + # wrap-as:complete_prefix
         # wrap-doc:
-        #  complete the given key to full matches by matching the given key as
-        #  prefix. This version of prefix completions ensure the return of the
-        #  top name completions. Due to depth-first traversal the traverser
+        #  Complete the given key to full matches(prefix matching)
+        #  and return the top n completions.
+        #  In case the used dictionary supports inner weights, the
+        #  completer traverses the dictionary according to weights,
+        #  otherwise byte-order.
+        #  
+        #  Note, due to depth-first traversal the traverser
         #  immediately yields results when it visits them. The results are
         #  neither in order nor limited to n. It is up to the caller to resort
         #  and truncate the lists of results.
         #  Only the number of top completions is guaranteed.
+
+        _MatchIteratorPair GetMultiwordCompletion (libcpp_utf8_string key) except + # wrap-as:complete_multiword
+        # wrap-doc:
+        #  Complete the given key to full matches after whitespace tokenizing.
+        #  In case the used dictionary supports inner weights, the
+        #  completer traverses the dictionary according to weights,
+        #  otherwise byte-order.
+
+        _MatchIteratorPair GetMultiwordCompletion (libcpp_utf8_string key, size_t top_n) except + # wrap-as:complete_multiword
+        # wrap-doc:
+        #  Complete the given key to full matches after whitespace tokenizing
+        #  and return the top n completions.
+        #  In case the used dictionary supports inner weights, the
+        #  completer traverses the dictionary according to weights,
+        #  otherwise byte-order.
+        #  
+        #  Note, due to depth-first traversal the traverser
+        #  immediately yields results when it visits them. The results are
+        #  neither in order nor limited to n. It is up to the caller to resort
+        #  and truncate the lists of results.
+        #  Only the number of top completions is guaranteed.
+
+        _MatchIteratorPair GetFuzzyMultiwordCompletion (libcpp_utf8_string key, int32_t max_edit_distance) except + # wrap-as:complete_fuzzy_multiword
+        # wrap-doc:
+        #  Complete the given key to full matches after whitespace tokenizing,
+        #  allowing up to max_edit_distance distance(Levenshtein).
+        #  In case the used dictionary supports inner weights, the
+        #  completer traverses the dictionary according to weights,
+        #  otherwise byte-order.
+
+        _MatchIteratorPair GetFuzzyMultiwordCompletion (libcpp_utf8_string key, int32_t max_edit_distance, size_t minimum_exact_prefix) except + # wrap-as:complete_fuzzy_multiword
+        # wrap-doc:
+        #  Complete the given key to full matches after whitespace tokenizing,
+        #  allowing up to max_edit_distance distance(Levenshtein) except for
+        #  a given exaxt prefix which must match exaxt.
+        #  In case the used dictionary supports inner weights, the
+        #  completer traverses the dictionary according to weights,
+        #  otherwise byte-order.
+
         _MatchIteratorPair GetAllItems () # wrap-ignore
         _MatchIteratorPair Lookup(libcpp_utf8_string  key) # wrap-as:search
         _MatchIteratorPair LookupText(libcpp_utf8_string text) # wrap-as:search_tokenized

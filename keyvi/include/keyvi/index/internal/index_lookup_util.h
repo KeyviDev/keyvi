@@ -41,12 +41,12 @@ namespace internal {
  * Filters matches and drops results for deleted keys for a single FSA.
  */
 template <class MatcherT, class DeletedT>
-inline keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT& matcher, const DeletedT& deleted_keys) {
-  keyvi::dictionary::Match m = matcher->NextMatch();
+inline keyvi::dictionary::match_t NextFilteredMatchSingle(const MatcherT& matcher, const DeletedT& deleted_keys) {
+  keyvi::dictionary::match_t m = matcher->NextMatch();
 
   TRACE("check if key is deleted");
-  while (m.IsEmpty() == false) {
-    if (deleted_keys->count(m.GetMatchedString()) > 0) {
+  while (m) {
+    if (deleted_keys->count(m->GetMatchedString()) > 0) {
       matcher->ResetLastMatch();
       m = matcher->NextMatch();
       continue;
@@ -61,11 +61,11 @@ inline keyvi::dictionary::Match NextFilteredMatchSingle(const MatcherT& matcher,
  * Checks if a first match is marked as deleted. Single FSA case.
  */
 template <class MatcherT, class DeletedT>
-inline keyvi::dictionary::Match FirstFilteredMatchSingle(const MatcherT& matcher, const DeletedT& deleted_keys) {
-  dictionary::Match first_match = matcher->FirstMatch();
-  if (first_match.IsEmpty() == false) {
-    if (deleted_keys->count(first_match.GetMatchedString()) > 0) {
-      return dictionary::Match();
+inline keyvi::dictionary::match_t FirstFilteredMatchSingle(const MatcherT& matcher, const DeletedT& deleted_keys) {
+  dictionary::match_t first_match = matcher->FirstMatch();
+  if (first_match) {
+    if (deleted_keys->count(first_match->GetMatchedString()) > 0) {
+      return dictionary::match_t();
     }
   }
   return first_match;
@@ -75,14 +75,14 @@ inline keyvi::dictionary::Match FirstFilteredMatchSingle(const MatcherT& matcher
  * Filters matches and drops results for deleted keys for a multiple FSA's.
  */
 template <class MatcherT, class DeletedT>
-inline keyvi::dictionary::Match NextFilteredMatch(const MatcherT& matcher, const DeletedT& deleted_keys_map) {
-  keyvi::dictionary::Match m = matcher->NextMatch();
+inline keyvi::dictionary::match_t NextFilteredMatch(const MatcherT& matcher, const DeletedT& deleted_keys_map) {
+  keyvi::dictionary::match_t m = matcher->NextMatch();
 
   TRACE("check if key is deleted");
-  while (m.IsEmpty() == false) {
-    auto dk = deleted_keys_map.find(m.GetFsa());
+  while (m) {
+    auto dk = deleted_keys_map.find(m->GetFsa());
     if (dk != deleted_keys_map.end()) {
-      if (dk->second->count(m.GetMatchedString()) > 0) {
+      if (dk->second->count(m->GetMatchedString()) > 0) {
         matcher->ResetLastMatch();
         m = matcher->NextMatch();
         continue;
@@ -97,13 +97,13 @@ inline keyvi::dictionary::Match NextFilteredMatch(const MatcherT& matcher, const
  * Checks if a first match is marked as deleted. Multi FSA case.
  */
 template <class MatcherT, class DeletedT>
-inline keyvi::dictionary::Match FirstFilteredMatch(const MatcherT& matcher, const DeletedT& deleted_keys_map) {
-  dictionary::Match first_match = matcher->FirstMatch();
-  if (first_match.IsEmpty() == false) {
-    auto dk = deleted_keys_map.find(first_match.GetFsa());
+inline keyvi::dictionary::match_t FirstFilteredMatch(const MatcherT& matcher, const DeletedT& deleted_keys_map) {
+  dictionary::match_t first_match = matcher->FirstMatch();
+  if (first_match) {
+    auto dk = deleted_keys_map.find(first_match->GetFsa());
     if (dk != deleted_keys_map.end()) {
-      if (dk->second->count(first_match.GetMatchedString()) > 0) {
-        return dictionary::Match();
+      if (dk->second->count(first_match->GetMatchedString()) > 0) {
+        return dictionary::match_t();
       }
     }
   }

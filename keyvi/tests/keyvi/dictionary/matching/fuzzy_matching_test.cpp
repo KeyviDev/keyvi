@@ -45,12 +45,12 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
       matching::FuzzyMatching<>::FromSingleFsa<>(dictionary.GetFsa(), query, max_edit_distance));
 
   MatchIterator::MatchIteratorPair it = MatchIterator::MakeIteratorPair(
-      [matcher_weights]() { return matcher_weights->NextMatch(); }, matcher_weights->FirstMatch());
+      [matcher_weights]() { return matcher_weights->NextMatch(); }, std::move(matcher_weights->FirstMatch()));
 
   auto expected_it = expected.begin();
   for (auto m : it) {
     BOOST_CHECK(expected_it != expected.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
 
   // test without weights
@@ -61,12 +61,12 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
       matching::FuzzyMatching<fsa::StateTraverser<>>::FromSingleFsa<fsa::StateTraverser<>>(dictionary.GetFsa(), query,
                                                                                            max_edit_distance));
   MatchIterator::MatchIteratorPair matcher_no_weights_it = MatchIterator::MakeIteratorPair(
-      [matcher_no_weights]() { return matcher_no_weights->NextMatch(); }, matcher_no_weights->FirstMatch());
+      [matcher_no_weights]() { return matcher_no_weights->NextMatch(); }, std::move(matcher_no_weights->FirstMatch()));
 
   expected_it = expected_sorted.begin();
   for (auto m : matcher_no_weights_it) {
     BOOST_CHECK(expected_it != expected_sorted.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected_sorted.end());
 
@@ -96,11 +96,11 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
       matching::FuzzyMatching<fsa::ZipStateTraverser<fsa::WeightedStateTraverser>>::FromMulipleFsas<
           fsa::WeightedStateTraverser>(fsas, query, max_edit_distance));
   MatchIterator::MatchIteratorPair matcher_zipped_it = MatchIterator::MakeIteratorPair(
-      [matcher_zipped]() { return matcher_zipped->NextMatch(); }, matcher_zipped->FirstMatch());
+      [matcher_zipped]() { return matcher_zipped->NextMatch(); }, std::move(matcher_zipped->FirstMatch()));
   expected_it = expected.begin();
   for (auto m : matcher_zipped_it) {
     BOOST_CHECK(expected_it != expected.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected.end());
 
@@ -110,11 +110,11 @@ void test_fuzzy_matching(std::vector<std::pair<std::string, uint32_t>>* test_dat
               fsa::StateTraverser<>>(fsas, query, max_edit_distance));
   MatchIterator::MatchIteratorPair matcher_zipped_no_weights_it =
       MatchIterator::MakeIteratorPair([matcher_zipped_no_weights]() { return matcher_zipped_no_weights->NextMatch(); },
-                                      matcher_zipped_no_weights->FirstMatch());
+                                      std::move(matcher_zipped_no_weights->FirstMatch()));
   expected_it = expected_sorted.begin();
   for (auto m : matcher_zipped_no_weights_it) {
     BOOST_CHECK(expected_it != expected_sorted.end());
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected_sorted.end());
 }

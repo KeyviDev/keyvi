@@ -34,8 +34,8 @@ except:
 #################
 
 VERSION_MAJOR = 0
-VERSION_MINOR = 5
-VERSION_PATCH = 8
+VERSION_MINOR = 6
+VERSION_PATCH = 2
 VERSION_DEV = 0
 IS_RELEASED = False
 
@@ -97,7 +97,7 @@ def generate_pykeyvi_source():
                             continue
                         fout.write(line.replace("boost::shared_ptr", "std::shared_ptr"))
 
-        except:
+        except ModuleNotFoundError:
             if not path.exists(pykeyvi_cpp):
                 raise
             else:

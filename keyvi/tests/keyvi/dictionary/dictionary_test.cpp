@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE(DictGet) {
 
   bool matched = false;
   for (auto m : d->Get("test")) {
-    BOOST_CHECK_EQUAL("test", m.GetMatchedString());
-    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m.GetAttribute("weight")));
+    BOOST_CHECK_EQUAL("test", m->GetMatchedString());
+    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(DictGet) {
   BOOST_CHECK(!matched);
 
   auto m = (*d)["test"];
-  BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+  BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
 }
 
 BOOST_AUTO_TEST_CASE(DictLookup) {
@@ -98,24 +98,24 @@ BOOST_AUTO_TEST_CASE(DictLookup) {
 
   bool matched = false;
   for (auto m : d->Lookup("nude")) {
-    BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
-    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+    BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
+    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
 
   matched = false;
   for (auto m : d->Lookup("nude ")) {
-    BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
-    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+    BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
+    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
 
   matched = false;
   for (auto m : d->Lookup("nude at work")) {
-    BOOST_CHECK_EQUAL("nude", m.GetMatchedString());
-    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+    BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
+    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
-    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+    BOOST_CHECK_EQUAL(expected_matches[i++], m->GetMatchedString());
   }
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
-    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+    BOOST_CHECK_EQUAL(expected_matches[i++], m->GetMatchedString());
   }
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
-    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+    BOOST_CHECK_EQUAL(expected_matches[i++], m->GetMatchedString());
   }
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
-    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+    BOOST_CHECK_EQUAL(expected_matches[i++], m->GetMatchedString());
   }
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
@@ -206,8 +206,8 @@ BOOST_AUTO_TEST_CASE(DictGetZerobyte) {
 
   bool matched = false;
   for (auto m : d->Get(std::string("\0test", 5))) {
-    BOOST_CHECK_EQUAL(std::string("\0test", 5), m.GetMatchedString());
-    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m.GetAttribute("weight")));
+    BOOST_CHECK_EQUAL(std::string("\0test", 5), m->GetMatchedString());
+    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(DictGetZerobyte) {
   BOOST_CHECK(!matched);
 
   auto m = (*d)[std::string("\0test", 5)];
-  BOOST_CHECK_EQUAL("22", boost::get<std::string>(m.GetAttribute("weight")));
+  BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
 }
 
 BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
-    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+    BOOST_CHECK_EQUAL(expected_matches[i++], m->GetMatchedString());
   }
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
@@ -253,7 +253,7 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
-    BOOST_CHECK_EQUAL(expected_matches[i++], m.GetMatchedString());
+    BOOST_CHECK_EQUAL(expected_matches[i++], m->GetMatchedString());
   }
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
@@ -281,11 +281,11 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
   auto completer_it = completer.begin();
 
   while (completer_it != completer.end()) {
-    if (completer_it->GetMatchedString().back() == 'b') {
+    if ((*completer_it)->GetMatchedString().back() == 'b') {
       if (i >= expected_matches.size()) {
         BOOST_FAIL("got more results than expected.");
       }
-      BOOST_CHECK_EQUAL(expected_matches[i++], completer_it->GetMatchedString());
+      BOOST_CHECK_EQUAL(expected_matches[i++], (*completer_it)->GetMatchedString());
     }
     completer_it.SetMinWeight(500);
     completer_it++;

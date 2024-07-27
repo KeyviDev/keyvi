@@ -114,20 +114,20 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDicts) {
   BOOST_CHECK(d->Contains("abdd"));
   BOOST_CHECK(d->Contains("bba"));
 
-  BOOST_CHECK_EQUAL("22", d->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("24", d->operator[]("abbc").GetValueAsString());
-  BOOST_CHECK_EQUAL("444", d->operator[]("abbcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("200", d->operator[]("abcde").GetValueAsString());
-  BOOST_CHECK_EQUAL("180", d->operator[]("abdd").GetValueAsString());
-  BOOST_CHECK_EQUAL("10", d->operator[]("bba").GetValueAsString());
+  BOOST_CHECK_EQUAL("22", d->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d->operator[]("abbc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("444", d->operator[]("abbcd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("200", d->operator[]("abcde")->GetValueAsString());
+  BOOST_CHECK_EQUAL("180", d->operator[]("abdd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("10", d->operator[]("bba")->GetValueAsString());
 
   BOOST_CHECK(d->Contains("abcd"));
   BOOST_CHECK(d->Contains("abbe"));
   BOOST_CHECK(d->Contains("bbacd"));
 
-  BOOST_CHECK_EQUAL("21", d->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("25", d->operator[]("abbe").GetValueAsString());
-  BOOST_CHECK_EQUAL("30", d->operator[]("bbacd").GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d->operator[]("abcd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("25", d->operator[]("abbe")->GetValueAsString());
+  BOOST_CHECK_EQUAL("30", d->operator[]("bbacd")->GetValueAsString());
 
   std::remove(filename.c_str());
 }
@@ -158,9 +158,9 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
   BOOST_CHECK(d->Contains("abbc"));
   BOOST_CHECK(d->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("25", d->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("30", d->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("25", d->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d->operator[]("abcd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("30", d->operator[]("abbc")->GetValueAsString());
 
   std::remove(filename.c_str());
 
@@ -180,11 +180,11 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
   BOOST_CHECK(d2->Contains("abbc"));
   BOOST_CHECK(d2->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("22", d2->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("22", d2->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd")->GetValueAsString());
 
   // overwritten by 2nd
-  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc")->GetValueAsString());
 
   std::remove(filename.c_str());
 
@@ -203,9 +203,9 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsValueMerge) {
   BOOST_CHECK(d3->Contains("abbc"));
   BOOST_CHECK(d3->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("22", d3->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d3->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("24", d3->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("22", d3->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d3->operator[]("abcd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d3->operator[]("abbc")->GetValueAsString());
 
   std::remove(filename.c_str());
 }
@@ -236,9 +236,9 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
   BOOST_CHECK(d->Contains("abbc"));
   BOOST_CHECK(d->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("25", d->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("30", d->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("25", d->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d->operator[]("abcd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("30", d->operator[]("abbc")->GetValueAsString());
 
   std::remove(filename.c_str());
 
@@ -258,11 +258,11 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
   BOOST_CHECK(d2->Contains("abbc"));
   BOOST_CHECK(d2->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("22", d2->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("22", d2->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd")->GetValueAsString());
 
   // overwritten by 2nd
-  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc")->GetValueAsString());
 
   std::remove(filename.c_str());
 
@@ -281,9 +281,9 @@ BOOST_AUTO_TEST_CASE(MergeIntegerDictsAppendMerge) {
   BOOST_CHECK(d3->Contains("abbc"));
   BOOST_CHECK(d3->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("22", d3->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d3->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("24", d3->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("22", d3->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d3->operator[]("abcd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d3->operator[]("abbc")->GetValueAsString());
 
   std::remove(filename.c_str());
 }
@@ -323,22 +323,22 @@ BOOST_AUTO_TEST_CASE(MergeStringDicts) {
     BOOST_CHECK(d->Contains("abdd"));
     BOOST_CHECK(d->Contains("bba"));
 
-    BOOST_CHECK_EQUAL("a", d->operator[]("abc").GetValueAsString());
+    BOOST_CHECK_EQUAL("a", d->operator[]("abc")->GetValueAsString());
 
     // overwritten by 2nd
-    BOOST_CHECK_EQUAL("z", d->operator[]("abbc").GetValueAsString());
-    BOOST_CHECK_EQUAL("c", d->operator[]("abbcd").GetValueAsString());
-    BOOST_CHECK_EQUAL("a", d->operator[]("abcde").GetValueAsString());
-    BOOST_CHECK_EQUAL("b", d->operator[]("abdd").GetValueAsString());
-    BOOST_CHECK_EQUAL("c", d->operator[]("bba").GetValueAsString());
+    BOOST_CHECK_EQUAL("z", d->operator[]("abbc")->GetValueAsString());
+    BOOST_CHECK_EQUAL("c", d->operator[]("abbcd")->GetValueAsString());
+    BOOST_CHECK_EQUAL("a", d->operator[]("abcde")->GetValueAsString());
+    BOOST_CHECK_EQUAL("b", d->operator[]("abdd")->GetValueAsString());
+    BOOST_CHECK_EQUAL("c", d->operator[]("bba")->GetValueAsString());
 
     BOOST_CHECK(d->Contains("abcd"));
     BOOST_CHECK(d->Contains("abbe"));
     BOOST_CHECK(d->Contains("bbacd"));
 
-    BOOST_CHECK_EQUAL("a", d->operator[]("abcd").GetValueAsString());
-    BOOST_CHECK_EQUAL("d", d->operator[]("abbe").GetValueAsString());
-    BOOST_CHECK_EQUAL("f", d->operator[]("bbacd").GetValueAsString());
+    BOOST_CHECK_EQUAL("a", d->operator[]("abcd")->GetValueAsString());
+    BOOST_CHECK_EQUAL("d", d->operator[]("abbe")->GetValueAsString());
+    BOOST_CHECK_EQUAL("f", d->operator[]("bbacd")->GetValueAsString());
 
     std::remove(filename.c_str());
   }
@@ -383,22 +383,22 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
     BOOST_CHECK(d->Contains("bba"));
     BOOST_CHECK(d->Contains("bbacd"));
 
-    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abc").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abc")->GetValueAsString());
 
     // overwritten by 2nd
-    BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc").GetValueAsString());
-    BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("abbcd").GetValueAsString());
-    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcde").GetValueAsString());
-    BOOST_CHECK_EQUAL("\"{b:2}\"", d->operator[]("abdd").GetValueAsString());
-    BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("bba").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc")->GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("abbcd")->GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcde")->GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{b:2}\"", d->operator[]("abdd")->GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{c:3}\"", d->operator[]("bba")->GetValueAsString());
 
     BOOST_CHECK(d->Contains("abcd"));
     BOOST_CHECK(d->Contains("abbe"));
     BOOST_CHECK(d->Contains("bbacd"));
 
-    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcd").GetValueAsString());
-    BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
-    BOOST_CHECK_EQUAL("\"{f:5}\"", d->operator[]("bbacd").GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{a:1}\"", d->operator[]("abcd")->GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe")->GetValueAsString());
+    BOOST_CHECK_EQUAL("\"{f:5}\"", d->operator[]("bbacd")->GetValueAsString());
 
     BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
     BOOST_CHECK_EQUAL(1, merger.GetStats().updated_keys_);
@@ -447,12 +447,12 @@ BOOST_AUTO_TEST_CASE(MergeFloatVectorDicts, *boost::unit_test::tolerance(0.00001
     BOOST_CHECK(d->Contains("bba"));
     BOOST_CHECK(d->Contains("bbacd"));
 
-    auto v = keyvi::util::DecodeFloatVector(d->operator[]("abc").GetRawValueAsString());
+    auto v = keyvi::util::DecodeFloatVector(d->operator[]("abc")->GetRawValueAsString());
     BOOST_CHECK_EQUAL(5, v.size());
     BOOST_TEST(0.4 == v[3]);
     BOOST_TEST(0.2 == v[1]);
 
-    v = keyvi::util::DecodeFloatVector(d->operator[]("abbc").GetRawValueAsString());
+    v = keyvi::util::DecodeFloatVector(d->operator[]("abbc")->GetRawValueAsString());
     BOOST_CHECK_EQUAL(5, v.size());
     BOOST_TEST(3.1 == v[0]);
     BOOST_TEST(2.3 == v[2]);
@@ -519,9 +519,9 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
   BOOST_CHECK(d->Contains("abbc"));
   BOOST_CHECK(d->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("25", d->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("30", d->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("25", d->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d->operator[]("abcd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("30", d->operator[]("abbc")->GetValueAsString());
 
   fsa::WeightedStateTraverser s(fsa);
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
@@ -575,11 +575,11 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
   BOOST_CHECK(d2->Contains("abbc"));
   BOOST_CHECK(d2->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("22", d2->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("22", d2->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd")->GetValueAsString());
 
   // overwritten by 2nd
-  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc")->GetValueAsString());
 
   std::remove(filename.c_str());
 
@@ -598,9 +598,9 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsValueMerge) {
   BOOST_CHECK(d3->Contains("abbc"));
   BOOST_CHECK(d3->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("22", d3->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d3->operator[]("abcd").GetValueAsString());
-  BOOST_CHECK_EQUAL("24", d3->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("22", d3->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d3->operator[]("abcd")->GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d3->operator[]("abbc")->GetValueAsString());
 
   fsa::WeightedStateTraverser s3(fsa3);
   BOOST_CHECK_EQUAL('a', s3.GetStateLabel());
@@ -667,11 +667,11 @@ BOOST_AUTO_TEST_CASE(MergeIntegerWeightDictsAppendMerge) {
   BOOST_CHECK(d2->Contains("abbc"));
   BOOST_CHECK(d2->Contains("abcd"));
 
-  BOOST_CHECK_EQUAL("22", d2->operator[]("abc").GetValueAsString());
-  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd").GetValueAsString());
+  BOOST_CHECK_EQUAL("22", d2->operator[]("abc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("21", d2->operator[]("abcd")->GetValueAsString());
 
   // overwritten by 2nd
-  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc").GetValueAsString());
+  BOOST_CHECK_EQUAL("24", d2->operator[]("abbc")->GetValueAsString());
 
   std::remove(filename.c_str());
 }
@@ -696,8 +696,8 @@ BOOST_AUTO_TEST_CASE(MergeToEmptyDict) {
 
   BOOST_CHECK(d->Contains("abbc"));
   BOOST_CHECK(d->Contains("abbe"));
-  BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc").GetValueAsString());
-  BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe").GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{b:3}\"", d->operator[]("abbc")->GetValueAsString());
+  BOOST_CHECK_EQUAL("\"{d:4}\"", d->operator[]("abbe")->GetValueAsString());
 
   BOOST_CHECK_EQUAL(0, merger.GetStats().deleted_keys_);
   BOOST_CHECK_EQUAL(0, merger.GetStats().updated_keys_);

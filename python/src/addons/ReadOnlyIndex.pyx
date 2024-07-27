@@ -6,9 +6,9 @@
             key = key.encode('utf-8')
         assert isinstance(key, bytes), 'arg in_0 wrong type'
 
-        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<libcpp_string>key)]))
+        cdef shared_ptr[_Match] _r = deref(self.inst.get())[(<libcpp_string>key)]
 
-        if _r.get().IsEmpty():
+        if _r.get() == nullptr:
             return default
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r
@@ -28,9 +28,9 @@
 
         assert isinstance(key, bytes), 'arg in_0 wrong type'
 
-        cdef shared_ptr[_Match] _r = shared_ptr[_Match](new _Match(deref(self.inst.get())[(<libcpp_string>key)]))
+        cdef shared_ptr[_Match] _r = deref(self.inst.get())[(<libcpp_string>key)]
 
-        if _r.get().IsEmpty():
+        if _r.get() == nullptr:
             raise KeyError(key)
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r

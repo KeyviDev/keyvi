@@ -58,6 +58,7 @@ class GeneratorAdapterInterface {
   virtual void Write(std::ostream& stream) {}
   virtual void WriteToFile(const std::string& filename) {}
   virtual void SetManifest(const std::string& manifest) {}
+  virtual void SetSpecializedDictionaryProperties(const std::string& specialized_dictionary_properties) {}
 
   virtual ~GeneratorAdapterInterface() {}
 };
@@ -84,6 +85,10 @@ class GeneratorAdapter final : public GeneratorAdapterInterface<typename ValueSt
   void WriteToFile(const std::string& filename) { generator_.WriteToFile(filename); }
 
   void SetManifest(const std::string& manifest) { generator_.SetManifest(manifest); }
+
+  void SetSpecializedDictionaryProperties(const std::string& specialized_dictionary_properties) {
+    generator_.SetSpecializedDictionaryProperties(specialized_dictionary_properties);
+  }
 
  private:
   Generator<PersistenceT, ValueStoreT, OffsetTypeT, HashCodeTypeT> generator_;

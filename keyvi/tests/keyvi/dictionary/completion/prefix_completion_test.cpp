@@ -73,14 +73,14 @@ BOOST_AUTO_TEST_CASE(simple) {
 
   auto expected_it = expected_output.begin();
   for (auto m : prefix_completion.GetCompletions("aa")) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
 
   BOOST_CHECK(expected_it == expected_output.end());
 
   auto prefix_match_pair = prefix_completion.GetCompletions("aaaa");
   MatchIterator prefix = prefix_match_pair.begin();
-  BOOST_CHECK_EQUAL((*prefix).GetMatchedString(), "aaaa");
+  BOOST_CHECK_EQUAL((*prefix)->GetMatchedString(), "aaaa");
   prefix++;
   BOOST_CHECK(prefix == prefix_match_pair.end());
 }
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(limit) {
 
   auto expected_it = expected_output.begin();
   for (auto m : prefix_completion.GetCompletions("angel")) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
 
   BOOST_CHECK(expected_it == expected_output.end());
@@ -123,12 +123,12 @@ BOOST_AUTO_TEST_CASE(approx1) {
 
   std::vector<std::string> expected_output;
   expected_output.push_back("aabc");
-  // not matching aabcül because of last character mismatch
+  expected_output.push_back("aabcül");
   expected_output.push_back("aabcdefghijklmnop");  // this matches because aab_c_d, "c" is an insert
 
   auto expected_it = expected_output.begin();
   for (auto m : prefix_completion.GetFuzzyCompletions("aabd", 2)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected_output.end());
 
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(approx1) {
 
   expected_it = expected_output.begin();
   for (auto m : prefix_completion.GetFuzzyCompletions("aabc", 2)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected_output.end());
 }
@@ -157,13 +157,13 @@ BOOST_AUTO_TEST_CASE(approxWithExactPrefix) {
 
   auto expected_it = expected_output.begin();
   for (auto m : prefix_completion.GetFuzzyCompletions("mß", 1)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected_output.end());
 
   expected_it = expected_output.begin();
   for (auto m : prefix_completion.GetFuzzyCompletions("mß", 2)) {
-    BOOST_CHECK_EQUAL(*expected_it++, m.GetMatchedString());
+    BOOST_CHECK_EQUAL(*expected_it++, m->GetMatchedString());
   }
   BOOST_CHECK(expected_it == expected_output.end());
 }

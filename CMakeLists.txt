@@ -6,6 +6,15 @@ if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
 endif()
 
+#### Linting
+find_program(CLANGTIDY clang-tidy)
+if(CLANGTIDY)
+  message ("-- Found clang-tidy")
+  set(CMAKE_CXX_CLANG_TIDY clang-tidy; --extra-arg-before=-std=c++17)
+else()
+  message ("-- clang-tidy not found")
+endif()
+
 #### Cmake modules
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
 
@@ -14,6 +23,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake_mo
 # configure C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version")
 
 # keyvi specific compile options, definitions and flags
 set (_KEVYI_COMPILE_OPTIONS "-Wall")
@@ -29,7 +39,6 @@ set (_OS_LIBRARIES "")
 # OSX specifics
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set (_KEYVI_COMPILE_DEFINITIONS "${_KEYVI_COMPILE_DEFINITIONS} OS_MACOSX")
-    set (_KEYVI_CXX_FLAGS "${_KEYVI_CXX_FLAGS} -mmacosx-version-min=10.9")
 endif()
 
 # build type specific settings
