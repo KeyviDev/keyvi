@@ -31,7 +31,7 @@
 *.orig
 
 # cmake build dir
-build/*
+/*build*
 */cmake-build-debug/*
 build_dir_debug/
 cmake-build-debug/
@@ -45,3 +45,11 @@ cmake-build-debug/
 
 # vim swap files
 *.swp
+
+# python
+*.egg-info
+
+# pybind build folder
+python*/*build*
+python*/dist
+python*/.cache/
