@@ -10,7 +10,7 @@ else
 commit_range="upstream/master...HEAD"
 fi
 
-infiles=`git diff --name-only --diff-filter=ACMRT $(echo ${commit_range} | sed 's/\.//') | grep -v "3rdparty" | grep -E "\.(cpp|h)$"`
+infiles=`git diff --name-only --diff-filter=ACMRT $(echo ${commit_range} | sed 's/\.//') | grep -v "3rdparty" | grep -v "pybind11" | grep -E "\.(cpp|h)$"`
 
 clang_format_files=()
 cpplint_files=()

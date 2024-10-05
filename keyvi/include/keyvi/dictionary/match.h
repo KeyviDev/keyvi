@@ -58,7 +58,7 @@ namespace dictionary {
 #ifdef Py_PYTHON_H
 class attributes_visitor : public boost::static_visitor<PyObject*> {
  public:
-  PyObject* operator()(int i) const { return PyInt_FromLong(i); }
+  PyObject* operator()(int i) const { return PyLong_FromLong(i); }
 
   PyObject* operator()(double i) const { return PyFloat_FromDouble(i); }
 
@@ -210,9 +210,7 @@ struct Match {
    *
    * @param value
    */
-  void SetRawValue(const std::string& value) {
-    raw_value_ = value;
-  }
+  void SetRawValue(const std::string& value) { raw_value_ = value; }
 
  private:
   size_t start_ = 0;
@@ -230,9 +228,7 @@ struct Match {
   template <class MatcherT, class DeletedT>
   friend match_t index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
 
-  fsa::automata_t& GetFsa() {
-    return fsa_;
-  }
+  fsa::automata_t& GetFsa() { return fsa_; }
 };
 
 } /* namespace dictionary */
