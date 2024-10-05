@@ -1,0 +1,74 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "keyvi_scikit_core"
+version = "0.6.3dev0"
+dependencies = [
+    "msgpack>=1.0.0",
+]
+
+[tool.scikit-build]
+wheel.expand-macos-universal-tags = true
+minimum-version = "build-system.requires"
+
+[tool.scikit-build.cmake.define]
+KEYVI_PYTHON_BINDINGS = "ON"
+KEYVI_C_BINDINGS = "OFF"
+KEYVI_TESTS = "OFF"
+KEYVI_BINARIES = "OFF"
+KEYVI_CLANG_TIDY = "OFF"
+KEYVI_DOCS = "OFF"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+log_cli_level = "INFO"
+filterwarnings = [
+  "error",
+  "ignore::pytest.PytestCacheWarning",
+]
+testpaths = ["tests"]
+
+[tool.cibuildwheel]
+build-frontend = "build[uv]"
+test-command = "pytest {project}/python/tests"
+test-extras = ["test"]
+
+[tool.cibuildwheel.pyodide]
+build-frontend = {name = "build", args = ["--exports", "whole_archive"]}
+
+[tool.ruff.lint]
+extend-select = [
+  "B",           # flake8-bugbear
+  "I",           # isort
+  "ARG",         # flake8-unused-arguments
+  "C4",          # flake8-comprehensions
+  "EM",          # flake8-errmsg
+  "ICN",         # flake8-import-conventions
+  "G",           # flake8-logging-format
+  "PGH",         # pygrep-hooks
+  "PIE",         # flake8-pie
+  "PL",          # pylint
+  "PT",          # flake8-pytest-style
+  "PTH",         # flake8-use-pathlib
+  "RET",         # flake8-return
+  "RUF",         # Ruff-specific
+  "SIM",         # flake8-simplify
+  "T20",         # flake8-print
+  "UP",          # pyupgrade
+  "YTT",         # flake8-2020
+  "EXE",         # flake8-executable
+  "NPY",         # NumPy specific rules
+  "PD",          # pandas-vet
+]
+ignore = [
+  "PLR09",    # Too many X
+  "PLR2004",  # Magic comparison
+]
+isort.required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["T20"]
