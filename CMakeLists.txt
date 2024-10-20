@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.21)
 project(keyvi)
 
 #### Build Type
@@ -6,23 +6,25 @@ if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
 endif()
 
-#### check if build top-level or as sub-build
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  set(KEYVI_MASTER_PROJECT ON)
-  message(STATUS "CMake ${CMAKE_VERSION}")
-else()
-  set(KEYVI_MASTER_PROJECT OFF)
-endif()
+#### Options
 
+option(KEYVI_C_BINDINGS "Keyvi: Build C binding" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_PYTHON_BINDINGS "Keyvi: Build Python module" OFF)
+option(KEYVI_TESTS "Keyvi: Build unit tests" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_BINARIES "Keyvi: Build Python module" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_CLANG_TIDY "Keyvi: Build with clang tidy" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_DOCS "Keyvi: Build docs" ${PROJECT_IS_TOP_LEVEL})
 
 #### Linting
-find_program(CLANGTIDY clang-tidy)
-if(CLANGTIDY)
-  message ("-- Found clang-tidy")
-  set(CMAKE_CXX_CLANG_TIDY clang-tidy; --extra-arg-before=-std=c++17)
-else()
-  message ("-- clang-tidy not found")
-endif()
+if(KEYVI_CLANG_TIDY)
+  find_program(CLANGTIDY clang-tidy)
+  if(CLANGTIDY)
+    message ("-- Found clang-tidy")
+    set(CMAKE_CXX_CLANG_TIDY clang-tidy; --extra-arg-before=-std=c++17)
+  else()
+    message ("-- clang-tidy not found")
+  endif()
+endif(KEYVI_CLANG_TIDY)
 
 #### Cmake modules
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
@@ -150,7 +152,7 @@ string(REPLACE " " ";" _KEYVI_COMPILE_DEFINITIONS_LIST "${_KEYVI_COMPILE_DEFINIT
 
 #### Targets ####
 
-if(KEYVI_MASTER_PROJECT)
+if(KEYVI_BINARIES)
   # keyvicompiler
   add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
   target_link_libraries(keyvicompiler ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
@@ -177,15 +179,19 @@ if(KEYVI_MASTER_PROJECT)
   target_include_directories(keyvimerger PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 
   install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
+endif(KEYVI_BINARIES)
 
-  # keyvi_c
+# keyvi_c
+if(KEYVI_C_BINDINGS)
   add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
   target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
   target_compile_options(keyvi_c PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
   target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
   target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
+endif(KEYVI_C_BINDINGS)
 
-  # unit tests
+# unit tests
+if(KEYVI_TESTS)
   FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
   add_executable(unit_test_all ${UNIT_TEST_SOURCES})
   target_link_libraries(unit_test_all ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
@@ -212,7 +218,7 @@ if(KEYVI_MASTER_PROJECT)
     endif()
     endforeach()
   endif (WIN32)
-endif(KEYVI_MASTER_PROJECT)
+endif(KEYVI_TESTS)
 
 # bindings
 add_custom_target(bindings
@@ -237,10 +243,14 @@ target_include_directories(keyvi INTERFACE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>
 target_compile_definitions(keyvi INTERFACE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_link_libraries(keyvi INTERFACE ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
 
+if (KEYVI_PYTHON_BINDINGS)
+    add_subdirectory(python-pybind)
+endif ()
+
 ### docs
 
 # don't run it as part of a non-toplevel build, e.g. python
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/sphinx-docs)
+if(KEYVI_DOCS)
     find_package(Doxygen)
     find_package(Sphinx COMPONENTS breathe)
 
@@ -266,4 +276,4 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/sphinx-docs)
     else()
         message ("-- Skip doc target, doxygen/sphinx not found")
     endif()
-endif()
+endif(KEYVI_DOCS)

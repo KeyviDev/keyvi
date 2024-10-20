@@ -210,7 +210,9 @@ struct Match {
    *
    * @param value
    */
-  void SetRawValue(const std::string& value) { raw_value_ = value; }
+  void SetRawValue(const std::string& value) {
+    raw_value_ = value;
+  }
 
  private:
   size_t start_ = 0;
@@ -228,7 +230,9 @@ struct Match {
   template <class MatcherT, class DeletedT>
   friend match_t index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
 
-  fsa::automata_t& GetFsa() { return fsa_; }
+  fsa::automata_t& GetFsa() {
+    return fsa_;
+  }
 };
 
 } /* namespace dictionary */

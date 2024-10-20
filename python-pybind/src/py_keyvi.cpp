@@ -25,7 +25,7 @@ namespace py = pybind11;
 void init_keyvi_dictionary(const py::module_ &);
 void init_keyvi_match(const py::module_ &);
 
-PYBIND11_MODULE(keyvi_pybind11, m) {
+PYBIND11_MODULE(keyvi_scikit_core, m) {
   m.doc() = R"pbdoc(
         keyvi - a key value store.
         -----------------------
@@ -38,7 +38,7 @@ PYBIND11_MODULE(keyvi_pybind11, m) {
     )pbdoc";
 
   init_keyvi_match(m);
-  py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi.dictionary");
+  py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi_scikit_core.dictionary");
   init_keyvi_dictionary(keyvi_dictionary);
 
 #ifdef VERSION_INFO
