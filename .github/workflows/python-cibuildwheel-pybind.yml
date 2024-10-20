@@ -154,12 +154,12 @@ jobs:
     - name: Build SDist
       run: |
         export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-        cd python && \
-        python -m pip install -r requirements.txt && \
+        cd python-pybind && \
+        python -m pip install . && \
         python setup.py sdist -d wheelhouse && \
         python -m pip install wheelhouse/*.tar.gz -v && \
         python -m pytest tests && \
-        python -m pip uninstall -y keyvi
+        python -m pip uninstall -y keyvi_pybind11
 
     - uses: actions/upload-artifact@v4
       with:
