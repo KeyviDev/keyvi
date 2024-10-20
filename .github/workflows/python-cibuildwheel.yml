@@ -13,19 +13,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04, macos-12]
+        os: [ubuntu-22.04, macos-14]
         # separate archs, so they use individual caches
         arch: [ 'x86_64', 'arm64' ]
         flavor: ['cpython', 'pypy']
         # separate musl and many on linux, for mac we just skip one of those
         target: [ 'many', 'musl' ]
         exclude:
-          - os: macos-12
+          - os: macos-14
             target: musl
           - os: ubuntu-22.04
             target: musl
             flavor: pypy
-          - os: macos-12
+          - os: macos-14
             arch: arm64
             flavor: pypy
     steps:
