@@ -97,7 +97,7 @@ jobs:
           PACKAGES=( icu4c xz lz4 zstd zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
           do
-            response=$(arm64-homebrew/bin/brew fetch --force --bottle-tag=arm64_monterey $PACKAGE | grep Downloaded )
+            response=$(arm64-homebrew/bin/brew fetch --force --bottle-tag=arm64_sonoma $PACKAGE | grep Downloaded )
             download_path=$(echo $response | xargs -n 1 | tail -1)
             arm64-homebrew/bin/brew reinstall -vd $download_path
           done
