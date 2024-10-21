@@ -5,11 +5,11 @@ RUN \
     if which yum; then \
         yum -y update && \
         yum clean all && \
-        yum -y install bzip2-devel snappy-devel xxhash-devel libzstd-devel python3-devel && \
+        yum -y install bzip2-devel snappy-devel xxhash-devel libzstd-devel python3-devel openssl-devel && \
         yum clean all; \
     elif which apk; then \
         apk upgrade --no-cache && \
-        apk add --no-cache procps bzip2-dev snappy-dev python3-dev hiredis-dev zstd-dev; \
+        apk add --no-cache procps bzip2-dev snappy-dev python3-dev zstd-dev xxhash-dev openssl-dev; \
     else \
         echo "unsupported os"; \
         exit 1; \
@@ -35,10 +35,10 @@ RUN cd boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH} && \
     cd .. && \
 rm -rf boost_*
 
-ENV CMAKE_MAJOR=3 CMAKE_MINOR=27 CMAKE_PATCH=7
+ENV CMAKE_MAJOR=3 CMAKE_MINOR=30 CMAKE_PATCH=5
 
 RUN curl -sSL https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}.tar.gz | tar -xz && \
-    cd cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH} && ./bootstrap --parallel=`nproc` -- -DCMAKE_USE_OPENSSL=OFF && make -j`nproc` && make install && \
+    cd cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH} && ./bootstrap --parallel=`nproc` -- && make -j`nproc` && make install && \
     cd .. && rm -rf cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}
 
 ENV CCACHE_MAJOR=4 CCACHE_MINOR=10 CCACHE_PATCH=2

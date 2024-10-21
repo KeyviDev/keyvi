@@ -1,4 +1,4 @@
-name: Python docker cibuildwheel
+name: Python Linux docker cibuildwheel
 
 on:
   push:
@@ -14,6 +14,10 @@ on:
 jobs:
   build_docker:
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          base_image: [many, musl]
+          arch: [x86_64, aarch64]
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
@@ -23,11 +27,19 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
-      - name: Build and push manylinux docker image
+      - name: Sets env for manylinux
+        run: |
+          echo "BASE_IMAGE=quay.io/pypa/manylinux_2_28_${{ matrix.arch }}" >> $GITHUB_ENV
+        if: matrix.base_image == 'many'
+      - name: Sets env for musllinux
+        run: |
+          echo "BASE_IMAGE=quay.io/pypa/musllinux_1_1_${{ matrix.arch }}" >> $GITHUB_ENV
+        if: matrix.base_image == 'musl'
+      - name: Build and push ${{ matrix.base_image }}-${{ matrix.arch }} docker image
         uses: docker/build-push-action@v6
         with:
           context: docker/manylinux-builder
           push: ${{ github.event_name == 'push' }}
           build-args: |
-            base_image=quay.io/pypa/manylinux_2_28_x86_64
+            base_image=${{ env.BASE_IMAGE }}
           tags: keyvidev/manylinux-builder-x86_64
