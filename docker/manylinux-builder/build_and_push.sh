@@ -2,10 +2,10 @@
 
 set -euxo pipefail
 
-#docker build . \
-#    -f Dockerfile \
-#    --build-arg base_image="quay.io/pypa/manylinux_2_28_x86_64" \
-#    -t keyvidev/manylinux-builder-x86_64
+docker build . \
+    -f Dockerfile \
+    --build-arg base_image="quay.io/pypa/manylinux_2_28_x86_64" \
+    -t keyvidev/manylinux-builder-x86_64
 
 docker build . \
     -f Dockerfile \
