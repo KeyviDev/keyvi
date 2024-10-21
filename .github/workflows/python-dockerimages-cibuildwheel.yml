@@ -27,8 +27,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: docker/manylinux-builder
-          push: true
-          #push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name == 'push' }}
           build-args: |
             base_image=quay.io/pypa/manylinux_2_28_x86_64
           tags: keyvidev/manylinux-builder-x86_64
