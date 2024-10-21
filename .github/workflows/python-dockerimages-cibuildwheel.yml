@@ -5,10 +5,12 @@ on:
     branches: [ master, release-* ]
     paths:
       - 'docker/*/Dockerfile'
+      - '.github/workflows/python-dockerimages-cibuildwheel.yml'
   pull_request:
     branches: [ master ]
-    #paths:
-      #- 'docker/*/Dockerfile'
+    paths:
+      - 'docker/*/Dockerfile'
+      - '.github/workflows/python-dockerimages-cibuildwheel.yml'
   workflow_dispatch:
 
 jobs:
