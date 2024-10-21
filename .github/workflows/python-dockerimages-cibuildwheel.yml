@@ -42,4 +42,4 @@ jobs:
           push: ${{ github.event_name == 'push' }}
           build-args: |
             base_image=${{ env.BASE_IMAGE }}
-          tags: keyvidev/manylinux-builder-x86_64
+          tags: keyvidev/${{ matrix.base_image }}linux-builder-${{ matrix.arch }}
