@@ -97,8 +97,10 @@ jobs:
           PACKAGES=( icu4c xz lz4 zstd zlib snappy boost )
           for PACKAGE in "${PACKAGES[@]}"
           do
+            echo "download cross-compiled package: $PACKAGE"
             response=$(arm64-homebrew/bin/brew fetch --force --bottle-tag=arm64_monterey $PACKAGE | grep Downloaded )
             download_path=$(echo $response | xargs -n 1 | tail -1)
+            echo "download response: $response / download path: $download_path"
             arm64-homebrew/bin/brew reinstall -vd $download_path
           done
           arm64-homebrew/bin/brew config
