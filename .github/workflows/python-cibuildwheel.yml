@@ -89,7 +89,7 @@ jobs:
       - name: install mac dependencies arm64
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'arm64') }}
         # explicitly install icu4c@75(required by boost), not icu4c which defaults to icu4c@74
-        # use --ignore-dependencies, so brew doesn't install deps on its own using the wrong arch(x86_64 instead of arm64)
+        # Note: when brew reinstall finds unsolved deps, it downloads and installs using the wrong arch(x86_64 instead of arm64)
         run: |
           set -e
           echo "MACOSX_DEPLOYMENT_TARGET=13.7" >> $GITHUB_ENV
@@ -102,7 +102,7 @@ jobs:
             arm64-homebrew/bin/brew info $PACKAGE
             response=$(arm64-homebrew/bin/brew fetch --force --bottle-tag=arm64_ventura $PACKAGE | grep Downloaded )
             download_path=$(echo $response | xargs -n 1 | tail -1)
-            arm64-homebrew/bin/brew reinstall -vd --ignore-dependencies $download_path
+            arm64-homebrew/bin/brew reinstall -vd $download_path
           done
           arm64-homebrew/bin/brew config
           ls /Users/runner/work/keyvi/keyvi/arm64-homebrew
