@@ -46,6 +46,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: docker/manylinux-builder
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           push: ${{ github.event_name == 'push' }}
           build-args: |
             base_image=${{ env.BASE_IMAGE }}
