@@ -1,18 +1,16 @@
 # Snappy, a fast compressor/decompressor
 
-find_path(Snappy_INCLUDE_DIR NAMES snappy.h)
+include(LibFindMacros)
 
-find_library(Snappy_LIBRARY NAMES snappy)
-
-message("${Snappy_INCLUDE_DIR} -- ${Snappy_LIBRARY}")
-
-include(SelectLibraryConfigurations)
-SELECT_LIBRARY_CONFIGURATIONS(SNAPPY)
-
-include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(
-    Snappy DEFAULT_MSG
-    Snappy_LIBRARY Snappy_INCLUDE_DIR
+find_path(Snappy_INCLUDE_DIR
+	NAMES snappy.h
 )
 
-mark_as_advanced(Snappy_INCLUDE_DIR Snappy_LIBRARY)
+find_library(Snappy_LIBRARY
+	NAMES snappy
+)
+
+set(Snappy_PROCESS_INCLUDES Snappy_INCLUDE_DIR)
+set(Snappy_PROCESS_LIBS Snappy_LIBRARY)
+
+libfind_process(Snappy)
