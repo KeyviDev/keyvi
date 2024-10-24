@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
+#include <pybind11/pybind11.h>
+
+#include <memory>
+
 #include "keyvi/dictionary/dictionary.h"
 #include "keyvi/dictionary/match.h"
 
 #include "py_match_iterator.h"
-
-#include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 namespace kd = keyvi::dictionary;
