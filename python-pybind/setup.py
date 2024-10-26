@@ -8,6 +8,7 @@ from pathlib import Path
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
+from setuptools.command.sdist import sdist as _sdist
 
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
@@ -55,6 +56,12 @@ def symlink_keyvi():
             shutil.rmtree(os.path.join(keyvi_cpp, "cmake_modules"))
     else:
         yield None, None
+
+
+class sdist(_sdist):
+    def run(self):
+        with symlink_keyvi():
+            _sdist.run(self)
 
 
 # A CMakeExtension needs a sourcedir instead of a file list.
@@ -175,7 +182,10 @@ setup(
     description="Python package for keyvi",
     long_description="",
     ext_modules=[CMakeExtension("keyvi")],
-    cmdclass={"build_ext": CMakeBuild},
+    cmdclass={
+        "build_ext": CMakeBuild,
+        "sdist": sdist,
+    },
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.8",
