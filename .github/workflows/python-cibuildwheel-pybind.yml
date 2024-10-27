@@ -2,9 +2,9 @@ name: Python Pybind cibuildwheel
 
 on:
   push:
-    branches: [ master, release-* ]
+    branches: [master, release-*]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -15,10 +15,10 @@ jobs:
       matrix:
         os: [ubuntu-22.04]
         # separate archs, so they use individual caches
-        arch: [ 'x86_64', 'arm64' ]
-        flavor: ['cpython', 'pypy']
+        arch: ["x86_64", "arm64"]
+        flavor: ["cpython", "pypy"]
         # separate musl and many on linux, for mac we just skip one of those
-        target: [ 'many', 'musl' ]
+        target: ["many", "musl"]
         exclude:
           - os: ubuntu-22.04
             target: musl
@@ -110,18 +110,18 @@ jobs:
           CIBW_TEST_SKIP: "*p{38,39,310,311}-m*linux_aarch64 pp*"
 
           # (many)linux custom docker images
-          CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
-          CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
-          CIBW_MUSLLINUX_X86_64_IMAGE: 'keyvidev/musllinux-builder-x86_64'
-          CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
-          
+          CIBW_MANYLINUX_X86_64_IMAGE: "keyvidev/manylinux-builder-x86_64"
+          CIBW_MANYLINUX_AARCH64_IMAGE: "keyvidev/manylinux-builder-aarch64"
+          CIBW_MUSLLINUX_X86_64_IMAGE: "keyvidev/musllinux-builder-x86_64"
+          CIBW_MUSLLINUX_AARCH64_IMAGE: "keyvidev/musllinux-builder-aarch64"
+
           # ccache using path
           CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
           CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
-          
+
           # python dependencies
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
-          
+
           # testing
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: >
@@ -131,7 +131,7 @@ jobs:
           # CIBW_BUILD_VERBOSITY: 2
         with:
           package-dir: python-pybind
-        
+
       - uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.flavor }}-${{ matrix.target }}
@@ -141,30 +141,31 @@ jobs:
     name: sdist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: install Linux deps
-      run: |
-        sudo apt-get update && \
-        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
-    - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.11
-      with:
-        key: ${{ matrix.os }}-sdist-python
+      - uses: actions/checkout@v4
+      - name: install Linux deps
+        run: |
+          sudo apt-get update && \
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.11
+        with:
+          key: ${{ matrix.os }}-sdist-python
 
-    - name: Build SDist
-      run: |
-        export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-        cd python-pybind && \
-        python -m pip install . && \
-        python setup.py sdist -d wheelhouse && \
-        python -m pip install wheelhouse/*.tar.gz -v && \
-        python -m pytest tests && \
-        python -m pip uninstall -y keyvi_pybind11
+      - name: Build SDist
+        run: |
+          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+          cd python-pybind && \
+          python -m pip install . && \
+          python setup.py sdist -d wheelhouse && \
+          python -m pip install wheelhouse/*.tar.gz -v && \
+          python -m pip install pytest && \
+          python -m pytest tests && \
+          python -m pip uninstall -y keyvi_pybind11
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: artifact-sdist
-        path: python-pybind/wheelhouse/*.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifact-sdist
+          path: python-pybind/wheelhouse/*.tar.gz
 
   upload_all:
     needs: [build_wheels, build_sdist]
@@ -176,7 +177,7 @@ jobs:
           pattern: artifact-*
           merge-multiple: true
           path: dist
-  
+
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.pypi_password }}
