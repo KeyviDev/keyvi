@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4...3.18)
 project(keyvi_pybind11)
 
 add_subdirectory(pybind11)
-add_subdirectory(src/keyvi)
+add_subdirectory(keyvi_cpp)
 
 FILE(GLOB_RECURSE KEYVI_PYBIND_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
 pybind11_add_module(keyvi_pybind11 ${KEYVI_PYBIND_SOURCES})

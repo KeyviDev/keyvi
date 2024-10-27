@@ -32,7 +32,7 @@ if not IS_RELEASED:
 @contextmanager
 def symlink_keyvi():
     keyvi_cpp_source = "../keyvi"
-    keyvi_cpp = "src/keyvi"
+    keyvi_cpp = "keyvi_cpp"
     keyvi_cpp_link = os.path.join(keyvi_cpp, "keyvi")
     if not os.path.exists(keyvi_cpp_link):
         try:
