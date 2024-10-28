@@ -27,9 +27,9 @@
 namespace py = pybind11;
 namespace kd = keyvi::dictionary;
 
-py::module_ msgpack_ = py::module_::import("msgpack");
-
 void init_keyvi_match(const py::module_ &m) {
+  py::module_ msgpack_ = py::module_::import("msgpack");
+
   py::class_<kd::Match, std::shared_ptr<kd::Match>>(m, "Match")
       .def(py::init<>())
       .def_property("start", &kd::Match::GetStart, &kd::Match::SetStart)
@@ -37,7 +37,7 @@ void init_keyvi_match(const py::module_ &m) {
       .def_property("score", &kd::Match::GetScore, &kd::Match::SetScore)
       .def_property("matched_string", &kd::Match::GetMatchedString, &kd::Match::SetMatchedString)
       .def_property_readonly("value",
-                             [](const kd::Match &m) -> py::object {
+                             [&msgpack_](const kd::Match &m) -> py::object {
                                auto packed_value = m.GetMsgPackedValueAsString();
                                if (packed_value.empty()) {
                                  return py::none();
