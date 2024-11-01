@@ -88,7 +88,7 @@ jobs:
 
       - name: install mac dependencies arm64
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'arm64') }}
-        # explicitly install icu4c@75(required by boost), not icu4c which defaults to icu4c@74
+        # explicitly install icu4c@76 and boost@1.86, not icu4c/boost to avoid unsupported combinations
         # Note: when brew reinstall finds unsolved deps, it downloads and installs using the wrong arch(x86_64 instead of arm64)
         run: |
           set -e
@@ -96,7 +96,7 @@ jobs:
           echo "_CMAKE_PREFIX_PATH=${{ github.workspace }}/arm64-homebrew" >> $GITHUB_ENV
           echo "CIBW_REPAIR_WHEEL_COMMAND_MACOS=DYLD_LIBRARY_PATH=${{ github.workspace }}/arm64-homebrew delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}" >> $GITHUB_ENV
           mkdir arm64-homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm64-homebrew
-          PACKAGES=( icu4c@75 xz lz4 zstd zlib snappy boost )
+          PACKAGES=( icu4c@76 xz lz4 zstd zlib snappy boost@1.86 )
           for PACKAGE in "${PACKAGES[@]}"
           do
             arm64-homebrew/bin/brew info $PACKAGE
