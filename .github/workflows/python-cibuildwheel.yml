@@ -94,6 +94,7 @@ jobs:
         # Note: when brew reinstall finds unsolved deps, it downloads and installs using the wrong arch(x86_64 instead of arm64)
         run: |
           set -e
+          echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> $GITHUB_ENV
           echo "_CMAKE_PREFIX_PATH=${{ github.workspace }}/arm64-homebrew" >> $GITHUB_ENV
           echo "CIBW_REPAIR_WHEEL_COMMAND_MACOS=DYLD_LIBRARY_PATH=${{ github.workspace }}/arm64-homebrew delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}" >> $GITHUB_ENV
           mkdir arm64-homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm64-homebrew
@@ -113,7 +114,7 @@ jobs:
         env:
           # Skip CPython 3.6 and CPython 3.7
           # skip pypy 3.8, https://github.com/pypa/distutils/issues/283
-          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-* pp38*
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-* pp38* pp39*
 
           # skip testing all python versions on linux arm, only test 3.12
           # skip tests on pypy, currently fails for indexer tests
