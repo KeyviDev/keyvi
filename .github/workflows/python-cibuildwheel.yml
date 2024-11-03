@@ -111,7 +111,8 @@ jobs:
         uses: pypa/cibuildwheel@v2.17.0
         env:
           # Skip CPython 3.6 and CPython 3.7
-          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-*
+          # skip pypy 3.8, https://github.com/pypa/distutils/issues/283
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-* pp38*
 
           # skip testing all python versions on linux arm, only test 3.12
           # skip tests on pypy, currently fails for indexer tests
