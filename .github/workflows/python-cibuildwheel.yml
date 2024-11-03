@@ -17,18 +17,20 @@ jobs:
         os: [ubuntu-22.04, macos-13]
         # separate archs, so they use individual caches
         arch: [ 'x86_64', 'arm64' ]
-        flavor: ['cpython', 'pypy']
+        # skip pypy, https://github.com/pypa/distutils/issues/283
+        flavor: ['cpython']
         # separate musl and many on linux, for mac we just skip one of those
         target: [ 'many', 'musl' ]
         exclude:
           - os: macos-13
             target: musl
-          - os: ubuntu-22.04
-            target: musl
-            flavor: pypy
-          - os: macos-13
-            arch: arm64
-            flavor: pypy
+          # skip pypy, https://github.com/pypa/distutils/issues/283
+          #- os: ubuntu-22.04
+          #  target: musl
+          #  flavor: pypy
+          #- os: macos-13
+          #  arch: arm64
+          #  flavor: pypy
     steps:
       - uses: actions/checkout@v4
       - name: Set up QEMU
@@ -113,8 +115,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.21.3
         env:
           # Skip CPython 3.6 and CPython 3.7
-          # skip pypy 3.8, https://github.com/pypa/distutils/issues/283
-          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-* pp38* pp39*
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-*
 
           # skip testing all python versions on linux arm, only test 3.12
           # skip tests on pypy, currently fails for indexer tests
