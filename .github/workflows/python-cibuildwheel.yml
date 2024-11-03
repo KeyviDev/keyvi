@@ -12,6 +12,7 @@ jobs:
     name: cibuildwheel ${{ matrix.os }}/${{ matrix.arch }}/${{ matrix.flavor }}/${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, macos-13]
         # separate archs, so they use individual caches
