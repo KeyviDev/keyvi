@@ -34,6 +34,14 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
+      - name: Sets platform for arm64
+        run: |
+          echo "PLATFORM=linux/arm64" >> $GITHUB_ENV
+        if: matrix.arch == 'aarch64'
+      - name: Sets platform for amd64
+        run: |
+          echo "PLATFORM=linux/amd64" >> $GITHUB_ENV
+        if: matrix.arch == 'x86_64'
       - name: Sets env for manylinux
         run: |
           echo "BASE_IMAGE=quay.io/pypa/manylinux_2_28_${{ matrix.arch }}" >> $GITHUB_ENV
@@ -48,6 +56,7 @@ jobs:
           context: docker/manylinux-builder
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: ${{ env.PLATFORM }}
           push: ${{ github.event_name == 'push' }}
           build-args: |
             base_image=${{ env.BASE_IMAGE }}
