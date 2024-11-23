@@ -1,0 +1,63 @@
+name: Python Linux docker cibuildwheel
+
+on:
+  push:
+    branches: [ master, release-* ]
+    paths:
+      - 'docker/*/Dockerfile'
+      - '.github/workflows/python-dockerimages-cibuildwheel.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'docker/*/Dockerfile'
+      - '.github/workflows/python-dockerimages-cibuildwheel.yml'
+  workflow_dispatch:
+
+jobs:
+  build_docker:
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          base_image: [many, musl]
+          arch: [x86_64, aarch64]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        if: ${{ matrix.arch == 'aarch64' }}
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to Docker Hub
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+      - name: Sets platform for arm64
+        run: |
+          echo "PLATFORM=linux/arm64" >> $GITHUB_ENV
+        if: matrix.arch == 'aarch64'
+      - name: Sets platform for amd64
+        run: |
+          echo "PLATFORM=linux/amd64" >> $GITHUB_ENV
+        if: matrix.arch == 'x86_64'
+      - name: Sets env for manylinux
+        run: |
+          echo "BASE_IMAGE=quay.io/pypa/manylinux_2_28_${{ matrix.arch }}" >> $GITHUB_ENV
+        if: matrix.base_image == 'many'
+      - name: Sets env for musllinux
+        run: |
+          echo "BASE_IMAGE=quay.io/pypa/musllinux_1_1_${{ matrix.arch }}" >> $GITHUB_ENV
+        if: matrix.base_image == 'musl'
+      - name: Build and push ${{ matrix.base_image }}-${{ matrix.arch }} docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker/manylinux-builder
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: ${{ env.PLATFORM }}
+          push: ${{ github.event_name == 'push' }}
+          build-args: |
+            base_image=${{ env.BASE_IMAGE }}
+          tags: keyvidev/${{ matrix.base_image }}linux-builder-${{ matrix.arch }}

@@ -327,18 +327,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             clean_pykeyvi_build_directory()
             _clean.clean.run(self)
 
-    have_wheel = False
-    try:
-        import wheel.bdist_wheel as _bdist_wheel
-
-        class bdist_wheel(custom_opts, _bdist_wheel.bdist_wheel):
-            parent = _bdist_wheel.bdist_wheel
-            user_options = _bdist_wheel.bdist_wheel.user_options + custom_user_options
-
-        have_wheel = True
-    except:
-        None
-
     class build_cxx(_build_ext.build_ext):
         description = "customized for keyvi: " + _build_ext.build_ext.description
 
@@ -388,8 +376,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         "bdist": bdist,
         "clean": clean,
     }
-    if have_wheel:
-        commands["bdist_wheel"] = bdist_wheel
+
     for e in ext_modules:
         e.cython_directives = {"embedsignature": True}
 

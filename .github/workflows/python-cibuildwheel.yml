@@ -12,22 +12,25 @@ jobs:
     name: cibuildwheel ${{ matrix.os }}/${{ matrix.arch }}/${{ matrix.flavor }}/${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-22.04, macos-12]
+        os: [ubuntu-22.04, macos-13]
         # separate archs, so they use individual caches
         arch: [ 'x86_64', 'arm64' ]
-        flavor: ['cpython', 'pypy']
+        # skip pypy, https://github.com/pypa/distutils/issues/283
+        flavor: ['cpython']
         # separate musl and many on linux, for mac we just skip one of those
         target: [ 'many', 'musl' ]
         exclude:
-          - os: macos-12
+          - os: macos-13
             target: musl
-          - os: ubuntu-22.04
-            target: musl
-            flavor: pypy
-          - os: macos-12
-            arch: arm64
-            flavor: pypy
+          # skip pypy, https://github.com/pypa/distutils/issues/283
+          #- os: ubuntu-22.04
+          #  target: musl
+          #  flavor: pypy
+          #- os: macos-13
+          #  arch: arm64
+          #  flavor: pypy
     steps:
       - uses: actions/checkout@v4
       - name: Set up QEMU
@@ -83,21 +86,25 @@ jobs:
       - name: install mac dependencies X86_64
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'x86_64') }}
         run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> $GITHUB_ENV && \
           brew update && \
           brew install zlib snappy boost
 
       - name: install mac dependencies arm64
         if: ${{ (runner.os == 'macOS') && (matrix.arch == 'arm64') }}
+        # explicitly install icu4c@76 and boost@1.86, not icu4c/boost to avoid unsupported combinations
+        # Note: when brew reinstall finds unsolved deps, it downloads and installs using the wrong arch(x86_64 instead of arm64)
         run: |
           set -e
-          echo "MACOSX_DEPLOYMENT_TARGET=12.3.0" >> $GITHUB_ENV
+          echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> $GITHUB_ENV
           echo "_CMAKE_PREFIX_PATH=${{ github.workspace }}/arm64-homebrew" >> $GITHUB_ENV
           echo "CIBW_REPAIR_WHEEL_COMMAND_MACOS=DYLD_LIBRARY_PATH=${{ github.workspace }}/arm64-homebrew delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel}" >> $GITHUB_ENV
           mkdir arm64-homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C arm64-homebrew
-          PACKAGES=( icu4c xz lz4 zstd zlib snappy boost )
+          PACKAGES=( icu4c@76 xz lz4 zstd zlib snappy boost@1.86 )
           for PACKAGE in "${PACKAGES[@]}"
           do
-            response=$(arm64-homebrew/bin/brew fetch --force --bottle-tag=arm64_monterey $PACKAGE | grep Downloaded )
+            arm64-homebrew/bin/brew info $PACKAGE
+            response=$(arm64-homebrew/bin/brew fetch --force --bottle-tag=arm64_ventura $PACKAGE | grep Downloaded )
             download_path=$(echo $response | xargs -n 1 | tail -1)
             arm64-homebrew/bin/brew reinstall -vd $download_path
           done
@@ -105,7 +112,7 @@ jobs:
           ls /Users/runner/work/keyvi/keyvi/arm64-homebrew
 
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
-        uses: pypa/cibuildwheel@v2.17.0
+        uses: pypa/cibuildwheel@v2.21.3
         env:
           # Skip CPython 3.6 and CPython 3.7
           CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-*
