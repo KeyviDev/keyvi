@@ -37,9 +37,6 @@ build-frontend = "build[uv]"
 test-command = "pytest {project}/python/tests"
 test-extras = ["test"]
 
-[tool.cibuildwheel.pyodide]
-build-frontend = {name = "build", args = ["--exports", "whole_archive"]}
-
 [tool.ruff.lint]
 extend-select = [
   "B",           # flake8-bugbear
