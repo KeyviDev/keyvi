@@ -153,8 +153,8 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           python -m pip install . && \
-          python setup.py sdist -d wheelhouse && \
-          python -m pip install wheelhouse/*.tar.gz -v && \
+          python -m build --sdist
+          python -m pip install dist/*.tar.gz -v && \
           python -m pip install pytest && \
           python -m pytest python-pybind11/tests && \
           python -m pip uninstall -y keyvi_pybind11
@@ -162,7 +162,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: artifact-sdist
-          path: python-pybind/wheelhouse/*.tar.gz
+          path: dist/*.tar.gz
 
   upload_all:
     needs: [build_wheels, build_sdist]
