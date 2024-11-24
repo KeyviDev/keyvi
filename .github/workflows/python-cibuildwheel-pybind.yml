@@ -152,12 +152,12 @@ jobs:
       - name: Build SDist
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          python -m pip install --upgrade build
+          python -m pip install --upgrade build && \
           python -m pip install . && \
           python -m build --sdist
           python -m pip install dist/*.tar.gz -v && \
           python -m pip install pytest && \
-          python -m pytest python-pybind11/tests && \
+          python -m pytest python-pybind/tests && \
           python -m pip uninstall -y keyvi_pybind11
 
       - uses: actions/upload-artifact@v4
