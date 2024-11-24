@@ -143,7 +143,7 @@ jobs:
       - name: install Linux deps
         run: |
           sudo apt-get update && \
-          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache ninja-build
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
