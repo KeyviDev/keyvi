@@ -22,7 +22,7 @@ KEYVI_CLANG_TIDY = "OFF"
 KEYVI_DOCS = "OFF"
 
 [tool.pytest.ini_options]
-minversion = "8.0"
+minversion = "7.1.1"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
 log_cli_level = "INFO"
