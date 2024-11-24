@@ -9,7 +9,7 @@ on:
 
 jobs:
   build_wheels:
-    name: cibuildwheel ${{ matrix.os }}/${{ matrix.arch }}/${{ matrix.flavor }}/${{ matrix.target }}
+    name: pybind11-cibuildwheel ${{ matrix.os }}/${{ matrix.arch }}/${{ matrix.flavor }}/${{ matrix.target }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -152,12 +152,11 @@ jobs:
       - name: Build SDist
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          cd python-pybind && \
           python -m pip install . && \
           python setup.py sdist -d wheelhouse && \
           python -m pip install wheelhouse/*.tar.gz -v && \
           python -m pip install pytest && \
-          python -m pytest tests && \
+          python -m pytest python-pybind11/tests && \
           python -m pip uninstall -y keyvi_pybind11
 
       - uses: actions/upload-artifact@v4
