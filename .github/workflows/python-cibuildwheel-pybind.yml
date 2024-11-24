@@ -129,8 +129,6 @@ jobs:
 
           # for debugging set this to 1,2 or 3
           # CIBW_BUILD_VERBOSITY: 2
-        with:
-          package-dir: python-pybind
 
       - uses: actions/upload-artifact@v4
         with:
