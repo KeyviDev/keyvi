@@ -30,11 +30,11 @@ filterwarnings = [
   "error",
   "ignore::pytest.PytestCacheWarning",
 ]
-testpaths = ["tests"]
+testpaths = ["python-pybind/tests"]
 
 [tool.cibuildwheel]
 build-frontend = "default"
-test-command = "pytest {project}/python-pybind/tests"
+test-command = "pytest python-pybind/tests"
 test-extras = ["test"]
 
 [tool.ruff.lint]
