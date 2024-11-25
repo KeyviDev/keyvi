@@ -34,8 +34,8 @@ testpaths = ["python-pybind/tests"]
 
 [tool.cibuildwheel]
 build-frontend = "default"
+test-requires = "pytest"
 test-command = "pytest python-pybind/tests"
-test-extras = ["test"]
 
 [tool.ruff.lint]
 extend-select = [
