@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi_pybind11 as keyvi
+import keyvi_scikit_core as keyvi
 #from test_tools import tmp_dictionary
 import warnings
 
