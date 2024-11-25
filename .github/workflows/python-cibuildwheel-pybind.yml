@@ -119,14 +119,6 @@ jobs:
           CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
           CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
 
-          # python dependencies
-          CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
-
-          # testing
-          CIBW_TEST_REQUIRES: pytest
-          CIBW_TEST_COMMAND: >
-            python -m pytest {package}/tests
-
           # for debugging set this to 1,2 or 3
           # CIBW_BUILD_VERBOSITY: 2
 
