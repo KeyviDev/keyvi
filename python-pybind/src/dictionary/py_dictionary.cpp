@@ -40,6 +40,8 @@ void init_keyvi_dictionary(const py::module_ &m) {
 
     )pbdoc";
 
+  // TODO(hendrik): 'items', 'keys', 'manifest', 'match_fuzzy', 'match_near',
+  // 'search_tokenized', 'statistics', 'values'
   py::class_<kd::Dictionary>(m, "Dictionary")
       .def(py::init<const std::string &>())
       .def(
@@ -117,13 +119,10 @@ void init_keyvi_dictionary(const py::module_ &m) {
       .def("get", &kd::Dictionary::operator[], R"pbdoc(
         Get an entry from the dictionary.
     )pbdoc")
-      // 'items', 'keys', 'manifest', 'match_fuzzy', 'match_near',
       .def("match",
            [](const kd::Dictionary &d, const std::string &key) {
              auto m = d.Get(key);
              return kpy::make_match_iterator(m.begin(), m.end());
            })
-      .def("search", &kd::Dictionary::Lookup)
-      // 'search_tokenized', 'statistics', 'values'
-      ;
+      .def("search", &kd::Dictionary::Lookup);
 }
