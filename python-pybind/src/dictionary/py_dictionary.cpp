@@ -42,12 +42,88 @@ void init_keyvi_dictionary(const py::module_ &m) {
 
   py::class_<kd::Dictionary>(m, "Dictionary")
       .def(py::init<const std::string &>())
+      .def(
+          "complete_fuzzy_multiword",
+          [](const kd::Dictionary &d, const std::string &query, const int32_t max_edit_distance,
+             const size_t minimum_exact_prefix = 0, const unsigned char multiword_separator = 0x1b) {
+            auto m = d.GetFuzzyMultiwordCompletion(query, max_edit_distance, minimum_exact_prefix, multiword_separator);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 0,
+          py::arg("multiword_separator") = 0x1b,
+          R"pbdoc(Complete the given key to full matches after whitespace tokenizing,
+                  allowing up to max_edit_distance distance(Levenshtein).
+                  In case the used dictionary supports inner weights, the
+                  completer traverses the dictionary according to weights,
+                  otherwise byte-order.
+          )pbdoc")
+      .def(
+          "complete_multiword",
+          [](const kd::Dictionary &d, const std::string &query, const unsigned char multiword_separator = 0x1b) {
+            auto m = d.GetMultiwordCompletion(query, multiword_separator);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("multiword_separator") = 0x1b,
+          R"pbdoc(Complete the given key to full matches after whitespace tokenizing
+                  and return the top n completions.
+                  In case the used dictionary supports inner weights, the
+                  completer traverses the dictionary according to weights,
+                  otherwise byte-order.
+
+                  Note, due to depth-first traversal the traverser
+                  immediately yields results when it visits them. The results are
+                  neither in order nor limited to n. It is up to the caller to resort
+                  and truncate the lists of results.
+                  Only the number of top completions is guaranteed.
+          )pbdoc")
+      .def(
+          "complete_prefix",
+          [](const kd::Dictionary &d, const std::string &query) {
+            auto m = d.GetPrefixCompletion(query);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"),
+          R"pbdoc(Complete the given key to full matches after whitespace tokenizing
+                  and return the top n completions.
+                  In case the used dictionary supports inner weights, the
+                  completer traverses the dictionary according to weights,
+                  otherwise byte-order.
+
+                  Note, due to depth-first traversal the traverser
+                  immediately yields results when it visits them. The results are
+                  neither in order nor limited to n. It is up to the caller to resort
+                  and truncate the lists of results.
+                  Only the number of top completions is guaranteed.
+          )pbdoc")
+      .def(
+          "complete_prefix",
+          [](const kd::Dictionary &d, const std::string &query, size_t top_n) {
+            auto m = d.GetPrefixCompletion(query, top_n);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("top_n"),
+          R"pbdoc(Complete the given key to full matches after whitespace tokenizing
+                  and return the top n completions.
+                  In case the used dictionary supports inner weights, the
+                  completer traverses the dictionary according to weights,
+                  otherwise byte-order.
+
+                  Note, due to depth-first traversal the traverser
+                  immediately yields results when it visits them. The results are
+                  neither in order nor limited to n. It is up to the caller to resort
+                  and truncate the lists of results.
+                  Only the number of top completions is guaranteed.
+          )pbdoc")
       .def("get", &kd::Dictionary::operator[], R"pbdoc(
         Get an entry from the dictionary.
     )pbdoc")
+      // 'items', 'keys', 'manifest', 'match_fuzzy', 'match_near',
+      .def("match",
+           [](const kd::Dictionary &d, const std::string &key) {
+             auto m = d.Get(key);
+             return kpy::make_match_iterator(m.begin(), m.end());
+           })
       .def("search", &kd::Dictionary::Lookup)
-      .def("match", [](const kd::Dictionary &d, const std::string &key) {
-        auto m = d.Get(key);
-        return kpy::make_match_iterator(m.begin(), m.end());
-      });
+      // 'search_tokenized', 'statistics', 'values'
+      ;
 }
