@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <pybind11/pybind11.h>
 #include <pybind11/functional.h>
+#include <pybind11/pybind11.h>
 
 #include "keyvi/dictionary/dictionary_types.h"
 
@@ -24,32 +24,32 @@ namespace py = pybind11;
 namespace kd = keyvi::dictionary;
 
 void init_keyvi_dictionary_compilers(const py::module_ &m) {
-  #define CREATE_COMPILER(compiler, name) \
-        py::class_<compiler>(m, name) \
-            .def(py::init<>()) \
-            .def("__enter__", [](compiler &c) { return &c; }) \
-            .def("__exit__", [](compiler &c, void *exc_type, void *exc_value, void *traceback) { c.Compile(); }) \
-            .def("__setitem__", &compiler::Add) \
-            .def("add", &compiler::Add) \
-            .def("compile", [](compiler &c, std::function<void(const size_t a, const size_t b)> progress_callback) { \
-              if (progress_callback == nullptr) { \
-                  c.Compile(); \
-                  return; \
-              } \
-              auto progress_compiler_callback = [](size_t a, size_t b, void *user_data) { \
-                auto py_callback = *reinterpret_cast<std::function<void(const size_t, const size_t)>*>(user_data); \
-                py_callback(a,b); \
-              }; \
-              void* user_data = reinterpret_cast<void*>(&progress_callback); \
-              c.Compile(progress_compiler_callback, user_data); \
-            }, py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) \
-            .def("set_manifest", &compiler::SetManifest) \
-            .def("write_to_file", &compiler::WriteToFile);
+#define CREATE_COMPILER(compiler, name)                                                                               \
+  py::class_<compiler>(m, name)                                                                                       \
+      .def(py::init<>())                                                                                              \
+      .def("__enter__", [](compiler &c) { return &c; })                                                               \
+      .def("__exit__", [](compiler &c, void *exc_type, void *exc_value, void *traceback) { c.Compile(); })            \
+      .def("__setitem__", &compiler::Add)                                                                             \
+      .def("add", &compiler::Add)                                                                                     \
+      .def(                                                                                                           \
+          "compile",                                                                                                  \
+          [](compiler &c, std::function<void(const size_t a, const size_t b)> progress_callback) {                    \
+            if (progress_callback == nullptr) {                                                                       \
+              c.Compile();                                                                                            \
+              return;                                                                                                 \
+            }                                                                                                         \
+            auto progress_compiler_callback = [](size_t a, size_t b, void *user_data) {                               \
+              auto py_callback = *reinterpret_cast<std::function<void(const size_t, const size_t)> *>(user_data);     \
+              py_callback(a, b);                                                                                      \
+            };                                                                                                        \
+            void *user_data = reinterpret_cast<void *>(&progress_callback);                                           \
+            c.Compile(progress_compiler_callback, user_data);                                                         \
+          },                                                                                                          \
+          py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) \
+      .def("set_manifest", &compiler::SetManifest)                                                                    \
+      .def("write_to_file", &compiler::WriteToFile);
 
   CREATE_COMPILER(kd::CompletionDictionaryCompiler, "CompletionDictionaryCompiler");
 
-  #undef CREATE_COMPILER
+#undef CREATE_COMPILER
 }
-
-//cdef void progress_compiler_callback(size_t a, size_t b, void* py_callback) noexcept with gil:
-//    (<object>py_callback)(a, b)
