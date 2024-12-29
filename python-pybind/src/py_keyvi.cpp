@@ -17,10 +17,13 @@
 
 #include <pybind11/pybind11.h>
 
+#include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
+
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
+namespace kd = keyvi::dictionary;
 
 void init_keyvi_dictionary(const py::module_ &);
 void init_keyvi_dictionary_compilers(const py::module_ &);
@@ -37,6 +40,17 @@ PYBIND11_MODULE(keyvi_scikit_core, m) {
            :toctree: _generate
 
     )pbdoc";
+
+  py::enum_<kd::loading_strategy_types>(m, "loading_strategy_types")
+      .value("default_os", kd::loading_strategy_types::default_os)
+      .value("lazy", kd::loading_strategy_types::lazy)
+      .value("populate", kd::loading_strategy_types::populate)
+      .value("populate_key_part", kd::loading_strategy_types::populate_key_part)
+      .value("populate_lazy", kd::loading_strategy_types::populate_lazy)
+      .value("lazy_no_readahead", kd::loading_strategy_types::lazy_no_readahead)
+      .value("lazy_no_readahead_value_part", kd::loading_strategy_types::lazy_no_readahead_value_part)
+      .value("populate_key_part_no_readahead_value_part",
+             kd::loading_strategy_types::populate_key_part_no_readahead_value_part);
 
   init_keyvi_match(m);
   py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi_scikit_core.dictionary");

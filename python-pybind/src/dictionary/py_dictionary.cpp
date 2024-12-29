@@ -44,6 +44,7 @@ void init_keyvi_dictionary(const py::module_ &m) {
   // 'search_tokenized', 'statistics', 'values'
   py::class_<kd::Dictionary>(m, "Dictionary")
       .def(py::init<const std::string &>())
+      .def(py::init<const std::string &, kd::loading_strategy_types>())
       .def(
           "complete_fuzzy_multiword",
           [](const kd::Dictionary &d, const std::string &query, const int32_t max_edit_distance,

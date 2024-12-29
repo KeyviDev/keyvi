@@ -6,12 +6,12 @@ import keyvi_scikit_core as keyvi
 import warnings
 
 
-#from keyvi.compiler import (
-#    JsonDictionaryCompiler,
-#    CompletionDictionaryCompiler,
-#    KeyOnlyDictionaryCompiler,
-#    StringDictionaryCompiler,
-#)
+from keyvi_scikit_core.compiler import (
+    JsonDictionaryCompiler,
+    CompletionDictionaryCompiler,
+    KeyOnlyDictionaryCompiler,
+    StringDictionaryCompiler,
+)
 
 
 """ def test_serialization():

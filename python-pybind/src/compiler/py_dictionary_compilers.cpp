@@ -17,16 +17,21 @@
 
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+
+#include <string>
+#include <vector>
 
 #include "keyvi/dictionary/dictionary_types.h"
 
 namespace py = pybind11;
 namespace kd = keyvi::dictionary;
 
-void init_keyvi_dictionary_compilers(const py::module_ &m) {
+void init_keyvi_dictionary_compilers(const py::module_ &module) {
 #define CREATE_COMPILER(compiler, name)                                                                               \
-  py::class_<compiler>(m, name)                                                                                       \
+  py::class_<compiler>(module, name)                                                                                  \
       .def(py::init<>())                                                                                              \
+      .def(py::init<const keyvi::util::parameters_t &>())                                                             \
       .def("__enter__", [](compiler &c) { return &c; })                                                               \
       .def("__exit__", [](compiler &c, void *exc_type, void *exc_value, void *traceback) { c.Compile(); })            \
       .def("__setitem__", &compiler::Add)                                                                             \
@@ -47,9 +52,67 @@ void init_keyvi_dictionary_compilers(const py::module_ &m) {
           },                                                                                                          \
           py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) \
       .def("set_manifest", &compiler::SetManifest)                                                                    \
-      .def("write_to_file", &compiler::WriteToFile);
-
+      .def("write_to_file", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>());
+#define CREATE_SK_COMPILER(compiler, name)                                                                            \
+  py::class_<compiler>(module, name)                                                                                  \
+      .def(py::init<const std::vector<std::string> &>())                                                              \
+      .def(py::init<const std::vector<std::string> &, const keyvi::util::parameters_t &>())                           \
+      .def("__enter__", [](compiler &c) { return &c; })                                                               \
+      .def("__exit__", [](compiler &c, void *exc_type, void *exc_value, void *traceback) { c.Compile(); })            \
+      .def("__setitem__", &compiler::Add)                                                                             \
+      .def("add", &compiler::Add)                                                                                     \
+      .def(                                                                                                           \
+          "compile",                                                                                                  \
+          [](compiler &c, std::function<void(const size_t a, const size_t b)> progress_callback) {                    \
+            pybind11::gil_scoped_release release_gil;                                                                 \
+            if (progress_callback == nullptr) {                                                                       \
+              c.Compile();                                                                                            \
+              return;                                                                                                 \
+            }                                                                                                         \
+            auto progress_compiler_callback = [](size_t a, size_t b, void *user_data) {                               \
+              auto py_callback = *reinterpret_cast<std::function<void(const size_t, const size_t)> *>(user_data);     \
+              pybind11::gil_scoped_acquire acquire_gil;                                                               \
+              py_callback(a, b);                                                                                      \
+            };                                                                                                        \
+            void *user_data = reinterpret_cast<void *>(&progress_callback);                                           \
+            c.Compile(progress_compiler_callback, user_data);                                                         \
+          },                                                                                                          \
+          py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) \
+      .def("set_manifest", &compiler::SetManifest)                                                                    \
+      .def("write_to_file", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>());
+#define CREATE_MERGER(merger, name)                                                                    \
+  py::class_<merger>(module, name)                                                                     \
+      .def(py::init<>())                                                                               \
+      .def(py::init<const keyvi::util::parameters_t &>())                                              \
+      .def("__enter__", [](merger &m) { return &m; })                                                  \
+      .def("__exit__", [](merger &m, void *exc_type, void *exc_value, void *traceback) { m.Merge(); }) \
+      .def("add", &merger::Add)                                                                        \
+      .def("merge",                                                                                    \
+           [](merger &m) {                                                                             \
+             pybind11::gil_scoped_release release_gil;                                                 \
+             m.Merge();                                                                                \
+           })                                                                                          \
+      .def("merge",                                                                                    \
+           [](merger &m, const std::string &filename) {                                                \
+             pybind11::gil_scoped_release release_gil;                                                 \
+             m.Merge(filename);                                                                        \
+           })                                                                                          \
+      .def("set_manifest", &merger::SetManifest)                                                       \
+      .def("write_to_file", &merger::WriteToFile, py::call_guard<py::gil_scoped_release>());
   CREATE_COMPILER(kd::CompletionDictionaryCompiler, "CompletionDictionaryCompiler");
+  CREATE_COMPILER(kd::FloatVectorDictionaryCompiler, "FloatVectorDictionaryCompiler");
+  CREATE_COMPILER(kd::IntDictionaryCompiler, "IntDictionaryCompiler");
+  CREATE_COMPILER(kd::JsonDictionaryCompiler, "JsonDictionaryCompiler");
+  CREATE_COMPILER(kd::KeyOnlyDictionaryCompiler, "KeyOnlyDictionaryCompiler");
+  CREATE_COMPILER(kd::StringDictionaryCompiler, "StringDictionaryCompiler");
+  CREATE_SK_COMPILER(kd::SecondaryKeyCompletionDictionaryCompiler, "SecondaryKeyCompletionDictionaryCompiler");
+  CREATE_SK_COMPILER(kd::SecondaryKeyFloatVectorDictionaryCompiler, "SecondaryKeyFloatVectorDictionaryCompiler");
+  CREATE_SK_COMPILER(kd::SecondaryKeyIntDictionaryCompiler, "SecondaryKeyIntDictionaryCompiler");
+  CREATE_SK_COMPILER(kd::SecondaryKeyJsonDictionaryCompiler, "SecondaryKeyJsonDictionaryCompiler");
+  CREATE_SK_COMPILER(kd::SecondaryKeyKeyOnlyDictionaryCompiler, "SecondaryKeyKeyOnlyDictionaryCompiler");
+  CREATE_SK_COMPILER(kd::SecondaryKeyStringDictionaryCompiler, "SecondaryKeyStringDictionaryCompiler");
+  CREATE_MERGER(kd::CompletionDictionaryMerger, "CompletionDictionaryMerger");
+  CREATE_MERGER(kd::IntDictionaryMerger, "IntDictionaryMerger");
 
 #undef CREATE_COMPILER
 }
