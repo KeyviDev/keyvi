@@ -23,6 +23,7 @@
 namespace py = pybind11;
 
 void init_keyvi_dictionary(const py::module_ &);
+void init_keyvi_dictionary_compilers(const py::module_ &);
 void init_keyvi_match(const py::module_ &);
 
 PYBIND11_MODULE(keyvi_scikit_core, m) {
@@ -40,6 +41,8 @@ PYBIND11_MODULE(keyvi_scikit_core, m) {
   init_keyvi_match(m);
   py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi_scikit_core.dictionary");
   init_keyvi_dictionary(keyvi_dictionary);
+  py::module keyvi_compilers = m.def_submodule("compiler", "keyvi_scikit_core.compiler");
+  init_keyvi_dictionary_compilers(keyvi_compilers);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

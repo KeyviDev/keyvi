@@ -1,4 +1,4 @@
-/* * keyvi - A key value store.
+/* keyvi - A key value store.
  *
  * Copyright 2024 Hendrik Muhs<hendrik.muhs@gmail.com>
  *
