@@ -9,6 +9,15 @@ dependencies = [
     "msgpack>=1.0.0",
 ]
 
+[project.optional-dependencies]
+lint = [
+    'ruff>=0.5.0',
+]
+test = [
+    'pytest>=7.4.2',
+]
+dev = ['keyvi_scikit_core[lint,test]']
+
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
 minimum-version = "build-system.requires"

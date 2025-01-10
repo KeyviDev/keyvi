@@ -27,6 +27,13 @@
 namespace py = pybind11;
 namespace kd = keyvi::dictionary;
 
+inline const py::object &get_msgpack_loads_func() {
+  PYBIND11_CONSTINIT static py::gil_safe_call_once_and_store<py::object> storage;
+  return storage
+      .call_once_and_store_result([]() -> py::object { return py::getattr(py::module_::import("msgpack"), "loads"); })
+      .get_stored();
+}
+
 void init_keyvi_match(const py::module_ &m) {
   py::module_ msgpack_ = py::module_::import("msgpack");
 
@@ -42,7 +49,7 @@ void init_keyvi_match(const py::module_ &m) {
                                if (packed_value.empty()) {
                                  return py::none();
                                }
-                               return msgpack_.attr("loads")(packed_value);
+                               return get_msgpack_loads_func()(py::bytes(packed_value));
                              })
       .def("value_as_string", &kd::Match::GetValueAsString)
       .def("raw_value_as_string", &kd::Match::GetRawValueAsString)
