@@ -120,6 +120,9 @@ void init_keyvi_dictionary(const py::module_ &m) {
       .def("get", &kd::Dictionary::operator[], R"pbdoc(
         Get an entry from the dictionary.
     )pbdoc")
+      .def("__getitem__", &kd::Dictionary::operator[], R"pbdoc(
+        Get an entry from the dictionary.
+    )pbdoc")
       .def("match",
            [](const kd::Dictionary &d, const std::string &key) {
              auto m = d.Get(key);

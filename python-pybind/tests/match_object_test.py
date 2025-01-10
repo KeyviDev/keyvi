@@ -2,7 +2,7 @@
 # Usage: py.test tests
 
 import keyvi_scikit_core as keyvi
-#from test_tools import tmp_dictionary
+from test_tools import tmp_dictionary
 import warnings
 
 
@@ -114,7 +114,7 @@ def test_score():
         assert m.value == {"a": 3} """
 
 
-""" def test_get_value_int():
+def test_get_value_int():
     c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
     c.Add("abc", 42)
     c.Add("abd", 21)
@@ -125,7 +125,7 @@ def test_score():
         assert m.value == 21
 
 
-def test_get_value_key_only():
+""" def test_get_value_key_only():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
     c.Add("abc")
     c.Add("abd")
@@ -134,7 +134,7 @@ def test_get_value_key_only():
         assert m.value == ''
         m = d["abd"]
         assert m.value == ''
-
+ """
 
 def test_get_value_string():
     c = StringDictionaryCompiler({"memory_limit_mb": "10"})
@@ -145,7 +145,7 @@ def test_get_value_string():
         assert m.value == "aaaaa"
         m = d["abd"]
         assert m.value == "bbbbb"
- """
+
 
 def test_matched_string():
     m = keyvi.Match()
