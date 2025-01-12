@@ -314,7 +314,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(MultipleCompile, DictT, json_types) {
   compiler.Compile();
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */
