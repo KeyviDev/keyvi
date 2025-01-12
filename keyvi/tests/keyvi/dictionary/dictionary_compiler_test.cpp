@@ -304,6 +304,17 @@ BOOST_AUTO_TEST_CASE(float_dictionary) {
   std::remove(file_name.c_str());
 }
 
+BOOST_AUTO_TEST_CASE_TEMPLATE(MultipleCompile, DictT, json_types) {
+  DictT compiler(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
+
+  compiler.Add("a", "1");
+  compiler.Add("b", "1");
+  compiler.Compile();
+  compiler.Compile();
+  compiler.Compile();
+}
+
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace dictionary */

@@ -129,6 +129,11 @@ class DictionaryCompiler final {
    * Do the final compilation
    */
   void Compile(callback_t progress_callback = nullptr, void* user_data = nullptr) {
+    // already compiled
+    if (generator_) {
+      return;
+    }
+
     value_store_->CloseFeeding();
 
     if (chunk_ == 0) {
