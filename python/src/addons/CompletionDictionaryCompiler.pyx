@@ -12,7 +12,7 @@
         self.Compile()
 
         
-    def Compile(self, *args):
+    def compile(self, *args):
         if not args:
             with nogil:
                 self.inst.get().Compile()
@@ -21,3 +21,9 @@
         cdef void* callback = <void*> args[0]
         with nogil:
             self.inst.get().Compile(progress_compiler_callback, callback)
+
+    def Compile(self):
+        return call_deprecated_method("Compile", "compile", self.compile)
+    
+    def Add(self):
+        return call_deprecated_method("Add", "add", self.add)
