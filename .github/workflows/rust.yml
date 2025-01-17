@@ -41,3 +41,4 @@ jobs:
       - run: cargo update --verbose --manifest-path rust/Cargo.toml
       - run: cargo build --verbose --manifest-path rust/Cargo.toml
       - run: cargo test --verbose --manifest-path rust/Cargo.toml
+
