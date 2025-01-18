@@ -28,8 +28,8 @@ def test_serialization():
 
 def test_raw_serialization():
     c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("abc", '{"a" : 2}')
-    c.Add("abd", '{"a" : 3}')
+    c.add("abc", '{"a" : 2}')
+    c.add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
         m = d["abc"]
         assert m.value_as_string() == '{"a":2}'
@@ -123,8 +123,8 @@ def test_score():
 
 def test_get_value():
     c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("abc", '{"a" : 2}')
-    c.Add("abd", '{"a" : 3}')
+    c.add("abc", '{"a" : 2}')
+    c.add("abd", '{"a" : 3}')
     with tmp_dictionary(c, 'match_object_json.kv') as d:
         m = d["abc"]
         assert m.value == {"a": 2}
@@ -134,8 +134,8 @@ def test_get_value():
 
 def test_get_value_int():
     c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("abc", 42)
-    c.Add("abd", 21)
+    c.add("abc", 42)
+    c.add("abd", 21)
     with tmp_dictionary(c, 'match_object_int.kv') as d:
         m = d["abc"]
         assert m.value == 42
@@ -145,8 +145,8 @@ def test_get_value_int():
 
 def test_get_value_key_only():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("abc")
-    c.Add("abd")
+    c.add("abc")
+    c.add("abd")
     with tmp_dictionary(c, 'match_object_key_only.kv') as d:
         m = d["abc"]
         assert m.value == ''
@@ -156,8 +156,8 @@ def test_get_value_key_only():
 
 def test_get_value_string():
     c = StringDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("abc", "aaaaa")
-    c.Add("abd", "bbbbb")
+    c.add("abc", "aaaaa")
+    c.add("abd", "bbbbb")
     with tmp_dictionary(c, 'match_object_string.kv') as d:
         m = d["abc"]
         assert m.value == "aaaaa"
