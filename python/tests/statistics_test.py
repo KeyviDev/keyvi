@@ -13,17 +13,17 @@ from keyvi.dictionary import Dictionary
 
 def test_size():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("Leela")
-    c.Add("Kif")
+    c.add("Leela")
+    c.add("Kif")
     with tmp_dictionary(c, 'brannigan_size.kv') as d:
         assert len(d) == 2
 
 
 def test_manifest():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("Leela")
-    c.Add("Kif")
-    c.SetManifest('{"author": "Zapp Brannigan"}')
+    c.add("Leela")
+    c.add("Kif")
+    c.set_manifest('{"author": "Zapp Brannigan"}')
     with tmp_dictionary(c, 'brannigan_manifest.kv') as d:
         m = json.loads(d.manifest())
         assert m['author'] == "Zapp Brannigan"
@@ -31,13 +31,13 @@ def test_manifest():
 
 def test_manifest_after_compile():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("Leela")
-    c.Add("Kif")
-    c.Compile()
-    c.SetManifest('{"author": "Zapp Brannigan"}')
+    c.add("Leela")
+    c.add("Kif")
+    c.compile()
+    c.set_manifest('{"author": "Zapp Brannigan"}')
     file_name = os.path.join(tempfile.gettempdir(), 'brannigan_manifest2.kv')
     try:
-        c.WriteToFile(file_name)
+        c.write_to_file(file_name)
         d = Dictionary(file_name)
         m = json.loads(d.manifest())
         assert m['author'] == "Zapp Brannigan"
@@ -48,9 +48,9 @@ def test_manifest_after_compile():
 
 def test_statistics():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("Leela")
-    c.Add("Kif")
-    c.SetManifest('{"author": "Zapp Brannigan"}')
+    c.add("Leela")
+    c.add("Kif")
+    c.set_manifest('{"author": "Zapp Brannigan"}')
     with tmp_dictionary(c, 'brannigan_statistics.kv') as d:
         stats = d.statistics()
         gen = stats.get('General', {})
@@ -73,17 +73,17 @@ def test_statistics():
 def test_manifest_for_merger():
     try:
         c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
-        c.Add("abc", '{"a" : 2}')
-        c.Compile()
-        c.SetManifest('{"author": "Zapp Brannigan"}')
-        c.WriteToFile('manifest_json_merge1.kv')
+        c.add("abc", '{"a" : 2}')
+        c.compile()
+        c.set_manifest('{"author": "Zapp Brannigan"}')
+        c.write_to_file('manifest_json_merge1.kv')
         del c
 
         c2 = JsonDictionaryCompiler({"memory_limit_mb": "10"})
-        c2.Add("abd", '{"a" : 3}')
-        c2.Compile()
-        c2.SetManifest('{"author": "Leela"}')
-        c2.WriteToFile('manifest_json_merge2.kv')
+        c2.add("abd", '{"a" : 3}')
+        c2.compile()
+        c2.set_manifest('{"author": "Leela"}')
+        c2.write_to_file('manifest_json_merge2.kv')
         del c2
 
         merger = JsonDictionaryMerger({"memory_limit_mb": "10"})

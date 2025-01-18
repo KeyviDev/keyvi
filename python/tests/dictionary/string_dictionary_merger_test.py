@@ -46,10 +46,10 @@ key_values_3 = {
 def generate_keyvi(key_values, filename):
     dictionary_compiler = StringDictionaryCompiler({"memory_limit_mb": "10"})
     for key, value in key_values.items():
-        dictionary_compiler.Add(key, json.dumps(value))
+        dictionary_compiler.add(key, json.dumps(value))
 
-    dictionary_compiler.Compile()
-    dictionary_compiler.WriteToFile(filename)
+    dictionary_compiler.compile()
+    dictionary_compiler.write_to_file(filename)
 
 
 @pytest.mark.parametrize('merger', [StringDictionaryMerger({"memory_limit_mb": "10"}),
