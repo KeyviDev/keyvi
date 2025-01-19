@@ -33,15 +33,6 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
         void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
         void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file
 
-    cdef cppclass IntDictionaryCompilerSmallData:
-        IntDictionaryCompilerSmallData() except +
-        IntDictionaryCompilerSmallData(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string, long) except + # wrap-as:add
-        void Compile() nogil # wrap-ignore
-        void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
-        void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file
-
     cdef cppclass KeyOnlyDictionaryCompiler:
         KeyOnlyDictionaryCompiler() except +
         KeyOnlyDictionaryCompiler(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
@@ -54,15 +45,6 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
     cdef cppclass JsonDictionaryCompiler:
         JsonDictionaryCompiler() except +
         JsonDictionaryCompiler(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string, libcpp_utf8_string) except + # wrap-as:add
-        void Compile() nogil # wrap-ignore
-        void Compile(callback_t, void*) nogil # wrap-ignore
-        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
-        void WriteToFile(libcpp_utf8_string) except + # wrap-as:write_to_file
-
-    cdef cppclass JsonDictionaryCompilerSmallData:
-        JsonDictionaryCompilerSmallData() except +
-        JsonDictionaryCompilerSmallData(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
         void Add(libcpp_utf8_string, libcpp_utf8_string) except + # wrap-as:add
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore

@@ -18,10 +18,19 @@ limitations under the License.
 '''
 
 from keyvi._core import CompletionDictionaryCompiler, CompletionDictionaryMerger, IntDictionaryCompiler, IntDictionaryMerger
-from keyvi._core import JsonDictionaryCompiler, JsonDictionaryCompilerSmallData, JsonDictionaryMerger
-from keyvi._core import IntDictionaryCompilerSmallData
+from keyvi._core import JsonDictionaryCompiler, JsonDictionaryMerger
 from keyvi._core import KeyOnlyDictionaryCompiler, KeyOnlyDictionaryGenerator, KeyOnlyDictionaryMerger
 from keyvi._core import StringDictionaryCompiler, StringDictionaryMerger
 from keyvi._core import FloatVectorDictionaryCompiler
 from keyvi._core import SecondaryKeyCompletionDictionaryCompiler, SecondaryKeyFloatVectorDictionaryCompiler, SecondaryKeyIntDictionaryCompiler
 from keyvi._core import SecondaryKeyKeyOnlyDictionaryCompiler, SecondaryKeyStringDictionaryCompiler, SecondaryKeyJsonDictionaryCompiler
+
+def JsonDictionaryCompilerSmallData(*args, **kwargs):
+    from warnings import warn
+    warn("JsonDictionaryCompilerSmallData is deprecated and will be removed in a future version. Use JsonDictionaryCompiler instead.")
+    return JsonDictionaryCompiler(*args, **kwargs)
+
+def IntDictionaryCompilerSmallData(*args, **kwargs):
+    from warnings import warn
+    warn("IntDictionaryCompilerSmallData is deprecated and will be removed in a future version. Use IntDictionaryCompiler instead.")
+    return IntDictionaryCompiler(*args, **kwargs)
