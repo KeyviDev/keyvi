@@ -5,7 +5,7 @@
 
 
     def __exit__(self, type, value, traceback):
-        self.Compile()
+        self.compile()
 
 
     def compile(self, *args):
