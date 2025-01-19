@@ -25,7 +25,7 @@ def generate_dictionary_compiler():
 
     dictionary_compiler = JsonDictionaryCompiler({"memory_limit_mb": "10"})
     for key, value in key_values:
-        dictionary_compiler.Add(key, json.dumps(value))
+        dictionary_compiler.add(key, json.dumps(value))
 
     return dictionary_compiler
 

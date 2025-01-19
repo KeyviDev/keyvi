@@ -14,12 +14,12 @@ from test_tools import tmp_dictionary
 
 def test_forward_backward_completion():
     c = CompletionDictionaryCompiler({"memory_limit_mb":"10"})
-    c.Add("bayern munich vs. real madrid", 80)
-    c.Add("munich vs. real madrid", 30)
+    c.add("bayern munich vs. real madrid", 80)
+    c.add("munich vs. real madrid", 30)
 
     c_bw = CompletionDictionaryCompiler({"memory_limit_mb":"10"})
-    c_bw.Add("bayern munich vs. real madrid"[::-1], 80)
-    c_bw.Add("munich vs. real madrid"[::-1], 30)
+    c_bw.add("bayern munich vs. real madrid"[::-1], 80)
+    c_bw.add("munich vs. real madrid"[::-1], 30)
 
     with tmp_dictionary(c, 'fw_bw_completion.kv') as d:
         with tmp_dictionary(c_bw, 'fw_bw_completion_bw.kv') as d2:

@@ -137,7 +137,7 @@ def create_dict(data):
         weight = value["w"]
 
         for e in reduce(lambda x, y: y(x), pipeline, (key, key)):
-            c.Add(e, weight)
+            c.add(e, weight)
 
     return c
 
