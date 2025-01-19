@@ -87,8 +87,8 @@ def test_manifest_for_merger():
         del c2
 
         merger = JsonDictionaryMerger({"memory_limit_mb": "10"})
-        merger.SetManifest('{"author": "Fry"}')
-        merger.Merge('manifest_json_merged.kv')
+        merger.set_manifest('{"author": "Fry"}')
+        merger.merge('manifest_json_merged.kv')
 
         d = Dictionary('manifest_json_merged.kv')
         m = json.loads(d.manifest())

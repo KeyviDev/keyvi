@@ -9,38 +9,38 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
     cdef cppclass JsonDictionaryMerger:
         JsonDictionaryMerger() except +
         JsonDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string) except +
-        void SetManifest(libcpp_utf8_string) except +
-        void Merge(libcpp_utf8_string) nogil
+        void Add(libcpp_utf8_string) except + # wrap-as:add
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void Merge(libcpp_utf8_string) nogil # wrap-as:merge
 
 cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::dictionary":
     cdef cppclass CompletionDictionaryMerger:
         CompletionDictionaryMerger() except +
         CompletionDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string) except +
-        void SetManifest(libcpp_utf8_string) except +
-        void Merge(libcpp_utf8_string) nogil
+        void Add(libcpp_utf8_string) except + # wrap-as:add
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void Merge(libcpp_utf8_string) nogil # wrap-as:merge
 
 cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::dictionary":
     cdef cppclass StringDictionaryMerger:
         StringDictionaryMerger() except +
         StringDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string) except +
-        void SetManifest(libcpp_utf8_string) except +
-        void Merge(libcpp_utf8_string) nogil
+        void Add(libcpp_utf8_string) except + # wrap-as:add
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void Merge(libcpp_utf8_string) nogil # wrap-as:merge
 
 cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::dictionary":
     cdef cppclass KeyOnlyDictionaryMerger:
         KeyOnlyDictionaryMerger() except +
         KeyOnlyDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string) except +
-        void SetManifest(libcpp_utf8_string) except +
-        void Merge(libcpp_utf8_string) nogil
+        void Add(libcpp_utf8_string) except + # wrap-as:add
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void Merge(libcpp_utf8_string) nogil # wrap-as:merge
 
 cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::dictionary":
     cdef cppclass IntDictionaryMerger:
         IntDictionaryMerger() except +
         IntDictionaryMerger(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string) except +
-        void SetManifest(libcpp_utf8_string) except +
-        void Merge(libcpp_utf8_string) nogil
+        void Add(libcpp_utf8_string) except + # wrap-as:add
+        void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
+        void Merge(libcpp_utf8_string) nogil # wrap-as:merge

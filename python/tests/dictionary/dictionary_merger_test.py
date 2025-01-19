@@ -68,10 +68,10 @@ def test_merge(merger):
         generate_keyvi(key_values_3, file_3)
 
 
-        merger.Add(file_1)
-        merger.Add(file_2)
-        merger.Add(file_3)
-        merger.Merge(merge_file)
+        merger.add(file_1)
+        merger.add(file_2)
+        merger.add(file_3)
+        merger.merge(merge_file)
 
 
         merged_dictionary = Dictionary(merge_file, loading_strategy_types.populate_lazy)
