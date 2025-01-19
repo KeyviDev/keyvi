@@ -63,7 +63,7 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
     cdef cppclass JsonDictionaryCompilerSmallData:
         JsonDictionaryCompilerSmallData() except +
         JsonDictionaryCompilerSmallData(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_string, libcpp_string) except + # wrap-ignore
+        void Add(libcpp_utf8_string, libcpp_utf8_string) except + # wrap-as:add
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
