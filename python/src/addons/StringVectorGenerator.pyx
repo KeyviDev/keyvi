@@ -1,9 +1,5 @@
 
 
-    def append(self,  in_0 ):
-        dumps = json.dumps(in_0).encode('utf-8')
-        self.inst.get().PushBack((<libcpp_utf8_string>dumps))
-
     def PushBack(self, *args):
         return call_deprecated_method("PushBack", "append", self.append, *args)
 
