@@ -6,5 +6,5 @@ from match_iterator cimport MatchIteratorPair as _MatchIteratorPair
 cdef extern from "keyvi/dictionary/completion/forward_backward_completion.h" namespace "keyvi::dictionary::completion":
     cdef cppclass ForwardBackwardCompletion:
         ForwardBackwardCompletion(shared_ptr[Dictionary], shared_ptr[Dictionary]) except +
-        _MatchIteratorPair GetCompletions(libcpp_utf8_string)
-        _MatchIteratorPair GetCompletions(libcpp_utf8_string, int)
+        _MatchIteratorPair GetCompletions(libcpp_utf8_string) # wrap-as:get_completions
+        _MatchIteratorPair GetCompletions(libcpp_utf8_string, int) # wrap-as:get_completions
