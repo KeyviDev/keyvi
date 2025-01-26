@@ -28,7 +28,7 @@ def test_mw_completion():
     with tmp_dictionary(c, 'mw_completion.kv') as d:
         mw = MultiWordCompletion(d)
         matches = sorted([(match['weight'], match.matched_string)
-                          for match in mw.get_completions("mozilla f")], reverse=True)
+                          for match in mw.complete("mozilla f")], reverse=True)
         assert len(matches) == 4
         assert matches[0][1] == 'mozilla firefox'
         assert matches[1][1] == 'mozilla fans'
@@ -46,7 +46,7 @@ def test_overlong_completion():
     with tmp_dictionary(c, 'mw_overlong_completion.kv') as d:
         mw = MultiWordCompletion(d)
         matches = sorted([(match['weight'], match.matched_string)
-                          for match in mw.get_completions("html dis")], reverse=True)
+                          for match in mw.complete("html dis")], reverse=True)
         assert len(matches) == 3
         assert matches[0][1] == 'html disable'
         assert matches[1][1] == 'html disabled'
@@ -60,5 +60,5 @@ def test_exact_match_without_completion():
     c["maa" + '\x1b' + "maa"] = 80
     with tmp_dictionary(c, 'test_exact_match_without_completion.kv') as d:
         mw = MultiWordCompletion(d)
-        for m in mw.get_completions("mr "):
+        for m in mw.complete("mr "):
             assert m.matched_string == b'mr'

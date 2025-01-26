@@ -25,7 +25,7 @@ def test_forward_backward_completion():
         with tmp_dictionary(c_bw, 'fw_bw_completion_bw.kv') as d2:
             completer = ForwardBackwardCompletion(d, d2)
             matches = sorted([(match['weight'], match.matched_string)
-                              for match in completer.get_completions("munich")], reverse=True)
+                              for match in completer.complete("munich")], reverse=True)
             assert len(matches) == 2
             assert matches[0][1] == 'bayern munich vs. real madrid'
             assert matches[1][1] == 'munich vs. real madrid'
