@@ -33,6 +33,7 @@
 #include "keyvi/compression/compression_strategy.h"
 #include "keyvi/compression/snappy_compression_strategy.h"
 #include "keyvi/compression/zlib_compression_strategy.h"
+#include "keyvi/compression/zstd_compression_strategy.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -51,6 +52,8 @@ inline CompressionStrategy* compression_strategy(const std::string& name = "") {
     return new ZlibCompressionStrategy();  // compression level?
   } else if (lower_name == "snappy") {
     return new SnappyCompressionStrategy();
+  } else if (lower_name == "zstd") {
+    return new ZstdCompressionStrategy();
   } else if (lower_name == "" || lower_name == "none" || lower_name == "raw") {
     return new RawCompressionStrategy();
   } else {
@@ -72,6 +75,9 @@ inline decompress_func_t decompressor_by_code(const std::string& s) {
     case SNAPPY_COMPRESSION:
       TRACE("unpack snappy compressed string");
       return SnappyCompressionStrategy::DoDecompress;
+    case ZSTD_COMPRESSION:
+      TRACE("unpack zstd compressed string");
+      return ZstdCompressionStrategy::DoDecompress;
     default:
       throw std::invalid_argument("Invalid compression code " +
                                   boost::lexical_cast<std::string>(static_cast<int>(s[0])));
