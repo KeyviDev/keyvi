@@ -6,4 +6,4 @@ from libcpp.memory cimport shared_ptr
 cdef extern from "keyvi/transform/fsa_transform.h" namespace "keyvi::transform":
     cdef cppclass FsaTransform:
         FsaTransform(shared_ptr[Dictionary]) except +
-        libcpp_string Normalize(libcpp_utf8_string) nogil
+        libcpp_string Normalize(libcpp_utf8_string) nogil # wrap-as:normalize

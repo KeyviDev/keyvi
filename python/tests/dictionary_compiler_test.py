@@ -12,8 +12,8 @@ from keyvi.compiler import JsonDictionaryCompiler, KeyOnlyDictionaryCompiler
 
 def test_compiler_no_compile_edge_case():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb":"10"})
-    c.Add("abc")
-    c.Add("abd")
+    c.add("abc")
+    c.add("abd")
     del c
 
 
@@ -40,9 +40,9 @@ def test_tmp_dir():
         os.mkdir("tmp_dir_test")
         os.chdir(os.path.join(tempfile.gettempdir(), "tmp_dir_test"))
         c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
-        c.Add("abc", "{'a':2}")
+        c.add("abc", "{'a':2}")
         assert os.listdir('.') == []
-        c.Compile()
+        c.compile()
         assert os.listdir('.') == []
         del c
         assert os.listdir('.') == []
@@ -54,8 +54,8 @@ def test_tmp_dir():
 def test_tmp_dir_defined():
     def run_compile(tmpdir):
         c = JsonDictionaryCompiler({"memory_limit_mb":"10", "temporary_path": tmpdir})
-        c.Add("abc", "{'a':2}")
-        c.Compile()
+        c.add("abc", "{'a':2}")
+        c.compile()
         assert os.listdir(tmpdir) != []
 
     test_dir = os.path.join(tempfile.gettempdir(), "tmp_dir_test_defined")
@@ -70,16 +70,16 @@ def test_tmp_dir_defined():
 
 def test_compile_step_missing():
     c = KeyOnlyDictionaryCompiler()
-    c.Add("abc")
-    c.Add("abd")
+    c.add("abc")
+    c.add("abd")
     with raises(RuntimeError):
-        c.WriteToFile("compile_step_missing.kv")
+        c.write_to_file("compile_step_missing.kv")
 
 
 def test_compile_write_to_invalid_file():
     c = KeyOnlyDictionaryCompiler()
-    c.Add("abc")
-    c.Add("abd")
-    c.Compile()
+    c.add("abc")
+    c.add("abd")
+    c.compile()
     with raises(ValueError):
-        c.WriteToFile(os.path.join("invalid", "sub", "directory", "file.kv"))
+        c.write_to_file(os.path.join("invalid", "sub", "directory", "file.kv"))

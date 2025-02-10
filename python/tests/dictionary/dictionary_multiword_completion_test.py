@@ -126,7 +126,7 @@ def test_multiword_simple():
         weight = value["w"]
 
         for e in reduce(lambda x, y: y(x), pipeline, (key, key)):
-            c.Add(e, weight)
+            c.add(e, weight)
 
     with tmp_dictionary(c, "completion.kv") as d:
         assert [m.matched_string for m in d.complete_multiword("zombies 8")] == [
