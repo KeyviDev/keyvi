@@ -118,6 +118,19 @@ else ()
   set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} snappy")
 endif ()
 
+# Zstd
+find_package(ZSTD REQUIRED)
+if (ZSTD_FOUND)
+    list(APPEND KEYVI_INCLUDES "${ZSTD_INCLUDE_DIRS}")
+else ()
+    message(FATAL_ERROR "Can not find zstd")
+endif (ZSTD_FOUND)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} zstd")
+else ()
+  set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} zstd")
+endif ()
+
 # rapidjson
 list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/rapidjson/include")
 
@@ -143,7 +156,7 @@ string(REPLACE " " ";" _KEYVI_COMPILE_DEFINITIONS_LIST "${_KEYVI_COMPILE_DEFINIT
 
 # keyvicompiler
 add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
-target_link_libraries(keyvicompiler ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvicompiler ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(keyvicompiler PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvicompiler PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvicompiler PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -152,7 +165,7 @@ install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
 
 # keyviinspector
 add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
-target_link_libraries(keyviinspector ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyviinspector ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(keyviinspector PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyviinspector PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyviinspector PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -161,7 +174,7 @@ install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
 
 # keyvimerger
 add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
-target_link_libraries(keyvimerger ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvimerger ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(keyvimerger PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvimerger PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvimerger PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -170,7 +183,7 @@ install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
 
 # keyvi_c
 add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
-target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(keyvi_c PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -178,7 +191,7 @@ target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>
 # unit tests
 FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
 add_executable(unit_test_all ${UNIT_TEST_SOURCES})
-target_link_libraries(unit_test_all ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(unit_test_all ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(unit_test_all PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(unit_test_all PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -224,7 +237,7 @@ add_library(keyvi INTERFACE)
 
 target_include_directories(keyvi INTERFACE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 target_compile_definitions(keyvi INTERFACE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_link_libraries(keyvi INTERFACE ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvi INTERFACE ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 
 ### docs
 
