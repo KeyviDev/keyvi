@@ -24,12 +24,19 @@
 
 #include "keyvi/c_api/c_api.h"
 
+#include <cstdint>
+#include <cstdlib>
 #include <cstring>
+#include <exception>
 #include <iostream>
+#include <string>
+#include <utility>
 
 #include "keyvi/dictionary/completion/multiword_completion.h"
 #include "keyvi/dictionary/completion/prefix_completion.h"
 #include "keyvi/dictionary/dictionary.h"
+#include "keyvi/dictionary/match.h"
+#include "keyvi/dictionary/match_iterator.h"
 
 using keyvi::dictionary::Dictionary;
 using keyvi::dictionary::dictionary_t;
@@ -41,7 +48,7 @@ using keyvi::dictionary::completion::PrefixCompletion;
 namespace {
 char* std_2_c_string(const std::string& str) {
   const size_t c_str_length = str.size() + 1;
-  auto result = static_cast<char*>(malloc(c_str_length));
+  auto* result = static_cast<char*>(malloc(c_str_length));
   strncpy(result, str.c_str(), c_str_length);
   return result;
 }
@@ -54,7 +61,7 @@ struct keyvi_dictionary {
 };
 
 struct keyvi_match {
-  explicit keyvi_match(const match_t& obj) : obj_(obj) {}
+  explicit keyvi_match(match_t obj) : obj_(std::move(obj)) {}
 
   match_t obj_;
 };
@@ -91,7 +98,7 @@ keyvi_dictionary* keyvi_create_dictionary(const char* filename) {
   try {
     return new keyvi_dictionary(Dictionary(filename));
   } catch (const std::exception& e) {
-    std::cerr << e.what() << std::endl;
+    std::cerr << e.what() << '\n';
     return nullptr;
   }
 }
@@ -129,7 +136,7 @@ keyvi_match_iterator* keyvi_dictionary_get_fuzzy(const keyvi_dictionary* dict, c
 
 keyvi_match_iterator* keyvi_dictionary_get_multi_word_completions(const keyvi_dictionary* dict, const char* key,
                                                                   const size_t key_len, const size_t cutoff) {
-  MultiWordCompletion multiWordCompletion(dict->obj_);
+  MultiWordCompletion const multiWordCompletion(dict->obj_);
   return new keyvi_match_iterator(multiWordCompletion.GetCompletions(std::string(key, key_len), cutoff));
 }
 
@@ -166,7 +173,7 @@ keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
   if (0 == data_size) {
     return empty_keyvi_bytes;
   }
-  auto data_ptr = malloc(data_size);
+  auto* data_ptr = malloc(data_size);
   if (nullptr == data_ptr) {
     return empty_keyvi_bytes;
   }
