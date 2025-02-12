@@ -22,18 +22,24 @@
  *  Created on: May 13, 2014
  *      Author: hendrik
  */
+#include <fstream>
 #include <iostream>
+#include <string>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/program_options.hpp>
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/positional_options.hpp>
+#include <boost/program_options/value_semantic.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/entry_iterator.h"
 
 void dump(const std::string& input, const std::string& output, bool keys_only = false) {
-  keyvi::dictionary::fsa::automata_t automata(new keyvi::dictionary::fsa::Automata(input.c_str()));
+  keyvi::dictionary::fsa::automata_t const automata(new keyvi::dictionary::fsa::Automata(input));
   keyvi::dictionary::fsa::EntryIterator it(automata);
-  keyvi::dictionary::fsa::EntryIterator end_it = keyvi::dictionary::fsa::EntryIterator();
+  keyvi::dictionary::fsa::EntryIterator const end_it = keyvi::dictionary::fsa::EntryIterator();
 
   std::ofstream out_stream(output);
 
@@ -41,8 +47,8 @@ void dump(const std::string& input, const std::string& output, bool keys_only = 
     it.WriteKey(out_stream);
 
     if (!keys_only) {
-      std::string value = it.GetValueAsString();
-      if (value.size()) {
+      std::string const value = it.GetValueAsString();
+      if (!value.empty()) {
         out_stream << "\t";
         out_stream << value;
       }
@@ -54,9 +60,9 @@ void dump(const std::string& input, const std::string& output, bool keys_only = 
 }
 
 void dump_with_attributes(const std::string& input, const std::string& output) {
-  keyvi::dictionary::fsa::automata_t automata(new keyvi::dictionary::fsa::Automata(input.c_str()));
+  keyvi::dictionary::fsa::automata_t const automata(new keyvi::dictionary::fsa::Automata(input));
   keyvi::dictionary::fsa::EntryIterator it(automata);
-  keyvi::dictionary::fsa::EntryIterator end_it = keyvi::dictionary::fsa::EntryIterator();
+  keyvi::dictionary::fsa::EntryIterator const end_it = keyvi::dictionary::fsa::EntryIterator();
 
   std::ofstream out_stream(output);
 
@@ -73,8 +79,8 @@ void dump_with_attributes(const std::string& input, const std::string& output) {
 }
 
 void print_statistics(const std::string& input) {
-  keyvi::dictionary::fsa::automata_t automata(new keyvi::dictionary::fsa::Automata(input.c_str()));
-  std::cout << automata->GetStatistics() << std::endl;
+  keyvi::dictionary::fsa::automata_t const automata(new keyvi::dictionary::fsa::Automata(input));
+  std::cout << automata->GetStatistics() << '\n';
 }
 
 int main(int argc, char** argv) {
@@ -100,17 +106,17 @@ int main(int argc, char** argv) {
   boost::program_options::store(
       boost::program_options::command_line_parser(argc, argv).options(description).positional(p).run(), vm);
   boost::program_options::notify(vm);
-  if (vm.count("help")) {
+  if (vm.count("help") != 0U) {
     std::cout << description;
     return 0;
   }
 
   bool key_only = false;
-  if (vm.count("keys-only")) {
+  if (vm.count("keys-only") != 0U) {
     key_only = true;
   }
 
-  if (vm.count("input-file") && vm.count("output-file")) {
+  if ((vm.count("input-file") != 0U) && (vm.count("output-file") != 0U)) {
     input_file = vm["input-file"].as<std::string>();
     output_file = vm["output-file"].as<std::string>();
 
@@ -119,13 +125,13 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  if (vm.count("input-file") && vm.count("statistics")) {
+  if ((vm.count("input-file") != 0U) && (vm.count("statistics") != 0U)) {
     input_file = vm["input-file"].as<std::string>();
     print_statistics(input_file);
     return 0;
   }
 
-  std::cout << "ERROR: arguments wrong or missing." << std::endl << std::endl;
+  std::cout << "ERROR: arguments wrong or missing." << '\n' << '\n';
   std::cout << description;
   return 1;
 }
