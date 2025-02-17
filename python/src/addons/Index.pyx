@@ -75,7 +75,7 @@
         py_result.inst = _r
         return py_result
 
-    def mset(self, list key_values ):
+    def bulk_set(self, list key_values ):
         assert isinstance(key_values, list), 'arg in_0 wrong type'
         cdef shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]] cpp_key_values = shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]](new libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]())
         cdef libcpp_pair[libcpp_utf8_string, libcpp_utf8_string] cpp_kv
@@ -97,7 +97,7 @@
         self.inst.get().MSet(cpp_key_values)
 
     def MSet(self, *args):
-        return call_deprecated_method("MSet", "mset", self.mset, *args)
+        return call_deprecated_method("MSet", "bulk_set", self.bulk_set, *args)
 
     def Set(self, *args):
         return call_deprecated_method("Set", "set", self.set, *args)

@@ -65,9 +65,9 @@ def test_bulk_add():
         for i in range(0, chunk_size * iterations):
             key_values.append(("key-{}".format(i), "value-{}".format(i)))
             if i % chunk_size == 0:
-                index.mset(key_values)
+                index.bulk_set(key_values)
                 key_values = []
-        index.mset(key_values)
+        index.bulk_set(key_values)
         index.flush()
 
         for i in range(0, 50):
