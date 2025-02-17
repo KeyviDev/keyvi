@@ -32,6 +32,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/variant.hpp>
 
+#include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/util/json_value.h"
 
@@ -196,12 +197,23 @@ struct Match {
     return fsa_->GetRawValueAsString(state_);
   }
 
-  std::string GetMsgPackedValueAsString() const {
+  std::string GetMsgPackedValueAsString(
+      const compression::CompressionAlgorithm compression_algorithm = compression::CompressionAlgorithm::NO_COMPRESSION) const {
     const std::string raw_value = GetRawValueAsString();
     if (raw_value.empty()) {
       return raw_value;
     }
+
+    if (raw_value[0] == compression_algorithm) {
+      return raw_value.substr(1);
+    } else if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+      const compression::decompress_func_t decompressor = compression::decompressor_by_code(raw_value);
+      return decompressor(raw_value);
+    }
+
+    // todo: recompress 
     const compression::decompress_func_t decompressor = compression::decompressor_by_code(raw_value);
+    
     return decompressor(raw_value);
   }
 
@@ -210,9 +222,7 @@ struct Match {
    *
    * @param value
    */
-  void SetRawValue(const std::string& value) {
-    raw_value_ = value;
-  }
+  void SetRawValue(const std::string& value) { raw_value_ = value; }
 
  private:
   size_t start_ = 0;
@@ -230,9 +240,7 @@ struct Match {
   template <class MatcherT, class DeletedT>
   friend match_t index::internal::FirstFilteredMatch(const MatcherT&, const DeletedT&);
 
-  fsa::automata_t& GetFsa() {
-    return fsa_;
-  }
+  fsa::automata_t& GetFsa() { return fsa_; }
 };
 
 } /* namespace dictionary */
