@@ -34,7 +34,7 @@
 namespace keyvi {
 namespace compression {
 
-enum CompressionCode {
+enum CompressionAlgorithm {
   NO_COMPRESSION = 0,
   ZLIB_COMPRESSION = 1,
   SNAPPY_COMPRESSION = 2,
@@ -88,12 +88,6 @@ struct RawCompressionStrategy final : public CompressionStrategy {
     buffer->resize(raw_size + 1);
     buffer->data()[0] = static_cast<char>(NO_COMPRESSION);
     std::memcpy(buffer->data() + 1, raw, raw_size);
-  }
-
-  static inline std::string DoCompress(const char* raw, size_t raw_size) {
-    buffer_t buf;
-    DoCompress(&buf, raw, raw_size);
-    return std::string(buf.data(), buf.size());
   }
 
   inline std::string Decompress(const std::string& compressed) { return DoDecompress(compressed); }
