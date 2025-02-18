@@ -36,7 +36,7 @@
 
         self.inst.get().Delete(key)
 
-    def Get (self, key, default = None):
+    def get (self, key, default = None):
         """Return the value for key if key is in the dictionary, else default."""
         if isinstance(key, unicode):
             key = key.encode('utf-8')
@@ -49,6 +49,9 @@
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r
         return py_result
+
+    def Get(self, *args):
+        return call_deprecated_method("Get", "get", self.get, *args)
 
     def __contains__(self, key):
         if isinstance(key, unicode):
@@ -72,7 +75,7 @@
         py_result.inst = _r
         return py_result
 
-    def MSet(self, list key_values ):
+    def bulk_set(self, list key_values ):
         assert isinstance(key_values, list), 'arg in_0 wrong type'
         cdef shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]] cpp_key_values = shared_ptr[libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]](new libcpp_vector[libcpp_pair[libcpp_utf8_string,libcpp_utf8_string]]())
         cdef libcpp_pair[libcpp_utf8_string, libcpp_utf8_string] cpp_kv
@@ -92,3 +95,21 @@
             cpp_key_values.get().push_back(cpp_kv)
 
         self.inst.get().MSet(cpp_key_values)
+
+    def MSet(self, *args):
+        return call_deprecated_method("MSet", "bulk_set", self.bulk_set, *args)
+
+    def Set(self, *args):
+        return call_deprecated_method("Set", "set", self.set, *args)
+
+    def GetNear(self, *args):
+        return call_deprecated_method("GetNear", "get_near", self.get_near, *args)
+
+    def GetFuzzy(self, *args):
+        return call_deprecated_method("GetFuzzy", "get_fuzzy", self.get_fuzzy, *args)
+
+    def Delete(self, *args):
+        return call_deprecated_method("Delete", "delete", self.delete, *args)
+
+    def Flush(self, *args):
+        return call_deprecated_method("Flush", "flush", self.flush, *args)

@@ -13,9 +13,9 @@ from test_tools import tmp_dictionary
 
 def test_zerobyte():
     c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
-    c.Add("\x00abc", '["a" : 2]')
-    c.Add("abc\x00def", '["a" : 3]')
-    c.Add("cd\x00", '["a" : 4]')
+    c.add("\x00abc", '["a" : 2]')
+    c.add("abc\x00def", '["a" : 3]')
+    c.add("cd\x00", '["a" : 4]')
     with tmp_dictionary(c, 'zerobyte.kv') as d:
         assert d["\x00abc"].value == '["a" : 2]'
         assert d["abc\x00def"].value == '["a" : 3]'
