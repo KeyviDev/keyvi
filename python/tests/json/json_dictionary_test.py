@@ -32,6 +32,8 @@ def test_simple_compression(compression: str):
             "compression_threshold": "0",
         }
     )
+    c.add("abc", '{"a" : 2}')
+    c.add("abd", '{"a" : 3}')
     with tmp_dictionary(c, f"simple_json_{compression}.kv") as d:
         assert len(d) == 2
         assert d["abc"].value_as_string() == '{"a":2}'
