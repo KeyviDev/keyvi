@@ -71,6 +71,8 @@ struct ValueStoreComponents {};
  * void CloseFeeding()
  *
  * void Write(std::ostream& stream)
+ *
+ * uint64_t GetFileVersionMin()
  */
 
 /**

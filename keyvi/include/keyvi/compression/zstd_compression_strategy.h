@@ -29,6 +29,8 @@
 
 #include <string>
 
+#include "keyvi/dictionary/fsa/internal/constants.h"
+
 #ifndef ZSTD_DEFAULT_CLEVEL
 
 /*-=====  Pre-defined compression levels  =====-*/
@@ -72,6 +74,8 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
   }
 
   std::string name() const { return "zstd"; }
+
+  uint64_t GetFileVersionMin() const { return 3; }
 
  private:
   int compression_level_;

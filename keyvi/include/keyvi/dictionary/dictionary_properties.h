@@ -147,6 +147,8 @@ class DictionaryProperties {
 
   const std::string& GetSpecializedDictionaryProperties() const { return specialized_dictionary_properties_; }
 
+  uint64_t GetVersion() const { return version_; }
+
   std::string GetStatistics() const {
     rapidjson::StringBuffer string_buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(string_buffer);

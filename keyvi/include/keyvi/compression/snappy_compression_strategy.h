@@ -30,6 +30,7 @@
 #include <string>
 
 #include "keyvi/compression/compression_strategy.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
 namespace compression {
@@ -61,6 +62,8 @@ struct SnappyCompressionStrategy final : public CompressionStrategy {
   }
 
   std::string name() const { return "snappy"; }
+
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
 };
 
 } /* namespace compression */

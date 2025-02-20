@@ -194,6 +194,8 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
     values_extern_->Write(stream, values_buffer_size_);
   }
 
+  uint64_t GetFileVersionMin() const { return compressor_->GetFileVersionMin(); }
+
  private:
   /*
    * Compressors & the associated compression functions. Ugly, but
@@ -228,6 +230,13 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
  public:
   explicit JsonValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : JsonValueStoreMinimizationBase(parameters) {}
+  explicit JsonValueStoreMerge(const std::vector<std::string>& inputFiles,
+                               const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : JsonValueStoreMinimizationBase(parameters) {
+    for (const auto& file_name : inputFiles) {
+      file_version_min_ = std::max(file_version_min_, DictionaryProperties::FromFile(file_name).GetVersion());
+    }
+  }
 
   uint64_t AddValueMerge(const char* payload, uint64_t fsa_value, bool* no_minimization) {
     size_t buffer_size;
@@ -268,6 +277,11 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
 
     values_extern_->Write(stream, values_buffer_size_);
   }
+
+  uint64_t GetFileVersionMin() const { return file_version_min_; }
+
+ private:
+  uint64_t file_version_min_ = 0;
 };
 
 class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
@@ -284,6 +298,7 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
       number_of_values_ += properties_.back().GetValueStoreProperties().GetNumberOfValues();
       number_of_unique_values_ += properties_.back().GetValueStoreProperties().GetNumberOfUniqueValues();
       values_buffer_size_ += properties_.back().GetValueStoreProperties().GetSize();
+      file_version_min_ = std::max(file_version_min_, properties_.back().GetVersion());
     }
   }
 
@@ -305,10 +320,13 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
     }
   }
 
+  uint64_t GetFileVersionMin() const { return file_version_min_; }
+
  private:
   std::vector<std::string> input_files_;
   std::vector<DictionaryProperties> properties_;
   std::vector<size_t> offsets_;
+  uint64_t file_version_min_ = 0;
 };
 
 class JsonValueStoreReader final : public IValueStoreReader {

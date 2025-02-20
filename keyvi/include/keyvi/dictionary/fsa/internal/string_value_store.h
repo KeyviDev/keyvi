@@ -33,6 +33,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "keyvi/dictionary/dictionary_properties.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
 #include "keyvi/dictionary/fsa/internal/lru_generation_cache.h"
 #include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
@@ -69,6 +70,8 @@ class StringValueStoreBase {
   uint64_t AddValue(const value_t& value, bool* no_minimization) { return 0; }
 
   static value_store_t GetValueStoreType() { return value_store_t::STRING; }
+
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
 
  protected:
   size_t number_of_values_ = 0;
@@ -167,6 +170,8 @@ class StringValueStore final : public StringValueStoreMinimizationBase {
 class StringValueStoreMerge final : public StringValueStoreMinimizationBase {
  public:
   explicit StringValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
+  explicit StringValueStoreMerge(const std::vector<std::string>& inputFiles,
+                                 const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
   uint64_t AddValueMerge(const char* payload, uint64_t fsa_value, bool* no_minimization) {
     const char* value = payload + fsa_value;
