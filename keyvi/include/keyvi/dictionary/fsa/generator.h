@@ -298,10 +298,9 @@ class Generator final {
     // value stores can ask for a higher version
     const uint64_t file_version = std::max(KEYVI_FILE_VERSION_DEFAULT, value_store_->GetFileVersionMin());
 
-    keyvi::dictionary::DictionaryProperties p(file_version, start_state_, number_of_keys_added_,
-                                              number_of_states_, value_store_->GetValueStoreType(),
-                                              persistence_->GetVersion(), persistence_->GetSize(), manifest_,
-                                              specialized_dictionary_properties_);
+    keyvi::dictionary::DictionaryProperties p(file_version, start_state_, number_of_keys_added_, number_of_states_,
+                                              value_store_->GetValueStoreType(), persistence_->GetVersion(),
+                                              persistence_->GetSize(), manifest_, specialized_dictionary_properties_);
     p.WriteAsJsonV2(stream);
 
     // write data from persistence

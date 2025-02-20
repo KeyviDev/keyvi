@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_JSON_VALUE_STORE_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_JSON_VALUE_STORE_H_
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 #include <string>
