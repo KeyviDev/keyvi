@@ -24,22 +24,12 @@
  */
 
 #include <string>
-#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/dictionary.h"
 #include "keyvi/dictionary/dictionary_compiler.h"
-#include "keyvi/dictionary/dictionary_index_compiler.h"
 #include "keyvi/dictionary/dictionary_types.h"
-#include "keyvi/dictionary/fsa/automata.h"
-#include "keyvi/dictionary/fsa/entry_iterator.h"
-#include "keyvi/dictionary/fsa/internal/int_inner_weights_value_store.h"
-#include "keyvi/dictionary/fsa/internal/int_value_store.h"
-#include "keyvi/dictionary/fsa/internal/json_value_store.h"
-#include "keyvi/dictionary/fsa/internal/sparse_array_persistence.h"
-#include "keyvi/util/configuration.h"
-#include "keyvi/util/float_vector_value.h"
 
 namespace keyvi {
 namespace dictionary {
