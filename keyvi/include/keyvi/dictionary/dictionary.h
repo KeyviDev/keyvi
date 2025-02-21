@@ -72,6 +72,8 @@ class Dictionary final {
 
   uint64_t GetSize() const { return fsa_->GetNumberOfKeys(); }
 
+  uint64_t GetVersion() const { return fsa_->GetVersion(); }
+
   /**
    * A simple Contains method to check whether a key is in the dictionary.
    *

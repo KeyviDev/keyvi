@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
@@ -59,7 +60,10 @@ class IntInnerWeightsValueStoreBase {
   uint32_t GetMergeWeight(uint64_t fsa_value) { return fsa_value; }
 
   void CloseFeeding() {}
+
   void Write(std::ostream& stream) const {}
+
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
 
   static value_store_t GetValueStoreType() { return value_store_t::INT_WITH_WEIGHTS; }
 };
@@ -75,6 +79,8 @@ class IntInnerWeightsValueStore final : public IntInnerWeightsValueStoreBase {
 class IntInnerWeightsValueStoreMerge final : public IntInnerWeightsValueStoreBase {
  public:
   explicit IntInnerWeightsValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
+  explicit IntInnerWeightsValueStoreMerge(const std::vector<std::string>&,
+                                          const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
   uint64_t AddValueMerge(const char* p, uint64_t v, bool* no_minimization) { return v; }
 };
