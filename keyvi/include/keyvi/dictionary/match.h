@@ -197,8 +197,8 @@ struct Match {
     return fsa_->GetRawValueAsString(state_);
   }
 
-  std::string GetMsgPackedValueAsString(
-      const compression::CompressionAlgorithm compression_algorithm = compression::CompressionAlgorithm::NO_COMPRESSION) const {
+  std::string GetMsgPackedValueAsString(const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const {
     const std::string raw_value = GetRawValueAsString();
     if (raw_value.empty()) {
       return raw_value;
@@ -211,9 +211,9 @@ struct Match {
       return decompressor(raw_value);
     }
 
-    // todo: recompress 
+    // todo: recompress
     const compression::decompress_func_t decompressor = compression::decompressor_by_code(raw_value);
-    
+
     return decompressor(raw_value);
   }
 
