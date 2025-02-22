@@ -26,6 +26,7 @@
 #define KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_
 
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -70,6 +71,8 @@ struct CompressionStrategy {
   /** The "name" of the compression strategy. */
   virtual std::string name() const = 0;
 };
+
+using compression_strategy_t = std::unique_ptr<CompressionStrategy>;
 
 /**
  * A compression strategy that does almost nothing; i.e. it only adds
