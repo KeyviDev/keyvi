@@ -25,6 +25,7 @@
 #ifndef KEYVI_UTIL_MSGPACK_UTIL_H_
 #define KEYVI_UTIL_MSGPACK_UTIL_H_
 #include <limits>
+#include <string>
 
 #include "msgpack.hpp"
 #include "rapidjson/document.h"
@@ -148,7 +149,7 @@ inline void MsgPackDump(Writer* writer, const msgpack::object& o) {
 }
 
 inline void JsonStringToMsgPack(const std::string& raw_value, msgpack::v1::sbuffer* msgpack_buffer,
-                               bool single_precision_float) {
+                                bool single_precision_float) {
   rapidjson::Document json_document;
   json_document.Parse<rapidjson::kParseNanAndInfFlag>(raw_value.c_str());
 
@@ -162,13 +163,12 @@ inline void JsonStringToMsgPack(const std::string& raw_value, msgpack::v1::sbuff
   }
 }
 
-inline std::string JsonStringToMsgPack(const std::string& raw_value, bool single_precision_float = false
-) {
-msgpack::sbuffer msgpack_buffer;
-compression::buffer_t buffer;
+inline std::string JsonStringToMsgPack(const std::string& raw_value, bool single_precision_float = false) {
+  msgpack::sbuffer msgpack_buffer;
+  compression::buffer_t buffer;
 
-JsonStringToMsgPack(raw_value, &msgpack_buffer, single_precision_float);
-return std::string(reinterpret_cast<char*>(buffer.data()), buffer.size());
+  JsonStringToMsgPack(raw_value, &msgpack_buffer, single_precision_float);
+  return std::string(reinterpret_cast<char*>(buffer.data()), buffer.size());
 }
 
 } /* namespace util */
