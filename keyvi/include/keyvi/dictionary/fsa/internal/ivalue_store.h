@@ -33,6 +33,7 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/variant.hpp>
 
+#include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/dictionary_merger_fwd.h"
 #include "keyvi/dictionary/fsa/internal/value_store_properties.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
@@ -111,13 +112,37 @@ class IValueStoreReader {
    * Get Value as string in raw format
    *
    * Note: The raw format is an implementation detail of keyvi, not an official binary interface.
-   * Value store implementers can override this method for performance reasons.
+   * Value store implementers can override this method with an optimized version.
    *
    * @param fsa_value
-   * @return the value as string without any decompression
+   * @return the value as binary encoded string
    */
   virtual std::string GetRawValueAsString(uint64_t fsa_value) const {
     return keyvi::util::EncodeJsonValue(GetValueAsString(fsa_value));
+  }
+
+  /**
+   * Get Value as msgpack string
+   *
+   * Value store implementers can override this method with an optimized version.
+   *
+   * @param fsa_value
+   * @return the value as msgpack string
+   */
+  virtual std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                                const compression::CompressionAlgorithm compression_algorithm =
+                                                    compression::CompressionAlgorithm::NO_COMPRESSION) const {
+    const std::string msgpacked_value = keyvi::util::JsonStringToMsgPack(GetValueAsString(fsa_value));
+
+    if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+      return msgpacked_value;
+    }
+
+    // compress the value
+    const compression::compression_strategy_t compressor =
+        compression::compression_strategy_by_enum(compression_algorithm);
+
+    return compressor->Compress(msgpacked_value);
   }
 
   /**

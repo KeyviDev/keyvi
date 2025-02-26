@@ -65,6 +65,12 @@ struct CompressionStrategy {
     return std::string(buf.data(), buf.size());
   }
 
+  inline std::string CompressWithoutHeader(const std::string& raw) {
+    buffer_t buf;
+    Compress(&buf, raw.data(), raw.size());
+    return std::string(buf.data() + 1, buf.size() - 1);
+  }
+
   /**
    * By the time this function is called, the length field added in Compress()
    * will have been removed.
