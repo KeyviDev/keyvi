@@ -383,7 +383,8 @@ class JsonValueStoreReader final : public IValueStoreReader {
     }
 
     // decompress
-    const compression::decompress_func_t decompressor = compression::decompressor_by_code(value_ptr[0]);
+    const compression::decompress_func_t decompressor =
+        compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(value_ptr[0]));
     std::string msgpacked_value = decompressor(std::string(value_ptr, value_size));
 
     if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
@@ -391,7 +392,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
     }
     // compress
     const compression::compression_strategy_t compressor =
-        compression::compression_strategy_by_enum(compression_algorithm);
+        compression::compression_strategy_by_code(compression_algorithm);
 
     return compressor->CompressWithoutHeader(msgpacked_value);
   }

@@ -140,9 +140,9 @@ class IValueStoreReader {
 
     // compress the value
     const compression::compression_strategy_t compressor =
-        compression::compression_strategy_by_enum(compression_algorithm);
+        compression::compression_strategy_by_code(compression_algorithm);
 
-    return compressor->Compress(msgpacked_value);
+    return compressor->CompressWithoutHeader(msgpacked_value);
   }
 
   /**
