@@ -199,22 +199,7 @@ struct Match {
 
   std::string GetMsgPackedValueAsString(const compression::CompressionAlgorithm compression_algorithm =
                                             compression::CompressionAlgorithm::NO_COMPRESSION) const {
-    const std::string raw_value = GetRawValueAsString();
-    if (raw_value.empty()) {
-      return raw_value;
-    }
-
-    if (raw_value[0] == compression_algorithm) {
-      return raw_value.substr(1);
-    } else if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
-      const compression::decompress_func_t decompressor = compression::decompressor_by_code(raw_value);
-      return decompressor(raw_value);
-    }
-
-    // todo: recompress
-    const compression::decompress_func_t decompressor = compression::decompressor_by_code(raw_value);
-
-    return decompressor(raw_value);
+    return fsa_->GetMsgPackedValueAsString(state_, compression_algorithm);
   }
 
   /**

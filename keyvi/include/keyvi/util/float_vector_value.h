@@ -35,7 +35,7 @@ namespace keyvi {
 namespace util {
 
 inline std::vector<float> DecodeFloatVector(const std::string& encoded_value) {
-  compression::decompress_func_t decompressor = compression::decompressor_by_code(encoded_value);
+  compression::decompress_func_t decompressor = compression::decompressor_from_string(encoded_value);
   std::string unompressed_string_value = decompressor(encoded_value);
 
   const size_t vector_size = unompressed_string_value.size() / sizeof(uint32_t);
