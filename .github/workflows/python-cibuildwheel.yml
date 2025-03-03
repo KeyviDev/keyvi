@@ -114,7 +114,7 @@ jobs:
           ls /Users/runner/work/keyvi/keyvi/arm64-homebrew
 
       - name: Build python wheels for ${{ matrix.os }} on ${{ matrix.arch }}
-        uses: pypa/cibuildwheel@v2.22.0
+        uses: pypa/cibuildwheel@v2.23.0
         env:
           # Skip CPython 3.6 and CPython 3.7
           CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-*
