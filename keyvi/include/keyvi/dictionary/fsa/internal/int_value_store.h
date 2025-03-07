@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
@@ -60,6 +61,7 @@ class IntValueStoreBase {
 
   void CloseFeeding() {}
   void Write(std::ostream& stream) const {}
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
 
   static value_store_t GetValueStoreType() { return value_store_t::INT; }
 };
@@ -76,6 +78,8 @@ class IntValueStore final : public IntValueStoreBase {
 class IntValueStoreMerge final : public IntValueStoreBase {
  public:
   explicit IntValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
+  explicit IntValueStoreMerge(const std::vector<std::string>&,
+                              const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
   uint64_t AddValueMerge(const char* p, uint64_t v, bool* no_minimization) { return v; }
 };

@@ -29,6 +29,8 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/dictionary/fsa/internal/constants.h"
+
 namespace keyvi {
 namespace compression {
 
@@ -36,6 +38,7 @@ enum CompressionCode {
   NO_COMPRESSION = 0,
   ZLIB_COMPRESSION = 1,
   SNAPPY_COMPRESSION = 2,
+  ZSTD_COMPRESSION = 3,
 };
 
 // buffer type which is realloc-able
@@ -69,6 +72,9 @@ struct CompressionStrategy {
 
   /** The "name" of the compression strategy. */
   virtual std::string name() const = 0;
+
+  /** The minimum version this compressor requires */
+  virtual uint64_t GetFileVersionMin() const = 0;
 };
 
 /**
@@ -95,6 +101,8 @@ struct RawCompressionStrategy final : public CompressionStrategy {
   static inline std::string DoDecompress(const std::string& compressed) { return compressed.substr(1); }
 
   std::string name() const { return "raw"; }
+
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
 };
 
 } /* namespace compression */

@@ -204,7 +204,8 @@ class DictionaryMerger final {
   }
 
   void CompleteMerge() {
-    ValueStoreMergeT* value_store = new ValueStoreMergeT(params_);
+    ValueStoreMergeT* value_store = new ValueStoreMergeT(inputFiles_, params_);
+
     generator_ =
         GeneratorAdapter::template CreateGenerator<keyvi::dictionary::fsa::internal::SparseArrayPersistence<uint16_t>>(
             GetTotalSparseArraySize(), params_, value_store);

@@ -31,6 +31,7 @@
 #include <string>
 
 #include "keyvi/compression/compression_strategy.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -130,6 +131,8 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
   }
 
   std::string name() const { return "zlib"; }
+
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
 
  private:
   z_stream zstream_compress_;

@@ -25,6 +25,7 @@
 
 #include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/dictionary_properties.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
 #include "keyvi/dictionary/fsa/internal/lru_generation_cache.h"
 #include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
@@ -62,6 +63,8 @@ class FloatVectorValueStoreBase {
   uint32_t GetWeightValue(value_t value) const { return 0; }
 
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
+
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
 
   static value_store_t GetValueStoreType() { return value_store_t::FLOAT_VECTOR; }
 
@@ -218,6 +221,8 @@ class FloatVectorValueStoreMergeBase {
 
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
+
   static value_store_t GetValueStoreType() { return value_store_t::FLOAT_VECTOR; }
 
  protected:
@@ -229,6 +234,10 @@ class FloatVectorValueStoreMergeBase {
 class FloatVectorValueStoreMerge final : public FloatVectorValueStoreMergeBase {
  public:
   explicit FloatVectorValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : FloatVectorValueStoreMerge({}, parameters) {}
+
+  explicit FloatVectorValueStoreMerge(const std::vector<std::string>& inputFiles,
+                                      const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : hash_(keyvi::util::mapGetMemory(parameters, MEMORY_LIMIT_KEY, DEFAULT_MEMORY_LIMIT_VALUE_STORE)) {
     temporary_directory_ = keyvi::util::mapGetTemporaryPath(parameters);
 
