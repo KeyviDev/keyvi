@@ -165,10 +165,9 @@ inline void JsonStringToMsgPack(const std::string& raw_value, msgpack::v1::sbuff
 
 inline std::string JsonStringToMsgPack(const std::string& raw_value, bool single_precision_float = false) {
   msgpack::sbuffer msgpack_buffer;
-  compression::buffer_t buffer;
 
   JsonStringToMsgPack(raw_value, &msgpack_buffer, single_precision_float);
-  return std::string(reinterpret_cast<char*>(buffer.data()), buffer.size());
+  return std::string(reinterpret_cast<char*>(msgpack_buffer.data()), msgpack_buffer.size());
 }
 
 } /* namespace util */

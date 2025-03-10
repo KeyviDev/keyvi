@@ -74,7 +74,7 @@ inline decompress_func_t decompressor_by_code(const CompressionAlgorithm algorit
       TRACE("unpack snappy compressed string");
       return SnappyCompressionStrategy::DoDecompress;
     default:
-      throw std::invalid_argument("Invalid compression code " +
+      throw std::invalid_argument("Invalid compression algorithm " +
                                   boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
   }
 }
@@ -93,7 +93,7 @@ inline compression_strategy_t compression_strategy_by_code(const CompressionAlgo
     case SNAPPY_COMPRESSION:
       return std::make_unique<SnappyCompressionStrategy>();
     default:
-      throw std::invalid_argument("Invalid compression algorith " +
+      throw std::invalid_argument("Invalid compression algorithm " +
                                   boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
   }
 }
