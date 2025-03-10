@@ -378,6 +378,10 @@ class JsonValueStoreReader final : public IValueStoreReader {
     size_t value_size;
     const char* value_ptr = keyvi::util::decodeVarIntString(strings_ + fsa_value, &value_size);
 
+    if (value_size == 0) {
+      return std::string();
+    }
+
     if (value_ptr[0] == compression_algorithm) {
       return std::string(value_ptr[1], value_size - 1);
     }
