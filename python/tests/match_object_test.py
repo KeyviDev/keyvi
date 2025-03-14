@@ -2,6 +2,7 @@
 # Usage: py.test tests
 
 import keyvi
+import msgpack
 from test_tools import tmp_dictionary
 import warnings
 
@@ -36,6 +37,7 @@ def test_raw_serialization():
         d = m.dumps()
         m2 = keyvi.Match.loads(d)
         assert m2.value_as_string() == '{"a":2}'
+        assert msgpack.loads(m.msgpacked_value_as_string()) == {"a": 2}
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             assert m.GetValueAsString() == '{"a":2}'
@@ -130,6 +132,7 @@ def test_get_value():
         assert m.value == {"a": 2}
         m = d["abd"]
         assert m.value == {"a": 3}
+        assert msgpack.loads(m.msgpacked_value_as_string()) == {"a": 3}
 
 
 def test_get_value_int():
@@ -141,6 +144,7 @@ def test_get_value_int():
         assert m.value == 42
         m = d["abd"]
         assert m.value == 21
+        assert msgpack.loads(m.msgpacked_value_as_string()) == 21
 
 
 def test_get_value_key_only():
@@ -152,6 +156,7 @@ def test_get_value_key_only():
         assert m.value == ''
         m = d["abd"]
         assert m.value == ''
+        assert msgpack.loads(m.msgpacked_value_as_string()) == ''
 
 
 def test_get_value_string():
@@ -163,6 +168,7 @@ def test_get_value_string():
         assert m.value == "aaaaa"
         m = d["abd"]
         assert m.value == "bbbbb"
+        assert msgpack.loads(m.msgpacked_value_as_string()) == "bbbbb"
 
 
 def test_matched_string():
