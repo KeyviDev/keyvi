@@ -364,7 +364,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
     }
 
     if (value_ptr[0] == compression_algorithm) {
-      return std::string(value_ptr[1], value_size - 1);
+      return std::string(value_ptr + 1, value_size - 1);
     }
 
     // decompress
