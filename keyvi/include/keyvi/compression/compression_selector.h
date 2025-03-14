@@ -25,6 +25,7 @@
 #ifndef KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_
 #define KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_
 
+#include <memory>
 #include <string>
 
 #include <boost/algorithm/string.hpp>
@@ -61,8 +62,8 @@ inline CompressionStrategy* compression_strategy(const std::string& name = "") {
 typedef std::string (*decompress_func_t)(const std::string&);
 typedef void (CompressionStrategy::*compress_mem_fn_t)(buffer_t*, const char*, size_t);
 
-inline decompress_func_t decompressor_by_code(const std::string& s) {
-  switch (s[0]) {
+inline decompress_func_t decompressor_by_code(const CompressionAlgorithm algorithm) {
+  switch (algorithm) {
     case NO_COMPRESSION:
       TRACE("unpack uncompressed string");
       return RawCompressionStrategy::DoDecompress;
@@ -73,8 +74,27 @@ inline decompress_func_t decompressor_by_code(const std::string& s) {
       TRACE("unpack snappy compressed string");
       return SnappyCompressionStrategy::DoDecompress;
     default:
-      throw std::invalid_argument("Invalid compression code " +
-                                  boost::lexical_cast<std::string>(static_cast<int>(s[0])));
+      throw std::invalid_argument("Invalid compression algorithm " +
+                                  boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
+  }
+}
+
+inline decompress_func_t decompressor_from_string(const std::string& s) {
+  return decompressor_by_code(static_cast<CompressionAlgorithm>(s[0]));
+}
+
+/** Returns an instance of a compression strategy by enum. */
+inline compression_strategy_t compression_strategy_by_code(const CompressionAlgorithm algorithm) {
+  switch (algorithm) {
+    case NO_COMPRESSION:
+      return std::make_unique<RawCompressionStrategy>();
+    case ZLIB_COMPRESSION:
+      return std::make_unique<ZlibCompressionStrategy>();
+    case SNAPPY_COMPRESSION:
+      return std::make_unique<SnappyCompressionStrategy>();
+    default:
+      throw std::invalid_argument("Invalid compression algorithm " +
+                                  boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
   }
 }
 
