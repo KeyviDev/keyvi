@@ -5,7 +5,7 @@ import keyvi
 import msgpack
 from test_tools import tmp_dictionary
 import warnings
-
+import zlib
 
 from keyvi.compiler import (
     JsonDictionaryCompiler,
@@ -31,7 +31,7 @@ def test_raw_serialization():
     c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
     c.add("abc", '{"a" : 2}')
     c.add("abd", '{"a" : 3}')
-    with tmp_dictionary(c, 'match_object_json.kv') as d:
+    with tmp_dictionary(c, "match_object_json.kv") as d:
         m = d["abc"]
         assert m.value_as_string() == '{"a":2}'
         d = m.dumps()
@@ -65,8 +65,8 @@ def test_unicode_attributes():
 
 def test_bytes_attributes():
     m = keyvi.Match()
-    bytes_key = bytes(u"äöü".encode('utf-8'))
-    bytes_value = bytes(u"äöüöäü".encode('utf-8'))
+    bytes_key = bytes("äöü".encode("utf-8"))
+    bytes_value = bytes("äöüöäü".encode("utf-8"))
     m[bytes_key] = 22
     assert m[bytes_key] == 22
     m["k2"] = bytes_value
@@ -75,14 +75,14 @@ def test_bytes_attributes():
 
 def test_double_attributes():
     m = keyvi.Match()
-    bytes_key = bytes("abc".encode('utf-8'))
+    bytes_key = bytes("abc".encode("utf-8"))
     m[bytes_key] = 42.0
     assert m[bytes_key] == 42.0
 
 
 def test_boolean_attributes():
     m = keyvi.Match()
-    bytes_key = bytes("def".encode('utf-8'))
+    bytes_key = bytes("def".encode("utf-8"))
     m[bytes_key] = True
     assert m[bytes_key] == True
 
@@ -127,48 +127,83 @@ def test_get_value():
     c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
     c.add("abc", '{"a" : 2}')
     c.add("abd", '{"a" : 3}')
-    with tmp_dictionary(c, 'match_object_json.kv') as d:
+    with tmp_dictionary(c, "match_object_json.kv") as d:
         m = d["abc"]
         assert m.value == {"a": 2}
         m = d["abd"]
         assert m.value == {"a": 3}
         assert msgpack.loads(m.msgpacked_value_as_string()) == {"a": 3}
+        assert msgpack.loads(
+            zlib.decompress(
+                m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.ZLIB_COMPRESSION)
+            )
+        ) == {"a": 3}
 
 
 def test_get_value_int():
     c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
     c.add("abc", 42)
     c.add("abd", 21)
-    with tmp_dictionary(c, 'match_object_int.kv') as d:
+    with tmp_dictionary(c, "match_object_int.kv") as d:
         m = d["abc"]
         assert m.value == 42
         m = d["abd"]
         assert m.value == 21
         assert msgpack.loads(m.msgpacked_value_as_string()) == 21
+        assert (
+            msgpack.loads(
+                zlib.decompress(
+                    m.msgpacked_value_as_string(
+                        keyvi.CompressionAlgorithm.ZLIB_COMPRESSION
+                    )
+                )
+            )
+            == 21
+        )
 
 
 def test_get_value_key_only():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
     c.add("abc")
     c.add("abd")
-    with tmp_dictionary(c, 'match_object_key_only.kv') as d:
+    with tmp_dictionary(c, "match_object_key_only.kv") as d:
         m = d["abc"]
-        assert m.value == ''
+        assert m.value == ""
         m = d["abd"]
-        assert m.value == ''
-        assert msgpack.loads(m.msgpacked_value_as_string()) == ''
+        assert m.value == ""
+        assert msgpack.loads(m.msgpacked_value_as_string()) == ""
+        assert (
+            msgpack.loads(
+                zlib.decompress(
+                    m.msgpacked_value_as_string(
+                        keyvi.CompressionAlgorithm.ZLIB_COMPRESSION
+                    )
+                )
+            )
+            == ""
+        )
 
 
 def test_get_value_string():
     c = StringDictionaryCompiler({"memory_limit_mb": "10"})
     c.add("abc", "aaaaa")
     c.add("abd", "bbbbb")
-    with tmp_dictionary(c, 'match_object_string.kv') as d:
+    with tmp_dictionary(c, "match_object_string.kv") as d:
         m = d["abc"]
         assert m.value == "aaaaa"
         m = d["abd"]
         assert m.value == "bbbbb"
         assert msgpack.loads(m.msgpacked_value_as_string()) == "bbbbb"
+        assert (
+            msgpack.loads(
+                zlib.decompress(
+                    m.msgpacked_value_as_string(
+                        keyvi.CompressionAlgorithm.ZLIB_COMPRESSION
+                    )
+                )
+            )
+            == "bbbbb"
+        )
 
 
 def test_matched_string():
