@@ -30,17 +30,12 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
 namespace compression {
-
-enum CompressionAlgorithm {
-  NO_COMPRESSION = 0,
-  ZLIB_COMPRESSION = 1,
-  SNAPPY_COMPRESSION = 2,
   ZSTD_COMPRESSION = 3,
-};
 
 // buffer type which is realloc-able
 typedef std::vector<char> buffer_t;

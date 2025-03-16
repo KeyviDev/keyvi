@@ -31,6 +31,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_strategy.h"
 #include "keyvi/compression/snappy_compression_strategy.h"
 #include "keyvi/compression/zlib_compression_strategy.h"
