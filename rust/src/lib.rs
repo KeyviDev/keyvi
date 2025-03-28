@@ -36,3 +36,5 @@ pub mod dictionary;
 pub mod keyvi_match;
 pub mod keyvi_match_iterator;
 pub mod keyvi_string;
+
+pub type Compression = bindings::root::keyvi::compression::CompressionAlgorithm;

@@ -1,6 +1,7 @@
 extern crate rand;
 extern crate rayon;
 extern crate serde_json;
+extern crate snap;
 
 extern crate keyvi;
 
@@ -10,6 +11,7 @@ mod tests {
     use rand::Rng;
     use rayon::prelude::*;
     use serde_json::Value;
+    use snap::raw::Decoder;
 
     use keyvi::dictionary;
 
@@ -83,6 +85,20 @@ mod tests {
 
         let m = d.get("non-existing-key-with-\0-in-middle");
         assert!(m.get_value_as_string().is_empty());
+    }
+
+    #[test]
+    fn match_msgpacked_value_compressed_array() {
+        let m = dictionary::Dictionary::new("test_data/test.kv")
+            .unwrap()
+            .get("a");
+
+        assert_eq!(m.get_msgpacked_value_compressed(keyvi::Compression::NO_COMPRESSION), vec![146, 12, 13]);
+
+        let mut snap_decoder = Decoder::new();
+        let value_compressed = m.get_msgpacked_value_compressed(keyvi::Compression::SNAPPY_COMPRESSION);
+        let value_uncompressed = snap_decoder.decompress_vec(&value_compressed);
+        assert_eq!(value_uncompressed.unwrap(), vec![146, 12, 13]);
     }
 
     #[test]
