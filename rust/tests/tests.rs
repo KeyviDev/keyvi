@@ -93,10 +93,14 @@ mod tests {
             .unwrap()
             .get("a");
 
-        assert_eq!(m.get_msgpacked_value_compressed(keyvi::Compression::NO_COMPRESSION), vec![146, 12, 13]);
+        assert_eq!(
+            m.get_msgpacked_value_compressed(keyvi::Compression::NO_COMPRESSION),
+            vec![146, 12, 13]
+        );
 
         let mut snap_decoder = Decoder::new();
-        let value_compressed = m.get_msgpacked_value_compressed(keyvi::Compression::SNAPPY_COMPRESSION);
+        let value_compressed =
+            m.get_msgpacked_value_compressed(keyvi::Compression::SNAPPY_COMPRESSION);
         let value_uncompressed = snap_decoder.decompress_vec(&value_compressed);
         assert_eq!(value_uncompressed.unwrap(), vec![146, 12, 13]);
     }
