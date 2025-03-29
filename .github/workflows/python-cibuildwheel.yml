@@ -66,11 +66,21 @@ jobs:
           brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done && \
           brew install ccache zlib snappy boost
 
+      - name: set mac deployment target X86_64
+        if: runner.os == 'macOS' && runner.arch == 'x86_64'
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=13.0"
+
+      - name: set mac deployment target arm64
+        if: runner.os == 'macOS' && runner.arch == 'ARM64'
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0"
+
       - name: Build python wheels for ${{ matrix.os }}
         uses: pypa/cibuildwheel@v2.23.1
         env:
-          # Skip CPython 3.6 and CPython 3.7
-          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-*
+          # Skip CPython 3.{6, 7, 8}
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-* cp38-*
 
           # skip tests on pypy, currently fails for indexer tests
           CIBW_TEST_SKIP: "pp*"
