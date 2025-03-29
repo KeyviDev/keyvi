@@ -69,18 +69,21 @@ jobs:
       - name: set mac deployment target X64
         if: runner.os == 'macOS' && runner.arch == 'X64'
         run: |
-          echo "MACOSX_DEPLOYMENT_TARGET=13.0"
+          echo "MACOSX_DEPLOYMENT_TARGET=13.0" >> $GITHUB_ENV
 
       - name: set mac deployment target arm64
         if: runner.os == 'macOS' && runner.arch == 'ARM64'
         run: |
-          echo "MACOSX_DEPLOYMENT_TARGET=14.0"
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
 
       - name: Build python wheels for ${{ matrix.os }}
         uses: pypa/cibuildwheel@v2.23.1
         env:
           # Skip CPython 3.{6, 7, 8}
           CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-* cp38-*
+
+          # only build native packages
+          CIBW_ARCHS: native
 
           # skip tests on pypy, currently fails for indexer tests
           CIBW_TEST_SKIP: "pp*"
