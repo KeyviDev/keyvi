@@ -66,8 +66,8 @@ jobs:
           brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done && \
           brew install ccache zlib snappy boost
 
-      - name: set mac deployment target X86_64
-        if: runner.os == 'macOS' && runner.arch == 'x86_64'
+      - name: set mac deployment target X64
+        if: runner.os == 'macOS' && runner.arch == 'X64'
         run: |
           echo "MACOSX_DEPLOYMENT_TARGET=13.0"
 
