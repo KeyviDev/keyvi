@@ -402,6 +402,10 @@ class Automata final {
     return dictionary_properties_->GetManifest();
   }
 
+  const uint64_t GetVersion() const {
+    return dictionary_properties_->GetVersion();
+  }
+
  private:
   dictionary_properties_t dictionary_properties_;
   std::unique_ptr<internal::IValueStoreReader> value_store_reader_;
