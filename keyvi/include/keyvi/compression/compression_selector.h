@@ -99,6 +99,8 @@ inline compression_strategy_t compression_strategy_by_code(const CompressionAlgo
       return std::make_unique<ZlibCompressionStrategy>();
     case SNAPPY_COMPRESSION:
       return std::make_unique<SnappyCompressionStrategy>();
+    case ZSTD_COMPRESSION:
+      return std::make_unique<ZstdCompressionStrategy>();
     default:
       throw std::invalid_argument("Invalid compression algorithm " +
                                   boost::lexical_cast<std::string>(static_cast<int>(algorithm)));

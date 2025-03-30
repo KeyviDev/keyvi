@@ -35,10 +35,9 @@
 
 namespace keyvi {
 namespace compression {
-  ZSTD_COMPRESSION = 3,
 
 // buffer type which is realloc-able
-typedef std::vector<char> buffer_t;
+using buffer_t = std::vector<char>;
 
 /**
  * The base class of every compression strategy.
