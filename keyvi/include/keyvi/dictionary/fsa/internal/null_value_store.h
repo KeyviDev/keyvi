@@ -100,6 +100,21 @@ class NullValueStoreReader final : public IValueStoreReader {
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override { return attributes_t(); }
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return ""; }
+
+  std::string GetRawValueAsString(uint64_t fsa_value) const override {
+    return "\x00\xc0";
+  }
+
+  std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                        const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const override {
+    if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+      return "\xc0";
+    }
+
+    return compression::compression_strategy_by_code(compression_algorithm)
+        ->CompressWithoutHeader("\xc0");
+  }
 };
 
 template <>

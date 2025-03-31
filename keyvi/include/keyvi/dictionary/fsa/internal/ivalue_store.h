@@ -117,9 +117,7 @@ class IValueStoreReader {
    * @param fsa_value
    * @return the value as binary encoded string
    */
-  virtual std::string GetRawValueAsString(uint64_t fsa_value) const {
-    return keyvi::util::EncodeJsonValue(GetValueAsString(fsa_value));
-  }
+  virtual std::string GetRawValueAsString(uint64_t fsa_value) const  = 0;
 
   /**
    * Get Value as msgpack string
@@ -131,19 +129,7 @@ class IValueStoreReader {
    */
   virtual std::string GetMsgPackedValueAsString(uint64_t fsa_value,
                                                 const compression::CompressionAlgorithm compression_algorithm =
-                                                    compression::CompressionAlgorithm::NO_COMPRESSION) const {
-    const std::string msgpacked_value = keyvi::util::JsonStringToMsgPack(GetValueAsString(fsa_value));
-
-    if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
-      return msgpacked_value;
-    }
-
-    // compress the value
-    const compression::compression_strategy_t compressor =
-        compression::compression_strategy_by_code(compression_algorithm);
-
-    return compressor->CompressWithoutHeader(msgpacked_value);
-  }
+                                                    compression::CompressionAlgorithm::NO_COMPRESSION) const = 0;
 
   /**
    * Get Value as string (for dumping or communication)

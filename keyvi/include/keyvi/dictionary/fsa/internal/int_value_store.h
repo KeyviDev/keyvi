@@ -28,9 +28,11 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/util/msgpack_util.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -108,6 +110,23 @@ class IntValueStoreReader final : public IValueStoreReader {
   }
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return std::to_string(fsa_value); }
+
+  std::string GetRawValueAsString(uint64_t fsa_value) const override {
+    // TODO: replace with std::format once we have C++20
+    return compression::compression_strategy_by_code(compression::CompressionAlgorithm::NO_COMPRESSION)
+        ->Compress(keyvi::util::ValueToMsgPack(fsa_value));
+  }
+
+  std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                        const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const override {
+    if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+      return keyvi::util::ValueToMsgPack(fsa_value);
+    }
+
+    return compression::compression_strategy_by_code(compression_algorithm)
+        ->CompressWithoutHeader(keyvi::util::ValueToMsgPack(fsa_value));
+  }
 };
 
 template <>

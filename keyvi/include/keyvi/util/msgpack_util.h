@@ -170,6 +170,17 @@ inline std::string JsonStringToMsgPack(const std::string& raw_value, bool single
   return std::string(reinterpret_cast<char*>(msgpack_buffer.data()), msgpack_buffer.size());
 }
 
+template <typename T>
+inline std::string ValueToMsgPack(const T& value) {
+  msgpack::sbuffer msgpack_buffer;
+  compression::buffer_t buffer;
+
+  msgpack::packer<msgpack::sbuffer> pk(&msgpack_buffer);
+  pk.pack(value);
+
+  return std::string(msgpack_buffer.data(), msgpack_buffer.size());
+}
+
 } /* namespace util */
 } /* namespace keyvi */
 
