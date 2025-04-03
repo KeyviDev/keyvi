@@ -182,6 +182,29 @@ keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match* match) {
   return keyvi_bytes{data_size, static_cast<const uint8_t*>(data_ptr)};
 }
 
+keyvi_bytes keyvi_match_get_msgpacked_value_compressed(const struct keyvi_match* match,
+                                                       keyvi::compression::CompressionAlgorithm compression) {
+  const keyvi_bytes empty_keyvi_bytes{0, nullptr};
+
+  if (!match->obj_) {
+    return empty_keyvi_bytes;
+  }
+
+  const std::string compressed_value = match->obj_->GetMsgPackedValueAsString(compression);
+
+  const size_t data_size = compressed_value.size();
+  if (0 == data_size) {
+    return empty_keyvi_bytes;
+  }
+  auto* data_ptr = malloc(data_size);
+  if (nullptr == data_ptr) {
+    return empty_keyvi_bytes;
+  }
+  memcpy(data_ptr, compressed_value.c_str(), data_size);
+
+  return keyvi_bytes{data_size, static_cast<const uint8_t*>(data_ptr)};
+}
+
 char* keyvi_match_get_matched_string(const keyvi_match* match) {
   return std_2_c_string(match->obj_ ? match->obj_->GetMatchedString() : "");
 }

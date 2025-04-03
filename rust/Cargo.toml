@@ -19,3 +19,4 @@ serde_json = ">=1.0"
 [dev-dependencies]
 rayon = "0.9"
 rand = ">=0.4"
+snap = "1.1"

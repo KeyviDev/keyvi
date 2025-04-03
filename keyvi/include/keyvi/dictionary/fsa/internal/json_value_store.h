@@ -372,6 +372,35 @@ class JsonValueStoreReader final : public IValueStoreReader {
     return keyvi::util::decodeVarIntString(strings_ + fsa_value);
   }
 
+  std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                        const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const override {
+    size_t value_size;
+    const char* value_ptr = keyvi::util::decodeVarIntString(strings_ + fsa_value, &value_size);
+
+    if (value_size == 0) {
+      return std::string();
+    }
+
+    if (value_ptr[0] == compression_algorithm) {
+      return std::string(value_ptr + 1, value_size - 1);
+    }
+
+    // decompress
+    const compression::decompress_func_t decompressor =
+        compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(value_ptr[0]));
+    std::string msgpacked_value = decompressor(std::string(value_ptr, value_size));
+
+    if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+      return msgpacked_value;
+    }
+    // compress
+    const compression::compression_strategy_t compressor =
+        compression::compression_strategy_by_code(compression_algorithm);
+
+    return compressor->CompressWithoutHeader(msgpacked_value);
+  }
+
   std::string GetValueAsString(uint64_t fsa_value) const override {
     TRACE("JsonValueStoreReader GetValueAsString");
     std::string packed_string = keyvi::util::decodeVarIntString(strings_ + fsa_value);

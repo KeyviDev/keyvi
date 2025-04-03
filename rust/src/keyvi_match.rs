@@ -73,6 +73,25 @@ impl KeyviMatch {
         msgpacked_value
     }
 
+    pub fn get_msgpacked_value_compressed(
+        &self,
+        compression_algorithm: root::keyvi::compression::CompressionAlgorithm,
+    ) -> Vec<u8> {
+        let kv_bytes = unsafe {
+            root::keyvi_match_get_msgpacked_value_compressed(self.match_ptr_, compression_algorithm)
+        };
+        let msgpacked_value = if kv_bytes.data_size == 0 {
+            Vec::new()
+        } else {
+            unsafe {
+                slice::from_raw_parts(kv_bytes.data_ptr, kv_bytes.data_size as usize).to_vec()
+            }
+        };
+        unsafe { root::keyvi_bytes_destroy(kv_bytes) };
+
+        msgpacked_value
+    }
+
     pub fn is_empty(&self) -> bool {
         unsafe { root::keyvi_match_is_empty(self.match_ptr_) }
     }

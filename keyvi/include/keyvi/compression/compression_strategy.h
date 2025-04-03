@@ -26,23 +26,18 @@
 #define KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_
 
 #include <cstring>
+#include <memory>
 #include <string>
 #include <vector>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 
 namespace keyvi {
 namespace compression {
 
-enum CompressionCode {
-  NO_COMPRESSION = 0,
-  ZLIB_COMPRESSION = 1,
-  SNAPPY_COMPRESSION = 2,
-  ZSTD_COMPRESSION = 3,
-};
-
 // buffer type which is realloc-able
-typedef std::vector<char> buffer_t;
+using buffer_t = std::vector<char>;
 
 /**
  * The base class of every compression strategy.
@@ -64,6 +59,12 @@ struct CompressionStrategy {
     return std::string(buf.data(), buf.size());
   }
 
+  inline std::string CompressWithoutHeader(const std::string& raw) {
+    buffer_t buf;
+    Compress(&buf, raw.data(), raw.size());
+    return std::string(buf.data() + 1, buf.size() - 1);
+  }
+
   /**
    * By the time this function is called, the length field added in Compress()
    * will have been removed.
@@ -77,6 +78,8 @@ struct CompressionStrategy {
   virtual uint64_t GetFileVersionMin() const = 0;
 };
 
+using compression_strategy_t = std::unique_ptr<CompressionStrategy>;
+
 /**
  * A compression strategy that does almost nothing; i.e. it only adds
  * the length field.
@@ -88,12 +91,6 @@ struct RawCompressionStrategy final : public CompressionStrategy {
     buffer->resize(raw_size + 1);
     buffer->data()[0] = static_cast<char>(NO_COMPRESSION);
     std::memcpy(buffer->data() + 1, raw, raw_size);
-  }
-
-  static inline std::string DoCompress(const char* raw, size_t raw_size) {
-    buffer_t buf;
-    DoCompress(&buf, raw, raw_size);
-    return std::string(buf.data(), buf.size());
   }
 
   inline std::string Decompress(const std::string& compressed) { return DoDecompress(compressed); }

@@ -42,7 +42,7 @@ namespace util {
 
 /** Decompresses (if needed) and decodes a json value stored in a JsonValueStore. */
 inline std::string DecodeJsonValue(const std::string& encoded_value) {
-  compression::decompress_func_t decompressor = compression::decompressor_by_code(encoded_value);
+  compression::decompress_func_t decompressor = compression::decompressor_from_string(encoded_value);
   std::string packed_string = decompressor(encoded_value);
   TRACE("unpacking %s", packed_string.c_str());
 
@@ -64,17 +64,7 @@ inline void EncodeJsonValue(std::function<void(compression::buffer_t*, const cha
                             size_t compression_threshold = 32) {
   msgpack_buffer->clear();
 
-  rapidjson::Document json_document;
-  json_document.Parse<rapidjson::kParseNanAndInfFlag>(raw_value.c_str());
-
-  if (!json_document.HasParseError()) {
-    TRACE("Got json");
-    msgpack::packer<msgpack::sbuffer> packer(msgpack_buffer);
-    JsonToMsgPack(json_document, &packer, single_precision_float);
-  } else {
-    TRACE("Got a normal string");
-    msgpack::pack(msgpack_buffer, raw_value);
-  }
+  JsonStringToMsgPack(raw_value, msgpack_buffer, single_precision_float);
   // compression
   if (msgpack_buffer->size() > compression_threshold) {
     long_compress(buffer, msgpack_buffer->data(), msgpack_buffer->size());
