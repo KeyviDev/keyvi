@@ -393,7 +393,7 @@ class FloatVectorValueStoreReader final : public IValueStoreReader {
 
   std::string GetMsgPackedValueAsString(uint64_t fsa_value,
                                         const compression::CompressionAlgorithm compression_algorithm =
-                                            compression::CompressionAlgorithm::NO_COMPRESSION) const {
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const override {
     size_t value_size;
     const char* value_ptr = keyvi::util::decodeVarIntString(strings_ + fsa_value, &value_size);
 
