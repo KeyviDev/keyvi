@@ -117,7 +117,7 @@ class IValueStoreReader {
    * @param fsa_value
    * @return the value as binary encoded string
    */
-  virtual std::string GetRawValueAsString(uint64_t fsa_value) const  = 0;
+  virtual std::string GetRawValueAsString(uint64_t fsa_value) const = 0;
 
   /**
    * Get Value as msgpack string

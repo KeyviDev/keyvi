@@ -101,9 +101,7 @@ class NullValueStoreReader final : public IValueStoreReader {
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return ""; }
 
-  std::string GetRawValueAsString(uint64_t fsa_value) const override {
-    return "\x00\xc0";
-  }
+  std::string GetRawValueAsString(uint64_t fsa_value) const override { return "\x00\xc0"; }
 
   std::string GetMsgPackedValueAsString(uint64_t fsa_value,
                                         const compression::CompressionAlgorithm compression_algorithm =
@@ -112,8 +110,7 @@ class NullValueStoreReader final : public IValueStoreReader {
       return "\xc0";
     }
 
-    return compression::compression_strategy_by_code(compression_algorithm)
-        ->CompressWithoutHeader("\xc0");
+    return compression::compression_strategy_by_code(compression_algorithm)->CompressWithoutHeader("\xc0");
   }
 };
 
