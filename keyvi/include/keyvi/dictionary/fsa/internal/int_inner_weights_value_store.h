@@ -114,7 +114,7 @@ class IntInnerWeightsValueStoreReader final : public IValueStoreReader {
   std::string GetValueAsString(uint64_t fsa_value) const override { return std::to_string(fsa_value); }
 
   std::string GetRawValueAsString(uint64_t fsa_value) const override {
-    // TODO: replace with std::format once we have C++20
+    // TODO(hendrik): replace with std::format once we have C++20
     return compression::compression_strategy_by_code(compression::CompressionAlgorithm::NO_COMPRESSION)
         ->Compress(keyvi::util::ValueToMsgPack(fsa_value));
   }

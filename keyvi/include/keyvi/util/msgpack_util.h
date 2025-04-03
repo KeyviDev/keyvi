@@ -31,6 +31,9 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 
+// #define ENABLE_TRACING
+#include "keyvi/dictionary/util/trace.h"
+
 /**
  * Utility classes for msgpack.
  *
@@ -173,7 +176,6 @@ inline std::string JsonStringToMsgPack(const std::string& raw_value, bool single
 template <typename T>
 inline std::string ValueToMsgPack(const T& value) {
   msgpack::sbuffer msgpack_buffer;
-  compression::buffer_t buffer;
 
   msgpack::packer<msgpack::sbuffer> pk(&msgpack_buffer);
   pk.pack(value);

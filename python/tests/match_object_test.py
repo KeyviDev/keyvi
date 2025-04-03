@@ -168,10 +168,10 @@ def test_get_value_key_only():
     c.add("abd")
     with tmp_dictionary(c, "match_object_key_only.kv") as d:
         m = d["abc"]
-        assert m.value == ""
+        assert m.value is None
         m = d["abd"]
-        assert m.value == ""
-        assert msgpack.loads(m.msgpacked_value_as_string()) == ""
+        assert m.value is None
+        assert msgpack.loads(m.msgpacked_value_as_string()) is None
         assert (
             msgpack.loads(
                 zlib.decompress(
@@ -180,7 +180,7 @@ def test_get_value_key_only():
                     )
                 )
             )
-            == ""
+            is None
         )
 
 
