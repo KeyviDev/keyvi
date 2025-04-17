@@ -101,11 +101,13 @@ class NullValueStoreReader final : public IValueStoreReader {
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return ""; }
 
+  // shortcut: `\00` for no compression, `\xc0` for nil/null in msgpack
   std::string GetRawValueAsString(uint64_t fsa_value) const override { return "\x00\xc0"; }
 
   std::string GetMsgPackedValueAsString(uint64_t fsa_value,
                                         const compression::CompressionAlgorithm compression_algorithm =
                                             compression::CompressionAlgorithm::NO_COMPRESSION) const override {
+    // `\xc0` == msgpack nil
     if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
       return "\xc0";
     }

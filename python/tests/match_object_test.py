@@ -6,6 +6,8 @@ import msgpack
 from test_tools import tmp_dictionary
 import warnings
 import zlib
+import snappy
+import zstd
 
 from keyvi.compiler import (
     JsonDictionaryCompiler,
@@ -137,6 +139,21 @@ def test_get_value():
             zlib.decompress(
                 m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.ZLIB_COMPRESSION)
             )
+        ) == {"a": 3}
+        assert msgpack.loads(
+            snappy.decompress(
+                m.msgpacked_value_as_string(
+                    keyvi.CompressionAlgorithm.SNAPPY_COMPRESSION
+                )
+            )
+        ) == {"a": 3}
+        assert msgpack.loads(
+            zstd.decompress(
+                m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.ZSTD_COMPRESSION)
+            )
+        ) == {"a": 3}
+        assert msgpack.loads(
+            m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.NO_COMPRESSION)
         ) == {"a": 3}
 
 
