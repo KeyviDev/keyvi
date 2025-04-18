@@ -139,6 +139,7 @@ jobs:
         python setup.py sdist -d wheelhouse && \
         python -m pip uninstall -y autowrap && \
         python -m pip install wheelhouse/*.tar.gz -v && \
+        python -m pip install python-snappy zstd && \
         python -m pytest tests && \
         python -m pip uninstall -y keyvi
 
