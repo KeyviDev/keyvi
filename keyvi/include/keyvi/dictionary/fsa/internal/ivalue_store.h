@@ -33,6 +33,7 @@
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/variant.hpp>
 
+#include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/dictionary_merger_fwd.h"
 #include "keyvi/dictionary/fsa/internal/value_store_properties.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
@@ -111,14 +112,24 @@ class IValueStoreReader {
    * Get Value as string in raw format
    *
    * Note: The raw format is an implementation detail of keyvi, not an official binary interface.
-   * Value store implementers can override this method for performance reasons.
+   * Value store implementers can override this method with an optimized version.
    *
    * @param fsa_value
-   * @return the value as string without any decompression
+   * @return the value as binary encoded string
    */
-  virtual std::string GetRawValueAsString(uint64_t fsa_value) const {
-    return keyvi::util::EncodeJsonValue(GetValueAsString(fsa_value));
-  }
+  virtual std::string GetRawValueAsString(uint64_t fsa_value) const = 0;
+
+  /**
+   * Get Value as msgpack string
+   *
+   * Value store implementers can override this method with an optimized version.
+   *
+   * @param fsa_value
+   * @return the value as msgpack string
+   */
+  virtual std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                                const compression::CompressionAlgorithm compression_algorithm =
+                                                    compression::CompressionAlgorithm::NO_COMPRESSION) const = 0;
 
   /**
    * Get Value as string (for dumping or communication)

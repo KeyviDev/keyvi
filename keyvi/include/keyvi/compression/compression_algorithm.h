@@ -1,7 +1,6 @@
 /* * keyvi - A key value store.
  *
- * Copyright 2017   Narek Gharibyan <narekgharibyan@gmail.com>
- *                  Subu <subu@cliqz.com>
+ * Copyright 2025 Hendrik Muhs<hendrik.muhs@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +15,20 @@
  * limitations under the License.
  */
 
-/*
- * lib.rs
- *
- *  Created on: September 4, 2017
- *  Author: Narek Gharibyan <narekgharibyan@gmail.com>
- *          Subu <subu@cliqz.com>
- */
+#ifndef KEYVI_COMPRESSION_COMPRESSION_ALGORITHM_H_
+#define KEYVI_COMPRESSION_COMPRESSION_ALGORITHM_H_
 
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-#![crate_type = "lib"]
+namespace keyvi {
+namespace compression {
 
-extern crate serde_json;
+enum CompressionAlgorithm {
+  NO_COMPRESSION = 0,
+  ZLIB_COMPRESSION = 1,
+  SNAPPY_COMPRESSION = 2,
+  ZSTD_COMPRESSION = 3,
+};
 
-mod bindings;
-pub mod dictionary;
-pub mod keyvi_match;
-pub mod keyvi_match_iterator;
-pub mod keyvi_string;
+} /* namespace compression */
+} /* namespace keyvi */
 
-pub type Compression = bindings::root::keyvi::compression::CompressionAlgorithm;
+#endif  // KEYVI_COMPRESSION_COMPRESSION_ALGORITHM_H_

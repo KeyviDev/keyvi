@@ -394,6 +394,13 @@ class Automata final {
     return value_store_reader_->GetRawValueAsString(state_value);
   }
 
+  std::string GetMsgPackedValueAsString(uint64_t state_value,
+                                        const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const {
+    assert(value_store_reader_);
+    return value_store_reader_->GetMsgPackedValueAsString(state_value, compression_algorithm);
+  }
+
   std::string GetStatistics() const {
     return dictionary_properties_->GetStatistics();
   }

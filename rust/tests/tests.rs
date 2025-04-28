@@ -1,15 +1,22 @@
+extern crate flate2;
 extern crate rand;
 extern crate rayon;
 extern crate serde_json;
+extern crate snap;
+extern crate zstd;
 
 extern crate keyvi;
 
 #[cfg(test)]
 mod tests {
+    use std::io::Read;
+
+    use flate2::read::ZlibDecoder;
     use rand;
     use rand::Rng;
     use rayon::prelude::*;
-    use serde_json::Value;
+    use serde_json::{value, Value};
+    use snap::raw::Decoder;
 
     use keyvi::dictionary;
 
@@ -83,6 +90,37 @@ mod tests {
 
         let m = d.get("non-existing-key-with-\0-in-middle");
         assert!(m.get_value_as_string().is_empty());
+    }
+
+    #[test]
+    fn match_msgpacked_value_compressed_array() {
+        let m = dictionary::Dictionary::new("test_data/test.kv")
+            .unwrap()
+            .get("a");
+
+        assert_eq!(
+            m.get_msgpacked_value_compressed(keyvi::Compression::NO_COMPRESSION),
+            vec![146, 12, 13]
+        );
+
+        let mut snap_decoder = Decoder::new();
+        let value_compressed_snap =
+            m.get_msgpacked_value_compressed(keyvi::Compression::SNAPPY_COMPRESSION);
+        let value_uncompressed_snap = snap_decoder.decompress_vec(&value_compressed_snap);
+        assert_eq!(value_uncompressed_snap.unwrap(), vec![146, 12, 13]);
+
+        let value_compressed_zstd =
+            m.get_msgpacked_value_compressed(keyvi::Compression::ZSTD_COMPRESSION);
+        let value_uncompressed_zstd: Vec<u8> =
+            zstd::decode_all(value_compressed_zstd.as_slice()).unwrap();
+        assert_eq!(value_uncompressed_zstd, vec![146, 12, 13]);
+
+        let value_compressed_zlib =
+            m.get_msgpacked_value_compressed(keyvi::Compression::ZLIB_COMPRESSION);
+        let mut zlib_decoder = ZlibDecoder::new(value_compressed_zlib.as_slice());
+        let mut value_uncompressed_zlib: Vec<u8> = Vec::new();
+        let _ = zlib_decoder.read_to_end(&mut value_uncompressed_zlib);
+        assert_eq!(value_uncompressed_zlib, vec![146, 12, 13]);
     }
 
     #[test]

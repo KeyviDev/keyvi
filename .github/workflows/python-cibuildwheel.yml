@@ -64,7 +64,8 @@ jobs:
         run: |
           brew update && \
           brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done && \
-          brew install ccache zlib snappy boost
+          brew install ccache zlib snappy boost@1.85
+          brew link boost@1.85
 
       - name: set mac deployment target X64
         if: runner.os == 'macOS' && runner.arch == 'X64'
@@ -102,7 +103,7 @@ jobs:
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
           
           # testing
-          CIBW_TEST_REQUIRES: pytest
+          CIBW_TEST_REQUIRES: pytest python-snappy zstd
           CIBW_TEST_COMMAND: >
             python -m pytest {package}/tests &&
             python -m pytest {package}/integration-tests
@@ -139,6 +140,7 @@ jobs:
         python setup.py sdist -d wheelhouse && \
         python -m pip uninstall -y autowrap && \
         python -m pip install wheelhouse/*.tar.gz -v && \
+        python -m pip install python-snappy zstd && \
         python -m pytest tests && \
         python -m pip uninstall -y keyvi
 

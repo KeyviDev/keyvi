@@ -32,6 +32,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/variant.hpp>
 
+#include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/util/json_value.h"
 
@@ -196,13 +197,33 @@ struct Match {
     return fsa_->GetRawValueAsString(state_);
   }
 
-  std::string GetMsgPackedValueAsString() const {
-    const std::string raw_value = GetRawValueAsString();
-    if (raw_value.empty()) {
-      return raw_value;
+  std::string GetMsgPackedValueAsString(const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const {
+    if (!fsa_) {
+      if (raw_value_.empty()) {
+        return raw_value_;
+      }
+
+      if (raw_value_[0] == compression_algorithm) {
+        return raw_value_.substr(1);
+      }
+
+      // decompress
+      const compression::decompress_func_t decompressor =
+          compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(raw_value_[0]));
+      std::string msgpacked_value = decompressor(raw_value_);
+
+      if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+        return msgpacked_value;
+      }
+      // compress
+      const compression::compression_strategy_t compressor =
+          compression::compression_strategy_by_code(compression_algorithm);
+
+      return compressor->CompressWithoutHeader(msgpacked_value);
     }
-    const compression::decompress_func_t decompressor = compression::decompressor_by_code(raw_value);
-    return decompressor(raw_value);
+
+    return fsa_->GetMsgPackedValueAsString(state_, compression_algorithm);
   }
 
   /**
