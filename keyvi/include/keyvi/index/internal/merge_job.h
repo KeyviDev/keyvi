@@ -26,7 +26,7 @@
 #include <thread>  // NOLINT
 #include <vector>
 
-#include <boost/process.hpp>
+#include <boost/process/v2/process.hpp>
 
 #include "keyvi/dictionary/dictionary_merger.h"
 #include "keyvi/dictionary/dictionary_types.h"
@@ -78,7 +78,7 @@ class MergeJob final {
   MergeJob& operator=(MergeJob const&) = delete;
   MergeJob(const MergeJob& that) = delete;
 
-  void Run(bool force_external_merge = false) {
+  void Run(boost::asio::io_context* external_process_ctx, bool force_external_merge = false) {
     uint64_t job_size = 0;
 
     for (const segment_t& segment : payload_.segments_) {
@@ -88,7 +88,7 @@ class MergeJob final {
     if (force_external_merge == false && job_size < payload_.settings_.GetSegmentExternalMergeKeyThreshold()) {
       DoInternalMerge();
     } else {
-      DoExternalProcessMerge();
+      DoExternalProcessMerge(external_process_ctx);
     }
   }
 
@@ -128,7 +128,7 @@ class MergeJob final {
  private:
   MergeJobPayload payload_;
   size_t id_;
-  std::shared_ptr<boost::process::child> external_process_;
+  std::shared_ptr<boost::process::v2::process> external_process_;
   std::thread internal_merge_;
 
   void DoInternalMerge() {
@@ -154,7 +154,7 @@ class MergeJob final {
     });
   }
 
-  void DoExternalProcessMerge() {
+  void DoExternalProcessMerge(boost::asio::io_context* external_process_ctx) {
     payload_.start_time_ = std::chrono::system_clock::now();
 
     std::vector<std::string> args;
@@ -169,7 +169,8 @@ class MergeJob final {
     args.push_back("-o");
     args.push_back(payload_.output_filename_.string());
 
-    external_process_.reset(new boost::process::child(payload_.settings_.GetKeyviMergerBin(), args));
+    external_process_.reset(
+        new boost::process::v2::process(*external_process_ctx, payload_.settings_.GetKeyviMergerBin(), args));
   }
 
   bool TryFinalizeMerge() {
@@ -177,6 +178,8 @@ class MergeJob final {
       if (!external_process_->running()) {
         payload_.exit_code_ = external_process_->exit_code();
         payload_.process_finished_ = true;
+        // free the process early, closes internal file descriptor
+        external_process_.reset();
         return true;
       }
     } else if (internal_merge_.joinable()) {
@@ -192,6 +195,8 @@ class MergeJob final {
     if (external_process_) {
       external_process_->wait();
       payload_.exit_code_ = external_process_->exit_code();
+      // free the process early, closes internal file descriptor
+      external_process_.reset();
     } else {
       internal_merge_.join();
       // exit code set by merge thread

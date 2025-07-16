@@ -70,7 +70,8 @@ class IndexWriterWorker final {
   using compiler_t = std::shared_ptr<dictionary::JsonDictionaryIndexCompiler>;
   struct IndexPayload {
     explicit IndexPayload(const std::string& index_directory, const keyvi::util::parameters_t& params)
-        : compiler_(),
+        : external_process_ctx_(),
+          compiler_(),
           write_counter_(0),
           segments_(),
           mutex_(),
@@ -88,6 +89,7 @@ class IndexWriterWorker final {
       segments_ = std::make_shared<segment_vec_t>();
     }
 
+    boost::asio::io_context external_process_ctx_;
     compiler_t compiler_;
     std::atomic_size_t write_counter_;
     segments_t segments_;
@@ -209,10 +211,9 @@ class IndexWriterWorker final {
       std::condition_variable c;
       std::unique_lock<std::mutex> lock(m);
 
-      compiler_active_object_([&m, &c](IndexPayload& payload) {
+      compiler_active_object_([&c](IndexPayload& payload) {
         PersistDeletes(&payload);
         Compile(&payload);
-        std::unique_lock<std::mutex> waitLock(m);
         c.notify_all();
       });
 
@@ -390,7 +391,8 @@ class IndexWriterWorker final {
     payload_.merge_jobs_.emplace_back(to_merge, merge_policy_id, p, payload_.settings_);
 
     // force external merge if low on filedescriptors
-    payload_.merge_jobs_.back().Run(payload_.segments_->size() + to_merge.size() + 10 > payload_.max_segments_);
+    payload_.merge_jobs_.back().Run(&payload_.external_process_ctx_,
+                                    payload_.segments_->size() + to_merge.size() + 10 > payload_.max_segments_);
   }
 
   void LoadIndex() {
