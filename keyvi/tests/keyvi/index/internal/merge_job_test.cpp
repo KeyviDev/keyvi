@@ -24,7 +24,9 @@
  */
 
 #include <chrono>  // NOLINT
+#include <string>
 #include <thread>  // NOLINT
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
