@@ -74,7 +74,8 @@ class IndexWriterWorker final {
           compiler_(),
           write_counter_(0),
           segments_(),
-          mutex_(),
+          segments_mutex_(),
+          flush_mutex_(),
           index_directory_(index_directory),
           index_toc_file_(index_directory_ / "index.toc"),
           index_toc_file_part_(index_directory_ / "index.toc.part"),
@@ -94,7 +95,8 @@ class IndexWriterWorker final {
     std::atomic_size_t write_counter_;
     segments_t segments_;
     std::weak_ptr<segment_vec_t> segments_weak_;
-    std::mutex mutex_;
+    std::mutex segments_mutex_;
+    std::mutex flush_mutex_;
     const boost::filesystem::path index_directory_;
     const boost::filesystem::path index_toc_file_;
     const boost::filesystem::path index_toc_file_part_;
@@ -138,7 +140,7 @@ class IndexWriterWorker final {
     segments_t segments = payload_.segments_weak_.lock();
     if (!segments) {
       TRACE("recreate segments weak ptr");
-      std::unique_lock<std::mutex> lock(payload_.mutex_);
+      std::unique_lock<std::mutex> lock(payload_.segments_mutex_);
       payload_.segments_weak_ = payload_.segments_;
       segments = payload_.segments_;
     }
@@ -207,13 +209,15 @@ class IndexWriterWorker final {
         Compile(&payload);
       });
     } else {
-      std::mutex m;
       std::condition_variable c;
-      std::unique_lock<std::mutex> lock(m);
+      std::unique_lock<std::mutex> lock(payload_.flush_mutex_);
 
       compiler_active_object_([&c](IndexPayload& payload) {
-        PersistDeletes(&payload);
-        Compile(&payload);
+        {
+          PersistDeletes(&payload);
+          Compile(&payload);
+          std::unique_lock<std::mutex> lock(payload.flush_mutex_);
+        }
         c.notify_all();
       });
 
@@ -320,7 +324,7 @@ class IndexWriterWorker final {
 
           // thread-safe swap
           {
-            std::unique_lock<std::mutex> lock(payload_.mutex_);
+            std::unique_lock<std::mutex> lock(payload_.segments_mutex_);
             payload_.segments_.swap(new_segments);
           }
           WriteToc(&payload_);
@@ -468,7 +472,7 @@ class IndexWriterWorker final {
 
     // thread-safe swap
     {
-      std::unique_lock<std::mutex> lock(payload->mutex_);
+      std::unique_lock<std::mutex> lock(payload->segments_mutex_);
       payload->segments_.swap(new_segments);
     }
 
