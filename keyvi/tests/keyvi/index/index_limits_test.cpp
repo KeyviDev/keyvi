@@ -28,6 +28,8 @@
 #else
 #include <sys/resource.h>
 
+#include <string>
+
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -63,7 +65,7 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
 
-  size_t old_limit = limit_filedescriptors(20);
+  size_t old_limit = limit_filedescriptors(40);
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-limits-test-temp-index-%%%%-%%%%-%%%%-%%%%");
@@ -85,7 +87,7 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
   boost::filesystem::remove_all(tmp_path);
 
   size_t increased_file_descriptors = keyvi::util::OsUtils::TryIncreaseFileDescriptors();
-  BOOST_CHECK(increased_file_descriptors > 20);
+  BOOST_CHECK(increased_file_descriptors > 40);
 
   limit_filedescriptors(old_limit);
 }

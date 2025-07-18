@@ -59,7 +59,7 @@ namespace dictionary {
 #ifdef Py_PYTHON_H
 class attributes_visitor : public boost::static_visitor<PyObject*> {
  public:
-  PyObject* operator()(int i) const { return PyInt_FromLong(i); }
+  PyObject* operator()(int i) const { return PyLong_FromLong(i); }
 
   PyObject* operator()(double i) const { return PyFloat_FromDouble(i); }
 
