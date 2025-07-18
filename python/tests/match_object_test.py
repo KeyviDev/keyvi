@@ -205,7 +205,7 @@ def test_get_value_string():
     c = StringDictionaryCompiler({"memory_limit_mb": "10"})
     c.add("abc", "aaaaa")
     c.add("abd", "bbbbb")
-    c.add("", "{}")
+    c.add("abe", "{}")
     with tmp_dictionary(c, "match_object_string.kv") as d:
         m = d["abc"]
         assert m.value == "aaaaa"
@@ -222,7 +222,7 @@ def test_get_value_string():
             )
             == "bbbbb"
         )
-        m = d["abd"]
+        m = d["abe"]
         # gh#333: keyvi < 0.6.4 returned a dictionary instead of a string
         assert m.value == "{}"
         assert isinstance(m.value, str)
