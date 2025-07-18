@@ -24,7 +24,9 @@
  */
 
 #include <chrono>  // NOLINT
+#include <string>
 #include <thread>  // NOLINT
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
@@ -51,6 +53,8 @@ namespace internal {
 BOOST_AUTO_TEST_SUITE(MergeJobTests)
 
 BOOST_AUTO_TEST_CASE(basic_merge) {
+  boost::asio::io_context external_process_ctx;
+
   std::vector<std::pair<std::string, std::string>> test_data = {
       {"abc", "{a:1}"}, {"abbc", "{b:2}"}, {"abbcd", "{c:3}"}, {"abcde", "{a:1}"}, {"abdd", "{b:2}"}, {"bba", "{c:3}"},
   };
@@ -70,7 +74,7 @@ BOOST_AUTO_TEST_CASE(basic_merge) {
   boost::filesystem::path p("merged.kv");
   IndexSettings settings({{KEYVIMERGER_BIN, get_keyvimerger_bin()}});
   MergeJob m({w1, w2}, 0, p, settings);
-  m.Run();
+  m.Run(&external_process_ctx);
 
   int retry = 100;
   while (retry > 0) {
