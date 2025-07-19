@@ -128,18 +128,19 @@ class IndexWriterWorker final {
     TRACE("destruct worker: %s", payload_.index_directory_.c_str());
     payload_.merge_enabled_ = false;
 
+    std::mutex* leaked_mutex = new std::mutex();
     std::condition_variable c;
-    std::unique_lock<std::mutex> lock(destruct_mutex_);
+    std::unique_lock<std::mutex> lock(*leaked_mutex);
     std::atomic_bool no_pending_ops{false};
 
     // push a function to finish all pending merges
-    compiler_active_object_([this, &c, &no_pending_ops](IndexPayload& payload) {
+    compiler_active_object_([leaked_mutex, &c, &no_pending_ops](IndexPayload& payload) {
       {
         Compile(&payload);
         for (MergeJob& p : payload.merge_jobs_) {
           p.Finalize();
         }
-        std::unique_lock<std::mutex> lock(destruct_mutex_);
+        std::unique_lock<std::mutex> lock(*leaked_mutex);
       }
       no_pending_ops = true;
 
