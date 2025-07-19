@@ -235,8 +235,8 @@ class IndexWriterWorker final {
           PersistDeletes(&payload);
           Compile(&payload);
           std::unique_lock<std::mutex> lock(payload.flush_mutex_);
-          flushed = true;
         }
+        flushed = true;
         c.notify_all();
       });
 
