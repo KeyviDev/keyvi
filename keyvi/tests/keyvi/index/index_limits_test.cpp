@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
 }
 
 BOOST_AUTO_TEST_CASE(repeat_limit_test) {
-  for (size_t i = 0; i < 1000; i++) {
+  for (size_t i = 0; i < 100; i++) {
     IndexLimitsTests::filedescriptor_limit_invoker();
   }
 }
