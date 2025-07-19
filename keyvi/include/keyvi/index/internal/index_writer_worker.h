@@ -127,13 +127,27 @@ class IndexWriterWorker final {
     TRACE("destruct worker: %s", payload_.index_directory_.c_str());
     payload_.merge_enabled_ = false;
 
+    std::condition_variable c;
+    std::unique_lock<std::mutex> lock(payload_.flush_mutex_);
+    std::atomic_bool no_pending_ops{false};
+
     // push a function to finish all pending merges
-    compiler_active_object_([](IndexPayload& payload) {
-      Compile(&payload);
-      for (MergeJob& p : payload.merge_jobs_) {
-        p.Finalize();
+    compiler_active_object_([&c, &no_pending_ops](IndexPayload& payload) {
+      {
+        Compile(&payload);
+        for (MergeJob& p : payload.merge_jobs_) {
+          p.Finalize();
+        }
+        std::unique_lock<std::mutex> lock(payload.flush_mutex_);
+        no_pending_ops = true;
       }
+      c.notify_all();
     });
+
+    // wait until everything has been executed
+    while (no_pending_ops == false) {
+      c.wait(lock);
+    }
   }
 
   const_segments_t Segments() {
