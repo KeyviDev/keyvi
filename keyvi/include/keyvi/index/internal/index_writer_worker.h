@@ -232,11 +232,9 @@ class IndexWriterWorker final {
       std::atomic_bool flushed{false};
 
       compiler_active_object_([&c, &flushed](IndexPayload& payload) {
-        {
-          PersistDeletes(&payload);
-          Compile(&payload);
-          std::unique_lock<std::mutex> lock(payload.flush_mutex_);
-        }
+        std::unique_lock<std::mutex> lock(payload.flush_mutex_);
+        PersistDeletes(&payload);
+        Compile(&payload);
         flushed = true;
         c.notify_all();
       });
