@@ -114,7 +114,6 @@ class IndexWriterWorker final {
   explicit IndexWriterWorker(const std::string& index_directory, const keyvi::util::parameters_t& params)
       : payload_(index_directory, params),
         merge_policy_(merge_policy(keyvi::util::mapGet<std::string>(params, MERGE_POLICY, DEFAULT_MERGE_POLICY))),
-        //destruct_mutex_(),
         compiler_active_object_(&payload_, std::bind(&index::internal::IndexWriterWorker::ScheduledTask, this),
                                 std::chrono::milliseconds(payload_.index_refresh_interval_)) {
     TRACE("construct worker: %s", payload_.index_directory_.c_str());
@@ -128,30 +127,13 @@ class IndexWriterWorker final {
     TRACE("destruct worker: %s", payload_.index_directory_.c_str());
     payload_.merge_enabled_ = false;
 
-    //std::mutex* leaked_mutex = new std::mutex();
-    //std::condition_variable c;
-    //std::unique_lock<std::mutex> lock(*leaked_mutex);
-    //std::atomic_bool no_pending_ops{false};
-
     // push a function to finish all pending merges
-    //compiler_active_object_([leaked_mutex, &c, &no_pending_ops](IndexPayload& payload) {
     compiler_active_object_([](IndexPayload& payload) {
-      {
-        Compile(&payload);
-        for (MergeJob& p : payload.merge_jobs_) {
-          p.Finalize();
-        }
-        //std::unique_lock<std::mutex> lock(*leaked_mutex);
+      Compile(&payload);
+      for (MergeJob& p : payload.merge_jobs_) {
+        p.Finalize();
       }
-      //no_pending_ops = true;
-
-      //c.notify_all();
     });
-
-    // wait until everything has been executed
-    //while (no_pending_ops == false) {
-    //  c.wait(lock);
-    //}
   }
 
   const_segments_t Segments() {
@@ -270,7 +252,6 @@ class IndexWriterWorker final {
  private:
   IndexPayload payload_;
   merge_policy_t merge_policy_;
-  //std::mutex destruct_mutex_;
   util::ActiveObject<IndexPayload> compiler_active_object_;
 
   void CompileIfThresholdIsHit() {
