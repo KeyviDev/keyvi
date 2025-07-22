@@ -211,17 +211,20 @@ class IndexWriterWorker final {
     } else {
       std::condition_variable c;
       std::unique_lock<std::mutex> lock(payload_.flush_mutex_);
+      std::atomic_bool flushed{false};
 
-      compiler_active_object_([&c](IndexPayload& payload) {
-        {
-          PersistDeletes(&payload);
-          Compile(&payload);
-          std::unique_lock<std::mutex> lock(payload.flush_mutex_);
-        }
+      compiler_active_object_([&c, &flushed](IndexPayload& payload) {
+        std::unique_lock<std::mutex> lock(payload.flush_mutex_);
+        PersistDeletes(&payload);
+        Compile(&payload);
+        flushed = true;
         c.notify_all();
       });
 
-      c.wait(lock);
+      // condition may be unblocked spuriously, check flushed
+      while (flushed == false) {
+        c.wait(lock);
+      }
     }
   }
 
