@@ -54,6 +54,19 @@ impl Dictionary {
         }
     }
 
+    pub fn with_loading_strategy(filename: &str, loading_strategy: root::keyvi::dictionary::LoadingStrategy) -> io::Result<Dictionary> {
+        let fn_c = CString::new(filename)?;
+        let ptr = unsafe { root::keyvi_create_dictionary_with_loading_strategy(fn_c.as_ptr(), loading_strategy) };
+        if ptr.is_null() {
+            Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "could not load file",
+            ))
+        } else {
+            Ok(Dictionary { dict: ptr })
+        }
+    }
+
     pub fn statistics(&self) -> String {
         let c_buf: *mut ::std::os::raw::c_char =
             unsafe { root::keyvi_dictionary_get_statistics(self.dict) };
