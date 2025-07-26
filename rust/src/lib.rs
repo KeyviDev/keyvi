@@ -38,4 +38,4 @@ pub mod keyvi_match_iterator;
 pub mod keyvi_string;
 
 pub type Compression = bindings::root::keyvi::compression::CompressionAlgorithm;
-pub type LoadingStrategy = bindings::root::keyvi::dictionary::LoadingStrategy;
+pub type LoadingStrategy = bindings::root::keyvi::dictionary::loading_strategy_types;

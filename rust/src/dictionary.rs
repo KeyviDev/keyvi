@@ -54,9 +54,14 @@ impl Dictionary {
         }
     }
 
-    pub fn with_loading_strategy(filename: &str, loading_strategy: root::keyvi::dictionary::LoadingStrategy) -> io::Result<Dictionary> {
+    pub fn with_loading_strategy(
+        filename: &str,
+        loading_strategy: root::keyvi::dictionary::LoadingStrategy,
+    ) -> io::Result<Dictionary> {
         let fn_c = CString::new(filename)?;
-        let ptr = unsafe { root::keyvi_create_dictionary_with_loading_strategy(fn_c.as_ptr(), loading_strategy) };
+        let ptr = unsafe {
+            root::keyvi_create_dictionary_with_loading_strategy(fn_c.as_ptr(), loading_strategy)
+        };
         if ptr.is_null() {
             Err(io::Error::new(
                 io::ErrorKind::InvalidInput,

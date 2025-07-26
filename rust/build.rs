@@ -53,7 +53,7 @@ fn main() {
         .enable_cxx_namespaces()
         .layout_tests(true)
         .rustified_enum("keyvi::compression::CompressionAlgorithm")
-        .rustified_enum("keyvi::dictionary::LoadingStrategy")
+        .rustified_enum("keyvi::dictionary::loading_strategy_types")
         .allowlist_function("keyvi_bytes_destroy")
         .allowlist_function("keyvi_string_destroy")
         .allowlist_function("keyvi_create_dictionary")
