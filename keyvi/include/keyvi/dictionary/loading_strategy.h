@@ -32,6 +32,8 @@ enum class loading_strategy_types {
   populate_key_part_no_readahead_value_part  // populate the key part, but disable read ahead value part
 };
 
+using LoadingStrategy = loading_strategy_types;
+
 } /* namespace dictionary */
 } /* namespace keyvi */
 #endif  // KEYVI_DICTIONARY_LOADING_STRATEGY_H_
