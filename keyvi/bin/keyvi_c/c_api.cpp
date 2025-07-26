@@ -103,7 +103,8 @@ keyvi_dictionary* keyvi_create_dictionary(const char* filename) {
   }
 }
 
-keyvi_dictionary* keyvi_create_dictionary_with_loading_strategy(const char* filename, keyvi::dictionary::LoadingStrategy loading_strategy) {
+keyvi_dictionary* keyvi_create_dictionary_with_loading_strategy(const char* filename,
+                                                                keyvi::dictionary::LoadingStrategy loading_strategy) {
   try {
     return new keyvi_dictionary(Dictionary(filename, loading_strategy));
   } catch (const std::exception& e) {
