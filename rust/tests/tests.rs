@@ -182,7 +182,11 @@ mod tests {
     #[test]
     fn get_all_items() {
         let expected_items = [("a", "[12,13]"), ("b", "[12,13]"), ("c", "[14,15]")];
-        let dict = dictionary::Dictionary::new("test_data/test.kv").unwrap();
+        let dict = dictionary::Dictionary::with_loading_strategy(
+            "test_data/test.kv",
+            keyvi::LoadingStrategy::populate,
+        )
+        .unwrap();
 
         for (item, expected_item) in dict.get_all_items().zip(&expected_items) {
             assert_eq!(item.matched_string(), expected_item.0);

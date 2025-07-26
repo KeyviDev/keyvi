@@ -32,6 +32,8 @@
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 
+#include "keyvi/dictionary/loading_strategy.h"
+
 // Mac has no MAP_POPULATE
 #if defined(OS_MACOSX)
 #ifndef MAP_POPULATE
@@ -41,18 +43,6 @@
 
 namespace keyvi {
 namespace dictionary {
-
-enum class loading_strategy_types {
-  default_os,                    // no special treatment, use whatever the OS/Boost has as default
-  lazy,                          // load data as needed with some read-ahead
-  populate,                      // immediately load everything in memory (blocks until everything is fully read)
-  populate_key_part,             // populate only the key part, load value part lazy
-  populate_lazy,                 // load data lazy but ask the OS to read ahead if possible (does not block)
-  lazy_no_readahead,             // disable any read-ahead (for cases when index > x * main memory)
-  lazy_no_readahead_value_part,  // disable read-ahead only for the value part
-  populate_key_part_no_readahead_value_part  // populate the key part, but disable read ahead value part
-};
-
 namespace fsa {
 namespace internal {
 
