@@ -21,7 +21,7 @@ def test_input_output_keys():
             k, v = line.split('\t')
             key = json.loads(k)
             value = json.loads(v)
-            compiler.Add(key, value)
+            compiler.add(key, value)
             input_keys_count += 1
 
     output_keys_count = 0
