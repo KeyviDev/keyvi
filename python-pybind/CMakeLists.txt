@@ -15,12 +15,12 @@ find_package(pybind11 CONFIG REQUIRED)
 # Add a library using FindPython's tooling (pybind11 also provides a helper like
 # this)
 FILE(GLOB_RECURSE KEYVI_PYBIND_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
-pybind11_add_module(keyvi_scikit_core ${KEYVI_PYBIND_SOURCES})
+pybind11_add_module(keyvi2 ${KEYVI_PYBIND_SOURCES})
 
-target_link_libraries(keyvi_scikit_core PRIVATE keyvi)
+target_link_libraries(keyvi2 PRIVATE keyvi)
 
 # This is passing in the version as a define just as an example
-target_compile_definitions(keyvi_scikit_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
+target_compile_definitions(keyvi2 PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 # The install directory is the output (wheel) directory
-install(TARGETS keyvi_scikit_core DESTINATION .)
+install(TARGETS keyvi2 DESTINATION .)

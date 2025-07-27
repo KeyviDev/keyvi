@@ -5,7 +5,7 @@ import contextlib
 import os
 import tempfile
 
-from keyvi_scikit_core.dictionary import Dictionary
+from keyvi2.dictionary import Dictionary
 
 
 @contextlib.contextmanager

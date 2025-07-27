@@ -29,7 +29,7 @@ void init_keyvi_dictionary(const py::module_ &);
 void init_keyvi_dictionary_compilers(const py::module_ &);
 void init_keyvi_match(const py::module_ &);
 
-PYBIND11_MODULE(keyvi_scikit_core, m) {
+PYBIND11_MODULE(keyvi2, m) {
   m.doc() = R"pbdoc(
         keyvi - a key value store.
         -----------------------
@@ -53,9 +53,9 @@ PYBIND11_MODULE(keyvi_scikit_core, m) {
              kd::loading_strategy_types::populate_key_part_no_readahead_value_part);
 
   init_keyvi_match(m);
-  py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi_scikit_core.dictionary");
+  py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi2.dictionary");
   init_keyvi_dictionary(keyvi_dictionary);
-  py::module keyvi_compilers = m.def_submodule("compiler", "keyvi_scikit_core.compiler");
+  py::module keyvi_compilers = m.def_submodule("compiler", "keyvi2.compiler");
   init_keyvi_dictionary_compilers(keyvi_compilers);
 
 #ifdef VERSION_INFO

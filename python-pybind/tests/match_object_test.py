@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
-import keyvi_scikit_core as keyvi
+import keyvi2 as keyvi
 from test_tools import tmp_dictionary
 import warnings
 
 
-from keyvi_scikit_core.compiler import (
+from keyvi2.compiler import (
     JsonDictionaryCompiler,
     CompletionDictionaryCompiler,
     KeyOnlyDictionaryCompiler,

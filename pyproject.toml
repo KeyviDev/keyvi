@@ -3,8 +3,8 @@ requires = ["scikit-build-core>=0.10", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "keyvi_scikit_core"
-version = "0.6.3dev0"
+name = "keyvi2"
+version = "0.6.4dev0"
 dependencies = [
     "msgpack>=1.0.0",
 ]
@@ -16,7 +16,7 @@ lint = [
 test = [
     'pytest>=7.4.2',
 ]
-dev = ['keyvi_scikit_core[lint,test]']
+dev = ['keyvi2[lint,test]']
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
