@@ -25,9 +25,9 @@
 #define KEYVI_INDEX_INTERNAL_INDEX_SETTINGS_H_
 
 #include <string>
+#include <tuple>
 #include <unordered_map>
-
-#include <boost/variant.hpp>
+#include <variant>
 
 #include "keyvi/index/constants.h"
 #include "keyvi/index/internal/index_auto_config.h"
@@ -77,24 +77,24 @@ class IndexSettings final {
     }
   }
 
-  const std::string& GetKeyviMergerBin() const { return boost::get<std::string>(settings_.at(KEYVIMERGER_BIN)); }
+  const std::string& GetKeyviMergerBin() const { return std::get<std::string>(settings_.at(KEYVIMERGER_BIN)); }
 
-  const size_t GetMaxSegments() const { return boost::get<size_t>(settings_.at(INDEX_MAX_SEGMENTS)); }
+  const size_t GetMaxSegments() const { return std::get<size_t>(settings_.at(INDEX_MAX_SEGMENTS)); }
 
   const size_t GetSegmentCompileKeyThreshold() const {
-    return boost::get<size_t>(settings_.at(SEGMENT_COMPILE_KEY_THRESHOLD));
+    return std::get<size_t>(settings_.at(SEGMENT_COMPILE_KEY_THRESHOLD));
   }
 
-  const size_t GetMaxConcurrentMerges() const { return boost::get<size_t>(settings_.at(MAX_CONCURRENT_MERGES)); }
+  const size_t GetMaxConcurrentMerges() const { return std::get<size_t>(settings_.at(MAX_CONCURRENT_MERGES)); }
 
-  const size_t GetRefreshInterval() const { return boost::get<size_t>(settings_.at(INDEX_REFRESH_INTERVAL)); }
+  const size_t GetRefreshInterval() const { return std::get<size_t>(settings_.at(INDEX_REFRESH_INTERVAL)); }
 
   const size_t GetSegmentExternalMergeKeyThreshold() const {
-    return boost::get<size_t>(settings_.at(SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD));
+    return std::get<size_t>(settings_.at(SEGMENT_EXTERNAL_MERGE_KEY_THRESHOLD));
   }
 
  private:
-  std::unordered_map<std::string, boost::variant<std::string, size_t>> settings_;
+  std::unordered_map<std::string, std::variant<std::string, size_t>> settings_;
 };
 
 } /* namespace internal */
