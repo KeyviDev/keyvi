@@ -27,11 +27,11 @@
 
 #include <memory>
 #include <string>
+#include <variant>
 
 #include <boost/container/flat_map.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
-#include <boost/variant.hpp>
 
 #include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/dictionary_merger_fwd.h"
@@ -85,7 +85,7 @@ struct ValueStoreComponents {};
  */
 class IValueStoreReader {
  public:
-  typedef boost::container::flat_map<std::string, boost::variant<std::string, int, double, bool>> attributes_raw_t;
+  typedef boost::container::flat_map<std::string, std::variant<std::string, int, double, bool>> attributes_raw_t;
   typedef std::shared_ptr<attributes_raw_t> attributes_t;
 
   /**

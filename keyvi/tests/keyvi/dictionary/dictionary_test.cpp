@@ -23,6 +23,10 @@
  *      Author: hendrik
  */
 
+#include <string>
+#include <tuple>
+#include <vector>
+
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -71,7 +75,7 @@ BOOST_AUTO_TEST_CASE(DictGet) {
   bool matched = false;
   for (auto m : d->Get("test")) {
     BOOST_CHECK_EQUAL("test", m->GetMatchedString());
-    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m->GetAttribute("weight")));
+    BOOST_CHECK_EQUAL(std::string("22"), std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
@@ -84,7 +88,7 @@ BOOST_AUTO_TEST_CASE(DictGet) {
   BOOST_CHECK(!matched);
 
   auto m = (*d)["test"];
-  BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
+  BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
 }
 
 BOOST_AUTO_TEST_CASE(DictLookup) {
@@ -99,7 +103,7 @@ BOOST_AUTO_TEST_CASE(DictLookup) {
   bool matched = false;
   for (auto m : d->Lookup("nude")) {
     BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
-    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
+    BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
@@ -107,7 +111,7 @@ BOOST_AUTO_TEST_CASE(DictLookup) {
   matched = false;
   for (auto m : d->Lookup("nude ")) {
     BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
-    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
+    BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
@@ -115,7 +119,7 @@ BOOST_AUTO_TEST_CASE(DictLookup) {
   matched = false;
   for (auto m : d->Lookup("nude at work")) {
     BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
-    BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
+    BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
@@ -207,7 +211,7 @@ BOOST_AUTO_TEST_CASE(DictGetZerobyte) {
   bool matched = false;
   for (auto m : d->Get(std::string("\0test", 5))) {
     BOOST_CHECK_EQUAL(std::string("\0test", 5), m->GetMatchedString());
-    BOOST_CHECK_EQUAL(std::string("22"), boost::get<std::string>(m->GetAttribute("weight")));
+    BOOST_CHECK_EQUAL(std::string("22"), std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
@@ -220,7 +224,7 @@ BOOST_AUTO_TEST_CASE(DictGetZerobyte) {
   BOOST_CHECK(!matched);
 
   auto m = (*d)[std::string("\0test", 5)];
-  BOOST_CHECK_EQUAL("22", boost::get<std::string>(m->GetAttribute("weight")));
+  BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
 }
 
 BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
