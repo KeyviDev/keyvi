@@ -42,47 +42,44 @@ inline void py_compile(Compiler *c, std::function<void(const size_t a, const siz
 }
 
 void init_keyvi_dictionary_compilers(const py::module_ &module) {
-#define CREATE_COMPILER(compiler, name)                                                                               \
-  py::class_<compiler>(module, name)                                                                                  \
-      .def(py::init<>())                                                                                              \
-      .def(py::init<const keyvi::util::parameters_t &>())                                                             \
-      .def("__enter__", [](compiler &c) { return &c; })                                                               \
+#define CREATE_COMPILER_COMMON(compiler)                                                                              \
+  .def("__enter__", [](compiler &c) { return &c; })                                                                   \
       .def("__exit__", [](compiler &c, void *exc_type, void *exc_value, void *traceback) { c.Compile(); })            \
       .def("__setitem__", &compiler::Add)                                                                             \
-      .def("add", &compiler::Add) /* DEPRECATED */                                                                    \
-      .def("Add", &compiler::Add)                                                                                     \
-      .def(                                                                                                           \
-          "compile",                                                                                                  \
-          [](compiler &c, std::function<void(const size_t a, const size_t b)> progress_callback) {                    \
-            py_compile(&c, progress_callback);                                                                        \
-          },                                                                                                          \
-          py::arg("progress_callback") =                                                                              \
-              static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) /* DEPRECATED */           \
-      .def(                                                                                                           \
-          "Compile",                                                                                                  \
-          [](compiler &c, std::function<void(const size_t a, const size_t b)> progress_callback) {                    \
-            py_compile(&c, progress_callback);                                                                        \
-          },                                                                                                          \
-          py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) \
-      .def("set_manifest", &compiler::SetManifest)                                                                    \
-      .def("write_to_file", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>()) /* DEPRECATED */        \
-      .def("WriteToFile", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>());
-#define CREATE_SK_COMPILER(compiler, name)                                                                            \
-  py::class_<compiler>(module, name)                                                                                  \
-      .def(py::init<const std::vector<std::string> &>())                                                              \
-      .def(py::init<const std::vector<std::string> &, const keyvi::util::parameters_t &>())                           \
-      .def("__enter__", [](compiler &c) { return &c; })                                                               \
-      .def("__exit__", [](compiler &c, void *exc_type, void *exc_value, void *traceback) { c.Compile(); })            \
-      .def("__setitem__", &compiler::Add)                                                                             \
-      .def("add", &compiler::Add)                                                                                     \
       .def(                                                                                                           \
           "compile",                                                                                                  \
           [](compiler &c, std::function<void(const size_t a, const size_t b)> progress_callback) {                    \
             py_compile(&c, progress_callback);                                                                        \
           },                                                                                                          \
           py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) \
+      .def(                                                                                                           \
+          "Compile", /* DEPRECATED */                                                                                 \
+          [](compiler &c, std::function<void(const size_t a, const size_t b)> progress_callback) {                    \
+            py_compile(&c, progress_callback);                                                                        \
+          },                                                                                                          \
+          py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) \
       .def("set_manifest", &compiler::SetManifest)                                                                    \
-      .def("write_to_file", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>());
+      .def("write_to_file", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>())                         \
+      .def("WriteToFile", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>()) /* DEPRECATED */
+#define CREATE_COMPILER(compiler, name)                                                    \
+  py::class_<compiler>(module, name)                                                       \
+      .def(py::init<>())                                                                   \
+      .def(py::init<const keyvi::util::parameters_t &>())                                  \
+      CREATE_COMPILER_COMMON(compiler)                                                     \
+      .def("add", &compiler::Add) /* DEPRECATED */                                         \
+      .def("Add", &compiler::Add);
+#define CREATE_KEY_ONLY_COMPILER(compiler, name)                                           \
+  py::class_<compiler>(module, name)                                                       \
+      .def(py::init<>())                                                                   \
+      .def(py::init<const keyvi::util::parameters_t &>()) CREATE_COMPILER_COMMON(compiler) \
+      .def("add", &compiler::Add) /* DEPRECATED */                                         \
+      .def("Add", [](compiler &c, const std::string &key) { c.Add(key); });
+#define CREATE_SK_COMPILER(compiler, name)                                                  \
+  py::class_<compiler>(module, name)                                                        \
+      .def(py::init<const std::vector<std::string> &>())                                    \
+      .def(py::init<const std::vector<std::string> &, const keyvi::util::parameters_t &>()) \
+          CREATE_COMPILER_COMMON(compiler)                                                  \
+      .def("add", &compiler::Add);
 #define CREATE_MERGER(merger, name)                                                                    \
   py::class_<merger>(module, name)                                                                     \
       .def(py::init<>())                                                                               \
@@ -106,7 +103,7 @@ void init_keyvi_dictionary_compilers(const py::module_ &module) {
   CREATE_COMPILER(kd::FloatVectorDictionaryCompiler, "FloatVectorDictionaryCompiler");
   CREATE_COMPILER(kd::IntDictionaryCompiler, "IntDictionaryCompiler");
   CREATE_COMPILER(kd::JsonDictionaryCompiler, "JsonDictionaryCompiler");
-  CREATE_COMPILER(kd::KeyOnlyDictionaryCompiler, "KeyOnlyDictionaryCompiler");
+  CREATE_KEY_ONLY_COMPILER(kd::KeyOnlyDictionaryCompiler, "KeyOnlyDictionaryCompiler");
   CREATE_COMPILER(kd::StringDictionaryCompiler, "StringDictionaryCompiler");
   CREATE_SK_COMPILER(kd::SecondaryKeyCompletionDictionaryCompiler, "SecondaryKeyCompletionDictionaryCompiler");
   CREATE_SK_COMPILER(kd::SecondaryKeyFloatVectorDictionaryCompiler, "SecondaryKeyFloatVectorDictionaryCompiler");

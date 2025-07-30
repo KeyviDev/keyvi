@@ -90,7 +90,7 @@ def test_score():
     assert m.score == 149
 
 
-""" def test_get_value():
+def test_get_value():
     c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
     c.Add("abc", '{"a" : 2}')
     c.Add("abd", '{"a" : 3}')
@@ -98,7 +98,7 @@ def test_score():
         m = d["abc"]
         assert m.value == {"a": 2}
         m = d["abd"]
-        assert m.value == {"a": 3} """
+        assert m.value == {"a": 3}
 
 
 def test_get_value_int():
@@ -112,16 +112,15 @@ def test_get_value_int():
         assert m.value == 21
 
 
-""" def test_get_value_key_only():
+def test_get_value_key_only():
     c = KeyOnlyDictionaryCompiler({"memory_limit_mb": "10"})
     c.Add("abc")
     c.Add("abd")
     with tmp_dictionary(c, 'match_object_key_only.kv') as d:
         m = d["abc"]
-        assert m.value == ''
+        assert m.value is None
         m = d["abd"]
-        assert m.value == ''
- """
+        assert m.value is None
 
 
 def test_get_value_string():
