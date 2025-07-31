@@ -60,7 +60,7 @@ struct ValueStoreComponents {};
  *
  * The following types/constants/methods (incomplete list) are required:
  *
- * typedef {type} value_t;
+ * using value_t = {type};
  * static const {type} no_value = 0;
  *
  * uint64_t GetValue(value_t value, bool* no_minimization)
@@ -85,8 +85,9 @@ struct ValueStoreComponents {};
  */
 class IValueStoreReader {
  public:
-  typedef boost::container::flat_map<std::string, std::variant<std::string, int, double, bool>> attributes_raw_t;
-  typedef std::shared_ptr<attributes_raw_t> attributes_t;
+  using attribute_t = std::variant<std::string, int, double, bool>;
+  using attributes_raw_t = boost::container::flat_map<std::string, attribute_t>;
+  using attributes_t = std::shared_ptr<attributes_raw_t>;
 
   /**
    * Default constructor. Override if the value store implementation requires extra data.

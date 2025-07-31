@@ -57,8 +57,8 @@ keyvi::dictionary::match_t FirstFilteredMatch(const MatcherT&, const DeletedT&);
 namespace dictionary {
 
 struct Match {
-  typedef std::shared_ptr<boost::container::flat_map<std::string, std::variant<std::string, int, double, bool>>>
-      attributes_t;
+  using attribute_t = std::variant<std::string, int, double, bool>;
+  using attributes_t = std::shared_ptr<boost::container::flat_map<std::string, attribute_t>>;
 
   Match(size_t a, size_t b, const std::string& matched_item, uint32_t score = 0, uint32_t weight = 0)
       : start_(a), end_(b), matched_item_(matched_item), raw_value_(), score_(score) {
@@ -146,7 +146,7 @@ struct Match {
   }
 #endif
 
-  const std::variant<std::string, int, double, bool>& GetAttribute(const std::string& key) {
+  const attribute_t& GetAttribute(const std::string& key) {
     // lazy creation
     if (!attributes_) {
       if (fsa_) {
