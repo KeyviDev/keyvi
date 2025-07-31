@@ -26,8 +26,7 @@
 #include <iostream>
 #include <string>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/program_options.hpp>
+#include <boost/program_options.hpp>  // NOLINT(misc-include-cleaner)
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/positional_options.hpp>
 #include <boost/program_options/value_semantic.hpp>
@@ -53,25 +52,6 @@ void dump(const std::string& input, const std::string& output, bool keys_only = 
         out_stream << value;
       }
     }
-    out_stream << "\n";
-    ++it;
-  }
-  out_stream.close();
-}
-
-void dump_with_attributes(const std::string& input, const std::string& output) {
-  keyvi::dictionary::fsa::automata_t const automata(new keyvi::dictionary::fsa::Automata(input));
-  keyvi::dictionary::fsa::EntryIterator it(automata);
-  keyvi::dictionary::fsa::EntryIterator const end_it = keyvi::dictionary::fsa::EntryIterator();
-
-  std::ofstream out_stream(output);
-
-  while (it != end_it) {
-    it.WriteKey(out_stream);
-
-    out_stream << "\t";
-
-    out_stream << it.GetValueAsAttributeVector()->at("value");
     out_stream << "\n";
     ++it;
   }
@@ -121,7 +101,6 @@ int main(int argc, char** argv) {
     output_file = vm["output-file"].as<std::string>();
 
     dump(input_file, output_file, key_only);
-    // dump_with_attributes (input_file, output_file);
     return 0;
   }
 
