@@ -22,7 +22,7 @@ def memory_usage_ps():
 
 def test_leak():
     c = JsonDictionaryCompiler({"memory_limit_mb":"10"})
-    c.Add("something", '["a" : 2]')
+    c.add("something", '["a" : 2]')
 
     with tmp_dictionary(c, 'near_simple.kv') as d:
         gc.collect()
