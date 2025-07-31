@@ -55,6 +55,10 @@ void init_keyvi_dictionary_compilers(const py::module_ &module) {
       .def(                                                                                                           \
           "Compile", /* DEPRECATED */                                                                                 \
           [](compiler &c, std::function<void(const size_t a, const size_t b)> progress_callback) {                    \
+            py::module_ warnings = py::module_::import("warnings");                                                   \
+            warnings.attr("warn")(                                                                                    \
+                "Compile is deprecated and will be removed in a future version. Use compile instead.",                \
+                py::module_::import("builtins").attr("DeprecationWarning"), 2);                                       \
             py_compile(&c, progress_callback);                                                                        \
           },                                                                                                          \
           py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)> *>(nullptr)) \

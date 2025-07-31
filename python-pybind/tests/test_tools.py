@@ -12,8 +12,8 @@ from keyvi2.dictionary import Dictionary
 def tmp_dictionary(compiler, file_name):
     tmp_dir = tempfile.gettempdir()
     fq_file_name = os.path.join(tmp_dir, file_name)
-    compiler.Compile()
-    compiler.WriteToFile(fq_file_name)
+    compiler.compile()
+    compiler.write_to_file(fq_file_name)
     del compiler
     d = Dictionary(fq_file_name)
     yield d
