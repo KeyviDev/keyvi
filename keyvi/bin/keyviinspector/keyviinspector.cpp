@@ -26,7 +26,7 @@
 #include <iostream>
 #include <string>
 
-#include <boost/program_options.hpp>  //NOLINT(misc-include-cleaner)
+#include <boost/program_options.hpp>  // NOLINT(misc-include-cleaner)
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/positional_options.hpp>
 #include <boost/program_options/value_semantic.hpp>
