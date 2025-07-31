@@ -33,6 +33,7 @@ extern "C" {
 #include <stdint.h>
 
 #include "keyvi/compression/compression_algorithm.h"
+#include "keyvi/dictionary/loading_strategy.h"
 
 struct keyvi_dictionary;
 struct keyvi_match;
@@ -60,6 +61,8 @@ void keyvi_string_destroy(char* str);
 //////////////////////
 
 struct keyvi_dictionary* keyvi_create_dictionary(const char*);
+
+struct keyvi_dictionary* keyvi_create_dictionary_with_loading_strategy(const char*, keyvi::dictionary::LoadingStrategy);
 
 void keyvi_dictionary_destroy(const struct keyvi_dictionary*);
 

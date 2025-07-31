@@ -40,6 +40,7 @@
 #include "keyvi/dictionary/fsa/internal/value_store_factory.h"
 #include "keyvi/dictionary/fsa/traversal/traversal_base.h"
 #include "keyvi/dictionary/fsa/traversal/weighted_traversal.h"
+#include "keyvi/dictionary/loading_strategy.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
