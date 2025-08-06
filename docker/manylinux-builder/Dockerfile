@@ -22,7 +22,7 @@ RUN curl https://zlib.net/zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz 
     cd zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} && ./configure && make -j`nproc` && make install && \
     cd .. && rm -rf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz
 
-ENV BOOST_MAJOR=1 BOOST_MINOR=83 BOOST_PATCH=0
+ENV BOOST_MAJOR=1 BOOST_MINOR=88 BOOST_PATCH=0
 ENV BOOST_URL="https://boostorg.jfrog.io/artifactory/main/release/${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH}/source/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz"
 ENV BOOST_FALLBACK_URL="https://sourceforge.net/projects/boost/files/boost/${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH}/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz"
 
@@ -35,13 +35,13 @@ RUN cd boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH} && \
     cd .. && \
 rm -rf boost_*
 
-ENV CMAKE_MAJOR=3 CMAKE_MINOR=30 CMAKE_PATCH=5
+ENV CMAKE_MAJOR=3 CMAKE_MINOR=31 CMAKE_PATCH=8
 
 RUN curl -sSL https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}.tar.gz | tar -xz && \
     cd cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH} && ./bootstrap --parallel=`nproc` -- && make -j`nproc` && make install && \
     cd .. && rm -rf cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}
 
-ENV CCACHE_MAJOR=4 CCACHE_MINOR=10 CCACHE_PATCH=2
+ENV CCACHE_MAJOR=4 CCACHE_MINOR=11 CCACHE_PATCH=3
 
 RUN \
     if [ $AUDITWHEEL_ARCH == "aarch64" ] && [ $AUDITWHEEL_POLICY == "manylinux2014" ]; then \
