@@ -45,7 +45,7 @@ jobs:
         if: matrix.base_image == 'many'
       - name: Sets env for musllinux
         run: |
-          echo "BASE_IMAGE=quay.io/pypa/musllinux_1_1_${{ env.ARCH }}" >> $GITHUB_ENV
+          echo "BASE_IMAGE=quay.io/pypa/musllinux_1_2_${{ env.ARCH }}" >> $GITHUB_ENV
         if: matrix.base_image == 'musl'
       - name: Build and push ${{ matrix.base_image }}-${{ env.ARCH }} docker image
         uses: docker/build-push-action@v6
