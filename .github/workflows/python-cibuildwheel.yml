@@ -32,7 +32,7 @@ jobs:
           #- os: macos-13
           #  flavor: pypy
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.11
         with:
@@ -121,7 +121,7 @@ jobs:
     name: sdist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: install Linux deps
       run: |
         sudo apt-get update && \
