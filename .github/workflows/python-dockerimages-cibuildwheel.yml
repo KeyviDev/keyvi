@@ -21,7 +21,7 @@ jobs:
           base_image: [many, musl]
           os: [ubuntu-24.04, ubuntu-24.04-arm]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v3
       - name: Log in to Docker Hub
         if: github.event_name == 'push'
