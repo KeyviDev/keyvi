@@ -21,12 +21,12 @@ def test_input_output_keys():
             k, v = line.split('\t')
             key = json.loads(k)
             value = json.loads(v)
-            compiler.Add(key, value)
+            compiler.add(key, value)
             input_keys_count += 1
 
     output_keys_count = 0
     with tmp_dictionary(compiler, 'var_length_short_test.kv') as d:
-        for _ in d.GetAllItems():
+        for _ in d.items():
             output_keys_count += 1
 
     assert input_keys_count == output_keys_count
