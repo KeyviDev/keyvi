@@ -58,7 +58,7 @@ endif (CMAKE_BUILD_TYPE_UPPER MATCHES COVERAGE)
 #### Dependencies ####
 
 # BOOST
-set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "system" "regex" "thread")
+set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "regex" "thread")
 set (_KEYVI_BOOST_LIBRARIES_TEST "unit_test_framework")
 
 set(Boost_USE_STATIC_LIBS OFF)
@@ -76,9 +76,9 @@ else ()
     message(FATAL_ERROR "Can not find Boost")
 endif ()
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem boost_system boost_regex boost_thread")
+    set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
 else ()
-    set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem boost_system boost_regex boost_thread")
+    set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
 endif ()
 
 if(Boost_VERSION VERSION_GREATER_EQUAL "1.86.0")
