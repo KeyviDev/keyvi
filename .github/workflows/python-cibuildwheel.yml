@@ -151,7 +151,6 @@ jobs:
   upload_all:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
     steps:
       - uses: actions/download-artifact@v5
         with:
@@ -162,3 +161,4 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.pypi_password }}
+          verbose: true
