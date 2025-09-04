@@ -75,6 +75,14 @@ if (Boost_FOUND)
 else ()
     message(FATAL_ERROR "Can not find Boost")
 endif ()
+
+# starting with boost 1.86, boost process is not header-only anymore, so we have to add it as dependency
+# see https://github.com/boostorg/process/issues/390
+if(Boost_VERSION VERSION_GREATER_EQUAL "1.86.0")
+    list(APPEND _KEYVI_BOOST_LIBRARIES "process")
+    find_package(Boost REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})
+endif()
+
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
 else ()
