@@ -25,6 +25,8 @@ jobs:
         exclude:
           - os: macos-13
             target: musl
+          - os: macos-14
+            target: musl
           # skip pypy, https://github.com/pypa/distutils/issues/283
           #- os: ubuntu-22.04
           #  target: musl
