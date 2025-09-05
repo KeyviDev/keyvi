@@ -76,7 +76,8 @@ jobs:
       - name: Build python wheels for ${{ matrix.os }}
         uses: pypa/cibuildwheel@v3.1.4
         env:
-          CIBW_SKIP: ${{ env.CIBW_SKIP }}
+          # Skip CPython 3.8
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp38-*
 
           # only build native packages
           CIBW_ARCHS: native
