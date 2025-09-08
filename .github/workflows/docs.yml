@@ -37,7 +37,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           architecture: x64
