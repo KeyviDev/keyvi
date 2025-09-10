@@ -69,23 +69,43 @@ endif (CMAKE_BUILD_TYPE_UPPER MATCHES COVERAGE)
 #### Dependencies ####
 
 # BOOST
-set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "system" "regex" "thread")
+set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "regex" "thread")
 set (_KEYVI_BOOST_LIBRARIES_TEST "unit_test_framework")
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})
+if(POLICY CMP0167) # Use upstream's FindBoost.cmake to find Boost libraries.
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
+find_package(Boost 1.80 REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})
 if (Boost_FOUND)
     list(APPEND KEYVI_INCLUDES "${Boost_INCLUDE_DIRS}")
 else ()
     message(FATAL_ERROR "Can not find Boost")
 endif ()
+
+# starting with boost 1.86, boost process is not header-only anymore, so we have to add it as dependency
+# see https://github.com/boostorg/process/issues/390
+if(Boost_VERSION VERSION_GREATER_EQUAL "1.86.0")
+    list(APPEND _KEYVI_BOOST_LIBRARIES "process")
+    find_package(Boost REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})
+endif()
+
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem boost_system boost_regex boost_thread-mt")
+    set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
 else ()
-    set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem boost_system boost_regex boost_thread")
+    set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
+endif ()
+
+if(Boost_VERSION VERSION_GREATER_EQUAL "1.86.0")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_process")
+    else ()
+        set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_process")
+    endif ()
 endif ()
 
 if (WIN32)
