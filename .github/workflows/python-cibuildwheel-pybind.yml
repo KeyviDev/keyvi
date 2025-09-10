@@ -25,16 +25,12 @@ jobs:
         exclude:
           - os: macos-13
             target: musl
-          # skip pypy, https://github.com/pypa/distutils/issues/283
-          #- os: ubuntu-22.04
-          #  target: musl
-          #  flavor: pypy
-          #- os: macos-13
-          #  flavor: pypy
+          - os: macos-14
+            target: musl
     steps:
       - uses: actions/checkout@v4
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.11
+        uses: hendrikmuhs/ccache-action@v1.2.18
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.flavor }}-python-pybind
 
@@ -64,8 +60,7 @@ jobs:
         run: |
           brew update && \
           brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done && \
-          brew install ccache zlib snappy boost@1.85
-          brew link boost@1.85
+          brew install ccache zlib snappy boost
 
       - name: set mac deployment target X64
         if: runner.os == 'macOS' && runner.arch == 'X64'
@@ -80,8 +75,8 @@ jobs:
       - name: Build python wheels for ${{ matrix.os }}
         uses: pypa/cibuildwheel@v3.0.1
         env:
-          # Skip CPython 3.{6, 7, 8}
-          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp36-* cp37-* cp38-*
+          # Skip CPython 3.8
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp38-*
 
           # only build native packages
           CIBW_ARCHS: native
@@ -111,15 +106,15 @@ jobs:
     name: sdist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: install Linux deps
       run: |
         sudo apt-get update && \
         sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
     - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.11
+      uses: hendrikmuhs/ccache-action@v1.2.18
       with:
-        key: ubuntu-sdist-python
+        key: ubuntu-sdist-python-pybind
 
     - name: Build SDist
       run: |
@@ -130,22 +125,3 @@ jobs:
         python -m pytest python-pybind/tests && \
         python -m pip uninstall -y keyvi_pybind11
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: artifact-sdist
-        path: python/wheelhouse/*.tar.gz
-
-  upload_all:
-    needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: artifact-*
-          merge-multiple: true
-          path: dist
-
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.pypi_password }}
