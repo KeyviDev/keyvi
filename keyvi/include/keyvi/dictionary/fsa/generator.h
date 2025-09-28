@@ -272,6 +272,9 @@ class Generator final {
             (*unpacked_state)[0].label == persistence_->ReadTransitionLabel(start_state_ + (*unpacked_state)[0].label)
                 ? "OK"
                 : "BROKEN");
+    } else {
+      // empty dictionaries have start_state_ for backwards compatibility
+      start_state_ = 1;
     }
 
     // free structures that are not needed anymore
