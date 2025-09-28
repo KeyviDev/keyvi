@@ -214,7 +214,7 @@ class SecondaryKeyDictionary final {
 };
 
 // shared pointer
-typedef std::shared_ptr<SecondaryKeyDictionary> secondary_key_dictionary_t;
+using secondary_key_dictionary_t = std::shared_ptr<SecondaryKeyDictionary>;
 
 } /* namespace dictionary */
 } /* namespace keyvi */

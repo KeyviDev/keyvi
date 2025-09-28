@@ -97,7 +97,13 @@ class Dictionary final {
    *
    * @return a match iterator of all the items
    */
-  MatchIterator::MatchIteratorPair GetAllItems() const { return GetAllItems(fsa_->GetStartState()); }
+  MatchIterator::MatchIteratorPair GetAllItems() const {
+    if (fsa_->GetNumberOfKeys() == 0) {
+      return MatchIterator::EmptyIteratorPair();
+    }
+
+    return GetAllItems(fsa_->GetStartState());
+  }
 
   /**
    * A simple leftmostlongest lookup function.
@@ -258,6 +264,11 @@ class Dictionary final {
 
   bool Contains(const uint64_t start_state, const std::string& key) const {
     uint64_t state = start_state;
+
+    if (!state) {
+      return false;
+    }
+
     const size_t key_length = key.size();
 
     TRACE("Contains for %s", key.c_str());
@@ -281,6 +292,11 @@ class Dictionary final {
 
   MatchIterator::MatchIteratorPair Get(const uint64_t start_state, const std::string& key) const {
     uint64_t state = start_state;
+
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
+
     const size_t text_length = key.size();
 
     for (size_t i = 0; i < text_length; ++i) {
@@ -304,6 +320,10 @@ class Dictionary final {
   }
 
   MatchIterator::MatchIteratorPair GetAllItems(const uint64_t state) const {
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
+
     std::vector<unsigned char> traversal_stack;
     traversal_stack.reserve(1024);
 
@@ -351,6 +371,10 @@ class Dictionary final {
 
   MatchIterator::MatchIteratorPair GetNear(const uint64_t state, const std::string& key,
                                            const size_t minimum_prefix_length, const bool greedy = false) const {
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
+
     auto data = std::make_shared<matching::NearMatching<>>(
         matching::NearMatching<>::FromSingleFsa(fsa_, state, key, minimum_prefix_length, greedy));
 
@@ -361,6 +385,10 @@ class Dictionary final {
   MatchIterator::MatchIteratorPair GetFuzzy(const uint64_t state, const std::string& query,
                                             const int32_t max_edit_distance,
                                             const size_t minimum_exact_prefix = 2) const {
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
+
     auto data = std::make_shared<matching::FuzzyMatching<>>(
         matching::FuzzyMatching<>::FromSingleFsa(fsa_, state, query, max_edit_distance, minimum_exact_prefix));
 
@@ -369,6 +397,9 @@ class Dictionary final {
   }
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const uint64_t state, const std::string& query) const {
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
     auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
         matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, state, query));
 
@@ -380,6 +411,10 @@ class Dictionary final {
 
   MatchIterator::MatchIteratorPair GetPrefixCompletion(const uint64_t state, const std::string& query,
                                                        size_t top_n) const {
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
+
     auto data = std::make_shared<matching::PrefixCompletionMatching<>>(
         matching::PrefixCompletionMatching<>::FromSingleFsa(fsa_, state, query));
 
@@ -405,6 +440,9 @@ class Dictionary final {
 
   MatchIterator::MatchIteratorPair GetMultiwordCompletion(const uint64_t state, const std::string& query,
                                                           const unsigned char multiword_separator) const {
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
     auto data = std::make_shared<matching::MultiwordCompletionMatching<>>(
         matching::MultiwordCompletionMatching<>::FromSingleFsa(fsa_, state, query, multiword_separator));
 
@@ -417,6 +455,10 @@ class Dictionary final {
   MatchIterator::MatchIteratorPair GetMultiwordCompletion(const uint64_t state, const std::string& query,
                                                           const size_t top_n,
                                                           const unsigned char multiword_separator) const {
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
+
     auto data = std::make_shared<matching::MultiwordCompletionMatching<>>(
         matching::MultiwordCompletionMatching<>::FromSingleFsa(fsa_, state, query, multiword_separator));
 
@@ -444,6 +486,9 @@ class Dictionary final {
                                                                const int32_t max_edit_distance,
                                                                const size_t minimum_exact_prefix,
                                                                const unsigned char multiword_separator) const {
+    if (!state) {
+      return MatchIterator::EmptyIteratorPair();
+    }
     auto data = std::make_shared<matching::FuzzyMultiwordCompletionMatching<>>(
         matching::FuzzyMultiwordCompletionMatching<>::FromSingleFsa(fsa_, state, query, max_edit_distance,
                                                                     minimum_exact_prefix, multiword_separator));
@@ -456,7 +501,7 @@ class Dictionary final {
 };
 
 // shared pointer
-typedef std::shared_ptr<Dictionary> dictionary_t;
+using dictionary_t = std::shared_ptr<Dictionary>;
 
 } /* namespace dictionary */
 } /* namespace keyvi */
