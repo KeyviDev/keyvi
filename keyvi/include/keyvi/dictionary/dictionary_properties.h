@@ -126,6 +126,8 @@ class DictionaryProperties {
 
   uint64_t GetNumberOfKeys() const { return number_of_keys_; }
 
+  uint64_t GetNumberOfStates() const { return number_of_states_; }
+
   fsa::internal::value_store_t GetValueStoreType() const { return value_store_type_; }
 
   size_t GetSparseArraySize() const { return sparse_array_size_; }

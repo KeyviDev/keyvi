@@ -129,9 +129,13 @@ class Automata final {
   /**
    * Get the start(root) stage of the FSA
    *
+   * In case of an empty FSA, returns 0.
+   *
    * @return index of root state.
    */
-  uint64_t GetStartState() const { return dictionary_properties_->GetStartState(); }
+  uint64_t GetStartState() const {
+    return dictionary_properties_->GetNumberOfStates() != 0 ? dictionary_properties_->GetStartState() : 0;
+  }
 
   uint64_t GetNumberOfKeys() const { return dictionary_properties_->GetNumberOfKeys(); }
 

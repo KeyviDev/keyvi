@@ -82,7 +82,7 @@ class NearMatching final {
    */
   static NearMatching FromSingleFsa(const fsa::automata_t& fsa, const uint64_t start_state, const std::string& query,
                                     const size_t minimum_exact_prefix, const bool greedy = false) {
-    if (query.size() < minimum_exact_prefix) {
+    if (query.size() < minimum_exact_prefix || state == 0) {
       return NearMatching();
     }
 
