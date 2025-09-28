@@ -68,6 +68,10 @@ class SparseArrayPersistence final {
     labels_ = new unsigned char[buffer_size_];
     std::memset(labels_, 0, buffer_size_);
 
+    // GH#xyz pre-initialize the 1st 2 label positions to prevent illegal zero-bytes in empty dictionaries
+    labels_[0] = 42;
+    labels_[1] = 42;
+
     temporary_directory_ = temporary_path;
     temporary_directory_ /= boost::filesystem::unique_path("dictionary-fsa-%%%%-%%%%-%%%%-%%%%");
     boost::filesystem::create_directory(temporary_directory_);

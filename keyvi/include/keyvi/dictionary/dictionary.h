@@ -98,6 +98,7 @@ class Dictionary final {
    * @return a match iterator of all the items
    */
   MatchIterator::MatchIteratorPair GetAllItems() const {
+    // GH#xyz empty dicts compiled using keyvi <= 0.7.1 might segfault
     if (fsa_->GetNumberOfKeys() == 0) {
       return MatchIterator::EmptyIteratorPair();
     }
