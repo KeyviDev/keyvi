@@ -97,9 +97,7 @@ class Dictionary final {
    *
    * @return a match iterator of all the items
    */
-  MatchIterator::MatchIteratorPair GetAllItems() const {
-    return GetAllItems(fsa_->GetStartState());
-  }
+  MatchIterator::MatchIteratorPair GetAllItems() const { return GetAllItems(fsa_->GetStartState()); }
 
   /**
    * A simple leftmostlongest lookup function.
