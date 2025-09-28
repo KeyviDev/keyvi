@@ -257,20 +257,22 @@ class Generator final {
 
     state_ = generator_state::FINALIZING;
 
-    // Consume all but stack[0].
-    ConsumeStack(0);
+    if (number_of_keys_added_ > 0) {
+      // Consume all but stack[0].
+      ConsumeStack(0);
 
-    // handling of last State.
-    internal::UnpackedState<PersistenceT>* unpacked_state = stack_->Get(0);
+      // handling of last State.
+      internal::UnpackedState<PersistenceT>* unpacked_state = stack_->Get(0);
 
-    start_state_ = builder_->PersistState(unpacked_state);
+      start_state_ = builder_->PersistState(unpacked_state);
 
-    TRACE("wrote start state at %d", start_state_);
-    TRACE("Check first transition: %d/%d %s", (*unpacked_state)[0].label,
-          persistence_->ReadTransitionLabel(start_state_ + (*unpacked_state)[0].label),
-          (*unpacked_state)[0].label == persistence_->ReadTransitionLabel(start_state_ + (*unpacked_state)[0].label)
-              ? "OK"
-              : "BROKEN");
+      TRACE("wrote start state at %d", start_state_);
+      TRACE("Check first transition: %d/%d %s", (*unpacked_state)[0].label,
+            persistence_->ReadTransitionLabel(start_state_ + (*unpacked_state)[0].label),
+            (*unpacked_state)[0].label == persistence_->ReadTransitionLabel(start_state_ + (*unpacked_state)[0].label)
+                ? "OK"
+                : "BROKEN");
+    }
 
     // free structures that are not needed anymore
     delete stack_;
