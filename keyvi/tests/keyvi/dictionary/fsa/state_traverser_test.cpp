@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
 
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
-  BOOST_CHECK(!s.AtEnd());
+  BOOST_CHECK(s);
   BOOST_CHECK(s);
 
   s++;
@@ -106,12 +106,12 @@ BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
   // traverser shall be exhausted
   s++;
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
   BOOST_CHECK(!s);
   BOOST_CHECK_EQUAL(0, s.GetDepth());
   s++;
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
   BOOST_CHECK_EQUAL(0, s.GetDepth());
 }
 
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(someTraversalWithPrune) {
 
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
-  BOOST_CHECK(!s.AtEnd());
+  BOOST_CHECK(s);
 
   s++;
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(someTraversalWithPrune) {
 
   s.Prune();
   s++;
-  BOOST_CHECK(!s.AtEnd());
+  BOOST_CHECK(s);
 
   BOOST_CHECK_EQUAL('c', s.GetStateLabel());
   BOOST_CHECK_EQUAL(3, s.GetDepth());
@@ -162,11 +162,11 @@ BOOST_AUTO_TEST_CASE(someTraversalWithPrune) {
   // traverser shall be exhausted
   s++;
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
   BOOST_CHECK_EQUAL(0, s.GetDepth());
   s++;
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
   BOOST_CHECK_EQUAL(0, s.GetDepth());
 }
 
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(longkeys) {
     BOOST_CHECK_EQUAL('a', s.GetStateLabel());
     BOOST_CHECK_EQUAL(i, s.GetDepth());
     s++;
-    BOOST_CHECK(!s.AtEnd());
+    BOOST_CHECK(s);
   }
 
   for (int i = 1; i <= 1000; ++i) {
@@ -192,20 +192,20 @@ BOOST_AUTO_TEST_CASE(longkeys) {
     BOOST_CHECK_EQUAL(i, s.GetDepth());
     s++;
     if (i != 1000) {
-      BOOST_CHECK(!s.AtEnd());
+      BOOST_CHECK(s);
     } else {
-      BOOST_CHECK(s.AtEnd());
+      BOOST_CHECK(!s);
     }
   }
 
   // traverser shall be exhausted
   s++;
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
   BOOST_CHECK_EQUAL(0, s.GetDepth());
   s++;
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
 
   BOOST_CHECK_EQUAL(0, s.GetDepth());
 }
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(zeroByte) {
 
   BOOST_CHECK_EQUAL('\0', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
-  BOOST_CHECK(!s.AtEnd());
+  BOOST_CHECK(s);
 
   s++;
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
@@ -308,12 +308,12 @@ BOOST_AUTO_TEST_CASE(zeroByte) {
   s++;
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
   BOOST_CHECK_EQUAL(0, s.GetDepth());
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
 
   s++;
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
   BOOST_CHECK_EQUAL(0, s.GetDepth());
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
 }
 
 BOOST_AUTO_TEST_CASE(traversal_min_weight) {
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_CASE(traversal_min_weight) {
   BOOST_CHECK_EQUAL('b', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
   BOOST_CHECK_EQUAL(40, s.GetInnerWeight());
-  BOOST_CHECK(!s.AtEnd());
+  BOOST_CHECK(s);
 
   s++;
   BOOST_CHECK_EQUAL('b', s.GetStateLabel());
@@ -341,11 +341,11 @@ BOOST_AUTO_TEST_CASE(traversal_min_weight) {
   BOOST_CHECK_EQUAL('d', s.GetStateLabel());
   BOOST_CHECK_EQUAL(4, s.GetDepth());
   BOOST_CHECK_EQUAL(40, s.GetInnerWeight());
-  BOOST_CHECK(!s.AtEnd());
+  BOOST_CHECK(s);
 
   s.SetMinWeight(12);
   s++;
-  BOOST_CHECK(!s.AtEnd());
+  BOOST_CHECK(s);
 
   BOOST_CHECK_EQUAL('a', s.GetStateLabel());
   BOOST_CHECK_EQUAL(1, s.GetDepth());
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE(traversal_min_weight) {
 
   s.SetMinWeight(20);
   s++;
-  BOOST_CHECK(s.AtEnd());
+  BOOST_CHECK(!s);
   BOOST_CHECK_EQUAL(0, s.GetStateLabel());
   BOOST_CHECK_EQUAL(0, s.GetDepth());
 }

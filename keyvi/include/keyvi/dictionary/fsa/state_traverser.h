@@ -168,8 +168,6 @@ class StateTraverser final {
    */
   inline void SetMinWeight(uint32_t min_weight) {}
 
-  bool AtEnd() const { return at_end_; }
-
  private:
   automata_t fsa_;
   uint64_t current_state_;
