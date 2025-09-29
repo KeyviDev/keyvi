@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-#include <memory>
-
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
+#include <memory>
+#include <string>
 
 #include "msgpack.hpp"
 
@@ -56,9 +57,7 @@ void init_keyvi_match(const py::module_ &m) {
                              })
       .def("value_as_string", &kd::Match::GetValueAsString)
       .def("raw_value_as_string", &kd::Match::GetRawValueAsString)
-      .def("__getitem__", [](kd::Match &m, const std::string &key) {
-        return m.GetAttribute(key);
-      })
+      .def("__getitem__", [](kd::Match &m, const std::string &key) { return m.GetAttribute(key); })
       .def("__setitem__", &kd::Match::SetAttribute<std::string>)
       .def("__setitem__", &kd::Match::SetAttribute<float>)
       .def("__setitem__", &kd::Match::SetAttribute<int>)

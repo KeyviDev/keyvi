@@ -65,18 +65,19 @@ void init_keyvi_dictionary_compilers(const py::module_ &module) {
       .def("set_manifest", &compiler::SetManifest)                                                                    \
       .def("write_to_file", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>())                         \
       .def("WriteToFile", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>()) /* DEPRECATED */
-#define CREATE_COMPILER(compiler, name)                                                    \
-  py::class_<compiler>(module, name)                                                       \
-      .def(py::init<>())                                                                   \
-      .def(py::init<const keyvi::util::parameters_t &>())                                  \
-      CREATE_COMPILER_COMMON(compiler)                                                     \
-      .def("add", &compiler::Add) /* DEPRECATED */                                         \
+#define CREATE_COMPILER(compiler, name)                                          \
+  py::class_<compiler>(module, name)                                             \
+      .def(py::init<>())                                                         \
+      .def(py::init<const keyvi::util::parameters_t &>()) /* init with params */ \
+      CREATE_COMPILER_COMMON(compiler)                                           \
+      .def("add", &compiler::Add) /* DEPRECATED */                               \
       .def("Add", &compiler::Add);
-#define CREATE_KEY_ONLY_COMPILER(compiler, name)                                           \
-  py::class_<compiler>(module, name)                                                       \
-      .def(py::init<>())                                                                   \
-      .def(py::init<const keyvi::util::parameters_t &>()) CREATE_COMPILER_COMMON(compiler) \
-      .def("add", &compiler::Add) /* DEPRECATED */                                         \
+#define CREATE_KEY_ONLY_COMPILER(compiler, name)                                 \
+  py::class_<compiler>(module, name)                                             \
+      .def(py::init<>())                                                         \
+      .def(py::init<const keyvi::util::parameters_t &>()) /* init with params */ \
+      CREATE_COMPILER_COMMON(compiler)                                           \
+      .def("add", &compiler::Add) /* DEPRECATED */                               \
       .def("Add", [](compiler &c, const std::string &key) { c.Add(key); });
 #define CREATE_SK_COMPILER(compiler, name)                                                  \
   py::class_<compiler>(module, name)                                                        \
