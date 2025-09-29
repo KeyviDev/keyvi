@@ -17,7 +17,9 @@
 //
 
 #include <memory>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
@@ -34,8 +36,8 @@ BOOST_AUTO_TEST_SUITE(ComparableStateTraverserTests)
 
 BOOST_AUTO_TEST_CASE(StateTraverserCompatibility) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   ComparableStateTraverser<StateTraverser<>> s(f);
 
@@ -112,8 +114,8 @@ BOOST_AUTO_TEST_CASE(StateTraverserCompatibility) {
 
 BOOST_AUTO_TEST_CASE(StateTraverserCompatSomeTraversalWithPrune) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   ComparableStateTraverser<StateTraverser<>> s(f);
 
@@ -174,12 +176,12 @@ BOOST_AUTO_TEST_CASE(StateTraverserCompatSomeTraversalWithPrune) {
 }
 
 BOOST_AUTO_TEST_CASE(StateTraverserCompatLongkeys) {
-  std::string a(1000, 'a');
-  std::string b(1000, 'b');
+  const std::string a(1000, 'a');
+  const std::string b(1000, 'b');
 
   std::vector<std::string> test_data = {a, b};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   ComparableStateTraverser<StateTraverser<>> s(f);
 
@@ -216,8 +218,8 @@ BOOST_AUTO_TEST_CASE(StateTraverserCompatLongkeys) {
 BOOST_AUTO_TEST_CASE(StateTraverserCompatZeroByte) {
   std::vector<std::string> test_data = {std::string("\0aaaa", 5), std::string("aa\0bb", 5), "aabc", "aacd",
                                         std::string("bbcd\0", 5)};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   ComparableStateTraverser<StateTraverser<>> s(f);
 
@@ -321,13 +323,13 @@ BOOST_AUTO_TEST_CASE(StateTraverserCompatZeroByte) {
 
 BOOST_AUTO_TEST_CASE(same_data) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   ComparableStateTraverser<StateTraverser<>> t1(f, false, 0);
   ComparableStateTraverser<StateTraverser<>> t2(f, false, 0);
   ComparableStateTraverser<StateTraverser<>> t3(f, false, 1);
-  ComparableStateTraverser<StateTraverser<>> t4(f, false, 1);
+  const ComparableStateTraverser<StateTraverser<>> t4(f, false, 1);
 
   BOOST_CHECK((t1 < t2) == false);
   BOOST_CHECK((t2 < t1) == false);
@@ -371,12 +373,12 @@ BOOST_AUTO_TEST_CASE(same_data) {
 
 BOOST_AUTO_TEST_CASE(interleave1) {
   std::vector<std::string> test_data1 = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary1(&test_data1);
-  automata_t f1 = dictionary1.GetFsa();
+  const testing::TempDictionary dictionary1(&test_data1);
+  const automata_t f1 = dictionary1.GetFsa();
 
   std::vector<std::string> test_data2 = {"aabb", "aabd", "abcd", "bbcd"};
-  testing::TempDictionary dictionary2(&test_data2);
-  automata_t f2 = dictionary2.GetFsa();
+  const testing::TempDictionary dictionary2(&test_data2);
+  const automata_t f2 = dictionary2.GetFsa();
 
   ComparableStateTraverser<StateTraverser<>> t1(f1, false, 0);
   ComparableStateTraverser<StateTraverser<>> t2(f2, false, 1);
@@ -415,12 +417,12 @@ BOOST_AUTO_TEST_CASE(interleave1) {
 
 BOOST_AUTO_TEST_CASE(interleave2) {
   std::vector<std::string> test_data1 = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary1(&test_data1);
-  automata_t f1 = dictionary1.GetFsa();
+  const testing::TempDictionary dictionary1(&test_data1);
+  const automata_t f1 = dictionary1.GetFsa();
 
   std::vector<std::string> test_data2 = {"aaab", "aabd", "abcd", "bbcd"};
-  testing::TempDictionary dictionary2(&test_data2);
-  automata_t f2 = dictionary2.GetFsa();
+  const testing::TempDictionary dictionary2(&test_data2);
+  const automata_t f2 = dictionary2.GetFsa();
 
   ComparableStateTraverser<StateTraverser<>> t1(f1, false, 0);
   ComparableStateTraverser<StateTraverser<>> t2(f2, false, 1);
@@ -449,12 +451,12 @@ BOOST_AUTO_TEST_CASE(interleave2) {
 
 BOOST_AUTO_TEST_CASE(nearTraversalSpecialization) {
   std::vector<std::string> test_data1 = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "cdefgh"};
-  testing::TempDictionary dictionary1(&test_data1);
-  automata_t f1 = dictionary1.GetFsa();
+  const testing::TempDictionary dictionary1(&test_data1);
+  const automata_t f1 = dictionary1.GetFsa();
 
   std::vector<std::string> test_data2 = {"abbb", "aabc", "bbcd", "aaceh", "cdefgh"};
-  testing::TempDictionary dictionary2(&test_data2);
-  automata_t f2 = dictionary2.GetFsa();
+  const testing::TempDictionary dictionary2(&test_data2);
+  const automata_t f2 = dictionary2.GetFsa();
 
   std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
 
@@ -537,12 +539,12 @@ BOOST_AUTO_TEST_CASE(nearTraversalSpecialization) {
 
 BOOST_AUTO_TEST_CASE(nearTraversalSpecialization2) {
   std::vector<std::string> test_data1 = {"aaaa", "aabb", "aabc", "aacd", "bbcd", "cdefgh"};
-  testing::TempDictionary dictionary1(&test_data1);
-  automata_t f1 = dictionary1.GetFsa();
+  const testing::TempDictionary dictionary1(&test_data1);
+  const automata_t f1 = dictionary1.GetFsa();
 
   std::vector<std::string> test_data2 = {"abbb", "aabc", "bbcd", "aaceh", "aacexyz", "aacexz", "cdefgh"};
-  testing::TempDictionary dictionary2(&test_data2);
-  automata_t f2 = dictionary2.GetFsa();
+  const testing::TempDictionary dictionary2(&test_data2);
+  const automata_t f2 = dictionary2.GetFsa();
 
   std::shared_ptr<std::string> near_key = std::make_shared<std::string>("aace");
 

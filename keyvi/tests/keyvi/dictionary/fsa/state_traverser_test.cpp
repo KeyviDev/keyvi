@@ -23,6 +23,9 @@
  *      Author: hendrik
  */
 
+#include <string>
+#include <vector>
+
 #include "keyvi/dictionary/fsa/state_traverser.h"
 
 #include <boost/test/unit_test.hpp>
@@ -39,8 +42,8 @@ BOOST_AUTO_TEST_SUITE(StateTraverserTests)
 
 BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   StateTraverser<> s(f);
 
@@ -117,8 +120,8 @@ BOOST_AUTO_TEST_CASE(someTraversalNoPrune) {
 
 BOOST_AUTO_TEST_CASE(someTraversalWithPrune) {
   std::vector<std::string> test_data = {"aaaa", "aabb", "aabc", "aacd", "bbcd"};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   StateTraverser<> s(f);
 
@@ -171,12 +174,12 @@ BOOST_AUTO_TEST_CASE(someTraversalWithPrune) {
 }
 
 BOOST_AUTO_TEST_CASE(longkeys) {
-  std::string a(1000, 'a');
-  std::string b(1000, 'b');
+  const std::string a(1000, 'a');
+  const std::string b(1000, 'b');
 
   std::vector<std::string> test_data = {a, b};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   StateTraverser<> s(f);
 
@@ -213,8 +216,8 @@ BOOST_AUTO_TEST_CASE(longkeys) {
 BOOST_AUTO_TEST_CASE(zeroByte) {
   std::vector<std::string> test_data = {std::string("\0aaaa", 5), std::string("aa\0bb", 5), "aabc", "aacd",
                                         std::string("bbcd\0", 5)};
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   StateTraverser<> s(f);
 
@@ -320,8 +323,8 @@ BOOST_AUTO_TEST_CASE(traversal_min_weight) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {{"aaaa", 5},  {"aabb", 15}, {"aabc", 10}, {"aacd", 20},
                                                              {"bbcd", 40}, {"cbcd", 18}, {"cefgh", 12}};
 
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   StateTraverser<traversal::WeightedTransition> s(f);
 
@@ -404,8 +407,8 @@ BOOST_AUTO_TEST_CASE(traversal_min_weight) {
 BOOST_AUTO_TEST_CASE(traversal_inner_weight_long_entry) {
   std::vector<std::pair<std::string, uint32_t>> test_data = {{std::string(500, 'a'), 300}};
 
-  testing::TempDictionary dictionary(&test_data);
-  automata_t f = dictionary.GetFsa();
+  const testing::TempDictionary dictionary(&test_data);
+  const automata_t f = dictionary.GetFsa();
 
   StateTraverser<traversal::WeightedTransition> s(f);
 
