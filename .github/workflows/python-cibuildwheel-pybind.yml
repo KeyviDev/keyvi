@@ -84,12 +84,6 @@ jobs:
           # skip tests on pypy, currently fails for indexer tests
           CIBW_TEST_SKIP: "pp*"
 
-          # (many)linux custom docker images
-          CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
-          CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
-          CIBW_MUSLLINUX_X86_64_IMAGE: 'keyvidev/musllinux-builder-x86_64'
-          CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
-
           # ccache using path
           CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
           CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf

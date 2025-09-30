@@ -9,7 +9,7 @@ dependencies = [
     "msgpack>=1.0.0",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 lint = [
     'ruff>=0.5.0',
 ]
@@ -17,7 +17,12 @@ test = [
     'pytest>=8.4.2',
     'python-snappy>=0.7.3',
 ]
-dev = ['keyvi2[lint,test]']
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    "tox",
+]
+
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
@@ -44,8 +49,12 @@ testpaths = ["python-pybind/tests"]
 
 [tool.cibuildwheel]
 build-frontend = "default"
-test-requires = "pytest"
+test-groups = ["test"]
 test-command = "pytest {project}/python-pybind/tests"
+manylinux-x86_64-image = "keyvidev/manylinux-builder-x86_64"
+musllinux-x86_64-image = "keyvidev/musllinux-builder-x86_64"
+manylinux-aarch64-image = "keyvidev/manylinux-builder-aarch64"
+musllinux-aarch64-image = "keyvidev/musllinux-builder-aarch64"
 
 [tool.ruff.lint]
 extend-select = [
