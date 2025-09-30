@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "keyvi2"
-version = "0.6.4dev0"
+version = "0.7.2dev0"
 dependencies = [
     "msgpack>=1.0.0",
 ]
@@ -14,7 +14,8 @@ lint = [
     'ruff>=0.5.0',
 ]
 test = [
-    'pytest>=7.4.2',
+    'pytest>=8.4.2',
+    'python-snappy>=0.7.3',
 ]
 dev = ['keyvi2[lint,test]']
 
