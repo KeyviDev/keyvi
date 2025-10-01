@@ -57,6 +57,13 @@ void init_keyvi_match(const py::module_ &m) {
                              })
       .def("value_as_string", &kd::Match::GetValueAsString)
       .def("raw_value_as_string", &kd::Match::GetRawValueAsString)
+      .def(
+          "msgpacked_value_as_string",
+          [](const kd::Match &m, const keyvi::compression::CompressionAlgorithm compression_algorithm =
+                                     keyvi::compression::CompressionAlgorithm::NO_COMPRESSION) -> py::str {
+            return m.GetMsgPackedValueAsString(compression_algorithm);
+          },
+          py::arg("compression_algorithm") = 0)
       .def("__getitem__", [](kd::Match &m, const std::string &key) { return m.GetAttribute(key); })
       .def("__setitem__", &kd::Match::SetAttribute<std::string>)
       .def("__setitem__", &kd::Match::SetAttribute<float>)
