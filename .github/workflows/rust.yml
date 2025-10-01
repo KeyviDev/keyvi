@@ -59,7 +59,7 @@ jobs:
     environment:
       name: crates.io
     permissions:
-      id-token: write     # Required for OIDC token exchange
+      id-token: write
 
     steps:
       - uses: actions/checkout@v5
