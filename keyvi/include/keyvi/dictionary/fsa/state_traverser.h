@@ -48,7 +48,7 @@ class StateTraverser final {
   using transition_t = TransitionT;
 
   explicit StateTraverser(automata_t f)
-      : fsa_(f), current_state_(f->GetStartState()), current_weight_(0), current_label_(0), at_end_(false), stack_() {
+      : fsa_(f), current_state_(f->GetStartState()), current_weight_(0), current_label_(0), stack_() {
     TRACE("StateTraverser starting with Start state %d", current_state_);
     f->GetOutGoingTransitions(current_state_, &stack_.GetStates(), &stack_.traversal_stack_payload, 0);
 
@@ -57,7 +57,7 @@ class StateTraverser final {
 
   StateTraverser(automata_t f, const uint64_t start_state, traversal::TraversalPayload<TransitionT> &&payload,
                  const bool advance = true)
-      : fsa_(f), current_weight_(0), current_label_(0), at_end_(false), stack_(std::move(payload)) {
+      : fsa_(f), current_weight_(0), current_label_(0), stack_(std::move(payload)) {
     current_state_ = start_state;
 
     TRACE("StateTraverser starting with Start state %d", current_state_);
@@ -70,7 +70,7 @@ class StateTraverser final {
   }
 
   StateTraverser(automata_t f, const uint64_t start_state, const bool advance = true)
-      : fsa_(f), current_state_(start_state), current_weight_(0), current_label_(0), at_end_(false), stack_() {
+      : fsa_(f), current_state_(start_state), current_weight_(0), current_label_(0), stack_() {
     TRACE("StateTraverser starting with Start state %d", current_state_);
     f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload,
                               f->GetInnerWeight(start_state));
@@ -89,13 +89,11 @@ class StateTraverser final {
         current_state_(other.current_state_),
         current_weight_(other.current_weight_),
         current_label_(other.current_label_),
-        at_end_(other.at_end_),
         stack_(std::move(other.stack_)) {
     other.fsa_ = 0;
     other.current_state_ = 0;
     other.current_weight_ = 0;
     other.current_label_ = 0;
-    other.at_end_ = true;
   }
 
   automata_t GetFsa() const { return fsa_; }
@@ -138,7 +136,7 @@ class StateTraverser final {
       if (stack_.GetDepth() == 0) {
         TRACE("traverser exhausted.");
         current_label_ = 0;
-        at_end_ = true;
+        current_state_ = 0;
         return;
       }
 
@@ -159,7 +157,7 @@ class StateTraverser final {
 
   label_t GetStateLabel() const { return current_label_; }
 
-  operator bool() const { return !at_end_; }
+  operator bool() const { return current_state_ != 0; }
 
   /**
    * Set the minimum weight states must be greater or equal to.
@@ -170,14 +168,11 @@ class StateTraverser final {
    */
   inline void SetMinWeight(uint32_t min_weight) {}
 
-  bool AtEnd() const { return at_end_; }
-
  private:
   automata_t fsa_;
   uint64_t current_state_;
   uint32_t current_weight_;
   label_t current_label_;
-  bool at_end_;
   traversal::TraversalStack<TransitionT> stack_;
 
   /**

@@ -135,8 +135,6 @@ class ComparableStateTraverser final {
 
   operator bool() const { return state_traverser_; }
 
-  bool AtEnd() const { return state_traverser_.AtEnd(); }
-
   void operator++(int) {
     state_traverser_++;
     if (state_traverser_) {

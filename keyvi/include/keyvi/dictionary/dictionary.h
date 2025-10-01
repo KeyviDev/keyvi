@@ -338,7 +338,7 @@ class Dictionary final {
       TRACE("GetAllKeys callback called");
 
       for (;;) {
-        if (!data->traverser.AtEnd()) {
+        if (data->traverser) {
           data->traversal_stack.resize(data->traverser.GetDepth() - 1);
           data->traversal_stack.push_back(data->traverser.GetStateLabel());
           TRACE("Current depth %d (%d)", data->traverser.GetDepth() - 1, data->traversal_stack.size());
