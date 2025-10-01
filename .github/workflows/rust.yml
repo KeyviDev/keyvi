@@ -3,7 +3,7 @@ name: Rust
 on:
   push:
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 env:
@@ -13,17 +13,18 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v5
-    - name: Install system packages
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
-    - name: Code fomatting
-      run: cargo fmt --manifest-path rust/Cargo.toml -- --check
-    - name: Build
-      run: cargo build --verbose --manifest-path rust/Cargo.toml
-    - name: Run tests
-      run: cargo test --verbose --manifest-path rust/Cargo.toml
+      - uses: actions/checkout@v5
+      - uses: swatinem/rust-cache@v2
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+      - name: Code fomatting
+        run: cargo fmt --manifest-path rust/Cargo.toml -- --check
+      - name: Build
+        run: cargo build --verbose --manifest-path rust/Cargo.toml
+      - name: Run tests
+        run: cargo test --verbose --manifest-path rust/Cargo.toml
 
   build_latest_deps:
     name: Latest Dependencies
@@ -33,6 +34,7 @@ jobs:
       CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: allow
     steps:
       - uses: actions/checkout@v5
+      - uses: swatinem/rust-cache@v2
       - name: Install system packages
         run: |
           sudo apt-get update
@@ -42,3 +44,26 @@ jobs:
       - run: cargo build --verbose --manifest-path rust/Cargo.toml
       - run: cargo test --verbose --manifest-path rust/Cargo.toml
 
+  publish:
+    name: Publish to crates.io
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    needs: build
+    environment:
+      name: crates.io
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: swatinem/rust-cache@v2
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+      - name: Publish
+        run: >
+          cargo publish
+          --verbose
+          --manifest-path rust/Cargo.toml
+          --locked
+          --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
