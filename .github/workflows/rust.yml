@@ -15,6 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            rust
       - name: Install system packages
         run: |
           sudo apt-get update
@@ -35,6 +38,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            rust
       - name: Install system packages
         run: |
           sudo apt-get update
@@ -56,6 +62,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            rust
       - name: Install system packages
         run: |
           sudo apt-get update
