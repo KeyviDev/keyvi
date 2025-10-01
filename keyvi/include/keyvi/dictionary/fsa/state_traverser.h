@@ -124,8 +124,6 @@ class StateTraverser final {
     // ignore cases where we are already at the end
     if (current_state_ == 0) {
       TRACE("at the end");
-      // TODO(hendrik): get rif of `at_end_`
-      at_end_ = true;
       return;
     }
 
