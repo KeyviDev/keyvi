@@ -273,7 +273,7 @@ class Generator final {
                 ? "OK"
                 : "BROKEN");
     } else {
-      // empty dictionaries have start_state_ for backwards compatibility
+      // empty dictionaries have start_state_ = 1 for backwards compatibility
       start_state_ = 1;
     }
 
