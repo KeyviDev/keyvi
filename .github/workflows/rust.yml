@@ -2,8 +2,11 @@ name: Rust
 
 on:
   push:
+    branches: [ master, release-* ]
   pull_request:
     branches: [master]
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:
