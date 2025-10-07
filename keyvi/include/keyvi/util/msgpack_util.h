@@ -25,10 +25,14 @@
 #ifndef KEYVI_UTIL_MSGPACK_UTIL_H_
 #define KEYVI_UTIL_MSGPACK_UTIL_H_
 #include <limits>
+#include <string>
 
 #include "msgpack.hpp"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
+
+// #define ENABLE_TRACING
+#include "keyvi/dictionary/util/trace.h"
 
 /**
  * Utility classes for msgpack.
@@ -145,6 +149,38 @@ inline void MsgPackDump(Writer* writer, const msgpack::object& o) {
     default:
       break;
   }
+}
+
+inline void JsonStringToMsgPack(const std::string& raw_value, msgpack::v1::sbuffer* msgpack_buffer,
+                                bool single_precision_float) {
+  rapidjson::Document json_document;
+  json_document.Parse<rapidjson::kParseNanAndInfFlag>(raw_value.c_str());
+
+  if (!json_document.HasParseError()) {
+    TRACE("Got json");
+    msgpack::packer<msgpack::sbuffer> packer(msgpack_buffer);
+    JsonToMsgPack(json_document, &packer, single_precision_float);
+  } else {
+    TRACE("Got a normal string");
+    msgpack::pack(msgpack_buffer, raw_value);
+  }
+}
+
+inline std::string JsonStringToMsgPack(const std::string& raw_value, bool single_precision_float = false) {
+  msgpack::sbuffer msgpack_buffer;
+
+  JsonStringToMsgPack(raw_value, &msgpack_buffer, single_precision_float);
+  return std::string(reinterpret_cast<char*>(msgpack_buffer.data()), msgpack_buffer.size());
+}
+
+template <typename T>
+inline std::string ValueToMsgPack(const T& value) {
+  msgpack::sbuffer msgpack_buffer;
+
+  msgpack::packer<msgpack::sbuffer> pk(&msgpack_buffer);
+  pk.pack(value);
+
+  return std::string(msgpack_buffer.data(), msgpack_buffer.size());
 }
 
 } /* namespace util */

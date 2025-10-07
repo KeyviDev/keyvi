@@ -5,27 +5,24 @@ RUN \
     if which yum; then \
         yum -y update && \
         yum clean all && \
-        yum -y install bzip2-devel snappy-devel python-devel && \
-        if [ $AUDITWHEEL_ARCH != "aarch64" ]; then \
-          yum -y install hiredis-devel libzstd-devel; \
-        fi && \
+        yum -y install bzip2-devel snappy-devel xxhash-devel libzstd-devel python3-devel openssl-devel && \
         yum clean all; \
     elif which apk; then \
         apk upgrade --no-cache && \
-        apk add --no-cache procps bzip2-dev snappy-dev python3-dev hiredis-dev zstd-dev; \
+        apk add --no-cache procps bzip2-dev snappy-dev python3-dev zstd-dev xxhash-dev openssl-dev; \
     else \
         echo "unsupported os"; \
         exit 1; \
     fi
 
-ENV ZLIB_MAJOR=1 ZLIB_MINOR=3
+ENV ZLIB_MAJOR=1 ZLIB_MINOR=3 ZLIB_PATCH=1
 
-RUN curl https://zlib.net/zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.tar.gz --output zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.tar.gz && \
-    tar -xvf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.tar.gz && \
-    cd zlib-${ZLIB_MAJOR}.${ZLIB_MINOR} && ./configure && make -j`nproc` && make install && \
-    cd .. && rm -rf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR} zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.tar.gz
+RUN curl https://zlib.net/zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz --output zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz && \
+    tar -xvf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz && \
+    cd zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} && ./configure && make -j`nproc` && make install && \
+    cd .. && rm -rf zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH} zlib-${ZLIB_MAJOR}.${ZLIB_MINOR}.${ZLIB_PATCH}.tar.gz
 
-ENV BOOST_MAJOR=1 BOOST_MINOR=83 BOOST_PATCH=0
+ENV BOOST_MAJOR=1 BOOST_MINOR=88 BOOST_PATCH=0
 ENV BOOST_URL="https://boostorg.jfrog.io/artifactory/main/release/${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH}/source/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz"
 ENV BOOST_FALLBACK_URL="https://sourceforge.net/projects/boost/files/boost/${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH}/boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH}.tar.gz"
 
@@ -38,20 +35,20 @@ RUN cd boost_${BOOST_MAJOR}_${BOOST_MINOR}_${BOOST_PATCH} && \
     cd .. && \
 rm -rf boost_*
 
-ENV CMAKE_MAJOR=3 CMAKE_MINOR=27 CMAKE_PATCH=7
+ENV CMAKE_MAJOR=3 CMAKE_MINOR=31 CMAKE_PATCH=8
 
 RUN curl -sSL https://cmake.org/files/v${CMAKE_MAJOR}.${CMAKE_MINOR}/cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}.tar.gz | tar -xz && \
-    cd cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH} && ./bootstrap --parallel=`nproc` -- -DCMAKE_USE_OPENSSL=OFF && make -j`nproc` && make install && \
+    cd cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH} && ./bootstrap --parallel=`nproc` -- && make -j`nproc` && make install && \
     cd .. && rm -rf cmake-${CMAKE_MAJOR}.${CMAKE_MINOR}.${CMAKE_PATCH}
 
-ENV CCACHE_MAJOR=4 CCACHE_MINOR=8 CCACHE_PATCH=3
+ENV CCACHE_MAJOR=4 CCACHE_MINOR=11 CCACHE_PATCH=3
 
 RUN \
     if [ $AUDITWHEEL_ARCH == "aarch64" ] && [ $AUDITWHEEL_POLICY == "manylinux2014" ]; then \
         echo "skiping ccache, not available for this platform"; \
     else \
         curl -sSL https://github.com/ccache/ccache/archive/refs/tags/v${CCACHE_MAJOR}.${CCACHE_MINOR}.${CCACHE_PATCH}.tar.gz | tar -xz && \
-        cd ccache-${CCACHE_MAJOR}.${CCACHE_MINOR}.${CCACHE_PATCH} && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j`nproc` && make install && \
+        cd ccache-${CCACHE_MAJOR}.${CCACHE_MINOR}.${CCACHE_PATCH} && mkdir build && cd build && cmake -D ENABLE_TESTING=OFF -D REDIS_STORAGE_BACKEND=OFF -D CMAKE_BUILD_TYPE=Release .. && make -j`nproc` && make install && \
         cd ../.. && rm -rf ccache-${CCACHE_MAJOR}.${CCACHE_MINOR}.${CCACHE_PATCH}; \
     fi
 

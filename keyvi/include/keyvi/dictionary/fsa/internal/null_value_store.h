@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
 
@@ -57,6 +58,8 @@ class NullValueStoreBase {
 
   void Write(std::ostream& stream) const {}
 
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
+
   static value_store_t GetValueStoreType() { return value_store_t::KEY_ONLY; }
 };
 
@@ -72,6 +75,8 @@ class NullValueStore final : public NullValueStoreBase {
 class NullValueStoreMerge final : public NullValueStoreBase {
  public:
   explicit NullValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
+  explicit NullValueStoreMerge(const std::vector<std::string>&,
+                               const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
   uint64_t AddValueMerge(const char* p, uint64_t v, bool* no_minimization) { return 0; }
 };
@@ -95,6 +100,20 @@ class NullValueStoreReader final : public IValueStoreReader {
   attributes_t GetValueAsAttributeVector(uint64_t fsa_value) const override { return attributes_t(); }
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return ""; }
+
+  // shortcut: `\00` for no compression, `\xc0` for nil/null in msgpack
+  std::string GetRawValueAsString(uint64_t fsa_value) const override { return "\x00\xc0"; }
+
+  std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                        const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const override {
+    // `\xc0` == msgpack nil
+    if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+      return "\xc0";
+    }
+
+    return compression::compression_strategy_by_code(compression_algorithm)->CompressWithoutHeader("\xc0");
+  }
 };
 
 template <>

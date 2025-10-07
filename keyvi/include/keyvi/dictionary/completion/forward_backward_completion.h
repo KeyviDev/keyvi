@@ -33,7 +33,6 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "keyvi/dictionary/completion/prefix_completion.h"
 #include "keyvi/dictionary/util/bounded_priority_queue.h"
@@ -72,8 +71,8 @@ class ForwardBackwardCompletion final {
     util::BoundedPriorityQueue<uint32_t> best_scores(2 * number_of_results);
     std::vector<match_t> results;
 
-    for (auto match : forward_completions_.GetCompletions(query, number_of_results)) {
-      uint32_t weight = boost::lexical_cast<uint32_t>(match->GetAttribute("weight"));
+    for (auto& match : forward_completions_.GetCompletions(query, number_of_results)) {
+      uint32_t weight = match->GetWeight();
 
       // put the weight into the priority queue
       best_scores.Put(weight);
@@ -109,8 +108,8 @@ class ForwardBackwardCompletion final {
               best_scores.Back());
 
         uint32_t last_weight = 0;
-        for (auto match : backward_completions_.GetCompletions(phrase.c_str(), number_of_results)) {
-          uint32_t weight = boost::lexical_cast<uint32_t>(match->GetAttribute("weight"));
+        for (auto& match : backward_completions_.GetCompletions(phrase.c_str(), number_of_results)) {
+          uint32_t weight = match->GetWeight();
 
           if (weight < best_scores.Back()) {
             TRACE("Skip Backward, score to low %d", weight);
@@ -160,7 +159,7 @@ class ForwardBackwardCompletion final {
 
         // reuse results vector
         results.clear();
-        for (auto match : backward_completions_.GetCompletions(phrase.c_str(), number_of_results)) {
+        for (auto& match : backward_completions_.GetCompletions(phrase.c_str(), number_of_results)) {
           std::string matched_string = match->GetMatchedString();
           std::reverse(matched_string.begin(), matched_string.end());
           // if the original query had a space at the end, this result should as well
@@ -168,7 +167,7 @@ class ForwardBackwardCompletion final {
             matched_string.append(" ");
           }
 
-          uint32_t weight = boost::lexical_cast<uint32_t>(match->GetAttribute("weight"));
+          uint32_t weight = match->GetWeight();
           match->SetScore(weight);
           match->SetMatchedString(matched_string);
 
@@ -195,9 +194,9 @@ class ForwardBackwardCompletion final {
             }
 
             // match forward with this
-            for (auto match_forward :
+            for (auto& match_forward :
                  forward_completions_.GetCompletions(m->GetMatchedString().c_str(), number_of_results)) {
-              uint32_t weight = boost::lexical_cast<uint32_t>(match_forward->GetAttribute("weight"));
+              uint32_t weight = match_forward->GetWeight();
 
               if (weight < best_scores.Back()) {
                 TRACE("Skip Backward forward,  score to low %d", weight);

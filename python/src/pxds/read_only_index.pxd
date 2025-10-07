@@ -12,6 +12,6 @@ cdef extern from "keyvi/index/read_only_index.h" namespace "keyvi::index":
         ReadOnlyIndex(libcpp_utf8_string, libcpp_map[libcpp_utf8_string, libcpp_utf8_string] params) except+
         bool Contains(libcpp_utf8_string) # wrap-ignore
         shared_ptr[Match] operator[](libcpp_utf8_string) # wrap-ignore
-        _MatchIteratorPair GetFuzzy(libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except+
-        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except +
-        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except +
+        _MatchIteratorPair GetFuzzy(libcpp_utf8_string, int32_t max_edit_distance, size_t minimum_exact_prefix) except+ # wrap-as:get_fuzzy
+        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length) except + # wrap-as:get_near
+        _MatchIteratorPair GetNear (libcpp_utf8_string, size_t minimum_prefix_length, bool greedy) except + # wrap-as:get_near

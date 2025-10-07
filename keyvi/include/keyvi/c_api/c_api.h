@@ -32,6 +32,9 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
+#include "keyvi/compression/compression_algorithm.h"
+#include "keyvi/dictionary/loading_strategy.h"
+
 struct keyvi_dictionary;
 struct keyvi_match;
 struct keyvi_match_iterator;
@@ -58,6 +61,8 @@ void keyvi_string_destroy(char* str);
 //////////////////////
 
 struct keyvi_dictionary* keyvi_create_dictionary(const char*);
+
+struct keyvi_dictionary* keyvi_create_dictionary_with_loading_strategy(const char*, keyvi::dictionary::LoadingStrategy);
 
 void keyvi_dictionary_destroy(const struct keyvi_dictionary*);
 
@@ -91,6 +96,9 @@ double keyvi_match_get_score(const struct keyvi_match*);
 char* keyvi_match_get_value_as_string(const struct keyvi_match*);
 
 keyvi_bytes keyvi_match_get_msgpacked_value(const struct keyvi_match*);
+
+keyvi_bytes keyvi_match_get_msgpacked_value_compressed(const struct keyvi_match*,
+                                                       keyvi::compression::CompressionAlgorithm);
 
 char* keyvi_match_get_matched_string(const struct keyvi_match*);
 

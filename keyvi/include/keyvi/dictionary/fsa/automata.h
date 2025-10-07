@@ -40,6 +40,7 @@
 #include "keyvi/dictionary/fsa/internal/value_store_factory.h"
 #include "keyvi/dictionary/fsa/traversal/traversal_base.h"
 #include "keyvi/dictionary/fsa/traversal/weighted_traversal.h"
+#include "keyvi/dictionary/loading_strategy.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -394,12 +395,23 @@ class Automata final {
     return value_store_reader_->GetRawValueAsString(state_value);
   }
 
+  std::string GetMsgPackedValueAsString(uint64_t state_value,
+                                        const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const {
+    assert(value_store_reader_);
+    return value_store_reader_->GetMsgPackedValueAsString(state_value, compression_algorithm);
+  }
+
   std::string GetStatistics() const {
     return dictionary_properties_->GetStatistics();
   }
 
   const std::string& GetManifest() const {
     return dictionary_properties_->GetManifest();
+  }
+
+  const uint64_t GetVersion() const {
+    return dictionary_properties_->GetVersion();
   }
 
  private:

@@ -14,15 +14,15 @@ from test_tools import tmp_dictionary
 
 def test_prefix_simple():
     c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("eric", 33)
-    c.Add("jeff", 33)
-    c.Add("eric bla", 233)
-    c.Add("eric blu", 113)
-    c.Add("eric ble", 413)
-    c.Add("eric blx", 223)
-    c.Add("eric bllllx", 193)
-    c.Add("eric bxxxx", 23)
-    c.Add("eric boox", 143)
+    c.add("eric", 33)
+    c.add("jeff", 33)
+    c.add("eric bla", 233)
+    c.add("eric blu", 113)
+    c.add("eric ble", 413)
+    c.add("eric blx", 223)
+    c.add("eric bllllx", 193)
+    c.add("eric bxxxx", 23)
+    c.add("eric boox", 143)
     with tmp_dictionary(c, "completion.kv") as d:
         assert [m.matched_string for m in d.complete_prefix("eric")] == [
             "eric",
@@ -103,9 +103,9 @@ def test_prefix_simple():
 
 def test_mismatches():
     c = CompletionDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("a", 33)
-    c.Add("ab", 33)
-    c.Add("abcd", 233)
+    c.add("a", 33)
+    c.add("ab", 33)
+    c.add("abcd", 233)
     with tmp_dictionary(c, "completion.kv") as d:
         assert [m.matched_string for m in d.complete_prefix("v")] == []
         assert [m.matched_string for m in d.complete_prefix("vwxyz")] == []

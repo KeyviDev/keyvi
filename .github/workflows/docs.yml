@@ -14,11 +14,11 @@ on:
 
 jobs:
   build:
-    runs-on: 'ubuntu-22.04'
+    runs-on: 'ubuntu-24.04'
     name:  'github pages'
     env:
       BUILD_TYPE:  'Release'
-      PYTHON_VERSION: '3.9'
+      PYTHON_VERSION: '3.12'
     strategy:
       fail-fast: false
     steps:
@@ -28,7 +28,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev doxygen
       - name: checkout from git
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
         # re-use the cache from the linux build
       - name: ccache
@@ -37,7 +37,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           architecture: x64

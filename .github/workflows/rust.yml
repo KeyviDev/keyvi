@@ -11,11 +11,9 @@ env:
 
 jobs:
   build:
-
-    runs-on: ubuntu-22.04
-
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Install system packages
       run: |
         sudo apt-get update
@@ -26,3 +24,21 @@ jobs:
       run: cargo build --verbose --manifest-path rust/Cargo.toml
     - name: Run tests
       run: cargo test --verbose --manifest-path rust/Cargo.toml
+
+  build_latest_deps:
+    name: Latest Dependencies
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: allow
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+      - run: rustup update stable && rustup default stable
+      - run: cargo update --verbose --manifest-path rust/Cargo.toml
+      - run: cargo build --verbose --manifest-path rust/Cargo.toml
+      - run: cargo test --verbose --manifest-path rust/Cargo.toml
+

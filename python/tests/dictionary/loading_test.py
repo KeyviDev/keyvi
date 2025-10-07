@@ -30,23 +30,23 @@ def test_non_existing_file():
 
 def test_truncated_file_json():
     c=JsonDictionaryCompiler({"memory_limit_mb":"10"})
-    c.Add('a', '{1:2}')
-    c.Add('b', '{2:4}')
-    c.Add('c', '{4:4}')
-    c.Add('d', '{2:3}')
-    c.Compile()
+    c.add('a', '{1:2}')
+    c.add('b', '{2:4}')
+    c.add('c', '{4:4}')
+    c.add('d', '{2:3}')
+    c.compile()
 
-    c.WriteToFile(os.path.join(tmp_dir,'truncation_test.kv'))
+    c.write_to_file(os.path.join(tmp_dir,'truncation_test.kv'))
     size = os.path.getsize(os.path.join(tmp_dir, 'truncation_test.kv'))
 
-    fd_in = open(os.path.join(tmp_dir,'truncation_test.kv'), 'rb')
-    fd = open(os.path.join(tmp_dir,'truncation_test1.kv'), 'wb')
-    fd.write(fd_in.read(int(size/2)))
-    fd.close()
+    with open(os.path.join(tmp_dir,'truncation_test.kv'), 'rb') as fd_in:
+        fd = open(os.path.join(tmp_dir,'truncation_test1.kv'), 'wb')
+        fd.write(fd_in.read(int(size/2)))
+        fd.close()
 
-    fd2 = open(os.path.join(tmp_dir,'truncation_test2.kv'), 'wb')
-    fd2.write(fd_in.read(int(size-2)))
-    fd2.close()
+        fd2 = open(os.path.join(tmp_dir,'truncation_test2.kv'), 'wb')
+        fd2.write(fd_in.read(int(size-2)))
+        fd2.close()
 
     with pytest.raises(ValueError):
         d=Dictionary(os.path.join(tmp_dir, 'truncation_test1.kv'))

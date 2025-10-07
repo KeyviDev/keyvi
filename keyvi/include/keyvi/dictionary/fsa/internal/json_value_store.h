@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_JSON_VALUE_STORE_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_JSON_VALUE_STORE_H_
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 #include <string>
@@ -194,6 +195,8 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
     values_extern_->Write(stream, values_buffer_size_);
   }
 
+  uint64_t GetFileVersionMin() const { return compressor_->GetFileVersionMin(); }
+
  private:
   /*
    * Compressors & the associated compression functions. Ugly, but
@@ -228,6 +231,13 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
  public:
   explicit JsonValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
       : JsonValueStoreMinimizationBase(parameters) {}
+  explicit JsonValueStoreMerge(const std::vector<std::string>& inputFiles,
+                               const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t())
+      : JsonValueStoreMinimizationBase(parameters) {
+    for (const auto& file_name : inputFiles) {
+      file_version_min_ = std::max(file_version_min_, DictionaryProperties::FromFile(file_name).GetVersion());
+    }
+  }
 
   uint64_t AddValueMerge(const char* payload, uint64_t fsa_value, bool* no_minimization) {
     size_t buffer_size;
@@ -268,6 +278,11 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
 
     values_extern_->Write(stream, values_buffer_size_);
   }
+
+  uint64_t GetFileVersionMin() const { return file_version_min_; }
+
+ private:
+  uint64_t file_version_min_ = 0;
 };
 
 class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
@@ -284,6 +299,7 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
       number_of_values_ += properties_.back().GetValueStoreProperties().GetNumberOfValues();
       number_of_unique_values_ += properties_.back().GetValueStoreProperties().GetNumberOfUniqueValues();
       values_buffer_size_ += properties_.back().GetValueStoreProperties().GetSize();
+      file_version_min_ = std::max(file_version_min_, properties_.back().GetVersion());
     }
   }
 
@@ -305,10 +321,13 @@ class JsonValueStoreAppendMerge final : public JsonValueStoreBase {
     }
   }
 
+  uint64_t GetFileVersionMin() const { return file_version_min_; }
+
  private:
   std::vector<std::string> input_files_;
   std::vector<DictionaryProperties> properties_;
   std::vector<size_t> offsets_;
+  uint64_t file_version_min_ = 0;
 };
 
 class JsonValueStoreReader final : public IValueStoreReader {
@@ -351,6 +370,35 @@ class JsonValueStoreReader final : public IValueStoreReader {
 
   std::string GetRawValueAsString(uint64_t fsa_value) const override {
     return keyvi::util::decodeVarIntString(strings_ + fsa_value);
+  }
+
+  std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                        const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const override {
+    size_t value_size;
+    const char* value_ptr = keyvi::util::decodeVarIntString(strings_ + fsa_value, &value_size);
+
+    if (value_size == 0) {
+      return std::string();
+    }
+
+    if (value_ptr[0] == compression_algorithm) {
+      return std::string(value_ptr + 1, value_size - 1);
+    }
+
+    // decompress
+    const compression::decompress_func_t decompressor =
+        compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(value_ptr[0]));
+    std::string msgpacked_value = decompressor(std::string(value_ptr, value_size));
+
+    if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+      return msgpacked_value;
+    }
+    // compress
+    const compression::compression_strategy_t compressor =
+        compression::compression_strategy_by_code(compression_algorithm);
+
+    return compressor->CompressWithoutHeader(msgpacked_value);
   }
 
   std::string GetValueAsString(uint64_t fsa_value) const override {

@@ -28,8 +28,11 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/compression/compression_selector.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
+#include "keyvi/util/msgpack_util.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -59,7 +62,10 @@ class IntInnerWeightsValueStoreBase {
   uint32_t GetMergeWeight(uint64_t fsa_value) { return fsa_value; }
 
   void CloseFeeding() {}
+
   void Write(std::ostream& stream) const {}
+
+  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
 
   static value_store_t GetValueStoreType() { return value_store_t::INT_WITH_WEIGHTS; }
 };
@@ -75,6 +81,8 @@ class IntInnerWeightsValueStore final : public IntInnerWeightsValueStoreBase {
 class IntInnerWeightsValueStoreMerge final : public IntInnerWeightsValueStoreBase {
  public:
   explicit IntInnerWeightsValueStoreMerge(const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
+  explicit IntInnerWeightsValueStoreMerge(const std::vector<std::string>&,
+                                          const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
   uint64_t AddValueMerge(const char* p, uint64_t v, bool* no_minimization) { return v; }
 };
@@ -104,6 +112,23 @@ class IntInnerWeightsValueStoreReader final : public IValueStoreReader {
   }
 
   std::string GetValueAsString(uint64_t fsa_value) const override { return std::to_string(fsa_value); }
+
+  std::string GetRawValueAsString(uint64_t fsa_value) const override {
+    // TODO(hendrik): replace with std::format once we have C++20
+    return compression::compression_strategy_by_code(compression::CompressionAlgorithm::NO_COMPRESSION)
+        ->Compress(keyvi::util::ValueToMsgPack(fsa_value));
+  }
+
+  std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                        const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const override {
+    if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+      return keyvi::util::ValueToMsgPack(fsa_value);
+    }
+
+    return compression::compression_strategy_by_code(compression_algorithm)
+        ->CompressWithoutHeader(keyvi::util::ValueToMsgPack(fsa_value));
+  }
 
   uint32_t GetWeight(uint64_t fsa_value) const override { return static_cast<uint32_t>(fsa_value); }
 };

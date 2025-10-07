@@ -34,7 +34,7 @@ except:
 #################
 
 VERSION_MAJOR = 0
-VERSION_MINOR = 6
+VERSION_MINOR = 7
 VERSION_PATCH = 2
 VERSION_DEV = 0
 IS_RELEASED = False
@@ -327,18 +327,6 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             clean_pykeyvi_build_directory()
             _clean.clean.run(self)
 
-    have_wheel = False
-    try:
-        import wheel.bdist_wheel as _bdist_wheel
-
-        class bdist_wheel(custom_opts, _bdist_wheel.bdist_wheel):
-            parent = _bdist_wheel.bdist_wheel
-            user_options = _bdist_wheel.bdist_wheel.user_options + custom_user_options
-
-        have_wheel = True
-    except:
-        None
-
     class build_cxx(_build_ext.build_ext):
         description = "customized for keyvi: " + _build_ext.build_ext.description
 
@@ -388,8 +376,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
         "bdist": bdist,
         "clean": clean,
     }
-    if have_wheel:
-        commands["bdist_wheel"] = bdist_wheel
+
     for e in ext_modules:
         e.cython_directives = {"embedsignature": True}
 
@@ -426,11 +413,11 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             "Programming Language :: C++",
             "Programming Language :: Cython",
             "Programming Language :: Python",
-            "Programming Language :: Python :: 3.8",
             "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",
             "Programming Language :: Python :: 3.12",
+            "Programming Language :: Python :: 3.13",
             "Programming Language :: Python :: Implementation :: CPython",
             "Programming Language :: Python :: Implementation :: PyPy",
             "Operating System :: MacOS :: MacOS X",

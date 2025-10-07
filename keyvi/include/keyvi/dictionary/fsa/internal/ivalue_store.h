@@ -27,12 +27,13 @@
 
 #include <memory>
 #include <string>
+#include <variant>
 
 #include <boost/container/flat_map.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/interprocess/mapped_region.hpp>
-#include <boost/variant.hpp>
 
+#include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/dictionary_merger_fwd.h"
 #include "keyvi/dictionary/fsa/internal/value_store_properties.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
@@ -59,7 +60,7 @@ struct ValueStoreComponents {};
  *
  * The following types/constants/methods (incomplete list) are required:
  *
- * typedef {type} value_t;
+ * using value_t = {type};
  * static const {type} no_value = 0;
  *
  * uint64_t GetValue(value_t value, bool* no_minimization)
@@ -71,6 +72,8 @@ struct ValueStoreComponents {};
  * void CloseFeeding()
  *
  * void Write(std::ostream& stream)
+ *
+ * uint64_t GetFileVersionMin()
  */
 
 /**
@@ -82,8 +85,9 @@ struct ValueStoreComponents {};
  */
 class IValueStoreReader {
  public:
-  typedef boost::container::flat_map<std::string, boost::variant<std::string, int, double, bool>> attributes_raw_t;
-  typedef std::shared_ptr<attributes_raw_t> attributes_t;
+  using attribute_t = std::variant<std::string, int, double, bool>;
+  using attributes_raw_t = boost::container::flat_map<std::string, attribute_t>;
+  using attributes_t = std::shared_ptr<attributes_raw_t>;
 
   /**
    * Default constructor. Override if the value store implementation requires extra data.
@@ -109,14 +113,24 @@ class IValueStoreReader {
    * Get Value as string in raw format
    *
    * Note: The raw format is an implementation detail of keyvi, not an official binary interface.
-   * Value store implementers can override this method for performance reasons.
+   * Value store implementers can override this method with an optimized version.
    *
    * @param fsa_value
-   * @return the value as string without any decompression
+   * @return the value as binary encoded string
    */
-  virtual std::string GetRawValueAsString(uint64_t fsa_value) const {
-    return keyvi::util::EncodeJsonValue(GetValueAsString(fsa_value));
-  }
+  virtual std::string GetRawValueAsString(uint64_t fsa_value) const = 0;
+
+  /**
+   * Get Value as msgpack string
+   *
+   * Value store implementers can override this method with an optimized version.
+   *
+   * @param fsa_value
+   * @return the value as msgpack string
+   */
+  virtual std::string GetMsgPackedValueAsString(uint64_t fsa_value,
+                                                const compression::CompressionAlgorithm compression_algorithm =
+                                                    compression::CompressionAlgorithm::NO_COMPRESSION) const = 0;
 
   /**
    * Get Value as string (for dumping or communication)

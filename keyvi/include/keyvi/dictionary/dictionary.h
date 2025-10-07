@@ -72,6 +72,8 @@ class Dictionary final {
 
   uint64_t GetSize() const { return fsa_->GetNumberOfKeys(); }
 
+  uint64_t GetVersion() const { return fsa_->GetVersion(); }
+
   /**
    * A simple Contains method to check whether a key is in the dictionary.
    *
@@ -322,7 +324,7 @@ class Dictionary final {
       TRACE("GetAllKeys callback called");
 
       for (;;) {
-        if (!data->traverser.AtEnd()) {
+        if (data->traverser) {
           data->traversal_stack.resize(data->traverser.GetDepth() - 1);
           data->traversal_stack.push_back(data->traverser.GetStateLabel());
           TRACE("Current depth %d (%d)", data->traverser.GetDepth() - 1, data->traversal_stack.size());

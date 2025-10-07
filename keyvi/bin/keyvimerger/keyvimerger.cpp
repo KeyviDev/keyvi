@@ -23,23 +23,34 @@
  *      Author: hendrik
  */
 
+#include <functional>
+#include <iostream>
+#include <ostream>
+#include <stdexcept>
 #include <string>
-#include <type_traits>
+#include <utility>
+#include <vector>
 
-#include <boost/filesystem.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/filesystem/directory.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/program_options.hpp>
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/positional_options.hpp>
+#include <boost/program_options/value_semantic.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <boost/range/iterator_range_core.hpp>
 
 #include "keyvi/dictionary/dictionary_types.h"
+#include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/util/configuration.h"
 
 /** Extracts the parameters. */
 keyvi::util::parameters_t extract_parameters(const boost::program_options::variables_map& vm) {
   keyvi::util::parameters_t ret;
-  for (auto& v : vm["parameter"].as<std::vector<std::string>>()) {
+  for (const auto& v : vm["parameter"].as<std::vector<std::string>>()) {
     std::vector<std::string> key_value;
-    boost::split(key_value, v, std::bind(std::equal_to<char>(), std::placeholders::_1, '='));
+    boost::split(key_value, v, [](auto&& PH1) { return std::equal_to<char>()(std::forward<decltype(PH1)>(PH1), '='); });
     if (key_value.size() == 2) {
       ret[key_value[0]] = key_value[1];
     } else {
@@ -79,18 +90,18 @@ int main(int argc, char** argv) {
   boost::program_options::store(
       boost::program_options::command_line_parser(argc, argv).options(description).positional(p).run(), vm);
   boost::program_options::notify(vm);
-  if (vm.count("help")) {
+  if (vm.count("help") != 0U) {
     std::cout << description;
     return 0;
   }
 
-  if (vm.count("input-file") && vm.count("output-file")) {
+  if ((vm.count("input-file") != 0U) && (vm.count("output-file") != 0U)) {
     input_files = vm["input-file"].as<std::vector<std::string>>();
     output_file = vm["output-file"].as<std::string>();
 
     std::vector<std::string> inputs;
 
-    for (auto f : input_files) {
+    for (const auto& f : input_files) {
       if (boost::filesystem::is_directory(f)) {
         for (auto& entry : boost::make_iterator_range(boost::filesystem::directory_iterator(f), {})) {
           if (entry.path().extension() == ".kv") {
@@ -103,19 +114,19 @@ int main(int argc, char** argv) {
     }
 
     keyvi::util::parameters_t params = extract_parameters(vm);
-    if (vm.count("memory-limit")) {
+    if (vm.count("memory-limit") != 0U) {
       params[MEMORY_LIMIT_KEY] = vm["memory-limit"].as<std::string>();
     }
 
     keyvi::dictionary::JsonDictionaryMerger jsonDictionaryMerger(params);
-    for (auto f : inputs) {
+    for (const auto& f : inputs) {
       jsonDictionaryMerger.Add(f);
     }
 
     jsonDictionaryMerger.Merge(output_file);
 
   } else {
-    std::cout << "ERROR: arguments wrong or missing." << std::endl << std::endl;
+    std::cout << "ERROR: arguments wrong or missing." << '\n' << '\n';
     std::cout << description;
     return 1;
   }

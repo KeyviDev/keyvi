@@ -28,6 +28,8 @@
 #else
 #include <sys/resource.h>
 
+#include <string>
+
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 
@@ -35,7 +37,7 @@
 #include "keyvi/index/index.h"
 
 inline std::string get_keyvimerger_bin() {
-  boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};
+  boost::filesystem::path path{std::getenv("KEYVI_UNITTEST_BASEPATH")};  // NOLINT
   path /= DEFAULT_KEYVIMERGER_BIN;
 
   BOOST_CHECK(boost::filesystem::is_regular_file(path));
@@ -44,10 +46,12 @@ inline std::string get_keyvimerger_bin() {
 }
 
 inline size_t limit_filedescriptors(size_t file_descriptor_limit) {
-  struct rlimit limit;
+  struct rlimit limit {
+    0
+  };
 
   getrlimit(RLIMIT_NOFILE, &limit);
-  size_t old_limit = limit.rlim_cur;
+  const size_t old_limit = limit.rlim_cur;
   limit.rlim_cur = file_descriptor_limit;
   BOOST_CHECK(setrlimit(RLIMIT_NOFILE, &limit) == 0);
   getrlimit(RLIMIT_NOFILE, &limit);
@@ -63,7 +67,7 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
   using boost::filesystem::temp_directory_path;
   using boost::filesystem::unique_path;
 
-  size_t old_limit = limit_filedescriptors(20);
+  const size_t old_limit = limit_filedescriptors(40);
 
   auto tmp_path = temp_directory_path();
   tmp_path /= unique_path("index-limits-test-temp-index-%%%%-%%%%-%%%%-%%%%");
@@ -78,14 +82,14 @@ BOOST_AUTO_TEST_CASE(filedescriptor_limit) {
     }
     writer.Flush();
     BOOST_CHECK(writer.Contains("a"));
-    dictionary::match_t m = writer["a"];
+    const dictionary::match_t m = writer["a"];
 
     BOOST_CHECK_EQUAL("{\"id\":4999}", m->GetValueAsString());
   }
   boost::filesystem::remove_all(tmp_path);
 
-  size_t increased_file_descriptors = keyvi::util::OsUtils::TryIncreaseFileDescriptors();
-  BOOST_CHECK(increased_file_descriptors > 20);
+  const size_t increased_file_descriptors = keyvi::util::OsUtils::TryIncreaseFileDescriptors();
+  BOOST_CHECK(increased_file_descriptors > 40);
 
   limit_filedescriptors(old_limit);
 }

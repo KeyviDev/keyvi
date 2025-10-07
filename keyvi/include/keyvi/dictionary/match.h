@@ -28,10 +28,11 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <variant>
 
 #include <boost/container/flat_map.hpp>
-#include <boost/variant.hpp>
 
+#include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/util/json_value.h"
 
@@ -55,22 +56,9 @@ keyvi::dictionary::match_t FirstFilteredMatch(const MatcherT&, const DeletedT&);
 }  // namespace index
 namespace dictionary {
 
-#ifdef Py_PYTHON_H
-class attributes_visitor : public boost::static_visitor<PyObject*> {
- public:
-  PyObject* operator()(int i) const { return PyInt_FromLong(i); }
-
-  PyObject* operator()(double i) const { return PyFloat_FromDouble(i); }
-
-  PyObject* operator()(bool i) const { return i ? Py_True : Py_False; }
-
-  PyObject* operator()(const std::string& str) const { return PyUnicode_FromString(str.c_str()); }
-};
-#endif
-
 struct Match {
-  typedef std::shared_ptr<boost::container::flat_map<std::string, boost::variant<std::string, int, double, bool>>>
-      attributes_t;
+  using attribute_t = std::variant<std::string, int, double, bool>;
+  using attributes_t = std::shared_ptr<boost::container::flat_map<std::string, attribute_t>>;
 
   Match(size_t a, size_t b, const std::string& matched_item, uint32_t score = 0, uint32_t weight = 0)
       : start_(a), end_(b), matched_item_(matched_item), raw_value_(), score_(score) {
@@ -138,11 +126,27 @@ struct Match {
 #ifdef Py_PYTHON_H
   PyObject* GetAttributePy(const std::string& key) {
     auto result = GetAttribute(key);
-    return boost::apply_visitor(attributes_visitor(), result);
+
+    return std::visit(
+        [](auto&& arg) {
+          using T = std::decay_t<decltype(arg)>;
+          if constexpr (std::is_same_v<T, bool>) {
+            return arg ? Py_True : Py_False;
+          } else if constexpr (std::is_same_v<T, int>) {
+            return PyLong_FromLong(arg);
+          } else if constexpr (std::is_same_v<T, double>) {
+            return PyFloat_FromDouble(arg);
+          } else if constexpr (std::is_same_v<T, std::string>) {
+            return PyUnicode_FromString(arg.c_str());
+          }
+          // not reachable
+          throw std::runtime_error("unexpected attribute type");
+        },
+        result);
   }
 #endif
 
-  const boost::variant<std::string, int, double, bool>& GetAttribute(const std::string& key) {
+  const attribute_t& GetAttribute(const std::string& key) {
     // lazy creation
     if (!attributes_) {
       if (fsa_) {
@@ -196,13 +200,33 @@ struct Match {
     return fsa_->GetRawValueAsString(state_);
   }
 
-  std::string GetMsgPackedValueAsString() const {
-    const std::string raw_value = GetRawValueAsString();
-    if (raw_value.empty()) {
-      return raw_value;
+  std::string GetMsgPackedValueAsString(const compression::CompressionAlgorithm compression_algorithm =
+                                            compression::CompressionAlgorithm::NO_COMPRESSION) const {
+    if (!fsa_) {
+      if (raw_value_.empty()) {
+        return raw_value_;
+      }
+
+      if (raw_value_[0] == compression_algorithm) {
+        return raw_value_.substr(1);
+      }
+
+      // decompress
+      const compression::decompress_func_t decompressor =
+          compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(raw_value_[0]));
+      std::string msgpacked_value = decompressor(raw_value_);
+
+      if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+        return msgpacked_value;
+      }
+      // compress
+      const compression::compression_strategy_t compressor =
+          compression::compression_strategy_by_code(compression_algorithm);
+
+      return compressor->CompressWithoutHeader(msgpacked_value);
     }
-    const compression::decompress_func_t decompressor = compression::decompressor_by_code(raw_value);
-    return decompressor(raw_value);
+
+    return fsa_->GetMsgPackedValueAsString(state_, compression_algorithm);
   }
 
   /**

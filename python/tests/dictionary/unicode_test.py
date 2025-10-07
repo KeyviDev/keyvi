@@ -13,8 +13,8 @@ sys.path.append(os.path.join(root, "../"))
 
 def test_unicode():
     c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("öäü", '{"a" : 2}')
-    c.Add("abd", '{"a" : 3}')
+    c.add("öäü", '{"a" : 2}')
+    c.add("abd", '{"a" : 3}')
     # use python syntax ala __setitem__
     c["abd"] = '{"a" : 3}'
 
@@ -28,9 +28,9 @@ def test_unicode():
 
 def test_unicode_lookup():
     c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
-    c.Add("Los Angeles", '{"country" : "USA"}')
-    c.Add("Frankfurt am Main", '{"country" : "Germany"}')
-    c.Add("Kirchheim bei München", '{"country" : "Germany"}')
+    c.add("Los Angeles", '{"country" : "USA"}')
+    c.add("Frankfurt am Main", '{"country" : "Germany"}')
+    c.add("Kirchheim bei München", '{"country" : "Germany"}')
 
     # create unicode string for lookup
     text = "From Los Angeles via Frankfurt am Main to Kirchheim bei München it should just work"

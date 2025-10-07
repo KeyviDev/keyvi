@@ -58,23 +58,43 @@ endif (CMAKE_BUILD_TYPE_UPPER MATCHES COVERAGE)
 #### Dependencies ####
 
 # BOOST
-set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "system" "regex" "thread")
+set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "regex" "thread")
 set (_KEYVI_BOOST_LIBRARIES_TEST "unit_test_framework")
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
 
-find_package(Boost REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})
+if(POLICY CMP0167) # Use upstream's FindBoost.cmake to find Boost libraries.
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
+find_package(Boost 1.80 REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})
 if (Boost_FOUND)
     list(APPEND KEYVI_INCLUDES "${Boost_INCLUDE_DIRS}")
 else ()
     message(FATAL_ERROR "Can not find Boost")
 endif ()
+
+# starting with boost 1.86, boost process is not header-only anymore, so we have to add it as dependency
+# see https://github.com/boostorg/process/issues/390
+if(Boost_VERSION VERSION_GREATER_EQUAL "1.86.0")
+    list(APPEND _KEYVI_BOOST_LIBRARIES "process")
+    find_package(Boost REQUIRED COMPONENTS ${_KEYVI_BOOST_LIBRARIES} ${_KEYVI_BOOST_LIBRARIES_TEST})
+endif()
+
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem boost_system boost_regex boost_thread-mt")
+    set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
 else ()
-    set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem boost_system boost_regex boost_thread")
+    set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
+endif ()
+
+if(Boost_VERSION VERSION_GREATER_EQUAL "1.86.0")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+        set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_process")
+    else ()
+        set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_process")
+    endif ()
 endif ()
 
 if (WIN32)
@@ -118,6 +138,19 @@ else ()
   set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} snappy")
 endif ()
 
+# Zstd
+find_package(ZSTD REQUIRED)
+if (ZSTD_FOUND)
+    list(APPEND KEYVI_INCLUDES "${ZSTD_INCLUDE_DIRS}")
+else ()
+    message(FATAL_ERROR "Can not find zstd")
+endif (ZSTD_FOUND)
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} zstd")
+else ()
+  set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} zstd")
+endif ()
+
 # rapidjson
 list(APPEND KEYVI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/keyvi/3rdparty/rapidjson/include")
 
@@ -143,7 +176,7 @@ string(REPLACE " " ";" _KEYVI_COMPILE_DEFINITIONS_LIST "${_KEYVI_COMPILE_DEFINIT
 
 # keyvicompiler
 add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
-target_link_libraries(keyvicompiler ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvicompiler ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(keyvicompiler PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvicompiler PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvicompiler PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -152,7 +185,7 @@ install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
 
 # keyviinspector
 add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
-target_link_libraries(keyviinspector ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyviinspector ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(keyviinspector PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyviinspector PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyviinspector PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -161,7 +194,7 @@ install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
 
 # keyvimerger
 add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
-target_link_libraries(keyvimerger ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvimerger ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(keyvimerger PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvimerger PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvimerger PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -170,7 +203,7 @@ install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
 
 # keyvi_c
 add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
-target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(keyvi_c PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -178,7 +211,7 @@ target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>
 # unit tests
 FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
 add_executable(unit_test_all ${UNIT_TEST_SOURCES})
-target_link_libraries(unit_test_all ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(unit_test_all ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 target_compile_options(unit_test_all PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
 target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_include_directories(unit_test_all PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
@@ -224,7 +257,7 @@ add_library(keyvi INTERFACE)
 
 target_include_directories(keyvi INTERFACE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 target_compile_definitions(keyvi INTERFACE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_link_libraries(keyvi INTERFACE ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${_OS_LIBRARIES})
+target_link_libraries(keyvi INTERFACE ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 
 ### docs
 

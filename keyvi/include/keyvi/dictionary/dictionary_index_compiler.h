@@ -126,6 +126,11 @@ class DictionaryIndexCompiler final {
    * Do the final compilation
    */
   void Compile() {
+    // already compiled
+    if (generator_) {
+      return;
+    }
+
     value_store_->CloseFeeding();
     Sort();
 
