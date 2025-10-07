@@ -42,7 +42,7 @@ namespace dictionary {
 BOOST_AUTO_TEST_SUITE(DictionaryTests)
 
 BOOST_AUTO_TEST_CASE(loadDict) {
-  fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
+  const fsa::internal::SparseArrayPersistence<> p(2048, boost::filesystem::temp_directory_path());
 
   fsa::Generator<fsa::internal::SparseArrayPersistence<>> g(keyvi::util::parameters_t({{"memory_limit_mb", "10"}}));
   g.Add("aaaa");
@@ -57,8 +57,8 @@ BOOST_AUTO_TEST_CASE(loadDict) {
   g.Write(out_stream);
   out_stream.close();
 
-  fsa::automata_t f(new fsa::Automata("testFile_completion"));
-  dictionary_t d(new Dictionary(f));
+  const fsa::automata_t f(new fsa::Automata("testFile_completion"));
+  const dictionary_t d(new Dictionary(f));
 }
 
 BOOST_AUTO_TEST_CASE(DictGet) {
@@ -69,11 +69,11 @@ BOOST_AUTO_TEST_CASE(DictGet) {
       {"bar", 200},
   };
 
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+  const testing::TempDictionary dictionary(&test_data);
+  const dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   bool matched = false;
-  for (auto m : d->Get("test")) {
+  for (const auto& m : d->Get("test")) {
     BOOST_CHECK_EQUAL("test", m->GetMatchedString());
     BOOST_CHECK_EQUAL(std::string("22"), std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
@@ -97,11 +97,11 @@ BOOST_AUTO_TEST_CASE(DictLookup) {
       {"nude-party", 24},
   };
 
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+  const testing::TempDictionary dictionary(&test_data);
+  const dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   bool matched = false;
-  for (auto m : d->Lookup("nude")) {
+  for (const auto& m : d->Lookup("nude")) {
     BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
     BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(DictLookup) {
   BOOST_CHECK(matched);
 
   matched = false;
-  for (auto m : d->Lookup("nude ")) {
+  for (const auto& m : d->Lookup("nude ")) {
     BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
     BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(DictLookup) {
   BOOST_CHECK(matched);
 
   matched = false;
-  for (auto m : d->Lookup("nude at work")) {
+  for (const auto& m : d->Lookup("nude at work")) {
     BOOST_CHECK_EQUAL("nude", m->GetMatchedString());
     BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
@@ -138,15 +138,15 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
       {"pizzeria:u28db8mmzj1t", "pizzeria in Munich"}, {"pizzeria:u2817uqfyqkg", "pizzeria in Munich"},
       {"pizzeria:u281wu8bmmzq", "pizzeria in Munich"}};
 
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+  const testing::TempDictionary dictionary(&test_data);
+  const dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   std::vector<std::string> expected_matches = {"pizzeria:u281wu8bmmzq"};
 
   size_t i = 0;
 
   // check near match for pizzeria:u28, it should only return 1 match "281wu" is the closest
-  for (auto m : d->GetNear("pizzeria:u281wu88kekq", 12)) {
+  for (const auto& m : d->GetNear("pizzeria:u281wu88kekq", 12)) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
   i = 0;
 
   // check near match for pizzeria:u28, it should only return 2 matches u2817 and u281w are equally good
-  for (auto m : d->GetNear("pizzeria:u2815u88kekq", 12)) {
+  for (const auto& m : d->GetNear("pizzeria:u2815u88kekq", 12)) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
   i = 0;
 
   // check near match for pizzeria:u28, it should only return 1 match "281wu" is the closest
-  for (auto m : d->GetNear("pizzeria:u281wu8bmmzq", 12)) {
+  for (const auto& m : d->GetNear("pizzeria:u281wu8bmmzq", 12)) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(DictGetNear) {
   i = 0;
 
   // check near match for the full location pizzeria:u281wu8bmmzq
-  for (auto m : d->GetNear("pizzeria:u281wu8bmmzq", 21)) {
+  for (const auto& m : d->GetNear("pizzeria:u281wu8bmmzq", 21)) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
@@ -205,23 +205,19 @@ BOOST_AUTO_TEST_CASE(DictGetZerobyte) {
       {"bar\0", 200},
   };
 
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+  const testing::TempDictionary dictionary(&test_data);
+  const dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   bool matched = false;
-  for (auto m : d->Get(std::string("\0test", 5))) {
+  for (const auto& m : d->Get(std::string("\0test", 5))) {
     BOOST_CHECK_EQUAL(std::string("\0test", 5), m->GetMatchedString());
     BOOST_CHECK_EQUAL(std::string("22"), std::get<std::string>(m->GetAttribute("weight")));
     matched = true;
   }
   BOOST_CHECK(matched);
 
-  matched = false;
-  for (auto m : d->Get("test2")) {
-    matched = true;
-  }
-
-  BOOST_CHECK(!matched);
+  const auto it = d->Get("test2");
+  BOOST_CHECK(it.begin() == it.end());
 
   auto m = (*d)[std::string("\0test", 5)];
   BOOST_CHECK_EQUAL("22", std::get<std::string>(m->GetAttribute("weight")));
@@ -233,14 +229,14 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
       {"eric f", 531}, {"eric g", 631},  {"eric h", 731},  {"eric i", 831}, {"eric j", 131},
   };
 
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+  const testing::TempDictionary dictionary(&test_data);
+  const dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   std::vector<std::string> expected_matches = {"eric c", "eric b", "eric i"};
 
   size_t i = 0;
 
-  for (auto m : d->GetPrefixCompletion("eric", 3)) {
+  for (const auto& m : d->GetPrefixCompletion("eric", 3)) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
@@ -253,7 +249,7 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
 
   i = 0;
 
-  for (auto m : d->GetPrefixCompletion("eric", 5)) {
+  for (const auto& m : d->GetPrefixCompletion("eric", 5)) {
     if (i >= expected_matches.size()) {
       BOOST_FAIL("got more results than expected.");
     }
@@ -262,9 +258,8 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletion) {
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
 
-  for (auto m : d->GetPrefixCompletion("steve", 3)) {
-    BOOST_FAIL("expected no match");
-  }
+  const auto it = d->GetPrefixCompletion("steve", 3);
+  BOOST_CHECK(it.begin() == it.end());
 }
 
 BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
@@ -273,8 +268,8 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
       {"mr. heinz f", 531}, {"mr. karl b", 631},  {"mr. gustav b", 731}, {"mr. gustav h", 831}, {"mr. jeremy j", 131},
   };
 
-  testing::TempDictionary dictionary(&test_data);
-  dictionary_t d(new Dictionary(dictionary.GetFsa()));
+  const testing::TempDictionary dictionary(&test_data);
+  const dictionary_t d(new Dictionary(dictionary.GetFsa()));
 
   // all names ending with 'b' and weight > 500
   std::vector<std::string> expected_matches = {"mr. max b", "mr. eric b", "mr. gustav b", "mr. karl b"};
@@ -299,6 +294,14 @@ BOOST_AUTO_TEST_CASE(DictGetPrefixCompletionCustomFilter) {
   completer.end().SetMinWeight(5);
 
   BOOST_CHECK_EQUAL(expected_matches.size(), i);
+}
+
+BOOST_AUTO_TEST_CASE(DictContainsEmptyDict) {
+  std::vector<std::pair<std::string, uint32_t>> test_data;
+  const testing::TempDictionary dictionary(&test_data);
+  const dictionary_t d(new Dictionary(dictionary.GetFsa()));
+
+  BOOST_CHECK_EQUAL(d->Contains("\x00"), false);  // NOLINT: testing NUL
 }
 
 BOOST_AUTO_TEST_SUITE_END()
