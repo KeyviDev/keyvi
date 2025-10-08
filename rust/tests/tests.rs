@@ -196,6 +196,7 @@ mod tests {
 
     #[test]
     fn get_all_items_empty() {
+        // uses dictionary created using keyvi < 0.7.2, see gh#368
         let dict = dictionary::Dictionary::new("test_data/empty-key-dict.kv").unwrap();
 
         let all_items: Vec<_> = dict.get_all_items().collect();
