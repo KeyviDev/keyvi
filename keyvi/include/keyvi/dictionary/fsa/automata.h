@@ -97,12 +97,12 @@ class Automata final {
     const boost::interprocess::map_options_t map_options =
         internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
-    TRACE("labels start offset: %d", dictionary_properties_.GetPersistenceOffset());
+    TRACE("labels start offset: %d", dictionary_properties_->GetPersistenceOffset());
     labels_region_ = boost::interprocess::mapped_region(file_mapping_, boost::interprocess::read_only,
                                                         dictionary_properties_->GetPersistenceOffset(),
                                                         dictionary_properties_->GetSparseArraySize(), 0, map_options);
 
-    TRACE("transitions start offset: %d", dictionary_properties_.GetTransitionsOffset());
+    TRACE("transitions start offset: %d", dictionary_properties_->GetTransitionsOffset());
     transitions_region_ = boost::interprocess::mapped_region(
         file_mapping_, boost::interprocess::read_only, dictionary_properties_->GetTransitionsOffset(),
         dictionary_properties_->GetTransitionsSize(), 0, map_options);
@@ -129,9 +129,13 @@ class Automata final {
   /**
    * Get the start(root) stage of the FSA
    *
+   * In case of an empty FSA, returns 0.
+   *
    * @return index of root state.
    */
-  uint64_t GetStartState() const { return dictionary_properties_->GetStartState(); }
+  uint64_t GetStartState() const {
+    return dictionary_properties_->GetNumberOfKeys() != 0 ? dictionary_properties_->GetStartState() : 0;
+  }
 
   uint64_t GetNumberOfKeys() const { return dictionary_properties_->GetNumberOfKeys(); }
 
