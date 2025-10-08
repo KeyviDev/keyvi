@@ -134,7 +134,7 @@ class Automata final {
    * @return index of root state.
    */
   uint64_t GetStartState() const {
-    return dictionary_properties_->GetNumberOfStates() != 0 ? dictionary_properties_->GetStartState() : 0;
+    return dictionary_properties_->GetNumberOfKeys() != 0 ? dictionary_properties_->GetStartState() : 0;
   }
 
   uint64_t GetNumberOfKeys() const { return dictionary_properties_->GetNumberOfKeys(); }
