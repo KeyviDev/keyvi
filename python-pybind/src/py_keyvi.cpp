@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
+#include <pybind11/native_enum.h>
 #include <pybind11/pybind11.h>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
 
 #define STRINGIFY(x) #x
@@ -40,6 +42,13 @@ PYBIND11_MODULE(keyvi2, m, py::mod_gil_not_used()) {
            :toctree: _generate
 
     )pbdoc";
+  py::native_enum<keyvi::compression::CompressionAlgorithm>(m, "CompressionAlgorithm", "enum.Enum",
+                                                            "Compression algorithm used for packing values")
+      .value("NO_COMPRESSION", keyvi::compression::CompressionAlgorithm::NO_COMPRESSION)
+      .value("ZLIB_COMPRESSION", keyvi::compression::CompressionAlgorithm::ZLIB_COMPRESSION)
+      .value("SNAPPY_COMPRESSION", keyvi::compression::CompressionAlgorithm::SNAPPY_COMPRESSION)
+      .value("ZSTD_COMPRESSION", keyvi::compression::CompressionAlgorithm::ZSTD_COMPRESSION)
+      .finalize();
 
   py::enum_<kd::loading_strategy_types>(m, "loading_strategy_types")
       .value("default_os", kd::loading_strategy_types::default_os)
