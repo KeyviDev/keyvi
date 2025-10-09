@@ -1,0 +1,11 @@
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v21.1.2
+    hooks:
+      - id: clang-format
+        exclude: '^(.*/3rdparty/.*)'
+  - repo: https://github.com/cpplint/cpplint
+    rev: 2.0.2
+    hooks:
+      - id: cpplint
+        exclude: '^(.*/3rdparty/.*)'
