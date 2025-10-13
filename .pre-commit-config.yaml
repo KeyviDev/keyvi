@@ -9,3 +9,12 @@ repos:
     hooks:
       - id: cpplint
         exclude: '^(.*/3rdparty/.*)'
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo-fmt
+        entry: cargo fmt --manifest-path rust/Cargo.toml -- --check
+        language: system
+        pass_filenames: false
+        types:
+          - rust
