@@ -30,6 +30,6 @@ Please be as reviewer friendly as possible:
 
 By contributing to the project:
 
-- You agree to publish your work under the licence of the project: Apache 2.0 
+- You agree to publish your work under the licence of the project: Apache 2.0
 - You represent and warrant that you are the exclusive owner of the Copyright in the Contribution
   - If your contribution contains 3rdparty code you provide details about licence and restriction
