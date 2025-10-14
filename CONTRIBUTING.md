@@ -11,7 +11,7 @@ You will need to fork the repository and clone it to your local machine. See [gi
 
 ### Submitting your changes
 
-Once you successfully tested you are ready to submit for review. Note that some parts have to fulfill certain rules (e.g. formating), please have a look and do the changes accordingly. We will not do it for you.
+Once you successfully tested you are ready to submit for review. Note that some parts have to fulfill certain rules (e.g. formating), please have a look and do the changes accordingly. All checks must pass.
 
 #### Submit a pull request
 
