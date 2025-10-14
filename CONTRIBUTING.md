@@ -11,7 +11,7 @@ You will need to fork the repository and clone it to your local machine. See [gi
 
 ### Submitting your changes
 
-Once you successfully tested you are ready to submit for review. Note that some parts have to fulfill certain rules (e.g. formating), please have a look and do the changes accordingly. We will not do it for you.
+Once you successfully tested you are ready to submit for review. Note that some parts have to fulfill certain rules (e.g. formating), please have a look and do the changes accordingly. All checks must pass.
 
 #### Submit a pull request
 
@@ -30,6 +30,6 @@ Please be as reviewer friendly as possible:
 
 By contributing to the project:
 
-- You agree to publish your work under the licence of the project: Apache 2.0 
+- You agree to publish your work under the licence of the project: Apache 2.0
 - You represent and warrant that you are the exclusive owner of the Copyright in the Contribution
   - If your contribution contains 3rdparty code you provide details about licence and restriction

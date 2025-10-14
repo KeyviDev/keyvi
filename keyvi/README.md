@@ -66,13 +66,3 @@ to build on the commandline (in addition cmake creates Visual Studio configs):
 ```
 cmake --build . --config Release
 ```
-
-## Coding Rules
-
-The cpp part of keyvi has to pass the [https://pypi.python.org/pypi/cpplint](cpplint) checks as well as [https://clang.llvm.org/docs/ClangFormat.html](clang-format) (5.0.0 at the moment, defined by our travis CI configuration). 
-
-The configuration of both tools is part of the project. You can check your changes against the config using the `check-style.sh` script. For your convenience consider using a plugin for your IDE of choice (e.g. CppStyle for Eclipse).
-
-Formatting is not done automatically for you but code neads to be cleanly pushed. 
-
-The check must pass for all changed, including new, files. 
