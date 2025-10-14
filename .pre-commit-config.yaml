@@ -1,0 +1,36 @@
+exclude: |
+    (?x)^(
+        keyvi/3rdparty/.*
+    )$
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v21.1.2
+    hooks:
+      - id: clang-format
+        exclude: '^(.*/3rdparty/.*)'
+  - repo: https://github.com/cpplint/cpplint
+    rev: 2.0.2
+    hooks:
+      - id: cpplint
+        exclude: '^(.*/3rdparty/.*)'
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo-fmt
+        entry: cargo fmt --manifest-path rust/Cargo.toml -- --check
+        language: system
+        pass_filenames: false
+        types:
+          - rust
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: "v0.14.0"
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
