@@ -28,5 +28,3 @@ jobs:
           extra-args: '-std=c++17'
           style: ''  # disable clang-format checks.
           tidy-checks: '' # Use .clang-tidy config file.
-        # only 'update' a single comment in a pull request's thread.
-          thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
