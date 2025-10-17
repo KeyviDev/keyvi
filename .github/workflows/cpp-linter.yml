@@ -1,7 +1,7 @@
 name: cpp-linter
 on:
   pull_request:
-    paths: ['**.cpp', '**.h', '**.hpp', '**CMakeLists.txt', '**.cmake']
+    paths: ['**.cpp', '**.h', '**.hpp', '**CMakeLists.txt', '**.cmake', '.github/workflows/cpp-linter.yml']
 
 jobs:
   cpp-linter:
