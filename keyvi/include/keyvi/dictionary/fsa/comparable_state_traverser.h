@@ -65,7 +65,7 @@ class ComparableStateTraverser final {
   using label_t = typename innerTraverserType::label_t;
   using transition_t = typename innerTraverserType::transition_t;
 
-  explicit ComparableStateTraverser(const innerTraverserType &&traverser, const bool advance = true,
+  explicit ComparableStateTraverser(const innerTraverserType&& traverser, const bool advance = true,
                                     const size_t order = 0)
       : state_traverser_(std::move(traverser)), order_(order) {
     if (advance) {
@@ -85,7 +85,7 @@ class ComparableStateTraverser final {
       : ComparableStateTraverser(f, f->GetStartState(), advance, order) {}
 
   explicit ComparableStateTraverser(const automata_t f, const uint64_t start_state,
-                                    traversal::TraversalPayload<transition_t> &&payload, const bool advance = true,
+                                    traversal::TraversalPayload<transition_t>&& payload, const bool advance = true,
                                     const size_t order = 0)
       : state_traverser_(f, start_state, std::move(payload), false), order_(order) {
     if (advance) {
@@ -94,13 +94,13 @@ class ComparableStateTraverser final {
   }
 
   ComparableStateTraverser() = delete;
-  ComparableStateTraverser &operator=(ComparableStateTraverser const &) = delete;
-  ComparableStateTraverser(const ComparableStateTraverser &that) = delete;
+  ComparableStateTraverser& operator=(ComparableStateTraverser const&) = delete;
+  ComparableStateTraverser(const ComparableStateTraverser& that) = delete;
 
   /**
    * Comparison of the state traverser for the purpose of ordering them
    */
-  bool operator<(const ComparableStateTraverser &rhs) const {
+  bool operator<(const ComparableStateTraverser& rhs) const {
     int compare = std::memcmp(label_stack_.data(), rhs.label_stack_.data(),
                               std::min(label_stack_.size(), rhs.label_stack_.size()) * sizeof(label_t));
     if (compare != 0) {
@@ -114,16 +114,16 @@ class ComparableStateTraverser final {
     return order_ > rhs.order_;
   }
 
-  bool operator>(const ComparableStateTraverser &rhs) const { return rhs.operator<(*this); }
+  bool operator>(const ComparableStateTraverser& rhs) const { return rhs.operator<(*this); }
 
-  bool operator<=(const ComparableStateTraverser &rhs) const { return !operator>(rhs); }
+  bool operator<=(const ComparableStateTraverser& rhs) const { return !operator>(rhs); }
 
-  bool operator>=(const ComparableStateTraverser &rhs) const { return !operator<(rhs); }
+  bool operator>=(const ComparableStateTraverser& rhs) const { return !operator<(rhs); }
 
   /**
    * Compare traverser with another one, _ignoring_ the order value
    */
-  bool operator==(const ComparableStateTraverser &rhs) const {
+  bool operator==(const ComparableStateTraverser& rhs) const {
     if (label_stack_.size() != rhs.label_stack_.size()) {
       return false;
     }
@@ -131,7 +131,7 @@ class ComparableStateTraverser final {
     return std::memcmp(label_stack_.data(), rhs.label_stack_.data(), label_stack_.size() * sizeof(label_t)) == 0;
   }
 
-  bool operator!=(const ComparableStateTraverser &rhs) const { return !operator==(rhs); }
+  bool operator!=(const ComparableStateTraverser& rhs) const { return !operator==(rhs); }
 
   operator bool() const { return state_traverser_; }
 
@@ -162,7 +162,7 @@ class ComparableStateTraverser final {
 
   label_t GetStateLabel() const { return state_traverser_.GetStateLabel(); }
 
-  const std::vector<label_t> &GetStateLabels() const { return label_stack_; }
+  const std::vector<label_t>& GetStateLabels() const { return label_stack_; }
 
   size_t GetOrder() const { return order_; }
 
@@ -186,22 +186,22 @@ class ComparableStateTraverser final {
   template <class nearInnerTraverserType>
   friend class matching::NearMatching;
 
-  traversal::TraversalState<transition_t> &GetStates() { return state_traverser_.GetStates(); }
+  traversal::TraversalState<transition_t>& GetStates() { return state_traverser_.GetStates(); }
 
-  traversal::TraversalPayload<transition_t> &GetTraversalPayload() { return state_traverser_.GetTraversalPayload(); }
+  traversal::TraversalPayload<transition_t>& GetTraversalPayload() { return state_traverser_.GetTraversalPayload(); }
 
-  const traversal::TraversalPayload<transition_t> &GetTraversalPayload() const {
+  const traversal::TraversalPayload<transition_t>& GetTraversalPayload() const {
     return state_traverser_.GetTraversalPayload();
   }
 };
 
-inline bool CompareWeights(const traversal::TraversalState<traversal::WeightedTransition> &i,
-                           const traversal::TraversalState<traversal::WeightedTransition> &j) {
+inline bool CompareWeights(const traversal::TraversalState<traversal::WeightedTransition>& i,
+                           const traversal::TraversalState<traversal::WeightedTransition>& j) {
   return i.GetNextInnerWeight() == j.GetNextInnerWeight();
 }
 
 template <>
-inline bool ComparableStateTraverser<WeightedStateTraverser>::operator<(const ComparableStateTraverser &rhs) const {
+inline bool ComparableStateTraverser<WeightedStateTraverser>::operator<(const ComparableStateTraverser& rhs) const {
   TRACE("operator< (weighted state specialization)");
 
   TRACE("depth %ld %ld", state_traverser_.GetDepth(), rhs.state_traverser_.GetDepth());
@@ -231,7 +231,7 @@ inline bool ComparableStateTraverser<WeightedStateTraverser>::operator<(const Co
 }
 
 template <>
-inline bool ComparableStateTraverser<NearStateTraverser>::operator==(const ComparableStateTraverser &rhs) const {
+inline bool ComparableStateTraverser<NearStateTraverser>::operator==(const ComparableStateTraverser& rhs) const {
   if (label_stack_.size() != rhs.label_stack_.size()) {
     return false;
   }
@@ -244,7 +244,7 @@ inline bool ComparableStateTraverser<NearStateTraverser>::operator==(const Compa
 }
 
 template <>
-inline bool ComparableStateTraverser<NearStateTraverser>::operator<(const ComparableStateTraverser &rhs) const {
+inline bool ComparableStateTraverser<NearStateTraverser>::operator<(const ComparableStateTraverser& rhs) const {
   TRACE("operator< (near state specialization)");
 
   if (GetTraversalPayload().exact != rhs.GetTraversalPayload().exact) {
