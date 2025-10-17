@@ -70,14 +70,14 @@ void init_keyvi_dictionary_compilers(const py::module_ &module) {
       .def(py::init<>())                                                         \
       .def(py::init<const keyvi::util::parameters_t &>()) /* init with params */ \
       CREATE_COMPILER_COMMON(compiler)                                           \
-      .def("add", &compiler::Add) /* DEPRECATED */                               \
+      .def("add", &compiler::Add)                                                \
       .def("Add", &compiler::Add);
 #define CREATE_KEY_ONLY_COMPILER(compiler, name)                                 \
   py::class_<compiler>(module, name)                                             \
       .def(py::init<>())                                                         \
       .def(py::init<const keyvi::util::parameters_t &>()) /* init with params */ \
       CREATE_COMPILER_COMMON(compiler)                                           \
-      .def("add", &compiler::Add) /* DEPRECATED */                               \
+      .def("add", [](compiler &c, const std::string &key) { c.Add(key); })       \
       .def("Add", [](compiler &c, const std::string &key) { c.Add(key); });
 #define CREATE_SK_COMPILER(compiler, name)                                                  \
   py::class_<compiler>(module, name)                                                        \
