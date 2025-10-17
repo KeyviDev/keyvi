@@ -114,7 +114,7 @@ if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
   link_directories (${Boost_LIBRARY_DIRS})
-  
+
   # required for endian specific functions
   list(APPEND _OS_LIBRARIES "ws2_32")
 endif (WIN32)
@@ -247,7 +247,7 @@ if(KEYVI_TESTS)
     elseif(EXISTS "${UTF_PATH}/../bin/${UTF_BASE_NAME}.dll")
         add_custom_command(TARGET unit_test_all POST_BUILD
           COMMAND ${CMAKE_COMMAND} -E copy "${UTF_PATH}/../bin/${UTF_BASE_NAME}.dll" ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-          )	
+          )
     endif()
     endforeach()
   endif (WIN32)
