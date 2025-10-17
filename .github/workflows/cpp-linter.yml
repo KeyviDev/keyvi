@@ -7,6 +7,7 @@ jobs:
   cpp-linter:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pull-requests: write
     steps:
       - name: install Linux deps
