@@ -1,0 +1,121 @@
+name: Python Pybind cibuildwheel
+
+on:
+  push:
+    branches: [ master, release-* ]
+  pull_request:
+    branches: [ master ]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: pybind-cibuildwheel ${{ matrix.os }}/${{ matrix.flavor }}/${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-15-intel: x86, macos-14: Arm64
+        os: [ubuntu-22.04, ubuntu-24.04-arm, macos-15-intel, macos-14]
+        # skip pypy, https://github.com/pypa/distutils/issues/283
+        flavor: ['cpython']
+        # separate musl and many on linux, for mac we just skip one of those
+        target: [ 'many', 'musl' ]
+        exclude:
+          - os: macos-15-intel
+            target: musl
+          - os: macos-14
+            target: musl
+    steps:
+      - uses: actions/checkout@v5
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.18
+        with:
+          key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.flavor }}-python-pybind
+
+      - name: Skip manylinux for musllinux target
+        if: ${{ (runner.os == 'Linux') && (matrix.target == 'musl') }}
+        run: |
+          echo "CIBW_SKIP=*manylinux*" >> $GITHUB_ENV
+
+      - name: Skip musllinux for manylinux target
+        if: ${{ (runner.os == 'Linux') && (matrix.target == 'many') }}
+        run: |
+          echo "CIBW_SKIP=*musllinux*" >> $GITHUB_ENV
+
+      - name: Skip pypy for cpython
+        if: ${{ matrix.flavor == 'cpython' }}
+        run: |
+          echo "CIBW_SKIP=${{ env.CIBW_SKIP }} pp*" >> $GITHUB_ENV
+
+      - name: Skip cpython for pypy
+        if: ${{ matrix.flavor == 'pypy' }}
+        run: |
+          echo "CIBW_SKIP=${{ env.CIBW_SKIP }} cp*" >> $GITHUB_ENV
+
+      - name: install mac dependencies
+        if: ${{ runner.os == 'macOS' }}
+        # 2nd command: workaround https://github.com/actions/setup-python/issues/577
+        run: |
+          brew update && \
+          brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done && \
+          brew install ccache zlib snappy boost
+
+      - name: set mac deployment target X64
+        if: runner.os == 'macOS' && runner.arch == 'X64'
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=15.0" >> $GITHUB_ENV
+
+      - name: set mac deployment target arm64
+        if: runner.os == 'macOS' && runner.arch == 'ARM64'
+        run: |
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
+
+      - name: Build python wheels for ${{ matrix.os }}
+        uses: pypa/cibuildwheel@v3.2.0
+        env:
+          # Skip CPython 3.8
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp38-*
+
+          # only build native packages
+          CIBW_ARCHS: native
+
+          # skip tests on pypy, currently fails for indexer tests
+          CIBW_TEST_SKIP: "pp*"
+
+          # ccache using path
+          CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
+          CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
+
+          # for debugging set this to 1,2 or 3
+          # CIBW_BUILD_VERBOSITY: 2
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ matrix.os }}-${{ matrix.flavor }}-${{ matrix.target }}
+          path: ./wheelhouse/*.whl
+
+  build_sdist:
+    name: sdist
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: install Linux deps
+      run: |
+        sudo apt-get update && \
+        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
+    - name: ccache
+      uses: hendrikmuhs/ccache-action@v1.2.18
+      with:
+        key: ubuntu-sdist-python-pybind
+
+    - name: Build SDist
+      run: |
+        export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
+        pipx run build --sdist
+        python -m pip install dist/*.tar.gz -v && \
+        python -m pip install pytest && \
+        python -m pytest python-pybind/tests && \
+        python -m pip uninstall -y keyvi_pybind11
+
