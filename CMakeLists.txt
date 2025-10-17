@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.21)
 project(keyvi)
 
 #### Build Type
@@ -6,14 +6,25 @@ if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
 endif()
 
+#### Options
+
+option(KEYVI_C_BINDINGS "Keyvi: Build C binding" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_PYTHON_BINDINGS "Keyvi: Build Python module" OFF)
+option(KEYVI_TESTS "Keyvi: Build unit tests" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_BINARIES "Keyvi: Build Python module" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_CLANG_TIDY "Keyvi: Build with clang tidy" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_DOCS "Keyvi: Build docs" ${PROJECT_IS_TOP_LEVEL})
+
 #### Linting
-find_program(CLANGTIDY clang-tidy)
-if(CLANGTIDY)
-  message ("-- Found clang-tidy")
-  set(CMAKE_CXX_CLANG_TIDY clang-tidy; --extra-arg-before=-std=c++17)
-else()
-  message ("-- clang-tidy not found")
-endif()
+if(KEYVI_CLANG_TIDY)
+  find_program(CLANGTIDY clang-tidy)
+  if(CLANGTIDY)
+    message ("-- Found clang-tidy")
+    set(CMAKE_CXX_CLANG_TIDY clang-tidy; --extra-arg-before=-std=c++17)
+  else()
+    message ("-- clang-tidy not found")
+  endif()
+endif(KEYVI_CLANG_TIDY)
 
 #### Cmake modules
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/")
@@ -174,67 +185,73 @@ string(REPLACE " " ";" _KEYVI_COMPILE_DEFINITIONS_LIST "${_KEYVI_COMPILE_DEFINIT
 
 #### Targets ####
 
-# keyvicompiler
-add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
-target_link_libraries(keyvicompiler ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
-target_compile_options(keyvicompiler PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(keyvicompiler PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_include_directories(keyvicompiler PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
+if(KEYVI_BINARIES)
+  # keyvicompiler
+  add_executable(keyvicompiler keyvi/bin/keyvicompiler/keyvicompiler.cpp)
+  target_link_libraries(keyvicompiler ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
+  target_compile_options(keyvicompiler PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
+  target_compile_definitions(keyvicompiler PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
+  target_include_directories(keyvicompiler PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 
-install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
+  install (TARGETS keyvicompiler DESTINATION bin COMPONENT applications OPTIONAL)
 
-# keyviinspector
-add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
-target_link_libraries(keyviinspector ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
-target_compile_options(keyviinspector PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(keyviinspector PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_include_directories(keyviinspector PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
+  # keyviinspector
+  add_executable(keyviinspector keyvi/bin/keyviinspector/keyviinspector.cpp)
+  target_link_libraries(keyviinspector ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
+  target_compile_options(keyviinspector PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
+  target_compile_definitions(keyviinspector PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
+  target_include_directories(keyviinspector PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 
-install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
+  install (TARGETS keyviinspector DESTINATION bin COMPONENT applications OPTIONAL)
 
-# keyvimerger
-add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
-target_link_libraries(keyvimerger ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
-target_compile_options(keyvimerger PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(keyvimerger PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_include_directories(keyvimerger PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
+  # keyvimerger
+  add_executable(keyvimerger keyvi/bin/keyvimerger/keyvimerger.cpp)
+  target_link_libraries(keyvimerger ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
+  target_compile_options(keyvimerger PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
+  target_compile_definitions(keyvimerger PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
+  target_include_directories(keyvimerger PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
 
-install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
+  install (TARGETS keyvimerger DESTINATION bin COMPONENT applications)
+endif(KEYVI_BINARIES)
 
 # keyvi_c
-add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
-target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
-target_compile_options(keyvi_c PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
+if(KEYVI_C_BINDINGS)
+  add_library(keyvi_c SHARED keyvi/bin/keyvi_c/c_api.cpp)
+  target_link_libraries(keyvi_c ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
+  target_compile_options(keyvi_c PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
+  target_compile_definitions(keyvi_c PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
+  target_include_directories(keyvi_c PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
+endif(KEYVI_C_BINDINGS)
 
 # unit tests
-FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
-add_executable(unit_test_all ${UNIT_TEST_SOURCES})
-target_link_libraries(unit_test_all ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
-target_compile_options(unit_test_all PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
-target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
-target_include_directories(unit_test_all PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
-add_dependencies(unit_test_all keyvimerger)
+if(KEYVI_TESTS)
+  FILE(GLOB_RECURSE UNIT_TEST_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} keyvi/tests/keyvi/*.cpp)
+  add_executable(unit_test_all ${UNIT_TEST_SOURCES})
+  target_link_libraries(unit_test_all ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
+  target_compile_options(unit_test_all PRIVATE ${_KEYVI_CXX_FLAGS_LIST})
+  target_compile_definitions(unit_test_all PRIVATE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
+  target_include_directories(unit_test_all PRIVATE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>")
+  add_dependencies(unit_test_all keyvimerger)
 
-if (WIN32)
-  message(STATUS "zlib: ${ZLIB_LIBRARY_RELEASE}")
-  # copies the dlls required to run to the build folder
-  foreach(LIB ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE} ${Boost_FILESYSTEM_LIBRARY_RELEASE} ${ZLIB_LIBRARY_RELEASE})
-    get_filename_component(UTF_BASE_NAME ${LIB} NAME_WE)
-    get_filename_component(UTF_PATH ${LIB} PATH)
-	if(EXISTS "${UTF_PATH}/${UTF_BASE_NAME}.dll")
-      add_custom_command(TARGET unit_test_all POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${UTF_PATH}/${UTF_BASE_NAME}.dll" ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-        )
-	# zlib might be stored in a different folder
-	elseif(EXISTS "${UTF_PATH}/../bin/${UTF_BASE_NAME}.dll")
-      add_custom_command(TARGET unit_test_all POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy "${UTF_PATH}/../bin/${UTF_BASE_NAME}.dll" ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-        )	
-	endif()
-  endforeach()
-endif (WIN32)
+  if (WIN32)
+    message(STATUS "zlib: ${ZLIB_LIBRARY_RELEASE}")
+    # copies the dlls required to run to the build folder
+    foreach(LIB ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE} ${Boost_FILESYSTEM_LIBRARY_RELEASE} ${ZLIB_LIBRARY_RELEASE})
+      get_filename_component(UTF_BASE_NAME ${LIB} NAME_WE)
+      get_filename_component(UTF_PATH ${LIB} PATH)
+    if(EXISTS "${UTF_PATH}/${UTF_BASE_NAME}.dll")
+        add_custom_command(TARGET unit_test_all POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy "${UTF_PATH}/${UTF_BASE_NAME}.dll" ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
+          )
+    # zlib might be stored in a different folder
+    elseif(EXISTS "${UTF_PATH}/../bin/${UTF_BASE_NAME}.dll")
+        add_custom_command(TARGET unit_test_all POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy "${UTF_PATH}/../bin/${UTF_BASE_NAME}.dll" ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
+          )	
+    endif()
+    endforeach()
+  endif (WIN32)
+endif(KEYVI_TESTS)
 
 # bindings
 add_custom_target(bindings
@@ -259,10 +276,14 @@ target_include_directories(keyvi INTERFACE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>
 target_compile_definitions(keyvi INTERFACE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_link_libraries(keyvi INTERFACE ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 
+if (KEYVI_PYTHON_BINDINGS)
+    add_subdirectory(python-pybind)
+endif ()
+
 ### docs
 
 # don't run it as part of a non-toplevel build, e.g. python
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/sphinx-docs)
+if(KEYVI_DOCS)
     find_package(Doxygen)
     find_package(Sphinx COMPONENTS breathe)
 
@@ -288,4 +309,4 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/sphinx-docs)
     else()
         message ("-- Skip doc target, doxygen/sphinx not found")
     endif()
-endif()
+endif(KEYVI_DOCS)
