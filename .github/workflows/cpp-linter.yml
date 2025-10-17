@@ -1,0 +1,30 @@
+name: cpp-linter
+on:
+  pull_request:
+    paths: ['**.cpp', '**.h', '**.hpp', '**CMakeLists.txt', '**.cmake']
+
+jobs:
+  cpp-linter:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: install Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+
+      - uses: actions/checkout@v5
+
+      - uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: 21
+          extra-args: '-std=c++17'
+          style: ''  # disable clang-format checks.
+          tidy-checks: '' # Use .clang-tidy config file.
+        # only 'update' a single comment in a pull request's thread.
+          thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
