@@ -16,7 +16,7 @@ jobs:
       with:
         split_workflow: true
         build_dir: build
-        apt_packages: "libsnappy-dev, libzzip-dev, zlib1g-dev, libboost-all-dev"
+        apt_packages: "libsnappy-dev, libzzip-dev, zlib1g-dev, libboost-all-dev libzstd-dev"
         clang_tidy_checks: ''
         cmake_command: "cmake -Bbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ."
 
