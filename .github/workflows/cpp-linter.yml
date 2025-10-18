@@ -32,4 +32,5 @@ jobs:
           database: build
           style: ''  # disable clang-format checks.
           tidy-checks: '' # Use .clang-tidy config file.
-          thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
+          ignore-tidy: 'keyvi/3rdparty'
+          step-summary: true
