@@ -1,0 +1,25 @@
+name: clang-tidy-review
+
+# You can be more specific, but it currently only works on pull requests
+on:
+  pull_request:
+    paths: ['**.cpp', '**.h', '**.hpp', '**CMakeLists.txt', '**.cmake', '.github/workflows/clang*.yml']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+
+    # Optionally generate compile_commands.json
+
+    - uses: ZedThree/clang-tidy-review@v0.21.0
+      with:
+        split_workflow: true
+        build_dir: build
+        apt_packages: "libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev"
+        clang_tidy_checks: ''
+        cmake_command: "cmake -Bbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ."
+
+    - uses: ZedThree/clang-tidy-review/upload@v0.21.0
