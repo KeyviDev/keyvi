@@ -6,7 +6,7 @@ RUN \
     yum -y install bzip2-devel snappy-devel xxhash-devel libzstd-devel python3-devel openssl-devel && \
     yum clean all;
 
-COPY docker/scripts/ /scripts/
+COPY --from=scripts . /scripts/
 WORKDIR /scripts
 
 RUN ./install_zlib.sh

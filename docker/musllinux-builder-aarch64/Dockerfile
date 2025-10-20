@@ -4,7 +4,7 @@ RUN \
     apk upgrade --no-cache && \
     apk add --no-cache procps bzip2-dev snappy-dev python3-dev zstd-dev xxhash-dev openssl-dev;
 
-COPY docker/scripts/ /scripts/
+COPY --from=scripts . /scripts/
 WORKDIR /scripts
 
 RUN ./install_zlib.sh
