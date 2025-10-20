@@ -7,7 +7,7 @@ updates:
       interval: "weekly"
   # Docker images for cibuildwheel
   - package-ecosystem: "docker"
-      directories:
+    directories:
       - "/docker/manylinux-builder-aarch64"
       - "/docker/manylinux-builder-x86_64"
       - "/docker/musllinux-builder-aarch64"
