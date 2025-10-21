@@ -180,7 +180,7 @@ class MinimizationHash final {
    * @return the equal state or an empty value
    */
   template <typename EqualityType>
-  inline const T Get(EqualityType& key) const {  // NOLINT
+  inline const T Get(EqualityType &key) const {  // NOLINT
     size_t hash = key.GetHashcode() & 0x7fffffff;
     size_t bucket = hash % hash_size_;
 
@@ -209,7 +209,7 @@ class MinimizationHash final {
    * @return the equal state or an empty value
    */
   template <typename EqualityType>
-  inline const T GetAndMove(EqualityType& key, MinimizationHash<T>* other) {  // NOLINT
+  inline const T GetAndMove(EqualityType &key, MinimizationHash<T> *other) {  // NOLINT
     size_t hash = key.GetHashcode() & 0x7fffffff;
     size_t bucket = hash % hash_size_;
     T entry = entries_[bucket];
@@ -325,10 +325,10 @@ class MinimizationHash final {
   size_t rehash_limit_ = 0;
 
   /// the actual data storage
-  T* entries_ = 0;
+  T *entries_ = 0;
 
   /// overflow data storage for colliding entries
-  T* overflow_entries_ = 0;
+  T *overflow_entries_ = 0;
 
   /// number of items in the data
   size_t count_ = 0;
@@ -399,10 +399,10 @@ class MinimizationHash final {
     hash_size_ = hash_size_step_table_[hash_size_step_];
     rehash_limit_ = static_cast<int>(hash_size_ * load_factor_);
 
-    T* old_entries = entries_;
+    T *old_entries = entries_;
     entries_ = new T[hash_size_];
 
-    T* old_overflow_entries = overflow_entries_;
+    T *old_overflow_entries = overflow_entries_;
     overflow_entries_size_ = std::min(hash_size_ >> 2, max_cookie_size_);
     overflow_entries_ = new T[overflow_entries_size_];
 

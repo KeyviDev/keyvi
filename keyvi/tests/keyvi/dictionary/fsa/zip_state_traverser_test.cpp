@@ -510,7 +510,7 @@ BOOST_AUTO_TEST_CASE(basic) {
   BOOST_CHECK(!t);
 }
 
-std::vector<std::string> GetAllKeys(ZipStateTraverser<StateTraverser<>>* zip_traverser) {
+std::vector<std::string> GetAllKeys(ZipStateTraverser<StateTraverser<>> *zip_traverser) {
   std::vector<unsigned char> label_stack;
   std::vector<std::string> keys;
 

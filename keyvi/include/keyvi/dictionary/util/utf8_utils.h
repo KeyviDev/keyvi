@@ -25,11 +25,12 @@
 #ifndef UTF8_UTILS_H_
 #define UTF8_UTILS_H_
 
+
 namespace keyvi {
 namespace dictionary {
 namespace util {
 
-class Utf8Utils final {
+class Utf8Utils final{
  public:
   static bool IsLeadByte(char utf8_byte) {
     int intValue = utf8_byte & 0xFF;
@@ -41,22 +42,32 @@ class Utf8Utils final {
     return (intValue < 0x80) || (intValue >= 0xC0);
   }
 
-  static size_t GetCharLength(char utf8_lead_byte) {
-    int intValue = utf8_lead_byte & 0xff;
+  static size_t GetCharLength(char utf8_lead_byte)
+  {
+     int intValue = utf8_lead_byte & 0xff;
 
-    if (intValue < 0x80) {
-      return 1;
-    } else if (intValue < 0xc0) {
-      std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(intValue));
-    } else if (intValue < 0xe0) {
-      return 2;
-    } else if (intValue < 0xf0) {
-      return 3;
-    } else if (intValue < 0xf8) {
-      return 4;
-    }
+     if (intValue < 0x80)
+     {
+         return 1;
+     }
+     else if (intValue < 0xc0)
+     {
+       std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(intValue));
+     }
+     else if (intValue < 0xe0)
+     {
+         return 2;
+     }
+     else if (intValue < 0xf0)
+     {
+         return 3;
+     }
+     else if (intValue < 0xf8)
+     {
+         return 4;
+     }
 
-    throw std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(intValue));
+     throw std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(intValue));
   }
 };
 

@@ -22,15 +22,15 @@
  *      Author: hendrik
  */
 
-// The following is left intentionally without include guard
-// so that tracing can be switched on and off on a per file basis.
+//The following is left intentionally without include guard
+//so that tracing can be switched on and off on a per file basis.
 #ifdef ENABLE_TRACING
-#undef TRACE
-#define TRACE ::keyvi::dictionary::util::trace::trace_it
-#undef ENABLE_TRACING
+# undef TRACE
+# define TRACE ::keyvi::dictionary::util::trace::trace_it
+# undef ENABLE_TRACING
 #else
-#undef TRACE
-#define TRACE(x, ...)
+# undef TRACE
+# define TRACE(x,...)
 #endif
 
 #ifndef TRACE_H_
@@ -45,17 +45,17 @@ namespace util {
 
 class trace final {
  public:
-  static void trace_it(const char* message, ...) {
-    va_list arguments;
-    va_start(arguments, message);
+    static void trace_it(const char* message, ...) {
+      va_list arguments;
+      va_start(arguments, message);
 
-    fprintf(stderr, "* ");
-    vfprintf(stderr, message, arguments);
-    fprintf(stderr, "\n");
-  }
-};
+      fprintf(stderr, "* ");
+      vfprintf(stderr, message, arguments);
+      fprintf(stderr, "\n");
+    }
+  };
 
-} /* namespace util */
-} /* namespace dictionary */
-} /* namespace keyvi */
+  } /* namespace util */
+  } /* namespace dictionary */
+  } /* namespace keyvi */
 #endif /* TRACE_H_ */

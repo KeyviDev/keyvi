@@ -35,7 +35,7 @@ namespace internal {
 BOOST_AUTO_TEST_SUITE(MinimizationHashTests)
 
 BOOST_AUTO_TEST_CASE(insert) {
-  MinimizationHash<PackedState<>>* hash = new MinimizationHash<PackedState<>>();
+  MinimizationHash<PackedState<>> *hash = new MinimizationHash<PackedState<>>();
   PackedState<> p1 = {10, 25, 2};
   hash->Add(p1);
   PackedState<> p2 = {12, 25, 3};
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(insert) {
 }
 
 BOOST_AUTO_TEST_CASE(reset) {
-  MinimizationHash<PackedState<>>* hash = new MinimizationHash<PackedState<>>();
+  MinimizationHash<PackedState<>> *hash = new MinimizationHash<PackedState<>>();
   PackedState<> p1 = {10, 25, 2};
   hash->Add(p1);
   PackedState<> p2 = {12, 25, 3};

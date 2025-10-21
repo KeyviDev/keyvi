@@ -46,7 +46,9 @@ inline std::string get_keyvimerger_bin() {
 }
 
 inline size_t limit_filedescriptors(size_t file_descriptor_limit) {
-  struct rlimit limit{0};
+  struct rlimit limit {
+    0
+  };
 
   getrlimit(RLIMIT_NOFILE, &limit);
   const size_t old_limit = limit.rlim_cur;
