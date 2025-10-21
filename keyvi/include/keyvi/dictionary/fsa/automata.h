@@ -410,7 +410,7 @@ class Automata final {
 
   [[nodiscard]] const std::string& GetManifest() const { return dictionary_properties_->GetManifest(); }
 
-  [[nodiscard]] const uint64_t GetVersion() const { return dictionary_properties_->GetVersion(); }
+  [[nodiscard]] uint64_t GetVersion() const { return dictionary_properties_->GetVersion(); }
 
  private:
   dictionary_properties_t dictionary_properties_;
