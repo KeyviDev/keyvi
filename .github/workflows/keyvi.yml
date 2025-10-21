@@ -1,13 +1,30 @@
 # Build on Linux
 
-name: Build keyvi
+name: Build keyvi core
 
 # Controls when the action will run. 
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/python**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'python/**'
+      - 'rust/**'
+
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/python**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'python/**'
+      - 'rust/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
