@@ -12,7 +12,7 @@ option(KEYVI_C_BINDINGS "Keyvi: Build C binding" ${PROJECT_IS_TOP_LEVEL})
 option(KEYVI_PYTHON_BINDINGS "Keyvi: Build Python module" OFF)
 option(KEYVI_TESTS "Keyvi: Build unit tests" ${PROJECT_IS_TOP_LEVEL})
 option(KEYVI_BINARIES "Keyvi: Build Python module" ${PROJECT_IS_TOP_LEVEL})
-option(KEYVI_CLANG_TIDY "Keyvi: Build with clang tidy" ${PROJECT_IS_TOP_LEVEL} OFF)
+option(KEYVI_CLANG_TIDY "Keyvi: Build with clang tidy" OFF)
 option(KEYVI_DOCS "Keyvi: Build docs" ${PROJECT_IS_TOP_LEVEL})
 
 #### Linting
