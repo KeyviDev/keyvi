@@ -406,11 +406,11 @@ class Automata final {
     return value_store_reader_->GetMsgPackedValueAsString(state_value, compression_algorithm);
   }
 
-  std::string GetStatistics() const { return dictionary_properties_->GetStatistics(); }
+  [[nodiscard]] std::string GetStatistics() const { return dictionary_properties_->GetStatistics(); }
 
-  const std::string& GetManifest() const { return dictionary_properties_->GetManifest(); }
+  [[nodiscard]] const std::string& GetManifest() const { return dictionary_properties_->GetManifest(); }
 
-  const uint64_t GetVersion() const { return dictionary_properties_->GetVersion(); }
+  [[nodiscard]] const uint64_t GetVersion() const { return dictionary_properties_->GetVersion(); }
 
  private:
   dictionary_properties_t dictionary_properties_;
@@ -472,7 +472,7 @@ class Automata final {
 
   friend class keyvi::dictionary::SecondaryKeyDictionary;
 
-  const dictionary_properties_t& GetDictionaryProperties() const { return dictionary_properties_; }
+  [[nodiscard]] const dictionary_properties_t& GetDictionaryProperties() const { return dictionary_properties_; }
 };
 
 // shared pointer

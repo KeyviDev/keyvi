@@ -31,6 +31,7 @@
 #include <vector>
 
 #include "keyvi/dictionary/fsa/automata.h"
+#include "keyvi/dictionary/fsa/traversal/traversal_base.h"
 #include "keyvi/dictionary/fsa/traverser_types.h"
 
 // #define ENABLE_TRACING
@@ -162,7 +163,7 @@ class ComparableStateTraverser final {
 
   label_t GetStateLabel() const { return state_traverser_.GetStateLabel(); }
 
-  const std::vector<label_t>& GetStateLabels() const { return label_stack_; }
+  [[nodiscard]] const std::vector<label_t>& GetStateLabels() const { return label_stack_; }
 
   size_t GetOrder() const { return order_; }
 
@@ -190,7 +191,7 @@ class ComparableStateTraverser final {
 
   traversal::TraversalPayload<transition_t>& GetTraversalPayload() { return state_traverser_.GetTraversalPayload(); }
 
-  const traversal::TraversalPayload<transition_t>& GetTraversalPayload() const {
+  [[nodiscard]] const traversal::TraversalPayload<transition_t>& GetTraversalPayload() const {
     return state_traverser_.GetTraversalPayload();
   }
 };
