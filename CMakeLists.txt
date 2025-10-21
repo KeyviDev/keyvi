@@ -10,7 +10,7 @@ endif()
 
 option(KEYVI_C_BINDINGS "Keyvi: Build C binding" ${PROJECT_IS_TOP_LEVEL})
 option(KEYVI_TESTS "Keyvi: Build unit tests" ${PROJECT_IS_TOP_LEVEL})
-option(KEYVI_BINARIES "Keyvi: Build Python module" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_BINARIES "Keyvi: Build keyvi binaries" ${PROJECT_IS_TOP_LEVEL})
 option(KEYVI_CLANG_TIDY "Keyvi: Build with clang tidy" OFF)
 option(KEYVI_DOCS "Keyvi: Build docs" ${PROJECT_IS_TOP_LEVEL})
 
