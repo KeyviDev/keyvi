@@ -293,7 +293,8 @@ class StringValueStoreReader final : public IValueStoreReader {
   std::string GetMsgPackedValueAsString(uint64_t fsa_value,
                                         const compression::CompressionAlgorithm compression_algorithm =
                                             compression::CompressionAlgorithm::NO_COMPRESSION) const override {
-    std::string msgpacked_value = keyvi::util::ValueToMsgPack(std::string(strings_ + fsa_value));
+    // GH#333: if string is valid json, parse it as msgpack for backwards-compatibility
+    std::string msgpacked_value = keyvi::util::JsonStringToMsgPack(std::string(strings_ + fsa_value));
 
     if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
       return msgpacked_value;

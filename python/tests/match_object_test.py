@@ -206,6 +206,7 @@ def test_get_value_string():
     c.add("abc", "aaaaa")
     c.add("abd", "bbbbb")
     c.add("abe", "{}")
+    c.add("abf", "{'xyz': 42}")
     with tmp_dictionary(c, "match_object_string.kv") as d:
         m = d["abc"]
         assert m.value == "aaaaa"
@@ -223,9 +224,11 @@ def test_get_value_string():
             == "bbbbb"
         )
         m = d["abe"]
-        # gh#333: keyvi < 0.6.4 returned a dictionary instead of a string
-        assert m.value == "{}"
-        assert isinstance(m.value, str)
+        # gh#333: return a dictionary instead of a string
+        assert m.value == {}
+        assert isinstance(m.value, dict)
+        m = d["abf"]
+        assert m.value == {"xyz": 42}
 
 
 def test_matched_string():
