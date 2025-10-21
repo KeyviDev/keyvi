@@ -4,6 +4,8 @@ on:
   push:
     branches: [ master, release-* ]
     paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/keyvi.yml'
       - '.github/workflows/python-dockerimages-**.yml'
       - '.github/workflows/rust**.yml'
       - 'docker/**'
@@ -12,6 +14,8 @@ on:
   pull_request:
     branches: [ master ]
     paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/keyvi.yml'
       - '.github/workflows/python-dockerimages-**.yml'
       - '.github/workflows/rust**.yml'
       - 'docker/**'
