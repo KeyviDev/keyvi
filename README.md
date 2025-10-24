@@ -5,6 +5,7 @@
 [![PythonImpl](https://img.shields.io/pypi/implementation/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PythonFormat](https://img.shields.io/pypi/format/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PyPIVersion](https://img.shields.io/pypi/v/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
+[![CratesVersion](https://img.shields.io/crates/v/keyvi)](https://crates.io/crates/keyvi/)
 
 ##
 ![Keyvi](/doc/images/keyvi-small.png)
