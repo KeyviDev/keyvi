@@ -68,7 +68,7 @@ endif (CMAKE_BUILD_TYPE_UPPER MATCHES COVERAGE)
 #### Dependencies ####
 
 # BOOST
-set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "regex" "thread")
+set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem")
 set (_KEYVI_BOOST_LIBRARIES_TEST "unit_test_framework")
 
 set(Boost_USE_STATIC_LIBS OFF)
