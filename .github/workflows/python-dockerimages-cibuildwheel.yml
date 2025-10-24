@@ -2,14 +2,14 @@ name: Python Linux docker cibuildwheel
 
 on:
   push:
-    branches: [ master, release-* ]
+    branches: [ master ]
     paths:
-      - 'docker/*/Dockerfile'
+      - 'docker/**'
       - '.github/workflows/python-dockerimages-cibuildwheel.yml'
   pull_request:
     branches: [ master ]
     paths:
-      - 'docker/*/Dockerfile'
+      - 'docker/**'
       - '.github/workflows/python-dockerimages-cibuildwheel.yml'
   workflow_dispatch:
 
@@ -39,22 +39,13 @@ jobs:
           echo "PLATFORM=linux/amd64" >> $GITHUB_ENV
           echo "ARCH=x86_64" >> $GITHUB_ENV
         if: matrix.os == 'ubuntu-24.04'
-      - name: Sets env for manylinux
-        run: |
-          echo "BASE_IMAGE=quay.io/pypa/manylinux_2_28_${{ env.ARCH }}" >> $GITHUB_ENV
-        if: matrix.base_image == 'many'
-      - name: Sets env for musllinux
-        run: |
-          echo "BASE_IMAGE=quay.io/pypa/musllinux_1_2_${{ env.ARCH }}" >> $GITHUB_ENV
-        if: matrix.base_image == 'musl'
       - name: Build and push ${{ matrix.base_image }}-${{ env.ARCH }} docker image
         uses: docker/build-push-action@v6
         with:
-          context: docker/manylinux-builder
+          context: docker/${{ matrix.base_image }}linux-builder-${{ env.ARCH }}
+          build-contexts: scripts=docker/scripts
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: ${{ env.PLATFORM }}
           push: ${{ github.event_name == 'push' }}
-          build-args: |
-            base_image=${{ env.BASE_IMAGE }}
           tags: keyvidev/${{ matrix.base_image }}linux-builder-${{ env.ARCH }}

@@ -5,3 +5,16 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  # Docker images for cibuildwheel
+  - package-ecosystem: "docker"
+    directories:
+      - "/docker/manylinux-builder-aarch64"
+      - "/docker/manylinux-builder-x86_64"
+      - "/docker/musllinux-builder-aarch64"
+      - "/docker/musllinux-builder-x86_64"
+    schedule:
+      interval: "weekly"
+    groups:
+      docker:
+        patterns:
+          - "*"
