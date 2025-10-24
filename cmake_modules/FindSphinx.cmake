@@ -337,4 +337,3 @@ function(sphinx_add_docs _target)
               "${_outputdir}"
     DEPENDS ${_depends})
 endfunction()
-

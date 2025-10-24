@@ -3,8 +3,22 @@ name: Rust
 on:
   push:
     branches: [ master, release-* ]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/keyvi.yml'
+      - '.github/workflows/python**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'python/**'
   pull_request:
     branches: [master]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/keyvi.yml'
+      - '.github/workflows/python**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'python/**'
   release:
     types: [published]
   workflow_dispatch:
