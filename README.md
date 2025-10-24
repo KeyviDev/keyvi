@@ -42,10 +42,10 @@ The python extension can be compiled standalone, check the [Readme](/python/READ
       * [Index](/doc/usage/Keyvi%20Index%20with%20python.md)
   * [Crashcourse](/doc/usage/Crashcourse.md)
   * [API docs](https://keyvidev.github.io/keyvi/index.html)
-  * [Using python keyvi with EMR (mrjob or pyspark)](/doc/usage/Using%20pykeyvi%20in%20EMR.md)  
+  * [Using python keyvi with EMR (mrjob or pyspark)](/doc/usage/Using%20pykeyvi%20in%20EMR.md)
 
 ## Internals
-  
+
   * [Construction Basics](/doc/algorithm/Construction-Basics.md)
   * [Persistence Basics](/doc/algorithm/Persistence-Basics.md)
   * [Minimization](/doc/algorithm/Minimization.md)
@@ -59,7 +59,7 @@ If you like to go deep down in the basics, keyvi is inspired by the following 2 
 
 ## Release procedure
   * [How to make a release](doc/RELEASE_PROCESS.md)
-  
+
 ## License
 
 keyvi is licensed under Apache License 2.0("ALv2"), see [license](LICENSE) for details, all [3rdparty libraries](/keyvi/3rdparty) ship with their own license. Except Boost, Snappy and zlib all 3rdparty code can be exclusively found in the [3rdparty](/keyvi/3rdparty) folder. The following licenses are used for the 3rdparty code (last updated: `0.5.0`, provided without warranty).

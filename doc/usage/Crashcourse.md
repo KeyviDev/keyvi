@@ -7,35 +7,35 @@ After installation you should have `keyvi` executable available:
 Try:
 
     keyvi -h
-    
+
 Try in python:
-    
+
     import keyvi
-    
+
 ### First compile and decompile
 
 Open a text editor and put some keys in there, e.g.
-    
+
     keyvi
     is
     a
     key
     value
     index
-    
+
 Compile:
 
     keyvi compile <input_file> compiled.kv key-only
-    
+
 Dump:
-    
+
     keyvi dump compiled.kv dump.out
 
-After dumping, open the file dump.out in a text editor, it should contain your data. 
+After dumping, open the file dump.out in a text editor, it should contain your data.
 
 Check questions:
  * What is the difference to your input file?
- 
+
 #### Open the file in python
 
 All python examples assume python 3.
@@ -45,23 +45,23 @@ Do:
     from keyvi.dictionary import Dictionary
     d = Dictionary("compiled.kv")
     "keyvi" in d
-    
+
 should return True
-    
+
     match = d['keyvi']
 
 gives you a so called match object
-    
+
     dir(match)
- 
+
 shows all methods you can call on that object, e.g.
 
     match.GetMatchedString()
- 
+
 should return "keyvi"
 
 Match objects are the common return structure in keyvi. For this very simple example, the other methods are not useful. But with going deeper into more elaborated examples below, you will find how they can be used.
- 
+
 Check questions:
 
  * How fast does it load? Do you have an idea how loading works internally?
@@ -69,7 +69,7 @@ Check questions:
 
 ### Simple Statistics
 
-Both, the `keyvi` executable and the Python API provide an easy way to obtain the number of keys and values in a keyvi file. 
+Both, the `keyvi` executable and the Python API provide an easy way to obtain the number of keys and values in a keyvi file.
 
 For the just created `compiled.kv` file run:
 
@@ -103,7 +103,7 @@ Similarly with python, on the `Dictionary` object `d` the call `d.GetStatistics(
 Go to [lookup examples](/python/examples/lookup)
 
 Compile cities.tsv and run the tester:
-    
+
     keyvicompiler -i cities.tsv -o cities.kv -d key-only
     python text_lookup_tester.py
 
@@ -127,7 +127,7 @@ Check questions:
 
  * Compare values and unique value, whats the meaning of it?
 
-     
+
 With sharding (for distributed data indexes):
 
      compile_json.py -i your-input -o your-keyvi.kv -s 3
@@ -147,14 +147,14 @@ Compile and try:
     python prefix_completion_tester.py
 
 Query: '80s'
- 
-Now try:    
+
+Now try:
 
     keyvicompiler -i completion.tsv -o prefix-completion.kv
     python prefix_completion_tester.py
 
 Check questions:
- 
+
  * What's the difference between the 2?
  * What if you have more data?
  * Advanced: How does it work?
@@ -164,7 +164,7 @@ Check questions:
 Try:
 
     python prefix_completion_fuzzy_tester.py
-    
+
 and use misspelled queries like '80s movie wit sombies'
 
 #### Multiword Completion
@@ -172,11 +172,11 @@ and use misspelled queries like '80s movie wit sombies'
 Compile with:
 
     cat completion.tsv | python multiword_completion_writer.py
-    
+
 and try:
 
     python multiword_completion_tester.py
-    
+
 e.g. 'zombies movie'
 
 Check questions:
@@ -192,8 +192,8 @@ Go to [normalization examples](/python/examples/normalization)
 Compile with:
 
     keyvicompiler -i normalization.tsv -o normalization.kv -d string
-    
+
 and try:
 
     cat sample.txt | python normalize.py
-    
+

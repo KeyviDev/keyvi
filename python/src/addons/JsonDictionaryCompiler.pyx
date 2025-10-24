@@ -11,7 +11,7 @@
     def __exit__(self, type, value, traceback):
         self.compile()
 
-        
+
     def compile(self, *args):
         if not args:
             with nogil:
@@ -33,4 +33,3 @@
 
     def WriteToFile(self, *args):
         return call_deprecated_method("WriteToFile", "write_to_file", self.write_to_file, *args)
-

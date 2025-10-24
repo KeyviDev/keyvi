@@ -9,4 +9,4 @@
     def SetManifest(self, *args):
         return call_deprecated_method("SetManifest", "set_manifest", self.set_manifest, *args)
 
-    
+

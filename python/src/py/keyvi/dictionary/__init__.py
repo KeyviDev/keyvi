@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 keyvi - A key value store.
 
 Copyright 2018 Hendrik Muhs<hendrik.muhs@gmail.com>
@@ -15,6 +15,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-'''
+"""
 
 from keyvi._core import Dictionary, SecondaryKeyDictionary
