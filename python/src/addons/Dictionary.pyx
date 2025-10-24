@@ -4,7 +4,7 @@
         if isinstance(key, unicode):
             key = key.encode('utf-8')
         assert isinstance(key, bytes), 'arg in_0 wrong type'
-    
+
         cdef shared_ptr[_Match] _r = deref(self.inst.get())[(<libcpp_string>key)]
 
         if _r.get() == nullptr:
@@ -29,7 +29,7 @@
             key = key.encode('utf-8')
 
         assert isinstance(key, bytes), 'arg in_0 wrong type'
-    
+
         cdef shared_ptr[_Match] _r = deref(self.inst.get())[(<libcpp_string>key)]
 
         if _r.get() == nullptr:
@@ -107,4 +107,3 @@
 
     def GetManifest(self, *args):
         return call_deprecated_method("GetManifest", "manifest", self.manifest, *args)
-

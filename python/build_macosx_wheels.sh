@@ -6,7 +6,7 @@ for PYTHON_VERSION in "3.8.13" "3.9.11" "3.10.3" "3.11.1" "3.12.0";
 do
     echo "Building on Python: ${PYTHON_VERSION}"
     pyenv install -s "${PYTHON_VERSION}"
-    
+
     PYENV_VENV="keyvi-${PYTHON_VERSION}"
 
     echo "Installing pyenv-venv: ${PYENV_VENV}"

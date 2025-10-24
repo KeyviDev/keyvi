@@ -66,21 +66,21 @@ class LeastRecentlyUsedGenerationsCache final {
 
   ~LeastRecentlyUsedGenerationsCache() {
     delete current_generation_;
-    for (MinimizationHash<EntryT> *generation : generations_) {
+    for (MinimizationHash<EntryT>* generation : generations_) {
       delete generation;
     }
   }
 
   LeastRecentlyUsedGenerationsCache() = delete;
-  LeastRecentlyUsedGenerationsCache &operator=(LeastRecentlyUsedGenerationsCache const &) = delete;
-  LeastRecentlyUsedGenerationsCache(const LeastRecentlyUsedGenerationsCache &that) = delete;
+  LeastRecentlyUsedGenerationsCache& operator=(LeastRecentlyUsedGenerationsCache const&) = delete;
+  LeastRecentlyUsedGenerationsCache(const LeastRecentlyUsedGenerationsCache& that) = delete;
 
   /** Add this object.
    * @param key The key to add
    */
   void Add(EntryT key) {
     if (current_generation_->Size() >= size_per_generation_) {
-      MinimizationHash<EntryT> *newGeneration = nullptr;
+      MinimizationHash<EntryT>* newGeneration = nullptr;
       if (generations_.size() + 1 == max_number_of_generations_) {
         // remove(free) the first generation
         newGeneration = generations_[0];
@@ -101,7 +101,7 @@ class LeastRecentlyUsedGenerationsCache final {
   }
 
   template <typename EqualityType>
-  const EntryT Get(EqualityType &key) {  // NOLINT
+  const EntryT Get(EqualityType& key) {  // NOLINT
     EntryT state = current_generation_->Get(key);
 
     if (!state.IsEmpty()) {
@@ -126,7 +126,7 @@ class LeastRecentlyUsedGenerationsCache final {
    */
   void Clear() {
     current_generation_->Clear();
-    for (MinimizationHash<EntryT> *generation : generations_) {
+    for (MinimizationHash<EntryT>* generation : generations_) {
       delete generation;
     }
     generations_.clear();
@@ -148,8 +148,8 @@ class LeastRecentlyUsedGenerationsCache final {
  private:
   size_t size_per_generation_;
   size_t max_number_of_generations_;
-  MinimizationHash<EntryT> *current_generation_;
-  std::vector<MinimizationHash<EntryT> *> generations_;
+  MinimizationHash<EntryT>* current_generation_;
+  std::vector<MinimizationHash<EntryT>*> generations_;
 };
 
 } /* namespace internal */

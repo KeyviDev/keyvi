@@ -23,11 +23,11 @@ def test_near():
     c.add("zahnarzt:u1qcvvw0hxe1", '["a" : 9]')
     c.add("zahnarzt:u1xjx6yfvfz2", '["a" : 10]')
     c.add("zahnarzt:u1q0gkqsenhf", '["a" : 11]')
-    with tmp_dictionary(c, 'near_simple.kv') as d:
-        assert (len(list(d.match_near("zahnarzt:u1q0gkqsenhf", 12))) == 1)
-        assert (len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 12))) == 3)
-        assert (len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 13))) == 0)
-        assert (len(list(d.match_near("zahnarzt:u0h0gkqsenhf", 10))) == 4)
+    with tmp_dictionary(c, "near_simple.kv") as d:
+        assert len(list(d.match_near("zahnarzt:u1q0gkqsenhf", 12))) == 1
+        assert len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 12))) == 3
+        assert len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 13))) == 0
+        assert len(list(d.match_near("zahnarzt:u0h0gkqsenhf", 10))) == 4
 
 
 def test_near_greedy():
@@ -42,17 +42,19 @@ def test_near_greedy():
     c.add("zahnarzt:u1qcvvw0hxe1", '["a" : 9]')
     c.add("zahnarzt:u1xjx6yfvfz2", '["a" : 10]')
     c.add("zahnarzt:u1q0gkqsenhf", '["a" : 11]')
-    with tmp_dictionary(c, 'near_greedy.kv') as d:
-        assert (len(list(d.match_near("zahnarzt:u1q0gkqsenhf", 12, True))) == 2)
-        assert (len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 12, True))) == 3)
-        assert (len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 13, True))) == 0)
-        assert (len(list(d.match_near("zahnarzt:u0h0gkqsenhf", 10, True))) == 10)
+    with tmp_dictionary(c, "near_greedy.kv") as d:
+        assert len(list(d.match_near("zahnarzt:u1q0gkqsenhf", 12, True))) == 2
+        assert len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 12, True))) == 3
+        assert len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 13, True))) == 0
+        assert len(list(d.match_near("zahnarzt:u0h0gkqsenhf", 10, True))) == 10
 
-        greedy = [x.matched_string
-                  for x in d.match_near("zahnarzt:u0h0gkqsenhf", 10, True)]
-        non_greedy = [x.matched_string
-                      for x in d.match_near("zahnarzt:u0h0gkqsenhf", 10, False)]
-        assert greedy[:len(non_greedy)] == non_greedy
+        greedy = [
+            x.matched_string for x in d.match_near("zahnarzt:u0h0gkqsenhf", 10, True)
+        ]
+        non_greedy = [
+            x.matched_string for x in d.match_near("zahnarzt:u0h0gkqsenhf", 10, False)
+        ]
+        assert greedy[: len(non_greedy)] == non_greedy
 
 
 def test_near_score():
@@ -69,7 +71,7 @@ def test_near_score():
     c.add("zahnarzt:u1q0gkqsenhf", '["a" : 11]')
     c.add("zahnarzt:u0h0gkqsenhf", '["a" : 11]')
 
-    with tmp_dictionary(c, 'near_score.kv') as d:
+    with tmp_dictionary(c, "near_score.kv") as d:
         greedy = list(d.match_near("zahnarzt:u0h0gkqsenhf", 10, True))
         assert greedy[0].score == 21
         for m in greedy[1:5]:
@@ -83,9 +85,9 @@ def test_near_less_precission():
     c.add("zahnarzt:u0we9", '["a" : 2]')
     c.add("zahnarzt:u1h2f", '["a" : 3]')
     c.add("zahnarzt:u1huf", '["a" : 4]')
-    with tmp_dictionary(c, 'near_less_precission.kv') as d:
-        assert (len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 12))) == 2)
-        assert (len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 13))) == 0)
+    with tmp_dictionary(c, "near_less_precission.kv") as d:
+        assert len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 12))) == 2
+        assert len(list(d.match_near("zahnarzt:u1h0gkqsenhf", 13))) == 0
 
 
 def test_near_broken_input():
@@ -93,7 +95,7 @@ def test_near_broken_input():
     c.add("zahnarzt:u0we9", '["a" : 2]')
     c.add("zahnarzt:u1h2f", '["a" : 3]')
     c.add("zahnarzt:u1huf", '["a" : 4]')
-    with tmp_dictionary(c, 'near_broken.kv') as d:
-        assert (len(list(d.match_near("zahnarzt:u1h", 12))) == 2)
-        assert (len(list(d.match_near("zahnarzt:u", 13))) == 0)
-        assert (len(list(d.match_near("zahnarzt:u1", 12))) == 0)
+    with tmp_dictionary(c, "near_broken.kv") as d:
+        assert len(list(d.match_near("zahnarzt:u1h", 12))) == 2
+        assert len(list(d.match_near("zahnarzt:u", 13))) == 0
+        assert len(list(d.match_near("zahnarzt:u1", 12))) == 0

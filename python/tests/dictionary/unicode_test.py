@@ -20,7 +20,7 @@ def test_unicode():
 
     # create unicode string
     key = "öäü"
-    with tmp_dictionary(c, 'unicode_json.kv') as d:
+    with tmp_dictionary(c, "unicode_json.kv") as d:
         assert key in d
         assert d[key].value == {"a": 2}
         assert d.get(key).value == {"a": 2}
@@ -34,10 +34,10 @@ def test_unicode_lookup():
 
     # create unicode string for lookup
     text = "From Los Angeles via Frankfurt am Main to Kirchheim bei München it should just work"
-    with tmp_dictionary(c, 'unicode_json_lookup.kv') as d:
+    with tmp_dictionary(c, "unicode_json_lookup.kv") as d:
         assert "Kirchheim bei München" in d
         matched_strings = [x.matched_string for x in d.search_tokenized(text)]
         assert len(matched_strings) == 3
-        assert u"Kirchheim bei München" in matched_strings
-        assert u"Los Angeles" in matched_strings
-        assert u"Frankfurt am Main" in matched_strings
+        assert "Kirchheim bei München" in matched_strings
+        assert "Los Angeles" in matched_strings
+        assert "Frankfurt am Main" in matched_strings
