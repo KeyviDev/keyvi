@@ -10,7 +10,7 @@ Create a release branch called `release-X.Y.Z`
  - Commit to `release-X.Y.Z` and push it to https://github.com/KeyviDev/keyvi/
  - Wait for CI to build all targets
 
-### Create tag
+### Create tag 
  - Draft a new release tagged vX.Y.Z with `release-X.Y.Z` as the target branch
  - Add the release notes in the description with references to PRs
  - Publish release
@@ -18,7 +18,7 @@ Create a release branch called `release-X.Y.Z`
 ## On the `master` branch
 
 ### Update the `python/setup.py` file
- - Update to the next release version
+ - Update to the next release version 
 ```
 VERSION_MAJOR = X
 VERSION_MINOR = Y

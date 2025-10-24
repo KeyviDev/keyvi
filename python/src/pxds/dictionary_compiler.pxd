@@ -4,7 +4,7 @@ from libcpp.map cimport map as libcpp_map
 from libcpp.vector cimport vector as libcpp_vector
 
 ctypedef void (*callback_t)(size_t a, size_t b, void* user_data)
-
+        
 cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::dictionary":
     cdef cppclass CompletionDictionaryCompiler:
         CompletionDictionaryCompiler() except +

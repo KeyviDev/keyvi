@@ -20,13 +20,13 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         lazy_no_readahead, # disable any read-ahead (for cases when index > x * main memory)
         lazy_no_readahead_value_part, # disable read-ahead only for the value part
         populate_key_part_no_readahead_value_part # populate the key part, but disable read ahead value part
-
+        
     cdef cppclass Dictionary:
         # wrap-doc:
         #  Keyvi dictionary, an immutable containers storing key value pairs, optimized
         #  for size, lookup performance and special lookp use cases.
         #  A keyvi dictionary has to be created by a previous compile run.
-        #
+        #  
         #  Keyvi dictionaries allow multiple types of approximate and completion
         #  matches due to its internal FST based data structure.
         Dictionary (libcpp_utf8_string filename) except +
@@ -52,7 +52,7 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         #  In case the used dictionary supports inner weights, the
         #  completer traverses the dictionary according to weights,
         #  otherwise byte-order.
-        #
+        #  
         #  Note, due to depth-first traversal the traverser
         #  immediately yields results when it visits them. The results are
         #  neither in order nor limited to n. It is up to the caller to resort
@@ -73,7 +73,7 @@ cdef extern from "keyvi/dictionary/dictionary.h" namespace "keyvi::dictionary":
         #  In case the used dictionary supports inner weights, the
         #  completer traverses the dictionary according to weights,
         #  otherwise byte-order.
-        #
+        #  
         #  Note, due to depth-first traversal the traverser
         #  immediately yields results when it visits them. The results are
         #  neither in order nor limited to n. It is up to the caller to resort

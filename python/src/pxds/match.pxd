@@ -29,3 +29,4 @@ cdef extern from "keyvi/dictionary/match.h" namespace "keyvi::dictionary":
         void SetAttribute(libcpp_utf8_string, int) except + # wrap-ignore
         void SetAttribute(libcpp_utf8_string, bool) except + # wrap-ignore
         bool IsEmpty() # wrap-ignore
+

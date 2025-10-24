@@ -11,7 +11,7 @@
     def __exit__(self, type, value, traceback):
         self.compile()
 
-
+        
     def compile(self, *args):
         if not args:
             with nogil:

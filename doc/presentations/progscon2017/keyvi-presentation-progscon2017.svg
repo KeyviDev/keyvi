@@ -6313,7 +6313,7 @@ function toggleSlideIndex()
 
 	if (currentMode == SLIDE_MODE)
 	{
-		hideProgressBar();
+		hideProgressBar();		
 		INDEX_OFFSET = -1;
 		indexSetPageSlide(activeSlide);
 		currentMode = INDEX_MODE;
@@ -6483,7 +6483,7 @@ function indexSetActiveSlide(nbr)
 	slides[activeSlide][&quot;element&quot;].setAttribute(&quot;opacity&quot;,1);
 }
 
-/** Function to set the page and active slide in index view.
+/** Function to set the page and active slide in index view. 
  *
  *  @param nbr index of the active slide
  *
@@ -6897,20 +6897,20 @@ function slideUpdateExportLayer()
 		exportedLayers.push(exportNode);
 
 		if (slides[counterSlides][&quot;effects&quot;])
-		{
+		{	
 			for (var counter = 0; counter &lt; slides[counterSlides][&quot;effects&quot;].length; counter++)
 			{
 				for (var subCounter = 0; subCounter &lt; slides[counterSlides][&quot;effects&quot;][counter].length; subCounter++)
 				{
 					var effect = slides[counterSlides][&quot;effects&quot;][counter][subCounter];
 					if (effect[&quot;effect&quot;] == &quot;fade&quot;)
-						fade(parseInt(effect[&quot;dir&quot;]), effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						fade(parseInt(effect[&quot;dir&quot;]), effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;appear&quot;)
-						appear(parseInt(effect[&quot;dir&quot;]), effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						appear(parseInt(effect[&quot;dir&quot;]), effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;pop&quot;)
-						pop(parseInt(effect[&quot;dir&quot;]), effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						pop(parseInt(effect[&quot;dir&quot;]), effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;view&quot;)
-						view(parseInt(effect[&quot;dir&quot;]), effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						view(parseInt(effect[&quot;dir&quot;]), effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 				}
 
 				var layerName = &quot;slide_&quot; + padString((counterSlides + 1).toString(), slides.length.toString().length) + &quot;_effect_&quot; + padString((counter + 1).toString(), maxEffect.toString().length);
@@ -7453,7 +7453,7 @@ function pop(dir, element, time, options)
 }
 
 /** Function to set a slide either to the start or the end state.
- *
+ *  
  *  @param slide the slide to use
  *  @param state the state into which the slide should be set
  */
@@ -7462,7 +7462,7 @@ function setSlideToState(slide, state)
 	slides[slide][&quot;viewGroup&quot;].setAttribute(&quot;transform&quot;, slides[slide].initialView);
 
 	if (slides[slide][&quot;effects&quot;])
-	{
+	{	
 		if (state == STATE_END)
 		{
 			for (var counter = 0; counter &lt; slides[slide][&quot;effects&quot;].length; counter++)
@@ -7471,13 +7471,13 @@ function setSlideToState(slide, state)
 				{
 					var effect = slides[slide][&quot;effects&quot;][counter][subCounter];
 					if (effect[&quot;effect&quot;] == &quot;fade&quot;)
-						fade(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						fade(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;appear&quot;)
-						appear(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						appear(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;pop&quot;)
-						pop(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						pop(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;view&quot;)
-						view(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						view(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 				}
 			}
 		}
@@ -7489,13 +7489,13 @@ function setSlideToState(slide, state)
 				{
 					var effect = slides[slide][&quot;effects&quot;][counter][subCounter];
 					if (effect[&quot;effect&quot;] == &quot;fade&quot;)
-						fade(parseInt(effect[&quot;dir&quot;]) * -1, effect[&quot;element&quot;], STATE_START, effect[&quot;options&quot;]);
+						fade(parseInt(effect[&quot;dir&quot;]) * -1, effect[&quot;element&quot;], STATE_START, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;appear&quot;)
-						appear(parseInt(effect[&quot;dir&quot;]) * -1, effect[&quot;element&quot;], STATE_START, effect[&quot;options&quot;]);
+						appear(parseInt(effect[&quot;dir&quot;]) * -1, effect[&quot;element&quot;], STATE_START, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;pop&quot;)
-						pop(parseInt(effect[&quot;dir&quot;]) * -1, effect[&quot;element&quot;], STATE_START, effect[&quot;options&quot;]);
+						pop(parseInt(effect[&quot;dir&quot;]) * -1, effect[&quot;element&quot;], STATE_START, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;view&quot;)
-						view(parseInt(effect[&quot;dir&quot;]) * -1, effect[&quot;element&quot;], STATE_START, effect[&quot;options&quot;]);
+						view(parseInt(effect[&quot;dir&quot;]) * -1, effect[&quot;element&quot;], STATE_START, effect[&quot;options&quot;]);	
 				}
 			}
 		}
@@ -7509,13 +7509,13 @@ function setSlideToState(slide, state)
 				{
 					var effect = slides[slide][&quot;effects&quot;][counter][subCounter];
 					if (effect[&quot;effect&quot;] == &quot;fade&quot;)
-						fade(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						fade(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;appear&quot;)
-						appear(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						appear(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;pop&quot;)
-						pop(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						pop(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 					else if (effect[&quot;effect&quot;] == &quot;view&quot;)
-						view(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);
+						view(effect[&quot;dir&quot;], effect[&quot;element&quot;], STATE_END, effect[&quot;options&quot;]);	
 				}
 			}
 		}
@@ -7542,7 +7542,7 @@ function propStrToDict(str)
 		if (subList.length == 2)
 		{
 			obj[subList[0]] = subList[1];
-		}
+		}	
 	}
 
 	return obj;
@@ -7567,7 +7567,7 @@ function dictToPropStr(dict)
 }
 
 /** Sub-function to add a suffix to the ids of the node and all its children.
- *
+ *	
  *	@param node the node to change
  *	@param suffix the suffix to add
  *	@param replace dictionary of replaced ids
@@ -7596,7 +7596,7 @@ function suffixNoneIds_sub(node, suffix, replace)
 }
 
 /** Function to add a suffix to the ids of the node and all its children.
- *
+ *	
  *	@param node the node to change
  *	@param suffix the suffix to add
  *  @return the changed node
@@ -7612,7 +7612,7 @@ function suffixNodeIds(node, suffix)
 }
 
 /** Function to build a progress bar.
- *
+ *	
  *  @param parent node to attach the progress bar to
  */
 function createProgressBar(parent_node)
@@ -7643,7 +7643,7 @@ function createProgressBar(parent_node)
 }
 
 /** Function to hide the progress bar.
- *
+ *	
  */
 function hideProgressBar()
 {
@@ -7658,7 +7658,7 @@ function hideProgressBar()
 }
 
 /** Function to show the progress bar.
- *
+ *	
  */
 function showProgressBar()
 {
@@ -7673,7 +7673,7 @@ function showProgressBar()
 }
 
 /** Set progress bar value.
- *
+ *	
  *	@param value the current slide number
  *
  */
@@ -7712,7 +7712,7 @@ function setProgressBarValue(value)
 }
 
 /** Set time indicator.
- *
+ *	
  *	@param value the percentage of time elapse so far between 0.0 and 1.0
  *
  */
@@ -7740,7 +7740,7 @@ function setTimeIndicatorValue(value)
 }
 
 /** Update timer.
- *
+ *	
  */
 function updateTimer()
 {
@@ -7752,7 +7752,7 @@ function updateTimer()
  *
  *  @param e event with screen coordinates
  *
- *  @return coordinates in SVG file coordinate system
+ *  @return coordinates in SVG file coordinate system	
  */
 function calcCoord(e)
 {
@@ -7943,7 +7943,7 @@ function rectToMatrix(rect)
 		scaleX = scaleY;
 		rectXcorr -= (WIDTH / scaleX - rectWidth) / 2;
 		rectWidth = WIDTH / scaleX;
-	}
+	}	
 	else
 	{
 		scaleY = scaleX;
@@ -8064,7 +8064,7 @@ function LocationHash(str)
 		{
 		}
 	}
-
+	
 	// Try to extract effect number.
 	if (parts.length &gt;= 2)
 	{
