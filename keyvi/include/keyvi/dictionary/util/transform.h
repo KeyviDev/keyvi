@@ -31,14 +31,15 @@ namespace keyvi {
 namespace dictionary {
 namespace util {
 
-class Transform final {
+class Transform final{
  public:
   /**
    * Apply Bag of Words reordering for all but the last token
    * @param input
    * @return token with bow applied
    */
-  static std::string BagOfWordsPartial(const std::string& input, size_t& number_of_tokens) {
+  static std::string BagOfWordsPartial(const std::string& input, size_t& number_of_tokens)
+  {
     std::vector<std::string> strs;
     boost::split(strs, input, boost::is_any_of("\t "));
     number_of_tokens = strs.size();

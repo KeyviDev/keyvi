@@ -14,19 +14,24 @@
 namespace keyvi {
 namespace python {
 
-class attributes_visitor : public boost::static_visitor<PyObject *> {
+class attributes_visitor : public boost::static_visitor<PyObject*>
+{
 public:
-  PyObject *operator()(int i) const { return PyLong_FromLong(i); }
+  PyObject* operator()(int i) const
+    {
+        return PyLong_FromLong(i);
+    }
 
-  PyObject *operator()(const std::string &str) const {
-    return PyString_FromString(str.c_str());
-  }
+  PyObject* operator()(const std::string & str) const
+    {
+        return PyString_FromString(str.c_str());
+    }
 };
 
-inline PyObject *Convert(dictionary::Match &m, const std::string &key) {
-  auto result = m.GetAttributeVar(key);
-  return boost::apply_visitor(attributes_visitor(), result);
-}
+inline PyObject* Convert (dictionary::Match& m,  const std::string& key) {
+    auto result = m.GetAttributeVar(key);
+    return boost::apply_visitor( attributes_visitor(), result );
+  }
 
 } /* namespace python */
 } /* namespace keyvi */

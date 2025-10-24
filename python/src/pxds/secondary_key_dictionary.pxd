@@ -40,7 +40,7 @@ cdef extern from "keyvi/dictionary/secondary_key_dictionary.h" namespace "keyvi:
         #  In case the used dictionary supports inner weights, the
         #  completer traverses the dictionary according to weights,
         #  otherwise byte-order.
-        #
+        #  
         #  Note, due to depth-first traversal the traverser
         #  immediately yields results when it visits them. The results are
         #  neither in order nor limited to n. It is up to the caller to resort
@@ -61,7 +61,7 @@ cdef extern from "keyvi/dictionary/secondary_key_dictionary.h" namespace "keyvi:
         #  In case the used dictionary supports inner weights, the
         #  completer traverses the dictionary according to weights,
         #  otherwise byte-order.
-        #
+        #  
         #  Note, due to depth-first traversal the traverser
         #  immediately yields results when it visits them. The results are
         #  neither in order nor limited to n. It is up to the caller to resort

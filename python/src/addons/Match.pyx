@@ -49,7 +49,7 @@
 
 
     def GetValue(self, *args):
-        """deprecated, use value property"""
+        """deprecated, use value property"""        
         return call_deprecated_method_getter("GetValue", "value", self.value, *args)
 
 

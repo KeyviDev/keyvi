@@ -82,13 +82,9 @@ def generate_pykeyvi_source():
     pxds = glob.glob("src/pxds/*")
     converters = "src/converters"
     converter_files = glob.glob(path.join(converters, "*"))
-    max_modification_time = max(
-        [path.getmtime(fn) for fn in addons + pxds + converter_files]
-    )
+    max_modification_time = max([path.getmtime(fn) for fn in addons + pxds + converter_files])
 
-    if not path.exists(pykeyvi_cpp) or max_modification_time > path.getmtime(
-        pykeyvi_cpp
-    ):
+    if not path.exists(pykeyvi_cpp) or max_modification_time > path.getmtime(pykeyvi_cpp):
         try:
             import autowrap.Main
 
@@ -105,9 +101,7 @@ def generate_pykeyvi_source():
             if not path.exists(pykeyvi_cpp):
                 raise
             else:
-                print(
-                    "Could not find autowrap, probably running from sdist environment"
-                )
+                print("Could not find autowrap, probably running from sdist environment")
 
 
 @contextmanager
@@ -119,9 +113,7 @@ def symlink_keyvi():
             os.symlink(path.abspath(keyvi_cpp_source), keyvi_cpp_link)
             shutil.copy("../CMakeLists.txt", path.join(keyvi_cpp, "CMakeLists.txt"))
             shutil.copytree("../cmake_modules", path.join(keyvi_cpp, "cmake_modules"))
-            keyvi_source_path = os.path.realpath(
-                os.path.join(os.getcwd(), keyvi_cpp_source)
-            )
+            keyvi_source_path = os.path.realpath(os.path.join(os.getcwd(), keyvi_cpp_source))
             pykeyvi_source_path = os.path.join(os.getcwd(), keyvi_cpp_link)
             yield (pykeyvi_source_path, keyvi_source_path)
         finally:
@@ -146,7 +138,7 @@ def cmake_configure(
 
     cmake_configure_cmd = "mkdir -p {}".format(build_path)
     cmake_configure_cmd += " && cd {}".format(build_path)
-    cmake_configure_cmd += ' && cmake -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"'.format(
+    cmake_configure_cmd += " && cmake" ' -D CMAKE_CXX_FLAGS="{CXX_FLAGS}"'.format(
         CXX_FLAGS=CMAKE_CXX_FLAGS.strip()
     )
     cmake_configure_cmd += f" -D CMAKE_BUILD_TYPE={build_type}"
@@ -175,9 +167,7 @@ def cmake_configure(
             cmake_flags[k] = " ".join(v.split())
 
     # set additional compiler flags
-    set_additional_flags(
-        "extra_compile_args", cmake_flags["KEYVI_CXX_FLAGS_ALL"].split(" ")
-    )
+    set_additional_flags("extra_compile_args", cmake_flags["KEYVI_CXX_FLAGS_ALL"].split(" "))
 
     # set defines
     if cmake_flags["KEYVI_COMPILE_DEFINITIONS"]:
@@ -198,9 +188,7 @@ def cmake_configure(
     # set link libraries
     if cmake_flags["KEYVI_LINK_LIBRARIES_STATIC"]:
         if sys.platform == "darwin":
-            set_additional_flags(
-                "libraries", cmake_flags["KEYVI_LINK_LIBRARIES_STATIC"].split(" ")
-            )
+            set_additional_flags("libraries", cmake_flags["KEYVI_LINK_LIBRARIES_STATIC"].split(" "))
 
         else:
             extra_link_arguments = ["-Wl,-Bstatic"]
@@ -212,15 +200,11 @@ def cmake_configure(
             set_additional_flags("extra_link_args", extra_link_arguments)
 
     if cmake_flags["KEYVI_LINK_LIBRARIES_DYNAMIC"]:
-        set_additional_flags(
-            "libraries", cmake_flags["KEYVI_LINK_LIBRARIES_DYNAMIC"].split(" ")
-        )
+        set_additional_flags("libraries", cmake_flags["KEYVI_LINK_LIBRARIES_DYNAMIC"].split(" "))
 
     # set link args
     if cmake_flags["KEYVI_LINK_FLAGS"]:
-        set_additional_flags(
-            "extra_link_args", cmake_flags["KEYVI_LINK_FLAGS"].split(" ")
-        )
+        set_additional_flags("extra_link_args", cmake_flags["KEYVI_LINK_FLAGS"].split(" "))
 
     return cmake_flags
 
@@ -234,9 +218,7 @@ def set_additional_flags(key, additional_flags):
 
 def patch_for_custom_zlib(zlib_root):
     for ext_m in ext_modules:
-        include_dirs = [path.join(zlib_root, "include")] + getattr(
-            ext_m, "include_dirs"
-        )
+        include_dirs = [path.join(zlib_root, "include")] + getattr(ext_m, "include_dirs")
         setattr(ext_m, "include_dirs", include_dirs)
         library_dirs = [path.join(zlib_root, "lib")] + getattr(ext_m, "library_dirs")
         setattr(ext_m, "library_dirs", library_dirs)
@@ -311,9 +293,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             osx_architectures = None
             archflags = os.environ.get("ARCHFLAGS")
             if archflags is not None:
-                osx_architectures = ";".join(
-                    set(archflags.split()) & {"x86_64", "arm64"}
-                )
+                osx_architectures = ";".join(set(archflags.split()) & {"x86_64", "arm64"})
 
             cmake_prefix_path = os.environ.get("_CMAKE_PREFIX_PATH")
 
@@ -360,9 +340,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
             if "zlib_root" in self.options:
                 patch_for_custom_zlib(self.options["zlib_root"])
 
-            keyvi_build_cmd = "cd {} && make -j {} bindings".format(
-                keyvi_build_dir, cpu_count
-            )
+            keyvi_build_cmd = "cd {} && make -j {} bindings".format(keyvi_build_dir, cpu_count)
 
             print("Building keyvi C++ part: " + keyvi_build_cmd)
             subprocess.call(keyvi_build_cmd, shell=True)

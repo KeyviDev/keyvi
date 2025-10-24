@@ -19,7 +19,7 @@ cdef class MatchIterator:
         cdef shared_ptr[_Match] _r = co.dereference( self.it )
         with nogil:
             co.preincrement( self.it )
-
+        
         cdef Match py_result = Match.__new__(Match)
         py_result.inst = _r
 
