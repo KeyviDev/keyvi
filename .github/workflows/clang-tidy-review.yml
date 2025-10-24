@@ -3,7 +3,7 @@ name: clang-tidy-review
 # You can be more specific, but it currently only works on pull requests
 on:
   pull_request:
-    paths: ['**.cpp', '**.h', '**.hpp', '**CMakeLists.txt', '**.cmake', '.github/workflows/clang*.yml']
+    paths: ['**.cpp', '**.h', '**.hpp', '**CMakeLists.txt', '**.cmake', '.github/workflows/clang*.yml', '**.clang-tidy']
 
 jobs:
   build:
