@@ -3,8 +3,24 @@ name: Python cibuildwheel
 on:
   push:
     branches: [ master, release-* ]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/keyvi.yml'
+      - '.github/workflows/python-dockerimages-**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'rust/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/keyvi.yml'
+      - '.github/workflows/python-dockerimages-**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'rust/**'
   release:
     types: [published]
   workflow_dispatch:
@@ -90,14 +106,14 @@ jobs:
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
           CIBW_MUSLLINUX_X86_64_IMAGE: 'keyvidev/musllinux-builder-x86_64'
           CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
-          
+
           # ccache using path
           CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
           CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
-          
+
           # python dependencies
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
-          
+
           # testing
           CIBW_TEST_REQUIRES: pytest python-snappy zstd
           CIBW_TEST_COMMAND: >
@@ -108,7 +124,7 @@ jobs:
           # CIBW_BUILD_VERBOSITY: 2
         with:
           package-dir: python
-        
+
       - uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.flavor }}-${{ matrix.target }}
@@ -160,5 +176,5 @@ jobs:
           pattern: artifact-*
           merge-multiple: true
           path: dist
-  
+
       - uses: pypa/gh-action-pypi-publish@release/v1
