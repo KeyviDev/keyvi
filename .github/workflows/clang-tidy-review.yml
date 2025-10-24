@@ -1,6 +1,7 @@
 name: clang-tidy-review
 
-# You can be more specific, but it currently only works on pull requests
+# Runs clang-tidy on the changed files and uploads the result as artifact
+# clang-tidy-post takes the artifact and posts the comments
 on:
   pull_request:
     paths: ['**.cpp', '**.h', '**.hpp', '**CMakeLists.txt', '**.cmake', '.github/workflows/clang*.yml', '**.clang-tidy']
