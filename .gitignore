@@ -48,6 +48,7 @@ cmake-build-debug/
 
 # python
 *.egg-info
+.venv
 
 # pybind build folder
 python*/*build*
