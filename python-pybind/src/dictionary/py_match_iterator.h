@@ -28,14 +28,14 @@ namespace pybind {
 // adapted from pybind11.h
 template <typename Access, pybind11::return_value_policy Policy, typename Iterator, typename Sentinel,
           typename ValueType, typename... Extra>
-pybind11::iterator make_match_iterator_impl(Iterator first, Sentinel last, Extra &&...extra) {
+pybind11::iterator make_match_iterator_impl(Iterator first, Sentinel last, Extra&&... extra) {
   using state = pybind11::detail::iterator_state<Access, Policy, Iterator, Sentinel, ValueType, Extra...>;
   if (!pybind11::detail::get_type_info(typeid(state), false)) {
     pybind11::class_<state>(pybind11::handle(), "iterator", pybind11::module_local())
-        .def("__iter__", [](state &s) -> state & { return s; })
+        .def("__iter__", [](state& s) -> state& { return s; })
         .def(
             "__next__",
-            [](state &s) -> ValueType {
+            [](state& s) -> ValueType {
               {
                 // release GIL as incrementing the iterator can be expensive, e.g. for fuzzy match
                 pybind11::gil_scoped_release no_gil;
@@ -53,7 +53,7 @@ pybind11::iterator make_match_iterator_impl(Iterator first, Sentinel last, Extra
               return Access()(s.it);
             },
             std::forward<Extra>(extra)..., Policy)
-        .def("set_min_weight", [](state &s, const uint32_t min_weight) -> void { s.it.SetMinWeight(min_weight); });
+        .def("set_min_weight", [](state& s, const uint32_t min_weight) -> void { s.it.SetMinWeight(min_weight); });
   }
 
   return pybind11::cast(state{std::forward<Iterator>(first), std::forward<Sentinel>(last), true});
@@ -63,7 +63,7 @@ pybind11::iterator make_match_iterator_impl(Iterator first, Sentinel last, Extra
 template <pybind11::return_value_policy Policy = pybind11::return_value_policy::reference_internal, typename Iterator,
           typename Sentinel, typename ValueType = typename pybind11::detail::iterator_access<Iterator>::result_type,
           typename... Extra>
-pybind11::typing::Iterator<ValueType> make_match_iterator(Iterator first, Sentinel last, Extra &&...extra) {
+pybind11::typing::Iterator<ValueType> make_match_iterator(Iterator first, Sentinel last, Extra&&... extra) {
   return make_match_iterator_impl<pybind11::detail::iterator_access<Iterator>, Policy, Iterator, Sentinel, ValueType,
                                   Extra...>(std::forward<Iterator>(first), std::forward<Sentinel>(last),
                                             std::forward<Extra>(extra)...);

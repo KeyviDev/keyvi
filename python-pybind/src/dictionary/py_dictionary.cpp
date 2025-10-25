@@ -28,7 +28,7 @@ namespace py = pybind11;
 namespace kd = keyvi::dictionary;
 namespace kpy = keyvi::pybind;
 
-void init_keyvi_dictionary(const py::module_ &m) {
+void init_keyvi_dictionary(const py::module_& m) {
   m.doc() = R"pbdoc(
         keyvi.dictionary
         -----------------------
@@ -43,11 +43,11 @@ void init_keyvi_dictionary(const py::module_ &m) {
   // TODO(hendrik): 'items', 'keys', 'manifest', 'match_fuzzy', 'match_near',
   // 'search_tokenized', 'statistics', 'values'
   py::class_<kd::Dictionary>(m, "Dictionary")
-      .def(py::init<const std::string &>())
-      .def(py::init<const std::string &, kd::loading_strategy_types>())
+      .def(py::init<const std::string&>())
+      .def(py::init<const std::string&, kd::loading_strategy_types>())
       .def(
           "complete_fuzzy_multiword",
-          [](const kd::Dictionary &d, const std::string &query, const int32_t max_edit_distance,
+          [](const kd::Dictionary& d, const std::string& query, const int32_t max_edit_distance,
              const size_t minimum_exact_prefix = 0, const unsigned char multiword_separator = 0x1b) {
             auto m = d.GetFuzzyMultiwordCompletion(query, max_edit_distance, minimum_exact_prefix, multiword_separator);
             return kpy::make_match_iterator(m.begin(), m.end());
@@ -62,7 +62,7 @@ void init_keyvi_dictionary(const py::module_ &m) {
           )pbdoc")
       .def(
           "complete_multiword",
-          [](const kd::Dictionary &d, const std::string &query, const unsigned char multiword_separator = 0x1b) {
+          [](const kd::Dictionary& d, const std::string& query, const unsigned char multiword_separator = 0x1b) {
             auto m = d.GetMultiwordCompletion(query, multiword_separator);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
@@ -81,7 +81,7 @@ void init_keyvi_dictionary(const py::module_ &m) {
           )pbdoc")
       .def(
           "complete_prefix",
-          [](const kd::Dictionary &d, const std::string &query) {
+          [](const kd::Dictionary& d, const std::string& query) {
             auto m = d.GetPrefixCompletion(query);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
@@ -100,7 +100,7 @@ void init_keyvi_dictionary(const py::module_ &m) {
           )pbdoc")
       .def(
           "complete_prefix",
-          [](const kd::Dictionary &d, const std::string &query, size_t top_n) {
+          [](const kd::Dictionary& d, const std::string& query, size_t top_n) {
             auto m = d.GetPrefixCompletion(query, top_n);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
@@ -124,7 +124,7 @@ void init_keyvi_dictionary(const py::module_ &m) {
         Get an entry from the dictionary.
     )pbdoc")
       .def("match",
-           [](const kd::Dictionary &d, const std::string &key) {
+           [](const kd::Dictionary& d, const std::string& key) {
              auto m = d.Get(key);
              return kpy::make_match_iterator(m.begin(), m.end());
            })

@@ -27,9 +27,9 @@
 namespace py = pybind11;
 namespace kd = keyvi::dictionary;
 
-void init_keyvi_dictionary(const py::module_ &);
-void init_keyvi_dictionary_compilers(const py::module_ &);
-void init_keyvi_match(const py::module_ &);
+void init_keyvi_dictionary(const py::module_&);
+void init_keyvi_dictionary_compilers(const py::module_&);
+void init_keyvi_match(const py::module_&);
 
 PYBIND11_MODULE(keyvi2, m, py::mod_gil_not_used()) {
   m.doc() = R"pbdoc(

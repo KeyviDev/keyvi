@@ -31,14 +31,14 @@
 namespace py = pybind11;
 namespace kd = keyvi::dictionary;
 
-inline const py::object &get_msgpack_loads_func() {
+inline const py::object& get_msgpack_loads_func() {
   PYBIND11_CONSTINIT static py::gil_safe_call_once_and_store<py::object> storage;
   return storage
       .call_once_and_store_result([]() -> py::object { return py::getattr(py::module_::import("msgpack"), "loads"); })
       .get_stored();
 }
 
-void init_keyvi_match(const py::module_ &m) {
+void init_keyvi_match(const py::module_& m) {
   py::module_ msgpack_ = py::module_::import("msgpack");
 
   py::class_<kd::Match, std::shared_ptr<kd::Match>>(m, "Match")
@@ -48,7 +48,7 @@ void init_keyvi_match(const py::module_ &m) {
       .def_property("score", &kd::Match::GetScore, &kd::Match::SetScore)
       .def_property("matched_string", &kd::Match::GetMatchedString, &kd::Match::SetMatchedString)
       .def_property_readonly("value",
-                             [&msgpack_](const kd::Match &m) -> py::object {
+                             [&msgpack_](const kd::Match& m) -> py::object {
                                auto packed_value = m.GetMsgPackedValueAsString();
                                if (packed_value.empty()) {
                                  return py::none();
@@ -59,17 +59,17 @@ void init_keyvi_match(const py::module_ &m) {
       .def("raw_value_as_string", &kd::Match::GetRawValueAsString)
       .def(
           "msgpacked_value_as_string",
-          [](const kd::Match &m, const keyvi::compression::CompressionAlgorithm compression_algorithm) -> py::bytes {
+          [](const kd::Match& m, const keyvi::compression::CompressionAlgorithm compression_algorithm) -> py::bytes {
             return py::bytes(m.GetMsgPackedValueAsString(compression_algorithm));
           },
           py::arg("compression_algorithm") = keyvi::compression::CompressionAlgorithm::NO_COMPRESSION)
-      .def("__getitem__", [](kd::Match &m, const std::string &key) { return m.GetAttribute(key); })
+      .def("__getitem__", [](kd::Match& m, const std::string& key) { return m.GetAttribute(key); })
       .def("__setitem__", &kd::Match::SetAttribute<std::string>)
       .def("__setitem__", &kd::Match::SetAttribute<float>)
       .def("__setitem__", &kd::Match::SetAttribute<int>)
       .def("__setitem__", &kd::Match::SetAttribute<bool>)
       .def("dumps",
-           [](const kd::Match &m) -> py::bytes {
+           [](const kd::Match& m) -> py::bytes {
              bool do_pack_rest = false;
              msgpack::sbuffer msgpack_buffer;
              msgpack::packer<msgpack::sbuffer> packer(&msgpack_buffer);
@@ -106,7 +106,7 @@ void init_keyvi_match(const py::module_ &m) {
              return py::bytes(msgpack_buffer.data(), msgpack_buffer.size());
            })
       .def_static("loads",
-                  [](const std::string_view &serialized_match) -> kd::Match {
+                  [](const std::string_view& serialized_match) -> kd::Match {
                     kd::Match match;
                     msgpack::object_handle handle = msgpack::unpack(serialized_match.data(), serialized_match.size());
                     msgpack::object obj = handle.get();
@@ -117,7 +117,7 @@ void init_keyvi_match(const py::module_ &m) {
                     }
 
                     // Get the array elements
-                    const msgpack::object *array = obj.via.array.ptr;
+                    const msgpack::object* array = obj.via.array.ptr;
                     uint32_t size = obj.via.array.size;
 
                     if (size > 5) {
@@ -146,11 +146,11 @@ void init_keyvi_match(const py::module_ &m) {
                           array[0].convert(value);
                           match.SetRawValue(value);
                       }
-                    } catch (const msgpack::type_error &e) {
+                    } catch (const msgpack::type_error& e) {
                       throw std::invalid_argument("not a serialized match, unexpected element types");
                     }
                     return match;
                   })
       .def_property_readonly("weight", &kd::Match::GetWeight)
-      .def("__bool__", [](const kd::Match &m) -> bool { return !m.IsEmpty(); });
+      .def("__bool__", [](const kd::Match& m) -> bool { return !m.IsEmpty(); });
 }
