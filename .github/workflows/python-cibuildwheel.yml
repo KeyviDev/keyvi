@@ -51,12 +51,14 @@ jobs:
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.flavor }}-python
 
-      - name: Skip manylinux for musllinux target
+      - name: Setup musllinux build
         if: ${{ (runner.os == 'Linux') && (matrix.target == 'musl') }}
+        # workaround: set CXX to g++, so it does not pick clang++ for python 3.14 builds
         run: |
           echo "CIBW_SKIP=*manylinux*" >> $GITHUB_ENV
+          echo "CIBW_ENVIRONMENT_LINUX=CXX=g++" >> $GITHUB_ENV
 
-      - name: Skip musllinux for manylinux target
+      - name: Setup manylinux build
         if: ${{ (runner.os == 'Linux') && (matrix.target == 'many') }}
         run: |
           echo "CIBW_SKIP=*musllinux*" >> $GITHUB_ENV
@@ -101,15 +103,15 @@ jobs:
           # skip tests on pypy, currently fails for indexer tests
           CIBW_TEST_SKIP: "pp*"
 
-          # (many)linux custom docker images
+          # (many,musl)linux custom docker images
           CIBW_MANYLINUX_X86_64_IMAGE: 'keyvidev/manylinux-builder-x86_64'
           CIBW_MANYLINUX_AARCH64_IMAGE: 'keyvidev/manylinux-builder-aarch64'
           CIBW_MUSLLINUX_X86_64_IMAGE: 'keyvidev/musllinux-builder-x86_64'
           CIBW_MUSLLINUX_AARCH64_IMAGE: 'keyvidev/musllinux-builder-aarch64'
 
-          # ccache using path
-          CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:/opt/homebrew/opt/ccache/libexec:$PATH
-          CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf CXX=g++
+          # prefix ccache in path
+          CIBW_ENVIRONMENT_MACOS: ${{ env.CIBW_ENVIRONMENT_MACOS }} PATH=/usr/local/opt/ccache/libexec:/opt/homebrew/opt/ccache/libexec:$PATH
+          CIBW_ENVIRONMENT_LINUX: ${{ env.CIBW_ENVIRONMENT_LINUX }} PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
 
           # python dependencies
           CIBW_BEFORE_BUILD: pip install -r python/requirements.txt
