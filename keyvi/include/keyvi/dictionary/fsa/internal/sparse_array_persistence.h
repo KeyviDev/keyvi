@@ -200,9 +200,7 @@ class SparseArrayPersistence final {
     TRACE("Wrote Transitions, stream at %d", stream.tellp());
   }
 
-  size_t GetChunkSizeExternalTransitions() const {
-    return transitions_extern_->GetChunkSize();
-  }
+  [[nodiscard]] size_t GetChunkSizeExternalTransitions() const { return transitions_extern_->GetChunkSize(); }
 
   uint32_t GetVersion() const;
 

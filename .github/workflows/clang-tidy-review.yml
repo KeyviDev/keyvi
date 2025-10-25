@@ -1,0 +1,29 @@
+name: clang-tidy-review
+
+# Runs clang-tidy on the changed files and uploads the result as artifact
+# clang-tidy-post takes the artifact and posts the comments
+on:
+  pull_request:
+    paths: ['**.cpp', '**.h', '**.hpp', '**CMakeLists.txt', '**.cmake', '.github/workflows/clang*.yml', '**.clang-tidy']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - uses: ZedThree/clang-tidy-review@v0.21.0
+      id: review
+      with:
+        split_workflow: true
+        build_dir: build
+        apt_packages: "libsnappy-dev, libzzip-dev, zlib1g-dev, libboost-all-dev, libzstd-dev"
+        clang_tidy_checks: ''
+        cmake_command: "cmake -Bbuild -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ."
+
+    - uses: ZedThree/clang-tidy-review/upload@v0.21.0
+
+    # If there are any comments, fail the check
+    - if: steps.review.outputs.total_comments > 0
+      run: exit 1
