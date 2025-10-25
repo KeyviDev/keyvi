@@ -11,9 +11,10 @@ endif()
 option(KEYVI_C_BINDINGS "Keyvi: Build C binding" ${PROJECT_IS_TOP_LEVEL})
 option(KEYVI_PYTHON_BINDINGS "Keyvi: Build Python module" OFF)
 option(KEYVI_TESTS "Keyvi: Build unit tests" ${PROJECT_IS_TOP_LEVEL})
-option(KEYVI_BINARIES "Keyvi: Build Python module" ${PROJECT_IS_TOP_LEVEL})
-option(KEYVI_CLANG_TIDY "Keyvi: Build with clang tidy" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_BINARIES "Keyvi: Build keyvi binaries" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_CLANG_TIDY "Keyvi: Build with clang tidy" OFF)
 option(KEYVI_DOCS "Keyvi: Build docs" ${PROJECT_IS_TOP_LEVEL})
+
 
 #### Linting
 if(KEYVI_CLANG_TIDY)
@@ -22,7 +23,7 @@ if(KEYVI_CLANG_TIDY)
     message ("-- Found clang-tidy")
     set(CMAKE_CXX_CLANG_TIDY clang-tidy; --extra-arg-before=-std=c++17)
   else()
-    message ("-- clang-tidy not found")
+    message(FATAL_ERROR "clang-tidy requested but not found")
   endif()
 endif(KEYVI_CLANG_TIDY)
 
@@ -69,7 +70,7 @@ endif (CMAKE_BUILD_TYPE_UPPER MATCHES COVERAGE)
 #### Dependencies ####
 
 # BOOST
-set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem" "regex" "thread")
+set (_KEYVI_BOOST_LIBRARIES "program_options" "iostreams" "filesystem")
 set (_KEYVI_BOOST_LIBRARIES_TEST "unit_test_framework")
 
 set(Boost_USE_STATIC_LIBS OFF)
@@ -95,9 +96,9 @@ if(Boost_VERSION VERSION_GREATER_EQUAL "1.86.0")
 endif()
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
+    set(_KEYVI_LINK_LIBRARIES_STATIC "${_KEYVI_LINK_LIBRARIES_STATIC} boost_program_options boost_iostreams boost_filesystem")
 else ()
-    set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem boost_regex boost_thread")
+    set(_KEYVI_LINK_LIBRARIES_DYNAMIC "${_KEYVI_LINK_LIBRARIES_DYNAMIC} boost_program_options boost_iostreams boost_filesystem")
 endif ()
 
 if(Boost_VERSION VERSION_GREATER_EQUAL "1.86.0")
@@ -114,7 +115,7 @@ if (WIN32)
   add_definitions( -DBOOST_ALL_NO_LIB )
   add_definitions( -DBOOST_ALL_DYN_LINK )
   link_directories (${Boost_LIBRARY_DIRS})
-  
+
   # required for endian specific functions
   list(APPEND _OS_LIBRARIES "ws2_32")
 endif (WIN32)
@@ -247,7 +248,7 @@ if(KEYVI_TESTS)
     elseif(EXISTS "${UTF_PATH}/../bin/${UTF_BASE_NAME}.dll")
         add_custom_command(TARGET unit_test_all POST_BUILD
           COMMAND ${CMAKE_COMMAND} -E copy "${UTF_PATH}/../bin/${UTF_BASE_NAME}.dll" ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}
-          )	
+          )
     endif()
     endforeach()
   endif (WIN32)

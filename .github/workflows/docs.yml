@@ -1,13 +1,24 @@
 # Build on Linux
 name: Build keyvi documentation
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/keyvi.yml'
+      - '.github/workflows/python**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/keyvi.yml'
+      - '.github/workflows/python**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,7 +43,7 @@ jobs:
 
         # re-use the cache from the linux build
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1
+        uses: hendrikmuhs/ccache-action@v1.2.18
         with:
           key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 
@@ -47,14 +58,14 @@ jobs:
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           python -m pip install -r python/requirements.txt
           python -m pip install sphinx breathe sphinx-wagtail-theme
-          
+
       - name: build python extension
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           cd python
           python setup.py build --mode ${BUILD_TYPE}
           python setup.py install --user
-    
+
       - name: build with cmake
         uses: lukka/run-cmake@v3
         with:
