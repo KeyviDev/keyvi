@@ -3,8 +3,24 @@ name: Python Pybind cibuildwheel
 on:
   push:
     branches: [ master, release-* ]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/keyvi.yml'
+      - '.github/workflows/python-dockerimages-**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'rust/**'
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/keyvi.yml'
+      - '.github/workflows/python-dockerimages-**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'rust/**'
   release:
     types: [published]
   workflow_dispatch:
@@ -27,6 +43,7 @@ jobs:
             target: musl
           - os: macos-14
             target: musl
+
     steps:
       - uses: actions/checkout@v5
       - name: ccache
@@ -34,12 +51,14 @@ jobs:
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.flavor }}-python-pybind
 
-      - name: Skip manylinux for musllinux target
+      - name: Setup musllinux build
         if: ${{ (runner.os == 'Linux') && (matrix.target == 'musl') }}
+        # workaround: set CXX to g++, so it does not pick clang++ for python 3.14 builds
         run: |
           echo "CIBW_SKIP=*manylinux*" >> $GITHUB_ENV
+          echo "CIBW_ENVIRONMENT_LINUX=CXX=g++" >> $GITHUB_ENV
 
-      - name: Skip musllinux for manylinux target
+      - name: Setup manylinux build
         if: ${{ (runner.os == 'Linux') && (matrix.target == 'many') }}
         run: |
           echo "CIBW_SKIP=*musllinux*" >> $GITHUB_ENV
@@ -62,7 +81,7 @@ jobs:
           brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done && \
           brew install ccache zlib snappy boost
 
-      - name: set mac deployment target X64
+      - name: set mac deployment target
         if: runner.os == 'macOS' && runner.arch == 'X64'
         run: |
           echo "MACOSX_DEPLOYMENT_TARGET=15.0" >> $GITHUB_ENV
@@ -73,7 +92,7 @@ jobs:
           echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
 
       - name: Build python wheels for ${{ matrix.os }}
-        uses: pypa/cibuildwheel@v3.2.0
+        uses: pypa/cibuildwheel@v3.2.1
         env:
           # Skip CPython 3.8
           CIBW_SKIP: ${{ env.CIBW_SKIP }} cp38-*
@@ -84,9 +103,9 @@ jobs:
           # skip tests on pypy, currently fails for indexer tests
           CIBW_TEST_SKIP: "pp*"
 
-          # ccache using path
-          CIBW_ENVIRONMENT_MACOS: PATH=/usr/local/opt/ccache/libexec:$PATH
-          CIBW_ENVIRONMENT_LINUX: PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
+          # prefix ccache in path
+          CIBW_ENVIRONMENT_MACOS: ${{ env.CIBW_ENVIRONMENT_MACOS }} PATH=/usr/local/opt/ccache/libexec:/opt/homebrew/opt/ccache/libexec:$PATH
+          CIBW_ENVIRONMENT_LINUX: ${{ env.CIBW_ENVIRONMENT_LINUX }} PATH=/usr/local/bin:/usr/lib/ccache:$PATH CCACHE_DIR=/host${{ github.workspace }}/.ccache CCACHE_CONFIGPATH=/host/home/runner/.config/ccache/ccache.conf
 
           # for debugging set this to 1,2 or 3
           # CIBW_BUILD_VERBOSITY: 2
@@ -118,4 +137,3 @@ jobs:
         python -m pip install pytest && \
         python -m pytest python-pybind/tests && \
         python -m pip uninstall -y keyvi_pybind11
-
