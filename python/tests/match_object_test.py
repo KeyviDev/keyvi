@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Usage: py.test tests
 
+import json
 import keyvi
 import msgpack
 from test_tools import tmp_dictionary
@@ -86,7 +87,7 @@ def test_boolean_attributes():
     m = keyvi.Match()
     bytes_key = bytes("def".encode("utf-8"))
     m[bytes_key] = True
-    assert m[bytes_key] == True
+    assert m[bytes_key]
 
 
 def test_start():
@@ -206,6 +207,7 @@ def test_get_value_string():
     c.add("abc", "aaaaa")
     c.add("abd", "bbbbb")
     c.add("abe", "{}")
+    c.add("abf", json.dumps({"xyz": 42}))
     with tmp_dictionary(c, "match_object_string.kv") as d:
         m = d["abc"]
         assert m.value == "aaaaa"
@@ -223,9 +225,11 @@ def test_get_value_string():
             == "bbbbb"
         )
         m = d["abe"]
-        # gh#333: keyvi < 0.6.4 returned a dictionary instead of a string
-        assert m.value == "{}"
-        assert isinstance(m.value, str)
+        # gh#333: return a dictionary instead of a string
+        assert m.value == {}
+        assert isinstance(m.value, dict)
+        m = d["abf"]
+        assert m.value == {"xyz": 42}
 
 
 def test_matched_string():
@@ -248,5 +252,5 @@ def test_bool_operator():
         assert issubclass(w[-1].category, DeprecationWarning)
     assert not m
     m.end = 42
-    assert not m is False
+    assert m is not False
     assert m

@@ -43,6 +43,7 @@
 #include "keyvi/dictionary/fsa/internal/value_store_properties.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
 #include "keyvi/util/configuration.h"
+#include "keyvi/util/msgpack_util.h"
 
 // #define ENABLE_TRACING
 #include "keyvi/dictionary/util/trace.h"
@@ -293,7 +294,9 @@ class StringValueStoreReader final : public IValueStoreReader {
   std::string GetMsgPackedValueAsString(uint64_t fsa_value,
                                         const compression::CompressionAlgorithm compression_algorithm =
                                             compression::CompressionAlgorithm::NO_COMPRESSION) const override {
-    std::string msgpacked_value = keyvi::util::ValueToMsgPack(std::string(strings_ + fsa_value));
+    // GH#333: if string is valid json, parse it as msgpack for backwards-compatibility
+    std::string msgpacked_value = keyvi::util::JsonStringToMsgPack(
+        std::string(strings_ + fsa_value));  // NOLINT : fine here, we access the mmaped buffer
 
     if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
       return msgpacked_value;
