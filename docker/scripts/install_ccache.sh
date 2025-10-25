@@ -46,7 +46,7 @@ rm -rf "${CCACHE_DIR}" "${CCACHE_TAR}"
 
 # --- Symlinks ---
 echo "Creating compiler symlinks for ccache..."
-for bin in gcc g++ cc c++ clang clang++; do
+for bin in gcc g++ cc c++; do
     if [ ! -e "/usr/local/bin/$bin" ]; then
         ln -s /usr/local/bin/ccache "/usr/local/bin/$bin" || true
     fi

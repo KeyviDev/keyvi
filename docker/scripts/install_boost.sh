@@ -24,7 +24,7 @@ tar xzf boost.tar.gz
 cd "${BOOST_DIR}"
 
 echo "Bootstrapping Boost..."
-./bootstrap.sh --without-libraries=graph_parallel,python
+./bootstrap.sh --with-libraries=system,program_options,iostreams,filesystem,test,interprocess,sort,container,process,format,lexical_cast
 
 # Use nproc if available, otherwise default to 1
 if command -v nproc >/dev/null 2>&1; then
@@ -37,6 +37,6 @@ echo "Building and installing Boost with ${JOBS} jobs..."
 ./b2 -j"${JOBS}" -d0 --prefix=/usr/local/ install
 
 cd ..
-rm -rf "boost_*" boost.tar.gz
+rm -rf "${BOOST_DIR}" boost.tar.gz
 
 echo "Boost ${BOOST_MAJOR}.${BOOST_MINOR}.${BOOST_PATCH} installed successfully."
