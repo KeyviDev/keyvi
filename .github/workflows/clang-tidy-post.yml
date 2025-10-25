@@ -19,3 +19,4 @@ jobs:
           lgtm_comment_body: ''
           annotations: false
           max_comments: 10
+          num_comments_as_exitcode: false
