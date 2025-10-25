@@ -43,7 +43,7 @@ jobs:
 
         # re-use the cache from the linux build
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1
+        uses: hendrikmuhs/ccache-action@v1.2.18
         with:
           key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 
