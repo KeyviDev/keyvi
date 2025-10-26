@@ -400,7 +400,7 @@ with symlink_keyvi() as (pykeyvi_source_path, keyvi_source_path):
     }
 
     for e in ext_modules:
-        e.cython_directives = {"embedsignature": True, "freethreading_compatible": True}
+        e.cython_directives = {"embedsignature": True}
 
     write_version_file()
     setup(
