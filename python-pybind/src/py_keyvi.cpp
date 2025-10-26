@@ -66,6 +66,7 @@ PYBIND11_MODULE(keyvi2, m, py::mod_gil_not_used()) {
   init_keyvi_dictionary(keyvi_dictionary);
   py::module keyvi_compilers = m.def_submodule("compiler", "keyvi2.compiler");
   init_keyvi_dictionary_compilers(keyvi_compilers);
+  py::module keyvi_completion = m.def_submodule("completion", "keyvi2.completion");
 
 #ifdef VERSION_INFO
   m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
