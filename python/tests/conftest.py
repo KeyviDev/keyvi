@@ -4,7 +4,6 @@ import importlib
 import os
 import sys
 
-
 # patch keyvi imports to an alternative module for testing purposes
 if keyvi2_module_name := os.getenv("KEYVI_MODULE_OVERWRITE"):
     for sub in ("", ".dictionary", ".compiler", ".completion"):
