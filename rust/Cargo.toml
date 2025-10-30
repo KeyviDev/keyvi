@@ -1,6 +1,6 @@
 [package]
 name = "keyvi"
-version = "0.7.4"
+version = "0.7.5"
 build = "build.rs"
 authors = ["Hendrik Muhs<hendrik.muhs@gmail.com>", "Narek Gharibyan <narekgharibyan@gmail.com>", "Subu <subu@cliqz.com>"]
 license = "Apache-2.0"
