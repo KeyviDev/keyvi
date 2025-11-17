@@ -15,6 +15,7 @@ lint = [
 ]
 test = [
     'pytest>=8.3.5',
+    'pytest-env>=1.2.0',
     'python-snappy>=0.7.3',
     'zstd>=1.5.7.2'
 ]
