@@ -38,6 +38,10 @@ KEYVI_CLANG_TIDY = "OFF"
 KEYVI_DOCS = "OFF"
 
 [tool.pytest.ini_options]
+env = [
+    "KEYVI_SKIP_TEST_DEPRECATIONS = 1",
+    "KEYVI_MODULE_OVERWRITE=keyvi2"
+]
 minversion = "7.1.1"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
@@ -46,7 +50,7 @@ filterwarnings = [
   "error",
   "ignore::pytest.PytestCacheWarning",
 ]
-testpaths = ["python-pybind/tests"]
+testpaths = ["python/tests"]
 
 [tool.cibuildwheel]
 build-frontend = "default"

@@ -118,6 +118,9 @@ void init_keyvi_dictionary_compilers(const py::module_& module) {
   CREATE_SK_COMPILER(kd::SecondaryKeyStringDictionaryCompiler, "SecondaryKeyStringDictionaryCompiler");
   CREATE_MERGER(kd::CompletionDictionaryMerger, "CompletionDictionaryMerger");
   CREATE_MERGER(kd::IntDictionaryMerger, "IntDictionaryMerger");
+  CREATE_MERGER(kd::JsonDictionaryMerger, "JsonDictionaryMerger");
+  CREATE_MERGER(kd::KeyOnlyDictionaryMerger, "KeyOnlyDictionaryMerger");
+  CREATE_MERGER(kd::StringDictionaryMerger, "StringDictionaryMerger");
 
 #undef CREATE_COMPILER
 }

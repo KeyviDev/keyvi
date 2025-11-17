@@ -21,6 +21,7 @@
 
 #include "keyvi/dictionary/dictionary.h"
 #include "keyvi/dictionary/match.h"
+#include "keyvi/dictionary/secondary_key_dictionary.h"
 
 #include "py_match_iterator.h"
 
@@ -129,4 +130,6 @@ void init_keyvi_dictionary(const py::module_& m) {
              return kpy::make_match_iterator(m.begin(), m.end());
            })
       .def("search", &kd::Dictionary::Lookup);
+
+  py::class_<kd::SecondaryKeyDictionary>(m, "SecondaryKeyDictionary");
 }

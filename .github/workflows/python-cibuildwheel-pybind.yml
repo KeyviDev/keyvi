@@ -135,5 +135,5 @@ jobs:
         pipx run build --sdist
         python -m pip install dist/*.tar.gz -v && \
         python -m pip install pytest && \
-        python -m pytest python-pybind/tests && \
-        python -m pip uninstall -y keyvi_pybind11
+        KEYVI_SKIP_TEST_DEPRECATIONS=1 KEYVI_MODULE_OVERWRITE=keyvi2 python -m pytest python/tests && \
+        python -m pip uninstall -y keyvi2
