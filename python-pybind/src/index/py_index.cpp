@@ -22,13 +22,13 @@
 #include "keyvi/index/index.h"
 #include "keyvi/index/read_only_index.h"
 
-//#include "../py_match_iterator.h"
+// #include "../py_match_iterator.h"
 
 namespace py = pybind11;
 namespace ki = keyvi::index;
-//namespace kpy = keyvi::pybind;
+// namespace kpy = keyvi::pybind;
 
 void init_keyvi_index(const py::module_& module) {
-    py::class_<ki::Index>(module, "Index");
-    py::class_<ki::ReadOnlyIndex>(module, "ReadOnlyIndex");
+  py::class_<ki::Index>(module, "Index");
+  py::class_<ki::ReadOnlyIndex>(module, "ReadOnlyIndex");
 }

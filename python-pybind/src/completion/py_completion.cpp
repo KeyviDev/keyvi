@@ -24,14 +24,14 @@
 #include "keyvi/dictionary/completion/prefix_completion.h"
 #include "keyvi/dictionary/match.h"
 
-//#include "../py_match_iterator.h"
+// #include "../py_match_iterator.h"
 
 namespace py = pybind11;
 namespace kdc = keyvi::dictionary::completion;
-//namespace kpy = keyvi::pybind;
+// namespace kpy = keyvi::pybind;
 
 void init_keyvi_completion(const py::module_& module) {
-    py::class_<kdc::ForwardBackwardCompletion>(module, "ForwardBackwardCompletion");
-    py::class_<kdc::MultiWordCompletion>(module, "MultiWordCompletion");
-    py::class_<kdc::PrefixCompletion>(module, "PrefixCompletion");
+  py::class_<kdc::ForwardBackwardCompletion>(module, "ForwardBackwardCompletion");
+  py::class_<kdc::MultiWordCompletion>(module, "MultiWordCompletion");
+  py::class_<kdc::PrefixCompletion>(module, "PrefixCompletion");
 }
