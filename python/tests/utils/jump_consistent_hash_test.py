@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 # Usage: py.test tests
+from __future__ import annotations
 
-import sys
 
 #from keyvi.util import JumpConsistentHashString
 
