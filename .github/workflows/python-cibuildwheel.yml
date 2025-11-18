@@ -125,6 +125,7 @@ jobs:
           # for debugging set this to 1,2 or 3
           # CIBW_BUILD_VERBOSITY: 2
         with:
+          config-file: "{package}/pyproject.toml"
           package-dir: python
 
       - uses: actions/upload-artifact@v5
