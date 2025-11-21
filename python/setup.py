@@ -92,7 +92,13 @@ def generate_pykeyvi_source():
         try:
             import autowrap.Main
 
-            autowrap.Main.run(pxds, addons, [converters], pykeyvi_pyx)
+            autowrap.Main.run(
+                pxds,
+                addons,
+                [converters],
+                pykeyvi_pyx,
+                extra_opts={"compiler_directives": {"freethreading_compatible": True}},
+            )
             # rewrite generated cpp to use std::shared_ptr instead of boost::shared_ptr
             with open(pykeyvi_cpp, "rt") as fin:
                 with open(pykeyvi_p_cpp, "wt") as fout:
