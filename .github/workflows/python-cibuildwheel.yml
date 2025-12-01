@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.19
+        uses: hendrikmuhs/ccache-action@v1.2.20
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.flavor }}-python
 
@@ -142,7 +142,7 @@ jobs:
         sudo apt-get update && \
         sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
     - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.19
+      uses: hendrikmuhs/ccache-action@v1.2.20
       with:
         key: ubuntu-sdist-python
 
