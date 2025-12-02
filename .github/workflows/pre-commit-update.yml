@@ -9,7 +9,7 @@ on:
 
 jobs:
   upgrade:
-    uses: browniebroke/github-actions/.github/workflows/pre-commit-autoupdate.yml@v1.21.0
+    uses: browniebroke/github-actions/.github/workflows/pre-commit-autoupdate.yml@v1.22.0
     secrets:
       gh_pat: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
     with:
