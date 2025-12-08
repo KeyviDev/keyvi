@@ -1,4 +1,4 @@
-FROM quay.io/pypa/musllinux_1_2_aarch64@sha256:d0b2cbe2cbc19b1cca501b298e1d0cfc10b7d7c7d75744c01aaa953f4cb14c4a
+FROM quay.io/pypa/musllinux_1_2_aarch64@sha256:cec3bb6db1a350507310311be1b9309cb7a925b2005c39324d46ada242b57a73
 
 RUN \
     apk upgrade --no-cache && \
