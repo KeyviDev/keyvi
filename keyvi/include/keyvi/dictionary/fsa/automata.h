@@ -91,21 +91,23 @@ class Automata final {
   explicit Automata(const dictionary_properties_t& dictionary_properties, loading_strategy_types loading_strategy,
                     const bool load_value_store)
       : dictionary_properties_(dictionary_properties) {
-    file_mapping_ = boost::interprocess::file_mapping(dictionary_properties_->GetFileName().c_str(),
-                                                      boost::interprocess::read_only);
+    boost::interprocess::file_mapping file_mapping = boost::interprocess::file_mapping(
+        dictionary_properties_->GetFileName().c_str(), boost::interprocess::read_only);
 
     const boost::interprocess::map_options_t map_options =
         internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
     TRACE("labels start offset: %d", dictionary_properties_->GetPersistenceOffset());
-    labels_region_ = boost::interprocess::mapped_region(file_mapping_, boost::interprocess::read_only,
-                                                        dictionary_properties_->GetPersistenceOffset(),
-                                                        dictionary_properties_->GetSparseArraySize(), 0, map_options);
+    labels_region_ = boost::interprocess::mapped_region(
+        file_mapping, boost::interprocess::read_only,
+        static_cast<boost::interprocess::offset_t>(dictionary_properties_->GetPersistenceOffset()),
+        dictionary_properties_->GetSparseArraySize(), nullptr, map_options);
 
     TRACE("transitions start offset: %d", dictionary_properties_->GetTransitionsOffset());
     transitions_region_ = boost::interprocess::mapped_region(
-        file_mapping_, boost::interprocess::read_only, dictionary_properties_->GetTransitionsOffset(),
-        dictionary_properties_->GetTransitionsSize(), 0, map_options);
+        file_mapping, boost::interprocess::read_only,
+        static_cast<boost::interprocess::offset_t>(dictionary_properties_->GetTransitionsOffset()),
+        dictionary_properties_->GetTransitionsSize(), nullptr, map_options);
 
     const auto advise = internal::MemoryMapFlags::FSAGetMemoryMapAdvices(loading_strategy);
 
@@ -117,7 +119,7 @@ class Automata final {
 
     if (load_value_store) {
       value_store_reader_.reset(
-          internal::ValueStoreFactory::MakeReader(dictionary_properties_->GetValueStoreType(), &file_mapping_,
+          internal::ValueStoreFactory::MakeReader(dictionary_properties_->GetValueStoreType(), &file_mapping,
                                                   dictionary_properties_->GetValueStoreProperties(), loading_strategy));
     }
   }
@@ -415,7 +417,6 @@ class Automata final {
  private:
   dictionary_properties_t dictionary_properties_;
   std::unique_ptr<internal::IValueStoreReader> value_store_reader_;
-  boost::interprocess::file_mapping file_mapping_;
   boost::interprocess::mapped_region labels_region_;
   boost::interprocess::mapped_region transitions_region_;
   unsigned char* labels_;
