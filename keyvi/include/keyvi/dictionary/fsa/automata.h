@@ -98,13 +98,15 @@ class Automata final {
         internal::MemoryMapFlags::FSAGetMemoryMapOptions(loading_strategy);
 
     TRACE("labels start offset: %d", dictionary_properties_->GetPersistenceOffset());
-    labels_region_ = boost::interprocess::mapped_region(file_mapping, boost::interprocess::read_only,
-                                                        dictionary_properties_->GetPersistenceOffset(),
-                                                        dictionary_properties_->GetSparseArraySize(), 0, map_options);
+    labels_region_ = boost::interprocess::mapped_region(
+        file_mapping, boost::interprocess::read_only,
+        static_cast<boost::interprocess::offset_t>(dictionary_properties_->GetPersistenceOffset()),
+        dictionary_properties_->GetSparseArraySize(), 0, map_options);
 
     TRACE("transitions start offset: %d", dictionary_properties_->GetTransitionsOffset());
     transitions_region_ = boost::interprocess::mapped_region(
-        file_mapping, boost::interprocess::read_only, dictionary_properties_->GetTransitionsOffset(),
+        file_mapping, boost::interprocess::read_only,
+        static_cast<boost::interprocess::offset_t>(dictionary_properties_->GetTransitionsOffset()),
         dictionary_properties_->GetTransitionsSize(), 0, map_options);
 
     const auto advise = internal::MemoryMapFlags::FSAGetMemoryMapAdvices(loading_strategy);
