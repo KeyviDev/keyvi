@@ -101,13 +101,13 @@ class Automata final {
     labels_region_ = boost::interprocess::mapped_region(
         file_mapping, boost::interprocess::read_only,
         static_cast<boost::interprocess::offset_t>(dictionary_properties_->GetPersistenceOffset()),
-        dictionary_properties_->GetSparseArraySize(), 0, map_options);
+        dictionary_properties_->GetSparseArraySize(), nullptr, map_options);
 
     TRACE("transitions start offset: %d", dictionary_properties_->GetTransitionsOffset());
     transitions_region_ = boost::interprocess::mapped_region(
         file_mapping, boost::interprocess::read_only,
         static_cast<boost::interprocess::offset_t>(dictionary_properties_->GetTransitionsOffset()),
-        dictionary_properties_->GetTransitionsSize(), 0, map_options);
+        dictionary_properties_->GetTransitionsSize(), nullptr, map_options);
 
     const auto advise = internal::MemoryMapFlags::FSAGetMemoryMapAdvices(loading_strategy);
 
