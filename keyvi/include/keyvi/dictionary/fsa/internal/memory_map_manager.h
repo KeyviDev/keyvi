@@ -61,7 +61,6 @@ class MemoryMapManager final {
                    const boost::filesystem::path filename_pattern)
       : chunk_size_(chunk_size), directory_(directory), filename_pattern_(filename_pattern) {}
   ~MemoryMapManager() = default;
-  ~MemoryMapManager() {}
 
   /* Using GetAdress to read multiple bytes is unsafe as it might be a buffer overflow
    *
@@ -78,7 +77,7 @@ class MemoryMapManager final {
 
     void* chunk_address = GetChunk(chunk_number);
 
-    return (reinterpret_cast<char*>(chunk_address) + chunk_offset);
+    return static_cast<char*>(chunk_address) + chunk_offset;
   }
 
   /* Get a buffer as copy.
@@ -93,12 +92,12 @@ class MemoryMapManager final {
     size_t second_chunk_size = buffer_length - first_chunk_size;
 
     void* chunk_address = GetChunk(chunk_number);
-    std::memcpy(buffer, reinterpret_cast<char*>(chunk_address) + chunk_offset, first_chunk_size);
+    std::memcpy(buffer, static_cast<char*>(chunk_address) + chunk_offset, first_chunk_size);
 
     if (second_chunk_size > 0) {
       void* chunk_address_part2 = GetChunk(chunk_number + 1);
-      std::memcpy(reinterpret_cast<char*>(buffer) + first_chunk_size,
-                  reinterpret_cast<const char*>(chunk_address_part2), second_chunk_size);
+      std::memcpy(static_cast<char*>(buffer) + first_chunk_size, static_cast<const char*>(chunk_address_part2),
+                  second_chunk_size);
     }
   }
 
@@ -125,8 +124,8 @@ class MemoryMapManager final {
       size_t copy_size = std::min(remaining, chunk_size_ - chunk_offset);
       TRACE("copy size: %ld", copy_size);
 
-      std::memcpy(reinterpret_cast<char*>(chunk_address) + chunk_offset,
-                  reinterpret_cast<const char*>(buffer) + buffer_offset, copy_size);
+      std::memcpy(static_cast<char*>(chunk_address) + chunk_offset, static_cast<const char*>(buffer) + buffer_offset,
+                  copy_size);
 
       remaining -= copy_size;
       tail_ += copy_size;
@@ -150,7 +149,7 @@ class MemoryMapManager final {
     void* chunk_address = GetChunk(chunk_number);
     size_t first_chunk_size = std::min(buffer_length, chunk_size_ - chunk_offset);
 
-    if (std::memcmp(reinterpret_cast<char*>(chunk_address) + chunk_offset, buffer, first_chunk_size) != 0) {
+    if (std::memcmp(static_cast<char*>(chunk_address) + chunk_offset, buffer, first_chunk_size) != 0) {
       return false;
     }
 
@@ -161,9 +160,8 @@ class MemoryMapManager final {
 
     // handle overflow
     void* chunk_address_part2 = GetChunk(chunk_number + 1);
-    return (std::memcmp(reinterpret_cast<const char*>(chunk_address_part2),
-                        reinterpret_cast<const char*>(buffer) + first_chunk_size,
-                        buffer_length - first_chunk_size) == 0);
+    return (std::memcmp(static_cast<const char*>(chunk_address_part2),
+                        static_cast<const char*>(buffer) + first_chunk_size, buffer_length - first_chunk_size) == 0);
   }
 
   void Write(std::ostream& stream, const size_t end) const {
@@ -191,7 +189,7 @@ class MemoryMapManager final {
         size_t bytes_in_chunk = std::min(chunk_size_, remaining);
         TRACE("write chunk %d, with size: %ld, remaining: %ld", chunk, bytes_in_chunk, remaining);
 
-        const char* ptr = reinterpret_cast<const char*>(mappings_[chunk].get_address());
+        const char* ptr = static_cast<const char*>(mappings_[chunk].get_address());
         stream.write(ptr, bytes_in_chunk);
 
         remaining -= bytes_in_chunk;
