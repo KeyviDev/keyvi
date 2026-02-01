@@ -93,13 +93,15 @@ class MemoryMapManager final {
     size_t second_chunk_size = buffer_length - first_chunk_size;
 
     void* chunk_address = GetChunk(chunk_number);
-    std::memcpy(buffer, static_cast<char*>(chunk_address) + chunk_offset,
-                first_chunk_size);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    std::memcpy(buffer, static_cast<char*>(chunk_address) + chunk_offset, first_chunk_size);
 
     if (second_chunk_size > 0) {
       void* chunk_address_part2 = GetChunk(chunk_number + 1);
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
       std::memcpy(static_cast<char*>(buffer) + first_chunk_size, static_cast<const char*>(chunk_address_part2),
-                  second_chunk_size);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                  second_chunk_size);
     }
   }
 
@@ -126,8 +128,9 @@ class MemoryMapManager final {
       size_t copy_size = std::min(remaining, chunk_size_ - chunk_offset);
       TRACE("copy size: %ld", copy_size);
 
+      // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
       std::memcpy(static_cast<char*>(chunk_address) + chunk_offset, static_cast<const char*>(buffer) + buffer_offset,
-                  copy_size);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+                  copy_size);
 
       remaining -= copy_size;
       tail_ += copy_size;
@@ -151,6 +154,7 @@ class MemoryMapManager final {
     void* chunk_address = GetChunk(chunk_number);
     size_t first_chunk_size = std::min(buffer_length, chunk_size_ - chunk_offset);
 
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     if (std::memcmp(static_cast<char*>(chunk_address) + chunk_offset, buffer, first_chunk_size) != 0) {
       return false;
     }
@@ -162,6 +166,8 @@ class MemoryMapManager final {
 
     // handle overflow
     void* chunk_address_part2 = GetChunk(chunk_number + 1);
+
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     return (std::memcmp(static_cast<const char*>(chunk_address_part2),
                         static_cast<const char*>(buffer) + first_chunk_size, buffer_length - first_chunk_size) == 0);
   }
