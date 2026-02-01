@@ -61,10 +61,6 @@ class MemoryMapManager final {
       : chunk_size_(chunk_size), directory_(directory), filename_pattern_(filename_pattern) {}
 
   ~MemoryMapManager() {
-    for (auto& m : mappings_) {
-      delete m.mapping_;
-      delete m.region_;
-    }
   }
 
   /* Using GetAdress to read multiple bytes is unsafe as it might be a buffer overflow
@@ -195,7 +191,7 @@ class MemoryMapManager final {
         size_t bytes_in_chunk = std::min(chunk_size_, remaining);
         TRACE("write chunk %d, with size: %ld, remaining: %ld", chunk, bytes_in_chunk, remaining);
 
-        const char* ptr = reinterpret_cast<const char*>(mappings_[chunk].region_->get_address());
+        const char* ptr = reinterpret_cast<const char*>(mappings_[chunk].get_address());
         stream.write(ptr, bytes_in_chunk);
 
         remaining -= bytes_in_chunk;
@@ -212,9 +208,7 @@ class MemoryMapManager final {
   void Persist() {
     persisted_ = true;
     for (auto& m : mappings_) {
-      m.region_->flush();
-      delete m.region_;
-      delete m.mapping_;
+      m.flush();
     }
 
     // truncate last file according to the written buffers
@@ -236,13 +230,8 @@ class MemoryMapManager final {
   size_t GetNumberOfChunks() const { return number_of_chunks_; }
 
  private:
-  struct mapping {
-    boost::interprocess::file_mapping* mapping_;
-    boost::interprocess::mapped_region* region_;
-  };
-
   size_t chunk_size_;
-  std::vector<mapping> mappings_;
+  std::vector<boost::interprocess::mapped_region> mappings_;
   boost::filesystem::path directory_;
   boost::filesystem::path filename_pattern_;
   size_t tail_ = 0;
@@ -262,13 +251,11 @@ class MemoryMapManager final {
       CreateMapping();
     }
 
-    return mappings_[chunk_number].region_->get_address();
+    return mappings_[chunk_number].get_address();
   }
 
   void CreateMapping() {
     TRACE("create new mapping %d", number_of_chunks_ + 1);
-    mapping new_mapping;
-
     boost::filesystem::path filename = GetFilenameForChunk(number_of_chunks_);
 
     std::ofstream chunk(filename.string().c_str(),
@@ -287,16 +274,14 @@ class MemoryMapManager final {
       throw memory_map_manager_exception("failed to create chunk (setting size)");
     }
 
-    new_mapping.mapping_ =
-        new boost::interprocess::file_mapping(filename.string().c_str(), boost::interprocess::read_write);
+    boost::interprocess::file_mapping mapping(filename.string().c_str(), boost::interprocess::read_write);
 
-    new_mapping.region_ =
-        new boost::interprocess::mapped_region(*new_mapping.mapping_, boost::interprocess::read_write);
+    boost::interprocess::mapped_region mapped_region(boost::interprocess::mapped_region(mapping, boost::interprocess::read_write));
 
     // prevent pre-fetching pages by the OS which does not make sense as values usually fit into few pages
-    new_mapping.region_->advise(boost::interprocess::mapped_region::advice_types::advice_random);
+    mapped_region.advise(boost::interprocess::mapped_region::advice_types::advice_random);
 
-    mappings_.push_back(new_mapping);
+    mappings_.push_back(std::move(mapped_region));
     ++number_of_chunks_;
   }
 };
