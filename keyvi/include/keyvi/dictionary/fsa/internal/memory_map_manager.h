@@ -60,8 +60,7 @@ class MemoryMapManager final {
                    const boost::filesystem::path filename_pattern)
       : chunk_size_(chunk_size), directory_(directory), filename_pattern_(filename_pattern) {}
 
-  ~MemoryMapManager() {
-  }
+  ~MemoryMapManager() {}
 
   /* Using GetAdress to read multiple bytes is unsafe as it might be a buffer overflow
    *
@@ -276,7 +275,8 @@ class MemoryMapManager final {
 
     boost::interprocess::file_mapping mapping(filename.string().c_str(), boost::interprocess::read_write);
 
-    boost::interprocess::mapped_region mapped_region(boost::interprocess::mapped_region(mapping, boost::interprocess::read_write));
+    boost::interprocess::mapped_region mapped_region(
+        boost::interprocess::mapped_region(mapping, boost::interprocess::read_write));
 
     // prevent pre-fetching pages by the OS which does not make sense as values usually fit into few pages
     mapped_region.advise(boost::interprocess::mapped_region::advice_types::advice_random);
