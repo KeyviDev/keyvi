@@ -60,7 +60,7 @@ class MemoryMapManager final {
   MemoryMapManager(const size_t chunk_size, const boost::filesystem::path directory,
                    const boost::filesystem::path filename_pattern)
       : chunk_size_(chunk_size), directory_(directory), filename_pattern_(filename_pattern) {}
-
+  ~MemoryMapManager() = default;
   ~MemoryMapManager() {}
 
   /* Using GetAdress to read multiple bytes is unsafe as it might be a buffer overflow
@@ -274,7 +274,7 @@ class MemoryMapManager final {
       throw memory_map_manager_exception("failed to create chunk (setting size)");
     }
 
-    boost::interprocess::file_mapping mapping(filename.string().c_str(), boost::interprocess::read_write);
+    boost::interprocess::file_mapping const mapping(filename.string().c_str(), boost::interprocess::read_write);
 
     boost::interprocess::mapped_region mapped_region(
         boost::interprocess::mapped_region(mapping, boost::interprocess::read_write));
