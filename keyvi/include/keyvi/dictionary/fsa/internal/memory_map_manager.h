@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_FSA_INTERNAL_MEMORY_MAP_MANAGER_H_
 
 #include <algorithm>
+#include <cstring>
 #include <fstream>
 #include <string>
 #include <utility>
@@ -77,7 +78,7 @@ class MemoryMapManager final {
 
     void* chunk_address = GetChunk(chunk_number);
 
-    return static_cast<char*>(chunk_address) + chunk_offset;
+    return static_cast<char*>(chunk_address) + chunk_offset;  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   }
 
   /* Get a buffer as copy.
@@ -92,12 +93,13 @@ class MemoryMapManager final {
     size_t second_chunk_size = buffer_length - first_chunk_size;
 
     void* chunk_address = GetChunk(chunk_number);
-    std::memcpy(buffer, static_cast<char*>(chunk_address) + chunk_offset, first_chunk_size);
+    std::memcpy(buffer, static_cast<char*>(chunk_address) + chunk_offset,
+                first_chunk_size);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
     if (second_chunk_size > 0) {
       void* chunk_address_part2 = GetChunk(chunk_number + 1);
       std::memcpy(static_cast<char*>(buffer) + first_chunk_size, static_cast<const char*>(chunk_address_part2),
-                  second_chunk_size);
+                  second_chunk_size);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
   }
 
@@ -125,7 +127,7 @@ class MemoryMapManager final {
       TRACE("copy size: %ld", copy_size);
 
       std::memcpy(static_cast<char*>(chunk_address) + chunk_offset, static_cast<const char*>(buffer) + buffer_offset,
-                  copy_size);
+                  copy_size);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
       remaining -= copy_size;
       tail_ += copy_size;
