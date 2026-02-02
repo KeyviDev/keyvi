@@ -78,7 +78,8 @@ class MemoryMapManager final {
 
     void* chunk_address = GetChunk(chunk_number);
 
-    return static_cast<char*>(chunk_address) + chunk_offset;  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return static_cast<char*>(chunk_address) + chunk_offset;
   }
 
   /* Get a buffer as copy.
@@ -167,8 +168,8 @@ class MemoryMapManager final {
     // handle overflow
     void* chunk_address_part2 = GetChunk(chunk_number + 1);
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     return (std::memcmp(static_cast<const char*>(chunk_address_part2),
+                        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                         static_cast<const char*>(buffer) + first_chunk_size, buffer_length - first_chunk_size) == 0);
   }
 
