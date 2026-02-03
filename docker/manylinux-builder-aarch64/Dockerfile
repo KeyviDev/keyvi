@@ -1,4 +1,4 @@
-FROM quay.io/pypa/manylinux_2_28_aarch64@sha256:1c428544d9db0567ae2d99ce72f3f754d12c0a60702064fd8ed5f12c50c4d19e
+FROM quay.io/pypa/manylinux_2_28_aarch64@sha256:6ff5add4c780323bbc5a28a1f0a17228250952f5a5d45e4a6f642c518c9c3747
 
 RUN \
     yum -y update && \
