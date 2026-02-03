@@ -45,9 +45,9 @@ jobs:
             target: musl
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.19
+        uses: hendrikmuhs/ccache-action@v1.2.20
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.flavor }}-python
 
@@ -92,7 +92,7 @@ jobs:
           echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
 
       - name: Build python wheels for ${{ matrix.os }}
-        uses: pypa/cibuildwheel@v3.2.1
+        uses: pypa/cibuildwheel@v3.3.1
         env:
           # Skip CPython 3.8
           CIBW_SKIP: ${{ env.CIBW_SKIP }} cp38-*
@@ -127,7 +127,7 @@ jobs:
         with:
           package-dir: python
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: artifact-${{ matrix.os }}-${{ matrix.flavor }}-${{ matrix.target }}
           path: ./wheelhouse/*.whl
@@ -136,13 +136,13 @@ jobs:
     name: sdist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: install Linux deps
       run: |
         sudo apt-get update && \
         sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
     - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.19
+      uses: hendrikmuhs/ccache-action@v1.2.20
       with:
         key: ubuntu-sdist-python
 
@@ -158,7 +158,7 @@ jobs:
         python -m pytest tests && \
         python -m pip uninstall -y keyvi
 
-    - uses: actions/upload-artifact@v5
+    - uses: actions/upload-artifact@v6
       with:
         name: artifact-sdist
         path: python/wheelhouse/*.tar.gz
@@ -173,7 +173,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           pattern: artifact-*
           merge-multiple: true

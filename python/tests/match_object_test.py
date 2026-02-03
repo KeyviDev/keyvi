@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-# Usage: py.test tests
-
 import json
 import keyvi
 import msgpack
 from test_tools import tmp_dictionary
 import warnings
 import zlib
+import os
 import snappy
 import zstd
 
@@ -16,6 +14,9 @@ from keyvi.compiler import (
     KeyOnlyDictionaryCompiler,
     StringDictionaryCompiler,
 )
+
+
+TEST_DEPRECATIONS = os.getenv("KEYVI_SKIP_TEST_DEPRECATIONS") != "1"
 
 
 def test_serialization():
@@ -41,11 +42,12 @@ def test_raw_serialization():
         m2 = keyvi.Match.loads(d)
         assert m2.value_as_string() == '{"a":2}'
         assert msgpack.loads(m.msgpacked_value_as_string()) == {"a": 2}
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
-            assert m.GetValueAsString() == '{"a":2}'
-            assert len(w) == 1
-            assert issubclass(w[-1].category, DeprecationWarning)
+        if TEST_DEPRECATIONS:
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                assert m.GetValueAsString() == '{"a":2}'
+                assert len(w) == 1
+                assert issubclass(w[-1].category, DeprecationWarning)
 
 
 def test_unicode_attributes():
@@ -56,14 +58,15 @@ def test_unicode_attributes():
     m.score = 99
     assert m["k2"] == " 吃饭了吗"
     assert m.score == 99.0
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        m.SetAttribute("k2", "öäü")
-        assert m["k2"] == "öäü"
-        assert m.GetAttribute("k2") == "öäü"
-        assert len(w) == 2
-        assert issubclass(w[0].category, DeprecationWarning)
-        assert issubclass(w[1].category, DeprecationWarning)
+    if TEST_DEPRECATIONS:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            m.SetAttribute("k2", "öäü")
+            assert m["k2"] == "öäü"
+            assert m.GetAttribute("k2") == "öäü"
+            assert len(w) == 2
+            assert issubclass(w[0].category, DeprecationWarning)
+            assert issubclass(w[1].category, DeprecationWarning)
 
 
 def test_bytes_attributes():
@@ -94,36 +97,39 @@ def test_start():
     m = keyvi.Match()
     m.start = 42
     assert m.start == 42
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        m.SetStart(44)
-        assert m.start == 44
-        assert len(w) == 1
-        assert issubclass(w[-1].category, DeprecationWarning)
+    if TEST_DEPRECATIONS:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            m.SetStart(44)
+            assert m.start == 44
+            assert len(w) == 1
+            assert issubclass(w[-1].category, DeprecationWarning)
 
 
 def test_end():
     m = keyvi.Match()
     m.end = 49
     assert m.end == 49
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        m.SetEnd(55)
-        assert m.end == 55
-        assert len(w) == 1
-        assert issubclass(w[-1].category, DeprecationWarning)
+    if TEST_DEPRECATIONS:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            m.SetEnd(55)
+            assert m.end == 55
+            assert len(w) == 1
+            assert issubclass(w[-1].category, DeprecationWarning)
 
 
 def test_score():
     m = keyvi.Match()
     m.score = 149
     assert m.score == 149
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        m.SetScore(155)
-        assert m.score == 155
-        assert len(w) == 1
-        assert issubclass(w[-1].category, DeprecationWarning)
+    if TEST_DEPRECATIONS:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            m.SetScore(155)
+            assert m.score == 155
+            assert len(w) == 1
+            assert issubclass(w[-1].category, DeprecationWarning)
 
 
 def test_get_value():
@@ -236,20 +242,22 @@ def test_matched_string():
     m = keyvi.Match()
     m.matched_string = "match"
     assert m.matched_string == "match"
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        m.SetMatchedString("other_match")
-        assert m.matched_string == "other_match"
-        assert len(w) == 1
-        assert issubclass(w[-1].category, DeprecationWarning)
+    if TEST_DEPRECATIONS:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            m.SetMatchedString("other_match")
+            assert m.matched_string == "other_match"
+            assert len(w) == 1
+            assert issubclass(w[-1].category, DeprecationWarning)
 
 
 def test_bool_operator():
     m = keyvi.Match()
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        assert m.IsEmpty()
-        assert issubclass(w[-1].category, DeprecationWarning)
+    if TEST_DEPRECATIONS:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            assert m.IsEmpty()
+            assert issubclass(w[-1].category, DeprecationWarning)
     assert not m
     m.end = 42
     assert m is not False
