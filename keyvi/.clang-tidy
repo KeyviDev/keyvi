@@ -16,3 +16,11 @@ Checks: "*,
 "
 HeaderFilterRegex: ''
 FormatStyle:     none
+CheckOptions:
+  - key:             misc-include-cleaner.IgnoreHeaders
+    # The following files are ignored when clang-tidy analyzes header
+    # inclusions:
+    # - boost detail
+    value:           '
+                     boost/.*/detail/.*\.hpp;
+                     '
