@@ -56,7 +56,7 @@ testpaths = ["python/tests"]
 [tool.cibuildwheel]
 build-frontend = "default"
 test-groups = ["test"]
-test-command = "pytest {project}/python-pybind/tests"
+test-command = "pytest {project}/python/tests"
 manylinux-x86_64-image = "keyvidev/manylinux-builder-x86_64"
 musllinux-x86_64-image = "keyvidev/musllinux-builder-x86_64"
 manylinux-aarch64-image = "keyvidev/manylinux-builder-aarch64"
