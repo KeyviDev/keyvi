@@ -39,11 +39,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev doxygen
       - name: checkout from git
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
         # re-use the cache from the linux build
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.19
+        uses: hendrikmuhs/ccache-action@v1.2.20
         with:
           key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 
