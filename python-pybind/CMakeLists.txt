@@ -17,6 +17,7 @@ find_package(pybind11 CONFIG REQUIRED)
 FILE(GLOB_RECURSE KEYVI_PYBIND_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
 pybind11_add_module(keyvi2 ${KEYVI_PYBIND_SOURCES})
 
+target_include_directories(keyvi2 PRIVATE src)
 target_link_libraries(keyvi2 PRIVATE keyvi)
 
 # This is passing in the version as a define just as an example

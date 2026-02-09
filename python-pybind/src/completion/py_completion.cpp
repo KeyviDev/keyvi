@@ -24,14 +24,29 @@
 #include "keyvi/dictionary/completion/prefix_completion.h"
 #include "keyvi/dictionary/match.h"
 
-// #include "../py_match_iterator.h"
+#include "py_match_iterator.h"
 
 namespace py = pybind11;
+namespace kd = keyvi::dictionary;
 namespace kdc = keyvi::dictionary::completion;
-// namespace kpy = keyvi::pybind;
+namespace kpy = keyvi::pybind;
 
 void init_keyvi_completion(const py::module_& module) {
-  py::class_<kdc::ForwardBackwardCompletion>(module, "ForwardBackwardCompletion");
+  py::class_<kdc::ForwardBackwardCompletion>(module, "ForwardBackwardCompletion")
+      .def(py::init<kd::dictionary_t, kd::dictionary_t>(), py::arg("forward_dictionary"),
+           py::arg("backward_dictionary"))
+      .def(
+          "complete",
+          [](const kdc::ForwardBackwardCompletion& c, const std::string& query, const int number_of_results) {
+            auto m = c.GetCompletions(query, number_of_results);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("number_of_results") = 10,
+          R"pbdoc(
+            Get forward-backward completions for a query.
+
+            Returns an iterator of Match objects.
+          )pbdoc");
   py::class_<kdc::MultiWordCompletion>(module, "MultiWordCompletion");
   py::class_<kdc::PrefixCompletion>(module, "PrefixCompletion");
 }

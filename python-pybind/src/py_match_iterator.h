@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef DICTIONARY_PY_MATCH_ITERATOR_H_
-#define DICTIONARY_PY_MATCH_ITERATOR_H_
+#ifndef PY_MATCH_ITERATOR_H_
+#define PY_MATCH_ITERATOR_H_
 
 #include <pybind11/pybind11.h>
 
@@ -72,4 +72,4 @@ pybind11::typing::Iterator<ValueType> make_match_iterator(Iterator first, Sentin
 } /* namespace pybind */
 } /* namespace keyvi */
 
-#endif  // DICTIONARY_PY_MATCH_ITERATOR_H_
+#endif  // PY_MATCH_ITERATOR_H_
