@@ -263,7 +263,7 @@ class ForwardBackwardCompletion final {
   PrefixCompletion forward_completions_;
   PrefixCompletion backward_completions_;
 };
-// NOLINTEND
+// NOLINTEND(readability-function-cognitive-complexity)
 
 } /* namespace completion */
 } /* namespace dictionary */
