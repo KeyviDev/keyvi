@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_COMPLETION_PREFIX_COMPLETION_H_
 
 #include <algorithm>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <utility>

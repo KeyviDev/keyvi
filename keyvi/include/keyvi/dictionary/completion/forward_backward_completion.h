@@ -35,6 +35,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "keyvi/dictionary/completion/prefix_completion.h"
+#include "keyvi/dictionary/match_iterator.h"
 #include "keyvi/dictionary/util/bounded_priority_queue.h"
 
 // #define ENABLE_TRACING
