@@ -45,8 +45,6 @@ namespace keyvi {
 namespace dictionary {
 namespace completion {
 
-// NOLINTBEGIN(readability-function-cognitive-complexity)
-
 /**
  * Port of forward->backward suggester code from python to C++
  */
@@ -59,6 +57,7 @@ class ForwardBackwardCompletion final {
     bool operator()(const match_t& m1, const match_t& m2) const { return m1->GetScore() < m2->GetScore(); }
   };
 
+  // NOLINTBEGIN(readability-function-cognitive-complexity)
   [[nodiscard]] MatchIterator::MatchIteratorPair GetCompletions(const std::string& query,
                                                                 int number_of_results = 10) const {
     // get query length
@@ -258,12 +257,12 @@ class ForwardBackwardCompletion final {
     };
     return MatchIterator::MakeIteratorPair(tfunc);
   }
+  // NOLINTEND(readability-function-cognitive-complexity)
 
  private:
   PrefixCompletion forward_completions_;
   PrefixCompletion backward_completions_;
 };
-// NOLINTEND(readability-function-cognitive-complexity)
 
 } /* namespace completion */
 } /* namespace dictionary */
