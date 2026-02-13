@@ -55,7 +55,8 @@ class PrefixCompletion final {
  public:
   explicit PrefixCompletion(dictionary_t d) : fsa_(d->GetFsa()) {}
 
-  [[nodiscard]] MatchIterator::MatchIteratorPair GetCompletions(const std::string& query, size_t number_of_results = 10) const {
+  [[nodiscard]] MatchIterator::MatchIteratorPair GetCompletions(const std::string& query,
+                                                                size_t number_of_results = 10) const {
     uint64_t state = fsa_->GetStartState();
     const size_t query_length = query.size();
     size_t depth = 0;
