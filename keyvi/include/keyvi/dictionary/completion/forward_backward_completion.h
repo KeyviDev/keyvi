@@ -59,6 +59,7 @@ class ForwardBackwardCompletion final {
 
   [[nodiscard]] MatchIterator::MatchIteratorPair GetCompletions(const std::string& query,
                                                                 int number_of_results = 10) const {
+    // NOLINTBEGIN(readability-function-cognitive-complexity)
     // get query length
     const size_t query_length = query.size();
 
@@ -254,7 +255,7 @@ class ForwardBackwardCompletion final {
 
       return match_t();
     };
-
+    // NOLINTEND
     return MatchIterator::MakeIteratorPair(tfunc);
   }
 
