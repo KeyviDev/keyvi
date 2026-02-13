@@ -56,7 +56,7 @@ class ForwardBackwardCompletion final {
     bool operator()(const match_t& m1, const match_t& m2) const { return m1->GetScore() < m2->GetScore(); }
   };
 
-  MatchIterator::MatchIteratorPair GetCompletions(const std::string& query, int number_of_results = 10) const {
+  [[nodiscard]] MatchIterator::MatchIteratorPair GetCompletions(const std::string& query, int number_of_results = 10) const {
     // get query length
     const size_t query_length = query.size();
 
