@@ -67,4 +67,4 @@ class Utf8Utils final {
 } /* namespace util */
 } /* namespace dictionary */
 } /* namespace keyvi */
-#endif /* KEYVI_DICTIONARY_UTIL_UTF8_UTILS_H_ */
+#endif  // KEYVI_DICTIONARY_UTIL_UTF8_UTILS_H_
