@@ -26,7 +26,6 @@
 #define KEYVI_DICTIONARY_UTIL_UTF8_UTILS_H_
 
 #include <cstddef>
-#include <cstdint>
 #include <stdexcept>
 #include <string>
 
@@ -52,7 +51,7 @@ class Utf8Utils final {
       return 1;
     }
 
-    if ((leadByte & 0xE0u) == 0xC0U) {  // 110xxxxx
+    if ((leadByte & 0xE0U) == 0xC0U) {  // 110xxxxx
       return 2;
     }
 
