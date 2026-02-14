@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_UTIL_TRANSFORM_H_
 
 #include <algorithm>
+#include <cstddef>
 #include <string>
 #include <vector>
 

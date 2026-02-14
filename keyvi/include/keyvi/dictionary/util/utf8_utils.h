@@ -25,6 +25,11 @@
 #ifndef KEYVI_DICTIONARY_UTIL_UTF8_UTILS_H_
 #define KEYVI_DICTIONARY_UTIL_UTF8_UTILS_H_
 
+#include <cstddef>
+#include <cstdint>
+#include <stdexcept>
+#include <string>
+
 namespace keyvi {
 namespace dictionary {
 namespace util {
@@ -42,7 +47,7 @@ class Utf8Utils final {
   }
 
   static size_t GetCharLength(char utf8_lead_byte) {
-    int intValue = utf8_lead_byte & 0xff;
+    const uint32_t intValue = utf8_lead_byte & 0xff;
 
     if (intValue < 0x80) {
       return 1;
