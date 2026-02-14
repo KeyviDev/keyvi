@@ -11,8 +11,18 @@ Checks: "*,
         -readability-else-after-return,
         -readability-static-accessed-through-instance,
         -readability-avoid-const-params-in-decls,
+        -readability-magic-numbers,
         -cppcoreguidelines-non-private-member-variables-in-classes,
         -misc-non-private-member-variables-in-classes,
+        -cppcoreguidelines-avoid-magic-numbers,
 "
-HeaderFilterRegex: ''
+HeaderFilterRegex: '^(?!include/keyvi/dictionary/util/trace\.h$).*'
 FormatStyle:     none
+CheckOptions:
+  - key:             misc-include-cleaner.IgnoreHeaders
+    # The following files are ignored when clang-tidy analyzes header
+    # inclusions:
+    # - boost detail
+    value:           '
+                     boost/.*/detail/.*\.hpp;
+                     '

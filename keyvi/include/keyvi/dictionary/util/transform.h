@@ -22,8 +22,13 @@
  *      Author: hendrik
  */
 
-#ifndef TRANSFORM_H_
-#define TRANSFORM_H_
+#ifndef KEYVI_DICTIONARY_UTIL_TRANSFORM_H_
+#define KEYVI_DICTIONARY_UTIL_TRANSFORM_H_
+
+#include <algorithm>
+#include <cstddef>
+#include <string>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 
@@ -31,15 +36,14 @@ namespace keyvi {
 namespace dictionary {
 namespace util {
 
-class Transform final{
+class Transform final {
  public:
   /**
    * Apply Bag of Words reordering for all but the last token
    * @param input
    * @return token with bow applied
    */
-  static std::string BagOfWordsPartial(const std::string& input, size_t& number_of_tokens)
-  {
+  static std::string BagOfWordsPartial(const std::string& input, size_t& number_of_tokens) {
     std::vector<std::string> strs;
     boost::split(strs, input, boost::is_any_of("\t "));
     number_of_tokens = strs.size();
@@ -57,4 +61,4 @@ class Transform final{
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* TRANSFORM_H_ */
+#endif /* KEYVI_DICTIONARY_UTIL_TRANSFORM_H_ */

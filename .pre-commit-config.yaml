@@ -28,7 +28,9 @@ repos:
       - id: check-toml
       - id: check-yaml
       - id: end-of-file-fixer
+        exclude: '^(.*\.svg)$'
       - id: trailing-whitespace
+        exclude: '^(.*\.svg)$'
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: "v0.14.0"
     hooks:

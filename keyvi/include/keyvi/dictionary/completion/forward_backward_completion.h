@@ -35,6 +35,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "keyvi/dictionary/completion/prefix_completion.h"
+#include "keyvi/dictionary/match_iterator.h"
 #include "keyvi/dictionary/util/bounded_priority_queue.h"
 
 // #define ENABLE_TRACING
@@ -56,7 +57,9 @@ class ForwardBackwardCompletion final {
     bool operator()(const match_t& m1, const match_t& m2) const { return m1->GetScore() < m2->GetScore(); }
   };
 
-  MatchIterator::MatchIteratorPair GetCompletions(const std::string& query, int number_of_results = 10) {
+  // NOLINTBEGIN(readability-function-cognitive-complexity)
+  [[nodiscard]] MatchIterator::MatchIteratorPair GetCompletions(const std::string& query,
+                                                                int number_of_results = 10) const {
     // get query length
     const size_t query_length = query.size();
 
@@ -252,9 +255,9 @@ class ForwardBackwardCompletion final {
 
       return match_t();
     };
-
     return MatchIterator::MakeIteratorPair(tfunc);
   }
+  // NOLINTEND(readability-function-cognitive-complexity)
 
  private:
   PrefixCompletion forward_completions_;
