@@ -48,25 +48,21 @@ class Utf8Utils final {
 
   [[nodiscard]]
   static size_t GetCharLength(unsigned char leadByte) {
-    if ((leadByte & 0x80U) == 0x00u)  // 0xxxxxxx
-    if ((leadByte & 0x80u) == 0x00u) {  // 0xxxxxxx
+    if ((leadByte & 0x80U) == 0x00U) {  // 0xxxxxxx
       return 1;
-}
+    }
 
-    if ((leadByte & 0xE0U) == 0xC0u)  // 110xxxxx
-    if ((leadByte & 0xE0u) == 0xC0u) {  // 110xxxxx
+    if ((leadByte & 0xE0u) == 0xC0U) {  // 110xxxxx
       return 2;
-}
+    }
 
-    if ((leadByte & 0xF0U) == 0xE0u)  // 1110xxxx
-    if ((leadByte & 0xF0u) == 0xE0u) {  // 1110xxxx
+    if ((leadByte & 0xF0U) == 0xE0U) {  // 1110xxxx
       return 3;
-}
+    }
 
-    if ((leadByte & 0xF8U) == 0xF0u)  // 11110xxx
-    if ((leadByte & 0xF8u) == 0xF0u) {  // 11110xxx
+    if ((leadByte & 0xF8U) == 0xF0U) {  // 11110xxx
       return 4;
-}
+    }
 
     throw std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(leadByte));
   }
