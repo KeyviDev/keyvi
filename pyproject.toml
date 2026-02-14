@@ -1,0 +1,96 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "keyvi2"
+version = "0.7.6dev0"
+dependencies = [
+    "msgpack>=1.0.0",
+]
+
+[dependency-groups]
+lint = [
+    'ruff>=0.5.0',
+]
+test = [
+    'pytest>=8.3.5',
+    'pytest-env>=1.1.5',
+    'python-snappy>=0.7.3',
+    'zstd>=1.5.7.2'
+]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    "tox",
+]
+
+
+[tool.scikit-build]
+wheel.expand-macos-universal-tags = true
+minimum-version = "build-system.requires"
+
+[tool.scikit-build.cmake.define]
+KEYVI_PYTHON_BINDINGS = "ON"
+KEYVI_C_BINDINGS = "OFF"
+KEYVI_TESTS = "OFF"
+KEYVI_BINARIES = "OFF"
+KEYVI_CLANG_TIDY = "OFF"
+KEYVI_DOCS = "OFF"
+
+[tool.pytest.ini_options]
+env = [
+    "KEYVI_SKIP_TEST_DEPRECATIONS = 1",
+    "KEYVI_MODULE_OVERWRITE=keyvi2"
+]
+minversion = "7.1.1"
+addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
+xfail_strict = true
+log_cli_level = "INFO"
+filterwarnings = [
+  "error",
+  "ignore::pytest.PytestCacheWarning",
+]
+testpaths = ["python/tests"]
+
+[tool.cibuildwheel]
+build-frontend = "default"
+test-groups = ["test"]
+test-command = "pytest {project}/python/tests"
+manylinux-x86_64-image = "keyvidev/manylinux-builder-x86_64"
+musllinux-x86_64-image = "keyvidev/musllinux-builder-x86_64"
+manylinux-aarch64-image = "keyvidev/manylinux-builder-aarch64"
+musllinux-aarch64-image = "keyvidev/musllinux-builder-aarch64"
+
+[tool.ruff.lint]
+extend-select = [
+  "B",           # flake8-bugbear
+  "I",           # isort
+  "ARG",         # flake8-unused-arguments
+  "C4",          # flake8-comprehensions
+  "EM",          # flake8-errmsg
+  "ICN",         # flake8-import-conventions
+  "G",           # flake8-logging-format
+  "PGH",         # pygrep-hooks
+  "PIE",         # flake8-pie
+  "PL",          # pylint
+  "PT",          # flake8-pytest-style
+  "PTH",         # flake8-use-pathlib
+  "RET",         # flake8-return
+  "RUF",         # Ruff-specific
+  "SIM",         # flake8-simplify
+  "T20",         # flake8-print
+  "UP",          # pyupgrade
+  "YTT",         # flake8-2020
+  "EXE",         # flake8-executable
+  "NPY",         # NumPy specific rules
+  "PD",          # pandas-vet
+]
+ignore = [
+  "PLR09",    # Too many X
+  "PLR2004",  # Magic comparison
+]
+isort.required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["T20"]
