@@ -46,22 +46,21 @@ class Utf8Utils final {
     return (intValue < 0x80) || (intValue >= 0xC0);
   }
 
-  static size_t GetCharLength(char utf8_lead_byte) {
-    const uint32_t intValue = utf8_lead_byte & 0xff;
-
-    if (intValue < 0x80) {
+  [[nodiscard]]
+  static size_t GetCharLength(unsigned char leadByte) {
+    if ((leadByte & 0x80u) == 0x00u)  // 0xxxxxxx
       return 1;
-    } else if (intValue < 0xc0) {
-      std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(intValue));
-    } else if (intValue < 0xe0) {
-      return 2;
-    } else if (intValue < 0xf0) {
-      return 3;
-    } else if (intValue < 0xf8) {
-      return 4;
-    }
 
-    throw std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(intValue));
+    if ((leadByte & 0xE0u) == 0xC0u)  // 110xxxxx
+      return 2;
+
+    if ((leadByte & 0xF0u) == 0xE0u)  // 1110xxxx
+      return 3;
+
+    if ((leadByte & 0xF8u) == 0xF0u)  // 11110xxx
+      return 4;
+
+    throw std::invalid_argument("Illegal UTF-8 lead byte: " + std::to_string(leadByte));
   }
 };
 
