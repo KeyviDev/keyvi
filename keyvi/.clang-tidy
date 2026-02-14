@@ -16,7 +16,7 @@ Checks: "*,
         -misc-non-private-member-variables-in-classes,
         -cppcoreguidelines-avoid-magic-numbers,
 "
-HeaderFilterRegex: ''
+HeaderFilterRegex: '^(?!include/keyvi/dictionary/util/trace\.h$).*'
 FormatStyle:     none
 CheckOptions:
   - key:             misc-include-cleaner.IgnoreHeaders

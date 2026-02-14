@@ -22,8 +22,8 @@
  *      Author: hendrik
  */
 
-#ifndef UTF8_UTILS_H_
-#define UTF8_UTILS_H_
+#ifndef KEYVI_DICTIONARY_UTIL_UTF8_UTILS_H_
+#define KEYVI_DICTIONARY_UTIL_UTF8_UTILS_H_
 
 namespace keyvi {
 namespace dictionary {
@@ -63,4 +63,4 @@ class Utf8Utils final {
 } /* namespace util */
 } /* namespace dictionary */
 } /* namespace keyvi */
-#endif /* UTF8_UTILS_H_ */
+#endif /* KEYVI_DICTIONARY_UTIL_UTF8_UTILS_H_ */

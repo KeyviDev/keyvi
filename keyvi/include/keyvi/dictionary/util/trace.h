@@ -24,6 +24,9 @@
 
 // The following is left intentionally without include guard
 // so that tracing can be switched on and off on a per file basis.
+
+// NOLINTBEGIN
+
 #ifdef ENABLE_TRACING
 #undef TRACE
 #define TRACE ::keyvi::dictionary::util::trace::trace_it
@@ -58,4 +61,6 @@ class trace final {
 } /* namespace util */
 } /* namespace dictionary */
 } /* namespace keyvi */
+
+// NOLINTEND
 #endif /* TRACE_H_ */

@@ -22,8 +22,12 @@
  *      Author: hendrik
  */
 
-#ifndef TRANSFORM_H_
-#define TRANSFORM_H_
+#ifndef KEYVI_DICTIONARY_UTIL_TRANSFORM_H_
+#define KEYVI_DICTIONARY_UTIL_TRANSFORM_H_
+
+#include <algorithm>
+#include <string>
+#include <vector>
 
 #include <boost/algorithm/string.hpp>
 
@@ -56,4 +60,4 @@ class Transform final {
 } /* namespace dictionary */
 } /* namespace keyvi */
 
-#endif /* TRANSFORM_H_ */
+#endif /* KEYVI_DICTIONARY_UTIL_TRANSFORM_H_ */
