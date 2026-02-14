@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Dictionary &mdash; keyvi  documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8e8a900e" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=310cf088" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=dd5fadba" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="keyvi  documentation" href="#" />
+            <link rel="next" title="Index" href="index.html" />
+            <link rel="prev" title="Index" href="../cpp/index.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="../index.html"
+                        title="keyvi"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/logo-white.png" width="45" height="59" alt="keyvi"
+                            class="logo-img"
+                        />
+                        keyvi
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Index</a></li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Dictionary</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <noscript>
+                            <p>JavaScript is required to toggle light/dark mode..</p>
+                        </noscript>
+                        <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                            <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                            <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                        </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/python/dictionary.rst" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/python/dictionary.rst.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                        
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="dictionary">
+<h1>Dictionary<a class="headerlink" href="#dictionary" title="Link to this heading">¶</a></h1>
+<p>The Dictionary provides read access to a singkle keyvi file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">keyvi.dictionary</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dictionary</span>
+
+<span class="n">d</span><span class="o">=</span><span class="n">Dictionary</span><span class="p">(</span><span class="s2">&quot;data.kv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">keyvi.dictionary.</span></span><span class="sig-name descname"><span class="pre">Dictionary</span></span><a class="headerlink" href="#keyvi.dictionary.Dictionary" title="Link to this definition">¶</a></dt>
+<dd><p>Cython implementation of _Dictionary</p>
+<p>Keyvi dictionary, an immutable containers storing key value pairs, optimized
+for size, lookup performance and special lookp use cases.
+A keyvi dictionary has to be created by a previous compile run.</p>
+<p>Keyvi dictionaries allow multiple types of approximate and completion
+matches due to its internal FST based data structure.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.complete_fuzzy_multiword">
+<span class="sig-name descname"><span class="pre">complete_fuzzy_multiword</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.complete_fuzzy_multiword" title="Link to this definition">¶</a></dt>
+<dd><p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">complete_fuzzy_multiword</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_edit_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+<p>Complete the given key to full matches after whitespace tokenizing,
+allowing up to max_edit_distance distance(Levenshtein).
+In case the used dictionary supports inner weights, the
+completer traverses the dictionary according to weights,
+otherwise byte-order.</p>
+<p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">complete_fuzzy_multiword</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_edit_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_exact_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+<p>Complete the given key to full matches after whitespace tokenizing,
+allowing up to max_edit_distance distance(Levenshtein) except for
+a given exaxt prefix which must match exaxt.
+In case the used dictionary supports inner weights, the
+completer traverses the dictionary according to weights,
+otherwise byte-order.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.complete_multiword">
+<span class="sig-name descname"><span class="pre">complete_multiword</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.complete_multiword" title="Link to this definition">¶</a></dt>
+<dd><p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">complete_multiword</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+<p>Complete the given key to full matches after whitespace tokenizing.
+In case the used dictionary supports inner weights, the
+completer traverses the dictionary according to weights,
+otherwise byte-order.</p>
+<p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">complete_multiword</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+<p>Complete the given key to full matches after whitespace tokenizing
+and return the top n completions.
+In case the used dictionary supports inner weights, the
+completer traverses the dictionary according to weights,
+otherwise byte-order.</p>
+<p>Note, due to depth-first traversal the traverser
+immediately yields results when it visits them. The results are
+neither in order nor limited to n. It is up to the caller to resort
+and truncate the lists of results.
+Only the number of top completions is guaranteed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.complete_prefix">
+<span class="sig-name descname"><span class="pre">complete_prefix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.complete_prefix" title="Link to this definition">¶</a></dt>
+<dd><p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">complete_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+<p>Complete the given key to full matches(prefix matching)
+In case the used dictionary supports inner weights, the
+completer traverses the dictionary according to weights,
+otherwise byte-order.</p>
+<p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">complete_prefix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+<p>Complete the given key to full matches(prefix matching)
+and return the top n completions.
+In case the used dictionary supports inner weights, the
+completer traverses the dictionary according to weights,
+otherwise byte-order.</p>
+<p>Note, due to depth-first traversal the traverser
+immediately yields results when it visits them. The results are
+neither in order nor limited to n. It is up to the caller to resort
+and truncate the lists of results.
+Only the number of top completions is guaranteed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.manifest">
+<span class="sig-name descname"><span class="pre">manifest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#keyvi.dictionary.Dictionary.manifest" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.match">
+<span class="sig-name descname"><span class="pre">match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#keyvi.dictionary.Dictionary.match" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.match_fuzzy">
+<span class="sig-name descname"><span class="pre">match_fuzzy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.match_fuzzy" title="Link to this definition">¶</a></dt>
+<dd><p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">match_fuzzy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_edit_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+<p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">match_fuzzy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_edit_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_exact_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.match_near">
+<span class="sig-name descname"><span class="pre">match_near</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#keyvi.dictionary.Dictionary.match_near" title="Link to this definition">¶</a></dt>
+<dd><p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">match_near</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_prefix_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+<p class="rubric">Overload:</p>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">match_near</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_prefix_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">greedy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.search">
+<span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#keyvi.dictionary.Dictionary.search" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="keyvi.dictionary.Dictionary.search_tokenized">
+<span class="sig-name descname"><span class="pre">search_tokenized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#keyvi.dictionary.Dictionary.search_tokenized" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="../cpp/index.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Index
+    </a>
+    <a class="float-right" href="index.html" title="Next">
+        Index <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Dictionary</a><ul>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary"><code class="docutils literal notranslate"><span class="pre">Dictionary</span></code></a><ul>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.complete_fuzzy_multiword"><code class="docutils literal notranslate"><span class="pre">Dictionary.complete_fuzzy_multiword()</span></code></a></li>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.complete_multiword"><code class="docutils literal notranslate"><span class="pre">Dictionary.complete_multiword()</span></code></a></li>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.complete_prefix"><code class="docutils literal notranslate"><span class="pre">Dictionary.complete_prefix()</span></code></a></li>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.manifest"><code class="docutils literal notranslate"><span class="pre">Dictionary.manifest()</span></code></a></li>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.match"><code class="docutils literal notranslate"><span class="pre">Dictionary.match()</span></code></a></li>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.match_fuzzy"><code class="docutils literal notranslate"><span class="pre">Dictionary.match_fuzzy()</span></code></a></li>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.match_near"><code class="docutils literal notranslate"><span class="pre">Dictionary.match_near()</span></code></a></li>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.search"><code class="docutils literal notranslate"><span class="pre">Dictionary.search()</span></code></a></li>
+<li><a class="reference internal" href="#keyvi.dictionary.Dictionary.search_tokenized"><code class="docutils literal notranslate"><span class="pre">Dictionary.search_tokenized()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://github.com/KeyviDev/keyvi">Github</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://pypi.org/project/keyvi/">Pypi</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center text-white-50 font-italic mt-3">
+                <small>Last updated: Feb 14, 2026</small>
+                <small>
+                    Created using
+                    <a class="text-white" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Sphinx Wagtail Theme 
+                    </a>
+                    and
+                    <a class="text-white" href="https://www.sphinx-doc.org/" rel="nofollow" target="_blank">
+                        Sphinx 9.1.0
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>
