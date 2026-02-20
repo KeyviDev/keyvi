@@ -1,15 +1,16 @@
 from libcpp.string cimport string as libcpp_string
 from libcpp.string  cimport string as libcpp_utf8_string
 from libcpp.map cimport map as libcpp_map
+from libc.stdint cimport uint64_t
 from libcpp.vector cimport vector as libcpp_vector
 
 ctypedef void (*callback_t)(size_t a, size_t b, void* user_data)
-        
+
 cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::dictionary":
     cdef cppclass CompletionDictionaryCompiler:
         CompletionDictionaryCompiler() except +
         CompletionDictionaryCompiler(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string, int) except + # wrap-as:add
+        void Add(libcpp_utf8_string, uint64_t) except + # wrap-as:add
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
@@ -27,7 +28,7 @@ cdef extern from "keyvi/dictionary/dictionary_types.h" namespace "keyvi::diction
     cdef cppclass IntDictionaryCompiler:
         IntDictionaryCompiler() except +
         IntDictionaryCompiler(libcpp_map[libcpp_utf8_string, libcpp_utf8_string] value_store_params) except +
-        void Add(libcpp_utf8_string, long) except + # wrap-as:add
+        void Add(libcpp_utf8_string, uint64_t) except + # wrap-as:add
         void Compile() nogil # wrap-ignore
         void Compile(callback_t, void*) nogil # wrap-ignore
         void SetManifest(libcpp_utf8_string) except + # wrap-as:set_manifest
