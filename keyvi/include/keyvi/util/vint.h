@@ -71,16 +71,16 @@ void encodeVarShort(int_t value, uint16_t* output, size_t* output_size_ptr) {
   size_t output_size = 0;
   // While more than 15 bits of data are left, occupy the last output byte
   // and set the next byte flag
-  while (value > 0x7FFFu) {
+  while (value > 0x7FFF) {
     // |0x7FFFu: Set the next byte flag
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    output[output_size] = (static_cast<uint16_t>(value) & 0x7FFFu) | 0x8000u;
+    output[output_size] = (static_cast<uint16_t>(value) & 0x7FFFU) | 0x8000U;
     // Remove the 15 bits we just wrote
     value >>= 15;
     output_size++;
   }
   // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  output[output_size++] = static_cast<uint16_t>(value) & 0x7FFFu;
+  output[output_size++] = static_cast<uint16_t>(value) & 0x7FFFU;
   *output_size_ptr = output_size;
 }
 
