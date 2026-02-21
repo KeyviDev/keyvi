@@ -29,6 +29,7 @@
 #ifndef KEYVI_UTIL_VINT_H_
 #define KEYVI_UTIL_VINT_H_
 
+#include <cstdint>
 #include <string>
 
 namespace keyvi {
@@ -113,11 +114,8 @@ inline size_t getVarIntLength(uint64_t value) {
  */
 template <typename int_t = uint64_t>
 size_t getVarShortLength(int_t value) {
-  return (value < 0x8000)               ? 1
-         : (value < 0x40000000)         ? 2
-         : (value < 0x200000000000)     ? 3
-         : (value < 0x1000000000000000) ? 4
-                                        : 5;
+  unsigned bit_index = 63 - __builtin_clzll(value | 1);
+  return 1 + bit_index / 15;
 }
 
 /**
