@@ -40,7 +40,7 @@ jobs:
           echo "ARCH=x86_64" >> $GITHUB_ENV
         if: matrix.os == 'ubuntu-24.04'
       - name: Build and push ${{ matrix.base_image }}-${{ env.ARCH }} docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: docker/${{ matrix.base_image }}linux-builder-${{ env.ARCH }}
           build-contexts: scripts=docker/scripts
