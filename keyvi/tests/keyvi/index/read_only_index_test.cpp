@@ -23,7 +23,9 @@
  *      Author: hendrik
  */
 #include <chrono>  //NOLINT
+#include <string>
 #include <thread>  //NOLINT
+#include <vector>
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
@@ -302,7 +304,8 @@ BOOST_AUTO_TEST_CASE(reloadRecoveryAfterMissingSegment) {
   testing::IndexMock index;
 
   std::vector<std::pair<std::string, std::string>> test_data = {
-      {"abc", "{a:1}"}, {"def", "{b:2}"},
+      {"abc", "{a:1}"},
+      {"def", "{b:2}"},
   };
   index.AddSegment(&test_data);
 
