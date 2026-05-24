@@ -30,6 +30,7 @@
 #include <atomic>
 #include <chrono>  //NOLINT
 #include <ctime>
+#include <exception>
 #include <memory>
 #include <mutex>  //NOLINT
 #include <string>
