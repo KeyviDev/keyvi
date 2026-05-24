@@ -189,12 +189,22 @@ class IndexReaderWorker final {
   }
 
   void UpdateWatcher() {
+    int retries_left = 3;
     while (!stop_update_thread_) {
       TRACE("UpdateWatcher: Check for new segments");
-      // reload
-      ReloadIndex();
-      ReloadDeletedKeys();
-      // sleep for next refresh
+      try {
+        ReloadIndex();
+        ReloadDeletedKeys();
+        retries_left = 0;
+      } catch (const std::exception& ex) {
+        TRACE("UpdateWatcher: reload failed: %s, retries left: %d", ex.what(), retries_left);
+        last_modification_time_ = 0;
+        if (retries_left > 0) {
+          --retries_left;
+          continue;
+        }
+        retries_left = 3;
+      }
       std::this_thread::sleep_for(refresh_interval_);
     }
   }

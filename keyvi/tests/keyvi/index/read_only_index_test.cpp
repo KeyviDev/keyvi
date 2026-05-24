@@ -298,6 +298,49 @@ BOOST_AUTO_TEST_CASE(nearMatching) {
                    {"\"pizzeria in Munich 4\"", "\"pizzeria in Munich 1\""});
 }
 
+BOOST_AUTO_TEST_CASE(reloadRecoveryAfterMissingSegment) {
+  testing::IndexMock index;
+
+  std::vector<std::pair<std::string, std::string>> test_data = {
+      {"abc", "{a:1}"}, {"def", "{b:2}"},
+  };
+  index.AddSegment(&test_data);
+
+  ReadOnlyIndex reader(index.GetIndexFolder(), {{"refresh_interval", "100"}});
+  BOOST_CHECK(reader.Contains("abc"));
+  BOOST_CHECK(reader.Contains("def"));
+
+  // simulate the race condition: write a TOC referencing a non-existent segment
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  {
+    boost::filesystem::path toc_file(index.GetIndexFolder());
+    toc_file /= "index.toc";
+    std::ofstream toc(toc_file.string());
+    toc << R"({"files": ["kv-0.kv", "kv-nonexistent.kv"]})";
+  }
+
+  // wait for a few reload cycles — the reader should not crash
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  // the reader should still serve the old segments
+  BOOST_CHECK(reader.Contains("abc"));
+  BOOST_CHECK(reader.Contains("def"));
+
+  // now fix the TOC by adding a real new segment
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::vector<std::pair<std::string, std::string>> test_data_2 = {
+      {"ghi", "{c:3}"},
+  };
+  index.AddSegment(&test_data_2);
+
+  // wait for reload to pick up the fixed TOC
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  BOOST_CHECK(reader.Contains("abc"));
+  BOOST_CHECK(reader.Contains("def"));
+  BOOST_CHECK(reader.Contains("ghi"));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace index */
