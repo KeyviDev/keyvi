@@ -153,6 +153,11 @@ class IndexReaderWorker final {
     index_toc.ParseStream(isw);
     TRACE("index_toc loaded");
 
+    if (index_toc.HasParseError() || !index_toc.IsObject() || !index_toc.HasMember("files") ||
+        !index_toc["files"].IsArray()) {
+      throw std::invalid_argument("invalid toc file");
+    }
+
     TRACE("reading segments");
 
     read_only_segments_t new_segments = std::make_shared<read_only_segment_vec_t>();
