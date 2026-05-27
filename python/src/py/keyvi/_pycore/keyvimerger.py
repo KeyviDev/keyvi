@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
         merger = keyvi.compiler.JsonDictionaryMerger(params)
         for f in args.input_file:
-            merger.Add(f)
+            merger.add(f)
 
         merger.Merge(args.output_file)
     else:
