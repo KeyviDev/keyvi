@@ -22,6 +22,7 @@
 #include <chrono>  //NOLINT
 #include <functional>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <thread>  // NOLINT
 #include <vector>
@@ -157,7 +158,16 @@ class MergeJob final {
   void DoExternalProcessMerge(boost::asio::io_context* external_process_ctx) {
     payload_.start_time_ = std::chrono::system_clock::now();
 
+    std::istringstream iss(payload_.settings_.GetKeyviMergerBin());
+    std::string executable;
+    iss >> executable;
+
     std::vector<std::string> args;
+    std::string token;
+    while (iss >> token) {
+      args.push_back(std::move(token));
+    }
+
     args.push_back("-m");
     args.push_back("5242880");
 
@@ -169,8 +179,7 @@ class MergeJob final {
     args.push_back("-o");
     args.push_back(payload_.output_filename_.string());
 
-    external_process_.reset(
-        new boost::process::v2::process(*external_process_ctx, payload_.settings_.GetKeyviMergerBin(), args));
+    external_process_.reset(new boost::process::v2::process(*external_process_ctx, executable, args));
   }
 
   bool TryFinalizeMerge() {
