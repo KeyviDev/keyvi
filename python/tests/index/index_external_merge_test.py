@@ -32,7 +32,6 @@ def test_external_merge():
             assert match.value == "value-{}".format(i)
 
 
-
 def test_external_merge_with_deletes():
     with tempfile.TemporaryDirectory() as test_dir:
         index_dir = os.path.join(test_dir, "index")
@@ -63,7 +62,6 @@ def test_external_merge_with_deletes():
                 assert key in index, "missing key: {}".format(key)
                 match = index[key]
                 assert match.value == "value-{}".format(i)
-
 
 
 def test_external_merge_with_overwrite():
@@ -99,9 +97,9 @@ def test_external_merge_with_overwrite():
             key = "key-{:05d}".format(i)
             assert key in index, "missing key: {}".format(key)
             match = index[key]
-            assert match.value == "value-v2-{}".format(i), \
+            assert match.value == "value-v2-{}".format(i), (
                 "expected v2 value for {}, got {}".format(key, match.value)
-
+            )
 
 
 def test_external_merge_read_only_index():
@@ -126,4 +124,3 @@ def test_external_merge_read_only_index():
         for i in range(500):
             key = "key-{:05d}".format(i)
             assert key in reader, "missing key in reader: {}".format(key)
-
