@@ -1,0 +1,83 @@
+/* * keyvi - A key value store.
+ *
+ * Copyright 2015 Hendrik Muhs<hendrik.muhs@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <pybind11/native_enum.h>
+#include <pybind11/pybind11.h>
+
+#include "keyvi/compression/compression_algorithm.h"
+#include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
+
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
+namespace py = pybind11;
+namespace kd = keyvi::dictionary;
+
+void init_keyvi_dictionary(const py::module_&);
+void init_keyvi_dictionary_compilers(const py::module_&);
+void init_keyvi_match(const py::module_&);
+void init_keyvi_completion(const py::module_&);
+void init_keyvi_index(const py::module_&);
+
+PYBIND11_MODULE(keyvi2, m, py::mod_gil_not_used()) {
+  m.doc() = R"pbdoc(
+        keyvi - a key value store.
+        -----------------------
+
+        .. currentmodule:: keyvi
+
+        .. autosummary::
+           :toctree: _generate
+
+    )pbdoc";
+  py::native_enum<keyvi::compression::CompressionAlgorithm>(m, "CompressionAlgorithm", "enum.Enum",
+                                                            "Compression algorithm used for packing values")
+      .value("NO_COMPRESSION", keyvi::compression::CompressionAlgorithm::NO_COMPRESSION)
+      .value("ZLIB_COMPRESSION", keyvi::compression::CompressionAlgorithm::ZLIB_COMPRESSION)
+      .value("SNAPPY_COMPRESSION", keyvi::compression::CompressionAlgorithm::SNAPPY_COMPRESSION)
+      .value("ZSTD_COMPRESSION", keyvi::compression::CompressionAlgorithm::ZSTD_COMPRESSION)
+      .finalize();
+
+  py::enum_<kd::loading_strategy_types>(m, "loading_strategy_types")
+      .value("default_os", kd::loading_strategy_types::default_os)
+      .value("lazy", kd::loading_strategy_types::lazy)
+      .value("populate", kd::loading_strategy_types::populate)
+      .value("populate_key_part", kd::loading_strategy_types::populate_key_part)
+      .value("populate_lazy", kd::loading_strategy_types::populate_lazy)
+      .value("lazy_no_readahead", kd::loading_strategy_types::lazy_no_readahead)
+      .value("lazy_no_readahead_value_part", kd::loading_strategy_types::lazy_no_readahead_value_part)
+      .value("populate_key_part_no_readahead_value_part",
+             kd::loading_strategy_types::populate_key_part_no_readahead_value_part);
+
+  init_keyvi_match(m);
+  py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi2.dictionary");
+  init_keyvi_dictionary(keyvi_dictionary);
+  py::module keyvi_compilers = m.def_submodule("compiler", "keyvi2.compiler");
+  init_keyvi_dictionary_compilers(keyvi_compilers);
+  py::module keyvi_completion = m.def_submodule("completion", "keyvi2.completion");
+  init_keyvi_completion(keyvi_completion);
+  py::module keyvi_index = m.def_submodule("index", "keyvi2.index");
+  init_keyvi_index(keyvi_index);
+  py::module keyvi_util = m.def_submodule("util", "keyvi2.util");
+  py::module keyvi_vector = m.def_submodule("vector", "keyvi2.vector");
+
+#ifdef VERSION_INFO
+  m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+#else
+  m.attr("__version__") = "dev";
+#endif
+}
