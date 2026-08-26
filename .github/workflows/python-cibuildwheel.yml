@@ -45,7 +45,7 @@ jobs:
             target: musl
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.23
         with:
@@ -92,10 +92,10 @@ jobs:
           echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
 
       - name: Build python wheels for ${{ matrix.os }}
-        uses: pypa/cibuildwheel@v3.4.1
+        uses: pypa/cibuildwheel@v4.2.0
         env:
-          # Skip CPython 3.8
-          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp38-*
+          # Skip CPython 3.15
+          CIBW_SKIP: ${{ env.CIBW_SKIP }} cp315*
 
           # only build native packages
           CIBW_ARCHS: native
@@ -136,7 +136,7 @@ jobs:
     name: sdist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: install Linux deps
       run: |
         sudo apt-get update && \
