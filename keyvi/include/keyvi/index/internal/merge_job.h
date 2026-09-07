@@ -179,7 +179,7 @@ class MergeJob final {
     args.push_back("-o");
     args.push_back(payload_.output_filename_.string());
 
-    external_process_.reset(new boost::process::v2::process(*external_process_ctx, executable, args));
+    external_process_ = std::make_shared<boost::process::v2::process>(*external_process_ctx, executable, args);
   }
 
   bool TryFinalizeMerge() {
