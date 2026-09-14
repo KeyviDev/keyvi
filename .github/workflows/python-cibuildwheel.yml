@@ -92,7 +92,7 @@ jobs:
           echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
 
       - name: Build python wheels for ${{ matrix.os }}
-        uses: pypa/cibuildwheel@v4.2.0
+        uses: pypa/cibuildwheel@v4.2.1
         env:
           # Skip CPython 3.15
           CIBW_SKIP: ${{ env.CIBW_SKIP }} cp315*
