@@ -386,9 +386,11 @@ class FloatVectorValueStoreReader final : public IValueStoreReader {
 
   std::string GetValueAsString(uint64_t fsa_value) const override {
     TRACE("FloatVectorValueStoreReader GetValueAsString");
-    std::string packed_string = keyvi::util::decodeVarIntString(strings_ + fsa_value);
+    size_t value_size = 0;
+    const char* value_ptr = keyvi::util::decodeVarIntString(
+        strings_ + fsa_value, &value_size);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-    return keyvi::util::FloatVectorAsString(keyvi::util::DecodeFloatVector(packed_string), ", ");
+    return keyvi::util::FloatVectorAsString(keyvi::util::DecodeFloatVector(value_ptr, value_size), ", ");
   }
 
   std::string GetMsgPackedValueAsString(uint64_t fsa_value,
@@ -408,7 +410,7 @@ class FloatVectorValueStoreReader final : public IValueStoreReader {
     // decompress
     const compression::decompress_func_t decompressor =
         compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(value_ptr[0]));
-    std::string msgpacked_value = decompressor(std::string(value_ptr, value_size));
+    std::string msgpacked_value = decompressor(value_ptr, value_size);
 
     if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
       return msgpacked_value;
@@ -427,14 +429,16 @@ class FloatVectorValueStoreReader final : public IValueStoreReader {
     }
 
     // compare the dimensions of the 1st vector of each value store
-    std::string packed_string = keyvi::util::decodeVarIntString(strings_);
-    std::vector<float> v = keyvi::util::DecodeFloatVector(packed_string);
+    size_t packed_size = 0;
+    const char* packed_ptr = keyvi::util::decodeVarIntString(strings_, &packed_size);
+    std::vector<float> const vec = keyvi::util::DecodeFloatVector(packed_ptr, packed_size);
 
-    std::string other_packed_string =
-        keyvi::util::decodeVarIntString(dynamic_cast<const FloatVectorValueStoreReader*>(&other)->strings_);
-    std::vector<float> other_v = keyvi::util::DecodeFloatVector(other_packed_string);
+    size_t other_packed_size = 0;
+    const char* other_packed_ptr = keyvi::util::decodeVarIntString(
+        dynamic_cast<const FloatVectorValueStoreReader*>(&other)->strings_, &other_packed_size);
+    std::vector<float> const other_vec = keyvi::util::DecodeFloatVector(other_packed_ptr, other_packed_size);
 
-    if (v.size() != other_v.size()) {
+    if (vec.size() != other_vec.size()) {
       throw std::invalid_argument("Float Vectors must have the same number of dimensions.");
     }
   }

@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(SimpleCompressAndUncompress) {
   auto compressed = cs->Compress(input);
   BOOST_CHECK(compressed.size() < strlen(input));
 
-  auto uncompressed = cs->Decompress(compressed);
+  auto uncompressed = cs->Decompress(compressed.data(), compressed.size());
   BOOST_CHECK_EQUAL(input, uncompressed);
 }
 

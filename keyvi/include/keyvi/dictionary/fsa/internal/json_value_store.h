@@ -389,7 +389,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
     // decompress
     const compression::decompress_func_t decompressor =
         compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(value_ptr[0]));
-    std::string msgpacked_value = decompressor(std::string(value_ptr, value_size));
+    std::string msgpacked_value = decompressor(value_ptr, value_size);
 
     if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
       return msgpacked_value;
@@ -403,9 +403,11 @@ class JsonValueStoreReader final : public IValueStoreReader {
 
   std::string GetValueAsString(uint64_t fsa_value) const override {
     TRACE("JsonValueStoreReader GetValueAsString");
-    std::string packed_string = keyvi::util::decodeVarIntString(strings_ + fsa_value);
+    size_t value_size = 0;
+    const char* value_ptr = keyvi::util::decodeVarIntString(
+        strings_ + fsa_value, &value_size);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
-    return keyvi::util::DecodeJsonValue(packed_string);
+    return keyvi::util::DecodeJsonValue(value_ptr, value_size);
   }
 
  private:

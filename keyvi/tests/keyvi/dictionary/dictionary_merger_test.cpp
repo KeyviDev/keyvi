@@ -23,7 +23,9 @@
  *      Author: hendrik
  */
 
+#include <string>
 #include <unordered_set>
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
@@ -447,12 +449,14 @@ BOOST_AUTO_TEST_CASE(MergeFloatVectorDicts, *boost::unit_test::tolerance(0.00001
     BOOST_CHECK(d->Contains("bba"));
     BOOST_CHECK(d->Contains("bbacd"));
 
-    auto v = keyvi::util::DecodeFloatVector(d->operator[]("abc")->GetRawValueAsString());
+    std::string raw_abc = d->operator[]("abc")->GetRawValueAsString();
+    auto v = keyvi::util::DecodeFloatVector(raw_abc.data(), raw_abc.size());
     BOOST_CHECK_EQUAL(5, v.size());
     BOOST_TEST(0.4 == v[3]);
     BOOST_TEST(0.2 == v[1]);
 
-    v = keyvi::util::DecodeFloatVector(d->operator[]("abbc")->GetRawValueAsString());
+    std::string raw_abbc = d->operator[]("abbc")->GetRawValueAsString();
+    v = keyvi::util::DecodeFloatVector(raw_abbc.data(), raw_abbc.size());
     BOOST_CHECK_EQUAL(5, v.size());
     BOOST_TEST(3.1 == v[0]);
     BOOST_TEST(2.3 == v[2]);
