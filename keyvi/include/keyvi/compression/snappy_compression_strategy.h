@@ -47,11 +47,11 @@ struct SnappyCompressionStrategy final : public CompressionStrategy {
     buffer->resize(output_length + 1);
   }
 
-  inline std::string Decompress(const std::string& compressed) { return DoDecompress(compressed); }
+  std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
 
-  static std::string DoDecompress(const std::string& compressed) {
+  static std::string DoDecompress(const char* data, const size_t size) {
     std::string uncompressed;
-    snappy::Uncompress(&compressed.data()[1], compressed.size() - 1, &uncompressed);
+    snappy::Uncompress(data + 1, size - 1, &uncompressed);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     return uncompressed;
   }
 

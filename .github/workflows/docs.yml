@@ -39,16 +39,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev doxygen
       - name: checkout from git
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
         # re-use the cache from the linux build
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.20
+        uses: hendrikmuhs/ccache-action@v1.2.24
         with:
           key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 
       - name: Setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           architecture: x64

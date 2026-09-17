@@ -20,11 +20,13 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <iterator>
 #include <sstream>
 #include <string>
 #include <vector>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/util/endian.h"
 
@@ -34,9 +36,11 @@
 namespace keyvi {
 namespace util {
 
-inline std::vector<float> DecodeFloatVector(const std::string& encoded_value) {
-  compression::decompress_func_t decompressor = compression::decompressor_from_string(encoded_value);
-  std::string unompressed_string_value = decompressor(encoded_value);
+inline std::vector<float> DecodeFloatVector(const char* data, const size_t size) {
+  const auto algorithm = static_cast<compression::CompressionAlgorithm>(
+      data[0]);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  compression::decompress_func_t decompressor = compression::decompressor_by_code(algorithm);
+  std::string unompressed_string_value = decompressor(data, size);
 
   const size_t vector_size = unompressed_string_value.size() / sizeof(uint32_t);
   std::vector<float> float_vector(vector_size);

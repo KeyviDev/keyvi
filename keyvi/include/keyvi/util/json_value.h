@@ -25,11 +25,14 @@
 #ifndef KEYVI_UTIL_JSON_VALUE_H_
 #define KEYVI_UTIL_JSON_VALUE_H_
 
+#include <cstddef>
 #include <string>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_selector.h"
 #include "keyvi/util/msgpack_util.h"
 #include "msgpack.hpp"
+#include "msgpack/v3/unpack.hpp"
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
@@ -40,14 +43,9 @@
 namespace keyvi {
 namespace util {
 
-/** Decompresses (if needed) and decodes a json value stored in a JsonValueStore. */
-inline std::string DecodeJsonValue(const std::string& encoded_value) {
-  compression::decompress_func_t decompressor = compression::decompressor_from_string(encoded_value);
-  std::string packed_string = decompressor(encoded_value);
-  TRACE("unpacking %s", packed_string.c_str());
-
+inline std::string MsgpackToJson(const char* data, const size_t size) {
   msgpack::object_handle doc;
-  msgpack::unpack(doc, packed_string.data(), packed_string.size());
+  msgpack::unpack(doc, data, size);
 
   rapidjson::StringBuffer buffer;
   rapidjson::Writer<rapidjson::StringBuffer, rapidjson::UTF8<>, rapidjson::UTF8<>, rapidjson::CrtAllocator,
@@ -55,6 +53,20 @@ inline std::string DecodeJsonValue(const std::string& encoded_value) {
       writer(buffer);
   MsgPackDump(&writer, doc.get());
   return buffer.GetString();
+}
+
+/** Decompresses (if needed) and decodes a json value stored in a JsonValueStore. */
+inline std::string DecodeJsonValue(const char* data, const size_t size) {
+  const auto algorithm = static_cast<compression::CompressionAlgorithm>(
+      data[0]);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
+  if (algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
+    return MsgpackToJson(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  }
+
+  const compression::decompress_func_t decompressor = compression::decompressor_by_code(algorithm);
+  const std::string decompressed = decompressor(data, size);
+  return MsgpackToJson(decompressed.data(), decompressed.size());
 }
 
 inline void EncodeJsonValue(std::function<void(compression::buffer_t*, const char*, size_t)> long_compress,

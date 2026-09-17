@@ -17,6 +17,9 @@
 
 #include "keyvi/dictionary/fsa/internal/float_vector_value_store.h"
 
+#include <string>
+#include <vector>
+
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/test/unit_test.hpp>
@@ -73,13 +76,15 @@ BOOST_AUTO_TEST_CASE(persistence) {
   fsa::internal::ValueStoreProperties properties = fsa::internal::ValueStoreProperties::FromJson(in_stream);
 
   FloatVectorValueStoreReader reader(file_mapping, properties, loading_strategy_types::lazy);
-  auto actual_v = keyvi::util::DecodeFloatVector(reader.GetRawValueAsString(v_idx));
+  std::string raw_v = reader.GetRawValueAsString(v_idx);
+  auto actual_v = keyvi::util::DecodeFloatVector(raw_v.data(), raw_v.size());
   BOOST_CHECK_EQUAL(5, actual_v.size());
   for (size_t i = 0; i < 5; ++i) {
     BOOST_CHECK_EQUAL(v[i], actual_v[i]);
   }
 
-  auto actual_w = keyvi::util::DecodeFloatVector(reader.GetRawValueAsString(w_idx));
+  std::string raw_w = reader.GetRawValueAsString(w_idx);
+  auto actual_w = keyvi::util::DecodeFloatVector(raw_w.data(), raw_w.size());
   BOOST_CHECK_EQUAL(5, actual_w.size());
   for (size_t i = 0; i < 5; ++i) {
     BOOST_CHECK_EQUAL(w[i], actual_w[i]);
