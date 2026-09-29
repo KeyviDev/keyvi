@@ -37,7 +37,7 @@ static const size_t KEYVI_FILE_MAGIC_LEN = 8;
 // min version of the file format
 static const uint64_t KEYVI_FILE_VERSION_MIN = 2;
 // max version of the file format supported
-static const uint64_t KEYVI_FILE_VERSION_MAX = 3;
+static const uint64_t KEYVI_FILE_VERSION_MAX = 4;
 
 // min version of the persistence part
 static const int KEYVI_FILE_PERSISTENCE_VERSION_MIN = 2;
