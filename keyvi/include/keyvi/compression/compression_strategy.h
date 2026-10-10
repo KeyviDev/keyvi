@@ -69,7 +69,7 @@ struct CompressionStrategy {
    * By the time this function is called, the length field added in Compress()
    * will have been removed.
    */
-  virtual std::string Decompress(const std::string& compressed) = 0;
+  virtual std::string Decompress(const char* data, const size_t size) = 0;
 
   /** The "name" of the compression strategy. */
   virtual std::string name() const = 0;
@@ -93,9 +93,11 @@ struct RawCompressionStrategy final : public CompressionStrategy {
     std::memcpy(buffer->data() + 1, raw, raw_size);
   }
 
-  inline std::string Decompress(const std::string& compressed) { return DoDecompress(compressed); }
+  std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
 
-  static inline std::string DoDecompress(const std::string& compressed) { return compressed.substr(1); }
+  static std::string DoDecompress(const char* data, const size_t size) {
+    return {data + 1, size - 1};  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  }
 
   std::string name() const { return "raw"; }
 

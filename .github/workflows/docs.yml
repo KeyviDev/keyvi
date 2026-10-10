@@ -39,16 +39,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev doxygen
       - name: checkout from git
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
         # re-use the cache from the linux build
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.18
+        uses: hendrikmuhs/ccache-action@v1.2.24
         with:
           key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 
       - name: Setup python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           architecture: x64
@@ -80,7 +80,7 @@ jobs:
           touch build/sphinx_doc/.nojekyll
       - name: Publish docs
         if: success() && github.event_name == 'push'
-        uses: crazy-max/ghaction-github-pages@v4
+        uses: crazy-max/ghaction-github-pages@v5
         with:
           target_branch: gh-pages
           build_dir: build/sphinx_doc

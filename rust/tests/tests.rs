@@ -12,8 +12,8 @@ mod tests {
     use std::io::Read;
 
     use flate2::read::ZlibDecoder;
-    use rand;
-    use rand::Rng;
+    use rand::rng;
+    use rand::RngExt;
     use rayon::prelude::*;
     use serde_json::{value, Value};
     use snap::raw::Decoder;
@@ -350,10 +350,10 @@ mod tests {
 
     #[test]
     fn dictionary_parallel_test() {
-        let mut rng = rand::thread_rng();
+        let mut rng = rng();
         let mut keys = Vec::new();
         for _ in 0..10000 {
-            let letter: char = rng.gen_range(b'a'..b'c') as char;
+            let letter: char = rng.random_range(b'a'..b'c') as char;
             keys.push(letter.to_string())
         }
 

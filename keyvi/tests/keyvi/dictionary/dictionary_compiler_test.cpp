@@ -295,7 +295,8 @@ BOOST_AUTO_TEST_CASE(float_dictionary) {
   bool matched = false;
   for (const auto& m : d.Get("abbe")) {
     BOOST_CHECK_EQUAL("3.1, 0.2, 1.3, 0.4, 0.5", m->GetValueAsString());
-    std::vector<float> float_vector = keyvi::util::DecodeFloatVector(m->GetRawValueAsString());
+    std::string raw_value = m->GetRawValueAsString();
+    std::vector<float> float_vector = keyvi::util::DecodeFloatVector(raw_value.data(), raw_value.size());
     BOOST_CHECK_EQUAL(5, float_vector.size());
     BOOST_CHECK_EQUAL(3.1F, float_vector[0]);
     BOOST_CHECK_EQUAL(1.3F, float_vector[2]);

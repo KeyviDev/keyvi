@@ -29,7 +29,7 @@ index.Set("a", "42")
 and get:
 
 ```
-m = index.Get('a') 
+m = index.Get('a')
 print(m.GetValue())
 ```
 

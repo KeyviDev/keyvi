@@ -25,6 +25,7 @@
 #ifndef KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_
 #define KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_
 
+#include <cstddef>
 #include <memory>
 #include <string>
 
@@ -63,8 +64,8 @@ inline CompressionStrategy* compression_strategy(const std::string& name = "") {
   }
 }
 
-typedef std::string (*decompress_func_t)(const std::string&);
-typedef void (CompressionStrategy::*compress_mem_fn_t)(buffer_t*, const char*, size_t);
+using decompress_func_t = std::string (*)(const char*, const size_t);
+using compress_mem_fn_t = void (CompressionStrategy::*)(buffer_t*, const char*, size_t);
 
 inline decompress_func_t decompressor_by_code(const CompressionAlgorithm algorithm) {
   switch (algorithm) {
@@ -84,10 +85,6 @@ inline decompress_func_t decompressor_by_code(const CompressionAlgorithm algorit
       throw std::invalid_argument("Invalid compression algorithm " +
                                   boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
   }
-}
-
-inline decompress_func_t decompressor_from_string(const std::string& s) {
-  return decompressor_by_code(static_cast<CompressionAlgorithm>(s[0]));
 }
 
 /** Returns an instance of a compression strategy by enum. */

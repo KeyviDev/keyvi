@@ -183,7 +183,7 @@ struct Match {
   std::string GetValueAsString() const {
     if (!fsa_) {
       if (raw_value_.size() != 0) {
-        return keyvi::util::DecodeJsonValue(raw_value_);
+        return keyvi::util::DecodeJsonValue(raw_value_.data(), raw_value_.size());
       } else {
         return "";
       }
@@ -214,7 +214,7 @@ struct Match {
       // decompress
       const compression::decompress_func_t decompressor =
           compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(raw_value_[0]));
-      std::string msgpacked_value = decompressor(raw_value_);
+      std::string msgpacked_value = decompressor(raw_value_.data(), raw_value_.size());
 
       if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
         return msgpacked_value;
