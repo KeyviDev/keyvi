@@ -164,6 +164,14 @@ void init_keyvi_dictionary(const py::module_& m) {
                   Only the number of top completions is guaranteed.
           )pbdoc")
       .def(
+          "complete_multiword",
+          [](const kd::Dictionary& d, const std::string& query, size_t top_n,
+             const unsigned char multiword_separator = 0x1b) {
+            auto m = d.GetMultiwordCompletion(query, top_n, multiword_separator);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("top_n"), py::arg("multiword_separator") = 0x1b)
+      .def(
           "complete_prefix",
           [](const kd::Dictionary& d, const std::string& query) {
             auto m = d.GetPrefixCompletion(query);
@@ -407,6 +415,14 @@ void init_keyvi_dictionary(const py::module_& m) {
             return kpy::make_match_iterator(m.begin(), m.end());
           },
           py::arg("query"), py::arg("meta"), py::arg("multiword_separator") = 0x1b)
+      .def(
+          "complete_multiword",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta, size_t top_n,
+             const unsigned char multiword_separator) {
+            auto m = d.GetMultiwordCompletion(query, meta, top_n, multiword_separator);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("meta"), py::arg("top_n"), py::arg("multiword_separator") = 0x1b)
       .def(
           "complete_fuzzy_multiword",
           [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta,
