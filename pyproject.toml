@@ -46,6 +46,8 @@ log_cli_level = "INFO"
 filterwarnings = [
   "error",
   "ignore::pytest.PytestCacheWarning",
+  # zstd C extension lacks Py_mod_gil declaration, triggers RuntimeWarning on Python 3.14t free-threaded builds
+  "ignore:The global interpreter lock.*:RuntimeWarning",
 ]
 testpaths = ["python/tests"]
 
