@@ -133,5 +133,11 @@ void init_keyvi_dictionary_compilers(const py::module_& module) {
   CREATE_MERGER(kd::KeyOnlyDictionaryMerger, "KeyOnlyDictionaryMerger");
   CREATE_MERGER(kd::StringDictionaryMerger, "StringDictionaryMerger");
 
+  py::class_<kd::KeyOnlyDictionaryGenerator>(module, "KeyOnlyDictionaryGenerator")
+      .def(py::init<>())
+      .def("add", [](kd::KeyOnlyDictionaryGenerator& g, const std::string& key) { g.Add(key); })
+      .def("close_feeding", &kd::KeyOnlyDictionaryGenerator::CloseFeeding, py::call_guard<py::gil_scoped_release>())
+      .def("write_to_file", &kd::KeyOnlyDictionaryGenerator::WriteToFile, py::call_guard<py::gil_scoped_release>());
+
 #undef CREATE_COMPILER
 }
