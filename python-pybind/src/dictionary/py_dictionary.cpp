@@ -16,8 +16,10 @@
  */
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include <cstdint>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -295,5 +297,109 @@ void init_keyvi_dictionary(const py::module_& m) {
             Get the statistics of the dictionary as a python dict.
           )pbdoc");
 
-  py::class_<kd::SecondaryKeyDictionary>(m, "SecondaryKeyDictionary");
+  using meta_t = std::map<std::string, std::string>;
+
+  py::class_<kd::SecondaryKeyDictionary>(m, "SecondaryKeyDictionary")
+      .def(py::init<const std::string&>())
+      .def(py::init<const std::string&, kd::loading_strategy_types>())
+      .def(
+          "get",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta,
+             py::object default_value) -> py::object {
+            auto m = d.GetFirst(key, meta);
+            if (!m) {
+              return default_value;
+            }
+            return py::cast(m);
+          },
+          py::arg("key"), py::arg("meta"), py::arg("default") = py::none())
+      .def(
+          "contains",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta) {
+            return d.Contains(key, meta);
+          },
+          py::arg("key"), py::arg("meta"))
+      .def("__len__", &kd::SecondaryKeyDictionary::GetSize)
+      .def(
+          "items",
+          [](const kd::SecondaryKeyDictionary& d, const meta_t& meta) {
+            auto m = d.GetAllItems(meta);
+            return DictionaryItemsIterator{m.begin(), m.end()};
+          },
+          py::arg("meta"))
+      .def(
+          "keys",
+          [](const kd::SecondaryKeyDictionary& d, const meta_t& meta) {
+            auto m = d.GetAllItems(meta);
+            return DictionaryKeysIterator{m.begin(), m.end()};
+          },
+          py::arg("meta"))
+      .def(
+          "values",
+          [](const kd::SecondaryKeyDictionary& d, const meta_t& meta) {
+            auto m = d.GetAllItems(meta);
+            return DictionaryValuesIterator{m.begin(), m.end()};
+          },
+          py::arg("meta"))
+      .def(
+          "match",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta) {
+            auto m = d.Get(key, meta);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("key"), py::arg("meta"))
+      .def(
+          "match_fuzzy",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta,
+             const int32_t max_edit_distance, const size_t minimum_exact_prefix) {
+            auto m = d.GetFuzzy(key, meta, max_edit_distance, minimum_exact_prefix);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("key"), py::arg("meta"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 2)
+      .def(
+          "match_near",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta,
+             const size_t minimum_prefix_length, const bool greedy) {
+            auto m = d.GetNear(key, meta, minimum_prefix_length, greedy);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("key"), py::arg("meta"), py::arg("minimum_prefix_length"), py::arg("greedy") = false)
+      .def(
+          "complete_prefix",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta) {
+            auto m = d.GetPrefixCompletion(query, meta);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("meta"))
+      .def(
+          "complete_prefix",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta, size_t top_n) {
+            auto m = d.GetPrefixCompletion(query, meta, top_n);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("meta"), py::arg("top_n"))
+      .def(
+          "complete_multiword",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta,
+             const unsigned char multiword_separator) {
+            auto m = d.GetMultiwordCompletion(query, meta, multiword_separator);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("meta"), py::arg("multiword_separator") = 0x1b)
+      .def(
+          "complete_fuzzy_multiword",
+          [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta,
+             const int32_t max_edit_distance, const size_t minimum_exact_prefix,
+             const unsigned char multiword_separator) {
+            auto m = d.GetFuzzyMultiwordCompletion(query, meta, max_edit_distance, minimum_exact_prefix,
+                                                   multiword_separator);
+            return kpy::make_match_iterator(m.begin(), m.end());
+          },
+          py::arg("query"), py::arg("meta"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 0,
+          py::arg("multiword_separator") = 0x1b)
+      .def("manifest", &kd::SecondaryKeyDictionary::GetManifest)
+      .def("statistics", [](const kd::SecondaryKeyDictionary& d) {
+        py::module_ json = py::module_::import("json");
+        return json.attr("loads")(d.GetStatistics());
+      });
 }
