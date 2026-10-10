@@ -1,10 +1,13 @@
-# Usage: py.test tests
-
-# from keyvi._core import get_package_root, get_interpreter_executable
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
+from pathlib import Path
 
-# def test_merger_binary():
-#    cmd = get_interpreter_executable() + b" " + os.path.join(get_package_root(), b"_pycore" , b"keyvimerger.py") + b" -h"
-#    rc = subprocess.call(cmd, shell=True)
-#    assert rc == 0
+
+def test_merger_binary():
+    module_file = __import__(os.environ.get("KEYVI_MODULE_OVERWRITE", "keyvi")).__file__
+    merger_script = Path(module_file).parent / "keyvimerger.py"
+    rc = subprocess.call([sys.executable, str(merger_script), "-h"])
+    assert rc == 0
