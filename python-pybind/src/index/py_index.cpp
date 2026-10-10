@@ -60,18 +60,23 @@ void init_keyvi_index(const py::module_& module) {
       .def(py::init([](const std::string& index_directory, const params_t& params) {
         return new ki::Index(index_directory, inject_keyvimerger_bin(params));
       }))
-      .def("set", &ki::Index::Set, py::arg("key"), py::arg("value"))
+      .def("set", &ki::Index::Set, py::arg("key"), py::arg("value"), py::call_guard<py::gil_scoped_release>())
       .def(
           "bulk_set",
           [](ki::Index& idx, const std::vector<std::pair<std::string, std::string>>& key_values) {
             auto kv = std::make_shared<std::vector<std::pair<std::string, std::string>>>(key_values.begin(),
                                                                                          key_values.end());
+            py::gil_scoped_release release_gil;
             idx.MSet(kv);
           },
           py::arg("key_values"))
-      .def("delete", &ki::Index::Delete, py::arg("key"))
-      .def("__delitem__", [](ki::Index& idx, const std::string& key) { idx.Delete(key); })
-      .def("flush", &ki::Index::Flush, py::arg("async") = false)
+      .def("delete", &ki::Index::Delete, py::arg("key"), py::call_guard<py::gil_scoped_release>())
+      .def("__delitem__",
+           [](ki::Index& idx, const std::string& key) {
+             py::gil_scoped_release release_gil;
+             idx.Delete(key);
+           })
+      .def("flush", &ki::Index::Flush, py::arg("async") = false, py::call_guard<py::gil_scoped_release>())
       .def(
           "get",
           [](ki::Index& idx, const std::string& key, py::object default_value) -> py::object {

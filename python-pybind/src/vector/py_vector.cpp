@@ -59,12 +59,14 @@ void init_keyvi_vector(const py::module_& m) {
           },
           py::arg("value"))
       .def("set_manifest", &kv::JsonVectorGenerator::SetManifest, py::arg("manifest"))
-      .def("write_to_file", &kv::JsonVectorGenerator::WriteToFile, py::arg("filename"));
+      .def("write_to_file", &kv::JsonVectorGenerator::WriteToFile, py::arg("filename"),
+           py::call_guard<py::gil_scoped_release>());
 
   py::class_<kv::StringVectorGenerator>(m, "StringVectorGenerator")
       .def(py::init<>())
       .def(py::init<const params_t&>())
       .def("append", &kv::StringVectorGenerator::PushBack, py::arg("value"))
       .def("set_manifest", &kv::StringVectorGenerator::SetManifest, py::arg("manifest"))
-      .def("write_to_file", &kv::StringVectorGenerator::WriteToFile, py::arg("filename"));
+      .def("write_to_file", &kv::StringVectorGenerator::WriteToFile, py::arg("filename"),
+           py::call_guard<py::gil_scoped_release>());
 }

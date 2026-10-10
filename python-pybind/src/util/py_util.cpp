@@ -36,10 +36,11 @@ void init_keyvi_util(py::module_& m) {
 
   py::class_<kt::FsaTransform>(m, "FsaTransform")
       .def(py::init<std::shared_ptr<kd::Dictionary>>())
-      .def("normalize", &kt::FsaTransform::Normalize, py::arg("input"));
+      .def("normalize", &kt::FsaTransform::Normalize, py::arg("input"), py::call_guard<py::gil_scoped_release>());
 
   py::class_<kc::PredictiveCompression>(m, "PredictiveCompression")
       .def(py::init<std::string>())
-      .def("compress", &kc::PredictiveCompression::Compress, py::arg("input"))
-      .def("uncompress", &kc::PredictiveCompression::Uncompress, py::arg("input"));
+      .def("compress", &kc::PredictiveCompression::Compress, py::arg("input"), py::call_guard<py::gil_scoped_release>())
+      .def("uncompress", &kc::PredictiveCompression::Uncompress, py::arg("input"),
+           py::call_guard<py::gil_scoped_release>());
 }

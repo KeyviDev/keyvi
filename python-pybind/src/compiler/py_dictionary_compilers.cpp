@@ -30,21 +30,28 @@ namespace kd = keyvi::dictionary;
 template <typename Compiler>
 inline void py_compile(Compiler* c, std::function<void(const size_t a, const size_t b)> progress_callback) {
   if (progress_callback == nullptr) {
+    py::gil_scoped_release release_gil;
     c->Compile();
     return;
   }
   auto progress_compiler_callback = [](size_t a, size_t b, void* user_data) {
+    py::gil_scoped_acquire acquire_gil;
     auto py_callback = *reinterpret_cast<std::function<void(const size_t, const size_t)>*>(user_data);
     py_callback(a, b);
   };
   void* user_data = reinterpret_cast<void*>(&progress_callback);
+  py::gil_scoped_release release_gil;
   c->Compile(progress_compiler_callback, user_data);
 }
 
 void init_keyvi_dictionary_compilers(const py::module_& module) {
 #define CREATE_COMPILER_COMMON(compiler)                                                                             \
   .def("__enter__", [](compiler& c) { return &c; })                                                                  \
-      .def("__exit__", [](compiler& c, void* exc_type, void* exc_value, void* traceback) { c.Compile(); })           \
+      .def("__exit__",                                                                                               \
+           [](compiler& c, void* exc_type, void* exc_value, void* traceback) {                                       \
+             py::gil_scoped_release release_gil;                                                                     \
+             c.Compile();                                                                                            \
+           })                                                                                                        \
       .def("__setitem__", &compiler::Add)                                                                            \
       .def(                                                                                                          \
           "compile",                                                                                                 \
@@ -85,24 +92,28 @@ void init_keyvi_dictionary_compilers(const py::module_& module) {
       .def(py::init<const std::vector<std::string>&, const keyvi::util::parameters_t&>()) \
           CREATE_COMPILER_COMMON(compiler)                                                \
       .def("add", &compiler::Add);
-#define CREATE_MERGER(merger, name)                                                                    \
-  py::class_<merger>(module, name)                                                                     \
-      .def(py::init<>())                                                                               \
-      .def(py::init<const keyvi::util::parameters_t&>())                                               \
-      .def("__enter__", [](merger& m) { return &m; })                                                  \
-      .def("__exit__", [](merger& m, void* exc_type, void* exc_value, void* traceback) { m.Merge(); }) \
-      .def("add", &merger::Add)                                                                        \
-      .def("merge",                                                                                    \
-           [](merger& m) {                                                                             \
-             pybind11::gil_scoped_release release_gil;                                                 \
-             m.Merge();                                                                                \
-           })                                                                                          \
-      .def("merge",                                                                                    \
-           [](merger& m, const std::string& filename) {                                                \
-             pybind11::gil_scoped_release release_gil;                                                 \
-             m.Merge(filename);                                                                        \
-           })                                                                                          \
-      .def("set_manifest", &merger::SetManifest)                                                       \
+#define CREATE_MERGER(merger, name)                                          \
+  py::class_<merger>(module, name)                                           \
+      .def(py::init<>())                                                     \
+      .def(py::init<const keyvi::util::parameters_t&>())                     \
+      .def("__enter__", [](merger& m) { return &m; })                        \
+      .def("__exit__",                                                       \
+           [](merger& m, void* exc_type, void* exc_value, void* traceback) { \
+             py::gil_scoped_release release_gil;                             \
+             m.Merge();                                                      \
+           })                                                                \
+      .def("add", &merger::Add)                                              \
+      .def("merge",                                                          \
+           [](merger& m) {                                                   \
+             pybind11::gil_scoped_release release_gil;                       \
+             m.Merge();                                                      \
+           })                                                                \
+      .def("merge",                                                          \
+           [](merger& m, const std::string& filename) {                      \
+             pybind11::gil_scoped_release release_gil;                       \
+             m.Merge(filename);                                              \
+           })                                                                \
+      .def("set_manifest", &merger::SetManifest)                             \
       .def("write_to_file", &merger::WriteToFile, py::call_guard<py::gil_scoped_release>());
   CREATE_COMPILER(kd::CompletionDictionaryCompiler, "CompletionDictionaryCompiler");
   CREATE_COMPILER(kd::FloatVectorDictionaryCompiler, "FloatVectorDictionaryCompiler");

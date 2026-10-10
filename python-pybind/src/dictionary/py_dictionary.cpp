@@ -78,42 +78,57 @@ void init_keyvi_dictionary(const py::module_& m) {
   py::class_<DictionaryItemsIterator>(m, "DictionaryItemsIterator")
       .def("__iter__", [](DictionaryItemsIterator& s) -> DictionaryItemsIterator& { return s; })
       .def("__next__", [](DictionaryItemsIterator& s) -> py::tuple {
-        if (s.it == s.end) {
-          throw py::stop_iteration();
+        kd::match_t m;
+        {
+          py::gil_scoped_release release_gil;
+          if (s.it == s.end) {
+            throw py::stop_iteration();
+          }
+          m = *s.it;
+          ++s.it;
         }
-        const kd::match_t& m = *s.it;
-        py::tuple result = py::make_tuple(m->GetMatchedString(), match_value(*m));
-        ++s.it;
-        return result;
+        return py::make_tuple(m->GetMatchedString(), match_value(*m));
       });
 
   py::class_<DictionaryKeysIterator>(m, "DictionaryKeysIterator")
       .def("__iter__", [](DictionaryKeysIterator& s) -> DictionaryKeysIterator& { return s; })
       .def("__next__", [](DictionaryKeysIterator& s) -> std::string {
-        if (s.it == s.end) {
-          throw py::stop_iteration();
+        kd::match_t m;
+        {
+          py::gil_scoped_release release_gil;
+          if (s.it == s.end) {
+            throw py::stop_iteration();
+          }
+          m = *s.it;
+          ++s.it;
         }
-        const kd::match_t& m = *s.it;
-        std::string result = m->GetMatchedString();
-        ++s.it;
-        return result;
+        return m->GetMatchedString();
       });
 
   py::class_<DictionaryValuesIterator>(m, "DictionaryValuesIterator")
       .def("__iter__", [](DictionaryValuesIterator& s) -> DictionaryValuesIterator& { return s; })
       .def("__next__", [](DictionaryValuesIterator& s) -> py::object {
-        if (s.it == s.end) {
-          throw py::stop_iteration();
+        kd::match_t m;
+        {
+          py::gil_scoped_release release_gil;
+          if (s.it == s.end) {
+            throw py::stop_iteration();
+          }
+          m = *s.it;
+          ++s.it;
         }
-        const kd::match_t& m = *s.it;
-        py::object result = match_value(*m);
-        ++s.it;
-        return result;
+        return match_value(*m);
       });
 
   py::class_<kd::Dictionary, std::shared_ptr<kd::Dictionary>>(m, "Dictionary")
-      .def(py::init<const std::string&>())
-      .def(py::init<const std::string&, kd::loading_strategy_types>())
+      .def(py::init([](const std::string& filename) {
+        py::gil_scoped_release release_gil;
+        return std::make_shared<kd::Dictionary>(filename);
+      }))
+      .def(py::init([](const std::string& filename, kd::loading_strategy_types loading_strategy) {
+        py::gil_scoped_release release_gil;
+        return std::make_shared<kd::Dictionary>(filename, loading_strategy);
+      }))
       .def(
           "complete_fuzzy_multiword",
           [](const kd::Dictionary& d, const std::string& query, const int32_t max_edit_distance,
@@ -300,8 +315,14 @@ void init_keyvi_dictionary(const py::module_& m) {
   using meta_t = std::map<std::string, std::string>;
 
   py::class_<kd::SecondaryKeyDictionary>(m, "SecondaryKeyDictionary")
-      .def(py::init<const std::string&>())
-      .def(py::init<const std::string&, kd::loading_strategy_types>())
+      .def(py::init([](const std::string& filename) {
+        py::gil_scoped_release release_gil;
+        return new kd::SecondaryKeyDictionary(filename);
+      }))
+      .def(py::init([](const std::string& filename, kd::loading_strategy_types loading_strategy) {
+        py::gil_scoped_release release_gil;
+        return new kd::SecondaryKeyDictionary(filename, loading_strategy);
+      }))
       .def(
           "get",
           [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta,
