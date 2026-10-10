@@ -51,6 +51,16 @@ struct DictionaryItemsIterator {
   kd::MatchIterator end;
 };
 
+struct DictionaryKeysIterator {
+  kd::MatchIterator it;
+  kd::MatchIterator end;
+};
+
+struct DictionaryValuesIterator {
+  kd::MatchIterator it;
+  kd::MatchIterator end;
+};
+
 void init_keyvi_dictionary(const py::module_& m) {
   m.doc() = R"pbdoc(
         keyvi.dictionary
@@ -71,6 +81,30 @@ void init_keyvi_dictionary(const py::module_& m) {
         }
         const kd::match_t& m = *s.it;
         py::tuple result = py::make_tuple(m->GetMatchedString(), match_value(*m));
+        ++s.it;
+        return result;
+      });
+
+  py::class_<DictionaryKeysIterator>(m, "DictionaryKeysIterator")
+      .def("__iter__", [](DictionaryKeysIterator& s) -> DictionaryKeysIterator& { return s; })
+      .def("__next__", [](DictionaryKeysIterator& s) -> std::string {
+        if (s.it == s.end) {
+          throw py::stop_iteration();
+        }
+        const kd::match_t& m = *s.it;
+        std::string result = m->GetMatchedString();
+        ++s.it;
+        return result;
+      });
+
+  py::class_<DictionaryValuesIterator>(m, "DictionaryValuesIterator")
+      .def("__iter__", [](DictionaryValuesIterator& s) -> DictionaryValuesIterator& { return s; })
+      .def("__next__", [](DictionaryValuesIterator& s) -> py::object {
+        if (s.it == s.end) {
+          throw py::stop_iteration();
+        }
+        const kd::match_t& m = *s.it;
+        py::object result = match_value(*m);
         ++s.it;
         return result;
       });
@@ -181,6 +215,24 @@ void init_keyvi_dictionary(const py::module_& m) {
           },
           R"pbdoc(
             Return an iterator over all (key, value) tuples in the dictionary.
+          )pbdoc")
+      .def(
+          "keys",
+          [](const kd::Dictionary& d) {
+            auto m = d.GetAllItems();
+            return DictionaryKeysIterator{m.begin(), m.end()};
+          },
+          R"pbdoc(
+            Return an iterator over all keys in the dictionary.
+          )pbdoc")
+      .def(
+          "values",
+          [](const kd::Dictionary& d) {
+            auto m = d.GetAllItems();
+            return DictionaryValuesIterator{m.begin(), m.end()};
+          },
+          R"pbdoc(
+            Return an iterator over all values in the dictionary.
           )pbdoc")
       .def(
           "match",
