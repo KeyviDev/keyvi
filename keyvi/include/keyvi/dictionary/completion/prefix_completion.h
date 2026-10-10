@@ -130,7 +130,7 @@ class PrefixCompletion final {
     return MatchIterator::EmptyIteratorPair();
   }
 
-  // NOLINTBEGIN(readability-function-cognitive-complexity)
+  // NOLINTBEGIN(readability-function-cognitive-complexity,bugprone-easily-swappable-parameters)
   [[nodiscard]] MatchIterator::MatchIteratorPair GetFuzzyCompletions(const std::string& query,
                                                                      const int32_t max_edit_distance,
                                                                      const size_t minimum_exact_prefix = 2) const {
@@ -226,7 +226,7 @@ class PrefixCompletion final {
 
     return MatchIterator::MakeIteratorPair(tfunc, std::move(first_match));
   }
-  // NOLINTEND(readability-function-cognitive-complexity)
+  // NOLINTEND(readability-function-cognitive-complexity,bugprone-easily-swappable-parameters)
 
  private:
   fsa::automata_t fsa_;
