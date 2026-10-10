@@ -31,7 +31,7 @@ namespace kd = keyvi::dictionary;
 namespace kt = keyvi::transform;
 namespace kc = keyvi::compression;
 
-void init_keyvi_util(const py::module_& m) {
+void init_keyvi_util(py::module_& m) {
   m.def("JumpConsistentHashString", &kd::util::JumpConsistentHashString, py::arg("key"), py::arg("num_buckets"));
 
   py::class_<kt::FsaTransform>(m, "FsaTransform")

@@ -33,7 +33,7 @@ void init_keyvi_match(const py::module_&);
 void init_keyvi_completion(const py::module_&);
 void init_keyvi_index(const py::module_&);
 void init_keyvi_vector(const py::module_&);
-void init_keyvi_util(const py::module_&);
+void init_keyvi_util(py::module_&);
 
 PYBIND11_MODULE(keyvi2, m, py::mod_gil_not_used()) {
   m.doc() = R"pbdoc(
