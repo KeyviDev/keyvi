@@ -25,3 +25,4 @@ target_compile_definitions(keyvi2 PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 # The install directory is the output (wheel) directory
 install(TARGETS keyvi2 DESTINATION .)
+install(FILES keyvimerger.py DESTINATION .)

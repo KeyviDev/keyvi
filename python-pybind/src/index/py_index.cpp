@@ -36,10 +36,30 @@ namespace kpy = keyvi::pybind;
 
 using params_t = std::map<std::string, std::string>;
 
+inline params_t inject_keyvimerger_bin(params_t params) {
+  if (params.find("keyvimerger_bin") == params.end()) {
+    py::object sys = py::module_::import("sys");
+    std::string executable = sys.attr("executable").cast<std::string>();
+
+    py::object os_path = py::module_::import("os.path");
+    py::object keyvi2_module = py::module_::import("keyvi2");
+    std::string module_file = keyvi2_module.attr("__file__").cast<std::string>();
+    std::string module_dir = os_path.attr("dirname")(module_file).cast<std::string>();
+    std::string merger_path = os_path.attr("join")(module_dir, "keyvimerger.py").cast<std::string>();
+
+    params["keyvimerger_bin"] = executable + " " + merger_path;
+  }
+  return params;
+}
+
 void init_keyvi_index(const py::module_& module) {
   py::class_<ki::Index>(module, "Index")
-      .def(py::init<const std::string&>())
-      .def(py::init<const std::string&, const params_t&>())
+      .def(py::init([](const std::string& index_directory) {
+        return new ki::Index(index_directory, inject_keyvimerger_bin({}));
+      }))
+      .def(py::init([](const std::string& index_directory, const params_t& params) {
+        return new ki::Index(index_directory, inject_keyvimerger_bin(params));
+      }))
       .def("set", &ki::Index::Set, py::arg("key"), py::arg("value"))
       .def(
           "bulk_set",
