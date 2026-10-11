@@ -120,7 +120,15 @@ void init_keyvi_dictionary(const py::module_& m) {
         return match_value(*m);
       });
 
-  py::class_<kd::Dictionary, std::shared_ptr<kd::Dictionary>>(m, "Dictionary")
+  py::class_<kd::Dictionary, std::shared_ptr<kd::Dictionary>>(m, "Dictionary",
+                                                              R"pbdoc(
+        Keyvi dictionary, an immutable container storing key value pairs, optimized
+        for size, lookup performance and special lookup use cases.
+        A keyvi dictionary has to be created by a previous compile run.
+
+        Keyvi dictionaries allow multiple types of approximate and completion
+        matches due to its internal FST based data structure.
+    )pbdoc")
       .def(py::init([](const std::string& filename) {
         py::gil_scoped_release release_gil;
         return std::make_shared<kd::Dictionary>(filename);
@@ -170,7 +178,19 @@ void init_keyvi_dictionary(const py::module_& m) {
             auto m = d.GetMultiwordCompletion(query, top_n, multiword_separator);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("query"), py::arg("top_n"), py::arg("multiword_separator") = 0x1b)
+          py::arg("query"), py::arg("top_n"), py::arg("multiword_separator") = 0x1b,
+          R"pbdoc(Complete the given key to full matches after whitespace tokenizing
+                  and return the top n completions.
+                  In case the used dictionary supports inner weights, the
+                  completer traverses the dictionary according to weights,
+                  otherwise byte-order.
+
+                  Note, due to depth-first traversal the traverser
+                  immediately yields results when it visits them. The results are
+                  neither in order nor limited to n. It is up to the caller to resort
+                  and truncate the lists of results.
+                  Only the number of top completions is guaranteed.
+          )pbdoc")
       .def(
           "complete_prefix",
           [](const kd::Dictionary& d, const std::string& query) {
@@ -322,7 +342,11 @@ void init_keyvi_dictionary(const py::module_& m) {
 
   using meta_t = std::map<std::string, std::string>;
 
-  py::class_<kd::SecondaryKeyDictionary>(m, "SecondaryKeyDictionary")
+  py::class_<kd::SecondaryKeyDictionary>(m, "SecondaryKeyDictionary",
+                                         R"pbdoc(
+        Secondary Key dictionary, specialized dictionary type that takes additional key value pairs
+        that are matched exact upfront, enabling use cases like multi-tenancy and personalization.
+    )pbdoc")
       .def(py::init([](const std::string& filename) {
         py::gil_scoped_release release_gil;
         return new kd::SecondaryKeyDictionary(filename);
@@ -399,14 +423,33 @@ void init_keyvi_dictionary(const py::module_& m) {
             auto m = d.GetPrefixCompletion(query, meta);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("query"), py::arg("meta"))
+          py::arg("query"), py::arg("meta"),
+          R"pbdoc(
+            Complete the given key to full matches (prefix matching).
+            In case the used dictionary supports inner weights, the
+            completer traverses the dictionary according to weights,
+            otherwise byte-order.
+          )pbdoc")
       .def(
           "complete_prefix",
           [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta, size_t top_n) {
             auto m = d.GetPrefixCompletion(query, meta, top_n);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("query"), py::arg("meta"), py::arg("top_n"))
+          py::arg("query"), py::arg("meta"), py::arg("top_n"),
+          R"pbdoc(
+            Complete the given key to full matches (prefix matching)
+            and return the top n completions.
+            In case the used dictionary supports inner weights, the
+            completer traverses the dictionary according to weights,
+            otherwise byte-order.
+
+            Note, due to depth-first traversal the traverser
+            immediately yields results when it visits them. The results are
+            neither in order nor limited to n. It is up to the caller to resort
+            and truncate the lists of results.
+            Only the number of top completions is guaranteed.
+          )pbdoc")
       .def(
           "complete_multiword",
           [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta,
@@ -414,7 +457,13 @@ void init_keyvi_dictionary(const py::module_& m) {
             auto m = d.GetMultiwordCompletion(query, meta, multiword_separator);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("query"), py::arg("meta"), py::arg("multiword_separator") = 0x1b)
+          py::arg("query"), py::arg("meta"), py::arg("multiword_separator") = 0x1b,
+          R"pbdoc(
+            Complete the given key to full matches after whitespace tokenizing.
+            In case the used dictionary supports inner weights, the
+            completer traverses the dictionary according to weights,
+            otherwise byte-order.
+          )pbdoc")
       .def(
           "complete_multiword",
           [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta, size_t top_n,
@@ -422,7 +471,20 @@ void init_keyvi_dictionary(const py::module_& m) {
             auto m = d.GetMultiwordCompletion(query, meta, top_n, multiword_separator);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("query"), py::arg("meta"), py::arg("top_n"), py::arg("multiword_separator") = 0x1b)
+          py::arg("query"), py::arg("meta"), py::arg("top_n"), py::arg("multiword_separator") = 0x1b,
+          R"pbdoc(
+            Complete the given key to full matches after whitespace tokenizing
+            and return the top n completions.
+            In case the used dictionary supports inner weights, the
+            completer traverses the dictionary according to weights,
+            otherwise byte-order.
+
+            Note, due to depth-first traversal the traverser
+            immediately yields results when it visits them. The results are
+            neither in order nor limited to n. It is up to the caller to resort
+            and truncate the lists of results.
+            Only the number of top completions is guaranteed.
+          )pbdoc")
       .def(
           "complete_fuzzy_multiword",
           [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta,
@@ -433,7 +495,14 @@ void init_keyvi_dictionary(const py::module_& m) {
             return kpy::make_match_iterator(m.begin(), m.end());
           },
           py::arg("query"), py::arg("meta"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 0,
-          py::arg("multiword_separator") = 0x1b)
+          py::arg("multiword_separator") = 0x1b,
+          R"pbdoc(
+            Complete the given key to full matches after whitespace tokenizing,
+            allowing up to max_edit_distance distance (Levenshtein).
+            In case the used dictionary supports inner weights, the
+            completer traverses the dictionary according to weights,
+            otherwise byte-order.
+          )pbdoc")
       .def("manifest", &kd::SecondaryKeyDictionary::GetManifest)
       .def("statistics", [](const kd::SecondaryKeyDictionary& d) {
         py::module_ json = py::module_::import("json");

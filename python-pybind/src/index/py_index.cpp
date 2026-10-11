@@ -86,7 +86,8 @@ void init_keyvi_index(const py::module_& module) {
             }
             return py::cast(m);
           },
-          py::arg("key"), py::arg("default") = py::none())
+          py::arg("key"), py::arg("default") = py::none(),
+          "Return the value for key if key is in the dictionary, else default.")
       .def("__getitem__",
            [](ki::Index& idx, const std::string& key) {
              auto m = idx[key];
@@ -124,7 +125,8 @@ void init_keyvi_index(const py::module_& module) {
             }
             return py::cast(m);
           },
-          py::arg("key"), py::arg("default") = py::none())
+          py::arg("key"), py::arg("default") = py::none(),
+          "Return the value for key if key is in the dictionary, else default.")
       .def("__getitem__",
            [](ki::ReadOnlyIndex& idx, const std::string& key) {
              auto m = idx[key];

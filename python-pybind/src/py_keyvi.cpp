@@ -55,15 +55,22 @@ PYBIND11_MODULE(keyvi2, m, py::mod_gil_not_used()) {
       .finalize();
 
   py::enum_<kd::loading_strategy_types>(m, "loading_strategy_types")
-      .value("default_os", kd::loading_strategy_types::default_os)
-      .value("lazy", kd::loading_strategy_types::lazy)
-      .value("populate", kd::loading_strategy_types::populate)
-      .value("populate_key_part", kd::loading_strategy_types::populate_key_part)
-      .value("populate_lazy", kd::loading_strategy_types::populate_lazy)
-      .value("lazy_no_readahead", kd::loading_strategy_types::lazy_no_readahead)
-      .value("lazy_no_readahead_value_part", kd::loading_strategy_types::lazy_no_readahead_value_part)
+      .value("default_os", kd::loading_strategy_types::default_os,
+             "No special treatment, use whatever the OS has as default")
+      .value("lazy", kd::loading_strategy_types::lazy, "Load data as needed with some read-ahead")
+      .value("populate", kd::loading_strategy_types::populate,
+             "Immediately load everything in memory (blocks until everything is fully read)")
+      .value("populate_key_part", kd::loading_strategy_types::populate_key_part,
+             "Populate only the key part, load value part lazy")
+      .value("populate_lazy", kd::loading_strategy_types::populate_lazy,
+             "Load data lazy but ask the OS to read ahead if possible (does not block)")
+      .value("lazy_no_readahead", kd::loading_strategy_types::lazy_no_readahead,
+             "Disable any read-ahead (for cases when index > x * main memory)")
+      .value("lazy_no_readahead_value_part", kd::loading_strategy_types::lazy_no_readahead_value_part,
+             "Disable read-ahead only for the value part")
       .value("populate_key_part_no_readahead_value_part",
-             kd::loading_strategy_types::populate_key_part_no_readahead_value_part);
+             kd::loading_strategy_types::populate_key_part_no_readahead_value_part,
+             "Populate the key part, but disable read-ahead for the value part");
 
   init_keyvi_match(m);
   py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi2.dictionary");
