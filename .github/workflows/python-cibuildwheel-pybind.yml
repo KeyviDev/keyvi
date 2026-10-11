@@ -119,13 +119,13 @@ jobs:
     name: sdist
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: install Linux deps
       run: |
         sudo apt-get update && \
         sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
     - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.20
+      uses: hendrikmuhs/ccache-action@v1.2.24
       with:
         key: ubuntu-sdist-python-pybind
 
@@ -137,3 +137,26 @@ jobs:
         python -m pip install pytest python-snappy zstd && \
         KEYVI_SKIP_TEST_DEPRECATIONS=1 python -m pytest python/tests && \
         python -m pip uninstall -y keyvi
+
+    - uses: actions/upload-artifact@v7
+      with:
+        name: artifact-sdist
+        path: dist/*.tar.gz
+
+  upload_all:
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    environment:
+      name: pypi
+      url: https://pypi.org/p/keyvi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: artifact-*
+          merge-multiple: true
+          path: dist
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
