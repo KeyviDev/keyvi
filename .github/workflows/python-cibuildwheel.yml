@@ -32,15 +32,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-15-intel: x86, macos-14: Arm64
-        os: [ubuntu-22.04, ubuntu-24.04-arm, macos-15-intel, macos-14]
+        # macos-14: Arm64
+        os: [ubuntu-22.04, ubuntu-24.04-arm, macos-14]
         # skip pypy, https://github.com/pypa/distutils/issues/283
         flavor: ['cpython']
         # separate musl and many on linux, for mac we just skip one of those
         target: [ 'many', 'musl' ]
         exclude:
-          - os: macos-15-intel
-            target: musl
           - os: macos-14
             target: musl
 
@@ -80,11 +78,6 @@ jobs:
           brew update && \
           brew list -1 | grep python | while read formula; do brew unlink $formula; brew link --overwrite $formula; done && \
           brew install ccache zlib snappy boost
-
-      - name: set mac deployment target
-        if: runner.os == 'macOS' && runner.arch == 'X64'
-        run: |
-          echo "MACOSX_DEPLOYMENT_TARGET=15.0" >> $GITHUB_ENV
 
       - name: set mac deployment target arm64
         if: runner.os == 'macOS' && runner.arch == 'ARM64'
