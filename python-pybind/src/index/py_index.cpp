@@ -42,8 +42,8 @@ inline params_t inject_keyvimerger_bin(params_t params) {
     std::string executable = sys.attr("executable").cast<std::string>();
 
     py::object os_path = py::module_::import("os.path");
-    py::object keyvi2_module = py::module_::import("keyvi2");
-    std::string module_file = keyvi2_module.attr("__file__").cast<std::string>();
+    py::object keyvi_module = py::module_::import("keyvi");
+    std::string module_file = keyvi_module.attr("__file__").cast<std::string>();
     std::string module_dir = os_path.attr("dirname")(module_file).cast<std::string>();
     std::string merger_path = os_path.attr("join")(module_dir, "keyvimerger.py").cast<std::string>();
 

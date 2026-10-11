@@ -21,7 +21,7 @@ from __future__ import annotations
 import sys
 from argparse import ArgumentParser
 
-import keyvi2.compiler
+import keyvi.compiler
 
 if __name__ == "__main__":
     argument_parser = ArgumentParser(description="keyvi")
@@ -51,7 +51,7 @@ if __name__ == "__main__":
         if args.memory_limit:
             params["memory-limit"] = args.memory_limit
 
-        merger = keyvi2.compiler.JsonDictionaryMerger(params)
+        merger = keyvi.compiler.JsonDictionaryMerger(params)
         for f in args.input_file:
             merger.add(f)
 

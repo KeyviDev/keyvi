@@ -35,7 +35,7 @@ void init_keyvi_index(const py::module_&);
 void init_keyvi_vector(const py::module_&);
 void init_keyvi_util(py::module_&);
 
-PYBIND11_MODULE(keyvi2, m, py::mod_gil_not_used()) {
+PYBIND11_MODULE(keyvi, m, py::mod_gil_not_used()) {
   m.doc() = R"pbdoc(
         keyvi - a key value store.
         -----------------------
@@ -73,17 +73,17 @@ PYBIND11_MODULE(keyvi2, m, py::mod_gil_not_used()) {
              "Populate the key part, but disable read-ahead for the value part");
 
   init_keyvi_match(m);
-  py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi2.dictionary");
+  py::module keyvi_dictionary = m.def_submodule("dictionary", "keyvi.dictionary");
   init_keyvi_dictionary(keyvi_dictionary);
-  py::module keyvi_compilers = m.def_submodule("compiler", "keyvi2.compiler");
+  py::module keyvi_compilers = m.def_submodule("compiler", "keyvi.compiler");
   init_keyvi_dictionary_compilers(keyvi_compilers);
-  py::module keyvi_completion = m.def_submodule("completion", "keyvi2.completion");
+  py::module keyvi_completion = m.def_submodule("completion", "keyvi.completion");
   init_keyvi_completion(keyvi_completion);
-  py::module keyvi_index = m.def_submodule("index", "keyvi2.index");
+  py::module keyvi_index = m.def_submodule("index", "keyvi.index");
   init_keyvi_index(keyvi_index);
-  py::module keyvi_util = m.def_submodule("util", "keyvi2.util");
+  py::module keyvi_util = m.def_submodule("util", "keyvi.util");
   init_keyvi_util(keyvi_util);
-  py::module keyvi_vector = m.def_submodule("vector", "keyvi2.vector");
+  py::module keyvi_vector = m.def_submodule("vector", "keyvi.vector");
   init_keyvi_vector(keyvi_vector);
 
 #ifdef VERSION_INFO

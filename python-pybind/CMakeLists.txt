@@ -12,17 +12,17 @@ project(
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG REQUIRED)
 
-# Add a library using FindPython's tooling (pybind11 also provides a helper like
-# this)
+# Use _keyvi_pybind as internal target name to avoid conflict with the keyvi C++ library target
 FILE(GLOB_RECURSE KEYVI_PYBIND_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
-pybind11_add_module(keyvi2 ${KEYVI_PYBIND_SOURCES})
+pybind11_add_module(_keyvi_pybind ${KEYVI_PYBIND_SOURCES})
 
-target_include_directories(keyvi2 PRIVATE src)
-target_link_libraries(keyvi2 PRIVATE keyvi)
+set_target_properties(_keyvi_pybind PROPERTIES OUTPUT_NAME keyvi)
+target_include_directories(_keyvi_pybind PRIVATE src)
+target_link_libraries(_keyvi_pybind PRIVATE keyvi)
 
 # This is passing in the version as a define just as an example
-target_compile_definitions(keyvi2 PRIVATE VERSION_INFO=${PROJECT_VERSION})
+target_compile_definitions(_keyvi_pybind PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 # The install directory is the output (wheel) directory
-install(TARGETS keyvi2 DESTINATION .)
+install(TARGETS _keyvi_pybind DESTINATION .)
 install(FILES keyvimerger.py DESTINATION .)

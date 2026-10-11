@@ -3,8 +3,9 @@ requires = ["scikit-build-core>=0.10", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "keyvi2"
-version = "0.7.6dev0"
+name = "keyvi"
+# 0.9.6 corresponds to 0.7.6 (Cython), using 0.9.x for the pybind11 beta series
+version = "0.9.6b1"
 dependencies = [
     "msgpack>=1.0.0",
 ]
@@ -59,7 +60,7 @@ manylinux-x86_64-image = "keyvidev/manylinux-builder-x86_64"
 musllinux-x86_64-image = "keyvidev/musllinux-builder-x86_64"
 manylinux-aarch64-image = "keyvidev/manylinux-builder-aarch64"
 musllinux-aarch64-image = "keyvidev/musllinux-builder-aarch64"
-test-environment = { KEYVI_SKIP_TEST_DEPRECATIONS="1",  KEYVI_MODULE_OVERWRITE="keyvi2"}
+test-environment = { KEYVI_SKIP_TEST_DEPRECATIONS="1"}
 
 [tool.ruff.lint]
 extend-select = [
