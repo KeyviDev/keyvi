@@ -82,7 +82,7 @@ jobs:
       - name: set mac deployment target arm64
         if: runner.os == 'macOS' && runner.arch == 'ARM64'
         run: |
-          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> $GITHUB_ENV
+          echo "MACOSX_DEPLOYMENT_TARGET=15.0" >> $GITHUB_ENV
 
       - name: Build python wheels for ${{ matrix.os }}
         uses: pypa/cibuildwheel@v4.2.1
