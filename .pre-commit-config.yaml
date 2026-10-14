@@ -1,6 +1,7 @@
 exclude: |
     (?x)^(
-        keyvi/3rdparty/.*
+        keyvi/3rdparty/.*|
+        python/setup\.py  # deprecated, will be removed after switching to pybind
     )$
 repos:
   - repo: https://github.com/pre-commit/mirrors-clang-format
