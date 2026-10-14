@@ -57,7 +57,7 @@ jobs:
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
           python -m pip install sphinx breathe sphinx-wagtail-theme
-          CMAKE_ARGS="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache" python -m pip install . -v
+          python -m pip install . -v
 
       - name: build with cmake
         uses: lukka/run-cmake@v3
