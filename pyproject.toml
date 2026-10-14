@@ -4,8 +4,8 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "keyvi"
-# 0.9.6 corresponds to 0.7.6 (Cython), using 0.9.x for the pybind11 beta series
-version = "0.9.6b1"
+# 0.9.8 corresponds to 0.7.8 (Cython), using 0.9.x for the pybind11 beta series
+version = "0.9.8b1"
 dependencies = [
     "msgpack>=1.0.0",
 ]
