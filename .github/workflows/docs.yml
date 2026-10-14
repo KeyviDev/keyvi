@@ -56,15 +56,8 @@ jobs:
       - name: Install python dependencies
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          python -m pip install -r python/requirements.txt
           python -m pip install sphinx breathe sphinx-wagtail-theme
-
-      - name: build python extension
-        run: |
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          cd python
-          python setup.py build --mode ${BUILD_TYPE}
-          python setup.py install --user
+          python -m pip install . -v
 
       - name: build with cmake
         uses: lukka/run-cmake@v3
