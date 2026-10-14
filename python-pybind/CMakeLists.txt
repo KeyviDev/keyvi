@@ -16,13 +16,12 @@ find_package(pybind11 CONFIG REQUIRED)
 FILE(GLOB_RECURSE KEYVI_PYBIND_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
 pybind11_add_module(_keyvi_pybind ${KEYVI_PYBIND_SOURCES})
 
-set_target_properties(_keyvi_pybind PROPERTIES OUTPUT_NAME keyvi)
+set_target_properties(_keyvi_pybind PROPERTIES OUTPUT_NAME _core)
 target_include_directories(_keyvi_pybind PRIVATE src)
 target_link_libraries(_keyvi_pybind PRIVATE keyvi)
 
 # This is passing in the version as a define just as an example
 target_compile_definitions(_keyvi_pybind PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
-# The install directory is the output (wheel) directory
-install(TARGETS _keyvi_pybind DESTINATION .)
-install(FILES keyvimerger.py DESTINATION .)
+# Install the compiled extension into the keyvi package directory
+install(TARGETS _keyvi_pybind DESTINATION keyvi)

@@ -6,9 +6,38 @@ build-backend = "scikit_build_core.build"
 name = "keyvi"
 # 0.9.8 corresponds to 0.7.8 (Cython), using 0.9.x for the pybind11 beta series
 version = "0.9.8b1"
+description = "Python package for keyvi"
+readme = "python/description.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Hendrik Muhs", email = "hendrik.muhs@gmail.com" },
+]
+requires-python = ">=3.10"
+keywords = ["FST"]
+classifiers = [
+    "Programming Language :: C++",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+]
 dependencies = [
     "msgpack>=1.0.0",
 ]
+
+[project.urls]
+Homepage = "http://keyvi.org"
+Repository = "https://github.com/KeyviDev/keyvi"
+Documentation = "https://keyvidev.github.io/keyvi/index.html"
+
+[project.scripts]
+keyvi = "keyvi.cli.cli:main"
 
 [dependency-groups]
 lint = [
@@ -29,6 +58,7 @@ dev = [
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
+wheel.packages = ["python-pybind/keyvi"]
 minimum-version = "build-system.requires"
 
 [tool.scikit-build.cmake.define]

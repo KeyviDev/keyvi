@@ -35,7 +35,7 @@ void init_keyvi_index(const py::module_&);
 void init_keyvi_vector(const py::module_&);
 void init_keyvi_util(py::module_&);
 
-PYBIND11_MODULE(keyvi, m, py::mod_gil_not_used()) {
+PYBIND11_MODULE(_core, m, py::mod_gil_not_used()) {
   m.doc() = R"pbdoc(
         keyvi - a key value store.
         -----------------------
