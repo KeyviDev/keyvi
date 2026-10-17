@@ -33,9 +33,14 @@ namespace kdc = keyvi::dictionary::completion;
 namespace kpy = keyvi::pybind;
 
 void init_keyvi_completion(const py::module_& module) {
-  py::class_<kdc::ForwardBackwardCompletion>(module, "ForwardBackwardCompletion")
+  py::class_<kdc::ForwardBackwardCompletion>(module, "ForwardBackwardCompletion",
+                                             R"pbdoc(
+        Completer using a forward and backward dictionary to provide
+        completions at any position within a key, not just at the end.
+    )pbdoc")
       .def(py::init<kd::dictionary_t, kd::dictionary_t>(), py::arg("forward_dictionary"),
-           py::arg("backward_dictionary"))
+           py::arg("backward_dictionary"),
+           "Create a forward-backward completer from a forward and a backward dictionary.")
       .def(
           "complete",
           [](const kdc::ForwardBackwardCompletion& c, const std::string& query, const int number_of_results) {
@@ -48,8 +53,12 @@ void init_keyvi_completion(const py::module_& module) {
 
             Returns an iterator of Match objects.
           )pbdoc");
-  py::class_<kdc::MultiWordCompletion>(module, "MultiWordCompletion")
-      .def(py::init<kd::dictionary_t>(), py::arg("dictionary"))
+  py::class_<kdc::MultiWordCompletion>(module, "MultiWordCompletion",
+                                       R"pbdoc(
+        Completer for multi-word queries, tokenizing on whitespace and
+        completing the last token using the provided dictionary.
+    )pbdoc")
+      .def(py::init<kd::dictionary_t>(), py::arg("dictionary"), "Create a multi-word completer from a dictionary.")
       .def(
           "complete",
           [](const kdc::MultiWordCompletion& c, const std::string& query, const int number_of_results) {
@@ -62,8 +71,15 @@ void init_keyvi_completion(const py::module_& module) {
 
             Returns an iterator of Match objects.
           )pbdoc");
-  py::class_<kdc::PrefixCompletion>(module, "PrefixCompletion")
-      .def(py::init<kd::dictionary_t>(), py::arg("dictionary"))
+  py::class_<kdc::PrefixCompletion>(module, "PrefixCompletion",
+                                    R"pbdoc(
+        Completer for prefix-based queries, completing a given prefix
+        to full keys in the dictionary.
+
+        .. deprecated::
+            Use :meth:`dictionary.Dictionary.complete_prefix` instead.
+    )pbdoc")
+      .def(py::init<kd::dictionary_t>(), py::arg("dictionary"), "Create a prefix completer from a dictionary.")
       .def(
           "complete",
           [](const kdc::PrefixCompletion& c, const std::string& query, const int number_of_results) {
