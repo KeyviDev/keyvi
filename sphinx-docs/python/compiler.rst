@@ -14,15 +14,6 @@ Different compiler types support different value types.
    compiler.compile()
    compiler.write_to_file("data.kv")
 
-Compilers can also be used as context managers:
-
-.. code-block:: python
-
-   with JsonDictionaryCompiler() as compiler:
-       compiler.add("key1", '{"value": 1}')
-       compiler.write_to_file("data.kv")
-
-
 Compilers
 ---------
 
