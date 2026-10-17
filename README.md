@@ -31,7 +31,7 @@ Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pyp
 
 The core part is a C++ header-only library, which can be used stand-alone. For more information check the [Readme](/keyvi/README.md) file in the keyvi subfolder.
 
-The python extension can be compiled standalone, check the [Readme](/python/README.md) file in the python subfolder for more information.
+The python extension can be compiled standalone, check the [Readme](/python-pybind/README.md) file in the python-pybind subfolder for more information.
 
 
 ## Usage

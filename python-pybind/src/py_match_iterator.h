@@ -53,7 +53,10 @@ pybind11::iterator make_match_iterator_impl(Iterator first, Sentinel last, Extra
               return Access()(s.it);
             },
             std::forward<Extra>(extra)..., Policy)
-        .def("set_min_weight", [](state& s, const uint32_t min_weight) -> void { s.it.SetMinWeight(min_weight); });
+        .def(
+            "set_min_weight", [](state& s, const uint32_t min_weight) -> void { s.it.SetMinWeight(min_weight); },
+            pybind11::arg("min_weight"),
+            "Set the minimum weight threshold for the iterator, skipping matches with lower weight.");
   }
 
   return pybind11::cast(state{std::forward<Iterator>(first), std::forward<Sentinel>(last), true});
