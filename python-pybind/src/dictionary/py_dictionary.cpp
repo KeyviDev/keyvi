@@ -75,7 +75,8 @@ void init_keyvi_dictionary(const py::module_& m) {
 
     )pbdoc";
 
-  py::class_<DictionaryItemsIterator>(m, "DictionaryItemsIterator")
+  py::class_<DictionaryItemsIterator>(m, "DictionaryItemsIterator",
+                                      "Iterator over (key, value) tuples of a dictionary.")
       .def("__iter__", [](DictionaryItemsIterator& s) -> DictionaryItemsIterator& { return s; })
       .def("__next__", [](DictionaryItemsIterator& s) -> py::tuple {
         kd::match_t m;
@@ -90,7 +91,7 @@ void init_keyvi_dictionary(const py::module_& m) {
         return py::make_tuple(m->GetMatchedString(), match_value(*m));
       });
 
-  py::class_<DictionaryKeysIterator>(m, "DictionaryKeysIterator")
+  py::class_<DictionaryKeysIterator>(m, "DictionaryKeysIterator", "Iterator over the keys of a dictionary.")
       .def("__iter__", [](DictionaryKeysIterator& s) -> DictionaryKeysIterator& { return s; })
       .def("__next__", [](DictionaryKeysIterator& s) -> std::string {
         kd::match_t m;
@@ -105,7 +106,7 @@ void init_keyvi_dictionary(const py::module_& m) {
         return m->GetMatchedString();
       });
 
-  py::class_<DictionaryValuesIterator>(m, "DictionaryValuesIterator")
+  py::class_<DictionaryValuesIterator>(m, "DictionaryValuesIterator", "Iterator over the values of a dictionary.")
       .def("__iter__", [](DictionaryValuesIterator& s) -> DictionaryValuesIterator& { return s; })
       .def("__next__", [](DictionaryValuesIterator& s) -> py::object {
         kd::match_t m;
@@ -130,13 +131,16 @@ void init_keyvi_dictionary(const py::module_& m) {
         matches due to its internal FST based data structure.
     )pbdoc")
       .def(py::init([](const std::string& filename) {
-        py::gil_scoped_release release_gil;
-        return std::make_shared<kd::Dictionary>(filename);
-      }))
+             py::gil_scoped_release release_gil;
+             return std::make_shared<kd::Dictionary>(filename);
+           }),
+           py::arg("filename"), "Open a keyvi dictionary from the given file.")
       .def(py::init([](const std::string& filename, kd::loading_strategy_types loading_strategy) {
-        py::gil_scoped_release release_gil;
-        return std::make_shared<kd::Dictionary>(filename, loading_strategy);
-      }))
+             py::gil_scoped_release release_gil;
+             return std::make_shared<kd::Dictionary>(filename, loading_strategy);
+           }),
+           py::arg("filename"), py::arg("loading_strategy"),
+           "Open a keyvi dictionary from the given file with a specific loading strategy.")
       .def(
           "complete_fuzzy_multiword",
           [](const kd::Dictionary& d, const std::string& query, const int32_t max_edit_distance,
@@ -344,17 +348,24 @@ void init_keyvi_dictionary(const py::module_& m) {
 
   py::class_<kd::SecondaryKeyDictionary>(m, "SecondaryKeyDictionary",
                                          R"pbdoc(
-        Secondary Key dictionary, specialized dictionary type that takes additional key value pairs
-        that are matched exact upfront, enabling use cases like multi-tenancy and personalization.
+        Secondary Key dictionary, a specialized dictionary type that takes
+        additional key value pairs (meta) that are matched exact upfront,
+        enabling use cases like multi-tenancy and personalization.
+
+        All lookup methods take a meta parameter, a dict of string to string,
+        to filter entries by secondary keys before performing the actual lookup.
     )pbdoc")
       .def(py::init([](const std::string& filename) {
-        py::gil_scoped_release release_gil;
-        return new kd::SecondaryKeyDictionary(filename);
-      }))
+             py::gil_scoped_release release_gil;
+             return new kd::SecondaryKeyDictionary(filename);
+           }),
+           py::arg("filename"), "Open a secondary key dictionary from the given file.")
       .def(py::init([](const std::string& filename, kd::loading_strategy_types loading_strategy) {
-        py::gil_scoped_release release_gil;
-        return new kd::SecondaryKeyDictionary(filename, loading_strategy);
-      }))
+             py::gil_scoped_release release_gil;
+             return new kd::SecondaryKeyDictionary(filename, loading_strategy);
+           }),
+           py::arg("filename"), py::arg("loading_strategy"),
+           "Open a secondary key dictionary from the given file with a specific loading strategy.")
       .def(
           "get",
           [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta,
@@ -365,42 +376,43 @@ void init_keyvi_dictionary(const py::module_& m) {
             }
             return py::cast(m);
           },
-          py::arg("key"), py::arg("meta"), py::arg("default") = py::none())
+          py::arg("key"), py::arg("meta"), py::arg("default") = py::none(),
+          "Get an entry matching the key and secondary keys (meta), returning default if not found.")
       .def(
           "contains",
           [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta) {
             return d.Contains(key, meta);
           },
-          py::arg("key"), py::arg("meta"))
-      .def("__len__", &kd::SecondaryKeyDictionary::GetSize)
+          py::arg("key"), py::arg("meta"), "Check if a key with the given secondary keys is in the dictionary.")
+      .def("__len__", &kd::SecondaryKeyDictionary::GetSize, "Return the number of keys in the dictionary.")
       .def(
           "items",
           [](const kd::SecondaryKeyDictionary& d, const meta_t& meta) {
             auto m = d.GetAllItems(meta);
             return DictionaryItemsIterator{m.begin(), m.end()};
           },
-          py::arg("meta"))
+          py::arg("meta"), "Return an iterator over all (key, value) tuples matching the secondary keys.")
       .def(
           "keys",
           [](const kd::SecondaryKeyDictionary& d, const meta_t& meta) {
             auto m = d.GetAllItems(meta);
             return DictionaryKeysIterator{m.begin(), m.end()};
           },
-          py::arg("meta"))
+          py::arg("meta"), "Return an iterator over all keys matching the secondary keys.")
       .def(
           "values",
           [](const kd::SecondaryKeyDictionary& d, const meta_t& meta) {
             auto m = d.GetAllItems(meta);
             return DictionaryValuesIterator{m.begin(), m.end()};
           },
-          py::arg("meta"))
+          py::arg("meta"), "Return an iterator over all values matching the secondary keys.")
       .def(
           "match",
           [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta) {
             auto m = d.Get(key, meta);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("key"), py::arg("meta"))
+          py::arg("key"), py::arg("meta"), "Exact match for a key within the secondary key space.")
       .def(
           "match_fuzzy",
           [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta,
@@ -408,7 +420,9 @@ void init_keyvi_dictionary(const py::module_& m) {
             auto m = d.GetFuzzy(key, meta, max_edit_distance, minimum_exact_prefix);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("key"), py::arg("meta"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 2)
+          py::arg("key"), py::arg("meta"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 2,
+          "Fuzzy match for a key within the secondary key space, allowing up to max_edit_distance Levenshtein "
+          "distance.")
       .def(
           "match_near",
           [](const kd::SecondaryKeyDictionary& d, const std::string& key, const meta_t& meta,
@@ -416,7 +430,15 @@ void init_keyvi_dictionary(const py::module_& m) {
             auto m = d.GetNear(key, meta, minimum_prefix_length, greedy);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("key"), py::arg("meta"), py::arg("minimum_prefix_length"), py::arg("greedy") = false)
+          py::arg("key"), py::arg("meta"), py::arg("minimum_prefix_length"), py::arg("greedy") = false,
+          R"pbdoc(
+            Match a key near within the secondary key space: match as much as
+            possible exact given the minimum prefix length and then return
+            everything below.
+
+            If greedy is True it matches everything below the minimum_prefix_length,
+            but in the order of exact first.
+          )pbdoc")
       .def(
           "complete_prefix",
           [](const kd::SecondaryKeyDictionary& d, const std::string& query, const meta_t& meta) {
@@ -425,7 +447,8 @@ void init_keyvi_dictionary(const py::module_& m) {
           },
           py::arg("query"), py::arg("meta"),
           R"pbdoc(
-            Complete the given key to full matches (prefix matching).
+            Complete the given key to full matches within the secondary key
+            space (prefix matching).
             In case the used dictionary supports inner weights, the
             completer traverses the dictionary according to weights,
             otherwise byte-order.
@@ -438,8 +461,8 @@ void init_keyvi_dictionary(const py::module_& m) {
           },
           py::arg("query"), py::arg("meta"), py::arg("top_n"),
           R"pbdoc(
-            Complete the given key to full matches (prefix matching)
-            and return the top n completions.
+            Complete the given key to full matches within the secondary key
+            space (prefix matching) and return the top n completions.
             In case the used dictionary supports inner weights, the
             completer traverses the dictionary according to weights,
             otherwise byte-order.
@@ -459,7 +482,8 @@ void init_keyvi_dictionary(const py::module_& m) {
           },
           py::arg("query"), py::arg("meta"), py::arg("multiword_separator") = 0x1b,
           R"pbdoc(
-            Complete the given key to full matches after whitespace tokenizing.
+            Complete the given key to full matches within the secondary key
+            space after whitespace tokenizing.
             In case the used dictionary supports inner weights, the
             completer traverses the dictionary according to weights,
             otherwise byte-order.
@@ -473,8 +497,8 @@ void init_keyvi_dictionary(const py::module_& m) {
           },
           py::arg("query"), py::arg("meta"), py::arg("top_n"), py::arg("multiword_separator") = 0x1b,
           R"pbdoc(
-            Complete the given key to full matches after whitespace tokenizing
-            and return the top n completions.
+            Complete the given key to full matches within the secondary key
+            space after whitespace tokenizing and return the top n completions.
             In case the used dictionary supports inner weights, the
             completer traverses the dictionary according to weights,
             otherwise byte-order.
@@ -497,15 +521,19 @@ void init_keyvi_dictionary(const py::module_& m) {
           py::arg("query"), py::arg("meta"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 0,
           py::arg("multiword_separator") = 0x1b,
           R"pbdoc(
-            Complete the given key to full matches after whitespace tokenizing,
-            allowing up to max_edit_distance distance (Levenshtein).
+            Complete the given key to full matches within the secondary key
+            space after whitespace tokenizing, allowing up to
+            max_edit_distance distance (Levenshtein).
             In case the used dictionary supports inner weights, the
             completer traverses the dictionary according to weights,
             otherwise byte-order.
           )pbdoc")
-      .def("manifest", &kd::SecondaryKeyDictionary::GetManifest)
-      .def("statistics", [](const kd::SecondaryKeyDictionary& d) {
-        py::module_ json = py::module_::import("json");
-        return json.attr("loads")(d.GetStatistics());
-      });
+      .def("manifest", &kd::SecondaryKeyDictionary::GetManifest, "Get the manifest of the dictionary.")
+      .def(
+          "statistics",
+          [](const kd::SecondaryKeyDictionary& d) {
+            py::module_ json = py::module_::import("json");
+            return json.attr("loads")(d.GetStatistics());
+          },
+          "Get the statistics of the dictionary as a python dict.");
 }

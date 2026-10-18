@@ -29,5 +29,10 @@ API Documentation
    :maxdepth: 2
    :caption: Python API
 
+   python/match
    python/dictionary
+   python/compiler
+   python/completion
    python/index
+   python/vector
+   python/util

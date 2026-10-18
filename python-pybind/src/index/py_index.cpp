@@ -53,14 +53,23 @@ inline params_t inject_keyvimerger_bin(params_t params) {
 }
 
 void init_keyvi_index(const py::module_& module) {
-  py::class_<ki::Index>(module, "Index")
+  py::class_<ki::Index>(module, "Index",
+                        R"pbdoc(
+        A mutable keyvi index that supports reading, writing and deleting
+        key-value pairs. The index is stored on disk and supports concurrent
+        reads. Background merges are performed automatically to compact the index and optimize reads.
+    )pbdoc")
       .def(py::init([](const std::string& index_directory) {
-        return new ki::Index(index_directory, inject_keyvimerger_bin({}));
-      }))
+             return new ki::Index(index_directory, inject_keyvimerger_bin({}));
+           }),
+           py::arg("index_directory"), "Open or create an index at the given directory.")
       .def(py::init([](const std::string& index_directory, const params_t& params) {
-        return new ki::Index(index_directory, inject_keyvimerger_bin(params));
-      }))
-      .def("set", &ki::Index::Set, py::arg("key"), py::arg("value"), py::call_guard<py::gil_scoped_release>())
+             return new ki::Index(index_directory, inject_keyvimerger_bin(params));
+           }),
+           py::arg("index_directory"), py::arg("params"),
+           "Open or create an index at the given directory with custom parameters.")
+      .def("set", &ki::Index::Set, py::arg("key"), py::arg("value"), py::call_guard<py::gil_scoped_release>(),
+           "Set a key-value pair in the index.")
       .def(
           "bulk_set",
           [](ki::Index& idx, const std::vector<std::pair<std::string, std::string>>& key_values) {
@@ -69,14 +78,18 @@ void init_keyvi_index(const py::module_& module) {
             py::gil_scoped_release release_gil;
             idx.MSet(kv);
           },
-          py::arg("key_values"))
-      .def("delete", &ki::Index::Delete, py::arg("key"), py::call_guard<py::gil_scoped_release>())
-      .def("__delitem__",
-           [](ki::Index& idx, const std::string& key) {
-             py::gil_scoped_release release_gil;
-             idx.Delete(key);
-           })
-      .def("flush", &ki::Index::Flush, py::arg("async") = false, py::call_guard<py::gil_scoped_release>())
+          py::arg("key_values"), "Set multiple key-value pairs in the index in a single batch.")
+      .def("delete", &ki::Index::Delete, py::arg("key"), py::call_guard<py::gil_scoped_release>(),
+           "Delete a key from the index.")
+      .def(
+          "__delitem__",
+          [](ki::Index& idx, const std::string& key) {
+            py::gil_scoped_release release_gil;
+            idx.Delete(key);
+          },
+          "Delete a key from the index. Raises KeyError if not found.")
+      .def("flush", &ki::Index::Flush, py::arg("async") = false, py::call_guard<py::gil_scoped_release>(),
+           "Flush pending writes to disk. If async is True, return immediately.")
       .def(
           "get",
           [](ki::Index& idx, const std::string& key, py::object default_value) -> py::object {
@@ -88,22 +101,33 @@ void init_keyvi_index(const py::module_& module) {
           },
           py::arg("key"), py::arg("default") = py::none(),
           "Return the value for key if key is in the dictionary, else default.")
-      .def("__getitem__",
-           [](ki::Index& idx, const std::string& key) {
-             auto m = idx[key];
-             if (!m) {
-               throw py::key_error(key);
-             }
-             return m;
-           })
-      .def("__contains__", [](ki::Index& idx, const std::string& key) { return idx.Contains(key); })
+      .def(
+          "__getitem__",
+          [](ki::Index& idx, const std::string& key) {
+            auto m = idx[key];
+            if (!m) {
+              throw py::key_error(key);
+            }
+            return m;
+          },
+          "Get a value by key. Raises KeyError if not found.")
+      .def(
+          "__contains__", [](ki::Index& idx, const std::string& key) { return idx.Contains(key); },
+          "Check if a key is in the index.")
       .def(
           "get_near",
           [](ki::Index& idx, const std::string& key, const size_t minimum_prefix_length, const bool greedy) {
             auto m = idx.GetNear(key, minimum_prefix_length, greedy);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("key"), py::arg("minimum_prefix_length"), py::arg("greedy") = false)
+          py::arg("key"), py::arg("minimum_prefix_length"), py::arg("greedy") = false,
+          R"pbdoc(
+            Match a key near: match as much as possible exact given the minimum
+            prefix length and then return everything below.
+
+            If greedy is True it matches everything below the minimum_prefix_length,
+            but in the order of exact first.
+          )pbdoc")
       .def(
           "get_fuzzy",
           [](ki::Index& idx, const std::string& key, const int32_t max_edit_distance,
@@ -111,11 +135,17 @@ void init_keyvi_index(const py::module_& module) {
             auto m = idx.GetFuzzy(key, max_edit_distance, minimum_exact_prefix);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("key"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 2);
+          py::arg("key"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 2,
+          "Fuzzy match for a key allowing up to max_edit_distance Levenshtein distance.");
 
-  py::class_<ki::ReadOnlyIndex>(module, "ReadOnlyIndex")
-      .def(py::init<const std::string&>())
-      .def(py::init<const std::string&, const params_t&>())
+  py::class_<ki::ReadOnlyIndex>(module, "ReadOnlyIndex",
+                                R"pbdoc(
+        A read-only keyvi index for lookups without write or delete support.
+        Useful for serving an index that is built and updated externally.
+    )pbdoc")
+      .def(py::init<const std::string&>(), py::arg("index_directory"), "Open a read-only index at the given directory.")
+      .def(py::init<const std::string&, const params_t&>(), py::arg("index_directory"), py::arg("params"),
+           "Open a read-only index at the given directory with custom parameters.")
       .def(
           "get",
           [](ki::ReadOnlyIndex& idx, const std::string& key, py::object default_value) -> py::object {
@@ -127,22 +157,33 @@ void init_keyvi_index(const py::module_& module) {
           },
           py::arg("key"), py::arg("default") = py::none(),
           "Return the value for key if key is in the dictionary, else default.")
-      .def("__getitem__",
-           [](ki::ReadOnlyIndex& idx, const std::string& key) {
-             auto m = idx[key];
-             if (!m) {
-               throw py::key_error(key);
-             }
-             return m;
-           })
-      .def("__contains__", [](ki::ReadOnlyIndex& idx, const std::string& key) { return idx.Contains(key); })
+      .def(
+          "__getitem__",
+          [](ki::ReadOnlyIndex& idx, const std::string& key) {
+            auto m = idx[key];
+            if (!m) {
+              throw py::key_error(key);
+            }
+            return m;
+          },
+          "Get a value by key. Raises KeyError if not found.")
+      .def(
+          "__contains__", [](ki::ReadOnlyIndex& idx, const std::string& key) { return idx.Contains(key); },
+          "Check if a key is in the index.")
       .def(
           "get_near",
           [](ki::ReadOnlyIndex& idx, const std::string& key, const size_t minimum_prefix_length, const bool greedy) {
             auto m = idx.GetNear(key, minimum_prefix_length, greedy);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("key"), py::arg("minimum_prefix_length"), py::arg("greedy") = false)
+          py::arg("key"), py::arg("minimum_prefix_length"), py::arg("greedy") = false,
+          R"pbdoc(
+            Match a key near: match as much as possible exact given the minimum
+            prefix length and then return everything below.
+
+            If greedy is True it matches everything below the minimum_prefix_length,
+            but in the order of exact first.
+          )pbdoc")
       .def(
           "get_fuzzy",
           [](ki::ReadOnlyIndex& idx, const std::string& key, const int32_t max_edit_distance,
@@ -150,5 +191,6 @@ void init_keyvi_index(const py::module_& module) {
             auto m = idx.GetFuzzy(key, max_edit_distance, minimum_exact_prefix);
             return kpy::make_match_iterator(m.begin(), m.end());
           },
-          py::arg("key"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 2);
+          py::arg("key"), py::arg("max_edit_distance"), py::arg("minimum_exact_prefix") = 2,
+          "Fuzzy match for a key allowing up to max_edit_distance Levenshtein distance.");
 }
