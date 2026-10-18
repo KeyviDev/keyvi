@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
 # Usage: py.test tests
+from __future__ import annotations
 
-import sys
 import os
+import sys
 from functools import reduce
 
 from keyvi.compiler import CompletionDictionaryCompiler
@@ -10,7 +10,6 @@ from keyvi.compiler import CompletionDictionaryCompiler
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
 from test_tools import tmp_dictionary
-
 
 multiword_data = {
     "80s action film released 2013": {"w": 43, "id": "a1"},

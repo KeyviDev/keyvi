@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*-
 # Usage: py.test tests
+from __future__ import annotations
 
-from keyvi.index import Index, ReadOnlyIndex
+import gc
 import os
 import random
 import shutil
 import tempfile
-import gc
+
+from keyvi.index import Index, ReadOnlyIndex
 
 
 def test_open_index():
@@ -34,19 +35,19 @@ def test_some_indexing():
         if not os.path.exists(test_dir):
             os.mkdir(test_dir)
         index = Index(os.path.join(test_dir, "index"))
-        for i in range(0, iterations):
-            index.set("key-{}".format(i), "value-{}".format(i))
+        for i in range(iterations):
+            index.set(f"key-{i}", f"value-{i}")
         index.flush()
         for i in range(split, iterations):
-            assert "key-{}".format(i) in index
-            index.delete("key-{}".format(i))
+            assert f"key-{i}" in index
+            index.delete(f"key-{i}")
         index.flush()
 
-        for i in range(0, split):
-            assert "key-{}".format(i) in index
+        for i in range(split):
+            assert f"key-{i}" in index
 
         for i in range(split, iterations):
-            assert not "key-{}".format(i) in index
+            assert f"key-{i}" not in index
         del index
     finally:
         shutil.rmtree(test_dir, ignore_errors=True)
@@ -62,17 +63,16 @@ def test_bulk_add():
         index = Index(os.path.join(test_dir, "index"))
         key_values = []
 
-        for i in range(0, chunk_size * iterations):
-            key_values.append(("key-{}".format(i), "value-{}".format(i)))
+        for i in range(chunk_size * iterations):
+            key_values.append((f"key-{i}", f"value-{i}"))
             if i % chunk_size == 0:
                 index.bulk_set(key_values)
                 key_values = []
         index.bulk_set(key_values)
         index.flush()
 
-        for i in range(0, 50):
-            assert "key-{}".format(random.randrange(0,
-                                   chunk_size * iterations)) in index
+        for i in range(50):
+            assert f"key-{random.randrange(0, chunk_size * iterations)}" in index
         del index
     finally:
         shutil.rmtree(test_dir, ignore_errors=True)
@@ -97,19 +97,19 @@ def test_get_fuzzy():
         for index in [write_index, read_only_index]:
             matches = list(index.get_fuzzy("appe", 1, 2))
             assert len(matches) == 1
-            assert u'apple' == matches[0].matched_string
+            assert matches[0].matched_string == "apple"
 
             matches = list(index.get_fuzzy("appes", 2, 2))
             assert len(matches) == 2
-            assert u'apple' == matches[0].matched_string
-            assert u'apples' == matches[1].matched_string
+            assert matches[0].matched_string == "apple"
+            assert matches[1].matched_string == "apples"
             matches = list(index.get_fuzzy("apples", 1, 2))
             assert len(matches) == 2
-            assert u'apple' == matches[0].matched_string
-            assert u'apples' == matches[1].matched_string
+            assert matches[0].matched_string == "apple"
+            assert matches[1].matched_string == "apples"
             matches = list(index.get_fuzzy("atocao", 2, 1))
             assert len(matches) == 1
-            assert u'avocado' == matches[0].matched_string
+            assert matches[0].matched_string == "avocado"
 
         write_index.delete("avocado")
         write_index.flush()
@@ -129,17 +129,12 @@ def test_get_near():
             os.mkdir(test_dir)
         write_index = Index(os.path.join(test_dir, "index"))
         # the following geohashes are created from openstreetmap coordinates and translated using a geohash encoder
-        write_index.set(
-            "u21xj502gs79", "{'city' : 'Kobarid', 'country': 'si'}")
-        write_index.set(
-            "u21xk2uxkhh2", "{'city' : 'Trnovo ob soci', 'country': 'si'}")
-        write_index.set(
-            "u21x75n34qrp", "{'city' : 'Srpnecia', 'country': 'si'}")
+        write_index.set("u21xj502gs79", "{'city' : 'Kobarid', 'country': 'si'}")
+        write_index.set("u21xk2uxkhh2", "{'city' : 'Trnovo ob soci', 'country': 'si'}")
+        write_index.set("u21x75n34qrp", "{'city' : 'Srpnecia', 'country': 'si'}")
         write_index.set("u21x6v1nx0c3", "{'city' : 'Zaga', 'country': 'si'}")
-        write_index.set(
-            "u21xs20w9ssu", "{'city' : 'Cezsoca', 'country': 'si'}")
-        write_index.set(
-            "u21x6yx5cqy6", "{'city' : 'Log Cezsoski', 'country': 'si'}")
+        write_index.set("u21xs20w9ssu", "{'city' : 'Cezsoca', 'country': 'si'}")
+        write_index.set("u21x6yx5cqy6", "{'city' : 'Log Cezsoski', 'country': 'si'}")
         write_index.set("u21xs7ses4s3", "{'city' : 'Bovec', 'country': 'si'}")
         write_index.flush()
 
@@ -149,28 +144,28 @@ def test_get_near():
             # some coordinate nearby, greedy false, so it prefers as close as possible
             matches = list(index.get_near("u21xjjhhymt7", 4))
             assert len(matches) == 1
-            assert u'u21xj502gs79' == matches[0].matched_string
-            assert u"{'city' : 'Kobarid', 'country': 'si'}" == matches[0].value
+            assert matches[0].matched_string == "u21xj502gs79"
+            assert matches[0].value == "{'city' : 'Kobarid', 'country': 'si'}"
 
             # greedy match, still closest should be the 1st match
             matches = list(index.get_near("u21xjjhhymt7", 4, True))
             assert len(matches) == 7
-            assert u'u21xj502gs79' == matches[0].matched_string
-            assert u"{'city' : 'Kobarid', 'country': 'si'}" == matches[0].value
+            assert matches[0].matched_string == "u21xj502gs79"
+            assert matches[0].value == "{'city' : 'Kobarid', 'country': 'si'}"
 
             # closer match near Bovec and Cezsoca but closer to Cezsoca
             matches = list(index.get_near("u21xs20w9ssu", 5))
             assert len(matches) == 1
-            assert u'u21xs20w9ssu' == matches[0].matched_string
-            assert u"{'city' : 'Cezsoca', 'country': 'si'}" == matches[0].value
+            assert matches[0].matched_string == "u21xs20w9ssu"
+            assert matches[0].value == "{'city' : 'Cezsoca', 'country': 'si'}"
 
             # greedy should return Bovec, but not the other locations due to the prefix
             matches = list(index.get_near("u21xs20w9ssu", 5, True))
             assert len(matches) == 2
-            assert u'u21xs20w9ssu' == matches[0].matched_string
-            assert u"{'city' : 'Cezsoca', 'country': 'si'}" == matches[0].value
-            assert u'u21xs7ses4s3' == matches[1].matched_string
-            assert u"{'city' : 'Bovec', 'country': 'si'}" == matches[1].value
+            assert matches[0].matched_string == "u21xs20w9ssu"
+            assert matches[0].value == "{'city' : 'Cezsoca', 'country': 'si'}"
+            assert matches[1].matched_string == "u21xs7ses4s3"
+            assert matches[1].value == "{'city' : 'Bovec', 'country': 'si'}"
 
         del write_index
         del read_only_index

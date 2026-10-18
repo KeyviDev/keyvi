@@ -1,6 +1,8 @@
 exclude: |
     (?x)^(
         keyvi/3rdparty/.*|
+        python/src/.*|  # deprecated, will be removed after switching to pybind
+        python/autowrap_includes/.*|  # deprecated, will be removed after switching to pybind
         python/setup\.py  # deprecated, will be removed after switching to pybind
     )$
 repos:
