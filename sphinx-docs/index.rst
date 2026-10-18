@@ -27,6 +27,13 @@ API Documentation
 
 .. toctree::
    :maxdepth: 2
+   :caption: Rust API
+
+   rust/dictionary
+   rust/match
+
+.. toctree::
+   :maxdepth: 2
    :caption: Python API
 
    python/match
