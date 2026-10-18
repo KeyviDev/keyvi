@@ -124,3 +124,6 @@ isort.required-imports = ["from __future__ import annotations"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["T20"]
+"python/examples/**" = ["T20", "PTH", "SIM115"]
+"python/tests/**" = ["T20", "PTH", "SIM115", "SIM117", "E402", "E711", "E712", "F841", "B007", "B905", "C401", "C416", "PT011", "PT013", "PLW2901"]  # deprecated, will be removed after switching to pybind
+"python/integration-tests/**" = ["T20", "PTH", "E402", "PLC0415", "RET504"]  # deprecated, will be removed after switching to pybind

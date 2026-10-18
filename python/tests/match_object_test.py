@@ -1,20 +1,22 @@
+from __future__ import annotations
+
 import json
-import keyvi
-import msgpack
-from test_tools import tmp_dictionary
+import os
 import warnings
 import zlib
-import os
+
+import msgpack
 import snappy
 import zstd
-
 from keyvi.compiler import (
-    JsonDictionaryCompiler,
     CompletionDictionaryCompiler,
+    JsonDictionaryCompiler,
     KeyOnlyDictionaryCompiler,
     StringDictionaryCompiler,
 )
+from test_tools import tmp_dictionary
 
+import keyvi
 
 TEST_DEPRECATIONS = os.getenv("KEYVI_SKIP_TEST_DEPRECATIONS") != "1"
 
@@ -71,8 +73,8 @@ def test_unicode_attributes():
 
 def test_bytes_attributes():
     m = keyvi.Match()
-    bytes_key = bytes("äöü".encode("utf-8"))
-    bytes_value = bytes("äöüöäü".encode("utf-8"))
+    bytes_key = bytes("äöü".encode())
+    bytes_value = bytes("äöüöäü".encode())
     m[bytes_key] = 22
     assert m[bytes_key] == 22
     m["k2"] = bytes_value
@@ -81,14 +83,14 @@ def test_bytes_attributes():
 
 def test_double_attributes():
     m = keyvi.Match()
-    bytes_key = bytes("abc".encode("utf-8"))
+    bytes_key = b"abc"
     m[bytes_key] = 42.0
     assert m[bytes_key] == 42.0
 
 
 def test_boolean_attributes():
     m = keyvi.Match()
-    bytes_key = bytes("def".encode("utf-8"))
+    bytes_key = b"def"
     m[bytes_key] = True
     assert m[bytes_key]
 

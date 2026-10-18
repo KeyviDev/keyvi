@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 # some common tools for tests
+from __future__ import annotations
 
 import contextlib
 import os

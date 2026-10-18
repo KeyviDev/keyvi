@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 # Usage: py.test tests
+from __future__ import annotations
 
 import heapq
-import sys
 import os
+import sys
 
 from keyvi.compiler import CompletionDictionaryCompiler
 

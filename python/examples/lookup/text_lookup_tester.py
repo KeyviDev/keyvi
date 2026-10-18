@@ -1,13 +1,17 @@
+from __future__ import annotations
+
 from keyvi.dictionary import Dictionary
 
 query = ""
 
-d=Dictionary("cities.kv")
+d = Dictionary("cities.kv")
+
 
 def get_lookup_key(query):
     return query
 
-while query!="exit":
-    query = raw_input("Query:")
-    for m in d.LookupText(get_lookup_key(query.strip())):
-        print("{}".format(m.GetMatchedString()))
+
+while query != "exit":
+    query = input("Query:")
+    for m in d.search_tokenized(get_lookup_key(query.strip())):
+        print(f"{m.matched_string}")
