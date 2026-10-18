@@ -24,6 +24,24 @@
  *          Subu <subu@cliqz.com>
  */
 
+//! Rust bindings for keyvi — a key value index based on finite state machines.
+//!
+//! Keyvi is optimized for size and lookup speed. The underlying FST data structure
+//! is very space efficient and supports various forms of approximate matching
+//! including fuzzy string matching.
+//!
+//! # Example
+//!
+//! ```no_run
+//! use keyvi::dictionary::Dictionary;
+//!
+//! let dict = Dictionary::new("data.kv").unwrap();
+//! let m = dict.get("my_key");
+//! if !m.is_empty() {
+//!     println!("{}: {}", m.matched_string(), m.get_value_as_string());
+//! }
+//! ```
+
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -37,5 +55,7 @@ pub mod keyvi_match;
 pub mod keyvi_match_iterator;
 pub mod keyvi_string;
 
+/// Compression algorithms for msgpacked value retrieval.
 pub type Compression = bindings::root::keyvi::compression::CompressionAlgorithm;
+/// Loading strategies controlling how dictionary data is mapped into memory.
 pub type LoadingStrategy = bindings::root::keyvi::dictionary::loading_strategy_types;

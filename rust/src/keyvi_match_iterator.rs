@@ -27,11 +27,26 @@
 use bindings::*;
 use keyvi_match::KeyviMatch;
 
+/// An iterator over match results from a dictionary lookup.
+///
+/// Implements the standard Rust [`Iterator`] trait with `Item = KeyviMatch`.
+///
+/// # Example
+///
+/// ```no_run
+/// use keyvi::dictionary::Dictionary;
+///
+/// let dict = Dictionary::new("data.kv").unwrap();
+/// for m in dict.get_prefix_completions("moz", 10) {
+///     println!("{}: {}", m.matched_string(), m.get_value_as_string());
+/// }
+/// ```
 pub struct KeyviMatchIterator {
     ptr_: *mut root::keyvi_match_iterator,
 }
 
 impl KeyviMatchIterator {
+    /// Create a new match iterator from a raw pointer (internal use).
     pub fn new(ptr: *mut root::keyvi_match_iterator) -> KeyviMatchIterator {
         KeyviMatchIterator { ptr_: ptr }
     }
