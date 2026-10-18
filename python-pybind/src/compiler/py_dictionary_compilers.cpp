@@ -45,6 +45,22 @@ inline void py_compile(Compiler* c, std::function<void(const size_t a, const siz
 }
 
 void init_keyvi_dictionary_compilers(const py::module_& module) {
+#define PARAMS_COMMON                                                                             \
+  "\n\nAccepted ``params``:\n\n"                                                                  \
+  "- ``memory_limit`` (int): Memory limit in bytes (default: 1 GB). "                             \
+  "Also accepts ``memory_limit_kb``, ``memory_limit_mb``, ``memory_limit_gb``.\n"                 \
+  "- ``temporary_path`` (str): Directory for temporary files (default: system temp directory).\n" \
+  "- ``minimization`` (bool): Enable FSA minimization (default: true).\n"                         \
+  "- ``parallel_sort_threshold`` (int): Threshold for parallel sort (default: 10000).\n"
+#define PARAMS_COMPRESSION                                                                                      \
+  "- ``compression`` (str): Compression type: ``'zlib'``, ``'snappy'``, ``'zstd'``, or none (default: none).\n" \
+  "- ``compression_threshold`` (int): Minimum value size in bytes to compress (default: 32).\n"
+#define PARAMS_MERGER_COMMON                                                                      \
+  "\n\nAccepted ``params``:\n\n"                                                                  \
+  "- ``memory_limit`` (int): Memory limit in bytes (default: 1 GB). "                             \
+  "Also accepts ``memory_limit_kb``, ``memory_limit_mb``, ``memory_limit_gb``.\n"                 \
+  "- ``temporary_path`` (str): Directory for temporary files (default: system temp directory).\n" \
+  "- ``merge_mode`` (str): Set to ``'append'`` for append mode (default: standard merge).\n"
 #define CREATE_COMPILER_COMMON(compiler)                                                                             \
   .def("__enter__", [](compiler& c) { return &c; })                                                                  \
       .def("__exit__",                                                                                               \
@@ -52,13 +68,14 @@ void init_keyvi_dictionary_compilers(const py::module_& module) {
              py::gil_scoped_release release_gil;                                                                     \
              c.Compile();                                                                                            \
            })                                                                                                        \
-      .def("__setitem__", &compiler::Add)                                                                            \
+      .def("__setitem__", &compiler::Add, "Add a key-value pair using dictionary syntax (compiler[key] = value).")   \
       .def(                                                                                                          \
           "compile",                                                                                                 \
           [](compiler& c, std::function<void(const size_t a, const size_t b)> progress_callback) {                   \
             py_compile(&c, progress_callback);                                                                       \
           },                                                                                                         \
-          py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)>*>(nullptr)) \
+          py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)>*>(nullptr), \
+          "Compile the dictionary. An optional progress callback receives (current, total) counts.")                 \
       .def(                                                                                                          \
           "Compile", /* DEPRECATED */                                                                                \
           [](compiler& c, std::function<void(const size_t a, const size_t b)> progress_callback) {                   \
@@ -69,75 +86,120 @@ void init_keyvi_dictionary_compilers(const py::module_& module) {
             py_compile(&c, progress_callback);                                                                       \
           },                                                                                                         \
           py::arg("progress_callback") = static_cast<std::function<void(const size_t a, const size_t b)>*>(nullptr)) \
-      .def("set_manifest", &compiler::SetManifest)                                                                   \
-      .def("write_to_file", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>())                        \
-      .def("WriteToFile", &compiler::WriteToFile, py::call_guard<py::gil_scoped_release>()) /* DEPRECATED */
-#define CREATE_COMPILER(compiler, name)                                         \
-  py::class_<compiler>(module, name)                                            \
-      .def(py::init<>())                                                        \
-      .def(py::init<const keyvi::util::parameters_t&>()) /* init with params */ \
-      CREATE_COMPILER_COMMON(compiler)                                          \
-      .def("add", &compiler::Add)                                               \
-      .def("Add", &compiler::Add);
-#define CREATE_KEY_ONLY_COMPILER(compiler, name)                                \
-  py::class_<compiler>(module, name)                                            \
-      .def(py::init<>())                                                        \
-      .def(py::init<const keyvi::util::parameters_t&>()) /* init with params */ \
-      CREATE_COMPILER_COMMON(compiler)                                          \
-      .def("add", [](compiler& c, const std::string& key) { c.Add(key); })      \
-      .def("Add", [](compiler& c, const std::string& key) { c.Add(key); });
-#define CREATE_SK_COMPILER(compiler, name)                                                \
-  py::class_<compiler>(module, name)                                                      \
-      .def(py::init<const std::vector<std::string>&>())                                   \
-      .def(py::init<const std::vector<std::string>&, const keyvi::util::parameters_t&>()) \
+      .def("set_manifest", &compiler::SetManifest, py::arg("manifest"),                                              \
+           "Set custom metadata to be stored with the dictionary (e.g. version, build date).")                       \
+      .def("write_to_file", &compiler::WriteToFile, py::arg("filename"), py::call_guard<py::gil_scoped_release>(),   \
+           "Write the compiled dictionary to a file.")                                                               \
+      .def("WriteToFile", &compiler::WriteToFile, py::arg("filename"),                                               \
+           py::call_guard<py::gil_scoped_release>()) /* DEPRECATED */
+#define CREATE_COMPILER(compiler, name, docstring)                                           \
+  py::class_<compiler>(module, name, docstring)                                              \
+      .def(py::init<>(), "Create a compiler with default parameters.")                       \
+      .def(py::init<const keyvi::util::parameters_t&>(), py::arg("params"),                  \
+           "Create a compiler with custom parameters.") CREATE_COMPILER_COMMON(compiler)     \
+      .def("add", &compiler::Add, py::arg("key"), py::arg("value"), "Add a key-value pair.") \
+      .def("Add", &compiler::Add, py::arg("key"), py::arg("value"));
+#define CREATE_KEY_ONLY_COMPILER(compiler, name)                                                         \
+  py::class_<compiler>(module, name, "Compiler for creating a key-only keyvi dictionary." PARAMS_COMMON) \
+      .def(py::init<>(), "Create a compiler with default parameters.")                                   \
+      .def(py::init<const keyvi::util::parameters_t&>(), py::arg("params"),                              \
+           "Create a compiler with custom parameters.") CREATE_COMPILER_COMMON(compiler)                 \
+      .def(                                                                                              \
+          "add", [](compiler& c, const std::string& key) { c.Add(key); }, py::arg("key"), "Add a key.")  \
+      .def("Add", [](compiler& c, const std::string& key) { c.Add(key); }, py::arg("key"));
+#define CREATE_SK_COMPILER(compiler, name, docstring)                                     \
+  py::class_<compiler>(module, name, docstring)                                           \
+      .def(py::init<const std::vector<std::string>&>(), py::arg("secondary_key_names"),   \
+           "Create a compiler with the given secondary key names.")                       \
+      .def(py::init<const std::vector<std::string>&, const keyvi::util::parameters_t&>(), \
+           py::arg("secondary_key_names"), py::arg("params"),                             \
+           "Create a compiler with the given secondary key names and custom parameters.") \
           CREATE_COMPILER_COMMON(compiler)                                                \
-      .def("add", &compiler::Add);
-#define CREATE_MERGER(merger, name)                                          \
-  py::class_<merger>(module, name)                                           \
-      .def(py::init<>())                                                     \
-      .def(py::init<const keyvi::util::parameters_t&>())                     \
-      .def("__enter__", [](merger& m) { return &m; })                        \
-      .def("__exit__",                                                       \
-           [](merger& m, void* exc_type, void* exc_value, void* traceback) { \
-             py::gil_scoped_release release_gil;                             \
-             m.Merge();                                                      \
-           })                                                                \
-      .def("add", &merger::Add)                                              \
-      .def("merge",                                                          \
-           [](merger& m) {                                                   \
-             pybind11::gil_scoped_release release_gil;                       \
-             m.Merge();                                                      \
-           })                                                                \
-      .def("merge",                                                          \
-           [](merger& m, const std::string& filename) {                      \
-             pybind11::gil_scoped_release release_gil;                       \
-             m.Merge(filename);                                              \
-           })                                                                \
-      .def("set_manifest", &merger::SetManifest)                             \
-      .def("write_to_file", &merger::WriteToFile, py::call_guard<py::gil_scoped_release>());
-  CREATE_COMPILER(kd::CompletionDictionaryCompiler, "CompletionDictionaryCompiler");
-  CREATE_COMPILER(kd::FloatVectorDictionaryCompiler, "FloatVectorDictionaryCompiler");
-  CREATE_COMPILER(kd::IntDictionaryCompiler, "IntDictionaryCompiler");
-  CREATE_COMPILER(kd::JsonDictionaryCompiler, "JsonDictionaryCompiler");
+      .def("add", &compiler::Add, "Add a key-value pair with secondary keys.");
+#define CREATE_MERGER(merger, name, docstring)                                                                         \
+  py::class_<merger>(module, name, docstring)                                                                          \
+      .def(py::init<>(), "Create a merger with default parameters.")                                                   \
+      .def(py::init<const keyvi::util::parameters_t&>(), py::arg("params"), "Create a merger with custom parameters.") \
+      .def("__enter__", [](merger& m) { return &m; })                                                                  \
+      .def("__exit__",                                                                                                 \
+           [](merger& m, void* exc_type, void* exc_value, void* traceback) {                                           \
+             py::gil_scoped_release release_gil;                                                                       \
+             m.Merge();                                                                                                \
+           })                                                                                                          \
+      .def("add", &merger::Add, py::arg("filename"), "Add a dictionary file to be merged.")                            \
+      .def(                                                                                                            \
+          "merge",                                                                                                     \
+          [](merger& m) {                                                                                              \
+            pybind11::gil_scoped_release release_gil;                                                                  \
+            m.Merge();                                                                                                 \
+          },                                                                                                           \
+          "Merge all added dictionaries. The result can be written with write_to_file.")                               \
+      .def(                                                                                                            \
+          "merge",                                                                                                     \
+          [](merger& m, const std::string& filename) {                                                                 \
+            pybind11::gil_scoped_release release_gil;                                                                  \
+            m.Merge(filename);                                                                                         \
+          },                                                                                                           \
+          py::arg("filename"), "Merge all added dictionaries and write the result to the given file.")                 \
+      .def("set_manifest", &merger::SetManifest, py::arg("manifest"),                                                  \
+           "Set custom metadata to be stored with the merged dictionary (e.g. version, build date).")                  \
+      .def("write_to_file", &merger::WriteToFile, py::arg("filename"), py::call_guard<py::gil_scoped_release>(),       \
+           "Write the merged dictionary to a file.");
+  CREATE_COMPILER(kd::CompletionDictionaryCompiler, "CompletionDictionaryCompiler",
+                  "Compiler for creating a completion dictionary with weighted string values." PARAMS_COMMON);
+  CREATE_COMPILER(kd::FloatVectorDictionaryCompiler, "FloatVectorDictionaryCompiler",
+                  "Compiler for creating a dictionary with float vector values." PARAMS_COMMON PARAMS_COMPRESSION
+                  "- ``vector_size`` (int): Number of dimensions per vector (default: 10).\n");
+  CREATE_COMPILER(kd::IntDictionaryCompiler, "IntDictionaryCompiler",
+                  "Compiler for creating a dictionary with integer values." PARAMS_COMMON);
+  CREATE_COMPILER(kd::JsonDictionaryCompiler, "JsonDictionaryCompiler",
+                  "Compiler for creating a dictionary with JSON values." PARAMS_COMMON PARAMS_COMPRESSION
+                  "- ``floating_point_precision`` (str): Set to ``'single'`` for 32-bit floats "
+                  "(default: double precision).\n");
   CREATE_KEY_ONLY_COMPILER(kd::KeyOnlyDictionaryCompiler, "KeyOnlyDictionaryCompiler");
-  CREATE_COMPILER(kd::StringDictionaryCompiler, "StringDictionaryCompiler");
-  CREATE_SK_COMPILER(kd::SecondaryKeyCompletionDictionaryCompiler, "SecondaryKeyCompletionDictionaryCompiler");
-  CREATE_SK_COMPILER(kd::SecondaryKeyFloatVectorDictionaryCompiler, "SecondaryKeyFloatVectorDictionaryCompiler");
-  CREATE_SK_COMPILER(kd::SecondaryKeyIntDictionaryCompiler, "SecondaryKeyIntDictionaryCompiler");
-  CREATE_SK_COMPILER(kd::SecondaryKeyJsonDictionaryCompiler, "SecondaryKeyJsonDictionaryCompiler");
-  CREATE_SK_COMPILER(kd::SecondaryKeyKeyOnlyDictionaryCompiler, "SecondaryKeyKeyOnlyDictionaryCompiler");
-  CREATE_SK_COMPILER(kd::SecondaryKeyStringDictionaryCompiler, "SecondaryKeyStringDictionaryCompiler");
-  CREATE_MERGER(kd::CompletionDictionaryMerger, "CompletionDictionaryMerger");
-  CREATE_MERGER(kd::IntDictionaryMerger, "IntDictionaryMerger");
-  CREATE_MERGER(kd::JsonDictionaryMerger, "JsonDictionaryMerger");
-  CREATE_MERGER(kd::KeyOnlyDictionaryMerger, "KeyOnlyDictionaryMerger");
-  CREATE_MERGER(kd::StringDictionaryMerger, "StringDictionaryMerger");
+  CREATE_COMPILER(kd::StringDictionaryCompiler, "StringDictionaryCompiler",
+                  "Compiler for creating a dictionary with string values." PARAMS_COMMON);
+  CREATE_SK_COMPILER(kd::SecondaryKeyCompletionDictionaryCompiler, "SecondaryKeyCompletionDictionaryCompiler",
+                     "Compiler for creating a secondary key dictionary with weighted string values." PARAMS_COMMON);
+  CREATE_SK_COMPILER(
+      kd::SecondaryKeyFloatVectorDictionaryCompiler, "SecondaryKeyFloatVectorDictionaryCompiler",
+      "Compiler for creating a secondary key dictionary with float vector values." PARAMS_COMMON PARAMS_COMPRESSION
+      "- ``vector_size`` (int): Number of dimensions per vector (default: 10).\n");
+  CREATE_SK_COMPILER(kd::SecondaryKeyIntDictionaryCompiler, "SecondaryKeyIntDictionaryCompiler",
+                     "Compiler for creating a secondary key dictionary with integer values." PARAMS_COMMON);
+  CREATE_SK_COMPILER(
+      kd::SecondaryKeyJsonDictionaryCompiler, "SecondaryKeyJsonDictionaryCompiler",
+      "Compiler for creating a secondary key dictionary with JSON values." PARAMS_COMMON PARAMS_COMPRESSION
+      "- ``floating_point_precision`` (str): Set to ``'single'`` for 32-bit floats "
+      "(default: double precision).\n");
+  CREATE_SK_COMPILER(kd::SecondaryKeyKeyOnlyDictionaryCompiler, "SecondaryKeyKeyOnlyDictionaryCompiler",
+                     "Compiler for creating a secondary key dictionary with keys only (no values)." PARAMS_COMMON);
+  CREATE_SK_COMPILER(kd::SecondaryKeyStringDictionaryCompiler, "SecondaryKeyStringDictionaryCompiler",
+                     "Compiler for creating a secondary key dictionary with string values." PARAMS_COMMON);
+  CREATE_MERGER(kd::CompletionDictionaryMerger, "CompletionDictionaryMerger",
+                "Merger for combining multiple completion dictionaries into one." PARAMS_MERGER_COMMON);
+  CREATE_MERGER(kd::IntDictionaryMerger, "IntDictionaryMerger",
+                "Merger for combining multiple integer dictionaries into one." PARAMS_MERGER_COMMON);
+  CREATE_MERGER(kd::JsonDictionaryMerger, "JsonDictionaryMerger",
+                "Merger for combining multiple JSON dictionaries into one." PARAMS_MERGER_COMMON);
+  CREATE_MERGER(kd::KeyOnlyDictionaryMerger, "KeyOnlyDictionaryMerger",
+                "Merger for combining multiple key-only dictionaries into one." PARAMS_MERGER_COMMON);
+  CREATE_MERGER(kd::StringDictionaryMerger, "StringDictionaryMerger",
+                "Merger for combining multiple string dictionaries into one." PARAMS_MERGER_COMMON);
 
-  py::class_<kd::KeyOnlyDictionaryGenerator>(module, "KeyOnlyDictionaryGenerator")
-      .def(py::init<>())
-      .def("add", [](kd::KeyOnlyDictionaryGenerator& g, const std::string& key) { g.Add(key); })
-      .def("close_feeding", &kd::KeyOnlyDictionaryGenerator::CloseFeeding, py::call_guard<py::gil_scoped_release>())
-      .def("write_to_file", &kd::KeyOnlyDictionaryGenerator::WriteToFile, py::call_guard<py::gil_scoped_release>());
+  py::class_<kd::KeyOnlyDictionaryGenerator>(module, "KeyOnlyDictionaryGenerator",
+                                             "Generator for creating a key-only dictionary with pre-sorted keys.")
+      .def(py::init<>(), "Create a key-only dictionary generator.")
+      .def(
+          "add", [](kd::KeyOnlyDictionaryGenerator& g, const std::string& key) { g.Add(key); }, py::arg("key"),
+          "Add a key. Keys must be added in sorted order.")
+      .def("close_feeding", &kd::KeyOnlyDictionaryGenerator::CloseFeeding, py::call_guard<py::gil_scoped_release>(),
+           "Signal that no more keys will be added.")
+      .def("write_to_file", &kd::KeyOnlyDictionaryGenerator::WriteToFile, py::arg("filename"),
+           py::call_guard<py::gil_scoped_release>(), "Write the dictionary to a file.");
 
 #undef CREATE_COMPILER
+#undef PARAMS_COMMON
+#undef PARAMS_COMPRESSION
+#undef PARAMS_MERGER_COMMON
 }
