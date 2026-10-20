@@ -25,6 +25,7 @@
 #ifndef KEYVI_DICTIONARY_FSA_STATE_TRAVERSER_H_
 #define KEYVI_DICTIONARY_FSA_STATE_TRAVERSER_H_
 
+#include <cstdint>
 #include <utility>
 
 #include "keyvi/dictionary/fsa/automata.h"
@@ -47,33 +48,33 @@ class StateTraverser final {
   using label_t = unsigned char;
   using transition_t = TransitionT;
 
-  explicit StateTraverser(automata_t f)
-      : fsa_(f), current_state_(f->GetStartState()), current_weight_(0), current_label_(0), stack_() {
+  explicit StateTraverser(const automata_t& fsa)
+      : fsa_(fsa), current_state_(fsa->GetStartState()), current_weight_(0), current_label_(0), stack_() {
     TRACE("StateTraverser starting with Start state %d", current_state_);
-    f->GetOutGoingTransitions(current_state_, &stack_.GetStates(), &stack_.traversal_stack_payload, 0);
+    fsa->GetOutGoingTransitions(current_state_, &stack_.GetStates(), &stack_.traversal_stack_payload, 0);
 
     this->operator++(0);
   }
 
-  StateTraverser(automata_t f, const uint64_t start_state, traversal::TraversalPayload<TransitionT> &&payload,
+  StateTraverser(const automata_t& fsa, const uint64_t start_state, traversal::TraversalPayload<TransitionT>&& payload,
                  const bool advance = true)
-      : fsa_(f), current_weight_(0), current_label_(0), stack_(std::move(payload)) {
+      : fsa_(fsa), current_weight_(0), current_label_(0), stack_(std::move(payload)) {
     current_state_ = start_state;
 
     TRACE("StateTraverser starting with Start state %d", current_state_);
-    f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload,
-                              f->GetInnerWeight(start_state));
+    fsa->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload,
+                                fsa->GetInnerWeight(start_state));
 
     if (advance) {
       this->operator++(0);
     }
   }
 
-  StateTraverser(automata_t f, const uint64_t start_state, const bool advance = true)
-      : fsa_(f), current_state_(start_state), current_weight_(0), current_label_(0), stack_() {
+  StateTraverser(const automata_t& fsa, const uint64_t start_state, const bool advance = true)
+      : fsa_(fsa), current_state_(start_state), current_weight_(0), current_label_(0), stack_() {
     TRACE("StateTraverser starting with Start state %d", current_state_);
-    f->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload,
-                              f->GetInnerWeight(start_state));
+    fsa->GetOutGoingTransitions(start_state, &stack_.GetStates(), &stack_.traversal_stack_payload,
+                                fsa->GetInnerWeight(start_state));
 
     if (advance) {
       this->operator++(0);
@@ -81,10 +82,10 @@ class StateTraverser final {
   }
 
   StateTraverser() = delete;
-  StateTraverser &operator=(StateTraverser const &) = delete;
-  StateTraverser(const StateTraverser &that) = delete;
+  StateTraverser& operator=(StateTraverser const&) = delete;
+  StateTraverser(const StateTraverser& that) = delete;
 
-  StateTraverser(StateTraverser &&other)
+  StateTraverser(StateTraverser&& other) noexcept
       : fsa_(other.fsa_),
         current_state_(other.current_state_),
         current_weight_(other.current_weight_),
@@ -182,13 +183,15 @@ class StateTraverser final {
 
   template <class innerTraverserType>
   friend class ComparableStateTraverser;
-  const traversal::TraversalStack<TransitionT> &GetStack() const { return stack_; }
+  [[nodiscard]] const traversal::TraversalStack<TransitionT>& GetStack() const { return stack_; }
 
-  traversal::TraversalState<transition_t> &GetStates() { return stack_.GetStates(); }
+  traversal::TraversalState<transition_t>& GetStates() { return stack_.GetStates(); }
 
-  traversal::TraversalPayload<TransitionT> &GetTraversalPayload() { return stack_.traversal_stack_payload; }
+  traversal::TraversalPayload<TransitionT>& GetTraversalPayload() { return stack_.traversal_stack_payload; }
 
-  const traversal::TraversalPayload<TransitionT> &GetTraversalPayload() const { return stack_.traversal_stack_payload; }
+  [[nodiscard]] const traversal::TraversalPayload<TransitionT>& GetTraversalPayload() const {
+    return stack_.traversal_stack_payload;
+  }
 };
 
 /**

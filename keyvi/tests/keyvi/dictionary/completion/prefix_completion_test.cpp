@@ -23,6 +23,9 @@
  *      Author: hendrik
  */
 
+#include <string>
+#include <vector>
+
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
 

@@ -24,6 +24,9 @@
  */
 
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
@@ -510,7 +513,9 @@ BOOST_AUTO_TEST_CASE(basic) {
   BOOST_CHECK(!t);
 }
 
-std::vector<std::string> GetAllKeys(ZipStateTraverser<StateTraverser<>> *zip_traverser) {
+namespace {
+
+std::vector<std::string> GetAllKeys(ZipStateTraverser<StateTraverser<>>* zip_traverser) {
   std::vector<unsigned char> label_stack;
   std::vector<std::string> keys;
 
@@ -526,6 +531,8 @@ std::vector<std::string> GetAllKeys(ZipStateTraverser<StateTraverser<>> *zip_tra
 
   return keys;
 }
+
+}  // namespace
 
 BOOST_AUTO_TEST_CASE(append) {
   std::vector<std::string> test_data1 = {"aa", "bb", "cc", "dd", "ee"};

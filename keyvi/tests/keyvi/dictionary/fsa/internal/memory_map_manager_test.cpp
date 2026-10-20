@@ -24,6 +24,7 @@
  */
 
 #include <cstring>
+#include <string>
 
 #include <boost/test/unit_test.hpp>
 
