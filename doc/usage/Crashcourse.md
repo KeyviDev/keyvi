@@ -111,7 +111,7 @@ Try queries like: "Fahrradwerkstatt München", "Berlin Alexanderplatz", "San Fra
 
 #### Build your own index
 
-Try python/scripts/compile_json.py and compile your own JSON. The format should be:
+Try python/examples/lookup/compile_json.py and compile your own JSON. The format should be:
 
     key {"city": "Munich", "state": "Germany"}
 

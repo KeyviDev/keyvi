@@ -18,6 +18,9 @@
 #include "keyvi/dictionary/matching/multiword_completion_matching.h"
 
 #include <algorithm>
+#include <string>
+#include <vector>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/dictionary.h"

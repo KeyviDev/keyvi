@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_FSA_ZIP_STATE_TRAVERSER_H_
 
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
 #include <initializer_list>
 #include <map>
@@ -38,6 +39,7 @@
 
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/dictionary/fsa/comparable_state_traverser.h"
+#include "keyvi/dictionary/fsa/traversal/traversal_base.h"
 #include "keyvi/dictionary/fsa/traverser_types.h"
 
 // #define ENABLE_TRACING
@@ -66,7 +68,7 @@ class ZipStateTraverser final {
   using traverser_t = std::shared_ptr<ComparableStateTraverser<innerTraverserType>>;
 
   struct TraverserCompare {
-    bool operator()(const traverser_t &t1, const traverser_t &t2) const { return *t1 > *t2; }
+    bool operator()(const traverser_t& lhs, const traverser_t& rhs) const { return *lhs > *rhs; }
   };
 
  public:
@@ -74,10 +76,10 @@ class ZipStateTraverser final {
   using transition_t = typename innerTraverserType::transition_t;
   using heap_t =
       boost::heap::skew_heap<traverser_t, boost::heap::compare<TraverserCompare>, boost::heap::mutable_<true>>;
-  explicit ZipStateTraverser(const std::vector<automata_t> &fsas, const bool advance = true) {
+  explicit ZipStateTraverser(const std::vector<automata_t>& fsas, const bool advance = true) {
     size_t order = 0;
-    for (const automata_t &f : fsas) {
-      traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++);
+    for (const automata_t& fsa : fsas) {
+      traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(fsa, advance, order++);
       // the traverser could be exhausted after it has been advanced
       if (*traverser) {
         traverser_queue_.push(traverser);
@@ -88,8 +90,8 @@ class ZipStateTraverser final {
 
   explicit ZipStateTraverser(const std::initializer_list<automata_t> fsas, const bool advance = true) {
     size_t order = 0;
-    for (auto f : fsas) {
-      traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(f, advance, order++);
+    for (auto fsa : fsas) {
+      traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(fsa, advance, order++);
       // the traverser could be exhausted after it has been advanced
       if (*traverser) {
         traverser_queue_.push(traverser);
@@ -98,13 +100,13 @@ class ZipStateTraverser final {
     FillInValues();
   }
 
-  explicit ZipStateTraverser(const std::vector<std::pair<automata_t, uint64_t>> &fsa_start_state_pairs,
+  explicit ZipStateTraverser(const std::vector<std::pair<automata_t, uint64_t>>& fsa_start_state_pairs,
                              const bool advance = true) {
     size_t order = 0;
-    for (auto f : fsa_start_state_pairs) {
-      if (f.second > 0) {
+    for (auto pair : fsa_start_state_pairs) {
+      if (pair.second > 0) {
         traverser_t traverser =
-            std::make_shared<ComparableStateTraverser<innerTraverserType>>(f.first, f.second, advance, order++);
+            std::make_shared<ComparableStateTraverser<innerTraverserType>>(pair.first, pair.second, advance, order++);
         // the traverser could be exhausted after it has been advanced
         if (*traverser) {
           traverser_queue_.push(traverser);
@@ -114,15 +116,15 @@ class ZipStateTraverser final {
     FillInValues();
   }
 
-  explicit ZipStateTraverser(std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<transition_t>>>
-                                 &&fsa_start_state_payloads,
+  explicit ZipStateTraverser(std::vector<std::tuple<automata_t, uint64_t, traversal::TraversalPayload<transition_t>>>&&
+                                 fsa_start_state_payloads,
                              const bool advance = true) {
     size_t order = 0;
 
-    for (auto &f : fsa_start_state_payloads) {
-      if (std::get<1>(f) > 0) {
+    for (auto& entry : fsa_start_state_payloads) {
+      if (std::get<1>(entry) > 0) {
         traverser_t traverser = std::make_shared<ComparableStateTraverser<innerTraverserType>>(
-            std::get<0>(f), std::get<1>(f), std::move(std::get<2>(f)), advance, order++);
+            std::get<0>(entry), std::get<1>(entry), std::move(std::get<2>(entry)), advance, order++);
 
         // the traverser could be exhausted after it has been advanced
         if (*traverser) {
@@ -134,10 +136,10 @@ class ZipStateTraverser final {
   }
 
   ZipStateTraverser() = delete;
-  ZipStateTraverser &operator=(ZipStateTraverser const &) = delete;
-  ZipStateTraverser(const ZipStateTraverser &that) = delete;
+  ZipStateTraverser& operator=(ZipStateTraverser const&) = delete;
+  ZipStateTraverser(const ZipStateTraverser& that) = delete;
 
-  ZipStateTraverser(ZipStateTraverser &&other)
+  ZipStateTraverser(ZipStateTraverser&& other)
       : traverser_queue_(std::move(other.traverser_queue_)),
         final_(other.final_),
         depth_(other.depth_),
@@ -212,7 +214,7 @@ class ZipStateTraverser final {
 
   label_t GetStateLabel() const { return state_label_; }
 
-  const std::vector<label_t> &GetStateLabels() const { return traverser_queue_.top()->GetStateLabels(); }
+  [[nodiscard]] const std::vector<label_t>& GetStateLabels() const { return traverser_queue_.top()->GetStateLabels(); }
 
   /**
    * Set the minimum weight states must be greater or equal to.
@@ -231,7 +233,7 @@ class ZipStateTraverser final {
   uint32_t inner_weight_ = 0;
   uint64_t state_id_ = 0;
   label_t state_label_ = 0;
-  size_t order_;
+  size_t order_{};
   automata_t fsa_;
   size_t equal_states_ = 1;
   bool pruned = false;
@@ -245,17 +247,17 @@ class ZipStateTraverser final {
     pruned = false;
 
     if (!traverser_queue_.empty()) {
-      const traverser_t &t = traverser_queue_.top();
-      TRACE("take values from traverser %lu", t->GetOrder());
+      const traverser_t& top = traverser_queue_.top();
+      TRACE("take values from traverser %lu", top->GetOrder());
 
-      final_ = t->IsFinalState();
-      depth_ = t->GetDepth();
-      state_value_ = t->GetStateValue();
-      inner_weight_ = t->GetInnerWeight();
-      state_id_ = t->GetStateId();
-      state_label_ = t->GetStateLabel();
-      fsa_ = t->GetFsa();
-      order_ = t->GetOrder();
+      final_ = top->IsFinalState();
+      depth_ = top->GetDepth();
+      state_value_ = top->GetStateValue();
+      inner_weight_ = top->GetInnerWeight();
+      state_id_ = top->GetStateId();
+      state_label_ = top->GetStateLabel();
+      fsa_ = top->GetFsa();
+      order_ = top->GetOrder();
       // memorize how many inner traverser are at a equal inner state
       equal_states_ = 1;
 
@@ -265,7 +267,7 @@ class ZipStateTraverser final {
 
       TRACE("label: %c", state_label_);
 
-      while (traverser_queue_.size() > equal_states_ && *t == *(*it)) {
+      while (traverser_queue_.size() > equal_states_ && *top == *(*it)) {
         TRACE("dedup");
         equal_states_++;
         // if not final yet check if other states are final
@@ -295,7 +297,7 @@ class ZipStateTraverser final {
   template <class nearInnerTraverserType>
   friend class matching::NearMatching;
 
-  const traversal::TraversalPayload<transition_t> &GetTraversalPayload() const {
+  [[nodiscard]] const traversal::TraversalPayload<transition_t>& GetTraversalPayload() const {
     return traverser_queue_.top()->GetTraversalPayload();
   }
 };
@@ -322,7 +324,7 @@ inline void ZipStateTraverser<WeightedStateTraverser>::PreIncrement() {
     size_t steps = equal_states_;
 
     while (steps > 0) {
-      for (const transition_t &transition : (*it)->GetStates().traversal_state_payload.transitions) {
+      for (const transition_t& transition : (*it)->GetStates().traversal_state_payload.transitions) {
         if (global_weights.count(transition.label) == 0 || global_weights.at(transition.label) < transition.weight) {
           global_weights[transition.label] = transition.weight;
         }
@@ -335,7 +337,7 @@ inline void ZipStateTraverser<WeightedStateTraverser>::PreIncrement() {
     it = traverser_queue_.ordered_begin();
     steps = equal_states_;
     while (steps > 0) {
-      for (transition_t &transition : (*it)->GetStates().traversal_state_payload.transitions) {
+      for (transition_t& transition : (*it)->GetStates().traversal_state_payload.transitions) {
         transition.weight = global_weights.at(transition.label);
       }
       // re-sort transitions
@@ -353,8 +355,9 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(const std::i
   size_t order = 0;
 
   if (fsas.size() < 2) {
-    for (auto f : fsas) {
-      traverser_t traverser = std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(f, advance, order++);
+    for (const auto& fsa : fsas) {
+      traverser_t const traverser =
+          std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(fsa, advance, order++);
       // the traverser could be exhausted after it has been advanced
       if (*traverser) {
         traverser_queue_.push(traverser);
@@ -364,34 +367,35 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(const std::i
     std::map<label_t, uint32_t> global_weights;
     std::vector<traverser_t> traversers;
 
-    for (auto f : fsas) {
-      traverser_t traverser = std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(f, false, order++);
+    for (const auto& fsa : fsas) {
+      traverser_t const traverser =
+          std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(fsa, false, order++);
       traversers.push_back(traverser);
     }
 
     // 1st pass collect all weights per label
-    for (const auto &t : traversers) {
-      for (const transition_t &transition : t->GetStates().traversal_state_payload.transitions) {
+    for (const auto& trav : traversers) {
+      for (const transition_t& transition : trav->GetStates().traversal_state_payload.transitions) {
         if (global_weights.count(transition.label) == 0 || global_weights.at(transition.label) < transition.weight) {
           global_weights[transition.label] = transition.weight;
         }
       }
     }
     // 2nd pass apply global weights
-    for (const auto &t : traversers) {
-      for (transition_t &transition : t->GetStates().traversal_state_payload.transitions) {
+    for (const auto& trav : traversers) {
+      for (transition_t& transition : trav->GetStates().traversal_state_payload.transitions) {
         transition.weight = global_weights.at(transition.label);
       }
       // re-sort transitions
-      t->GetStates().PostProcess(&t->GetTraversalPayload());
+      trav->GetStates().PostProcess(&trav->GetTraversalPayload());
 
       // now advance?
       if (advance) {
-        t->operator++(0);
+        trav->operator++(0);
       }
       // the traverser could be exhausted after it has been advanced
-      if (*t) {
-        traverser_queue_.push(t);
+      if (*trav) {
+        traverser_queue_.push(trav);
       }
     }
   }
@@ -400,14 +404,15 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(const std::i
 }
 
 template <>
-inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(const std::vector<automata_t> &fsas,
+inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(const std::vector<automata_t>& fsas,
                                                                     const bool advance) {
   TRACE("construct  (weighted state specialization)");
   size_t order = 0;
 
   if (fsas.size() < 2) {
-    for (auto f : fsas) {
-      traverser_t traverser = std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(f, advance, order++);
+    for (const auto& fsa : fsas) {
+      traverser_t const traverser =
+          std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(fsa, advance, order++);
       // the traverser could be exhausted after it has been advanced
       if (*traverser) {
         traverser_queue_.push(traverser);
@@ -417,34 +422,35 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(const std::v
     std::map<label_t, uint32_t> global_weights;
     std::vector<traverser_t> traversers;
 
-    for (auto f : fsas) {
-      traverser_t traverser = std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(f, false, order++);
+    for (const auto& fsa : fsas) {
+      const traverser_t traverser =
+          std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(fsa, false, order++);
       traversers.push_back(traverser);
     }
 
     // 1st pass collect all weights per label
-    for (const auto &t : traversers) {
-      for (const transition_t &transition : t->GetStates().traversal_state_payload.transitions) {
+    for (const auto& trav : traversers) {
+      for (const transition_t& transition : trav->GetStates().traversal_state_payload.transitions) {
         if (global_weights.count(transition.label) == 0 || global_weights.at(transition.label) < transition.weight) {
           global_weights[transition.label] = transition.weight;
         }
       }
     }
     // 2nd pass apply global weights
-    for (const auto &t : traversers) {
-      for (transition_t &transition : t->GetStates().traversal_state_payload.transitions) {
+    for (const auto& trav : traversers) {
+      for (transition_t& transition : trav->GetStates().traversal_state_payload.transitions) {
         transition.weight = global_weights.at(transition.label);
       }
       // re-sort transitions
-      t->GetStates().PostProcess(&t->GetTraversalPayload());
+      trav->GetStates().PostProcess(&trav->GetTraversalPayload());
 
       // now advance?
       if (advance) {
-        t->operator++(0);
+        trav->operator++(0);
       }
       // the traverser could be exhausted after it has been advanced
-      if (*t) {
-        traverser_queue_.push(t);
+      if (*trav) {
+        traverser_queue_.push(trav);
       }
     }
   }
@@ -454,14 +460,14 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(const std::v
 
 template <>
 inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(
-    const std::vector<std::pair<automata_t, uint64_t>> &fsa_start_state_pairs, const bool advance) {
+    const std::vector<std::pair<automata_t, uint64_t>>& fsa_start_state_pairs, const bool advance) {
   size_t order = 0;
 
   if (fsa_start_state_pairs.size() < 2) {
-    for (auto f : fsa_start_state_pairs) {
-      if (f.second > 0) {
-        traverser_t traverser =
-            std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(f.first, f.second, advance, order++);
+    for (const auto& pair : fsa_start_state_pairs) {
+      if (pair.second > 0) {
+        const traverser_t traverser = std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(
+            pair.first, pair.second, advance, order++);
         // the traverser could be exhausted after it has been advanced
         if (*traverser) {
           traverser_queue_.push(traverser);
@@ -472,39 +478,39 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(
     // there is more than 1 inner traverser
     std::map<label_t, uint32_t> global_weights;
     std::vector<traverser_t> traversers;
-    for (auto f : fsa_start_state_pairs) {
-      if (f.second > 0) {
+    for (const auto& pair : fsa_start_state_pairs) {
+      if (pair.second > 0) {
         traverser_t traverser =
-            std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(f.first, f.second, false, order++);
+            std::make_shared<ComparableStateTraverser<WeightedStateTraverser>>(pair.first, pair.second, false, order++);
         traversers.push_back(traverser);
       }
     }
     // 1st pass collect all weights per label
-    for (const auto &t : traversers) {
-      for (const transition_t &transition : t->GetStates().traversal_state_payload.transitions) {
+    for (const auto& trav : traversers) {
+      for (const transition_t& transition : trav->GetStates().traversal_state_payload.transitions) {
         if (global_weights.count(transition.label) == 0 || global_weights.at(transition.label) < transition.weight) {
           global_weights[transition.label] = transition.weight;
         }
       }
     }
     // 2nd pass apply global weights
-    for (const auto &t : traversers) {
-      for (transition_t &transition : t->GetStates().traversal_state_payload.transitions) {
+    for (const auto& trav : traversers) {
+      for (transition_t& transition : trav->GetStates().traversal_state_payload.transitions) {
         transition.weight = global_weights.at(transition.label);
       }
-      TRACE("resort %ld", t->GetOrder());
+      TRACE("resort %ld", trav->GetOrder());
 
       // re-sort transitions
-      t->GetStates().PostProcess(&t->GetTraversalPayload());
+      trav->GetStates().PostProcess(&trav->GetTraversalPayload());
 
       // now advance?
       if (advance) {
-        t->operator++(0);
+        trav->operator++(0);
       }
 
       // the traverser could be exhausted after it has been advanced
-      if (*t) {
-        traverser_queue_.push(t);
+      if (*trav) {
+        traverser_queue_.push(trav);
       }
     }
   }
@@ -518,8 +524,8 @@ inline ZipStateTraverser<WeightedStateTraverser>::ZipStateTraverser(
  */
 template <>
 inline void ZipStateTraverser<WeightedStateTraverser>::SetMinWeight(uint32_t weight) {
-  for (auto t : traverser_queue_) {
-    t->SetMinWeight(weight);
+  for (const auto& trav : traverser_queue_) {
+    trav->SetMinWeight(weight);
   }
 }
 

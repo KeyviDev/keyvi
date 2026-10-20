@@ -24,6 +24,7 @@
 
 #include <exception>
 #include <string>
+#include <vector>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
