@@ -23,6 +23,9 @@
  *      Author: hendrik
  */
 
+#include <string>
+#include <vector>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/fsa/codepoint_state_traverser.h"

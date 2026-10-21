@@ -27,6 +27,8 @@
 
 #include <inttypes.h>
 #include <bitset>
+#include <cstdint>
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -58,7 +60,7 @@ class PredictiveCompression final {
     if (bigram[0] == 0 || bigram[1] == 0) {
       return "";
     } else {
-      return predictor_table_[(uint16_t(bigram[0]) << 8) + bigram[1]];
+      return predictor_table_[(static_cast<unsigned>(bigram[0]) << 8U) + bigram[1]];
     }
   }
 
@@ -210,7 +212,7 @@ class PredictiveCompression final {
       char c;
       instream.get(c);
       if (instream.eof()) break;
-      uint16_t index = (uint16_t(c) << 8) + (uint16_t)instream.get();
+      const uint16_t index = ((static_cast<unsigned>(c) & 0xFFU) << 8U) + instream.get();
       uint8_t length = instream.get();
       if (length > 8) {
         char error[100];
