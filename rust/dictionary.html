@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Dictionary &mdash; keyvi  documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=9cdaa676" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=dd5fadba" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="keyvi  documentation" href="#" />
+            <link rel="next" title="Match" href="match.html" />
+            <link rel="prev" title="Index" href="../cpp/index.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="../index.html"
+                        title="keyvi"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/logo-white.png" width="45" height="59" alt="keyvi"
+                            class="logo-img"
+                        />
+                        keyvi
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rust API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="match.html">Match</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../python/match.html">Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/completion.html">Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/vector.html">Vector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/util.html">Util</a></li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Dictionary</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            <noscript>
+                                <p>JavaScript is required to toggle light/dark mode..</p>
+                            </noscript>
+                            <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                                <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                                <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                            </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/rust/dictionary.rst" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/rust/dictionary.rst.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                            
+                        </div>
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="dictionary">
+<h1>Dictionary<a class="headerlink" href="#dictionary" title="Link to this heading">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">Dictionary</span></code> struct provides read-only access to a keyvi dictionary file.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">keyvi</span><span class="p">::</span><span class="n">dictionary</span><span class="p">::</span><span class="n">Dictionary</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">dict</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="s">"data.kv"</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dict</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"my_key"</span><span class="p">);</span>
+<span class="fm">println!</span><span class="p">(</span><span class="s">"{}"</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">get_value_as_string</span><span class="p">());</span>
+</pre></div>
+</div>
+<section id="id1">
+<h2>Dictionary<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>Read-only access to a compiled keyvi dictionary file. Thread-safe (implements <code class="docutils literal notranslate"><span class="pre">Send</span></code> and <code class="docutils literal notranslate"><span class="pre">Sync</span></code>).</p>
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::new(filename:</span> <span class="pre">&amp;str)</span> <span class="pre">-&gt;</span> <span class="pre">io::Result&lt;Dictionary&gt;</span></span></dt>
+<dd><p>Open a dictionary from the given file path.</p>
+<p>Returns an error if the file does not exist or cannot be loaded.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::with_loading_strategy(filename:</span> <span class="pre">&amp;str,</span> <span class="pre">loading_strategy:</span> <span class="pre">LoadingStrategy)</span> <span class="pre">-&gt;</span> <span class="pre">io::Result&lt;Dictionary&gt;</span></span></dt>
+<dd><p>Open a dictionary with a specific loading strategy.</p>
+<p>Available strategies (from <code class="docutils literal notranslate"><span class="pre">keyvi::LoadingStrategy</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">populate</span></code> – eagerly load the full dictionary into memory.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lazy</span></code> – load pages on demand via memory-mapped I/O.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">populate_lazy</span></code> – advise the OS to load pages but don’t block.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::get(&amp;self,</span> <span class="pre">key:</span> <span class="pre">&amp;str)</span> <span class="pre">-&gt;</span> <span class="pre">KeyviMatch</span></span></dt>
+<dd><p>Look up a key. Returns a <code class="docutils literal notranslate"><span class="pre">KeyviMatch</span></code> (call <code class="docutils literal notranslate"><span class="pre">is_empty()</span></code> to check whether the key was found).</p>
+</dd></dl>
+
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::get_all_items(&amp;self)</span> <span class="pre">-&gt;</span> <span class="pre">KeyviMatchIterator</span></span></dt>
+<dd><p>Return an iterator over all key-value pairs in the dictionary.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::get_prefix_completions(&amp;self,</span> <span class="pre">key:</span> <span class="pre">&amp;str,</span> <span class="pre">cutoff:</span> <span class="pre">usize)</span> <span class="pre">-&gt;</span> <span class="pre">KeyviMatchIterator</span></span></dt>
+<dd><p>Return completions for the given prefix, up to <code class="docutils literal notranslate"><span class="pre">cutoff</span></code> results.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::get_fuzzy(&amp;self,</span> <span class="pre">key:</span> <span class="pre">&amp;str,</span> <span class="pre">max_edit_distance:</span> <span class="pre">usize)</span> <span class="pre">-&gt;</span> <span class="pre">KeyviMatchIterator</span></span></dt>
+<dd><p>Return fuzzy matches within the given edit distance.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::get_multi_word_completions(&amp;self,</span> <span class="pre">key:</span> <span class="pre">&amp;str,</span> <span class="pre">cutoff:</span> <span class="pre">usize)</span> <span class="pre">-&gt;</span> <span class="pre">KeyviMatchIterator</span></span></dt>
+<dd><p>Return multi-word completions for the given prefix, up to <code class="docutils literal notranslate"><span class="pre">cutoff</span></code> results.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::size(&amp;self)</span> <span class="pre">-&gt;</span> <span class="pre">usize</span></span></dt>
+<dd><p>Return the number of entries in the dictionary.</p>
+</dd></dl>
+
+<dl class="describe">
+<dt class="sig sig-object">
+<span class="sig-name descname"><span class="pre">Dictionary::statistics(&amp;self)</span> <span class="pre">-&gt;</span> <span class="pre">String</span></span></dt>
+<dd><p>Return dictionary statistics as a JSON string.</p>
+</dd></dl>
+
+</section>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="../cpp/index.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Index
+    </a>
+    <a class="float-right" href="match.html" title="Next">
+        Match <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Dictionary</a><ul>
+<li><a class="reference internal" href="#id1">Dictionary</a></li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://github.com/KeyviDev/keyvi">Github</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://pypi.org/project/keyvi/">Pypi</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center text-white-50 font-italic mt-3">
+                <small>Last updated: Oct 21, 2026</small>
+                <small>
+                    Created using
+                    <a class="text-white" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Sphinx Wagtail Theme 
+                    </a>
+                    and
+                    <a class="text-white" href="https://www.sphinx-doc.org/" rel="nofollow" target="_blank">
+                        Sphinx 9.1.1
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>
