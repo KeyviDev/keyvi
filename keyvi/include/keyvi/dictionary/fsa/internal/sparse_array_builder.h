@@ -25,6 +25,8 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_SPARSE_ARRAY_BUILDER_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_SPARSE_ARRAY_BUILDER_H_
 
+#include <iostream>  // NOLINT(misc-include-cleaner)
+
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/lru_generation_cache.h"
 #include "keyvi/dictionary/fsa/internal/minimization_hash.h"

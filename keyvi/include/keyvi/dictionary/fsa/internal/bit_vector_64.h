@@ -27,7 +27,10 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <cstdint>
 #include <limits>
+#include <utility>
 
 namespace keyvi {
 namespace dictionary {
@@ -63,7 +66,7 @@ struct BitVector final {
    * Sets a bit in the bitvector.
    * @param bit the bit to set.
    */
-  inline void Set(const size_t bit) { bits_[bit >> 6] |= (uint64_t)1 << (bit & 63); }
+  void Set(const size_t bit) { bits_[bit >> 6U] |= static_cast<uint64_t>(1) << (bit & 63U); }
 
   /**
    * Sets all bits of the given bitvector
@@ -81,7 +84,7 @@ struct BitVector final {
         bits_[byte_position + i] |= other.bits_[i];
       }
     } else {
-      bits_[byte_position] |= ((uint64_t)other.bits_[0] << bit_position);
+      bits_[byte_position] |= (static_cast<uint64_t>(other.bits_[0]) << bit_position);
       for (size_t i = 1; i < write_length; ++i) {
         bits_[byte_position + i] |= ((other.bits_[i] << bit_position) | (other.bits_[i - 1] >> (64 - bit_position)));
       }
@@ -112,14 +115,16 @@ struct BitVector final {
    * Erase a bit, set it to 0.
    * @param bit the bit to erase.
    */
-  inline void Erase(const size_t bit) { bits_[bit >> 6] &= (uint64_t)(~(1 << (bit & 63))); }
+  void Erase(const size_t bit) { bits_[bit >> 6U] &= static_cast<uint64_t>(~(1ULL << (bit & 63U))); }
 
   /** Gets the state of the given bit
    *
    * @param bit the bit
    * @return True if set, false otherwise.
    */
-  inline bool Get(const size_t bit) const { return (bits_[bit >> 6] & ((uint64_t)1 << (bit & 63))) != 0; }
+  [[nodiscard]] bool Get(const size_t bit) const {
+    return (bits_[bit >> 6U] & (static_cast<uint64_t>(1) << (bit & 63U))) != 0;
+  }
 
   /**
    * Get the next non set bit in the bitvector starting from the given position.

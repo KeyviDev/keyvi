@@ -26,6 +26,7 @@
 #define KEYVI_DICTIONARY_FSA_INTERNAL_PACKED_STATE_H_
 
 #include <algorithm>
+#include <cstdint>
 #include <string>
 
 namespace keyvi {
@@ -51,16 +52,18 @@ struct PackedState final {
  public:
   PackedState() : PackedState(0, 0, 0) {}
   PackedState(OffsetTypeT offset, HashCodeTypeT hashcode, int num_outgoing)
-      : offset_(offset), hashcode_(hashcode), num_outgoing_and_cookie_((uint32_t)(num_outgoing & 0x1FF)) {}
+      : offset_(offset), hashcode_(hashcode), num_outgoing_and_cookie_(static_cast<uint32_t>(num_outgoing) & 0x1FFU) {}
 
   HashCodeTypeT GetHashcode() const { return hashcode_; }
 
-  int GetNumberOfOutgoingTransitions() const { return static_cast<int>(this->num_outgoing_and_cookie_ & 0x1FF); }
+  [[nodiscard]] int GetNumberOfOutgoingTransitions() const {
+    return static_cast<int>(this->num_outgoing_and_cookie_ & 0x1FFU);
+  }
 
-  int GetCookie() const { return static_cast<int>((this->num_outgoing_and_cookie_ & 0xFFFFFE00) >> 9); }
+  [[nodiscard]] int GetCookie() const { return static_cast<int>((this->num_outgoing_and_cookie_ & 0xFFFFFE00U) >> 9U); }
 
   void SetCookie(int value) {
-    this->num_outgoing_and_cookie_ = (this->num_outgoing_and_cookie_ & 0x1FF) | (uint32_t)(value << 9);
+    this->num_outgoing_and_cookie_ = (this->num_outgoing_and_cookie_ & 0x1FFU) | (static_cast<uint32_t>(value) << 9U);
   }
 
   OffsetTypeT GetOffset() const { return offset_; }
