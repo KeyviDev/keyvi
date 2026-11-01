@@ -297,8 +297,8 @@ if(KEYVI_DOCS)
         set(DOXYGEN_GENERATE_XML YES)
         set(DOXYGEN_INLINE_INHERITED_MEMB YES)
 
-        # for scanning the python extension
-        set(SPHINX_EXTENSIONS sphinx.ext.autodoc)
+        # autodoc for scanning the python extension, myst_parser for markdown pages
+        set(SPHINX_EXTENSIONS sphinx.ext.autodoc myst_parser)
         set(SPHINX_CONF_IMPORT sphinx-docs/conf_extra.py)
 
         doxygen_add_docs(doxygen_keyvi ${KEYVI_PUBLIC_HEADERS})
