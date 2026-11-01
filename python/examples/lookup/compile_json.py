@@ -65,7 +65,7 @@ def compile_file(input_path, output, jobs, shards):
 
                     shard = JumpConsistentHashString(key, shards)
                     compilers[shard].add(key, value)
-                except Exception:
+                except Exception:  # noqa: BLE001
                     print("failed to add: " + line)
         print("Skipped keys " + str(skipped_keys))
 

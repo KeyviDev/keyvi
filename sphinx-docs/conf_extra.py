@@ -14,11 +14,8 @@ html_theme_options = {
     "logo": "logo-white.png",
     "logo_alt": "keyvi",
     "github_url": "https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/",
-    "footer_links": ",".join(
-        [
-            "Github|https://github.com/KeyviDev/keyvi",
-            "Pypi|https://pypi.org/project/keyvi/",
-        ]
+    "footer_links": (
+        "Github|https://github.com/KeyviDev/keyvi,Pypi|https://pypi.org/project/keyvi/"
     ),
 }
 

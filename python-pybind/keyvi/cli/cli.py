@@ -73,7 +73,7 @@ def compile_dict(args):
                     compiler.add(splits[0], int(splits[1]))
                 else:
                     compiler.add(splits[0], splits[1])
-            except Exception:
+            except Exception:  # noqa: BLE001
                 sys.stderr.write(f"Can not parse line: {line}\n")
 
     compiler.compile()
