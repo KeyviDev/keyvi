@@ -14,6 +14,46 @@ already have a network stack in your application. A out of the box network enabl
 
 The core of keyvi is written in C++, binding are available for Rust and Python.
 
+Install the python version with::
+
+   pip install keyvi
+
+Talks and presentations:
+
+* `BBuzz2016 talk <https://www.youtube.com/watch?v=GBjisdmHe4g>`_
+  (`slides <https://cdn.jsdelivr.net/gh/KeyviDev/keyvi/doc/presentations/bbuzz2016/keyvi-presentation.svg#1_0>`__)
+* `Search Meetup Munich Jan 2016 <http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz>`_
+* `Progscon 2017 talk <https://www.infoq.com/presentations/keyvi>`_
+* `Search Meetup Munich Apr 2018
+  <https://cdn.jsdelivr.net/gh/KeyviDev/keyvi/doc/presentations/searchmuc_apr_2018/keyvi-presentation-search-meetup-2018.svg#1_0>`_
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Usage
+
+   usage/crashcourse
+   usage/building-dictionaries
+   usage/building-dictionaries-python
+   usage/index-python
+   usage/emr
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Internals
+
+   internals/construction-basics
+   internals/persistence-basics
+   internals/minimization
+   internals/scaling
+   internals/extensibility
+
+If you like to go deep down in the basics, keyvi is inspired by the following 2 papers:
+
+* Sparse Array (See Storing a Sparse Table, Robert E. Tarjan et al.
+  http://infolab.stanford.edu/pub/cstr/reports/cs/tr/78/683/CS-TR-78-683.pdf)
+* Incremental, which means minimization is done on the fly (See Incremental Construction of Minimal Acyclic
+  Finite-State Automata, J. Daciuk et al.: http://www.mitpressjournals.org/doi/pdf/10.1162/089120100561601)
+
 
 API Documentation
 =================

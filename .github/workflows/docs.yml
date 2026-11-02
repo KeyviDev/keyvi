@@ -56,7 +56,7 @@ jobs:
       - name: Install python dependencies
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          python -m pip install sphinx breathe sphinx-wagtail-theme
+          python -m pip install sphinx breathe sphinx-wagtail-theme myst-parser
           python -m pip install . -v
 
       - name: configure with cmake

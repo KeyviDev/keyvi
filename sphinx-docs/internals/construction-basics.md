@@ -1,3 +1,5 @@
+# Construction basics
+
 ## Introduction
 
 “An automaton (plural: automata) is a self-operating machine. The word is sometimes used to describe a robot, more
@@ -8,11 +10,11 @@ specifically an autonomous robot. Used colloquially, it refers to a mindless fol
 deterministic, acyclic, finite-state automata
 compact size, fast linear lookup
 
-![Trie](/doc/images/trie.png)
+![Trie](../images/trie.png)
 
 Minimizing yields the FSA:
 
-![FSA](/doc/images/fsa.png)
+![FSA](../images/fsa.png)
 
 ## Construction
 
@@ -44,7 +46,7 @@ real control flows.
         else:
             Register.add(Child)
 
-![Construction example Daciuk/Watson](/doc/images/daciuk_watson.png)
+![Construction example Daciuk/Watson](../images/daciuk_watson.png)
 
 ### Incremental Construction in Keyvi
 
@@ -74,9 +76,9 @@ real control flows.
             unpacked_state_stack.connect ( highest_stack, state )‏
 
 Code:
- General entry point: [generator](/keyvi/src/cpp/dictionary/fsa/generator.h)
 
- Unpacked_State_Stack: [unpacked_state_stack](/keyvi/src/cpp/dictionary/fsa/internal/unpacked_state_stack.h)
+- General entry point: [generator](https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/generator.h)
+- Unpacked_State_Stack: [unpacked_state_stack](https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/unpacked_state_stack.h)
 
 #### Illustration
 
@@ -87,53 +89,53 @@ Building a tiny automata containing just 4 strings:
     abcde
     abe
 
-## Step1
+##### Step 1
 
 
-![Step1](/doc/images/construction_step1.png)
+![Step1](../images/construction_step1.png)
 
 
-## Step2
+##### Step 2
 
 
-![Step2](/doc/images/construction_step2.png)
+![Step2](../images/construction_step2.png)
 
 
-## Step3
+##### Step 3
 
 
-![Step3](/doc/images/construction_step3.png)
+![Step3](../images/construction_step3.png)
 
 
-## Step4
+##### Step 4
 
 
-![Step4](/doc/images/construction_step4.png)
+![Step4](../images/construction_step4.png)
 
 
-##Step5
+##### Step 5
 
 
-![Step5](/doc/images/construction_step5.png)
+![Step5](../images/construction_step5.png)
 
 
-## Step6
+##### Step 6
 
 
-![Step6](/doc/images/construction_step6.png)
+![Step6](../images/construction_step6.png)
 
 
-## Step7
+##### Step 7
 
 
-![Step7](/doc/images/construction_step7.png)
+![Step7](../images/construction_step7.png)
 
 
 #### Summary
 
 The FSA is built from "right to left", the root state is written last.
 
-#### Comparison:Daciuk/Watson vs. keyvi
+#### Comparison: Daciuk/Watson vs. keyvi
 
  - use sorted data characteristic: compare only the last two words
  - no temporary state creation as with replace_or_register, which can be problematic depended on underlying data structure (e.g. Sparse Array)‏

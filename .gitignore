@@ -54,3 +54,6 @@ cmake-build-debug/
 python*/*build*
 python*/dist
 python*/.cache/
+
+# python bytecode, e.g. from importing sphinx-docs/conf_extra.py during the docs build
+__pycache__/
