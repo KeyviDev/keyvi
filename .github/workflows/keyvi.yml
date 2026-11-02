@@ -69,7 +69,8 @@ jobs:
       - name: build with cmake
         run: |
           echo "::add-matcher::.github/problem-matchers/gcc.json"
-          cmake --build build --parallel
+          # limit jobs: a bare --parallel means unlimited `make -j`, which exhausts runner memory
+          cmake --build build --parallel $(getconf _NPROCESSORS_ONLN)
           echo "::remove-matcher owner=gcc-clang::"
 
       - name: Unit tests

@@ -66,7 +66,8 @@ jobs:
           -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: build with cmake
-        run: cmake --build build --parallel
+        # limit jobs: a bare --parallel means unlimited `make -j`, which exhausts runner memory
+        run: cmake --build build --parallel $(nproc)
 
       - name: C++ unit tests
         run: build/unit_test_all -l unit_scope
