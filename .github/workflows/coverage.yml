@@ -35,7 +35,7 @@ env:
 jobs:
   coverage:
     runs-on: ubuntu-24.04
-    name: C++ coverage
+    name: coverage
     steps:
       - name: install deps
         run: |
