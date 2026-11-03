@@ -1,0 +1,130 @@
+# Code coverage for keyvi core (C++), combining C++ unit tests and python (pybind11) tests
+
+name: Coverage
+
+on:
+  push:
+    branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/python-dockerimages-**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'rust/**'
+
+  pull_request:
+    branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/python-dockerimages-**.yml'
+      - '.github/workflows/rust**.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'rust/**'
+
+  workflow_dispatch:
+
+env:
+  GCOVR_OPTS: >-
+    --root ${{ github.workspace }}
+    --filter keyvi/include/
+    --exclude-throw-branches --exclude-unreachable-branches
+    --gcov-ignore-parse-errors=negative_hits.warn_once_per_file
+
+jobs:
+  coverage:
+    runs-on: ubuntu-24.04
+    name: coverage
+    steps:
+      - name: install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+          pipx install gcovr
+
+      - name: checkout from git
+        uses: actions/checkout@v7
+
+      - name: set up python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: ccache
+        uses: hendrikmuhs/ccache-action@v1.2.24
+        with:
+          key: coverage
+
+      # C++ unit tests
+      - name: configure with cmake
+        run: >
+          cmake -S . -B build
+          -D CMAKE_BUILD_TYPE=Coverage
+          -D KEYVI_DOCS=OFF
+          -D CMAKE_C_COMPILER_LAUNCHER=ccache
+          -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: build with cmake
+        # limit jobs: a bare --parallel means unlimited `make -j`, which exhausts runner memory
+        run: cmake --build build --parallel $(nproc)
+
+      - name: C++ unit tests
+        run: build/unit_test_all -l unit_scope
+
+      - name: C++ coverage tracefile
+        run: |
+          mkdir -p coverage
+          gcovr $GCOVR_OPTS build --json coverage/cpp.json
+
+      # python (pybind11) tests, build dir is kept so gcov can find the .gcno/.gcda files
+      - name: build python package with coverage
+        # --no-build-isolation: gcov needs the pybind11 headers at their build-time path, an isolated
+        # build env is deleted after the build. -fprofile-exclude-files avoids instrumenting pybind11,
+        # but always-inline pybind11 code (e.g. class_::def) still ends up in our functions, the rest
+        # is removed by --filter. Build deps are installed from [build-system] requires in pyproject.toml.
+        env:
+          CMAKE_BUILD_PARALLEL_LEVEL: 4
+        run: >
+          python -m pip install --upgrade pip &&
+          python -c 'import tomllib; print("\n".join(tomllib.load(open("pyproject.toml", "rb"))["build-system"]["requires"]))'
+          | xargs python -m pip install &&
+          python -m pip install . --group test --no-build-isolation
+          -C cmake.build-type=Coverage
+          -C build-dir=build-python
+          -C cmake.define.CMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF
+          -C "cmake.define.CMAKE_CXX_FLAGS=-fprofile-exclude-files=.*/pybind11/.*"
+          -C cmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: python tests
+        working-directory: ${{ runner.temp }}
+        env:
+          KEYVI_SKIP_TEST_DEPRECATIONS: 1
+        run: python -m pytest -p no:cacheprovider ${{ github.workspace }}/python/tests
+
+      - name: python coverage tracefile
+        run: gcovr $GCOVR_OPTS build-python --json coverage/python.json
+
+      # combine
+      - name: generate combined coverage report
+        run: |
+          # --merge-lines: count a line once, not once per template instantiation
+          gcovr --add-tracefile coverage/cpp.json --add-tracefile coverage/python.json \
+            --merge-lines \
+            --print-summary \
+            --xml coverage/coverage.xml \
+            --html-details coverage/index.html \
+            --markdown-summary "$GITHUB_STEP_SUMMARY"
+
+      - name: upload coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+
+      - name: upload to codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage/coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
