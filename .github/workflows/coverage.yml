@@ -126,5 +126,9 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           files: coverage/coverage.xml
+          # upload only the gcovr report: by default the uploader also searches for reports and runs
+          # its own gcov over all .gcno files, which pulls in tests, binaries and 3rdparty code
+          disable_search: true
+          plugins: noop
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
