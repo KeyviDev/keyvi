@@ -79,6 +79,8 @@ jobs:
 
       # python (pybind11) tests, build dir is kept so gcov can find the .gcno/.gcda files
       - name: build python package with coverage
+        # -fprofile-exclude-files: don't instrument pybind11, its headers live in pip's temporary
+        # isolated build env and are gone when gcov runs (and we don't want to measure them anyway)
         env:
           CMAKE_BUILD_PARALLEL_LEVEL: 4
         run: >
@@ -87,6 +89,7 @@ jobs:
           -C cmake.build-type=Coverage
           -C build-dir=build-python
           -C cmake.define.CMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF
+          -C "cmake.define.CMAKE_CXX_FLAGS=-fprofile-exclude-files=.*/pybind11/.*"
           -C cmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: python tests
