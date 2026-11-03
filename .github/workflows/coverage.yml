@@ -28,7 +28,7 @@ on:
 env:
   GCOVR_OPTS: >-
     --root ${{ github.workspace }}
-    --filter keyvi/include/ --filter python-pybind/src/
+    --filter keyvi/include/
     --exclude-throw-branches --exclude-unreachable-branches
     --gcov-ignore-parse-errors=negative_hits.warn_once_per_file
 
@@ -79,13 +79,17 @@ jobs:
 
       # python (pybind11) tests, build dir is kept so gcov can find the .gcno/.gcda files
       - name: build python package with coverage
-        # -fprofile-exclude-files: don't instrument pybind11, its headers live in pip's temporary
-        # isolated build env and are gone when gcov runs (and we don't want to measure them anyway)
+        # --no-build-isolation: gcov needs the pybind11 headers at their build-time path, an isolated
+        # build env is deleted after the build. -fprofile-exclude-files avoids instrumenting pybind11,
+        # but always-inline pybind11 code (e.g. class_::def) still ends up in our functions, the rest
+        # is removed by --filter. Build deps are installed from [build-system] requires in pyproject.toml.
         env:
           CMAKE_BUILD_PARALLEL_LEVEL: 4
         run: >
           python -m pip install --upgrade pip &&
-          python -m pip install . --group test
+          python -c 'import tomllib; print("\n".join(tomllib.load(open("pyproject.toml", "rb"))["build-system"]["requires"]))'
+          | xargs python -m pip install &&
+          python -m pip install . --group test --no-build-isolation
           -C cmake.build-type=Coverage
           -C build-dir=build-python
           -C cmake.define.CMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF
