@@ -29,11 +29,15 @@ use std::ops::Deref;
 
 use bindings::*;
 
+/// Owned wrapper around a C string returned by keyvi.
+///
+/// Automatically frees the underlying C string on drop. Dereferences to `&str`.
 pub struct KeyviString {
     str_: *mut ::std::os::raw::c_char,
 }
 
 impl KeyviString {
+    /// Create a new `KeyviString` from a raw C string pointer (internal use).
     pub fn new(str: *mut ::std::os::raw::c_char) -> KeyviString {
         KeyviString { str_: str }
     }

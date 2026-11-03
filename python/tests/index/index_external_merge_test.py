@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
 # Usage: py.test tests
+from __future__ import annotations
 
-from keyvi.index import Index, ReadOnlyIndex
 import os
 import tempfile
 import time
+
+from keyvi.index import Index, ReadOnlyIndex
 
 
 def test_external_merge():
@@ -15,8 +16,8 @@ def test_external_merge():
         for batch in range(10):
             key_values = []
             for i in range(50):
-                key = "key-{:05d}".format(batch * 50 + i)
-                value = "value-{}".format(batch * 50 + i)
+                key = f"key-{batch * 50 + i:05d}"
+                value = f"value-{batch * 50 + i}"
                 key_values.append((key, value))
             index.bulk_set(key_values)
             index.flush()
@@ -26,10 +27,10 @@ def test_external_merge():
 
         # verify all keys are still accessible
         for i in range(500):
-            key = "key-{:05d}".format(i)
-            assert key in index, "missing key: {}".format(key)
+            key = f"key-{i:05d}"
+            assert key in index, f"missing key: {key}"
             match = index[key]
-            assert match.value == "value-{}".format(i)
+            assert match.value == f"value-{i}"
 
 
 def test_external_merge_with_deletes():
@@ -40,28 +41,28 @@ def test_external_merge_with_deletes():
         for batch in range(10):
             key_values = []
             for i in range(50):
-                key = "key-{:05d}".format(batch * 50 + i)
-                value = "value-{}".format(batch * 50 + i)
+                key = f"key-{batch * 50 + i:05d}"
+                value = f"value-{batch * 50 + i}"
                 key_values.append((key, value))
             index.bulk_set(key_values)
             index.flush()
 
         # delete every other key
         for i in range(0, 500, 2):
-            index.delete("key-{:05d}".format(i))
+            index.delete(f"key-{i:05d}")
         index.flush()
 
         # wait for external merge to complete
         time.sleep(5)
 
         for i in range(500):
-            key = "key-{:05d}".format(i)
+            key = f"key-{i:05d}"
             if i % 2 == 0:
-                assert key not in index, "key should be deleted: {}".format(key)
+                assert key not in index, f"key should be deleted: {key}"
             else:
-                assert key in index, "missing key: {}".format(key)
+                assert key in index, f"missing key: {key}"
                 match = index[key]
-                assert match.value == "value-{}".format(i)
+                assert match.value == f"value-{i}"
 
 
 def test_external_merge_with_overwrite():
@@ -73,8 +74,8 @@ def test_external_merge_with_overwrite():
         for batch in range(5):
             key_values = []
             for i in range(50):
-                key = "key-{:05d}".format(batch * 50 + i)
-                value = "value-v1-{}".format(batch * 50 + i)
+                key = f"key-{batch * 50 + i:05d}"
+                value = f"value-v1-{batch * 50 + i}"
                 key_values.append((key, value))
             index.bulk_set(key_values)
             index.flush()
@@ -83,8 +84,8 @@ def test_external_merge_with_overwrite():
         for batch in range(5):
             key_values = []
             for i in range(50):
-                key = "key-{:05d}".format(batch * 50 + i)
-                value = "value-v2-{}".format(batch * 50 + i)
+                key = f"key-{batch * 50 + i:05d}"
+                value = f"value-v2-{batch * 50 + i}"
                 key_values.append((key, value))
             index.bulk_set(key_values)
             index.flush()
@@ -94,11 +95,11 @@ def test_external_merge_with_overwrite():
 
         # verify that the latest values are returned
         for i in range(250):
-            key = "key-{:05d}".format(i)
-            assert key in index, "missing key: {}".format(key)
+            key = f"key-{i:05d}"
+            assert key in index, f"missing key: {key}"
             match = index[key]
-            assert match.value == "value-v2-{}".format(i), (
-                "expected v2 value for {}, got {}".format(key, match.value)
+            assert match.value == f"value-v2-{i}", (
+                f"expected v2 value for {key}, got {match.value}"
             )
 
 
@@ -110,8 +111,8 @@ def test_external_merge_read_only_index():
         for batch in range(10):
             key_values = []
             for i in range(50):
-                key = "key-{:05d}".format(batch * 50 + i)
-                value = "value-{}".format(batch * 50 + i)
+                key = f"key-{batch * 50 + i:05d}"
+                value = f"value-{batch * 50 + i}"
                 key_values.append((key, value))
             index.bulk_set(key_values)
             index.flush()
@@ -122,5 +123,5 @@ def test_external_merge_read_only_index():
         # open a read-only index and verify all data
         reader = ReadOnlyIndex(index_dir)
         for i in range(500):
-            key = "key-{:05d}".format(i)
-            assert key in reader, "missing key in reader: {}".format(key)
+            key = f"key-{i:05d}"
+            assert key in reader, f"missing key in reader: {key}"

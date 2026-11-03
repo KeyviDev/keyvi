@@ -1,21 +1,22 @@
-from keyvi.dictionary import Dictionary
-from keyvi.completion import MultiWordCompletion
+from __future__ import annotations
 
-MULTIWORD_QUERY_SEPARATOR = '\x1b'
+from keyvi.completion import MultiWordCompletion
+from keyvi.dictionary import Dictionary
+
+MULTIWORD_QUERY_SEPARATOR = "\x1b"
 
 query = ""
 
-d=Dictionary("mw-completion.kv")
-c=MultiWordCompletion(d)
+d = Dictionary("mw-completion.kv")
+c = MultiWordCompletion(d)
+
 
 def get_lookup_key(query):
-    l = query.split(" ")
-    l_bow = " ".join(sorted(l[:-1]) + l[-1:])
-
-    return l_bow
+    tokens = query.split(" ")
+    return " ".join(sorted(tokens[:-1]) + tokens[-1:])
 
 
-while query!="exit":
+while query != "exit":
     query = str(input("Query:"))
-    for m in c.GetCompletions(get_lookup_key(query.strip())):
-        print("{} {}".format(m.GetMatchedString(), m.GetAttribute("weight")))
+    for m in c.complete(get_lookup_key(query.strip())):
+        print("{} {}".format(m.matched_string, m["weight"]))

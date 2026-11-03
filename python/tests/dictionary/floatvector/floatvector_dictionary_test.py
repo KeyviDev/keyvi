@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
 # Usage: py.test tests
-import sys
+from __future__ import annotations
+
 import os
+import sys
 
 from keyvi.compiler import FloatVectorDictionaryCompiler
 
@@ -12,12 +13,11 @@ from test_tools import tmp_dictionary
 
 
 def test_simple():
-    c = FloatVectorDictionaryCompiler({"memory_limit_mb":"10", "vector_size": "8"})
+    c = FloatVectorDictionaryCompiler({"memory_limit_mb": "10", "vector_size": "8"})
     c.add("abc", [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8])
     c.add("abd", [1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8])
 
-    with tmp_dictionary(c, 'simple_float_vector.kv') as d:
+    with tmp_dictionary(c, "simple_float_vector.kv") as d:
         assert len(d) == 2
-        assert d["abc"].value_as_string() == '0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8'
-        assert d["abd"].value_as_string() == '1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8'
-
+        assert d["abc"].value_as_string() == "0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8"
+        assert d["abd"].value_as_string() == "1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8"

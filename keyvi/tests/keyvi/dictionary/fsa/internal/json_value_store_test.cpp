@@ -24,6 +24,8 @@
 
 #include "keyvi/dictionary/fsa/internal/json_value_store.h"
 
+#include <string>
+
 #include <boost/filesystem.hpp>
 #include <boost/interprocess/file_mapping.hpp>
 #include <boost/test/unit_test.hpp>

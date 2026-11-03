@@ -68,7 +68,7 @@ struct BitVector final {
    * Sets a bit in the bitvector.
    * @param bit the bit to set.
    */
-  inline void Set(const size_t bit) { bits_[bit >> 5] |= (uint32_t)1 << (bit & 31); }
+  inline void Set(const size_t bit) { bits_[bit >> 5] |= static_cast<uint32_t>(1) << (bit & 31); }
 
   /**
    * Sets all bits of the given bitvector
@@ -86,7 +86,7 @@ struct BitVector final {
         bits_[byte_position + i] |= other.bits_[i];
       }
     } else {
-      bits_[byte_position] |= ((uint32_t)other.bits_[0] << bit_position);
+      bits_[byte_position] |= (static_cast<uint32_t>(other.bits_[0]) << bit_position);
       for (size_t i = 1; i < write_length; i++) {
         bits_[byte_position + i] |= ((other.bits_[i] << bit_position) | (other.bits_[i - 1] >> (32 - bit_position)));
       }
@@ -117,7 +117,7 @@ struct BitVector final {
    * Erase a bit, set it to 0.
    * @param bit the bit to erase.
    */
-  inline void Erase(const size_t bit) { bits_[bit >> 5] &= (uint32_t)(~(1 << (bit & 31))); }
+  inline void Erase(const size_t bit) { bits_[bit >> 5] &= static_cast<uint32_t>(~(1 << (bit & 31))); }
 
   /** Gets the state of the given bit
    *

@@ -223,7 +223,7 @@ BOOST_AUTO_TEST_CASE(fuzzyMatchingExactPrefix) {
   index.AddSegment(&test_data);
   std::vector<std::pair<std::string, std::string>> test_data_2 = {{"apple", "{c:6}"}, {"cde", "{x:1}"}};
   index.AddSegment(&test_data_2);
-  ReadOnlyIndex reader_1(index.GetIndexFolder(), {{"refresh_interval", "400"}});
+  ReadOnlyIndex reader_1(index.GetIndexFolder(), {{"refresh_interval", "60000"}});
 
   testFuzzyMatching(&reader_1, "app", 0, 1, {}, {});
   testFuzzyMatching(&reader_1, "ap", 1, 1, {"a"}, {"\"{a:1}\""});

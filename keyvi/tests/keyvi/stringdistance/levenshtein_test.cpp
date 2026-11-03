@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 #include <cstdint>
+#include <string>
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 

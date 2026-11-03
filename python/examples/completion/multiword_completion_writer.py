@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 Query permutator to match multiword queries.
 
@@ -18,8 +16,11 @@ We do not require "messenger facebook deu" (1 0 3) due to the BOW reordering at 
 
 """
 
+from __future__ import annotations
+
 import sys
 from functools import reduce
+
 from keyvi.compiler import CompletionDictionaryCompiler
 
 # permutation lookup table, number_of_tokens - > permutations_to_build
@@ -78,7 +79,8 @@ PERMUTATION_LOOKUP_TABLE = {
     ],
 }
 
-MULTIWORD_QUERY_SEPARATOR = '\x1b'
+MULTIWORD_QUERY_SEPARATOR = "\x1b"
+
 
 class MultiWordPermutation:
     def __init__(self):
@@ -95,21 +97,27 @@ class MultiWordPermutation:
         for permutation in PERMUTATION_LOOKUP_TABLE[len(query_tokens_bow)]:
             if len(permutation) < 3:
                 first_token = query_tokens_bow[permutation[0]]
-                if first_token != query_tokens[permutation[0]] and len(first_token) == 1:
+                if (
+                    first_token != query_tokens[permutation[0]]
+                    and len(first_token) == 1
+                ):
                     continue
-            yield " ".join([query_tokens_bow[i] for i in permutation]) + MULTIWORD_QUERY_SEPARATOR + query
+            yield (
+                " ".join([query_tokens_bow[i] for i in permutation])
+                + MULTIWORD_QUERY_SEPARATOR
+                + query
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pipeline = []
     pipeline.append(MultiWordPermutation())
     c = CompletionDictionaryCompiler()
-
 
     for line in sys.stdin:
         key, weight = line.split("\t")
 
         for q in reduce(lambda x, y: y(x), pipeline, key):
-            c.Add(q, int(weight))
-    c.Compile()
-    c.WriteToFile("mw-completion.kv")
+            c.add(q, int(weight))
+    c.compile()
+    c.write_to_file("mw-completion.kv")

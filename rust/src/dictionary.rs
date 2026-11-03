@@ -32,6 +32,19 @@ use keyvi_match::KeyviMatch;
 use keyvi_match_iterator::KeyviMatchIterator;
 use keyvi_string::KeyviString;
 
+/// Read-only access to a compiled keyvi dictionary file.
+///
+/// A `Dictionary` is thread-safe and can be shared across threads.
+///
+/// # Example
+///
+/// ```no_run
+/// use keyvi::dictionary::Dictionary;
+///
+/// let dict = Dictionary::new("data.kv").unwrap();
+/// let m = dict.get("my_key");
+/// println!("{}", m.get_value_as_string());
+/// ```
 pub struct Dictionary {
     dict: *mut root::keyvi_dictionary,
 }
@@ -41,6 +54,9 @@ unsafe impl Send for Dictionary {}
 unsafe impl Sync for Dictionary {}
 
 impl Dictionary {
+    /// Open a dictionary from the given file path.
+    ///
+    /// Returns an error if the file does not exist or cannot be loaded.
     pub fn new(filename: &str) -> io::Result<Dictionary> {
         let fn_c = CString::new(filename)?;
         let ptr = unsafe { root::keyvi_create_dictionary(fn_c.as_ptr()) };
@@ -54,6 +70,12 @@ impl Dictionary {
         }
     }
 
+    /// Open a dictionary with a specific loading strategy.
+    ///
+    /// Available strategies (from [`LoadingStrategy`](crate::LoadingStrategy)):
+    /// - `populate` — eagerly load the full dictionary into memory.
+    /// - `lazy` — load pages on demand via memory-mapped I/O.
+    /// - `populate_lazy` — advise the OS to load pages but don't block.
     pub fn with_loading_strategy(
         filename: &str,
         loading_strategy: root::keyvi::dictionary::LoadingStrategy,
@@ -72,16 +94,20 @@ impl Dictionary {
         }
     }
 
+    /// Return dictionary statistics as a JSON string.
     pub fn statistics(&self) -> String {
         let c_buf: *mut ::std::os::raw::c_char =
             unsafe { root::keyvi_dictionary_get_statistics(self.dict) };
         KeyviString::new(c_buf).to_owned()
     }
 
+    /// Return the number of entries in the dictionary.
     pub fn size(&self) -> usize {
         unsafe { root::keyvi_dictionary_get_size(self.dict) }
     }
 
+    /// Look up a key. Returns a [`KeyviMatch`] (call [`KeyviMatch::is_empty`] to
+    /// check whether the key was found).
     pub fn get(&self, key: &str) -> KeyviMatch {
         let match_ptr = unsafe {
             root::keyvi_dictionary_get(
@@ -93,11 +119,13 @@ impl Dictionary {
         KeyviMatch::new(match_ptr)
     }
 
+    /// Return an iterator over all key-value pairs in the dictionary.
     pub fn get_all_items(&self) -> KeyviMatchIterator {
         let ptr = unsafe { root::keyvi_dictionary_get_all_items(self.dict) };
         KeyviMatchIterator::new(ptr)
     }
 
+    /// Return completions for the given prefix, up to `cutoff` results.
     pub fn get_prefix_completions(&self, key: &str, cutoff: usize) -> KeyviMatchIterator {
         let ptr = unsafe {
             root::keyvi_dictionary_get_prefix_completions(
@@ -110,6 +138,7 @@ impl Dictionary {
         KeyviMatchIterator::new(ptr)
     }
 
+    /// Return fuzzy matches within the given edit distance.
     pub fn get_fuzzy(&self, key: &str, max_edit_distance: usize) -> KeyviMatchIterator {
         let ptr = unsafe {
             root::keyvi_dictionary_get_fuzzy(
@@ -122,6 +151,7 @@ impl Dictionary {
         KeyviMatchIterator::new(ptr)
     }
 
+    /// Return multi-word completions for the given prefix, up to `cutoff` results.
     pub fn get_multi_word_completions(&self, key: &str, cutoff: usize) -> KeyviMatchIterator {
         let ptr = unsafe {
             root::keyvi_dictionary_get_multi_word_completions(

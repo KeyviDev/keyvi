@@ -9,10 +9,12 @@ endif()
 #### Options
 
 option(KEYVI_C_BINDINGS "Keyvi: Build C binding" ${PROJECT_IS_TOP_LEVEL})
+option(KEYVI_PYTHON_BINDINGS "Keyvi: Build Python module" OFF)
 option(KEYVI_TESTS "Keyvi: Build unit tests" ${PROJECT_IS_TOP_LEVEL})
 option(KEYVI_BINARIES "Keyvi: Build keyvi binaries" ${PROJECT_IS_TOP_LEVEL})
 option(KEYVI_CLANG_TIDY "Keyvi: Build with clang tidy" OFF)
 option(KEYVI_DOCS "Keyvi: Build docs" ${PROJECT_IS_TOP_LEVEL})
+
 
 #### Linting
 if(KEYVI_CLANG_TIDY)
@@ -54,7 +56,12 @@ endif()
 # build type specific settings
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -ggdb3")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -O0 --coverage")
+# coverage build type (gcc/clang): -fprofile-update=atomic avoids corrupt counters in multi-threaded code
+set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -O0 --coverage -fprofile-update=atomic")
+set(CMAKE_C_FLAGS_COVERAGE "${CMAKE_C_FLAGS_DEBUG} -O0 --coverage -fprofile-update=atomic")
+set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG} --coverage")
+set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} --coverage")
+set(CMAKE_MODULE_LINKER_FLAGS_COVERAGE "${CMAKE_MODULE_LINKER_FLAGS_DEBUG} --coverage")
 
 # link libraries
 set(_KEYVI_LINK_LIBRARIES_STATIC "")
@@ -275,6 +282,10 @@ target_include_directories(keyvi INTERFACE "$<BUILD_INTERFACE:${KEYVI_INCLUDES}>
 target_compile_definitions(keyvi INTERFACE ${_KEYVI_COMPILE_DEFINITIONS_LIST})
 target_link_libraries(keyvi INTERFACE ${Boost_LIBRARIES} ${ZLIB_LIBRARIES} ${Snappy_LIBRARY} ${ZSTD_LIBRARIES} ${_OS_LIBRARIES})
 
+if (KEYVI_PYTHON_BINDINGS)
+    add_subdirectory(python-pybind)
+endif ()
+
 ### docs
 
 # don't run it as part of a non-toplevel build, e.g. python
@@ -291,8 +302,8 @@ if(KEYVI_DOCS)
         set(DOXYGEN_GENERATE_XML YES)
         set(DOXYGEN_INLINE_INHERITED_MEMB YES)
 
-        # for scanning the python extension
-        set(SPHINX_EXTENSIONS sphinx.ext.autodoc)
+        # autodoc for scanning the python extension, myst_parser for markdown pages
+        set(SPHINX_EXTENSIONS sphinx.ext.autodoc myst_parser)
         set(SPHINX_CONF_IMPORT sphinx-docs/conf_extra.py)
 
         doxygen_add_docs(doxygen_keyvi ${KEYVI_PUBLIC_HEADERS})

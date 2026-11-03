@@ -1,5 +1,6 @@
 ##
 [![BuildBadge](https://github.com/KeyviDev/keyvi/workflows/Build%20keyvi/badge.svg)](https://github.com/KeyviDev/keyvi/actions)
+[![Coverage](https://codecov.io/gh/KeyviDev/keyvi/branch/master/graph/badge.svg)](https://codecov.io/gh/KeyviDev/keyvi)
 [![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](/keyvi/README.md)
 [![PythonVersions](https://img.shields.io/pypi/pyversions/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PythonImpl](https://img.shields.io/pypi/implementation/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
@@ -31,32 +32,13 @@ Precompiled binary wheels are available for OS X and Linux on [PyPi](https://pyp
 
 The core part is a C++ header-only library, which can be used stand-alone. For more information check the [Readme](/keyvi/README.md) file in the keyvi subfolder.
 
-The python extension can be compiled standalone, check the [Readme](/python/README.md) file in the python subfolder for more information.
+The python extension can be compiled standalone, check the [Readme](/python-pybind/README.md) file in the python-pybind subfolder for more information.
 
 
-## Usage
+## Documentation
 
-  * Howtos
-    * [Compiling Dictionaries/Indexes](/doc/usage/Building%20keyvi%20dictionaries.md)
-    * Python version of keyvi
-      * [Compiling](/doc/usage/Building%20keyvi%20dictionaries%20with%20python.md)
-      * [Index](/doc/usage/Keyvi%20Index%20with%20python.md)
-  * [Crashcourse](/doc/usage/Crashcourse.md)
-  * [API docs](https://keyvidev.github.io/keyvi/index.html)
-  * [Using python keyvi with EMR (mrjob or pyspark)](/doc/usage/Using%20pykeyvi%20in%20EMR.md)
-
-## Internals
-
-  * [Construction Basics](/doc/algorithm/Construction-Basics.md)
-  * [Persistence Basics](/doc/algorithm/Persistence-Basics.md)
-  * [Minimization](/doc/algorithm/Minimization.md)
-  * [Scaling](/doc/algorithm/Scaling.md)
-  * [Extensibility](/doc/algorithm/Extensibility.md)
-
-If you like to go deep down in the basics, keyvi is inspired by the following 2 papers:
-
-  * Sparse Array (See Storing a Sparse Table, Robert E. Tarjan et al. http://infolab.stanford.edu/pub/cstr/reports/cs/tr/78/683/CS-TR-78-683.pdf)
-  * Incremental, which means minimization is done on the fly (See Incremental Construction of Minimal Acyclic Finite-State Automata, J. Daciuk et al.: http://www.mitpressjournals.org/doi/pdf/10.1162/089120100561601)
+The documentation, including usage guides, internals and API docs, is available at
+[keyvidev.github.io/keyvi](https://keyvidev.github.io/keyvi/). Its sources can be found in [sphinx-docs](/sphinx-docs).
 
 ## Release procedure
   * [How to make a release](doc/RELEASE_PROCESS.md)

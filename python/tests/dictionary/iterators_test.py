@@ -1,11 +1,12 @@
-from test_tools import tmp_dictionary
-import sys
-import os
+from __future__ import annotations
+
 import json
+import os
+import sys
 import warnings
 
 from keyvi.compiler import JsonDictionaryCompiler
-
+from test_tools import tmp_dictionary
 
 TEST_DEPRECATIONS = os.getenv("KEYVI_SKIP_TEST_DEPRECATIONS") != "1"
 

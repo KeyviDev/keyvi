@@ -25,7 +25,12 @@
 
 #include <chrono>  //NOLINT
 #include <cstdlib>
+#include <map>
+#include <memory>
+#include <string>
 #include <thread>  //NOLINT
+#include <utility>
+#include <vector>
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>

@@ -56,25 +56,19 @@ jobs:
       - name: Install python dependencies
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          python -m pip install -r python/requirements.txt
-          python -m pip install sphinx breathe sphinx-wagtail-theme
+          python -m pip install sphinx breathe sphinx-wagtail-theme myst-parser
+          python -m pip install . -v
 
-      - name: build python extension
-        run: |
-          export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-          cd python
-          python setup.py build --mode ${BUILD_TYPE}
-          python setup.py install --user
+      - name: configure with cmake
+        run: >
+          cmake -S . -B build
+          -D CMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          -D CMAKE_C_COMPILER_LAUNCHER=ccache
+          -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-      - name: build with cmake
-        uses: lukka/run-cmake@v3
-        with:
-          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          cmakeAppendedArgs: '-DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache'
-          buildWithCMake: true
-          buildDirectory: '${{ github.workspace }}/build'
-          buildWithCMakeArgs: --target sphinx_doc
+      - name: build docs with cmake
+        run: cmake --build build --parallel --target sphinx_doc
+
       - name: Disable jekyll
         run: |
           touch build/sphinx_doc/.nojekyll

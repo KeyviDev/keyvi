@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 
+#include <string>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/index/internal/index_settings.h"

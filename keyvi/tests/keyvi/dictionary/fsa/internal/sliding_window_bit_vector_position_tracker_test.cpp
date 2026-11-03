@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(no_integer_overflow) {
   positions.Set(10);
 
   // trigger switch of the bit vectors
-  uint32_t t = uint32_t(INT_MAX) + 10;
+  const uint32_t t = static_cast<uint32_t>(INT_MAX) + 10;
   positions.Set(t);
 
   BOOST_CHECK(positions.IsSet(t));

@@ -10,8 +10,8 @@ An index is a near-realtime updateable data structure with full CRUD functionali
    from keyvi.index import ReadOnlyIndex
 
    index = Index("/tmp/index-directory")
-   index.Set("a", "{'b': 3}")
-   index.Flush()
+   index.set("a", '{"b": 3}')
+   index.flush()
 
    ri = ReadOnlyIndex("/tmp/index-directory")
 

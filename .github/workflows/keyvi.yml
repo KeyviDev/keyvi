@@ -59,14 +59,19 @@ jobs:
         with:
           key: ${{ matrix.os }}-${{ matrix.type }}
 
+      - name: configure with cmake
+        run: >
+          cmake -S . -B build
+          -D CMAKE_BUILD_TYPE=${{ matrix.type }}
+          -D CMAKE_C_COMPILER_LAUNCHER=ccache
+          -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
+
       - name: build with cmake
-        uses: lukka/run-cmake@v3
-        with:
-          cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-          cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-          cmakeAppendedArgs: '-DCMAKE_BUILD_TYPE=${{ matrix.type }} -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache'
-          buildWithCMake: true
-          buildDirectory: '${{ github.workspace }}/build'
+        run: |
+          echo "::add-matcher::.github/problem-matchers/gcc.json"
+          # limit jobs: a bare --parallel means unlimited `make -j`, which exhausts runner memory
+          cmake --build build --parallel $(getconf _NPROCESSORS_ONLN)
+          echo "::remove-matcher owner=gcc-clang::"
 
       - name: Unit tests
         id: unit_tests

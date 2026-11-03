@@ -23,6 +23,8 @@
  *      Author: hendrik
  */
 
+#include <limits>
+
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/fsa/internal/packed_state.h"
@@ -56,7 +58,7 @@ BOOST_AUTO_TEST_CASE(compare64) {
   BOOST_CHECK(p.GetHashcode() == 42);
 
   int64_t hashcode = std::numeric_limits<int64_t>::max();
-  int32_t hashcode_32 = (int32_t)hashcode;
+  const auto hashcode_32 = static_cast<int32_t>(hashcode);
 
   PackedState<> p2(0, hashcode, 42);
 

@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
 # Usage: py.test tests
-from test_tools import tmp_dictionary
-import sys
-import os
-import pytest
+from __future__ import annotations
 
+import os
+import sys
+
+import pytest
 from keyvi.compiler import JsonDictionaryCompiler
+from test_tools import tmp_dictionary
 
 root = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(root, "../"))
