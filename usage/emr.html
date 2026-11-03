@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Using keyvi in pyspark or mrjob &mdash; keyvi  documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=9cdaa676" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=dd5fadba" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="keyvi  documentation" href="#" />
+            <link rel="next" title="Construction basics" href="../internals/construction-basics.html" />
+            <link rel="prev" title="Keyvi index with python" href="index-python.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="../index.html"
+                        title="keyvi"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/logo-white.png" width="45" height="59" alt="keyvi"
+                            class="logo-img"
+                        />
+                        keyvi
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="crashcourse.html">Crashcourse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building-dictionaries.html">Compiling dictionaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building-dictionaries-python.html">Compiling dictionaries with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index-python.html">Keyvi index with python</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using keyvi in pyspark or mrjob</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../internals/construction-basics.html">Construction basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/persistence-basics.html">Persistence basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/minimization.html">Minimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/scaling.html">Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/extensibility.html">Extensibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rust API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../rust/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rust/match.html">Match</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../python/match.html">Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/completion.html">Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/vector.html">Vector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/util.html">Util</a></li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Using keyvi in pyspark or mrjob</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            <noscript>
+                                <p>JavaScript is required to toggle light/dark mode..</p>
+                            </noscript>
+                            <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                                <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                                <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                            </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/usage/emr.md" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/usage/emr.md.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                            
+                        </div>
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="using-keyvi-in-pyspark-or-mrjob">
+<h1>Using keyvi in pyspark or mrjob<a class="headerlink" href="#using-keyvi-in-pyspark-or-mrjob" title="Link to this heading">¶</a></h1>
+<p>Imagine you want to do some lookups in your map-reduce jobs like matching or extracting certain patterns - in fuzzy manner if you like - and your lookup table is huge.
+You could call a database or key value store remotely, but that kills performance and introduces a single point of failure in the otherwise distributed processing.
+With keyvi you can easily do that, given you are using a python based framework like mrjob or pyspark.
+Due to the shared memory model keyvi indexes are just loaded once in memory, independent on the number of mappers on one machine.
+It works even if keyvi files are bigger than the main memory, for the price of some IO of course.
+In the end all calls will be local and do not entail any networking.</p>
+<section id="bootstrapping-keyvi">
+<h2>Bootstrapping keyvi<a class="headerlink" href="#bootstrapping-keyvi" title="Link to this heading">¶</a></h2>
+<p>All we need is to install keyvi at bootstraping time.</p>
+<p>Precompiled wheels are available for Linux, therefore just install the python version of keyvi during bootstrap:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>keyvi
+</pre></div>
+</div>
+</section>
+<section id="using-keyvi">
+<h2>Using keyvi<a class="headerlink" href="#using-keyvi" title="Link to this heading">¶</a></h2>
+<p>The rest is simple, get your keyvi files on the machines. You can download them during bootstrap from S3 or more convenient in pyspark, put them on hdfs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">s3_filename</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Ensure you initialize the Dictionary e.g. in mapper_init (mrjob) or using a singleton pattern (pyspark) and not for every mapper call.</p>
+<p>See this example loader for pyspark:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">keyvi.dictionary</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dictionary</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># only works if in spark</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyspark</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparkFiles</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyspark</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparkContext</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Spark_KeyviLoader</span><span class="p">:</span>
+        <span class="c1"># this is a singleton</span>
+        <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="nb">globals</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loaded_keyvi_dicts</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded_keyvi_dicts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">hdfs_filename</span> <span class="o">=</span> <span class="n">SparkFiles</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hdfs_filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                        <span class="s2">"Could not find dictionary with name </span><span class="si">{}</span><span class="s2"> in HDFS, did you load it?"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">name</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">Dictionary</span><span class="p">(</span><span class="n">hdfs_filename</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                        <span class="s2">"Failed to load keyvi dictionary </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">loaded_keyvi_dicts</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+
+            <span class="k">return</span> <span class="n">d</span>
+
+        <span class="nd">@staticmethod</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">load_into_spark</span><span class="p">(</span><span class="n">s3_filename</span><span class="p">):</span>
+            <span class="n">sc</span> <span class="o">=</span> <span class="n">SparkContext</span><span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">addFile</span><span class="p">(</span><span class="n">s3_filename</span><span class="p">)</span>
+
+    <span class="n">KeyviLoader</span> <span class="o">=</span> <span class="n">Spark_KeyviLoader</span>
+
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># fallback for standalone use and testing</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Local_KeyviLoader</span><span class="p">:</span>
+        <span class="c1"># this is a singleton</span>
+        <span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="nb">globals</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loaded_keyvi_dicts</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded_keyvi_dicts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">Dictionary</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">"my_keyvi_files_folder"</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">loaded_keyvi_dicts</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+
+            <span class="k">return</span> <span class="n">d</span>
+
+    <span class="n">KeyviLoader</span> <span class="o">=</span> <span class="n">Local_KeyviLoader</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_keyvi_dictionary</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">KeyviLoader</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="index-python.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Keyvi index with python
+    </a>
+    <a class="float-right" href="../internals/construction-basics.html" title="Next">
+        Construction basics <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Using keyvi in pyspark or mrjob</a><ul>
+<li><a class="reference internal" href="#bootstrapping-keyvi">Bootstrapping keyvi</a></li>
+<li><a class="reference internal" href="#using-keyvi">Using keyvi</a></li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://github.com/KeyviDev/keyvi">Github</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://pypi.org/project/keyvi/">Pypi</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center text-white-50 font-italic mt-3">
+                <small>Last updated: Nov 03, 2026</small>
+                <small>
+                    Created using
+                    <a class="text-white" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Sphinx Wagtail Theme 
+                    </a>
+                    and
+                    <a class="text-white" href="https://www.sphinx-doc.org/" rel="nofollow" target="_blank">
+                        Sphinx 9.1.1
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>

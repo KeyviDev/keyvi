@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Scaling &mdash; keyvi  documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=9cdaa676" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=dd5fadba" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="keyvi  documentation" href="#" />
+            <link rel="next" title="Extensibility" href="extensibility.html" />
+            <link rel="prev" title="Minimization" href="minimization.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="../index.html"
+                        title="keyvi"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/logo-white.png" width="45" height="59" alt="keyvi"
+                            class="logo-img"
+                        />
+                        keyvi
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/crashcourse.html">Crashcourse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/building-dictionaries.html">Compiling dictionaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/building-dictionaries-python.html">Compiling dictionaries with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index-python.html">Keyvi index with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/emr.html">Using keyvi in pyspark or mrjob</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="construction-basics.html">Construction basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence-basics.html">Persistence basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="minimization.html">Minimization</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rust API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../rust/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rust/match.html">Match</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../python/match.html">Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/completion.html">Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/vector.html">Vector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/util.html">Util</a></li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Scaling</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            <noscript>
+                                <p>JavaScript is required to toggle light/dark mode..</p>
+                            </noscript>
+                            <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                                <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                                <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                            </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/internals/scaling.md" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/internals/scaling.md.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                            
+                        </div>
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="scaling">
+<h1>Scaling<a class="headerlink" href="#scaling" title="Link to this heading">¶</a></h1>
+<p>This page describes a number of performance and scaling tricks to make it possible to store millions of data points.</p>
+<section id="sorting">
+<h2>Sorting<a class="headerlink" href="#sorting" title="Link to this heading">¶</a></h2>
+<p>The construction algorithm requires sorted input. keyvi uses external memory sorting, it spills to disk when necessary
+and therefore works for large data.</p>
+<p>Code: <a class="reference external" href="https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/dictionary_compiler.h">dictionary_compiler</a></p>
+</section>
+<section id="minimization">
+<h2>Minimization<a class="headerlink" href="#minimization" title="Link to this heading">¶</a></h2>
+<p>For each state the compiler stores a fingerprint of the state in the hashtable, although a fingerprint is stored in
+12 bytes the hashtable would not fit into main memory if you have lots of keys.</p>
+<p>Therefore keyvi uses several hashtables organized by a LRU (Least Recently Used) Cache:</p>
+<p>The 1st hashtable is filled with a limited number of entries, once full a new hash table is created. If the amount of
+hashtables reaches the limit the last hashtable is thrown away.</p>
+<p>To keep “good hashes”: Each entry of a successful lookup in a lower hashtable will be moved to the top hashtable. Therefore
+states which often minimize will stay in memory, while states which do not minimize will be thrown away over time.</p>
+<p>Code: <a class="reference external" href="https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/lru_generation_cache.h">LRU Cache</a></p>
+</section>
+<section id="compilation-index-performance">
+<h2>Compilation/Index Performance<a class="headerlink" href="#compilation-index-performance" title="Link to this heading">¶</a></h2>
+<p>Apart from low-level optimizations like avoiding object copies, pooling, short string optimization, good hash function etc.,
+keyvi uses some optimization on the algorithm side.</p>
+<section id="minimization-stop">
+<h3>Minimization Stop<a class="headerlink" href="#minimization-stop" title="Link to this heading">¶</a></h3>
+<p>As described in Construction the FSA is build from ‘right to left’, minimization only works this way. Once a minimization
+fails it is impossible to minimize the parent state. Therefore we stop minimization of the preceding states once it fails once.
+Note: we still store the fingerprints in the hashtable for later minimizations.</p>
+<p>Code: <a class="reference external" href="https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/unpacked_state.h">Unpacked State</a></p>
+<p>Note: The amount of memory is configurable in the compiler. Increasing the limit might improve compression.</p>
+</section>
+<section id="packing">
+<h3>Packing<a class="headerlink" href="#packing" title="Link to this heading">¶</a></h3>
+<p>Sparse Array Construction is one of the most demanding parts. To speedup compilation we make use of bit vectors,
+sliding windows and the <a class="reference external" href="http://en.wikipedia.org/wiki/De_Bruijn_sequence">De Bruijn</a> sequence to quickly find spots to pack
+the data, or - if available - intrinsic compiler/CPU functions.</p>
+<p>Code: <a class="reference external" href="https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/bit_vector.h">BitVector</a></p>
+</section>
+</section>
+<section id="persistence-and-loading">
+<h2>Persistence and Loading<a class="headerlink" href="#persistence-and-loading" title="Link to this heading">¶</a></h2>
+<p>keyvi is a index structure, it is persisted on disk. It does not require to be unpacked when loading. Loading means
+mirroring the disk data structure in main memory. The keyvi loader uses Shared Memory for that, which means the index
+is loaded only once even if multiple processes read it.</p>
+<p>Note: keyvi files can be replicated and distributed.</p>
+</section>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="minimization.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Minimization
+    </a>
+    <a class="float-right" href="extensibility.html" title="Next">
+        Extensibility <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Scaling</a><ul>
+<li><a class="reference internal" href="#sorting">Sorting</a></li>
+<li><a class="reference internal" href="#minimization">Minimization</a></li>
+<li><a class="reference internal" href="#compilation-index-performance">Compilation/Index Performance</a><ul>
+<li><a class="reference internal" href="#minimization-stop">Minimization Stop</a></li>
+<li><a class="reference internal" href="#packing">Packing</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#persistence-and-loading">Persistence and Loading</a></li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://github.com/KeyviDev/keyvi">Github</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://pypi.org/project/keyvi/">Pypi</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center text-white-50 font-italic mt-3">
+                <small>Last updated: Nov 03, 2026</small>
+                <small>
+                    Created using
+                    <a class="text-white" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Sphinx Wagtail Theme 
+                    </a>
+                    and
+                    <a class="text-white" href="https://www.sphinx-doc.org/" rel="nofollow" target="_blank">
+                        Sphinx 9.1.1
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>
