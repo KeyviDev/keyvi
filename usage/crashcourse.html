@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Crashcourse &mdash; keyvi  documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=9cdaa676" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=dd5fadba" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="keyvi  documentation" href="#" />
+            <link rel="next" title="Compiling dictionaries" href="building-dictionaries.html" />
+            <link rel="prev" title="Welcome to keyvi!" href="../index.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="../index.html"
+                        title="keyvi"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/logo-white.png" width="45" height="59" alt="keyvi"
+                            class="logo-img"
+                        />
+                        keyvi
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Crashcourse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building-dictionaries.html">Compiling dictionaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building-dictionaries-python.html">Compiling dictionaries with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index-python.html">Keyvi index with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emr.html">Using keyvi in pyspark or mrjob</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../internals/construction-basics.html">Construction basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/persistence-basics.html">Persistence basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/minimization.html">Minimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/scaling.html">Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../internals/extensibility.html">Extensibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rust API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../rust/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rust/match.html">Match</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../python/match.html">Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/completion.html">Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/vector.html">Vector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/util.html">Util</a></li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Crashcourse</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            <noscript>
+                                <p>JavaScript is required to toggle light/dark mode..</p>
+                            </noscript>
+                            <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                                <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                                <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                            </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/usage/crashcourse.md" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/usage/crashcourse.md.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                            
+                        </div>
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="crashcourse">
+<h1>Crashcourse<a class="headerlink" href="#crashcourse" title="Link to this heading">¶</a></h1>
+<section id="install">
+<h2>Install<a class="headerlink" href="#install" title="Link to this heading">¶</a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pip install keyvi
+</pre></div>
+</div>
+<p>After installation you should have the <code class="docutils literal notranslate"><span class="pre">keyvi</span></code> executable available, try:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvi -h
+</pre></div>
+</div>
+<p>Try in python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">keyvi</span>
+</pre></div>
+</div>
+<p>Some of the exercises below use the C++ tools <code class="docutils literal notranslate"><span class="pre">keyvicompiler</span></code> and <code class="docutils literal notranslate"><span class="pre">keyviinspector</span></code>, see
+<a class="reference internal" href="building-dictionaries.html"><span class="doc">Compiling dictionaries</span></a> for how to get them.</p>
+</section>
+<section id="first-compile-and-decompile">
+<h2>First compile and decompile<a class="headerlink" href="#first-compile-and-decompile" title="Link to this heading">¶</a></h2>
+<p>Open a text editor and put some keys in there, e.g.</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvi
+is
+a
+key
+value
+index
+</pre></div>
+</div>
+<p>Compile:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvi compile &lt;input_file&gt; compiled.kv key-only
+</pre></div>
+</div>
+<p>Dump:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvi dump compiled.kv dump.out
+</pre></div>
+</div>
+<p>After dumping, open the file <code class="docutils literal notranslate"><span class="pre">dump.out</span></code> in a text editor, it should contain your data.</p>
+<p>Check questions:</p>
+<ul class="simple">
+<li><p>What is the difference to your input file?</p></li>
+</ul>
+<section id="open-the-file-in-python">
+<h3>Open the file in python<a class="headerlink" href="#open-the-file-in-python" title="Link to this heading">¶</a></h3>
+<p>Do:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">keyvi.dictionary</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dictionary</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">Dictionary</span><span class="p">(</span><span class="s2">"compiled.kv"</span><span class="p">)</span>
+<span class="s2">"keyvi"</span> <span class="ow">in</span> <span class="n">d</span>
+</pre></div>
+</div>
+<p>should return <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">match</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">"keyvi"</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>gives you a so called match object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">dir</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>shows all methods you can call on that object, e.g.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">match</span><span class="o">.</span><span class="n">matched_string</span>
+</pre></div>
+</div>
+<p>should return <code class="docutils literal notranslate"><span class="pre">&quot;keyvi&quot;</span></code>.</p>
+<p>Match objects are the common return structure in keyvi. For this very simple example, the other methods are not
+useful. But with going deeper into more elaborated examples below, you will find how they can be used.</p>
+<p>Check questions:</p>
+<ul class="simple">
+<li><p>How fast does it load? Do you have an idea how loading works internally?</p></li>
+<li><p>What happens if you load multiple times (using different processes)?</p></li>
+</ul>
+</section>
+</section>
+<section id="simple-statistics">
+<h2>Simple statistics<a class="headerlink" href="#simple-statistics" title="Link to this heading">¶</a></h2>
+<p>Both, the <code class="docutils literal notranslate"><span class="pre">keyvi</span></code> executable and the Python API provide an easy way to obtain the number of keys and values in a
+keyvi file.</p>
+<p>For the just created <code class="docutils literal notranslate"><span class="pre">compiled.kv</span></code> file run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvi stats compiled.kv
+</pre></div>
+</div>
+<p>The output should be similar to:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"General"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"manifest"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"number_of_keys"</span><span class="p">:</span><span class="w"> </span><span class="s2">"6"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"number_of_states"</span><span class="p">:</span><span class="w"> </span><span class="s2">"14"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"start_state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"19"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"value_store_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">"Persistence"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"size"</span><span class="p">:</span><span class="w"> </span><span class="s2">"280"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note: As we have compiled a <code class="docutils literal notranslate"><span class="pre">key-only</span></code> dictionary there is no info regarding values.</p>
+<p>Similarly with python, on the <code class="docutils literal notranslate"><span class="pre">Dictionary</span></code> object <code class="docutils literal notranslate"><span class="pre">d</span></code> the call <code class="docutils literal notranslate"><span class="pre">d.statistics()</span></code> will return the same information.</p>
+</section>
+<section id="lookup-and-extraction">
+<h2>Lookup and extraction<a class="headerlink" href="#lookup-and-extraction" title="Link to this heading">¶</a></h2>
+<p>Go to the <a class="reference external" href="https://github.com/KeyviDev/keyvi/tree/master/python/examples/lookup">lookup examples</a>.</p>
+<p>Compile <code class="docutils literal notranslate"><span class="pre">cities.tsv</span></code> and run the tester:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvicompiler -i cities.tsv -o cities.kv -d key-only
+python text_lookup_tester.py
+</pre></div>
+</div>
+<p>Try queries like: “Fahrradwerkstatt München”, “Berlin Alexanderplatz”, “San Francisco Coffee Bar”</p>
+<section id="build-your-own-index">
+<h3>Build your own index<a class="headerlink" href="#build-your-own-index" title="Link to this heading">¶</a></h3>
+<p>Try <code class="docutils literal notranslate"><span class="pre">compile_json.py</span></code> and compile your own JSON. The format should be:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>key {"city": "Munich", "state": "Germany"}
+</pre></div>
+</div>
+<p>(put a tab (<code class="docutils literal notranslate"><span class="pre">\t</span></code>) between key and value, you can also use <code class="docutils literal notranslate"><span class="pre">keyvicompiler</span></code> instead, but the idea of this exercise is
+to use the compiler from the python bindings.)</p>
+<p>Check statistics:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvi stats your-own.kv
+</pre></div>
+</div>
+<p>Check questions:</p>
+<ul class="simple">
+<li><p>Compare values and unique values, what’s the meaning of it?</p></li>
+</ul>
+<p>With sharding (for distributed data indexes):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>python compile_json.py -i your-input -o your-keyvi.kv -s 3
+</pre></div>
+</div>
+</section>
+</section>
+<section id="completion">
+<h2>Completion<a class="headerlink" href="#completion" title="Link to this heading">¶</a></h2>
+<p>Go to the <a class="reference external" href="https://github.com/KeyviDev/keyvi/tree/master/python/examples/completion">completion examples</a>.</p>
+<section id="prefix-completion">
+<h3>Prefix completion<a class="headerlink" href="#prefix-completion" title="Link to this heading">¶</a></h3>
+<p>Have a look at the files <code class="docutils literal notranslate"><span class="pre">completion-nw.tsv</span></code>, <code class="docutils literal notranslate"><span class="pre">completion.tsv</span></code>, they basically contain keys and integer values.</p>
+<p>Compile and try:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvicompiler -i completion-nw.tsv -o prefix-completion.kv
+python prefix_completion_tester.py
+</pre></div>
+</div>
+<p>Query: ’80s’</p>
+<p>Now try:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvicompiler -i completion.tsv -o prefix-completion.kv
+python prefix_completion_tester.py
+</pre></div>
+</div>
+<p>Check questions:</p>
+<ul class="simple">
+<li><p>What’s the difference between the 2?</p></li>
+<li><p>What if you have more data?</p></li>
+<li><p>Advanced: How does it work?</p></li>
+</ul>
+</section>
+<section id="fuzzy-prefix-completion">
+<h3>Fuzzy prefix completion<a class="headerlink" href="#fuzzy-prefix-completion" title="Link to this heading">¶</a></h3>
+<p>Try:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>python prefix_completion_fuzzy_tester.py
+</pre></div>
+</div>
+<p>and use misspelled queries like ’80s movie wit sombies’</p>
+</section>
+<section id="multiword-completion">
+<h3>Multiword completion<a class="headerlink" href="#multiword-completion" title="Link to this heading">¶</a></h3>
+<p>Compile with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cat completion.tsv | python multiword_completion_writer.py
+</pre></div>
+</div>
+<p>and try:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>python multiword_completion_tester.py
+</pre></div>
+</div>
+<p>e.g. ‘zombies movie’</p>
+<p>Check questions:</p>
+<ul class="simple">
+<li><p>What is the size difference between multiword and pure prefix?</p></li>
+<li><p>What is more complex in multiword?</p></li>
+<li><p>Why is it still ‘relatively small’?</p></li>
+</ul>
+</section>
+</section>
+<section id="normalization">
+<h2>Normalization<a class="headerlink" href="#normalization" title="Link to this heading">¶</a></h2>
+<p>Go to the <a class="reference external" href="https://github.com/KeyviDev/keyvi/tree/master/python/examples/normalization">normalization examples</a>.</p>
+<p>Compile with:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>keyvicompiler -i normalization.tsv -o normalization.kv -d string
+</pre></div>
+</div>
+<p>and try:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cat sample.txt | python normalize.py
+</pre></div>
+</div>
+</section>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="../index.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Welcome to keyvi!
+    </a>
+    <a class="float-right" href="building-dictionaries.html" title="Next">
+        Compiling dictionaries <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Crashcourse</a><ul>
+<li><a class="reference internal" href="#install">Install</a></li>
+<li><a class="reference internal" href="#first-compile-and-decompile">First compile and decompile</a><ul>
+<li><a class="reference internal" href="#open-the-file-in-python">Open the file in python</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simple-statistics">Simple statistics</a></li>
+<li><a class="reference internal" href="#lookup-and-extraction">Lookup and extraction</a><ul>
+<li><a class="reference internal" href="#build-your-own-index">Build your own index</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#completion">Completion</a><ul>
+<li><a class="reference internal" href="#prefix-completion">Prefix completion</a></li>
+<li><a class="reference internal" href="#fuzzy-prefix-completion">Fuzzy prefix completion</a></li>
+<li><a class="reference internal" href="#multiword-completion">Multiword completion</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#normalization">Normalization</a></li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://github.com/KeyviDev/keyvi">Github</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://pypi.org/project/keyvi/">Pypi</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center text-white-50 font-italic mt-3">
+                <small>Last updated: Nov 10, 2026</small>
+                <small>
+                    Created using
+                    <a class="text-white" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Sphinx Wagtail Theme 
+                    </a>
+                    and
+                    <a class="text-white" href="https://www.sphinx-doc.org/" rel="nofollow" target="_blank">
+                        Sphinx 9.1.1
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>

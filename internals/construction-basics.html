@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Construction basics &mdash; keyvi  documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=9cdaa676" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=dd5fadba" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="keyvi  documentation" href="#" />
+            <link rel="next" title="Persistence basics" href="persistence-basics.html" />
+            <link rel="prev" title="Using keyvi in pyspark or mrjob" href="../usage/emr.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="../index.html"
+                        title="keyvi"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/logo-white.png" width="45" height="59" alt="keyvi"
+                            class="logo-img"
+                        />
+                        keyvi
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/crashcourse.html">Crashcourse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/building-dictionaries.html">Compiling dictionaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/building-dictionaries-python.html">Compiling dictionaries with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index-python.html">Keyvi index with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/emr.html">Using keyvi in pyspark or mrjob</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Construction basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence-basics.html">Persistence basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="minimization.html">Minimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scaling.html">Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rust API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../rust/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rust/match.html">Match</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../python/match.html">Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/completion.html">Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/vector.html">Vector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/util.html">Util</a></li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Construction basics</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            <noscript>
+                                <p>JavaScript is required to toggle light/dark mode..</p>
+                            </noscript>
+                            <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                                <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                                <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                            </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/internals/construction-basics.md" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/internals/construction-basics.md.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                            
+                        </div>
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="construction-basics">
+<h1>Construction basics<a class="headerlink" href="#construction-basics" title="Link to this heading">¶</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>“An automaton (plural: automata) is a self-operating machine. The word is sometimes used to describe a robot, more
+specifically an autonomous robot. Used colloquially, it refers to a mindless follower.”  (Wikipedia)</p>
+<section id="minimal-acyclic-finite-state-automata">
+<h3>Minimal Acyclic Finite State Automata<a class="headerlink" href="#minimal-acyclic-finite-state-automata" title="Link to this heading">¶</a></h3>
+<p>deterministic, acyclic, finite-state automata
+compact size, fast linear lookup</p>
+<p><img alt="Trie" src="../_images/trie.png" /></p>
+<p>Minimizing yields the FSA:</p>
+<p><img alt="FSA" src="../_images/fsa.png" /></p>
+</section>
+</section>
+<section id="construction">
+<h2>Construction<a class="headerlink" href="#construction" title="Link to this heading">¶</a></h2>
+<p>keyvi is using so called “incremental construction”, the alternative are obviously non-incremental algorithms. If you are curious, there are
+some instruction classes available on youtube.</p>
+<p>keyvi is only about text/string automata. There are other use cases for finite state techniques, e.g. modeling
+real control flows.</p>
+<section id="incremental-construction-by-watson-daciuk">
+<h3>Incremental Construction by Watson/Daciuk<a class="headerlink" href="#incremental-construction-by-watson-daciuk" title="Link to this heading">¶</a></h3>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Register = Ø
+while (another word):
+    Word = next word in lexicographic order
+    CommonPrefix = common_prefix(Word) #automata lookup
+    LastState = last_state (CommonPrefix)‏
+    CurrentSuffix = Word [length(CommonPrefix + 1):]
+    if LastState.has_Children():
+        replace_or_register(LastState)‏
+    add_suffix(LastState, CurrentSuffix)‏
+replace_or_register(q0)‏
+
+func replace_or_register(State):
+    Child = last_child(State)‏
+    if (has_children (Child):
+        replace_or_register(Child)‏
+    if Register.find(Child):
+        last_child = Register[Child]
+    else:
+        Register.add(Child)
+</pre></div>
+</div>
+<p><img alt="Construction example Daciuk/Watson" src="../_images/daciuk_watson.png" /></p>
+</section>
+<section id="incremental-construction-in-keyvi">
+<h3>Incremental Construction in Keyvi<a class="headerlink" href="#incremental-construction-in-keyvi" title="Link to this heading">¶</a></h3>
+<section id="algorithm">
+<h4>Algorithm<a class="headerlink" href="#algorithm" title="Link to this heading">¶</a></h4>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Register = Ø
+current_word = next word in lexicographic order
+while (another word):
+    new_word = next word in lexicographic order
+    common_prefix = common_prefix(current_word, new_word)‏
+    feed_stack ( current_word , length( common_prefix), length ( current_word ) )
+    consume_stack ( length ( common_prefix ) )‏
+    current_word = new_word
+feed_stack ( current_word, 0, length ( current_word ) )‏
+consume_stack ( 0 )‏
+
+func feed_stack( word, begin, end ):
+    for ( i = begin, i&lt;end, ++i ):
+        unpacked_state_stack.insert(i, word[i])‏
+    unpacked_state_stack.insert(end, “final”)‏
+
+func consume_stack(end):
+    while ( highest_stack &gt; end ):
+        stack_entry = unpacked_state_stack.pop(highest_stack)‏
+        state = add_state (stack_entry)‏
+        --highest_stack
+        unpacked_state_stack.connect ( highest_stack, state )‏
+</pre></div>
+</div>
+<p>Code:</p>
+<ul class="simple">
+<li><p>General entry point: <a class="reference external" href="https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/generator.h">generator</a></p></li>
+<li><p>Unpacked_State_Stack: <a class="reference external" href="https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/unpacked_state_stack.h">unpacked_state_stack</a></p></li>
+</ul>
+</section>
+<section id="illustration">
+<h4>Illustration<a class="headerlink" href="#illustration" title="Link to this heading">¶</a></h4>
+<p>Building a tiny automata containing just 4 strings:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>aa
+abc
+abcde
+abe
+</pre></div>
+</div>
+<section id="step-1">
+<h5>Step 1<a class="headerlink" href="#step-1" title="Link to this heading">¶</a></h5>
+<p><img alt="Step1" src="../_images/construction_step1.png" /></p>
+</section>
+<section id="step-2">
+<h5>Step 2<a class="headerlink" href="#step-2" title="Link to this heading">¶</a></h5>
+<p><img alt="Step2" src="../_images/construction_step2.png" /></p>
+</section>
+<section id="step-3">
+<h5>Step 3<a class="headerlink" href="#step-3" title="Link to this heading">¶</a></h5>
+<p><img alt="Step3" src="../_images/construction_step3.png" /></p>
+</section>
+<section id="step-4">
+<h5>Step 4<a class="headerlink" href="#step-4" title="Link to this heading">¶</a></h5>
+<p><img alt="Step4" src="../_images/construction_step4.png" /></p>
+</section>
+<section id="step-5">
+<h5>Step 5<a class="headerlink" href="#step-5" title="Link to this heading">¶</a></h5>
+<p><img alt="Step5" src="../_images/construction_step5.png" /></p>
+</section>
+<section id="step-6">
+<h5>Step 6<a class="headerlink" href="#step-6" title="Link to this heading">¶</a></h5>
+<p><img alt="Step6" src="../_images/construction_step6.png" /></p>
+</section>
+<section id="step-7">
+<h5>Step 7<a class="headerlink" href="#step-7" title="Link to this heading">¶</a></h5>
+<p><img alt="Step7" src="../_images/construction_step7.png" /></p>
+</section>
+</section>
+<section id="summary">
+<h4>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h4>
+<p>The FSA is built from “right to left”, the root state is written last.</p>
+</section>
+<section id="comparison-daciuk-watson-vs-keyvi">
+<h4>Comparison: Daciuk/Watson vs. keyvi<a class="headerlink" href="#comparison-daciuk-watson-vs-keyvi" title="Link to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>use sorted data characteristic: compare only the last two words</p></li>
+<li><p>no temporary state creation as with replace_or_register, which can be problematic depended on underlying data structure (e.g. Sparse Array)‏</p></li>
+<li><p>no recursion (as in replace_or_register)‏</p></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="../usage/emr.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Using keyvi in pyspark or mrjob
+    </a>
+    <a class="float-right" href="persistence-basics.html" title="Next">
+        Persistence basics <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Construction basics</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a><ul>
+<li><a class="reference internal" href="#minimal-acyclic-finite-state-automata">Minimal Acyclic Finite State Automata</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#construction">Construction</a><ul>
+<li><a class="reference internal" href="#incremental-construction-by-watson-daciuk">Incremental Construction by Watson/Daciuk</a></li>
+<li><a class="reference internal" href="#incremental-construction-in-keyvi">Incremental Construction in Keyvi</a><ul>
+<li><a class="reference internal" href="#algorithm">Algorithm</a></li>
+<li><a class="reference internal" href="#illustration">Illustration</a><ul>
+<li><a class="reference internal" href="#step-1">Step 1</a></li>
+<li><a class="reference internal" href="#step-2">Step 2</a></li>
+<li><a class="reference internal" href="#step-3">Step 3</a></li>
+<li><a class="reference internal" href="#step-4">Step 4</a></li>
+<li><a class="reference internal" href="#step-5">Step 5</a></li>
+<li><a class="reference internal" href="#step-6">Step 6</a></li>
+<li><a class="reference internal" href="#step-7">Step 7</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+<li><a class="reference internal" href="#comparison-daciuk-watson-vs-keyvi">Comparison: Daciuk/Watson vs. keyvi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://github.com/KeyviDev/keyvi">Github</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://pypi.org/project/keyvi/">Pypi</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center text-white-50 font-italic mt-3">
+                <small>Last updated: Nov 10, 2026</small>
+                <small>
+                    Created using
+                    <a class="text-white" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Sphinx Wagtail Theme 
+                    </a>
+                    and
+                    <a class="text-white" href="https://www.sphinx-doc.org/" rel="nofollow" target="_blank">
+                        Sphinx 9.1.1
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>

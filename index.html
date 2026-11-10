@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-content_root="./">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Welcome to keyvi! &mdash; keyvi  documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="_static/dist/theme.css?v=9cdaa676" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=dd5fadba" />
+            <link rel="index" title="Index" href="genindex.html" />
+            <link rel="search" title="Search" href="search.html" />
+            <link rel="top" title="keyvi  documentation" href="#" />
+            <link rel="next" title="Crashcourse" href="usage/crashcourse.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="#"
+                        title="keyvi"
+                        class="logo navbar-brand"
+                    >
+                        <img src="_static/logo-white.png" width="45" height="59" alt="keyvi"
+                            class="logo-img"
+                        />
+                        keyvi
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/crashcourse.html">Crashcourse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/building-dictionaries.html">Compiling dictionaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/building-dictionaries-python.html">Compiling dictionaries with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index-python.html">Keyvi index with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/emr.html">Using keyvi in pyspark or mrjob</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="internals/construction-basics.html">Construction basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/persistence-basics.html">Persistence basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/minimization.html">Minimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/scaling.html">Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="internals/extensibility.html">Extensibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp/index.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rust API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rust/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rust/match.html">Match</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python/match.html">Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python/completion.html">Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python/index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python/vector.html">Vector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python/util.html">Util</a></li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="#">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Welcome to keyvi!</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            <noscript>
+                                <p>JavaScript is required to toggle light/dark mode..</p>
+                            </noscript>
+                            <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                                <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                                <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                            </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/index.rst" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="_sources/index.rst.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                            
+                        </div>
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="welcome-to-keyvi">
+<h1>Welcome to keyvi!<a class="headerlink" href="#welcome-to-keyvi" title="Link to this heading">¶</a></h1>
+<p>Keyvi - the short form for “Key value index” is a key value store (KVS) optimized for size and lookup speed. The usage
+of shared memory makes it scalable and resistant. The biggest difference to other stores is the underlying data
+structure based on <a class="reference external" href="https://en.wikipedia.org/wiki/Finite-state_machine">finite state machine</a>. Storage is very space
+efficient, fast and by design makes various sorts of approximate matching be it fuzzy string matching or geo highly
+efficient. The immutable FST data structure can be used stand-alone for static datasets. If you need online writes,
+you can use keyvi index, a “near realtime index”. The index can be used as embedded key value store, e.g. if you
+already have a network stack in your application. A out of the box network enabled store is available with
+<a class="reference external" href="https://github.com/KeyviDev/keyvi-server">keyvi-server</a>.</p>
+<p>The core of keyvi is written in C++, binding are available for Rust and Python.</p>
+<p>Install the python version with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">keyvi</span>
+</pre></div>
+</div>
+<p>Talks and presentations:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=GBjisdmHe4g">BBuzz2016 talk</a>
+(<a class="reference external" href="https://cdn.jsdelivr.net/gh/KeyviDev/keyvi/doc/presentations/bbuzz2016/keyvi-presentation.svg#1_0">slides</a>)</p></li>
+<li><p><a class="reference external" href="http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz">Search Meetup Munich Jan 2016</a></p></li>
+<li><p><a class="reference external" href="https://www.infoq.com/presentations/keyvi">Progscon 2017 talk</a></p></li>
+<li><p><a class="reference external" href="https://cdn.jsdelivr.net/gh/KeyviDev/keyvi/doc/presentations/searchmuc_apr_2018/keyvi-presentation-search-meetup-2018.svg#1_0">Search Meetup Munich Apr 2018</a></p></li>
+</ul>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage/crashcourse.html">Crashcourse</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/crashcourse.html#install">Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/crashcourse.html#first-compile-and-decompile">First compile and decompile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/crashcourse.html#simple-statistics">Simple statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/crashcourse.html#lookup-and-extraction">Lookup and extraction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/crashcourse.html#completion">Completion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/crashcourse.html#normalization">Normalization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/building-dictionaries.html">Compiling dictionaries</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/building-dictionaries.html#the-keyvi-command-line-tool">The <code class="docutils literal notranslate"><span class="pre">keyvi</span></code> command line tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/building-dictionaries.html#the-keyvicompiler-tool">The <code class="docutils literal notranslate"><span class="pre">keyvicompiler</span></code> tool</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/building-dictionaries-python.html">Compiling dictionaries with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/index-python.html">Keyvi index with python</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/index-python.html#getting-started">Getting started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/index-python.html#index-flush">Index flush</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/index-python.html#thread-safety-multi-processing">Thread safety / multi processing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage/emr.html">Using keyvi in pyspark or mrjob</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/emr.html#bootstrapping-keyvi">Bootstrapping keyvi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/emr.html#using-keyvi">Using keyvi</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="internals/construction-basics.html">Construction basics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="internals/construction-basics.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internals/construction-basics.html#construction">Construction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals/persistence-basics.html">Persistence basics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="internals/persistence-basics.html#sparse-array-in-a-nutshell">Sparse Array in a nutshell</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internals/persistence-basics.html#connecting-fsa-construction-with-sparse-array-building">Connecting FSA construction with Sparse Array building</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals/minimization.html">Minimization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="internals/minimization.html#keyvi-minimization">keyvi Minimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internals/minimization.html#getting-best-compression-ratios">Getting best compression ratios</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals/scaling.html">Scaling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="internals/scaling.html#sorting">Sorting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internals/scaling.html#minimization">Minimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internals/scaling.html#compilation-index-performance">Compilation/Index Performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="internals/scaling.html#persistence-and-loading">Persistence and Loading</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internals/extensibility.html">Extensibility</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="internals/extensibility.html#value-types">Value types</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<p>If you like to go deep down in the basics, keyvi is inspired by the following 2 papers:</p>
+<ul class="simple">
+<li><p>Sparse Array (See Storing a Sparse Table, Robert E. Tarjan et al.
+<a class="reference external" href="http://infolab.stanford.edu/pub/cstr/reports/cs/tr/78/683/CS-TR-78-683.pdf">http://infolab.stanford.edu/pub/cstr/reports/cs/tr/78/683/CS-TR-78-683.pdf</a>)</p></li>
+<li><p>Incremental, which means minimization is done on the fly (See Incremental Construction of Minimal Acyclic
+Finite-State Automata, J. Daciuk et al.: <a class="reference external" href="http://www.mitpressjournals.org/doi/pdf/10.1162/089120100561601">http://www.mitpressjournals.org/doi/pdf/10.1162/089120100561601</a>)</p></li>
+</ul>
+</section>
+<section id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cpp/dictionary_compiler.html">DictionaryCompiler</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cpp/dictionary_compiler.html#_CPPv4I_N5keyvi10dictionary3fsa8internal13value_store_tEEN5keyvi10dictionary18DictionaryCompilerE"><code class="docutils literal notranslate"><span class="pre">keyvi::dictionary::DictionaryCompiler</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cpp/index.html">Index</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cpp/index.html#_CPPv4N5keyvi5index5IndexE"><code class="docutils literal notranslate"><span class="pre">keyvi::index::Index</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Rust API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="rust/dictionary.html">Dictionary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rust/dictionary.html#id1">Dictionary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rust/match.html">Match</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rust/match.html#keyvimatch">KeyviMatch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rust/match.html#keyvimatchiterator">KeyviMatchIterator</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="python/match.html">Match</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python/match.html#keyvi.Match"><code class="docutils literal notranslate"><span class="pre">Match</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python/dictionary.html">Dictionary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python/dictionary.html#keyvi.dictionary.Dictionary"><code class="docutils literal notranslate"><span class="pre">Dictionary</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/dictionary.html#secondarykeydictionary">SecondaryKeyDictionary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python/compiler.html">Compiler</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python/compiler.html#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/compiler.html#compilers">Compilers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/compiler.html#secondary-key-compilers">Secondary Key Compilers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/compiler.html#mergers">Mergers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/compiler.html#generator">Generator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python/completion.html">Completion</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python/completion.html#keyvi.completion.PrefixCompletion"><code class="docutils literal notranslate"><span class="pre">PrefixCompletion</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/completion.html#keyvi.completion.MultiWordCompletion"><code class="docutils literal notranslate"><span class="pre">MultiWordCompletion</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/completion.html#keyvi.completion.ForwardBackwardCompletion"><code class="docutils literal notranslate"><span class="pre">ForwardBackwardCompletion</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python/index.html">Index</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python/index.html#keyvi.index.Index"><code class="docutils literal notranslate"><span class="pre">Index</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/index.html#keyvi.index.ReadOnlyIndex"><code class="docutils literal notranslate"><span class="pre">ReadOnlyIndex</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python/vector.html">Vector</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python/vector.html#keyvi.vector.JsonVector"><code class="docutils literal notranslate"><span class="pre">JsonVector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/vector.html#keyvi.vector.StringVector"><code class="docutils literal notranslate"><span class="pre">StringVector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/vector.html#keyvi.vector.JsonVectorGenerator"><code class="docutils literal notranslate"><span class="pre">JsonVectorGenerator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/vector.html#keyvi.vector.StringVectorGenerator"><code class="docutils literal notranslate"><span class="pre">StringVectorGenerator</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="python/util.html">Util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python/util.html#keyvi.util.JumpConsistentHashString"><code class="docutils literal notranslate"><span class="pre">JumpConsistentHashString()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/util.html#keyvi.util.FsaTransform"><code class="docutils literal notranslate"><span class="pre">FsaTransform</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="python/util.html#keyvi.util.PredictiveCompression"><code class="docutils literal notranslate"><span class="pre">PredictiveCompression</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-right" href="usage/crashcourse.html" title="Next">
+        Crashcourse <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Welcome to keyvi!</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a><ul>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://github.com/KeyviDev/keyvi">Github</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://pypi.org/project/keyvi/">Pypi</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center text-white-50 font-italic mt-3">
+                <small>Last updated: Nov 10, 2026</small>
+                <small>
+                    Created using
+                    <a class="text-white" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Sphinx Wagtail Theme 
+                    </a>
+                    and
+                    <a class="text-white" href="https://www.sphinx-doc.org/" rel="nofollow" target="_blank">
+                        Sphinx 9.1.1
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script type="text/javascript" src="_static/dist/theme.js"></script>
+        <script type="text/javascript" src="_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="_static/searchtools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>

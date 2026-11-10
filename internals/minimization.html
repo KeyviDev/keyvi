@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" data-content_root="../">
+<head>
+    <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+        <title>Minimization &mdash; keyvi  documentation</title>
+    
+    <link rel="stylesheet" type="text/css" href="../_static/dist/fontawesome.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/dist/theme.css?v=9cdaa676" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=dd5fadba" />
+            <link rel="index" title="Index" href="../genindex.html" />
+            <link rel="search" title="Search" href="../search.html" />
+            <link rel="top" title="keyvi  documentation" href="#" />
+            <link rel="next" title="Scaling" href="scaling.html" />
+            <link rel="prev" title="Persistence basics" href="persistence-basics.html" />
+    </head>
+<body>
+    <script type="text/javascript" src="../_static/dist/blocking.js"></script>
+    <header class="container-fluid bg-primary">
+        <a class="btn btn-sm btn-light skip-to-content-link" href="#main">Skip to content</a>
+        <div class="container-fluid">
+            <div class="navbar navbar-expand-lg navbar-dark font-weight-bold">
+                    <a href="../index.html"
+                        title="keyvi"
+                        class="logo navbar-brand"
+                    >
+                        <img src="../_static/logo-white.png" width="45" height="59" alt="keyvi"
+                            class="logo-img"
+                        />
+                        keyvi
+                    </a>
+                
+                
+                <button class="navbar-toggler btn btn-primary d-lg-none" type="button" data-toggle="collapse" data-target="#collapseSidebar" aria-expanded="false" aria-controls="collapseExample">
+                    <span class="navbar-toggler-icon"></span>
+                    <span class="sr-only">menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-12 col-lg-3 sidebar-container">
+                <div id="collapseSidebar" class="collapse sticky-top d-lg-block pt-5 pr-lg-4">
+<div id="searchbox" class="searchbox mb-6 px-1" role="search">
+    <form id="search-form" action="../search.html" autocomplete="off" method="get" role="search">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text border-right-0 bg-white py-3 pl-3 pr-2"><span class="fas fa-search"></span></div>
+            </div>
+            <input class="form-control py-3 pr-3 pl-1 h-100 border-left-0" type="search" name="q" placeholder="Search documentation" aria-label="Search documentation" id="searchinput" />
+        </div>
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+    </form>
+</div><div class="site-toc">
+    <nav class="toc mt-3" aria-label="Main menu">
+        <p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/crashcourse.html">Crashcourse</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/building-dictionaries.html">Compiling dictionaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/building-dictionaries-python.html">Compiling dictionaries with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index-python.html">Keyvi index with python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/emr.html">Using keyvi in pyspark or mrjob</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Internals</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="construction-basics.html">Construction basics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persistence-basics.html">Persistence basics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Minimization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scaling.html">Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extensibility.html">Extensibility</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/dictionary_compiler.html">DictionaryCompiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cpp/index.html">Index</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Rust API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../rust/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rust/match.html">Match</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../python/match.html">Match</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/dictionary.html">Dictionary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/compiler.html">Compiler</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/completion.html">Completion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/vector.html">Vector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../python/util.html">Util</a></li>
+</ul>
+
+    </nav>
+    <template data-toggle-item-template>
+        <button class="btn btn-sm btn-link toctree-expand" type="button">
+            <span class="sr-only">Toggle menu contents</span>
+        </button>
+    </template>
+</div>
+                    <div class="d-lg-none border-bottom">
+                        
+                    </div>
+                </div>
+            </aside>
+            <div class="col-12 col-lg-9 pt-5">
+                <header class="row align-items-baseline">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+    <ol class="breadcrumb m-0 p-0 bg-transparent">
+        <li class="breadcrumb-item"><a href="../index.html">Docs</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Minimization</li>
+    </ol>
+</nav>
+                    </div>
+                    <div class="col-sm-12 col-lg-auto mt-3 mt-lg-3">
+                        <div class="d-flex flex-wrap gap-2">
+                            <noscript>
+                                <p>JavaScript is required to toggle light/dark mode..</p>
+                            </noscript>
+                            <button id="wagtail-theme" class="btn btn-sm btn-light text-decoration-none" type="button">
+                                <span class="dark-only"><i class="fas fa-sun"></i> Light mode</span>
+                                <span class="light-only"><i class="fas fa-moon"></i> Dark mode</span>
+                            </button>
+    <a class="btn btn-sm btn-light text-decoration-none" href="https://github.com/KeyviDev/keyvi/tree/master/sphinx-docs/internals/minimization.md" rel="nofollow">
+        <span class="btn-icon"><span class="fab fa-github"></span></span>
+        <span class="btn-text">Edit on GitHub</span>
+    </a>
+    <a class="btn btn-sm btn-light text-decoration-none" href="../_sources/internals/minimization.md.txt" rel="nofollow">
+        <span class="btn-icon"><span class="fas fa-code"></span></span>
+        <span class="btn-text">View source</span>
+    </a>
+                            
+                        </div>
+                    </div>
+                </header>
+                <div class="row" >
+                    <div class="col-12">
+                        <hr class="w-100 my-4">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-lg-9 order-last order-lg-first rst-content">
+                        <main role="main" id="main">
+    <section id="minimization">
+<h1>Minimization<a class="headerlink" href="#minimization" title="Link to this heading">¶</a></h1>
+<p>The purpose of minimization is to compress the data by finding equal states which can be re-used instead of writing a
+new state.</p>
+<section id="keyvi-minimization">
+<h2>keyvi Minimization<a class="headerlink" href="#keyvi-minimization" title="Link to this heading">¶</a></h2>
+<p>Minimization is implemented using a hash table. Each state that is written, is inserted into the hash table. Before
+persisting a new state, we try to find a equal state in the hashtable.</p>
+<p>Code:</p>
+<p>Entry point of minimization: <a class="reference external" href="https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/sparse_array_builder.h">sparse_array_builder</a></p>
+<p>Minimization hashtable: <a class="reference external" href="https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/minimization_hash.h">minimization_hash</a></p>
+<p>The Hashtable in keyvi has a very small footprint of 12 bytes per entry.</p>
+</section>
+<section id="getting-best-compression-ratios">
+<h2>Getting best compression ratios<a class="headerlink" href="#getting-best-compression-ratios" title="Link to this heading">¶</a></h2>
+<p>Minimization/Compression is dependent on the data. FSA’s are mainly used in computational linguistics, one of the reasons:
+FSA’s make use of high ambiguity in languages.</p>
+<p><img alt="Compression" src="../_images/compression.png" /></p>
+<section id="prefix-compression">
+<h3>Prefix compression<a class="headerlink" href="#prefix-compression" title="Link to this heading">¶</a></h3>
+<p>Therefore having “natural language keys” yields compression, both at prefix as well as suffix side. “Binary keys”, e.g.
+fingerprints, are pretty bad in terms of compression.</p>
+<p>Note that Prefix compression is basically the same as in a trie.</p>
+</section>
+<section id="suffix-and-value-compression">
+<h3>Suffix and value compression<a class="headerlink" href="#suffix-and-value-compression" title="Link to this heading">¶</a></h3>
+<p>In contrast to a trie the FSA compresses suffixes as well. But note: The value is part of the suffix, as it is attached
+to the “final state”. Therefore sparse values will yield best results while having totally unique values will result in
+no suffix compression.</p>
+</section>
+<section id="improving-compression-rate-reducing-size">
+<h3>Improving compression rate / Reducing Size<a class="headerlink" href="#improving-compression-rate-reducing-size" title="Link to this heading">¶</a></h3>
+<p>Normalize keys to gain better prefix compression.</p>
+<p>Think about your values, reduce the version space if possible. For example: if you store integer values, think about their
+range. Normalizing the integers reduce the number of unique values and therefore improve the compression ratio.</p>
+<p>Take minimization into account: permutations and repetitions are a strength of the algorithm, e.g. storing tons of almost
+identical keys pointing to the same value. In other data structures this can cause huge memory usage, FSA’s are good in
+minimizing that.</p>
+</section>
+<section id="check-questions">
+<h3>Check questions<a class="headerlink" href="#check-questions" title="Link to this heading">¶</a></h3>
+<ol class="arabic simple">
+<li><p>You want to write a Date Extractor which can extract all dates of the fomat “YYYY-MM-DD”. Estimate the size
+requirement.</p></li>
+<li><p>Now assign a counter(incremented each time) to each key. What happens? What about your size estimate?</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+</main>
+                        <nav aria-label="Page navigation" class="py-4 my-5 clearfix font-weight-bold border-top">
+    <a class="float-left" href="persistence-basics.html" title="Previous">
+        <span aria-hidden="true">←&nbsp;</span>Persistence basics
+    </a>
+    <a class="float-right" href="scaling.html" title="Next">
+        Scaling <span aria-hidden="true">&nbsp;→</span>
+    </a>
+</nav>
+                    </div>
+                    
+                    <nav class="col-12 col-lg-3 pb-4">
+                        <div class="sticky-top toc page-toc" aria-labelledby="page-toc-heading">
+                            <p class="font-weight-bold" id="page-toc-heading">Page contents</p>
+                            <ul>
+<li><a class="reference internal" href="#">Minimization</a><ul>
+<li><a class="reference internal" href="#keyvi-minimization">keyvi Minimization</a></li>
+<li><a class="reference internal" href="#getting-best-compression-ratios">Getting best compression ratios</a><ul>
+<li><a class="reference internal" href="#prefix-compression">Prefix compression</a></li>
+<li><a class="reference internal" href="#suffix-and-value-compression">Suffix and value compression</a></li>
+<li><a class="reference internal" href="#improving-compression-rate-reducing-size">Improving compression rate / Reducing Size</a></li>
+<li><a class="reference internal" href="#check-questions">Check questions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+                        </div>
+                    </nav>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="container-fluid bg-primary text-light">
+        <div class="container">
+            <div class="row">
+        <div class="col p-4">
+            
+                <nav aria-label="Footer">
+                    <ul class="nav justify-content-center mb-2">
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://github.com/KeyviDev/keyvi">Github</a></li>
+                        
+                            
+                            
+                            <li class="nav-item"><a class="nav-link text-light"  href="https://pypi.org/project/keyvi/">Pypi</a></li>
+                        
+                    </ul>
+                </nav>
+            
+            <div class="text-center text-white-50 font-italic mt-3">
+                <small>Last updated: Nov 10, 2026</small>
+                <small>
+                    Created using
+                    <a class="text-white" href="https://github.com/wagtail/sphinx_wagtail_theme" rel="nofollow" target="_blank">
+                        Sphinx Wagtail Theme 
+                    </a>
+                    and
+                    <a class="text-white" href="https://www.sphinx-doc.org/" rel="nofollow" target="_blank">
+                        Sphinx 9.1.1
+                    </a>
+                </small>
+            </div>
+        </div>
+    </div>
+        </div>
+    </footer>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+        <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+        <script type="text/javascript" src="../_static/dist/theme.js"></script>
+        <script type="text/javascript" src="../_static/dist/vendor.js"></script>
+        <script type="text/javascript" src="../_static/searchtools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', function() { Search.loadIndex("../searchindex.js"); });
+        </script>
+        <script type="text/javascript" id="searchindexloader"></script>
+    </body>
+</html>
