@@ -23,12 +23,17 @@ fi
 # --- Download ---
 echo "Downloading zlib ${ZLIB_VERSION} from ${ZLIB_URL}"
 
-curl -fsSL --retry 5 --retry-delay 2
-    "${ZLIB_URL}" -o "${ZLIB_TAR}"
+echo "ZLIB_URL=${ZLIB_URL}"
+echo "ZLIB_TAR=${ZLIB_TAR}"
+
+curl --fail --silent --show-error --location \
+    --retry 5 \
+    --retry-delay 2 \
+    --output "${ZLIB_TAR}" \
+    "${ZLIB_URL}"
 
 # --- Verify ---
 echo "Verifying checksum..."
-
 echo "${ZLIB_SHA256}  ${ZLIB_TAR}" | sha256sum -c -
 
 echo "Testing gzip archive..."
