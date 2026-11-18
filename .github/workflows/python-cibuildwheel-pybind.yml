@@ -1,28 +1,10 @@
 name: Python Pybind cibuildwheel
 
+# Build-only workflow, called from python-cibuildwheel.yml.
+# Publishing to PyPI happens there in a single upload job, so that all keyvi
+# releases share one trusted publisher (avoids PyPI "changed provenance" warnings).
 on:
-  push:
-    branches: [ master, release-* ]
-    paths-ignore:
-      - '.github/workflows/docs.yml'
-      - '.github/workflows/keyvi.yml'
-      - '.github/workflows/python-dockerimages-**.yml'
-      - '.github/workflows/rust**.yml'
-      - 'docker/**'
-      - 'doc/**'
-      - 'rust/**'
-  pull_request:
-    branches: [ master ]
-    paths-ignore:
-      - '.github/workflows/docs.yml'
-      - '.github/workflows/keyvi.yml'
-      - '.github/workflows/python-dockerimages-**.yml'
-      - '.github/workflows/rust**.yml'
-      - 'docker/**'
-      - 'doc/**'
-      - 'rust/**'
-  release:
-    types: [published]
+  workflow_call:
   workflow_dispatch:
 
 jobs:
@@ -104,7 +86,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: artifact-${{ matrix.os }}-${{ matrix.flavor }}-${{ matrix.target }}
+          name: artifact-pybind-${{ matrix.os }}-${{ matrix.flavor }}-${{ matrix.target }}
           path: ./wheelhouse/*.whl
 
   build_sdist:
@@ -132,23 +114,5 @@ jobs:
 
     - uses: actions/upload-artifact@v7
       with:
-        name: artifact-sdist
+        name: artifact-pybind-sdist
         path: dist/*.tar.gz
-
-  upload_all:
-    needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    environment:
-      name: pypi
-      url: https://pypi.org/p/keyvi
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/download-artifact@v8
-        with:
-          pattern: artifact-*
-          merge-multiple: true
-          path: dist
-
-      - uses: pypa/gh-action-pypi-publish@release/v1

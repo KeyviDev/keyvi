@@ -156,8 +156,14 @@ jobs:
         name: artifact-sdist
         path: python/wheelhouse/*.tar.gz
 
+  build_pybind:
+    name: pybind
+    uses: ./.github/workflows/python-cibuildwheel-pybind.yml
+
+  # single upload job for both cython and pybind packages, keep this the only
+  # trusted publisher for keyvi on PyPI
   upload_all:
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels, build_sdist, build_pybind]
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
     environment:
