@@ -31,7 +31,9 @@ html_theme_options = {
     "footer_links": (
         "Github|https://github.com/KeyviDev/keyvi,"
         "Pypi|https://pypi.org/project/keyvi/,"
-        "crates.io|https://crates.io/crates/keyvi"
+        "crates.io|https://crates.io/crates/keyvi,"
+        "Sponsor|https://github.com/sponsors/hendrikmuhs,"
+        "Buy me a coffee|https://buymeacoffee.com/hendrikmuhs"
     ),
 }
 

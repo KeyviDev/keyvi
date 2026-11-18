@@ -35,6 +35,8 @@ dependencies = [
 Homepage = "http://keyvi.org"
 Repository = "https://github.com/KeyviDev/keyvi"
 Documentation = "https://keyvidev.github.io/keyvi/index.html"
+Funding = "https://github.com/sponsors/hendrikmuhs"
+"Buy Me a Coffee" = "https://buymeacoffee.com/hendrikmuhs"
 
 [project.scripts]
 keyvi = "keyvi.cli.cli:main"
