@@ -10,7 +10,7 @@ The most useful customization are different value types:
 Keys are always strings, values can be of any type, even nested types. Built-in types at time of writing are no-value,
 integer, strings and json.
 
-Value types have to implement a ["duck-type"](http://en.wikipedia.org/wiki/Duck_typing) interface.
+Value types have to implement a ["duck-type"](https://en.wikipedia.org/wiki/Duck_typing) interface.
 
 Code: [IValue_Store](https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/ivalue_store.h)
 

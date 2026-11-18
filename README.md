@@ -1,5 +1,5 @@
 ##
-[![BuildBadge](https://github.com/KeyviDev/keyvi/workflows/Build%20keyvi/badge.svg)](https://github.com/KeyviDev/keyvi/actions)
+[![BuildBadge](https://github.com/KeyviDev/keyvi/actions/workflows/keyvi.yml/badge.svg)](https://github.com/KeyviDev/keyvi/actions/workflows/keyvi.yml)
 [![Coverage](https://codecov.io/gh/KeyviDev/keyvi/branch/master/graph/badge.svg)](https://codecov.io/gh/KeyviDev/keyvi)
 [![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](/keyvi/README.md)
 [![PythonVersions](https://img.shields.io/pypi/pyversions/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
