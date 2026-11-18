@@ -1,3 +1,4 @@
+include LICENSE.txt
 recursive-include autowrap_includes *.hpp
 graft src
 include _core.cpp
