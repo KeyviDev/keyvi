@@ -40,7 +40,7 @@ jobs:
       - name: install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-dev libboost-filesystem-dev libboost-iostreams-dev libboost-program-options-dev libboost-test-dev
           pipx install gcovr
 
       - name: checkout from git
