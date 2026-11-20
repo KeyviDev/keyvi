@@ -129,6 +129,7 @@ BOOST_AUTO_TEST_CASE(Name) {
 
   const ZstdDictCompressionStrategy strategy(dict.data(), dict.size());
   BOOST_CHECK_EQUAL("zstd_dict", strategy.name());
+  BOOST_CHECK_EQUAL(4, strategy.GetFileVersionMin());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

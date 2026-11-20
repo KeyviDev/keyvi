@@ -28,13 +28,13 @@
 #include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_strategy.h"
 
+namespace keyvi::compression {
+
 #ifndef ZSTD_DEFAULT_CLEVEL
 constexpr int kZstdDefaultCompressionLevel = 3;
 #else
 constexpr int kZstdDefaultCompressionLevel = ZSTD_DEFAULT_CLEVEL;
 #endif
-
-namespace keyvi::compression {
 
 struct ZstdDictCompressionStrategy final : public CompressionStrategy {
   ZstdDictCompressionStrategy(const char* dict_data, size_t dict_size,
