@@ -26,6 +26,7 @@ enum CompressionAlgorithm {
   ZLIB_COMPRESSION = 1,
   SNAPPY_COMPRESSION = 2,
   ZSTD_COMPRESSION = 3,
+  ZSTD_DICT_COMPRESSION = 4,
 };
 
 } /* namespace compression */
