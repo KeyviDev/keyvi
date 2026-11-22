@@ -1,5 +1,5 @@
 ##
-[![BuildBadge](https://github.com/KeyviDev/keyvi/workflows/Build%20keyvi/badge.svg)](https://github.com/KeyviDev/keyvi/actions)
+[![BuildBadge](https://github.com/KeyviDev/keyvi/actions/workflows/keyvi.yml/badge.svg)](https://github.com/KeyviDev/keyvi/actions/workflows/keyvi.yml)
 [![Coverage](https://codecov.io/gh/KeyviDev/keyvi/branch/master/graph/badge.svg)](https://codecov.io/gh/KeyviDev/keyvi)
 [![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](/keyvi/README.md)
 [![PythonVersions](https://img.shields.io/pypi/pyversions/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
@@ -7,6 +7,8 @@
 [![PythonFormat](https://img.shields.io/pypi/format/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![PyPIVersion](https://img.shields.io/pypi/v/keyvi.svg)](https://pypi.python.org/pypi/keyvi/)
 [![CratesVersion](https://img.shields.io/crates/v/keyvi)](https://crates.io/crates/keyvi/)
+[![GitHubSponsors](https://img.shields.io/github/sponsors/hendrikmuhs?logo=githubsponsors&label=Sponsor)](https://github.com/sponsors/hendrikmuhs)
+[![BuyMeACoffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-donate-yellow?logo=buymeacoffee)](https://buymeacoffee.com/hendrikmuhs)
 
 ##
 ![Keyvi](/doc/images/keyvi-small.png)
@@ -69,8 +71,9 @@ The python version ships with the same 3rdparty dependencies as the C++ code and
 | msgpack (for python)        | Apache License, Version 2.0  |
 
 
-## Credits
+## Support keyvi
 
-Thanks go to:
+keyvi is developed and maintained in spare time. If you find it useful, please consider supporting its development:
 
- - [Cliqz](https://cliqz.com/) for sponsoring and [opening keyvi](https://cliqz.com/en/magazine/cliqzs-major-open-source-contribution-keyvi-key-value-index)
+  * [GitHub Sponsors](https://github.com/sponsors/hendrikmuhs)
+  * [Buy Me a Coffee](https://buymeacoffee.com/hendrikmuhs)

@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.24
+        uses: hendrikmuhs/ccache-action@v1.2.25
         with:
           key: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.flavor }}-python
 
@@ -133,9 +133,9 @@ jobs:
     - name: install Linux deps
       run: |
         sudo apt-get update && \
-        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev ccache
+        sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-dev libboost-filesystem-dev libboost-iostreams-dev libboost-program-options-dev libboost-test-dev libboost-process-dev ccache
     - name: ccache
-      uses: hendrikmuhs/ccache-action@v1.2.24
+      uses: hendrikmuhs/ccache-action@v1.2.25
       with:
         key: ubuntu-sdist-python
 
@@ -156,8 +156,14 @@ jobs:
         name: artifact-sdist
         path: python/wheelhouse/*.tar.gz
 
+  build_pybind:
+    name: pybind
+    uses: ./.github/workflows/python-cibuildwheel-pybind.yml
+
+  # single upload job for both cython and pybind packages, keep this the only
+  # trusted publisher for keyvi on PyPI
   upload_all:
-    needs: [build_wheels, build_sdist]
+    needs: [build_wheels, build_sdist, build_pybind]
     runs-on: ubuntu-latest
     if: github.event_name == 'release'
     environment:

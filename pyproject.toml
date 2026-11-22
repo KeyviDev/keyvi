@@ -4,8 +4,8 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "keyvi"
-# 0.9.8 corresponds to 0.7.8 (Cython), using 0.9.x for the pybind11 beta series
-version = "0.9.8b1"
+# 0.9.10 corresponds to 0.7.10 (Cython), using 0.9.x for the pybind11 beta series
+version = "0.9.10b1"
 description = "Python package for keyvi"
 readme = "python/description.md"
 license = "Apache-2.0"
@@ -35,6 +35,8 @@ dependencies = [
 Homepage = "http://keyvi.org"
 Repository = "https://github.com/KeyviDev/keyvi"
 Documentation = "https://keyvidev.github.io/keyvi/index.html"
+Funding = "https://github.com/sponsors/hendrikmuhs"
+"Buy Me a Coffee" = "https://buymeacoffee.com/hendrikmuhs"
 
 [project.scripts]
 keyvi = "keyvi.cli.cli:main"

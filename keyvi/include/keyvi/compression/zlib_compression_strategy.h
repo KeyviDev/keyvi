@@ -29,6 +29,7 @@
 
 #include <zlib.h>
 #include <cstdint>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -117,13 +118,17 @@ struct BasicZlibCompressionStrategy final : public CompressionStrategy {
 
     output_length = zstream_compress_.total_out;
 
+    // GCOVR_EXCL_START
     if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
       std::ostringstream oss;
-      oss << "Exception during zlib compression: (" << ret << ") " << zstream_compress_.msg;
+      // msg might be NULL
+      oss << "Exception during zlib compression: (" << ret << ") "
+          << (zstream_compress_.msg != nullptr ? zstream_compress_.msg : "unknown error");
       // reset, so that the instance can be reused
       deflateReset(&zstream_compress_);
       throw(std::runtime_error(oss.str()));
     }
+    // GCOVR_EXCL_STOP
     deflateReset(&zstream_compress_);
     buffer->resize(output_length + offset);
   }
@@ -166,7 +171,9 @@ struct BasicZlibCompressionStrategy final : public CompressionStrategy {
 
     if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
       std::ostringstream oss;
-      oss << "Exception during zlib decompression: (" << ret << ") " << zs.msg;
+      // msg might be NULL
+      oss << "Exception during zlib decompression: (" << ret << ") "
+          << (zs.msg != nullptr ? zs.msg : "unknown error");  // GCOVR_EXCL_BR_LINE
       throw(std::runtime_error(oss.str()));
     }
 

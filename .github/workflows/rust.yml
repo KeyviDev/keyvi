@@ -38,7 +38,7 @@ jobs:
       - name: Install system packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-dev libboost-filesystem-dev libboost-iostreams-dev libboost-program-options-dev libboost-test-dev
       - name: Code fomatting
         run: cargo fmt --manifest-path rust/Cargo.toml -- --check
       - name: Build
@@ -61,7 +61,7 @@ jobs:
       - name: Install system packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-dev libboost-filesystem-dev libboost-iostreams-dev libboost-program-options-dev libboost-test-dev libboost-process-dev
       - run: rustup update stable && rustup default stable
       - run: cargo update --verbose --manifest-path rust/Cargo.toml
       - run: cargo build --verbose --manifest-path rust/Cargo.toml
@@ -87,7 +87,7 @@ jobs:
       - name: Install system packages
         run: |
           sudo apt-get update
-          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-dev libboost-filesystem-dev libboost-iostreams-dev libboost-program-options-dev libboost-test-dev libboost-process-dev
 
       - uses: rust-lang/crates-io-auth-action@v1
         id: auth

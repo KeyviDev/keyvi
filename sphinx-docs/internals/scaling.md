@@ -42,7 +42,7 @@ Note: The amount of memory is configurable in the compiler. Increasing the limit
 ### Packing
 
 Sparse Array Construction is one of the most demanding parts. To speedup compilation we make use of bit vectors,
-sliding windows and the [De Bruijn](http://en.wikipedia.org/wiki/De_Bruijn_sequence) sequence to quickly find spots to pack
+sliding windows and the [De Bruijn](https://en.wikipedia.org/wiki/De_Bruijn_sequence) sequence to quickly find spots to pack
 the data, or - if available - intrinsic compiler/CPU functions.
 
 Code: [BitVector](https://github.com/KeyviDev/keyvi/blob/master/keyvi/include/keyvi/dictionary/fsa/internal/bit_vector.h)

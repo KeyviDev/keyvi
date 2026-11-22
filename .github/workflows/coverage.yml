@@ -40,7 +40,7 @@ jobs:
       - name: install deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-dev libboost-filesystem-dev libboost-iostreams-dev libboost-program-options-dev libboost-test-dev
           pipx install gcovr
 
       - name: checkout from git
@@ -52,7 +52,7 @@ jobs:
           python-version: '3.13'
 
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.24
+        uses: hendrikmuhs/ccache-action@v1.2.25
         with:
           key: coverage
 
@@ -123,7 +123,7 @@ jobs:
           path: coverage/
 
       - name: upload to codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: coverage/coverage.xml
           # upload only the gcovr report: by default the uploader also searches for reports and runs

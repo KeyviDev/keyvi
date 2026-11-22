@@ -37,13 +37,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-all-dev doxygen
+          sudo apt-get install -y libsnappy-dev libzzip-dev zlib1g-dev libboost-dev libboost-filesystem-dev libboost-iostreams-dev libboost-program-options-dev libboost-test-dev doxygen
       - name: checkout from git
         uses: actions/checkout@v7
 
         # re-use the cache from the linux build
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.24
+        uses: hendrikmuhs/ccache-action@v1.2.25
         with:
           key: ${{ runner.os }}-${{ env.BUILD_TYPE }}
 

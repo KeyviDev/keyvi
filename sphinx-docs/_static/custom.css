@@ -6,3 +6,37 @@
 pre {
     background-color: #24292f;
 }
+
+/* GitHub link in the top right of the header bar. */
+header .navbar-nav .nav-link {
+    color: #fff !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    background-image: none !important;
+}
+
+header .navbar-nav .nav-link:hover {
+    opacity: 0.8;
+}
+
+/* Narrow screens: keep the GitHub icon in the header, icon only. */
+@media (max-width: 991.98px) {
+    header .navbar-collapse {
+        display: flex !important;
+        flex-basis: auto;
+        margin-right: 0.75rem;
+    }
+
+    header .navbar-nav {
+        flex-direction: row;
+    }
+
+    header .navbar-nav .nav-link {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    header .navbar-nav .nav-link .link-text {
+        display: none;
+    }
+}

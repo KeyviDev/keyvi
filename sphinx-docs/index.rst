@@ -22,7 +22,7 @@ Talks and presentations:
 
 * `BBuzz2016 talk <https://www.youtube.com/watch?v=GBjisdmHe4g>`_
   (`slides <https://cdn.jsdelivr.net/gh/KeyviDev/keyvi/doc/presentations/bbuzz2016/keyvi-presentation.svg#1_0>`__)
-* `Search Meetup Munich Jan 2016 <http://www.slideshare.net/HendrikMuhs/keyvi-the-key-value-index-cliqz>`_
+* `Search Meetup Munich Jan 2016 <https://www.slideshare.net/slideshow/keyvi-the-key-value-index-cliqz/57212536>`_
 * `Progscon 2017 talk <https://www.infoq.com/presentations/keyvi>`_
 * `Search Meetup Munich Apr 2018
   <https://cdn.jsdelivr.net/gh/KeyviDev/keyvi/doc/presentations/searchmuc_apr_2018/keyvi-presentation-search-meetup-2018.svg#1_0>`_
@@ -49,10 +49,11 @@ Talks and presentations:
 
 If you like to go deep down in the basics, keyvi is inspired by the following 2 papers:
 
-* Sparse Array (See Storing a Sparse Table, Robert E. Tarjan et al.
-  http://infolab.stanford.edu/pub/cstr/reports/cs/tr/78/683/CS-TR-78-683.pdf)
-* Incremental, which means minimization is done on the fly (See Incremental Construction of Minimal Acyclic
-  Finite-State Automata, J. Daciuk et al.: http://www.mitpressjournals.org/doi/pdf/10.1162/089120100561601)
+* Sparse Array (See `Storing a Sparse Table <https://doi.org/10.1145/359168.359175>`_, Robert E. Tarjan et al.,
+  `tech report PDF
+  <http://bitsavers.informatik.uni-stuttgart.de/pdf/stanford/Stanford_CS_TR_Collection_2025-12-12/PDF/1978/CS-TR-78-683.pdf>`_)
+* Incremental, which means minimization is done on the fly (See `Incremental Construction of Minimal Acyclic
+  Finite-State Automata <https://doi.org/10.1162/089120100561601>`_, J. Daciuk et al.)
 
 
 API Documentation
