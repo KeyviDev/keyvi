@@ -130,6 +130,7 @@ class StringValueStore final : public StringValueStoreMinimizationBase {
    * todo: performance improvements / port stuff from json_value_store
    */
   uint64_t AddValue(const value_t& value, bool* no_minimization) {
+    ++number_of_values_;
     const RawPointerForCompareString<MemoryMapManager> stp(value.data(), value.size(), values_extern_.get());
 
     const RawPointer<> p = hash_.Get(stp);
@@ -140,6 +141,7 @@ class StringValueStore final : public StringValueStoreMinimizationBase {
     }
 
     *no_minimization = true;
+    ++number_of_unique_values_;
 
     // else persist string value
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
@@ -175,6 +177,7 @@ class StringValueStoreMerge final : public StringValueStoreMinimizationBase {
                                  const keyvi::util::parameters_t& parameters = keyvi::util::parameters_t()) {}
 
   uint64_t AddValueMerge(const char* payload, uint64_t fsa_value, bool* no_minimization) {
+    ++number_of_values_;
     const char* value = payload + fsa_value;
     const size_t value_size = std::strlen(value);
     const RawPointerForCompareString<MemoryMapManager> stp(value, value_size, values_extern_.get());
@@ -187,6 +190,7 @@ class StringValueStoreMerge final : public StringValueStoreMinimizationBase {
     }
 
     *no_minimization = true;
+    ++number_of_unique_values_;
 
     // else persist string value
     uint64_t pt = static_cast<uint64_t>(values_buffer_size_);
