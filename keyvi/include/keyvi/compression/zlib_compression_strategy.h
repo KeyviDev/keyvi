@@ -86,7 +86,9 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
     if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
       std::ostringstream oss;
-      oss << "Exception during zlib compression: (" << ret << ") " << zstream_compress_.msg;
+      // msg might be NULL
+      oss << "Exception during zlib compression: (" << ret << ") "
+          << (zstream_compress_.msg != nullptr ? zstream_compress_.msg : "unknown error");
       throw(std::runtime_error(oss.str()));
     }
     deflateReset(&zstream_compress_);
@@ -125,7 +127,8 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
 
     if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
       std::ostringstream oss;
-      oss << "Exception during zlib decompression: (" << ret << ") " << zs.msg;
+      // msg might be NULL
+      oss << "Exception during zlib decompression: (" << ret << ") " << (zs.msg != nullptr ? zs.msg : "unknown error");
       throw(std::runtime_error(oss.str()));
     }
 
