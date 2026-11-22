@@ -41,10 +41,9 @@ BOOST_AUTO_TEST_CASE(DecompressTruncated) {
   const std::string compressed = strategy.Compress(std::string(1000, 'x'));
 
   // zlib reports truncated input without a message (msg is NULL)
-  BOOST_CHECK_EXCEPTION(strategy.Decompress(compressed.data(), compressed.size() - 3), std::runtime_error,
-                        [](const std::runtime_error& e) {
-                          return std::string(e.what()).find("unknown error") != std::string::npos;
-                        });
+  BOOST_CHECK_EXCEPTION(
+      strategy.Decompress(compressed.data(), compressed.size() - 3), std::runtime_error,
+      [](const std::runtime_error& e) { return std::string(e.what()).find("unknown error") != std::string::npos; });
 }
 
 BOOST_AUTO_TEST_SUITE_END()
