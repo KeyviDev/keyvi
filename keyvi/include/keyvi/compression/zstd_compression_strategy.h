@@ -70,23 +70,24 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
 
   using CompressionStrategy::CompressWithoutHeader;
 
-  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
+  void Compress(buffer_t* buffer, const char* raw, size_t raw_size) override { DoCompress(buffer, raw, raw_size); }
 
-  inline void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
+  void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
     DoCompressAt(buffer, 0, raw, raw_size);
   }
 
-  inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
+  void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
     DoCompressAt(buffer, 1, raw, raw_size);
-    buffer->data()[0] = static_cast<char>(ZSTD_COMPRESSION);
+    (*buffer)[0] = static_cast<char>(ZSTD_COMPRESSION);
   }
 
   /** Compress into buffer starting at offset, the buffer is resized to offset + compressed size. */
-  inline void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
+  void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
     size_t output_length = ZSTD_compressBound(raw_size);
     buffer->resize(output_length + offset);
 
     // same output as ZSTD_compress, but reuses the compression context instead of creating one per call
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     output_length = ZSTD_compressCCtx(cctx_, buffer->data() + offset, output_length, raw, raw_size, compression_level_);
     if (ZSTD_isError(output_length) != 0U) {  // GCOVR_EXCL_BR_LINE
       // GCOVR_EXCL_START
@@ -117,7 +118,7 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
     if (ZSTD_isError(result) != 0U) {
       throw std::runtime_error(std::string("zstd decompression failed: ") + ZSTD_getErrorName(result));
     }
-    if (result != uncompressed.size()) {  // GCOVR_EXCL_BR_LINE
+    if (result != uncompressed.size()) {                                               // GCOVR_EXCL_BR_LINE
       throw std::runtime_error("zstd decompression failed: unexpected content size");  // GCOVR_EXCL_LINE
     }
 
@@ -137,6 +138,7 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
     thread_local std::string frame;
 
     // keep the buffer for typical values, but do not keep large buffers per thread (also on error)
+    // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions,hicpp-special-member-functions)
     struct ReleaseLargeBuffer {
       std::string* buffer;
       ~ReleaseLargeBuffer() {
@@ -144,18 +146,18 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
           std::string().swap(*buffer);
         }
       }
-    } release_large_buffer{&frame};
+    } const release_large_buffer{&frame};
 
     frame.assign(prefix).append(data, size);
     return DoDecompressWithoutHeader(frame.data(), frame.size());
   }
 
   /** maximum size of the frame buffer kept per thread for DoDecompressWithPrefix */
-  static constexpr size_t kMaxRetainedFrameBufferSize = 1024 * 1024;
+  static constexpr size_t kMaxRetainedFrameBufferSize = size_t{1024} * 1024;
 
-  std::string name() const { return "zstd"; }
+  [[nodiscard]] std::string name() const override { return "zstd"; }
 
-  uint64_t GetFileVersionMin() const { return 3; }
+  [[nodiscard]] uint64_t GetFileVersionMin() const override { return 3; }
 
  private:
   int compression_level_;
@@ -164,7 +166,7 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
   /** decompression context per thread, readers are shared between threads */
   static ZSTD_DCtx* GetDecompressionContext() {
     thread_local const std::unique_ptr<ZSTD_DCtx, decltype(&ZSTD_freeDCtx)> dctx(ZSTD_createDCtx(), &ZSTD_freeDCtx);
-    if (!dctx) {  // GCOVR_EXCL_BR_LINE
+    if (!dctx) {                                                            // GCOVR_EXCL_BR_LINE
       throw std::runtime_error("failed to initialize zstd decompression");  // GCOVR_EXCL_LINE
     }
     return dctx.get();
@@ -174,8 +176,9 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
 /**
  * zstd without the 4 byte magic number at the start of every frame.
  *
- * Not selectable by name, used internally by value stores that store the compression once (JsonValueStore2).
- * To decompress with a standard zstd decoder, prepend the magic number (0x28 0xb5 0x2f 0xfd).
+ * Not selectable via the "compression" parameter (compression_strategy(name)), used internally by value stores that
+ * store the compression once (JsonValueStore2). To decompress with a standard zstd decoder, prepend the magic number
+ * (0x28 0xb5 0x2f 0xfd).
  */
 struct ZstdMagiclessCompressionStrategy final : public CompressionStrategy {
   explicit ZstdMagiclessCompressionStrategy(int compression_level = ZSTD_DEFAULT_CLEVEL)
@@ -197,7 +200,7 @@ struct ZstdMagiclessCompressionStrategy final : public CompressionStrategy {
 
   void Compress(buffer_t* buffer, const char* raw, size_t raw_size) override {
     CompressAt(buffer, 1, raw, raw_size);
-    buffer->data()[0] = static_cast<char>(ZSTD_MAGICLESS);
+    (*buffer)[0] = static_cast<char>(ZSTD_MAGICLESS);
   }
 
   void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
@@ -214,9 +217,9 @@ struct ZstdMagiclessCompressionStrategy final : public CompressionStrategy {
     return ZstdCompressionStrategy::DoDecompressWithPrefix(FramePrefix(), data, size);
   }
 
-  std::string name() const override { return "zstd_magicless"; }
+  [[nodiscard]] std::string name() const override { return "zstd_magicless"; }
 
-  uint64_t GetFileVersionMin() const override { return 4; }
+  [[nodiscard]] uint64_t GetFileVersionMin() const override { return 4; }
 
   /**
    * The magic number of the zstd1 frame format (0xFD2FB528, little endian), the bytes left out of every frame.
@@ -226,7 +229,7 @@ struct ZstdMagiclessCompressionStrategy final : public CompressionStrategy {
    */
   static std::string FramePrefix() { return {"\x28\xb5\x2f\xfd", 4}; }
 
-  std::string GetFramePrefix() const override { return FramePrefix(); }
+  [[nodiscard]] std::string GetFramePrefix() const override { return FramePrefix(); }
 
  private:
   int compression_level_;

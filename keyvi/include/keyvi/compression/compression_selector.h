@@ -89,6 +89,9 @@ inline decompress_func_t decompressor_by_code(const CompressionAlgorithm algorit
     case ZSTD_MAGICLESS:
       TRACE("unpack zstd magicless compressed string");
       return ZstdMagiclessCompressionStrategy::DoDecompress;
+    case ZSTD_DICT_COMPRESSION:
+      throw std::invalid_argument(
+          "zstd dictionary compression requires the dictionary, use ZstdDictCompressionStrategy");
     default:
       throw std::invalid_argument("Invalid compression algorithm " +
                                   boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
@@ -113,15 +116,25 @@ inline decompress_func_t decompressor_without_header_by_code(const CompressionAl
       return ZstdCompressionStrategy::DoDecompressWithoutHeader;
     case ZSTD_MAGICLESS:
       return ZstdMagiclessCompressionStrategy::DoDecompressWithoutHeader;
+    case ZSTD_DICT_COMPRESSION:
+      throw std::invalid_argument(
+          "zstd dictionary compression requires the dictionary, use ZstdDictCompressionStrategy");
     default:
       throw std::invalid_argument("Invalid compression algorithm " +
                                   boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
   }
 }
 
-/** Returns the compression code for the (canonical) name of a compression strategy, see name(). */
+/**
+ * Returns the compression code for the canonical name of a compression strategy, the inverse of
+ * CompressionStrategy::name().
+ *
+ * Meant for names written by keyvi itself, not for user input: the lookup is case-sensitive, does not accept
+ * aliases and also covers internal formats. To select a compression by user input (the "compression" parameter),
+ * use compression_strategy(name).
+ */
 inline CompressionAlgorithm compression_algorithm_by_name(const std::string& name) {
-  if (name == "" || name == "raw") {
+  if (name.empty() || name == "raw") {
     return NO_COMPRESSION;
   } else if (name == "zlib") {
     return ZLIB_COMPRESSION;
@@ -155,6 +168,7 @@ inline CompressionStrategy* cached_compression_strategy_by_code(const Compressio
     throw std::invalid_argument("Invalid compression algorithm " + std::to_string(static_cast<int>(algorithm)));
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index): index is checked above
   compression_strategy_t& strategy = strategies[index];
   if (!strategy) {
     switch (algorithm) {
@@ -176,6 +190,9 @@ inline CompressionStrategy* cached_compression_strategy_by_code(const Compressio
       case ZSTD_MAGICLESS:
         strategy = std::make_unique<ZstdMagiclessCompressionStrategy>();
         break;
+      case ZSTD_DICT_COMPRESSION:
+        // not cached and not supported for re-compression: requires the dictionary
+        throw std::invalid_argument("zstd dictionary compression is not supported for re-compression");
       default:
         throw std::invalid_argument("Invalid compression algorithm " + std::to_string(static_cast<int>(algorithm)));
     }

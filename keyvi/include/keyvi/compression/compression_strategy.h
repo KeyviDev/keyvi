@@ -57,22 +57,20 @@ struct CompressionStrategy {
    */
   virtual void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) = 0;
 
-  inline std::string Compress(const std::string& raw) { return Compress(raw.data(), raw.size()); }
+  std::string Compress(const std::string& raw) { return Compress(raw.data(), raw.size()); }
 
-  inline std::string Compress(const char* raw, size_t raw_size) {
+  std::string Compress(const char* raw, size_t raw_size) {
     buffer_t buf;
     Compress(&buf, raw, raw_size);
-    return std::string(buf.data(), buf.size());
+    return {buf.data(), buf.size()};
   }
 
-  inline std::string CompressWithoutHeader(const std::string& raw) {
-    return CompressWithoutHeader(raw.data(), raw.size());
-  }
+  std::string CompressWithoutHeader(const std::string& raw) { return CompressWithoutHeader(raw.data(), raw.size()); }
 
-  inline std::string CompressWithoutHeader(const char* raw, size_t raw_size) {
+  std::string CompressWithoutHeader(const char* raw, size_t raw_size) {
     buffer_t buf;
     CompressWithoutHeader(&buf, raw, raw_size);
-    return std::string(buf.data(), buf.size());
+    return {buf.data(), buf.size()};
   }
 
   /**
@@ -82,16 +80,16 @@ struct CompressionStrategy {
   virtual std::string Decompress(const char* data, const size_t size) = 0;
 
   /** The "name" of the compression strategy. */
-  virtual std::string name() const = 0;
+  [[nodiscard]] virtual std::string name() const = 0;
 
   /** The minimum version this compressor requires */
-  virtual uint64_t GetFileVersionMin() const = 0;
+  [[nodiscard]] virtual uint64_t GetFileVersionMin() const = 0;
 
   /**
    * Bytes the compressor leaves out at the start of every compressed value which are needed by a standard decoder,
    * e.g. the magic number of zstd. Empty if the output is a complete stream.
    */
-  virtual std::string GetFramePrefix() const { return {}; }
+  [[nodiscard]] virtual std::string GetFramePrefix() const { return {}; }
 };
 
 using compression_strategy_t = std::unique_ptr<CompressionStrategy>;
@@ -103,20 +101,21 @@ using compression_strategy_t = std::unique_ptr<CompressionStrategy>;
 struct RawCompressionStrategy final : public CompressionStrategy {
   using CompressionStrategy::CompressWithoutHeader;
 
-  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
+  void Compress(buffer_t* buffer, const char* raw, size_t raw_size) override { DoCompress(buffer, raw, raw_size); }
 
-  inline void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
+  void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
     DoCompressAt(buffer, 0, raw, raw_size);
   }
 
-  static inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
+  static void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
     DoCompressAt(buffer, 1, raw, raw_size);
-    buffer->data()[0] = static_cast<char>(NO_COMPRESSION);
+    (*buffer)[0] = static_cast<char>(NO_COMPRESSION);
   }
 
   /** "Compress" into buffer starting at offset, the buffer is resized to offset + compressed size. */
-  static inline void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
+  static void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
     buffer->resize(raw_size + offset);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
     std::memcpy(buffer->data() + offset, raw, raw_size);
   }
 
@@ -128,9 +127,9 @@ struct RawCompressionStrategy final : public CompressionStrategy {
 
   static std::string DoDecompressWithoutHeader(const char* data, const size_t size) { return {data, size}; }
 
-  std::string name() const { return "raw"; }
+  [[nodiscard]] std::string name() const override { return "raw"; }
 
-  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
+  [[nodiscard]] uint64_t GetFileVersionMin() const override { return KEYVI_FILE_VERSION_MIN; }
 };
 
 } /* namespace compression */

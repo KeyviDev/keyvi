@@ -54,7 +54,8 @@ struct ZlibFormat {
 /**
  * raw deflate format: no header and no checksum, saves 6 bytes compared to zlib.
  *
- * Not selectable by name, used internally by value stores that store the compression once (JsonValueStore2).
+ * Not selectable via the "compression" parameter (compression_strategy(name)), used internally by value stores that
+ * store the compression once (JsonValueStore2).
  */
 struct ZlibDeflateFormat {
   static constexpr int kWindowBits = -MAX_WBITS;
@@ -82,23 +83,29 @@ struct BasicZlibCompressionStrategy final : public CompressionStrategy {
     }
   }
 
-  ~BasicZlibCompressionStrategy() { deflateEnd(&zstream_compress_); }
+  ~BasicZlibCompressionStrategy() override { deflateEnd(&zstream_compress_); }
+
+  // the zlib stream must not be shared, deflateEnd would be called twice
+  BasicZlibCompressionStrategy(const BasicZlibCompressionStrategy&) = delete;
+  BasicZlibCompressionStrategy& operator=(const BasicZlibCompressionStrategy&) = delete;
+  BasicZlibCompressionStrategy(BasicZlibCompressionStrategy&&) = delete;
+  BasicZlibCompressionStrategy& operator=(BasicZlibCompressionStrategy&&) = delete;
 
   using CompressionStrategy::CompressWithoutHeader;
 
-  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
+  void Compress(buffer_t* buffer, const char* raw, size_t raw_size) override { DoCompress(buffer, raw, raw_size); }
 
-  inline void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
+  void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
     DoCompressAt(buffer, 0, raw, raw_size);
   }
 
-  inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
+  void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
     DoCompressAt(buffer, 1, raw, raw_size);
-    buffer->data()[0] = static_cast<char>(Format::kAlgorithm);
+    (*buffer)[0] = static_cast<char>(Format::kAlgorithm);
   }
 
   /** Compress into buffer starting at offset, the buffer is resized to offset + compressed size. */
-  inline void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
+  void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
     TRACE("Zlib compress length %d", raw_size);
 
     zstream_compress_.next_in = reinterpret_cast<z_const Bytef*>(raw);
@@ -111,6 +118,7 @@ struct BasicZlibCompressionStrategy final : public CompressionStrategy {
     int ret;
 
     // compress bytes
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
     zstream_compress_.next_out = reinterpret_cast<Bytef*>(buffer->data() + offset);
     zstream_compress_.avail_out = buffer->size() - offset;
 
@@ -180,12 +188,12 @@ struct BasicZlibCompressionStrategy final : public CompressionStrategy {
     return outstring;
   }
 
-  std::string name() const { return Format::kName; }
+  [[nodiscard]] std::string name() const override { return Format::kName; }
 
-  uint64_t GetFileVersionMin() const { return Format::kFileVersionMin; }
+  [[nodiscard]] uint64_t GetFileVersionMin() const override { return Format::kFileVersionMin; }
 
  private:
-  z_stream zstream_compress_;
+  z_stream zstream_compress_{};
 };
 
 using ZlibCompressionStrategy = BasicZlibCompressionStrategy<ZlibFormat>;

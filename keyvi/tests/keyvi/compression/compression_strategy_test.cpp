@@ -26,8 +26,7 @@
 
 #include "keyvi/compression/compression_selector.h"
 
-namespace keyvi {
-namespace compression {
+namespace keyvi::compression {
 
 namespace {
 /** a new (not cached) instance of a strategy */
@@ -87,6 +86,7 @@ BOOST_AUTO_TEST_CASE(CompressionAlgorithmByName) {
   BOOST_CHECK_EQUAL(NO_COMPRESSION, compression_algorithm_by_name(""));
   BOOST_CHECK_EQUAL(ZSTD_DICT_COMPRESSION, compression_algorithm_by_name("zstd_dict"));
   BOOST_CHECK_THROW(compression_algorithm_by_name("lz4"), std::invalid_argument);
+  BOOST_CHECK_THROW(decompressor_by_code(ZSTD_DICT_COMPRESSION), std::invalid_argument);
   BOOST_CHECK_THROW(decompressor_without_header_by_code(ZSTD_DICT_COMPRESSION), std::invalid_argument);
 }
 
@@ -99,8 +99,8 @@ BOOST_AUTO_TEST_CASE(ZlibDeflate) {
   BOOST_CHECK_EQUAL(2, zlib->GetFileVersionMin());
 
   // not selectable by name
-  BOOST_CHECK_THROW(compression_strategy("zlib_deflate"), std::invalid_argument);
-  BOOST_CHECK_THROW(compression_strategy("deflate"), std::invalid_argument);
+  BOOST_CHECK_THROW(compression_strategy_t(compression_strategy("zlib_deflate")), std::invalid_argument);
+  BOOST_CHECK_THROW(compression_strategy_t(compression_strategy("deflate")), std::invalid_argument);
 
   // raw deflate is the zlib stream without the 2 byte header and the 4 byte adler32 checksum
   for (const std::string input : {"", "a", "the quick brown fox jumps over the lazy dog"}) {
@@ -119,14 +119,14 @@ BOOST_AUTO_TEST_CASE(ZstdMagicless) {
   BOOST_CHECK_EQUAL(4, zstd_magicless->GetFileVersionMin());
 
   // not selectable by name
-  BOOST_CHECK_THROW(compression_strategy("zstd_magicless"), std::invalid_argument);
+  BOOST_CHECK_THROW(compression_strategy_t(compression_strategy("zstd_magicless")), std::invalid_argument);
 
   const std::string magic = "\x28\xb5\x2f\xfd";
   BOOST_CHECK_EQUAL(magic, zstd_magicless->GetFramePrefix());
   BOOST_CHECK(zstd->GetFramePrefix().empty());
   BOOST_CHECK(cached_compression_strategy_by_code(ZLIB_DEFLATE)->GetFramePrefix().empty());
   for (const std::string& input : {std::string(), std::string("a"), std::string(100000, 'x'),
-                                  std::string("the quick brown fox jumps over the lazy dog")}) {
+                                   std::string("the quick brown fox jumps over the lazy dog")}) {
     const std::string zstd_stream = zstd->CompressWithoutHeader(input);
     const std::string magicless_stream = zstd_magicless->CompressWithoutHeader(input);
 
@@ -163,11 +163,12 @@ BOOST_AUTO_TEST_CASE(ZstdDecompressWithPrefix) {
 
   const std::string frame = zstd->CompressWithoutHeader(std::string(1000, 'y') + "z");
   const std::string prefix = frame.substr(0, 4);
+  const std::string body = frame.substr(4);
   // truncated
-  BOOST_CHECK_THROW(ZstdCompressionStrategy::DoDecompressWithPrefix(prefix, frame.data() + 4, frame.size() - 5),
+  BOOST_CHECK_THROW(ZstdCompressionStrategy::DoDecompressWithPrefix(prefix, body.data(), body.size() - 1),
                     std::runtime_error);
   // wrong prefix
-  BOOST_CHECK_THROW(ZstdCompressionStrategy::DoDecompressWithPrefix("abcd", frame.data() + 4, frame.size() - 4),
+  BOOST_CHECK_THROW(ZstdCompressionStrategy::DoDecompressWithPrefix("abcd", body.data(), body.size()),
                     std::runtime_error);
   // garbage
   BOOST_CHECK_THROW(ZstdCompressionStrategy::DoDecompressWithPrefix(prefix, "", 0), std::runtime_error);
@@ -178,8 +179,8 @@ BOOST_AUTO_TEST_CASE(ZstdDecompressWithPrefixLargeFrame) {
   std::string large;
   uint32_t state = 42;
   for (size_t i = 0; i < 2 * ZstdCompressionStrategy::kMaxRetainedFrameBufferSize; ++i) {
-    state = state * 1664525 + 1013904223;  // incompressible
-    large.push_back(static_cast<char>(state >> 24));
+    state = (state * 1664525U) + 1013904223U;  // incompressible
+    large.push_back(static_cast<char>(state >> 24U));
   }
   CompressionStrategy* const zstd_magicless = cached_compression_strategy_by_code(ZSTD_MAGICLESS);
   const std::string compressed_large = zstd_magicless->CompressWithoutHeader(large);
@@ -188,9 +189,9 @@ BOOST_AUTO_TEST_CASE(ZstdDecompressWithPrefixLargeFrame) {
 
   for (int i = 0; i < 2; ++i) {
     BOOST_CHECK(large == ZstdMagiclessCompressionStrategy::DoDecompressWithoutHeader(compressed_large.data(),
-                                                                                       compressed_large.size()));
+                                                                                     compressed_large.size()));
     BOOST_CHECK_EQUAL("small", ZstdMagiclessCompressionStrategy::DoDecompressWithoutHeader(compressed_small.data(),
-                                                                                         compressed_small.size()));
+                                                                                           compressed_small.size()));
   }
 }
 
@@ -199,19 +200,20 @@ BOOST_AUTO_TEST_CASE(ZstdMagiclessDecompressFromThreads) {
   std::vector<std::string> inputs;
   std::vector<std::string> compressed;
   for (int i = 0; i < 16; ++i) {
-    inputs.push_back(std::string(1000 + i * 100, static_cast<char>('a' + i)) + std::to_string(i));
+    inputs.push_back(std::string(1000 + (i * 100), static_cast<char>('a' + i)) + std::to_string(i));
     compressed.push_back(zstd_magicless->CompressWithoutHeader(inputs.back()));
   }
 
   std::vector<int> failures(8, 0);
   std::vector<std::thread> threads;
-  for (size_t t = 0; t < failures.size(); ++t) {
-    threads.emplace_back([&, t] {
+  threads.reserve(failures.size());
+  for (int& thread_failures : failures) {
+    threads.emplace_back([&] {
       for (int round = 0; round < 200; ++round) {
         for (size_t i = 0; i < inputs.size(); ++i) {
-          if (ZstdMagiclessCompressionStrategy::DoDecompressWithoutHeader(compressed[i].data(),
-                                                                          compressed[i].size()) != inputs[i]) {
-            ++failures[t];
+          if (ZstdMagiclessCompressionStrategy::DoDecompressWithoutHeader(compressed[i].data(), compressed[i].size()) !=
+              inputs[i]) {
+            ++thread_failures;
           }
         }
       }
@@ -257,11 +259,12 @@ BOOST_AUTO_TEST_CASE(CachedCompressionStrategy) {
 
   // not supported by code or invalid
   BOOST_CHECK_THROW(cached_compression_strategy_by_code(ZSTD_DICT_COMPRESSION), std::invalid_argument);
+  // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange): invalid on purpose
   BOOST_CHECK_THROW(cached_compression_strategy_by_code(static_cast<CompressionAlgorithm>(42)), std::invalid_argument);
+  // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange): invalid on purpose
   BOOST_CHECK_THROW(cached_compression_strategy_by_code(static_cast<CompressionAlgorithm>(-1)), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-}  // namespace compression
-}  // namespace keyvi
+}  // namespace keyvi::compression

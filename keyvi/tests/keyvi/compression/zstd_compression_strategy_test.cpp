@@ -54,12 +54,12 @@ BOOST_AUTO_TEST_CASE(SameOutputAsZstdCompress) {
     for (const std::string& input : {std::string(), std::string("a"), std::string(100000, 'x'), large,
                                      std::string("the quick brown fox jumps over the lazy dog")}) {
       std::vector<char> expected(ZSTD_compressBound(input.size()));
-      expected.resize(
-          ZSTD_compress(expected.data(), expected.size(), input.data(), input.size(), ZSTD_DEFAULT_CLEVEL));
+      expected.resize(ZSTD_compress(expected.data(), expected.size(), input.data(), input.size(), ZSTD_DEFAULT_CLEVEL));
 
       const std::string compressed = strategy.CompressWithoutHeader(input);
       BOOST_CHECK_EQUAL(std::string(expected.data(), expected.size()), compressed);
-      BOOST_CHECK_EQUAL(input, ZstdCompressionStrategy::DoDecompressWithoutHeader(compressed.data(), compressed.size()));
+      BOOST_CHECK_EQUAL(input,
+                        ZstdCompressionStrategy::DoDecompressWithoutHeader(compressed.data(), compressed.size()));
     }
   }
 }

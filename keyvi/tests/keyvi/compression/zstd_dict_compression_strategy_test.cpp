@@ -150,6 +150,37 @@ BOOST_AUTO_TEST_CASE(CompressWithoutHeader) {
 
   BOOST_CHECK_EQUAL(with_header.substr(1), without_header);
   BOOST_CHECK_EQUAL(input, strategy.Decompress(with_header.data(), with_header.size()));
+  BOOST_CHECK_EQUAL(input, strategy.DecompressWithoutHeader(without_header.data(), without_header.size()));
+}
+
+BOOST_AUTO_TEST_CASE(DecompressInvalidInput) {
+  std::vector<std::string> samples;
+  samples.reserve(200);
+  for (int i = 0; i < 200; ++i) {
+    samples.push_back("the quick brown fox jumps over the lazy dog " + std::to_string(i));
+  }
+
+  auto dict = TrainDictionary(samples);
+  BOOST_REQUIRE(!dict.empty());
+
+  ZstdDictCompressionStrategy strategy(dict.data(), dict.size());
+
+  const std::string input = "the quick brown fox jumps over the lazy dog 42";
+
+  // empty buffer
+  BOOST_CHECK_THROW(strategy.Decompress(input.data(), 0), std::invalid_argument);
+
+  // other compression code
+  std::string wrong_code = strategy.Compress(input);
+  wrong_code[0] = static_cast<char>(ZSTD_COMPRESSION);
+  BOOST_CHECK_THROW(strategy.Decompress(wrong_code.data(), wrong_code.size()), std::invalid_argument);
+
+  // header only, no frame
+  const std::string header_only(1, static_cast<char>(ZSTD_DICT_COMPRESSION));
+  BOOST_CHECK_THROW(strategy.Decompress(header_only.data(), header_only.size()), std::runtime_error);
+
+  // garbage
+  BOOST_CHECK_THROW(strategy.DecompressWithoutHeader(input.data(), input.size()), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
