@@ -49,7 +49,7 @@ if __name__ == "__main__":
         params = dict(args.params)
 
         if args.memory_limit:
-            params["memory-limit"] = args.memory_limit
+            params["memory_limit"] = args.memory_limit
 
         merger = keyvi.compiler.JsonDictionaryMerger(params)
         for f in args.input_file:
