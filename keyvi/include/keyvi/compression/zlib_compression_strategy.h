@@ -28,9 +28,11 @@
 #define ZLIB_CONST
 
 #include <zlib.h>
+#include <cstdint>
 #include <stdexcept>
 #include <string>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 
@@ -40,9 +42,30 @@
 namespace keyvi {
 namespace compression {
 
-/** A compression strategy that wraps zlib. */
-struct ZlibCompressionStrategy final : public CompressionStrategy {
-  explicit ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION) {
+/** zlib format: deflate with a 2 byte header and an adler32 checksum (4 bytes) */
+struct ZlibFormat {
+  static constexpr int kWindowBits = MAX_WBITS;
+  static constexpr CompressionAlgorithm kAlgorithm = ZLIB_COMPRESSION;
+  static constexpr const char* kName = "zlib";
+  static constexpr uint64_t kFileVersionMin = KEYVI_FILE_VERSION_MIN;
+};
+
+/**
+ * raw deflate format: no header and no checksum, saves 6 bytes compared to zlib.
+ *
+ * Not selectable by name, used internally by value stores that store the compression once (JsonValueStore2).
+ */
+struct ZlibDeflateFormat {
+  static constexpr int kWindowBits = -MAX_WBITS;
+  static constexpr CompressionAlgorithm kAlgorithm = ZLIB_DEFLATE;
+  static constexpr const char* kName = "zlib_deflate";
+  static constexpr uint64_t kFileVersionMin = 4;
+};
+
+/** A compression strategy that wraps zlib, Format selects the stream format (zlib or raw deflate). */
+template <typename Format>
+struct BasicZlibCompressionStrategy final : public CompressionStrategy {
+  explicit BasicZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION) {
     // init zlib structure for compression
 
     zstream_compress_.zalloc = Z_NULL;
@@ -52,33 +75,43 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     // see zlib.h level 9 means more speed for the price of memory
     const int mem_level = 9;
 
-    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, MAX_WBITS, mem_level, Z_DEFAULT_STRATEGY) !=
-        Z_OK) {
+    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, Format::kWindowBits, mem_level,
+                     Z_DEFAULT_STRATEGY) != Z_OK) {
       throw std::bad_alloc();
     }
   }
 
-  ~ZlibCompressionStrategy() { deflateEnd(&zstream_compress_); }
+  ~BasicZlibCompressionStrategy() { deflateEnd(&zstream_compress_); }
+
+  using CompressionStrategy::CompressWithoutHeader;
 
   inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
 
+  inline void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
+    DoCompressAt(buffer, 0, raw, raw_size);
+  }
+
   inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
+    DoCompressAt(buffer, 1, raw, raw_size);
+    buffer->data()[0] = static_cast<char>(Format::kAlgorithm);
+  }
+
+  /** Compress into buffer starting at offset, the buffer is resized to offset + compressed size. */
+  inline void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
     TRACE("Zlib compress length %d", raw_size);
 
     zstream_compress_.next_in = reinterpret_cast<z_const Bytef*>(raw);
     zstream_compress_.avail_in = raw_size;  // set the z_stream's input
     size_t output_length = deflateBound(&zstream_compress_, raw_size);
-    buffer->resize(output_length + 1);
+    buffer->resize(output_length + offset);
 
     TRACE("Zlib compress output length %d", output_length);
-
-    buffer->data()[0] = static_cast<char>(ZLIB_COMPRESSION);
 
     int ret;
 
     // compress bytes
-    zstream_compress_.next_out = reinterpret_cast<Bytef*>(buffer->data() + 1);
-    zstream_compress_.avail_out = buffer->size() - 1;
+    zstream_compress_.next_out = reinterpret_cast<Bytef*>(buffer->data() + offset);
+    zstream_compress_.avail_out = buffer->size() - offset;
 
     ret = deflate(&zstream_compress_, Z_FINISH);
 
@@ -87,23 +120,31 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
       std::ostringstream oss;
       oss << "Exception during zlib compression: (" << ret << ") " << zstream_compress_.msg;
+      // reset, so that the instance can be reused
+      deflateReset(&zstream_compress_);
       throw(std::runtime_error(oss.str()));
     }
     deflateReset(&zstream_compress_);
-    buffer->resize(output_length + 1);
+    buffer->resize(output_length + offset);
   }
 
   std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
 
   static std::string DoDecompress(const char* data, const size_t size) {
+    return DoDecompressWithoutHeader(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  }
+
+  static std::string DoDecompressWithoutHeader(const char* data, const size_t size) {
     z_stream zs;  // z_stream is zlib's control structure
     memset(&zs, 0, sizeof(zs));
 
-    if (inflateInit(&zs) != Z_OK) throw(std::runtime_error("inflateInit failed while decompressing."));
+    if (inflateInit2(&zs, Format::kWindowBits) != Z_OK) {
+      throw(std::runtime_error("inflateInit failed while decompressing."));
+    }
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    zs.next_in = reinterpret_cast<z_const Bytef*>(data) + 1;
-    zs.avail_in = size - 1;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    zs.next_in = reinterpret_cast<z_const Bytef*>(data);
+    zs.avail_in = size;
 
     int ret;
     char outbuffer[32768];
@@ -132,13 +173,16 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     return outstring;
   }
 
-  std::string name() const { return "zlib"; }
+  std::string name() const { return Format::kName; }
 
-  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
+  uint64_t GetFileVersionMin() const { return Format::kFileVersionMin; }
 
  private:
   z_stream zstream_compress_;
 };
+
+using ZlibCompressionStrategy = BasicZlibCompressionStrategy<ZlibFormat>;
+using ZlibDeflateCompressionStrategy = BasicZlibCompressionStrategy<ZlibDeflateFormat>;
 
 } /* namespace compression */
 } /* namespace keyvi */

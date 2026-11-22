@@ -3,4 +3,6 @@ cdef extern from "keyvi/compression/compression_algorithm.h" namespace "keyvi::c
         NO_COMPRESSION,
         ZLIB_COMPRESSION,
         SNAPPY_COMPRESSION,
-        ZSTD_COMPRESSION
+        ZSTD_COMPRESSION,
+        ZLIB_DEFLATE,
+        ZSTD_MAGICLESS

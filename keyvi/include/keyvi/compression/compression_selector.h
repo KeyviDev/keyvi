@@ -25,8 +25,10 @@
 #ifndef KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_
 #define KEYVI_COMPRESSION_COMPRESSION_SELECTOR_H_
 
+#include <array>
 #include <cstddef>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 #include <boost/algorithm/string.hpp>
@@ -75,33 +77,110 @@ inline decompress_func_t decompressor_by_code(const CompressionAlgorithm algorit
     case ZLIB_COMPRESSION:
       TRACE("unpack zlib compressed string");
       return ZlibCompressionStrategy::DoDecompress;
+    case ZLIB_DEFLATE:
+      TRACE("unpack zlib deflate compressed string");
+      return ZlibDeflateCompressionStrategy::DoDecompress;
     case SNAPPY_COMPRESSION:
       TRACE("unpack snappy compressed string");
       return SnappyCompressionStrategy::DoDecompress;
     case ZSTD_COMPRESSION:
       TRACE("unpack zstd compressed string");
       return ZstdCompressionStrategy::DoDecompress;
+    case ZSTD_MAGICLESS:
+      TRACE("unpack zstd magicless compressed string");
+      return ZstdMagiclessCompressionStrategy::DoDecompress;
     default:
       throw std::invalid_argument("Invalid compression algorithm " +
                                   boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
   }
 }
 
-/** Returns an instance of a compression strategy by enum. */
-inline compression_strategy_t compression_strategy_by_code(const CompressionAlgorithm algorithm) {
+/**
+ * Returns a decompression function for data that does _not_ start with the compression code,
+ * e.g. for value stores that store the compression once instead of per value.
+ */
+inline decompress_func_t decompressor_without_header_by_code(const CompressionAlgorithm algorithm) {
   switch (algorithm) {
     case NO_COMPRESSION:
-      return std::make_unique<RawCompressionStrategy>();
+      return RawCompressionStrategy::DoDecompressWithoutHeader;
     case ZLIB_COMPRESSION:
-      return std::make_unique<ZlibCompressionStrategy>();
+      return ZlibCompressionStrategy::DoDecompressWithoutHeader;
+    case ZLIB_DEFLATE:
+      return ZlibDeflateCompressionStrategy::DoDecompressWithoutHeader;
     case SNAPPY_COMPRESSION:
-      return std::make_unique<SnappyCompressionStrategy>();
+      return SnappyCompressionStrategy::DoDecompressWithoutHeader;
     case ZSTD_COMPRESSION:
-      return std::make_unique<ZstdCompressionStrategy>();
+      return ZstdCompressionStrategy::DoDecompressWithoutHeader;
+    case ZSTD_MAGICLESS:
+      return ZstdMagiclessCompressionStrategy::DoDecompressWithoutHeader;
     default:
       throw std::invalid_argument("Invalid compression algorithm " +
                                   boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
   }
+}
+
+/** Returns the compression code for the (canonical) name of a compression strategy, see name(). */
+inline CompressionAlgorithm compression_algorithm_by_name(const std::string& name) {
+  if (name == "" || name == "raw") {
+    return NO_COMPRESSION;
+  } else if (name == "zlib") {
+    return ZLIB_COMPRESSION;
+  } else if (name == "zlib_deflate") {
+    return ZLIB_DEFLATE;
+  } else if (name == "snappy") {
+    return SNAPPY_COMPRESSION;
+  } else if (name == "zstd") {
+    return ZSTD_COMPRESSION;
+  } else if (name == "zstd_magicless") {
+    return ZSTD_MAGICLESS;
+  } else if (name == "zstd_dict") {
+    return ZSTD_DICT_COMPRESSION;
+  }
+  throw std::invalid_argument(name + " is not a valid compression");
+}
+
+/**
+ * Returns a cached instance of a compression strategy by enum, owned by the calling thread.
+ *
+ * Creating a strategy can be expensive (e.g. zlib allocates its compression state), strategies are not
+ * thread-safe, therefore one instance per thread and algorithm. Do not keep the pointer beyond the current thread,
+ * components that need their own compressor (e.g. value store writers) create the strategy directly.
+ */
+inline CompressionStrategy* cached_compression_strategy_by_code(const CompressionAlgorithm algorithm) {
+  thread_local std::array<compression_strategy_t, 8> strategies;
+  static_assert(ZSTD_MAGICLESS < 8, "increase the size of the compression strategy cache");
+
+  const auto index = static_cast<size_t>(algorithm);
+  if (index >= strategies.size()) {
+    throw std::invalid_argument("Invalid compression algorithm " + std::to_string(static_cast<int>(algorithm)));
+  }
+
+  compression_strategy_t& strategy = strategies[index];
+  if (!strategy) {
+    switch (algorithm) {
+      case NO_COMPRESSION:
+        strategy = std::make_unique<RawCompressionStrategy>();
+        break;
+      case ZLIB_COMPRESSION:
+        strategy = std::make_unique<ZlibCompressionStrategy>();
+        break;
+      case ZLIB_DEFLATE:
+        strategy = std::make_unique<ZlibDeflateCompressionStrategy>();
+        break;
+      case SNAPPY_COMPRESSION:
+        strategy = std::make_unique<SnappyCompressionStrategy>();
+        break;
+      case ZSTD_COMPRESSION:
+        strategy = std::make_unique<ZstdCompressionStrategy>();
+        break;
+      case ZSTD_MAGICLESS:
+        strategy = std::make_unique<ZstdMagiclessCompressionStrategy>();
+        break;
+      default:
+        throw std::invalid_argument("Invalid compression algorithm " + std::to_string(static_cast<int>(algorithm)));
+    }
+  }
+  return strategy.get();
 }
 
 } /* namespace compression */

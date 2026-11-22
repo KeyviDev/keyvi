@@ -52,6 +52,8 @@ PYBIND11_MODULE(_core, m, py::mod_gil_not_used()) {
       .value("ZLIB_COMPRESSION", keyvi::compression::CompressionAlgorithm::ZLIB_COMPRESSION)
       .value("SNAPPY_COMPRESSION", keyvi::compression::CompressionAlgorithm::SNAPPY_COMPRESSION)
       .value("ZSTD_COMPRESSION", keyvi::compression::CompressionAlgorithm::ZSTD_COMPRESSION)
+      .value("ZLIB_DEFLATE", keyvi::compression::CompressionAlgorithm::ZLIB_DEFLATE)
+      .value("ZSTD_MAGICLESS", keyvi::compression::CompressionAlgorithm::ZSTD_MAGICLESS)
       .finalize();
 
   py::enum_<kd::loading_strategy_types>(m, "loading_strategy_types")

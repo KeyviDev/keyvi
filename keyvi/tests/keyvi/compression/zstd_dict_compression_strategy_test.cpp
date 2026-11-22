@@ -132,6 +132,26 @@ BOOST_AUTO_TEST_CASE(Name) {
   BOOST_CHECK_EQUAL(4, strategy.GetFileVersionMin());
 }
 
+BOOST_AUTO_TEST_CASE(CompressWithoutHeader) {
+  std::vector<std::string> samples;
+  samples.reserve(200);
+  for (int i = 0; i < 200; ++i) {
+    samples.push_back("the quick brown fox jumps over the lazy dog " + std::to_string(i));
+  }
+
+  auto dict = TrainDictionary(samples);
+  BOOST_REQUIRE(!dict.empty());
+
+  ZstdDictCompressionStrategy strategy(dict.data(), dict.size());
+
+  const std::string input = "the quick brown fox jumps over the lazy dog 42";
+  const std::string with_header = strategy.Compress(input);
+  const std::string without_header = strategy.CompressWithoutHeader(input);
+
+  BOOST_CHECK_EQUAL(with_header.substr(1), without_header);
+  BOOST_CHECK_EQUAL(input, strategy.Decompress(with_header.data(), with_header.size()));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 }  // namespace compression

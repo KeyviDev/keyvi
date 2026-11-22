@@ -37,21 +37,36 @@ namespace compression {
 
 /** A compression strategy that wraps snappy. */
 struct SnappyCompressionStrategy final : public CompressionStrategy {
+  using CompressionStrategy::CompressWithoutHeader;
+
   inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
 
+  inline void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
+    DoCompressAt(buffer, 0, raw, raw_size);
+  }
+
   static inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
-    size_t output_length = snappy::MaxCompressedLength(raw_size);
-    buffer->resize(output_length + 1);
+    DoCompressAt(buffer, 1, raw, raw_size);
     buffer->data()[0] = static_cast<char>(SNAPPY_COMPRESSION);
-    snappy::RawCompress(raw, raw_size, buffer->data() + 1, &output_length);
-    buffer->resize(output_length + 1);
+  }
+
+  /** Compress into buffer starting at offset, the buffer is resized to offset + compressed size. */
+  static inline void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
+    size_t output_length = snappy::MaxCompressedLength(raw_size);
+    buffer->resize(output_length + offset);
+    snappy::RawCompress(raw, raw_size, buffer->data() + offset, &output_length);
+    buffer->resize(output_length + offset);
   }
 
   std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
 
   static std::string DoDecompress(const char* data, const size_t size) {
+    return DoDecompressWithoutHeader(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  }
+
+  static std::string DoDecompressWithoutHeader(const char* data, const size_t size) {
     std::string uncompressed;
-    snappy::Uncompress(data + 1, size - 1, &uncompressed);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    snappy::Uncompress(data, size, &uncompressed);
     return uncompressed;
   }
 

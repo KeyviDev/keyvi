@@ -417,8 +417,8 @@ class FloatVectorValueStoreReader final : public IValueStoreReader {
     }
 
     // compress
-    const compression::compression_strategy_t compressor =
-        compression::compression_strategy_by_code(compression_algorithm);
+    compression::CompressionStrategy* const compressor =
+        compression::cached_compression_strategy_by_code(compression_algorithm);
 
     return compressor->CompressWithoutHeader(msgpacked_value);
   }

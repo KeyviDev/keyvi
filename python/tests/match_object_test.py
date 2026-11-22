@@ -162,6 +162,19 @@ def test_get_value():
             )
         ) == {"a": 3}
         assert msgpack.loads(
+            zlib.decompress(
+                m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.ZLIB_DEFLATE),
+                wbits=-zlib.MAX_WBITS,
+            )
+        ) == {"a": 3}
+        # zstd without the magic number, prepend it to decode with a standard zstd decoder
+        assert msgpack.loads(
+            zstd.decompress(
+                b"\x28\xb5\x2f\xfd"
+                + m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.ZSTD_MAGICLESS)
+            )
+        ) == {"a": 3}
+        assert msgpack.loads(
             m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.NO_COMPRESSION)
         ) == {"a": 3}
 

@@ -57,20 +57,15 @@ struct ZstdDictCompressionStrategy final : public CompressionStrategy {
   ZstdDictCompressionStrategy& operator=(ZstdDictCompressionStrategy&&) = delete;
 
   using CompressionStrategy::Compress;
+  using CompressionStrategy::CompressWithoutHeader;
 
   void Compress(buffer_t* buffer, const char* raw, size_t raw_size) override {
-    size_t output_length = ZSTD_compressBound(raw_size);
-    buffer->resize(output_length + 1);
+    CompressAt(buffer, 1, raw, raw_size);
     (*buffer)[0] = static_cast<char>(ZSTD_DICT_COMPRESSION);
+  }
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    output_length = ZSTD_compress_usingCDict(cctx_, buffer->data() + 1, output_length, raw, raw_size, cdict_);
-    if (ZSTD_isError(output_length) != 0U) {  // GCOVR_EXCL_BR_LINE
-      // GCOVR_EXCL_START
-      throw std::runtime_error(std::string("zstd dict compression failed: ") + ZSTD_getErrorName(output_length));
-      // GCOVR_EXCL_STOP
-    }
-    buffer->resize(output_length + 1);
+  void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
+    CompressAt(buffer, 0, raw, raw_size);
   }
 
   std::string Decompress(const char* data, const size_t size) override {
@@ -98,6 +93,21 @@ struct ZstdDictCompressionStrategy final : public CompressionStrategy {
   [[nodiscard]] uint64_t GetFileVersionMin() const override { return 4; }
 
  private:
+  /** Compress into buffer starting at offset, the buffer is resized to offset + compressed size. */
+  void CompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
+    size_t output_length = ZSTD_compressBound(raw_size);
+    buffer->resize(output_length + offset);
+
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    output_length = ZSTD_compress_usingCDict(cctx_, buffer->data() + offset, output_length, raw, raw_size, cdict_);
+    if (ZSTD_isError(output_length) != 0U) {  // GCOVR_EXCL_BR_LINE
+      // GCOVR_EXCL_START
+      throw std::runtime_error(std::string("zstd dict compression failed: ") + ZSTD_getErrorName(output_length));
+      // GCOVR_EXCL_STOP
+    }
+    buffer->resize(output_length + offset);
+  }
+
   // ZSTD_free* functions accept nullptr
   void Cleanup() {
     ZSTD_freeCCtx(cctx_);

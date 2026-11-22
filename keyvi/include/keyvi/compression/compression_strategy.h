@@ -51,6 +51,12 @@ struct CompressionStrategy {
 
   virtual void Compress(buffer_t* buffer, const char* raw, size_t raw_size) = 0;
 
+  /**
+   * Compress without writing the compression code as first character, e.g. for value stores that
+   * store the compression once instead of per value.
+   */
+  virtual void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) = 0;
+
   inline std::string Compress(const std::string& raw) { return Compress(raw.data(), raw.size()); }
 
   inline std::string Compress(const char* raw, size_t raw_size) {
@@ -60,9 +66,13 @@ struct CompressionStrategy {
   }
 
   inline std::string CompressWithoutHeader(const std::string& raw) {
+    return CompressWithoutHeader(raw.data(), raw.size());
+  }
+
+  inline std::string CompressWithoutHeader(const char* raw, size_t raw_size) {
     buffer_t buf;
-    Compress(&buf, raw.data(), raw.size());
-    return std::string(buf.data() + 1, buf.size() - 1);
+    CompressWithoutHeader(&buf, raw, raw_size);
+    return std::string(buf.data(), buf.size());
   }
 
   /**
@@ -76,6 +86,12 @@ struct CompressionStrategy {
 
   /** The minimum version this compressor requires */
   virtual uint64_t GetFileVersionMin() const = 0;
+
+  /**
+   * Bytes the compressor leaves out at the start of every compressed value which are needed by a standard decoder,
+   * e.g. the magic number of zstd. Empty if the output is a complete stream.
+   */
+  virtual std::string GetFramePrefix() const { return {}; }
 };
 
 using compression_strategy_t = std::unique_ptr<CompressionStrategy>;
@@ -85,19 +101,32 @@ using compression_strategy_t = std::unique_ptr<CompressionStrategy>;
  * the length field.
  */
 struct RawCompressionStrategy final : public CompressionStrategy {
+  using CompressionStrategy::CompressWithoutHeader;
+
   inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
 
+  inline void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
+    DoCompressAt(buffer, 0, raw, raw_size);
+  }
+
   static inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
-    buffer->resize(raw_size + 1);
+    DoCompressAt(buffer, 1, raw, raw_size);
     buffer->data()[0] = static_cast<char>(NO_COMPRESSION);
-    std::memcpy(buffer->data() + 1, raw, raw_size);
+  }
+
+  /** "Compress" into buffer starting at offset, the buffer is resized to offset + compressed size. */
+  static inline void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
+    buffer->resize(raw_size + offset);
+    std::memcpy(buffer->data() + offset, raw, raw_size);
   }
 
   std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
 
   static std::string DoDecompress(const char* data, const size_t size) {
-    return {data + 1, size - 1};  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return DoDecompressWithoutHeader(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   }
+
+  static std::string DoDecompressWithoutHeader(const char* data, const size_t size) { return {data, size}; }
 
   std::string name() const { return "raw"; }
 
