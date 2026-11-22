@@ -39,6 +39,7 @@
 #include "keyvi/dictionary/fsa/internal/memory_map_flags.h"
 #include "keyvi/dictionary/fsa/internal/memory_map_manager.h"
 #include "keyvi/dictionary/fsa/internal/minimization_hash.h"
+#include "keyvi/dictionary/fsa/internal/value_store_append_merge.h"
 #include "keyvi/dictionary/fsa/internal/value_store_persistence.h"
 #include "keyvi/dictionary/fsa/internal/value_store_properties.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
@@ -238,9 +239,7 @@ class StringValueStoreAppendMerge final : public StringValueStoreBase {
     properties.WriteAsJsonV2(stream);
 
     for (size_t i = 0; i < input_files_.size(); ++i) {
-      std::ifstream in_stream(input_files_[i]);
-      in_stream.seekg(properties_[i].GetValueStoreProperties().GetOffset());
-      stream << in_stream.rdbuf();
+      CopyValueStorePayload(input_files_[i], properties_[i].GetValueStoreProperties(), &stream);
     }
   }
 
