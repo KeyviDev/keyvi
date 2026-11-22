@@ -131,7 +131,8 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     if (ret != Z_STREAM_END) {  // an error occurred that was not EOF
       std::ostringstream oss;
       // msg might be NULL
-      oss << "Exception during zlib decompression: (" << ret << ") " << (zs.msg != nullptr ? zs.msg : "unknown error");
+      oss << "Exception during zlib decompression: (" << ret << ") "
+          << (zs.msg != nullptr ? zs.msg : "unknown error");  // GCOVR_EXCL_BR_LINE
       throw(std::runtime_error(oss.str()));
     }
 
