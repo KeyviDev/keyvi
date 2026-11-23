@@ -242,6 +242,7 @@ class JsonValueStoreMerge final : public JsonValueStoreMinimizationBase {
   }
 
   uint64_t AddValueMerge(const char* payload, uint64_t fsa_value, bool* no_minimization) {
+    ++number_of_values_;
     size_t buffer_size;
 
     const char* full_buf = payload + fsa_value;

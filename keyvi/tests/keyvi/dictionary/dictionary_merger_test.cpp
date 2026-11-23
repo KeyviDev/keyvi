@@ -31,6 +31,7 @@
 
 #include "keyvi/dictionary/dictionary.h"
 #include "keyvi/dictionary/dictionary_merger.h"
+#include "keyvi/dictionary/dictionary_properties.h"
 #include "keyvi/dictionary/dictionary_types.h"
 #include "keyvi/dictionary/fsa/traverser_types.h"
 #include "keyvi/testing/temp_dictionary.h"
@@ -315,6 +316,11 @@ BOOST_AUTO_TEST_CASE(MergeStringDicts) {
 
     merger.Merge(filename);
 
+    // values are counted: normal merge counts the merged values, append merge all values of the inputs
+    BOOST_CHECK_EQUAL(params.count("merge_mode") ? 10 : 9,
+                      DictionaryProperties::FromFile(filename).GetValueStoreProperties().GetNumberOfValues());
+    BOOST_CHECK(DictionaryProperties::FromFile(filename).GetValueStoreProperties().GetNumberOfUniqueValues() > 0);
+
     fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
     dictionary_t d(new Dictionary(fsa));
 
@@ -371,6 +377,11 @@ BOOST_AUTO_TEST_CASE(MergeJsonDicts) {
     merger.Add(dictionary2.GetFileName());
 
     merger.Merge(filename);
+
+    // values are counted: normal merge counts the merged values, append merge all values of the inputs
+    BOOST_CHECK_EQUAL(params.count("merge_mode") ? 10 : 9,
+                      DictionaryProperties::FromFile(filename).GetValueStoreProperties().GetNumberOfValues());
+    BOOST_CHECK(DictionaryProperties::FromFile(filename).GetValueStoreProperties().GetNumberOfUniqueValues() > 0);
 
     fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
     dictionary_t d(new Dictionary(fsa));
@@ -435,6 +446,11 @@ BOOST_AUTO_TEST_CASE(MergeFloatVectorDicts, *boost::unit_test::tolerance(0.00001
     merger.Add(dictionary2.GetFileName());
 
     merger.Merge(filename);
+
+    // values are counted: normal merge counts the merged values, append merge all values of the inputs
+    BOOST_CHECK_EQUAL(params.count("merge_mode") ? 10 : 9,
+                      DictionaryProperties::FromFile(filename).GetValueStoreProperties().GetNumberOfValues());
+    BOOST_CHECK(DictionaryProperties::FromFile(filename).GetValueStoreProperties().GetNumberOfUniqueValues() > 0);
 
     fsa::automata_t fsa(new fsa::Automata(filename.c_str()));
     dictionary_t d(new Dictionary(fsa));
