@@ -32,6 +32,8 @@
 
 #include <boost/container/flat_map.hpp>
 
+#include "keyvi/compression/compression_algorithm.h"
+#include "keyvi/compression/compression_selector.h"
 #include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/fsa/automata.h"
 #include "keyvi/util/json_value.h"

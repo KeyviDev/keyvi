@@ -32,6 +32,8 @@
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "keyvi/compression/compression_algorithm.h"
+#include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/dictionary_properties.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"

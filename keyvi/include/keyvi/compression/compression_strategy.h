@@ -25,6 +25,8 @@
 #ifndef KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_
 #define KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <memory>
 #include <string>

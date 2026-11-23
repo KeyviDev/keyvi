@@ -27,7 +27,9 @@
 
 #define ZLIB_CONST
 
+#include <zconf.h>
 #include <zlib.h>
+#include <cstddef>
 #include <cstdint>
 #include <sstream>
 #include <stdexcept>

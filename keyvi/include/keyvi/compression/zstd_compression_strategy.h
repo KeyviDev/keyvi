@@ -28,6 +28,8 @@
 // only the stable zstd API is used, no ZSTD_STATIC_LINKING_ONLY
 #include <zstd.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <memory>
 #include <new>

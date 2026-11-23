@@ -26,9 +26,12 @@
 #define KEYVI_COMPRESSION_SNAPPY_COMPRESSION_STRATEGY_H_
 
 #include <snappy.h>
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <string>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 

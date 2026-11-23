@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
