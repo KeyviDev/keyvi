@@ -70,21 +70,7 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
   ZstdCompressionStrategy(ZstdCompressionStrategy&&) = delete;
   ZstdCompressionStrategy& operator=(ZstdCompressionStrategy&&) = delete;
 
-  using CompressionStrategy::CompressWithoutHeader;
-
-  void Compress(buffer_t* buffer, const char* raw, size_t raw_size) override { DoCompress(buffer, raw, raw_size); }
-
-  void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
-    DoCompressAt(buffer, 0, raw, raw_size);
-  }
-
-  void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
-    DoCompressAt(buffer, 1, raw, raw_size);
-    (*buffer)[0] = static_cast<char>(ZSTD_COMPRESSION);
-  }
-
-  /** Compress into buffer starting at offset, the buffer is resized to offset + compressed size. */
-  void DoCompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
+  void DoCompress(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) override {
     size_t output_length = ZSTD_compressBound(raw_size);
     buffer->resize(output_length + offset);
 
@@ -99,13 +85,9 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
     buffer->resize(output_length + offset);
   }
 
-  std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
+  std::string Decompress(const char* data, const size_t size) const override { return DoDecompress(data, size); }
 
   static std::string DoDecompress(const char* data, const size_t size) {
-    return DoDecompressWithoutHeader(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  }
-
-  static std::string DoDecompressWithoutHeader(const char* data, const size_t size) {
     const unsigned long long content_size = ZSTD_getFrameContentSize(data, size);  // NOLINT(runtime/int)
     if (content_size == ZSTD_CONTENTSIZE_UNKNOWN || content_size == ZSTD_CONTENTSIZE_ERROR) {
       throw std::runtime_error("zstd decompression failed: unable to determine content size");
@@ -151,11 +133,13 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
     } const release_large_buffer{&frame};
 
     frame.assign(prefix).append(data, size);
-    return DoDecompressWithoutHeader(frame.data(), frame.size());
+    return DoDecompress(frame.data(), frame.size());
   }
 
   /** maximum size of the frame buffer kept per thread for DoDecompressWithPrefix */
   static constexpr size_t kMaxRetainedFrameBufferSize = size_t{1024} * 1024;
+
+  [[nodiscard]] CompressionAlgorithm GetCompressionAlgorithm() const override { return ZSTD_COMPRESSION; }
 
   [[nodiscard]] std::string name() const override { return "zstd"; }
 
@@ -196,27 +180,13 @@ struct ZstdMagiclessCompressionStrategy final : public CompressionStrategy {
   ZstdMagiclessCompressionStrategy(ZstdMagiclessCompressionStrategy&&) = delete;
   ZstdMagiclessCompressionStrategy& operator=(ZstdMagiclessCompressionStrategy&&) = delete;
 
-  using CompressionStrategy::Compress;
-  using CompressionStrategy::CompressWithoutHeader;
-
-  void Compress(buffer_t* buffer, const char* raw, size_t raw_size) override {
-    CompressAt(buffer, 1, raw, raw_size);
-    (*buffer)[0] = static_cast<char>(ZSTD_MAGICLESS);
-  }
-
-  void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
-    CompressAt(buffer, 0, raw, raw_size);
-  }
-
-  std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
+  std::string Decompress(const char* data, const size_t size) const override { return DoDecompress(data, size); }
 
   static std::string DoDecompress(const char* data, const size_t size) {
-    return DoDecompressWithoutHeader(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  }
-
-  static std::string DoDecompressWithoutHeader(const char* data, const size_t size) {
     return ZstdCompressionStrategy::DoDecompressWithPrefix(FramePrefix(), data, size);
   }
+
+  [[nodiscard]] CompressionAlgorithm GetCompressionAlgorithm() const override { return ZSTD_MAGICLESS; }
 
   [[nodiscard]] std::string name() const override { return "zstd_magicless"; }
 
@@ -232,12 +202,7 @@ struct ZstdMagiclessCompressionStrategy final : public CompressionStrategy {
 
   [[nodiscard]] std::string GetFramePrefix() const override { return FramePrefix(); }
 
- private:
-  int compression_level_;
-  ZSTD_CCtx* cctx_;
-
-  /** Compress into buffer starting at offset, the buffer is resized to offset + compressed size. */
-  void CompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
+  void DoCompress(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) override {
     static constexpr size_t kPrefixSize = 4;
     size_t output_length = ZSTD_compressBound(raw_size);
     buffer->resize(output_length + offset);
@@ -262,6 +227,10 @@ struct ZstdMagiclessCompressionStrategy final : public CompressionStrategy {
     std::memmove(frame, frame + kPrefixSize, output_length - kPrefixSize);
     buffer->resize(offset + output_length - kPrefixSize);
   }
+
+ private:
+  int compression_level_;
+  ZSTD_CCtx* cctx_;
 };
 
 } /* namespace compression */

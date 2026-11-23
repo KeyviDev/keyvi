@@ -56,28 +56,21 @@ struct ZstdDictCompressionStrategy final : public CompressionStrategy {
   ZstdDictCompressionStrategy(ZstdDictCompressionStrategy&&) = delete;
   ZstdDictCompressionStrategy& operator=(ZstdDictCompressionStrategy&&) = delete;
 
-  using CompressionStrategy::Compress;
-  using CompressionStrategy::CompressWithoutHeader;
+  void DoCompress(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) override {
+    size_t output_length = ZSTD_compressBound(raw_size);
+    buffer->resize(output_length + offset);
 
-  void Compress(buffer_t* buffer, const char* raw, size_t raw_size) override {
-    CompressAt(buffer, 1, raw, raw_size);
-    (*buffer)[0] = static_cast<char>(ZSTD_DICT_COMPRESSION);
-  }
-
-  void CompressWithoutHeader(buffer_t* buffer, const char* raw, size_t raw_size) override {
-    CompressAt(buffer, 0, raw, raw_size);
-  }
-
-  std::string Decompress(const char* data, const size_t size) override {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    if (size == 0 || static_cast<unsigned char>(data[0]) != ZSTD_DICT_COMPRESSION) {
-      throw std::invalid_argument("zstd dict decompression failed: not zstd dictionary compressed data");
+    output_length = ZSTD_compress_usingCDict(cctx_, buffer->data() + offset, output_length, raw, raw_size, cdict_);
+    if (ZSTD_isError(output_length) != 0U) {  // GCOVR_EXCL_BR_LINE
+      // GCOVR_EXCL_START
+      throw std::runtime_error(std::string("zstd dict compression failed: ") + ZSTD_getErrorName(output_length));
+      // GCOVR_EXCL_STOP
     }
-    return DecompressWithoutHeader(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    buffer->resize(output_length + offset);
   }
 
-  /** Decompress data written by CompressWithoutHeader. */
-  std::string DecompressWithoutHeader(const char* data, const size_t size) const {
+  std::string Decompress(const char* data, const size_t size) const override {
     // unsigned long long: the sentinel values do not fit into size_t on 32 bit platforms
     const unsigned long long content_size = ZSTD_getFrameContentSize(data, size);  // NOLINT(runtime/int)
     if (content_size == ZSTD_CONTENTSIZE_UNKNOWN || content_size == ZSTD_CONTENTSIZE_ERROR) {
@@ -100,26 +93,13 @@ struct ZstdDictCompressionStrategy final : public CompressionStrategy {
     return uncompressed;
   }
 
+  [[nodiscard]] CompressionAlgorithm GetCompressionAlgorithm() const override { return ZSTD_DICT_COMPRESSION; }
+
   [[nodiscard]] std::string name() const override { return "zstd_dict"; }
 
   [[nodiscard]] uint64_t GetFileVersionMin() const override { return 4; }
 
  private:
-  /** Compress into buffer starting at offset, the buffer is resized to offset + compressed size. */
-  void CompressAt(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) {
-    size_t output_length = ZSTD_compressBound(raw_size);
-    buffer->resize(output_length + offset);
-
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    output_length = ZSTD_compress_usingCDict(cctx_, buffer->data() + offset, output_length, raw, raw_size, cdict_);
-    if (ZSTD_isError(output_length) != 0U) {  // GCOVR_EXCL_BR_LINE
-      // GCOVR_EXCL_START
-      throw std::runtime_error(std::string("zstd dict compression failed: ") + ZSTD_getErrorName(output_length));
-      // GCOVR_EXCL_STOP
-    }
-    buffer->resize(output_length + offset);
-  }
-
   // ZSTD_free* functions accept nullptr
   void Cleanup() {
     ZSTD_freeCCtx(cctx_);

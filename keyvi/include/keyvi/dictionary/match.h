@@ -214,9 +214,7 @@ struct Match {
       }
 
       // decompress
-      const compression::decompress_func_t decompressor =
-          compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(raw_value_[0]));
-      std::string msgpacked_value = decompressor(raw_value_.data(), raw_value_.size());
+      std::string msgpacked_value = compression::decompress(raw_value_.data(), raw_value_.size());
 
       if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
         return msgpacked_value;
@@ -225,7 +223,7 @@ struct Match {
       compression::CompressionStrategy* const compressor =
           compression::cached_compression_strategy_by_code(compression_algorithm);
 
-      return compressor->CompressWithoutHeader(msgpacked_value);
+      return compressor->Compress(msgpacked_value);
     }
 
     return fsa_->GetMsgPackedValueAsString(state_, compression_algorithm);

@@ -114,7 +114,7 @@ class NullValueStoreReader final : public IValueStoreReader {
       return "\xc0";
     }
 
-    return compression::cached_compression_strategy_by_code(compression_algorithm)->CompressWithoutHeader("\xc0");
+    return compression::cached_compression_strategy_by_code(compression_algorithm)->Compress("\xc0");
   }
 };
 

@@ -115,7 +115,7 @@ class IntValueStoreReader final : public IValueStoreReader {
   std::string GetRawValueAsString(uint64_t fsa_value) const override {
     // TODO(hendrik): replace with std::format once we have C++20
     return compression::cached_compression_strategy_by_code(compression::CompressionAlgorithm::NO_COMPRESSION)
-        ->Compress(keyvi::util::ValueToMsgPack(fsa_value));
+        ->CompressWithCode(keyvi::util::ValueToMsgPack(fsa_value));
   }
 
   std::string GetMsgPackedValueAsString(uint64_t fsa_value,
@@ -126,7 +126,7 @@ class IntValueStoreReader final : public IValueStoreReader {
     }
 
     return compression::cached_compression_strategy_by_code(compression_algorithm)
-        ->CompressWithoutHeader(keyvi::util::ValueToMsgPack(fsa_value));
+        ->Compress(keyvi::util::ValueToMsgPack(fsa_value));
   }
 };
 

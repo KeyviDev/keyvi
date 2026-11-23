@@ -121,6 +121,11 @@ mod tests {
         let mut value_uncompressed_zlib: Vec<u8> = Vec::new();
         let _ = zlib_decoder.read_to_end(&mut value_uncompressed_zlib);
         assert_eq!(value_uncompressed_zlib, vec![146, 12, 13]);
+
+        // not supported, returns an empty value
+        assert!(m
+            .get_msgpacked_value_compressed(keyvi::Compression::ZSTD_DICT_COMPRESSION)
+            .is_empty());
     }
 
     #[test]

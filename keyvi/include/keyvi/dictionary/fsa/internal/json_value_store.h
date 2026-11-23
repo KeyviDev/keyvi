@@ -40,6 +40,7 @@
 #include <boost/lexical_cast.hpp>
 
 #include "keyvi/compression/compression_selector.h"
+#include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/dictionary_properties.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
@@ -139,12 +140,13 @@ class JsonValueStore final : public JsonValueStoreMinimizationBase {
 
     compressor_.reset(compression::compression_strategy(compressor));
     raw_compressor_.reset(compression::compression_strategy("raw"));
-    // This is beyond ugly, but needed for EncodeJsonValue :(
-    long_compress_ = std::bind(static_cast<compression::compress_mem_fn_t>(&compression::CompressionStrategy::Compress),
-                               compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-    short_compress_ =
-        std::bind(static_cast<compression::compress_mem_fn_t>(&compression::CompressionStrategy::Compress),
-                  raw_compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    long_compress_ = [compressor = compressor_.get()](compression::buffer_t* buffer, const char* raw, size_t raw_size) {
+      compressor->CompressWithCode(buffer, raw, raw_size);
+    };
+    short_compress_ = [compressor = raw_compressor_.get()](compression::buffer_t* buffer, const char* raw,
+                                                           size_t raw_size) {
+      compressor->CompressWithCode(buffer, raw, raw_size);
+    };
   }
 
   /**
@@ -387,9 +389,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
     }
 
     // decompress
-    const compression::decompress_func_t decompressor =
-        compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(value_ptr[0]));
-    std::string msgpacked_value = decompressor(value_ptr, value_size);
+    std::string msgpacked_value = compression::decompress(value_ptr, value_size);
 
     if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
       return msgpacked_value;
@@ -398,7 +398,7 @@ class JsonValueStoreReader final : public IValueStoreReader {
     compression::CompressionStrategy* const compressor =
         compression::cached_compression_strategy_by_code(compression_algorithm);
 
-    return compressor->CompressWithoutHeader(msgpacked_value);
+    return compressor->Compress(msgpacked_value);
   }
 
   std::string GetValueAsString(uint64_t fsa_value) const override {

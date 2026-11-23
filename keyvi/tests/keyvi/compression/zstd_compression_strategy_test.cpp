@@ -35,10 +35,10 @@ BOOST_AUTO_TEST_CASE(SimpleCompressAndUncompress) {
   std::unique_ptr<CompressionStrategy> cs;
   cs.reset(compression_strategy("zstd"));
 
-  auto compressed = cs->Compress(input);
+  auto compressed = cs->CompressWithCode(input);
   BOOST_CHECK(compressed.size() < strlen(input));
 
-  auto uncompressed = cs->Decompress(compressed.data(), compressed.size());
+  auto uncompressed = cs->DecompressWithCode(compressed.data(), compressed.size());
   BOOST_CHECK_EQUAL(input, uncompressed);
 }
 
@@ -56,10 +56,9 @@ BOOST_AUTO_TEST_CASE(SameOutputAsZstdCompress) {
       std::vector<char> expected(ZSTD_compressBound(input.size()));
       expected.resize(ZSTD_compress(expected.data(), expected.size(), input.data(), input.size(), ZSTD_DEFAULT_CLEVEL));
 
-      const std::string compressed = strategy.CompressWithoutHeader(input);
+      const std::string compressed = strategy.Compress(input);
       BOOST_CHECK_EQUAL(std::string(expected.data(), expected.size()), compressed);
-      BOOST_CHECK_EQUAL(input,
-                        ZstdCompressionStrategy::DoDecompressWithoutHeader(compressed.data(), compressed.size()));
+      BOOST_CHECK_EQUAL(input, ZstdCompressionStrategy::DoDecompress(compressed.data(), compressed.size()));
     }
   }
 }

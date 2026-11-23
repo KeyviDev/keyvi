@@ -200,7 +200,14 @@ keyvi_bytes keyvi_match_get_msgpacked_value_compressed(const struct keyvi_match*
     return empty_keyvi_bytes;
   }
 
-  const std::string compressed_value = match->obj_->GetMsgPackedValueAsString(compression);
+  std::string compressed_value;
+  try {
+    compressed_value = match->obj_->GetMsgPackedValueAsString(compression);
+  } catch (const std::exception& e) {
+    // e.g. an unsupported compression, exceptions must not cross the C API
+    std::cerr << e.what() << '\n';
+    return empty_keyvi_bytes;
+  }
 
   const size_t data_size = compressed_value.size();
   if (0 == data_size) {

@@ -67,27 +67,24 @@ inline CompressionStrategy* compression_strategy(const std::string& name = "") {
 }
 
 using decompress_func_t = std::string (*)(const char*, const size_t);
-using compress_mem_fn_t = void (CompressionStrategy::*)(buffer_t*, const char*, size_t);
 
+/**
+ * Returns a decompression function for data that does _not_ start with the compression code,
+ * e.g. for value stores that store the compression once instead of per value.
+ */
 inline decompress_func_t decompressor_by_code(const CompressionAlgorithm algorithm) {
   switch (algorithm) {
     case NO_COMPRESSION:
-      TRACE("unpack uncompressed string");
       return RawCompressionStrategy::DoDecompress;
     case ZLIB_COMPRESSION:
-      TRACE("unpack zlib compressed string");
       return ZlibCompressionStrategy::DoDecompress;
     case ZLIB_DEFLATE:
-      TRACE("unpack zlib deflate compressed string");
       return ZlibDeflateCompressionStrategy::DoDecompress;
     case SNAPPY_COMPRESSION:
-      TRACE("unpack snappy compressed string");
       return SnappyCompressionStrategy::DoDecompress;
     case ZSTD_COMPRESSION:
-      TRACE("unpack zstd compressed string");
       return ZstdCompressionStrategy::DoDecompress;
     case ZSTD_MAGICLESS:
-      TRACE("unpack zstd magicless compressed string");
       return ZstdMagiclessCompressionStrategy::DoDecompress;
     case ZSTD_DICT_COMPRESSION:
       throw std::invalid_argument(
@@ -98,31 +95,14 @@ inline decompress_func_t decompressor_by_code(const CompressionAlgorithm algorit
   }
 }
 
-/**
- * Returns a decompression function for data that does _not_ start with the compression code,
- * e.g. for value stores that store the compression once instead of per value.
- */
-inline decompress_func_t decompressor_without_header_by_code(const CompressionAlgorithm algorithm) {
-  switch (algorithm) {
-    case NO_COMPRESSION:
-      return RawCompressionStrategy::DoDecompressWithoutHeader;
-    case ZLIB_COMPRESSION:
-      return ZlibCompressionStrategy::DoDecompressWithoutHeader;
-    case ZLIB_DEFLATE:
-      return ZlibDeflateCompressionStrategy::DoDecompressWithoutHeader;
-    case SNAPPY_COMPRESSION:
-      return SnappyCompressionStrategy::DoDecompressWithoutHeader;
-    case ZSTD_COMPRESSION:
-      return ZstdCompressionStrategy::DoDecompressWithoutHeader;
-    case ZSTD_MAGICLESS:
-      return ZstdMagiclessCompressionStrategy::DoDecompressWithoutHeader;
-    case ZSTD_DICT_COMPRESSION:
-      throw std::invalid_argument(
-          "zstd dictionary compression requires the dictionary, use ZstdDictCompressionStrategy");
-    default:
-      throw std::invalid_argument("Invalid compression algorithm " +
-                                  boost::lexical_cast<std::string>(static_cast<int>(algorithm)));
+/** Decompresses data that starts with the compression code, e.g. a value written by
+ * CompressionStrategy::CompressWithCode(). */
+inline std::string decompress(const char* data, const size_t size) {
+  if (size == 0) {
+    throw std::invalid_argument("can not decompress empty data, compression code missing");
   }
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  return decompressor_by_code(static_cast<CompressionAlgorithm>(data[0]))(data + 1, size - 1);
 }
 
 /**

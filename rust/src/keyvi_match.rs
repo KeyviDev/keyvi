@@ -96,7 +96,8 @@ impl KeyviMatch {
     /// Return the raw value as a compressed MessagePack-encoded byte vector.
     ///
     /// Available compression algorithms (from [`Compression`](crate::Compression)):
-    /// `NO_COMPRESSION`, `ZLIB_COMPRESSION`, `SNAPPY_COMPRESSION`, `ZSTD_COMPRESSION`.
+    /// `NO_COMPRESSION`, `ZLIB_COMPRESSION`, `SNAPPY_COMPRESSION`, `ZSTD_COMPRESSION`, `ZLIB_DEFLATE`,
+    /// `ZSTD_MAGICLESS`. `ZSTD_DICT_COMPRESSION` is not supported and returns an empty vector.
     pub fn get_msgpacked_value_compressed(
         &self,
         compression_algorithm: root::keyvi::compression::CompressionAlgorithm,
