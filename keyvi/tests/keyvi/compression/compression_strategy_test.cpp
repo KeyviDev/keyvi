@@ -275,6 +275,8 @@ BOOST_AUTO_TEST_CASE(CachedCompressionStrategy) {
   BOOST_CHECK_THROW(cached_compression_strategy_by_code(ZSTD_DICT_COMPRESSION), std::invalid_argument);
   // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange): invalid on purpose
   BOOST_CHECK_THROW(cached_compression_strategy_by_code(static_cast<CompressionAlgorithm>(42)), std::invalid_argument);
+  // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange): invalid on purpose, within the cache size
+  BOOST_CHECK_THROW(cached_compression_strategy_by_code(static_cast<CompressionAlgorithm>(7)), std::invalid_argument);
   // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange): invalid on purpose
   BOOST_CHECK_THROW(cached_compression_strategy_by_code(static_cast<CompressionAlgorithm>(-1)), std::invalid_argument);
 }

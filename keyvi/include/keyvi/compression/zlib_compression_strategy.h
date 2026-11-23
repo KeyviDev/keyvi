@@ -78,9 +78,10 @@ struct BasicZlibCompressionStrategy final : public CompressionStrategy {
     // see zlib.h level 9 means more speed for the price of memory
     const int mem_level = 9;
 
-    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, Format::kWindowBits, mem_level,
-                     Z_DEFAULT_STRATEGY) != Z_OK) {
-      throw std::bad_alloc();
+    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, Format::kWindowBits,
+                     mem_level,                      // GCOVR_EXCL_BR_LINE
+                     Z_DEFAULT_STRATEGY) != Z_OK) {  // GCOVR_EXCL_BR_LINE
+      throw std::bad_alloc();                        // GCOVR_EXCL_LINE
     }
   }
 
@@ -134,8 +135,8 @@ struct BasicZlibCompressionStrategy final : public CompressionStrategy {
     z_stream zs;  // z_stream is zlib's control structure
     memset(&zs, 0, sizeof(zs));
 
-    if (inflateInit2(&zs, Format::kWindowBits) != Z_OK) {
-      throw(std::runtime_error("inflateInit failed while decompressing."));
+    if (inflateInit2(&zs, Format::kWindowBits) != Z_OK) {                    // GCOVR_EXCL_BR_LINE
+      throw(std::runtime_error("inflateInit failed while decompressing."));  // GCOVR_EXCL_LINE
     }
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
