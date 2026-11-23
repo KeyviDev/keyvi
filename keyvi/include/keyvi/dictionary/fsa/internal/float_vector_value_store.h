@@ -187,7 +187,7 @@ class FloatVectorValueStore final : public FloatVectorValueStoreMinimizationBase
     values_extern_->Write(stream, values_buffer_size_);
   }
 
-  uint64_t GetFileVersionMin() const { return compressor_->GetFileVersionMin(); }
+  [[nodiscard]] uint64_t GetFileVersionMin() const { return compressor_->GetFileVersionMin(); }
 
  private:
   std::unique_ptr<compression::CompressionStrategy> compressor_;
@@ -228,7 +228,7 @@ class FloatVectorValueStoreMergeBase {
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
   /** values are copied together with their compression, so the highest version of the inputs is required */
-  uint64_t GetFileVersionMin() const { return file_version_min_; }
+  [[nodiscard]] uint64_t GetFileVersionMin() const { return file_version_min_; }
 
   static value_store_t GetValueStoreType() { return value_store_t::FLOAT_VECTOR; }
 

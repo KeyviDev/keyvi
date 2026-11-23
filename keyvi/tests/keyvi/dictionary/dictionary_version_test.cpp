@@ -65,14 +65,14 @@ BOOST_AUTO_TEST_CASE(CheckVersionsByCompression) {
   check_dictionary_version_with_compression("zstd", 3);
 }
 
-static std::string temp_file_name() {
+namespace {
+std::string temp_file_name() {
   boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
   temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionaryversion-%%%%-%%%%-%%%%-%%%%");
   return temp_path.string();
 }
 
-static void check_float_vector_dictionary_version_with_compression(const std::string& compression,
-                                                                   uint64_t expected_version) {
+void check_float_vector_dictionary_version_with_compression(const std::string& compression, uint64_t expected_version) {
   keyvi::dictionary::DictionaryCompiler<dictionary_type_t::FLOAT_VECTOR> compiler(
       {{"memory_limit_mb", "10"}, {"compression", compression}, {"compression_threshold", "0"}, {"vector_size", "3"}});
 
@@ -97,6 +97,7 @@ static void check_float_vector_dictionary_version_with_compression(const std::st
 
   BOOST_CHECK(std::remove(file_name.c_str()) == 0);
 }
+}  // namespace
 
 BOOST_AUTO_TEST_CASE(CheckFloatVectorVersionsByCompression) {
   check_float_vector_dictionary_version_with_compression("raw", 2);
