@@ -178,9 +178,8 @@ struct ZstdCompressionStrategy final : public CompressionStrategy {
 /**
  * zstd without the 4 byte magic number at the start of every frame.
  *
- * Not selectable via the "compression" parameter (compression_strategy(name)), used internally by value stores that
- * store the compression once (JsonValueStore2). To decompress with a standard zstd decoder, prepend the magic number
- * (0x28 0xb5 0x2f 0xfd).
+ * Not selectable via the "compression" parameter (compression_strategy(name)). To decompress with a standard zstd
+ * decoder, prepend the magic number (0x28 0xb5 0x2f 0xfd).
  */
 struct ZstdMagiclessCompressionStrategy final : public CompressionStrategy {
   explicit ZstdMagiclessCompressionStrategy(int compression_level = ZSTD_DEFAULT_CLEVEL)

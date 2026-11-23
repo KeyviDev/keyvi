@@ -27,8 +27,8 @@ enum CompressionAlgorithm {
   SNAPPY_COMPRESSION = 2,
   ZSTD_COMPRESSION = 3,
   ZSTD_DICT_COMPRESSION = 4,
-  ZLIB_DEFLATE = 5,    //!< raw deflate: zlib without header and checksum, used internally by JsonValueStore2
-  ZSTD_MAGICLESS = 6,  //!< zstd without the 4 byte magic number, used internally by JsonValueStore2
+  ZLIB_DEFLATE = 5,    //!< raw deflate: zlib without header and checksum
+  ZSTD_MAGICLESS = 6,  //!< zstd without the 4 byte magic number
 };
 
 } /* namespace compression */

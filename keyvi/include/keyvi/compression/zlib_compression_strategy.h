@@ -56,8 +56,7 @@ struct ZlibFormat {
 /**
  * raw deflate format: no header and no checksum, saves 6 bytes compared to zlib.
  *
- * Not selectable via the "compression" parameter (compression_strategy(name)), used internally by value stores that
- * store the compression once (JsonValueStore2).
+ * Not selectable via the "compression" parameter (compression_strategy(name)).
  */
 struct ZlibDeflateFormat {
   static constexpr int kWindowBits = -MAX_WBITS;
