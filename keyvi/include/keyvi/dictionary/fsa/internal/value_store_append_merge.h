@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <fstream>
+#include <ios>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -34,10 +35,9 @@
 
 #include "keyvi/dictionary/fsa/internal/value_store_properties.h"
 
-namespace keyvi {
-namespace dictionary {
-namespace fsa {
-namespace internal {
+namespace keyvi::dictionary::fsa::internal {
+
+constexpr size_t kCopyValueStorePayloadBufferSize = static_cast<size_t>(64) * 1024;
 
 /**
  * Copies the value store payload of a dictionary file to stream (used by append merges).
@@ -51,27 +51,24 @@ inline void CopyValueStorePayload(const std::string& filename, const ValueStoreP
   if (!in_stream.good()) {
     throw std::invalid_argument("can not open dictionary file: " + filename);
   }
-  in_stream.seekg(properties.GetOffset());
+  in_stream.seekg(static_cast<std::streamoff>(properties.GetOffset()));
   if (!in_stream.good()) {
     throw std::invalid_argument("file is corrupt(truncated): " + filename);
   }
 
-  std::vector<char> buffer(64 * 1024);
+  std::vector<char> buffer(kCopyValueStorePayloadBufferSize);
   size_t remaining = properties.GetSize();
   while (remaining > 0) {
     const size_t chunk_size = std::min(remaining, buffer.size());
-    in_stream.read(buffer.data(), chunk_size);
+    in_stream.read(buffer.data(), static_cast<std::streamsize>(chunk_size));
     if (static_cast<size_t>(in_stream.gcount()) != chunk_size) {
       throw std::invalid_argument("file is corrupt(truncated): " + filename);
     }
-    stream->write(buffer.data(), chunk_size);
+    stream->write(buffer.data(), static_cast<std::streamsize>(chunk_size));
     remaining -= chunk_size;
   }
 }
 
-} /* namespace internal */
-} /* namespace fsa */
-} /* namespace dictionary */
-} /* namespace keyvi */
+}  // namespace keyvi::dictionary::fsa::internal
 
 #endif  // KEYVI_DICTIONARY_FSA_INTERNAL_VALUE_STORE_APPEND_MERGE_H_
