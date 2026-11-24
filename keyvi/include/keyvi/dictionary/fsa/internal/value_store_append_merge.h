@@ -52,9 +52,6 @@ inline void CopyValueStorePayload(const std::string& filename, const ValueStoreP
     throw std::invalid_argument("can not open dictionary file: " + filename);
   }
   in_stream.seekg(static_cast<std::streamoff>(properties.GetOffset()));
-  if (!in_stream.good()) {
-    throw std::invalid_argument("file is corrupt(truncated): " + filename);
-  }
 
   std::vector<char> buffer(kCopyValueStorePayloadBufferSize);
   size_t remaining = properties.GetSize();
