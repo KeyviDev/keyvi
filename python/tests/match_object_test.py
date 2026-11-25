@@ -6,6 +6,7 @@ import warnings
 import zlib
 
 import msgpack
+import pytest
 import snappy
 import zstd
 from keyvi.compiler import (
@@ -163,6 +164,30 @@ def test_get_value():
         ) == {"a": 3}
         assert msgpack.loads(
             m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.NO_COMPRESSION)
+        ) == {"a": 3}
+
+
+@pytest.mark.skipif(
+    not hasattr(keyvi.CompressionAlgorithm, "ZSTD_MAGICLESS"),
+    reason="header-less compression is only supported by the pybind11 bindings",
+)
+def test_get_value_headerless_compression():
+    c = JsonDictionaryCompiler({"memory_limit_mb": "10"})
+    c.add("abd", '{"a" : 3}')
+    with tmp_dictionary(c, "match_object_json_headerless.kv") as d:
+        m = d["abd"]
+        assert msgpack.loads(
+            zlib.decompress(
+                m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.ZLIB_DEFLATE),
+                wbits=-zlib.MAX_WBITS,
+            )
+        ) == {"a": 3}
+        # zstd without the magic number, prepend it to decode with a standard zstd decoder
+        assert msgpack.loads(
+            zstd.decompress(
+                b"\x28\xb5\x2f\xfd"
+                + m.msgpacked_value_as_string(keyvi.CompressionAlgorithm.ZSTD_MAGICLESS)
+            )
         ) == {"a": 3}
 
 

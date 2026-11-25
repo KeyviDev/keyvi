@@ -30,7 +30,28 @@ extern crate cmake;
 use std::env;
 use std::path::PathBuf;
 
+use bindgen::callbacks::{EnumVariantCustomBehavior, EnumVariantValue, ParseCallbacks};
 use cmake::Config;
+
+/// Hides enum variants that are not usable from Rust.
+#[derive(Debug)]
+struct HideUnsupportedVariants;
+
+impl ParseCallbacks for HideUnsupportedVariants {
+    fn enum_variant_behavior(
+        &self,
+        _enum_name: Option<&str>,
+        original_variant_name: &str,
+        _variant_value: EnumVariantValue,
+    ) -> Option<EnumVariantCustomBehavior> {
+        // zstd dictionary compression requires a dictionary, it can not be used to re-compress a value
+        if original_variant_name == "ZSTD_DICT_COMPRESSION" {
+            Some(EnumVariantCustomBehavior::Hide)
+        } else {
+            None
+        }
+    }
+}
 
 fn main() {
     let dst = Config::new("keyvi_core/").build_target("keyvi_c").build();
@@ -53,6 +74,7 @@ fn main() {
         .enable_cxx_namespaces()
         .layout_tests(true)
         .rustified_enum("keyvi::compression::CompressionAlgorithm")
+        .parse_callbacks(Box::new(HideUnsupportedVariants))
         .rustified_enum("keyvi::dictionary::loading_strategy_types")
         .allowlist_function("keyvi_bytes_destroy")
         .allowlist_function("keyvi_string_destroy")

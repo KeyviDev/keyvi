@@ -25,8 +25,11 @@
 #ifndef KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_
 #define KEYVI_COMPRESSION_COMPRESSION_STRATEGY_H_
 
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -42,40 +45,70 @@ using buffer_t = std::vector<char>;
 /**
  * The base class of every compression strategy.
  *
- * All strategies (aside from RawCompressionStrategy) should insert the
- * compression code (see above) as the first character of the encoded string.
- * The code will also have to be taken into account in the decompress method.
+ * Compress() and Decompress() work on the plain compressed data. CompressWithCode() and DecompressWithCode()
+ * additionally write and check the compression code as first character, e.g. for values that are stored with
+ * their compression. Strategies implement DoCompress() and Decompress() only, the compression code is handled here.
  */
 struct CompressionStrategy {
   virtual ~CompressionStrategy() = default;
 
-  virtual void Compress(buffer_t* buffer, const char* raw, size_t raw_size) = 0;
+  /**
+   * Compress into buffer starting at offset, without the compression code, the buffer is resized to
+   * offset + compressed size.
+   */
+  virtual void DoCompress(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) = 0;
 
-  inline std::string Compress(const std::string& raw) { return Compress(raw.data(), raw.size()); }
+  /** The compression code, written as first character by CompressWithCode(). */
+  [[nodiscard]] virtual CompressionAlgorithm GetCompressionAlgorithm() const = 0;
 
-  inline std::string Compress(const char* raw, size_t raw_size) {
+  /** Compress without the compression code. */
+  void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, 0, raw, raw_size); }
+
+  std::string Compress(const std::string& raw) { return Compress(raw.data(), raw.size()); }
+
+  std::string Compress(const char* raw, size_t raw_size) {
     buffer_t buf;
     Compress(&buf, raw, raw_size);
-    return std::string(buf.data(), buf.size());
+    return {buf.data(), buf.size()};
   }
 
-  inline std::string CompressWithoutHeader(const std::string& raw) {
+  /** Compress and write the compression code as first character. */
+  void CompressWithCode(buffer_t* buffer, const char* raw, size_t raw_size) {
+    DoCompress(buffer, 1, raw, raw_size);
+    (*buffer)[0] = static_cast<char>(GetCompressionAlgorithm());
+  }
+
+  std::string CompressWithCode(const std::string& raw) { return CompressWithCode(raw.data(), raw.size()); }
+
+  std::string CompressWithCode(const char* raw, size_t raw_size) {
     buffer_t buf;
-    Compress(&buf, raw.data(), raw.size());
-    return std::string(buf.data() + 1, buf.size() - 1);
+    CompressWithCode(&buf, raw, raw_size);
+    return {buf.data(), buf.size()};
   }
 
-  /**
-   * By the time this function is called, the length field added in Compress()
-   * will have been removed.
-   */
-  virtual std::string Decompress(const char* data, const size_t size) = 0;
+  /** Decompress data written by Compress(). */
+  virtual std::string Decompress(const char* data, const size_t size) const = 0;
+
+  /** Decompress data written by CompressWithCode(), checks and removes the compression code. */
+  std::string DecompressWithCode(const char* data, const size_t size) const {
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    if (size == 0 || static_cast<unsigned char>(data[0]) != GetCompressionAlgorithm()) {
+      throw std::invalid_argument(name() + " decompression failed: unexpected compression code");
+    }
+    return Decompress(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+  }
 
   /** The "name" of the compression strategy. */
-  virtual std::string name() const = 0;
+  [[nodiscard]] virtual std::string name() const = 0;
 
   /** The minimum version this compressor requires */
-  virtual uint64_t GetFileVersionMin() const = 0;
+  [[nodiscard]] virtual uint64_t GetFileVersionMin() const = 0;
+
+  /**
+   * Bytes the compressor leaves out at the start of every compressed value which are needed by a standard decoder,
+   * e.g. the magic number of zstd. Empty if the output is a complete stream.
+   */
+  [[nodiscard]] virtual std::string GetFramePrefix() const { return {}; }
 };
 
 using compression_strategy_t = std::unique_ptr<CompressionStrategy>;
@@ -85,23 +118,21 @@ using compression_strategy_t = std::unique_ptr<CompressionStrategy>;
  * the length field.
  */
 struct RawCompressionStrategy final : public CompressionStrategy {
-  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
-
-  static inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
-    buffer->resize(raw_size + 1);
-    buffer->data()[0] = static_cast<char>(NO_COMPRESSION);
-    std::memcpy(buffer->data() + 1, raw, raw_size);
+  void DoCompress(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) override {
+    buffer->resize(raw_size + offset);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    std::memcpy(buffer->data() + offset, raw, raw_size);
   }
 
-  std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
+  std::string Decompress(const char* data, const size_t size) const override { return DoDecompress(data, size); }
 
-  static std::string DoDecompress(const char* data, const size_t size) {
-    return {data + 1, size - 1};  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  }
+  static std::string DoDecompress(const char* data, const size_t size) { return {data, size}; }
 
-  std::string name() const { return "raw"; }
+  [[nodiscard]] CompressionAlgorithm GetCompressionAlgorithm() const override { return NO_COMPRESSION; }
 
-  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
+  [[nodiscard]] std::string name() const override { return "raw"; }
+
+  [[nodiscard]] uint64_t GetFileVersionMin() const override { return KEYVI_FILE_VERSION_MIN; }
 };
 
 } /* namespace compression */

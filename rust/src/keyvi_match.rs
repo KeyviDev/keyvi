@@ -96,7 +96,9 @@ impl KeyviMatch {
     /// Return the raw value as a compressed MessagePack-encoded byte vector.
     ///
     /// Available compression algorithms (from [`Compression`](crate::Compression)):
-    /// `NO_COMPRESSION`, `ZLIB_COMPRESSION`, `SNAPPY_COMPRESSION`, `ZSTD_COMPRESSION`.
+    /// `NO_COMPRESSION`, `ZLIB_COMPRESSION`, `SNAPPY_COMPRESSION`, `ZSTD_COMPRESSION`, `ZLIB_DEFLATE`,
+    /// `ZSTD_MAGICLESS`. Prepend the zstd magic number (0x28 0xb5 0x2f 0xfd) to decode `ZSTD_MAGICLESS` with a
+    /// standard zstd decoder, `ZLIB_DEFLATE` is a raw deflate stream.
     pub fn get_msgpacked_value_compressed(
         &self,
         compression_algorithm: root::keyvi::compression::CompressionAlgorithm,

@@ -17,6 +17,8 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
@@ -33,11 +35,32 @@ BOOST_AUTO_TEST_CASE(SimpleCompressAndUncompress) {
   std::unique_ptr<CompressionStrategy> cs;
   cs.reset(compression_strategy("zstd"));
 
-  auto compressed = cs->Compress(input);
+  auto compressed = cs->CompressWithCode(input);
   BOOST_CHECK(compressed.size() < strlen(input));
 
-  auto uncompressed = cs->Decompress(compressed.data(), compressed.size());
+  auto uncompressed = cs->DecompressWithCode(compressed.data(), compressed.size());
   BOOST_CHECK_EQUAL(input, uncompressed);
+}
+
+BOOST_AUTO_TEST_CASE(SameOutputAsZstdCompress) {
+  // the strategy reuses its compression context, the output must be identical to the one-shot ZSTD_compress
+  ZstdCompressionStrategy strategy;
+  std::string large;
+  for (int i = 0; i < 20000; ++i) {
+    large += std::to_string(i * 7919 % 1000) + ",";
+  }
+
+  for (int round = 0; round < 2; ++round) {
+    for (const std::string& input : {std::string(), std::string("a"), std::string(100000, 'x'), large,
+                                     std::string("the quick brown fox jumps over the lazy dog")}) {
+      std::vector<char> expected(ZSTD_compressBound(input.size()));
+      expected.resize(ZSTD_compress(expected.data(), expected.size(), input.data(), input.size(), ZSTD_DEFAULT_CLEVEL));
+
+      const std::string compressed = strategy.Compress(input);
+      BOOST_CHECK_EQUAL(std::string(expected.data(), expected.size()), compressed);
+      BOOST_CHECK_EQUAL(input, ZstdCompressionStrategy::DoDecompress(compressed.data(), compressed.size()));
+    }
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

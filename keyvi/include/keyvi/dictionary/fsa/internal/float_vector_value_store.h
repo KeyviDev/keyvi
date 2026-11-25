@@ -18,12 +18,15 @@
 #ifndef KEYVI_DICTIONARY_FSA_INTERNAL_FLOAT_VECTOR_VALUE_STORE_H_
 #define KEYVI_DICTIONARY_FSA_INTERNAL_FLOAT_VECTOR_VALUE_STORE_H_
 
+#include <algorithm>
 #include <array>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "keyvi/compression/compression_selector.h"
+#include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/dictionary_properties.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
@@ -132,8 +135,9 @@ class FloatVectorValueStore final : public FloatVectorValueStoreMinimizationBase
     minimize_ = keyvi::util::mapGetBool(parameters, MINIMIZATION_KEY, true);
 
     compressor_.reset(compression::compression_strategy(compressor));
-    compress_ = std::bind(static_cast<compression::compress_mem_fn_t>(&compression::CompressionStrategy::Compress),
-                          compressor_.get(), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    compress_ = [compressor = compressor_.get()](compression::buffer_t* buffer, const char* raw, size_t raw_size) {
+      compressor->CompressWithCode(buffer, raw, raw_size);
+    };
   }
 
   uint64_t AddValue(const value_t& value, bool* no_minimization) {
@@ -184,6 +188,8 @@ class FloatVectorValueStore final : public FloatVectorValueStoreMinimizationBase
     values_extern_->Write(stream, values_buffer_size_);
   }
 
+  [[nodiscard]] uint64_t GetFileVersionMin() const { return compressor_->GetFileVersionMin(); }
+
  private:
   std::unique_ptr<compression::CompressionStrategy> compressor_;
   std::function<void(compression::buffer_t*, const char*, size_t)> compress_;
@@ -222,7 +228,8 @@ class FloatVectorValueStoreMergeBase {
 
   uint32_t GetMergeWeight(uint64_t fsa_value) { return 0; }
 
-  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
+  /** values are copied together with their compression, so the highest version of the inputs is required */
+  [[nodiscard]] uint64_t GetFileVersionMin() const { return file_version_min_; }
 
   static value_store_t GetValueStoreType() { return value_store_t::FLOAT_VECTOR; }
 
@@ -230,6 +237,11 @@ class FloatVectorValueStoreMergeBase {
   size_t number_of_values_ = 0;
   size_t number_of_unique_values_ = 0;
   size_t values_buffer_size_ = 0;
+  uint64_t file_version_min_ = KEYVI_FILE_VERSION_MIN;
+
+  void AddInputFileVersion(const DictionaryProperties& properties) {
+    file_version_min_ = std::max(file_version_min_, properties.GetVersion());
+  }
 };
 
 class FloatVectorValueStoreMerge final : public FloatVectorValueStoreMergeBase {
@@ -253,6 +265,10 @@ class FloatVectorValueStoreMerge final : public FloatVectorValueStoreMergeBase {
 
     values_extern_.reset(
         new MemoryMapManager(external_memory_chunk_size, temporary_directory_, "floatvector_values_filebuffer"));
+
+    for (const auto& file_name : inputFiles) {
+      AddInputFileVersion(DictionaryProperties::FromFile(file_name));
+    }
   }
 
   ~FloatVectorValueStoreMerge() { boost::filesystem::remove_all(temporary_directory_); }
@@ -323,6 +339,7 @@ class FloatVectorValueStoreAppendMerge final : public FloatVectorValueStoreMerge
       number_of_values_ += properties_.back().GetValueStoreProperties().GetNumberOfValues();
       number_of_unique_values_ += properties_.back().GetValueStoreProperties().GetNumberOfUniqueValues();
       values_buffer_size_ += properties_.back().GetValueStoreProperties().GetSize();
+      AddInputFileVersion(properties_.back());
     }
   }
 
@@ -408,19 +425,17 @@ class FloatVectorValueStoreReader final : public IValueStoreReader {
     }
 
     // decompress
-    const compression::decompress_func_t decompressor =
-        compression::decompressor_by_code(static_cast<compression::CompressionAlgorithm>(value_ptr[0]));
-    std::string msgpacked_value = decompressor(value_ptr, value_size);
+    std::string msgpacked_value = compression::decompress(value_ptr, value_size);
 
     if (compression_algorithm == compression::CompressionAlgorithm::NO_COMPRESSION) {
       return msgpacked_value;
     }
 
     // compress
-    const compression::compression_strategy_t compressor =
-        compression::compression_strategy_by_code(compression_algorithm);
+    compression::CompressionStrategy* const compressor =
+        compression::cached_compression_strategy_by_code(compression_algorithm);
 
-    return compressor->CompressWithoutHeader(msgpacked_value);
+    return compressor->Compress(msgpacked_value);
   }
 
   void CheckCompatibility(const IValueStoreReader& other) override {

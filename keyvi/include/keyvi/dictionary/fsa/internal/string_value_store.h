@@ -32,6 +32,8 @@
 #include <boost/functional/hash.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include "keyvi/compression/compression_algorithm.h"
+#include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/dictionary_properties.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
@@ -290,8 +292,9 @@ class StringValueStoreReader final : public IValueStoreReader {
 
   std::string GetRawValueAsString(uint64_t fsa_value) const override {
     // TODO(hendrik): replace with std::format once we have C++20
-    return compression::compression_strategy_by_code(compression::CompressionAlgorithm::NO_COMPRESSION)
-        ->Compress(keyvi::util::ValueToMsgPack(std::string(strings_ + fsa_value)));
+    return compression::cached_compression_strategy_by_code(compression::CompressionAlgorithm::NO_COMPRESSION)
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        ->CompressWithCode(keyvi::util::ValueToMsgPack(std::string(strings_ + fsa_value)));
   }
 
   std::string GetMsgPackedValueAsString(uint64_t fsa_value,
@@ -306,10 +309,10 @@ class StringValueStoreReader final : public IValueStoreReader {
     }
 
     // compress
-    const compression::compression_strategy_t compressor =
-        compression::compression_strategy_by_code(compression_algorithm);
+    compression::CompressionStrategy* const compressor =
+        compression::cached_compression_strategy_by_code(compression_algorithm);
 
-    return compressor->CompressWithoutHeader(msgpacked_value);
+    return compressor->Compress(msgpacked_value);
   }
 
  private:

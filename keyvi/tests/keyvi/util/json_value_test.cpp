@@ -115,6 +115,20 @@ BOOST_AUTO_TEST_CASE(EncodeDecodeFloats) {
   BOOST_CHECK(encoded.size() > encoded_single_precision_float.size());
 }
 
+BOOST_AUTO_TEST_CASE(EncodeDecodeShortValue) {
+  // values below the compression threshold are not compressed
+  const std::string input = R"({"a":1})";
+  const std::string encoded = EncodeJsonValue(input);
+  BOOST_REQUIRE(!encoded.empty());
+  BOOST_CHECK_EQUAL(compression::NO_COMPRESSION, encoded[0]);
+  BOOST_CHECK_EQUAL(input, DecodeJsonValue(encoded.data(), encoded.size()));
+
+  const std::string long_input = R"({"a":")" + std::string(100, 'x') + R"("})";
+  const std::string long_encoded = EncodeJsonValue(long_input);
+  BOOST_CHECK_EQUAL(compression::SNAPPY_COMPRESSION, long_encoded[0]);
+  BOOST_CHECK_EQUAL(long_input, DecodeJsonValue(long_encoded.data(), long_encoded.size()));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } /* namespace util */

@@ -11,7 +11,7 @@ extern crate keyvi;
 mod tests {
     use std::io::Read;
 
-    use flate2::read::ZlibDecoder;
+    use flate2::read::{DeflateDecoder, ZlibDecoder};
     use rand::rng;
     use rand::RngExt;
     use rayon::prelude::*;
@@ -121,6 +121,20 @@ mod tests {
         let mut value_uncompressed_zlib: Vec<u8> = Vec::new();
         let _ = zlib_decoder.read_to_end(&mut value_uncompressed_zlib);
         assert_eq!(value_uncompressed_zlib, vec![146, 12, 13]);
+
+        let value_compressed_deflate =
+            m.get_msgpacked_value_compressed(keyvi::Compression::ZLIB_DEFLATE);
+        let mut deflate_decoder = DeflateDecoder::new(value_compressed_deflate.as_slice());
+        let mut value_uncompressed_deflate: Vec<u8> = Vec::new();
+        let _ = deflate_decoder.read_to_end(&mut value_uncompressed_deflate);
+        assert_eq!(value_uncompressed_deflate, vec![146, 12, 13]);
+
+        let mut value_compressed_magicless = vec![0x28, 0xb5, 0x2f, 0xfd];
+        value_compressed_magicless
+            .extend(m.get_msgpacked_value_compressed(keyvi::Compression::ZSTD_MAGICLESS));
+        let value_uncompressed_magicless: Vec<u8> =
+            zstd::decode_all(value_compressed_magicless.as_slice()).unwrap();
+        assert_eq!(value_uncompressed_magicless, vec![146, 12, 13]);
     }
 
     #[test]

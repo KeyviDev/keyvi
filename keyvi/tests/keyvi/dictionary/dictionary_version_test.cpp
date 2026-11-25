@@ -24,11 +24,13 @@
  */
 
 #include <string>
+#include <vector>
 
 #include <boost/test/unit_test.hpp>
 
 #include "keyvi/dictionary/dictionary.h"
 #include "keyvi/dictionary/dictionary_compiler.h"
+#include "keyvi/dictionary/dictionary_merger.h"
 #include "keyvi/dictionary/dictionary_types.h"
 
 namespace keyvi {
@@ -61,6 +63,47 @@ BOOST_AUTO_TEST_CASE(CheckVersionsByCompression) {
   check_dictionary_version_with_compression("zlib", 2);
   check_dictionary_version_with_compression("snappy", 2);
   check_dictionary_version_with_compression("zstd", 3);
+}
+
+namespace {
+std::string temp_file_name() {
+  boost::filesystem::path temp_path = boost::filesystem::temp_directory_path();
+  temp_path /= boost::filesystem::unique_path("dictionary-unit-test-dictionaryversion-%%%%-%%%%-%%%%-%%%%");
+  return temp_path.string();
+}
+
+void check_float_vector_dictionary_version_with_compression(const std::string& compression, uint64_t expected_version) {
+  keyvi::dictionary::DictionaryCompiler<dictionary_type_t::FLOAT_VECTOR> compiler(
+      {{"memory_limit_mb", "10"}, {"compression", compression}, {"compression_threshold", "0"}, {"vector_size", "3"}});
+
+  for (size_t i = 0; i < 10; ++i) {
+    compiler.Add("key-" + std::to_string(i), std::vector<float>{0.1F * static_cast<float>(i), 0.2F, 0.3F});
+  }
+  compiler.Compile();
+
+  const std::string file_name = temp_file_name();
+  compiler.WriteToFile(file_name);
+  BOOST_CHECK_EQUAL(expected_version, Dictionary(file_name).GetVersion());
+
+  // values are copied with their compression on merge, the version is kept
+  for (const std::string merge_mode : {"", "append"}) {
+    DictionaryMerger<dictionary_type_t::FLOAT_VECTOR> merger({{"memory_limit_mb", "10"}, {"merge_mode", merge_mode}});
+    merger.Add(file_name);
+    const std::string merged_file_name = temp_file_name();
+    merger.Merge(merged_file_name);
+    BOOST_CHECK_EQUAL(expected_version, Dictionary(merged_file_name).GetVersion());
+    BOOST_CHECK(std::remove(merged_file_name.c_str()) == 0);
+  }
+
+  BOOST_CHECK(std::remove(file_name.c_str()) == 0);
+}
+}  // namespace
+
+BOOST_AUTO_TEST_CASE(CheckFloatVectorVersionsByCompression) {
+  check_float_vector_dictionary_version_with_compression("raw", 2);
+  check_float_vector_dictionary_version_with_compression("zlib", 2);
+  check_float_vector_dictionary_version_with_compression("snappy", 2);
+  check_float_vector_dictionary_version_with_compression("zstd", 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "keyvi/compression/compression_algorithm.h"
+#include "keyvi/compression/compression_selector.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 #include "keyvi/dictionary/fsa/internal/ivalue_store.h"
 #include "keyvi/dictionary/fsa/internal/value_store_types.h"
@@ -112,7 +114,7 @@ class NullValueStoreReader final : public IValueStoreReader {
       return "\xc0";
     }
 
-    return compression::compression_strategy_by_code(compression_algorithm)->CompressWithoutHeader("\xc0");
+    return compression::cached_compression_strategy_by_code(compression_algorithm)->Compress("\xc0");
   }
 };
 

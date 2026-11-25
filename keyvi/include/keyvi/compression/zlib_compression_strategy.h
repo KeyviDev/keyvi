@@ -27,11 +27,15 @@
 
 #define ZLIB_CONST
 
+#include <zconf.h>
 #include <zlib.h>
+#include <cstddef>
+#include <cstdint>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 
@@ -41,9 +45,30 @@
 namespace keyvi {
 namespace compression {
 
-/** A compression strategy that wraps zlib. */
-struct ZlibCompressionStrategy final : public CompressionStrategy {
-  explicit ZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION) {
+/** zlib format: deflate with a 2 byte header and an adler32 checksum (4 bytes) */
+struct ZlibFormat {
+  static constexpr int kWindowBits = MAX_WBITS;
+  static constexpr CompressionAlgorithm kAlgorithm = ZLIB_COMPRESSION;
+  static constexpr const char* kName = "zlib";
+  static constexpr uint64_t kFileVersionMin = KEYVI_FILE_VERSION_MIN;
+};
+
+/**
+ * raw deflate format: no header and no checksum, saves 6 bytes compared to zlib.
+ *
+ * Not selectable via the "compression" parameter (compression_strategy(name)).
+ */
+struct ZlibDeflateFormat {
+  static constexpr int kWindowBits = -MAX_WBITS;
+  static constexpr CompressionAlgorithm kAlgorithm = ZLIB_DEFLATE;
+  static constexpr const char* kName = "zlib_deflate";
+  static constexpr uint64_t kFileVersionMin = 4;
+};
+
+/** A compression strategy that wraps zlib, Format selects the stream format (zlib or raw deflate). */
+template <typename Format>
+struct BasicZlibCompressionStrategy final : public CompressionStrategy {
+  explicit BasicZlibCompressionStrategy(int compression_level = Z_BEST_COMPRESSION) {
     // init zlib structure for compression
 
     zstream_compress_.zalloc = Z_NULL;
@@ -53,33 +78,37 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     // see zlib.h level 9 means more speed for the price of memory
     const int mem_level = 9;
 
-    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, MAX_WBITS, mem_level, Z_DEFAULT_STRATEGY) !=
-        Z_OK) {
-      throw std::bad_alloc();
+    if (deflateInit2(&zstream_compress_, compression_level, Z_DEFLATED, Format::kWindowBits,
+                     mem_level,                      // GCOVR_EXCL_BR_LINE
+                     Z_DEFAULT_STRATEGY) != Z_OK) {  // GCOVR_EXCL_BR_LINE
+      throw std::bad_alloc();                        // GCOVR_EXCL_LINE
     }
   }
 
-  ~ZlibCompressionStrategy() { deflateEnd(&zstream_compress_); }
+  ~BasicZlibCompressionStrategy() override { deflateEnd(&zstream_compress_); }
 
-  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
+  // the zlib stream must not be shared, deflateEnd would be called twice
+  BasicZlibCompressionStrategy(const BasicZlibCompressionStrategy&) = delete;
+  BasicZlibCompressionStrategy& operator=(const BasicZlibCompressionStrategy&) = delete;
+  BasicZlibCompressionStrategy(BasicZlibCompressionStrategy&&) = delete;
+  BasicZlibCompressionStrategy& operator=(BasicZlibCompressionStrategy&&) = delete;
 
-  inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
+  void DoCompress(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) override {
     TRACE("Zlib compress length %d", raw_size);
 
     zstream_compress_.next_in = reinterpret_cast<z_const Bytef*>(raw);
     zstream_compress_.avail_in = raw_size;  // set the z_stream's input
     size_t output_length = deflateBound(&zstream_compress_, raw_size);
-    buffer->resize(output_length + 1);
+    buffer->resize(output_length + offset);
 
     TRACE("Zlib compress output length %d", output_length);
-
-    buffer->data()[0] = static_cast<char>(ZLIB_COMPRESSION);
 
     int ret;
 
     // compress bytes
-    zstream_compress_.next_out = reinterpret_cast<Bytef*>(buffer->data() + 1);
-    zstream_compress_.avail_out = buffer->size() - 1;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    zstream_compress_.next_out = reinterpret_cast<Bytef*>(buffer->data() + offset);
+    zstream_compress_.avail_out = buffer->size() - offset;
 
     ret = deflate(&zstream_compress_, Z_FINISH);
 
@@ -91,24 +120,28 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
       // msg might be NULL
       oss << "Exception during zlib compression: (" << ret << ") "
           << (zstream_compress_.msg != nullptr ? zstream_compress_.msg : "unknown error");
+      // reset, so that the instance can be reused
+      deflateReset(&zstream_compress_);
       throw(std::runtime_error(oss.str()));
     }
     // GCOVR_EXCL_STOP
     deflateReset(&zstream_compress_);
-    buffer->resize(output_length + 1);
+    buffer->resize(output_length + offset);
   }
 
-  std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
+  std::string Decompress(const char* data, const size_t size) const override { return DoDecompress(data, size); }
 
   static std::string DoDecompress(const char* data, const size_t size) {
     z_stream zs;  // z_stream is zlib's control structure
     memset(&zs, 0, sizeof(zs));
 
-    if (inflateInit(&zs) != Z_OK) throw(std::runtime_error("inflateInit failed while decompressing."));
+    if (inflateInit2(&zs, Format::kWindowBits) != Z_OK) {                    // GCOVR_EXCL_BR_LINE
+      throw(std::runtime_error("inflateInit failed while decompressing."));  // GCOVR_EXCL_LINE
+    }
 
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    zs.next_in = reinterpret_cast<z_const Bytef*>(data) + 1;
-    zs.avail_in = size - 1;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+    zs.next_in = reinterpret_cast<z_const Bytef*>(data);
+    zs.avail_in = size;
 
     int ret;
     char outbuffer[32768];
@@ -139,13 +172,18 @@ struct ZlibCompressionStrategy final : public CompressionStrategy {
     return outstring;
   }
 
-  std::string name() const { return "zlib"; }
+  [[nodiscard]] CompressionAlgorithm GetCompressionAlgorithm() const override { return Format::kAlgorithm; }
 
-  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
+  [[nodiscard]] std::string name() const override { return Format::kName; }
+
+  [[nodiscard]] uint64_t GetFileVersionMin() const override { return Format::kFileVersionMin; }
 
  private:
-  z_stream zstream_compress_;
+  z_stream zstream_compress_{};
 };
+
+using ZlibCompressionStrategy = BasicZlibCompressionStrategy<ZlibFormat>;
+using ZlibDeflateCompressionStrategy = BasicZlibCompressionStrategy<ZlibDeflateFormat>;
 
 } /* namespace compression */
 } /* namespace keyvi */

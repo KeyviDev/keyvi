@@ -26,9 +26,12 @@
 #define KEYVI_COMPRESSION_SNAPPY_COMPRESSION_STRATEGY_H_
 
 #include <snappy.h>
-#include <sstream>
+#include <cstddef>
+#include <cstdint>
+#include <stdexcept>
 #include <string>
 
+#include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/fsa/internal/constants.h"
 
@@ -37,27 +40,29 @@ namespace compression {
 
 /** A compression strategy that wraps snappy. */
 struct SnappyCompressionStrategy final : public CompressionStrategy {
-  inline void Compress(buffer_t* buffer, const char* raw, size_t raw_size) { DoCompress(buffer, raw, raw_size); }
-
-  static inline void DoCompress(buffer_t* buffer, const char* raw, size_t raw_size) {
+  void DoCompress(buffer_t* buffer, size_t offset, const char* raw, size_t raw_size) override {
     size_t output_length = snappy::MaxCompressedLength(raw_size);
-    buffer->resize(output_length + 1);
-    buffer->data()[0] = static_cast<char>(SNAPPY_COMPRESSION);
-    snappy::RawCompress(raw, raw_size, buffer->data() + 1, &output_length);
-    buffer->resize(output_length + 1);
+    buffer->resize(output_length + offset);
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    snappy::RawCompress(raw, raw_size, buffer->data() + offset, &output_length);
+    buffer->resize(output_length + offset);
   }
 
-  std::string Decompress(const char* data, const size_t size) override { return DoDecompress(data, size); }
+  std::string Decompress(const char* data, const size_t size) const override { return DoDecompress(data, size); }
 
   static std::string DoDecompress(const char* data, const size_t size) {
     std::string uncompressed;
-    snappy::Uncompress(data + 1, size - 1, &uncompressed);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    if (!snappy::Uncompress(data, size, &uncompressed)) {
+      throw std::runtime_error("snappy decompression failed: corrupt input");
+    }
     return uncompressed;
   }
 
-  std::string name() const { return "snappy"; }
+  [[nodiscard]] CompressionAlgorithm GetCompressionAlgorithm() const override { return SNAPPY_COMPRESSION; }
 
-  uint64_t GetFileVersionMin() const { return KEYVI_FILE_VERSION_MIN; }
+  [[nodiscard]] std::string name() const override { return "snappy"; }
+
+  [[nodiscard]] uint64_t GetFileVersionMin() const override { return KEYVI_FILE_VERSION_MIN; }
 };
 
 } /* namespace compression */

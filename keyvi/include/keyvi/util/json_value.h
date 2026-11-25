@@ -30,6 +30,8 @@
 
 #include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_selector.h"
+#include "keyvi/compression/compression_strategy.h"
+#include "keyvi/compression/snappy_compression_strategy.h"
 #include "keyvi/util/msgpack_util.h"
 #include "msgpack.hpp"
 #include "msgpack/v3/unpack.hpp"
@@ -64,8 +66,7 @@ inline std::string DecodeJsonValue(const char* data, const size_t size) {
     return MsgpackToJson(data + 1, size - 1);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
   }
 
-  const compression::decompress_func_t decompressor = compression::decompressor_by_code(algorithm);
-  const std::string decompressed = decompressor(data, size);
+  const std::string decompressed = compression::decompress(data, size);
   return MsgpackToJson(decompressed.data(), decompressed.size());
 }
 
@@ -97,10 +98,14 @@ inline std::string EncodeJsonValue(const std::string& raw_value, bool single_pre
   msgpack::sbuffer msgpack_buffer;
   compression::buffer_t buffer;
 
-  EncodeJsonValue(static_cast<void (*)(compression::buffer_t*, const char*, size_t)>(
-                      &compression::SnappyCompressionStrategy::DoCompress),
-                  static_cast<void (*)(compression::buffer_t*, const char*, size_t)>(
-                      &compression::RawCompressionStrategy::DoCompress),
+  compression::SnappyCompressionStrategy snappy_compressor;
+  compression::RawCompressionStrategy raw_compressor;
+
+  EncodeJsonValue([&snappy_compressor](compression::buffer_t* out, const char* data,
+                                       size_t data_size) { snappy_compressor.CompressWithCode(out, data, data_size); },
+                  [&raw_compressor](compression::buffer_t* out, const char* data, size_t data_size) {
+                    raw_compressor.CompressWithCode(out, data, data_size);
+                  },
                   &msgpack_buffer, &buffer, raw_value, single_precision_float, compression_threshold);
   return std::string(reinterpret_cast<char*>(buffer.data()), buffer.size());
 }

@@ -24,10 +24,12 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "keyvi/compression/compression_algorithm.h"
 #include "keyvi/compression/compression_selector.h"
+#include "keyvi/compression/compression_strategy.h"
 #include "keyvi/dictionary/util/endian.h"
 
 // #define ENABLE_TRACING
@@ -37,10 +39,7 @@ namespace keyvi {
 namespace util {
 
 inline std::vector<float> DecodeFloatVector(const char* data, const size_t size) {
-  const auto algorithm = static_cast<compression::CompressionAlgorithm>(
-      data[0]);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-  compression::decompress_func_t decompressor = compression::decompressor_by_code(algorithm);
-  std::string unompressed_string_value = decompressor(data, size);
+  const std::string unompressed_string_value = compression::decompress(data, size);
 
   const size_t vector_size = unompressed_string_value.size() / sizeof(uint32_t);
   std::vector<float> float_vector(vector_size);
@@ -96,9 +95,11 @@ inline std::string EncodeFloatVector(std::vector<float> value, size_t size) {
   std::vector<uint32_t> helper_buffer(size);
   compression::buffer_t compression_buffer;
 
-  EncodeFloatVector(static_cast<void (*)(compression::buffer_t*, const char*, size_t)>(
-                        &compression::RawCompressionStrategy::DoCompress),
-                    &helper_buffer, &compression_buffer, value);
+  compression::RawCompressionStrategy raw_compressor;
+
+  EncodeFloatVector([&raw_compressor](compression::buffer_t* out, const char* data,
+                                      size_t data_size) { raw_compressor.CompressWithCode(out, data, data_size); },
+                    &helper_buffer, &compression_buffer, std::move(value));
   return std::string(reinterpret_cast<char*>(compression_buffer.data()), compression_buffer.size());
 }
 
